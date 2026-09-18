@@ -1,0 +1,14 @@
+D:\PROJECT\DB하이텍\gitlab\101_ServerBin\DACrux.TEST.DSL.dll
+D:\PROJECT\DB하이텍\gitlab\101_ServerBin\DACrux.TEST.DSL.pdb
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.TEST.DSL\obj\Debug\DACrux.TEST.DSL.csproj.AssemblyReference.cache
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.TEST.DSL\obj\Debug\DACrux.TEST.DSL.csproj.CoreCompileInputs.cache
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.TEST.DSL\obj\Debug\DACrux.T.3A9952F1.Up2Date
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.TEST.DSL\obj\Debug\DACrux.TEST.DSL.dll
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.TEST.DSL\obj\Debug\DACrux.TEST.DSL.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\101_ServerBin\DACrux.TEST.DSL.dll
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\101_ServerBin\DACrux.TEST.DSL.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.DSL\obj\Debug\DACrux.TEST.DSL.csproj.AssemblyReference.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.DSL\obj\Debug\DACrux.TEST.DSL.csproj.CoreCompileInputs.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.DSL\obj\Debug\DACrux.T.3A9952F1.Up2Date
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.DSL\obj\Debug\DACrux.TEST.DSL.dll
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.DSL\obj\Debug\DACrux.TEST.DSL.pdb

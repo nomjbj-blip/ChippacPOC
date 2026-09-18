@@ -1,0 +1,936 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Data;
+using Oracle.ManagedDataAccess.Client;
+using System.Text;
+
+namespace FabTwoToMigrationTools.Source
+{
+    public class FabTwoToDM : BaseInfo, IDisposable
+    {
+        private readonly string UserID = "udb";
+        private readonly string Password = "udb";
+        private readonly string DataSource = "FAB2TODMS";
+        private OracleConnection oConnection = null;
+
+        public OracleConnection Connection { get { return oConnection; } set { oConnection = value; } }
+        public OracleTransaction Transaction { get; set; }
+
+        public FabTwoToDM(
+            )
+        {
+            base.UserID = this.UserID;
+            base.Password = this.Password;
+            base.DataSource = this.DataSource;
+            oConnection = base.DbOpen();
+        }
+
+        public FabTwoToDM(
+            string userid,
+            string password,
+            string connectionname
+            )
+        {
+            base.UserID = userid;
+            base.Password = password;
+            base.DataSource = connectionname;
+            oConnection = base.DbOpen();
+        }
+
+        public DataTable GetLot(
+            DateTime dStartDate,
+            DateTime dEndDate
+            )
+        {
+            Dictionary<string, Parameter> dicParams = null;
+            StringBuilder sQuery = new StringBuilder();
+            sQuery.AppendLine(" SELECT LOT_ID,   ");
+            sQuery.AppendLine("        DEVICE,   ");
+            sQuery.AppendLine("        WAFER_ID,   ");
+            sQuery.AppendLine("        WAFER_KEY,   ");
+            sQuery.AppendLine("        INSPECTION_FILENAME, ");
+            sQuery.AppendLine("        TO_CHAR(INSPECTION_TIME, 'YYYYMMDDHH24MISS') AS \"INSPECTION_TIME\", ");
+            sQuery.AppendLine("        '' AS \"COMMENT\"  ");
+            sQuery.AppendLine("   FROM INSP_WAFER_SUMMARY   ");
+            sQuery.AppendLine("  WHERE 1 = 1                ");
+            sQuery.AppendLine("    AND INSPECTION_TIME >= TO_DATE(:STARTDATE, 'YYYYMMDDHH24MISS')  ");
+            sQuery.AppendLine("    AND INSPECTION_TIME < TO_DATE(:ENDDATE, 'YYYYMMDDHH24MISS')     ");
+            //sQuery.AppendLine("    AND LOT_ID = '193855' ");
+            //sQuery.AppendLine("    AND WAFER_ID = '@07' ");
+            //sQuery.AppendLine("    AND INSPECTION_FILENAME = '0326120041.001' ");
+            sQuery.AppendLine("  ORDER BY LOT_ID     ");
+
+            //--
+
+            dicParams = new Dictionary<string, Parameter>();
+            #region [ Setting Parameter ]
+            Parameter p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = string.Format("{0}000000", dStartDate.ToString(Constract.DEFAULT_DATE_STRING));
+            dicParams.Add("STARTDATE", p);
+
+            //--
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = string.Format("{0}000000", dEndDate.ToString(Constract.DEFAULT_DATE_STRING));
+            dicParams.Add("ENDDATE", p);
+            #endregion [ Setting Parameter ]
+
+            //--
+
+            DataTable dt = base.ExecuteQuery(
+                oConnection,
+                Constract.FUNCATION_NAME_LOT,
+                sQuery.ToString(),
+                dicParams
+                );
+
+            return dt;
+        }
+
+        public DataTable GetWafer(
+            DwResultValue rv
+            )
+        {
+            Dictionary<string, Parameter> dicParams = null;
+            StringBuilder sQuery = new StringBuilder();
+            sQuery.AppendLine(" SELECT DISTINCT WAFER_KEY AS \"WAFER_KEY\",  ");
+            sQuery.AppendLine("        WAFER_ID, ");
+            sQuery.AppendLine("        SLOT_ID ");
+            sQuery.AppendLine("   FROM INSP_WAFER_SUMMARY  ");
+            sQuery.AppendLine("  WHERE 1 = 1               ");
+            sQuery.AppendLine("    AND INSPECTION_TIME = TO_DATE(:inspdatetime, 'YYYYMMDDHH24MISS') ");
+            sQuery.AppendLine("    AND WAFER_KEY = :waferkey ");
+
+            //--
+
+            dicParams = new Dictionary<string, Parameter>();
+            #region [ Setting Parameter ]
+            Parameter p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = rv.InspDateTime;
+            dicParams.Add("inspdatetime", p);
+
+            p = new Parameter();
+            p.Type = DbType.Int64;
+            p.Value = rv.WaferKey;
+            dicParams.Add("waferkey", p);
+
+            #endregion [ Setting Parameter ]
+
+            //--
+
+            DataTable dt = base.ExecuteQuery(
+                oConnection,
+                Constract.FUNCATION_NAME_WAFER,
+                sQuery.ToString(),
+                dicParams
+                );
+
+            return dt;
+        }
+
+        public DataTable GetProduct(
+            DwResultValue rv
+            )
+        {
+            Dictionary<string, Parameter> dicParams = null;
+            StringBuilder sQuery = new StringBuilder();
+            sQuery.AppendLine(" SELECT T1.DEVICE AS \"PRODUCT\", ");
+            sQuery.AppendLine("        'FAB2' AS \"FACILITY\", ");
+            sQuery.AppendLine("        T1.TECHNOLOGY, ");
+            sQuery.AppendLine("        T1.INSPECTED_DIE AS \"NETDIE\", ");
+            sQuery.AppendLine("        T2.WAFER_SIZE AS \"WAFER_SIZE\", ");
+            sQuery.AppendLine("        0 AS \"ANGLE\", ");
+            sQuery.AppendLine("        'N' AS \"NOTCH_TYPE\", ");
+            sQuery.AppendLine("        T2.DIE_SIZE_X AS \"DIE_PITCH_X\", ");
+            sQuery.AppendLine("        T2.DIE_SIZE_Y AS \"DIE_PITCH_Y\", ");
+            sQuery.AppendLine("        T2.ORIGIN_INDEX_X AS \"DIE_ORIGIN_X\", ");
+            sQuery.AppendLine("        T2.ORIGIN_INDEX_Y AS \"DIE_ORIGIN_Y\", ");
+            sQuery.AppendLine("        CASE WHEN T2.ROTATION_ANGLE = '0' THEN T1.CENTER_X - T1.ORIGIN_X ");
+            sQuery.AppendLine("             WHEN T2.ROTATION_ANGLE = '90' THEN T2.DIE_SIZE_X + (T1.CENTER_X - T1.ORIGIN_X) ");
+            sQuery.AppendLine("             WHEN T2.ROTATION_ANGLE = '180' THEN T1.CENTER_X - T1.ORIGIN_X ");
+            sQuery.AppendLine("             WHEN T2.ROTATION_ANGLE = '270' THEN T1.CENTER_X - T1.ORIGIN_X END AS \"ORIGIN_X\", -- SAMPLE CENTER LOCATION X ");
+            sQuery.AppendLine("        CASE WHEN T2.ROTATION_ANGLE = '0' THEN T1.CENTER_Y - T1.ORIGIN_Y ");
+            sQuery.AppendLine("             WHEN T2.ROTATION_ANGLE = '90' THEN T1.CENTER_Y - T1.ORIGIN_Y ");
+            sQuery.AppendLine("             WHEN T2.ROTATION_ANGLE = '180' THEN T1.CENTER_Y - T1.ORIGIN_Y ");
+            sQuery.AppendLine("             WHEN T2.ROTATION_ANGLE = '270' THEN T2.DIE_SIZE_Y + (T1.CENTER_Y - T1.ORIGIN_Y) END AS \"ORIGIN_Y\", -- SAMPLE CENTER LOCATION Y ");
+            sQuery.AppendLine("        '' AS \"COMMENT\" ");
+            sQuery.AppendLine("   FROM INSP_WAFER_SUMMARY T1, INSP_RECIPE T2 ");
+            sQuery.AppendLine("  WHERE     1 = 1 ");
+            sQuery.AppendLine("        AND T1.RECIPE_KEY = T2.RECIPE_KEY ");
+            sQuery.AppendLine("        AND T1.INSPECTION_TIME = TO_DATE(:inspdatetime, 'YYYYMMDDHH24MISS')  ");
+            sQuery.AppendLine("        AND T1.WAFER_KEY = :waferkey  ");
+
+
+            //--
+            dicParams = new Dictionary<string, Parameter>();
+            #region [ Setting Parameter ]
+            Parameter p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = rv.InspDateTime;
+            dicParams.Add("inspdatetime", p);
+
+            p = new Parameter();
+            p.Type = DbType.Int64;
+            p.Value = rv.WaferKey;
+            dicParams.Add("waferkey", p);
+
+            #endregion [ Setting Parameter ]
+
+            //--
+
+            DataTable dt = base.ExecuteQuery(
+                oConnection,
+                Constract.FUNCATION_NAME_PRODUCT,
+                sQuery.ToString(),
+                dicParams
+                );
+
+            return dt;
+        }
+
+        public DataTable GetSetup(
+            DwResultValue rv
+            )
+        {
+            Dictionary<string, Parameter> dicParams = null;
+            StringBuilder sQuery = new StringBuilder();
+
+            //--
+
+            //sQuery.AppendLine(" SELECT T2.RECIPE_ID AS \"SETUP_ID\", ");
+            //sQuery.AppendLine("        T1.LAYER_ID AS \"STEP_ID\", ");
+            //sQuery.AppendLine("        TO_CHAR(T2.RECIPE_TIME, 'YYYYMMDDHH24MISS') AS \"SETUP_TIME\", ");
+            //sQuery.AppendLine("        '0' AS \"ANGLE\", ");
+            //sQuery.AppendLine("        T2.WAFER_SIZE AS \"WAFER_SIZE\", ");
+            //sQuery.AppendLine("        'F' AS \"NOTCH_TYPE\", ");
+            //sQuery.AppendLine("        T2.DIE_SIZE_X AS \"DIE_PITCH_X\", ");
+            //sQuery.AppendLine("        T2.DIE_SIZE_Y AS \"DIE_PITCH_Y\", ");
+            //sQuery.AppendLine("        T2.ORIGIN_INDEX_X AS \"DIE_ORIGIN_X\", ");
+            //sQuery.AppendLine("        T2.ORIGIN_INDEX_Y AS \"DIE_ORIGIN_Y\", ");
+            //sQuery.AppendLine("        CASE WHEN T2.ROTATION_ANGLE = '0' THEN T1.CENTER_X - T1.ORIGIN_X ");
+            //sQuery.AppendLine("             WHEN T2.ROTATION_ANGLE = '90' THEN T2.DIE_SIZE_X + (T1.CENTER_X - T1.ORIGIN_X) ");
+            //sQuery.AppendLine("             WHEN T2.ROTATION_ANGLE = '180' THEN T1.CENTER_X - T1.ORIGIN_X ");
+            //sQuery.AppendLine("             WHEN T2.ROTATION_ANGLE = '270' THEN T1.CENTER_X - T1.ORIGIN_X END AS \"ORIGIN_X\", -- SAMPLE CENTER LOCATION X ");
+            //sQuery.AppendLine("        CASE WHEN T2.ROTATION_ANGLE = '0' THEN T1.CENTER_Y - T1.ORIGIN_Y ");
+            //sQuery.AppendLine("             WHEN T2.ROTATION_ANGLE = '90' THEN T1.CENTER_Y - T1.ORIGIN_Y ");
+            //sQuery.AppendLine("             WHEN T2.ROTATION_ANGLE = '180' THEN T1.CENTER_Y - T1.ORIGIN_Y ");
+            //sQuery.AppendLine("             WHEN T2.ROTATION_ANGLE = '270' THEN T2.DIE_SIZE_Y + (T1.CENTER_Y - T1.ORIGIN_Y) END AS \"ORIGIN_Y\", -- SAMPLE CENTER LOCATION Y ");
+            //sQuery.AppendLine("        0 AS \"STREET_X\", ");
+            //sQuery.AppendLine("        0 AS \"STREET_Y\" ");
+            //sQuery.AppendLine("   FROM INSP_WAFER_SUMMARY T1, INSP_RECIPE T2 ");
+            //sQuery.AppendLine("  WHERE     1 = 1 ");
+            //sQuery.AppendLine("        AND T1.RECIPE_KEY = T2.RECIPE_KEY ");
+            //sQuery.AppendLine("        AND T1.LOT_ID = :lotid ");
+            //sQuery.AppendLine("        AND T1.DEVICE = :device ");
+            //sQuery.AppendLine("        AND T1.WAFER_ID = :waferid ");
+            //sQuery.AppendLine("        AND T1.INSPECTION_FILENAME = :filename ");
+            //sQuery.AppendLine("        AND T1.INSPECTION_TIME = TO_DATE(:inspdatetime, 'YYYYMMDDHH24MISS')  ");
+
+            //--
+
+            sQuery.AppendLine(" SELECT T1.RECIPE_KEY, ");
+            sQuery.AppendLine("        T2.RECIPE_ID AS \"SETUP_ID\", ");
+            sQuery.AppendLine("        T1.LAYER_ID AS \"STEP_ID\", ");
+            sQuery.AppendLine("        TO_CHAR(T2.RECIPE_TIME, 'YYYYMMDDHH24MISS') AS \"SETUP_TIME\", ");
+            sQuery.AppendLine("        T2.ROTATION_ANGLE AS \"ANGLE\", ");
+            sQuery.AppendLine("        T2.WAFER_SIZE AS \"WAFER_SIZE\", ");
+            sQuery.AppendLine("        'F' AS \"NOTCH_TYPE\", ");
+            sQuery.AppendLine("        T2.DIE_SIZE_X AS \"DIE_PITCH_X\", ");
+            sQuery.AppendLine("        T2.DIE_SIZE_Y AS \"DIE_PITCH_Y\", ");
+            sQuery.AppendLine("        T2.ORIGIN_INDEX_X AS \"DIE_ORIGIN_X\", ");
+            sQuery.AppendLine("        T2.ORIGIN_INDEX_Y AS \"DIE_ORIGIN_Y\", ");
+            sQuery.AppendLine("        CASE WHEN T2.ROTATION_ANGLE = '0' THEN T1.CENTER_X - T1.ORIGIN_X ");
+            sQuery.AppendLine("             WHEN T2.ROTATION_ANGLE = '90' THEN T2.DIE_SIZE_X + (T1.CENTER_X - T1.ORIGIN_X) ");
+            sQuery.AppendLine("             WHEN T2.ROTATION_ANGLE = '180' THEN T1.CENTER_X - T1.ORIGIN_X ");
+            sQuery.AppendLine("             WHEN T2.ROTATION_ANGLE = '270' THEN T1.CENTER_X - T1.ORIGIN_X ");
+            sQuery.AppendLine("         END AS \"ORIGIN_X\", -- SAMPLE CENTER LOCATION X ");
+            sQuery.AppendLine("        CASE WHEN T2.ROTATION_ANGLE = '0' THEN T1.CENTER_Y - T1.ORIGIN_Y ");
+            sQuery.AppendLine("             WHEN T2.ROTATION_ANGLE = '90' THEN T1.CENTER_Y - T1.ORIGIN_Y ");
+            sQuery.AppendLine("             WHEN T2.ROTATION_ANGLE = '180' THEN T1.CENTER_Y - T1.ORIGIN_Y ");
+            sQuery.AppendLine("             WHEN T2.ROTATION_ANGLE = '270' THEN T2.DIE_SIZE_Y + (T1.CENTER_Y - T1.ORIGIN_Y) ");
+            sQuery.AppendLine("         END AS \"ORIGIN_Y\", -- SAMPLE CENTER LOCATION Y ");
+            sQuery.AppendLine("        0 AS \"STREET_X\", ");
+            sQuery.AppendLine("        0 AS \"STREET_Y\" ");
+            sQuery.AppendLine("   FROM INSP_WAFER_SUMMARY T1, ");
+            sQuery.AppendLine("        (  SELECT T3.RECIPE_KEY, ");
+            sQuery.AppendLine("                  T3.RECIPE_ID, ");
+            sQuery.AppendLine("                  T3.RECIPE_TIME, ");
+            sQuery.AppendLine("                  T3.WAFER_SIZE, ");
+            sQuery.AppendLine("                  T3.ROTATION_ANGLE, ");
+            sQuery.AppendLine("                  T3.DIE_SIZE_X, ");
+            sQuery.AppendLine("                  T3.DIE_SIZE_Y, ");
+            sQuery.AppendLine("                  T3.ORIGIN_INDEX_X - MIN (T4.INDEX_X) + 1 AS \"ORIGIN_INDEX_X\", "); // X 축에 대한 좌표 변경 "1"
+            sQuery.AppendLine("                  T3.ORIGIN_INDEX_Y - MIN (T4.INDEX_Y) + 1 AS \"ORIGIN_INDEX_Y\" "); // Y 축에 대한 좌표 변경 "1"
+            sQuery.AppendLine("             FROM INSP_WAFER_SUMMARY T1, INSP_WAFER_TEST_SUMMARY T2, INSP_RECIPE T3, INSP_REGION T4 ");
+            sQuery.AppendLine("            WHERE 1 = 1 ");
+            sQuery.AppendLine("                  AND T1.INSPECTION_TIME = T2.INSPECTION_TIME ");
+            sQuery.AppendLine("                  AND T1.WAFER_KEY = T2.WAFER_KEY ");
+            sQuery.AppendLine("                  AND T1.RECIPE_KEY = T3.RECIPE_KEY ");
+            sQuery.AppendLine("                  AND T1.RECIPE_KEY = T4.RECIPE_KEY ");
+            sQuery.AppendLine("                  AND T2.TEST_ID = T4.TEST_ID ");
+            sQuery.AppendLine("                  AND T1.INSPECTION_TIME = TO_DATE(:inspdatetime, 'yyyymmddhh24miss') ");
+            sQuery.AppendLine("                  AND T1.WAFER_KEY = :waferkey  ");
+            sQuery.AppendLine("         GROUP BY T3.RECIPE_KEY, ");
+            sQuery.AppendLine("                  T3.RECIPE_ID, ");
+            sQuery.AppendLine("                  T3.RECIPE_TIME, ");
+            sQuery.AppendLine("                  T3.WAFER_SIZE, ");
+            sQuery.AppendLine("                  T3.ROTATION_ANGLE, ");
+            sQuery.AppendLine("                  T3.DIE_SIZE_X, ");
+            sQuery.AppendLine("                  T3.DIE_SIZE_Y, ");
+            sQuery.AppendLine("                  T3.ORIGIN_INDEX_X, ");
+            sQuery.AppendLine("                  T3.ORIGIN_INDEX_Y) T2 ");
+            sQuery.AppendLine("  WHERE     1 = 1 ");
+            sQuery.AppendLine("        AND T1.RECIPE_KEY = T2.RECIPE_KEY ");
+            sQuery.AppendLine("        AND T1.INSPECTION_TIME = TO_DATE(:inspdatetime, 'YYYYMMDDHH24MISS')  ");
+            sQuery.AppendLine("        AND T1.WAFER_KEY = :waferkey ");
+
+
+            dicParams = new Dictionary<string, Parameter>();
+            #region [ Setting Parameter ]
+            Parameter p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = rv.InspDateTime;
+            dicParams.Add("inspdatetime", p);
+
+
+            p = new Parameter();
+            p.Type = DbType.Int64;
+            p.Value = rv.WaferKey;
+            dicParams.Add("waferkey", p);
+
+            #endregion [ Setting Parameter ]
+
+            //--
+
+            DataTable dt = base.ExecuteQuery(
+                oConnection,
+                Constract.FUNCATION_NAME_SETUP,
+                sQuery.ToString(),
+                dicParams
+                );
+
+            return dt;
+        }
+
+        public DataTable GetStep(
+            DwResultValue rv
+            )
+        {
+            Dictionary<string, Parameter> dicParams = null;
+            StringBuilder sQuery = new StringBuilder();
+            sQuery.AppendLine(" SELECT '' AS \"STEP_SEQ\", ");
+            sQuery.AppendLine("        T2.TEST_ID AS \"TEST\", ");
+            sQuery.AppendLine("        '' AS \"WAFER_SEQ\", ");
+            sQuery.AppendLine("        T1.LAYER_ID AS \"STEP_ID\", ");
+            sQuery.AppendLine("        T1.SLOT_ID AS \"SLOT_ID\", ");
+            sQuery.AppendLine("        T1.LOT_ID AS \"RESULT_ID\", ");
+            sQuery.AppendLine("        T1.INSPECT_EQUIP_ID AS \"INSPECTION_EQ\", ");
+            sQuery.AppendLine("        T1.INSPECT_EQUIP_ID AS \"REVIEW_EQ\", ");
+            sQuery.AppendLine("        '' AS \"SETUP_SEQ\", ");
+            sQuery.AppendLine("        TO_CHAR (T1.INSPECTION_TIME, 'YYYYMMDDHH24MISS') AS \"RESULTTIMESTAMP\", ");
+            sQuery.AppendLine("        TO_CHAR (T1.LAST_UPDATE, 'YYYYMMDDHH24MISS') AS \"FILETIMESTAMP\", ");
+            sQuery.AppendLine("        'UNKNOWN' AS \"MAIN_EQ\", ");
+            sQuery.AppendLine("        '' AS \"ROUTE\", ");
+            sQuery.AppendLine("        '' AS \"OPER\", ");
+            sQuery.AppendLine("        TO_CHAR(T1.SCAN_AREA) AS \"SCAN_AREA\", ");
+            sQuery.AppendLine("        T1.DEFECTIVE_DIE, ");
+            sQuery.AppendLine("        T1.DEFECTS, ");
+            sQuery.AppendLine("        T1.IMAGES, ");
+            sQuery.AppendLine("        T2.DEFECT_DENSITY AS \"DEFECT_DD\", ");
+            sQuery.AppendLine("        T1.INSPECTION_FILENAME AS \"INSP_FILENAME\", ");
+            sQuery.AppendLine("        T1.INSPECTION_FILENAME AS \"SERVICE_FILENAME\", ");
+            sQuery.AppendLine("        '' AS \"COMMENT\" ");
+            sQuery.AppendLine("   FROM INSP_WAFER_SUMMARY T1, INSP_WAFER_TEST_SUMMARY T2 ");
+            sQuery.AppendLine("  WHERE     T1.INSPECTION_TIME = T2.INSPECTION_TIME ");
+            sQuery.AppendLine("        AND T1.WAFER_KEY = T2.WAFER_KEY ");
+            sQuery.AppendLine("        AND T1.INSPECTION_TIME = TO_DATE(:inspdatetime, 'YYYYMMDDHH24MISS')  ");
+            sQuery.AppendLine("        AND T1.WAFER_KEY = :waferkey ");
+
+            //--
+
+            dicParams = new Dictionary<string, Parameter>();
+            #region [ Setting Parameter ]
+            Parameter p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = rv.InspDateTime;
+            dicParams.Add("inspdatetime", p);
+
+            //--
+
+            p = new Parameter();
+            p.Type = DbType.Int64;
+            p.Value = rv.WaferKey;
+            dicParams.Add("waferkey", p);
+
+            #endregion [ Setting Parameter ]
+
+            //--
+
+            DataTable dt = base.ExecuteQuery(
+                oConnection,
+                Constract.FUNCATION_NAME_STEP,
+                sQuery.ToString(),
+                dicParams
+                );
+
+            return dt;
+        }
+
+        public DataTable GetInspInfo(
+            DwResultValue rv
+            )
+        {
+            Dictionary<string, Parameter> dicParams = null;
+            StringBuilder sQuery = new StringBuilder();
+            sQuery.AppendLine(" SELECT '' AS \"STEP_SEQ\", ");
+            sQuery.AppendLine("        '' AS \"WAFER_SEQ\", ");
+            sQuery.AppendLine("        TO_CHAR (T1.INSPECTION_TIME, 'YYYYMMDDHH24MISS') AS RESULTTIMESTAMP, ");
+            sQuery.AppendLine("        TO_CHAR (T1.LAST_UPDATE, 'YYYYMMDDHH24MISS') AS FILETIMESTAMP, ");
+            sQuery.AppendLine("        'FAB2' AS \"FACTORY\", ");
+            sQuery.AppendLine("        T1.TECHNOLOGY AS \"TECHNOLOGY\", ");
+            sQuery.AppendLine("        T1.DEVICE AS \"PRODUCT\", ");
+            sQuery.AppendLine("        T1.LOT_ID AS \"LOT_ID\", ");
+            sQuery.AppendLine("        T1.WAFER_ID AS \"WAFER_ID\", ");
+            sQuery.AppendLine("        T1.LAYER_ID AS \"STEP_ID\", ");
+            sQuery.AppendLine("        T2.TEST_ID AS \"TEST\", ");
+            sQuery.AppendLine("        T1.SLOT_ID AS \"SLOT_ID\", ");
+            sQuery.AppendLine("        '' AS \"SETUP_SEQ\", ");
+            sQuery.AppendLine("        TO_CHAR (SYSDATE, 'YYYYMMDDHH24MISS') AS \"STATUS\", ");
+            sQuery.AppendLine("        'UNKNOWN' AS \"MAIN_EQ\", ");
+            sQuery.AppendLine("        '' AS \"ROUTE\", ");
+            sQuery.AppendLine("        '' AS \"OPER\", ");
+            sQuery.AppendLine("        T1.INSPECT_EQUIP_ID AS \"INSPECTION_EQ\", ");
+            sQuery.AppendLine("        DECODE(T1.INSPECTION_PARAMETER, NULL, 'DEFECTID,XREL,YREL,XINDEX,YINDEX,XSIZE,YSIZE,DEFECTAREA,DSIZE,CLASSNUMBER,TEST,CLUSTERNUMBER,ROUGHBINNUMBER,FINEBINNUMBER,REVIEWSAMPLE,IMAGECOUNT,IMAGELIST', T1.INSPECTION_PARAMETER) AS \"INSPECTION_PARAM\", ");
+            sQuery.AppendLine("        T1.DEFECTS, ");
+            sQuery.AppendLine("        T1.CLASSIFIED_DEFECTS, ");
+            sQuery.AppendLine("        '0' AS \"KILLER_DEFECTS\", ");
+            sQuery.AppendLine("        T1.RANDOM_DEFECTS, ");
+            sQuery.AppendLine("        '0' AS \"ADDER_KILLER_DEFECTS\", ");
+            sQuery.AppendLine("        T1.ADDER_RANDOM_DEFECTS, ");
+            sQuery.AppendLine("        T1.CLUSTERS AS \"CLUSTERS\", ");
+            sQuery.AppendLine("        T1.ADDER_CLUSTERS, ");
+            sQuery.AppendLine("        T1.CLUSTER_AREA, ");
+            sQuery.AppendLine("        T2.DEFECT_DENSITY AS \"DEFECT_DD\", ");
+            sQuery.AppendLine("        '' AS \"KILLER_DEFECT_DD\", ");
+            sQuery.AppendLine("        '' AS \"RANDOM_DEFECT_DD\", ");
+            sQuery.AppendLine("        T1.INSPECTED_DIE AS \"INSPECTED_DIE\", ");
+            sQuery.AppendLine("        T1.DEFECTIVE_DIE AS \"DEFECTIVE_DIE\", ");
+            sQuery.AppendLine("        T1.ADDER_DEFECTIVE_DIE AS \"ADDER_DEF_DIE\", ");
+            sQuery.AppendLine("        '0' AS \"KILL_DEF_DIE\", ");
+            sQuery.AppendLine("        '0' AS \"KILL_ADDER_DEF_DIE\", ");
+            sQuery.AppendLine("        T1.IMAGES AS \"IMAGES\", ");
+            sQuery.AppendLine("        TO_CHAR(T1.SCAN_AREA) AS \"SCAN_AREA\", ");
+            sQuery.AppendLine("        T1.ADDER_DEFECTS, ");
+            sQuery.AppendLine("        '0' AS \"KILL_RND_DEFECTS\", ");
+            sQuery.AppendLine("        '' AS \"COMMENT\", ");
+            sQuery.AppendLine("        '' AS \"RETICLE_ID\", ");
+            sQuery.AppendLine("        '' AS \"INTERLOCK_FLAG\", ");
+            sQuery.AppendLine("        '' AS \"STEPPER_EQ\", ");
+            sQuery.AppendLine("        SUMMARY_FLAG AS \"SUMMARY_FLAG\" ");
+            sQuery.AppendLine("   FROM INSP_WAFER_SUMMARY T1, INSP_WAFER_TEST_SUMMARY T2 ");
+            sQuery.AppendLine("  WHERE     T1.INSPECTION_TIME = T2.INSPECTION_TIME ");
+            sQuery.AppendLine("        AND T1.WAFER_KEY = T2.WAFER_KEY ");
+            sQuery.AppendLine("        AND T1.INSPECTION_TIME = TO_DATE(:inspdatetime, 'YYYYMMDDHH24MISS')  ");
+            sQuery.AppendLine("        AND T1.WAFER_KEY = :waferkey ");
+
+            //--
+
+            dicParams = new Dictionary<string, Parameter>();
+            #region [ Setting Parameter ]
+            Parameter p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = rv.InspDateTime;
+            dicParams.Add("inspdatetime", p);
+
+            //--
+
+            p = new Parameter();
+            p.Type = DbType.Int64;
+            p.Value = rv.WaferKey;
+            dicParams.Add("waferkey", p);
+
+            #endregion [ Setting Parameter ]
+
+            //--
+
+            DataTable dt = base.ExecuteQuery(
+                oConnection,
+                Constract.FUNCATION_NAME_INSP_INFO,
+                sQuery.ToString(),
+                dicParams
+                );
+
+            return dt;
+        }
+
+        public DataTable GetSetupMap(
+           DwResultValue rv
+           )
+        {
+            Dictionary<string, Parameter> dicParams = null;
+            StringBuilder sQuery = new StringBuilder();
+
+            //--
+
+            //sQuery.AppendLine(" SELECT T1.RECIPE_KEY AS \"STEP_SEQ\", ");
+            //sQuery.AppendLine("        T2.TEST_ID AS \"TEST\", ");
+            //sQuery.AppendLine("        T2.INDEX_X - T1.ORIGIN_INDEX_X AS \"INDEX_X\", ");
+            //sQuery.AppendLine("        T2.INDEX_Y - T1.ORIGIN_INDEX_Y AS \"INDEX_Y\" ");
+            //sQuery.AppendLine("   FROM (SELECT T2.RECIPE_KEY, ");
+            //sQuery.AppendLine("                T2.WAFER_SIZE, ");
+            //sQuery.AppendLine("                T2.ORIGIN_INDEX_X, ");
+            //sQuery.AppendLine("                T2.ORIGIN_INDEX_Y ");
+            //sQuery.AppendLine("           FROM INSP_WAFER_SUMMARY T1, INSP_RECIPE T2 ");
+            //sQuery.AppendLine("          WHERE 1 = 1 AND T1.RECIPE_KEY = T2.RECIPE_KEY ");
+            //sQuery.AppendLine("            AND T1.LOT_ID = :lotid ");
+            //sQuery.AppendLine("            AND T1.WAFER_ID = :waferid ");
+            //sQuery.AppendLine("            AND T1.DEVICE = :device ");
+            //sQuery.AppendLine("            AND T1.INSPECTION_FILENAME = :filename ");
+            //sQuery.AppendLine("         ) T1, ");
+            //sQuery.AppendLine("        INSP_REGION T2 ");
+            //sQuery.AppendLine("  WHERE 1 = 1 AND T1.RECIPE_KEY = T2.RECIPE_KEY ");
+
+            //--
+
+            //sQuery.AppendLine(" SELECT T1.RECIPE_KEY AS \"SETUP_SEQ\", ");
+            //sQuery.AppendLine("        T2.TEST_ID AS \"TEST\", ");
+            //sQuery.AppendLine("        T2.INDEX_X  AS \"INDEX_X\", ");
+            //sQuery.AppendLine("        T2.INDEX_Y AS \"INDEX_Y\" ");
+            //sQuery.AppendLine("   FROM (SELECT T2.RECIPE_KEY, ");
+            //sQuery.AppendLine("                T2.WAFER_SIZE, ");
+            //sQuery.AppendLine("                T2.ORIGIN_INDEX_X, ");
+            //sQuery.AppendLine("                T2.ORIGIN_INDEX_Y ");
+            //sQuery.AppendLine("           FROM INSP_WAFER_SUMMARY T1, INSP_RECIPE T2 ");
+            //sQuery.AppendLine("          WHERE 1 = 1 AND T1.RECIPE_KEY = T2.RECIPE_KEY ");
+            //sQuery.AppendLine("            AND T1.LOT_ID = :lotid ");
+            //sQuery.AppendLine("            AND T1.WAFER_ID = :waferid ");
+            //sQuery.AppendLine("            AND T1.DEVICE = :device ");
+            //sQuery.AppendLine("            AND T1.INSPECTION_FILENAME = :filename ");
+            //sQuery.AppendLine("            AND T1.INSPECTION_TIME = TO_DATE(:inspdatetime, 'YYYYMMDDHH24MISS')  ");
+            //sQuery.AppendLine("         ) T1, ");
+            //sQuery.AppendLine("        INSP_REGION T2 ");
+            //sQuery.AppendLine("  WHERE 1 = 1 AND T1.RECIPE_KEY = T2.RECIPE_KEY ");
+
+            //--
+
+            sQuery.AppendLine(" SELECT T1.RECIPE_KEY AS \"SETUP_SEQ\", ");
+            sQuery.AppendLine("        T1.TEST_ID AS \"TEST\", ");
+            sQuery.AppendLine("        T2.INDEX_X - T1.DIFF_INDEX_X + 1 AS \"INDEX_X\", ");
+            sQuery.AppendLine("        T2.INDEX_Y - T1.DIFF_INDEX_Y + 1 AS \"INDEX_Y\"  ");
+            sQuery.AppendLine("   FROM (  SELECT T1.RECIPE_KEY, ");
+            sQuery.AppendLine("                  T2.TEST_ID, ");
+            sQuery.AppendLine("                  MIN(T3.INDEX_X) AS DIFF_INDEX_X, ");
+            sQuery.AppendLine("                  MIN(T3.INDEX_Y) AS DIFF_INDEX_Y ");
+            sQuery.AppendLine("             FROM INSP_WAFER_SUMMARY T1, INSP_WAFER_TEST_SUMMARY T2, INSP_REGION T3 ");
+            sQuery.AppendLine("            WHERE     1 = 1 ");
+            sQuery.AppendLine("                  AND T1.INSPECTION_TIME = T2.INSPECTION_TIME ");
+            sQuery.AppendLine("                  AND T1.WAFER_KEY = T2.WAFER_KEY");
+            sQuery.AppendLine("                  AND T1.RECIPE_KEY = T3.RECIPE_KEY ");
+            sQuery.AppendLine("                  AND T2.TEST_ID = T3.TEST_ID ");
+            sQuery.AppendLine("                  AND T1.INSPECTION_TIME = TO_DATE(:inspdatetime, 'YYYYMMDDHH24MISS')  ");
+            sQuery.AppendLine("                  AND T1.WAFER_KEY = :waferkey ");
+            sQuery.AppendLine("         GROUP BY T1.RECIPE_KEY, ");
+            sQuery.AppendLine("                  T2.TEST_ID ");
+            sQuery.AppendLine("        ) T1, ");
+            sQuery.AppendLine("        INSP_REGION T2 ");
+            sQuery.AppendLine("  WHERE 1 = 1 ");
+            sQuery.AppendLine("        AND T1.RECIPE_KEY = T2.RECIPE_KEY ");
+            sQuery.AppendLine("        AND T1.TEST_ID = T2.TEST_ID ");
+
+            //--
+
+            dicParams = new Dictionary<string, Parameter>();
+            #region [ Setting Parameter ]
+            Parameter p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = rv.InspDateTime;
+            dicParams.Add("inspdatetime", p);
+
+            p = new Parameter();
+            p.Type = DbType.Int64;
+            p.Value = rv.WaferKey;
+            dicParams.Add("waferkey", p);
+
+            #endregion [ Setting Parameter ]
+
+            //--
+
+            DataTable dt = base.ExecuteQuery(
+                oConnection,
+                Constract.FUNCATION_NAME_SETUP_MAP,
+                sQuery.ToString(),
+                dicParams
+                );
+
+            return dt;
+        }
+
+        public DataTable GetDefect(
+            DwResultValue rv
+            )
+        {
+            Dictionary<string, Parameter> dicParams = null;
+            StringBuilder sQuery = new StringBuilder();
+
+            //--
+
+            //sQuery.AppendLine("   SELECT '' AS STEP_SEQ, ");
+            //sQuery.AppendLine("          T1.DEFECT_ID, ");
+            //sQuery.AppendLine("          '' AS WAFER_SEQ, ");
+            //sQuery.AppendLine("          T2.DIE_SIZE_X * (T1.INDEX_X - T2.ORIGIN_INDEX_X) + (T1.WAFER_X - (T2.DIE_SIZE_X * T1.INDEX_X)) - T2.ORIGIN_X AS \"X\", ");
+            //sQuery.AppendLine("          T2.DIE_SIZE_Y * (T1.INDEX_Y - T2.ORIGIN_INDEX_Y) + (T1.WAFER_Y - (T2.DIE_SIZE_Y * T1.INDEX_Y)) - T2.ORIGIN_Y AS \"Y\", ");
+            //sQuery.AppendLine("          T1.WAFER_X - (T2.DIE_SIZE_X * T1.INDEX_X) AS \"XREF\", ");
+            //sQuery.AppendLine("          T1.WAFER_Y - (T2.DIE_SIZE_Y * T1.INDEX_Y) AS \"YREF\", ");
+            //sQuery.AppendLine("          T1.INDEX_X - T2.ORIGIN_INDEX_X AS \"XINDEX\", ");
+            //sQuery.AppendLine("          T1.INDEX_Y - T2.ORIGIN_INDEX_Y AS \"YINDEX\", ");
+            //sQuery.AppendLine("          T1.SIZE_X AS \"XSIZE\", ");
+            //sQuery.AppendLine("          T1.SIZE_Y AS \"YSIZE\", ");
+            //sQuery.AppendLine("          T1.AREA AS \"DEFECTAREA\", ");
+            //sQuery.AppendLine("          T1.SIZE_D AS \"DSIZE\", ");
+            //sQuery.AppendLine("          T1.CLASS_NUMBER AS \"CLASSNUMBER\", ");
+            //sQuery.AppendLine("          T1.TEST_ID AS \"TEST\", ");
+            //sQuery.AppendLine("          T1.CLASS_NUMBER AS \"CLUSTERNUMBER\", ");
+            //sQuery.AppendLine("          T1.ROUGH_BIN_CLASS AS \"ROUGHBINCLASS\", ");
+            //sQuery.AppendLine("          '0' AS \"FINEBINNUMBER\", ");
+            //sQuery.AppendLine("          T1.REVIEW_SAMPLE_FLAG AS \"REVIEWSAMPLE\", ");
+            //sQuery.AppendLine("          T1.IMAGES AS \"IMAGECOUNT\", ");
+            //sQuery.AppendLine("          ADDER AS ADDER, ");
+            //sQuery.AppendLine("          REGEXP_SUBSTR (T2.RECIPE_ID, '[^_]+', 1, 2) AS FIRST_STEP, ");
+            //sQuery.AppendLine("          -1 AS RETICLE_REPEAT_ID, ");
+            //sQuery.AppendLine("          -1 AS DIE_REPEAT_ID, ");
+            //sQuery.AppendLine("          T1.MANUAL_OPTICAL_CLASS AS MAN_OPT_CLASS, ");
+            //sQuery.AppendLine("          T1.AUTOMATED_OPTICAL_CLASS AS AUTO_OPT_CLASS, ");
+            //sQuery.AppendLine("          T1.AUTOMATED_OFFLINE_SEM_CLASS AS MAN_SEM_CLASS, ");
+            //sQuery.AppendLine("          T1.AUTOMATED_ONLINE_SEM_CLASS AS AUTO_SEM_CLASS ");
+            //sQuery.AppendLine("     FROM INSP_DEFECT T1, ");
+            //sQuery.AppendLine("          (SELECT T1.INSPECTION_TIME, ");
+            //sQuery.AppendLine("                  T1.WAFER_KEY, ");
+            //sQuery.AppendLine("                  T1.INSPECTION_FILENAME, ");
+            //sQuery.AppendLine("                  T2.RECIPE_KEY, ");
+            //sQuery.AppendLine("                  T2.RECIPE_ID, ");
+            //sQuery.AppendLine("                  T2.DIE_SIZE_X, ");
+            //sQuery.AppendLine("                  T2.DIE_SIZE_Y, ");
+            //sQuery.AppendLine("                  T2.ORIGIN_INDEX_X, ");
+            //sQuery.AppendLine("                  T2.ORIGIN_INDEX_Y, ");
+            //sQuery.AppendLine("                  T2.ORIGIN_DIE_X, ");
+            //sQuery.AppendLine("                  T2.ORIGIN_DIE_Y, ");
+            //sQuery.AppendLine("                  T2.ROTATION_ANGLE, ");
+            //sQuery.AppendLine("                  CASE ");
+            //sQuery.AppendLine("                     WHEN T2.ROTATION_ANGLE IN ('0') THEN T1.CENTER_X - T1.ORIGIN_X ");
+            //sQuery.AppendLine("                     WHEN T2.ROTATION_ANGLE IN ('90') THEN T2.DIE_SIZE_X + (T1.CENTER_Y - T1.ORIGIN_Y) ");
+            //sQuery.AppendLine("                     WHEN T2.ROTATION_ANGLE IN ('180') THEN T1.CENTER_X - T1.ORIGIN_X ");
+            //sQuery.AppendLine("                     WHEN T2.ROTATION_ANGLE IN ('270') THEN T1.CENTER_X - T1.ORIGIN_X ");
+            //sQuery.AppendLine("                  END ");
+            //sQuery.AppendLine("                     AS \"ORIGIN_X\",                 -- SAMPLE CENTER LOCATION X ");
+            //sQuery.AppendLine("                  CASE ");
+            //sQuery.AppendLine("                     WHEN T2.ROTATION_ANGLE IN ('0') THEN T1.CENTER_Y - T1.ORIGIN_Y ");
+            //sQuery.AppendLine("                     WHEN T2.ROTATION_ANGLE IN ('90') THEN T1.CENTER_X - T1.ORIGIN_X ");
+            //sQuery.AppendLine("                     WHEN T2.ROTATION_ANGLE IN ('180') THEN T1.CENTER_Y - T1.ORIGIN_Y ");
+            //sQuery.AppendLine("                     WHEN T2.ROTATION_ANGLE IN ('270') THEN T2.DIE_SIZE_Y + (T1.CENTER_Y - T1.ORIGIN_Y) ");
+            //sQuery.AppendLine("                  END ");
+            //sQuery.AppendLine("                     AS \"ORIGIN_Y\"                  -- SAMPLE CENTER LOCATION X ");
+            //sQuery.AppendLine("             FROM INSP_WAFER_SUMMARY T1, INSP_RECIPE T2 ");
+            //sQuery.AppendLine("            WHERE     1 = 1 ");
+            //sQuery.AppendLine("                  AND T1.RECIPE_KEY = T2.RECIPE_KEY ");
+            //sQuery.AppendLine("                  AND T1.LOT_ID = :lotid ");
+            //sQuery.AppendLine("                  AND T1.DEVICE = :device ");
+            //sQuery.AppendLine("                  AND T1.WAFER_ID = :waferid ");
+            //sQuery.AppendLine("                  AND T1.INSPECTION_FILENAME = :filename ");
+            //sQuery.AppendLine("           ) T2 ");
+            //sQuery.AppendLine("    WHERE     1 = 1 ");
+            //sQuery.AppendLine("          AND T1.INSPECTION_TIME = T2.INSPECTION_TIME ");
+            //sQuery.AppendLine("          AND T1.WAFER_KEY = T2.WAFER_KEY ");
+            //sQuery.AppendLine(" ORDER BY T1.DEFECT_ID ");
+
+            //sQuery.AppendLine("   SELECT '' AS STEP_SEQ, ");
+            //sQuery.AppendLine("          T1.DEFECT_ID, ");
+            //sQuery.AppendLine("          '' AS WAFER_SEQ, ");
+            //sQuery.AppendLine("          (T2.DIE_SIZE_X * T1.INDEX_X) + (T1.WAFER_X - (T2.DIE_SIZE_X * T1.INDEX_X)) - T2.CENTER_X AS \"X\", ");
+            //sQuery.AppendLine("          (T2.DIE_SIZE_Y * T1.INDEX_Y) + (T1.WAFER_Y - (T2.DIE_SIZE_Y * T1.INDEX_Y)) - T2.CENTER_Y AS \"Y\", ");
+            //sQuery.AppendLine("          T1.WAFER_X - (T2.DIE_SIZE_X * T1.INDEX_X) AS \"XREF\", ");
+            //sQuery.AppendLine("          T1.WAFER_Y - (T2.DIE_SIZE_Y * T1.INDEX_Y) AS \"YREF\", ");
+            //sQuery.AppendLine("          T1.INDEX_X - T2.DIFF_INDEX_X AS \"XINDEX\", ");
+            //sQuery.AppendLine("          T1.INDEX_Y - T2.DIFF_INDEX_Y AS \"YINDEX\", ");
+            //sQuery.AppendLine("          T1.SIZE_X AS \"XSIZE\", ");
+            //sQuery.AppendLine("          T1.SIZE_Y AS \"YSIZE\", ");
+            //sQuery.AppendLine("          T1.AREA AS \"DEFECTAREA\", ");
+            //sQuery.AppendLine("          T1.SIZE_D AS \"DSIZE\", ");
+            //sQuery.AppendLine("          T1.CLASS_NUMBER AS \"CLASSNUMBER\", ");
+            //sQuery.AppendLine("          T1.TEST_ID AS \"TEST\", ");
+            //sQuery.AppendLine("          NVL(T1.CLUSTER_ID, 0) AS \"CLUSTERNUMBER\", ");
+            //sQuery.AppendLine("          T1.ROUGH_BIN_CLASS AS \"ROUGHBINCLASS\", ");
+            //sQuery.AppendLine("          '0' AS \"FINEBINNUMBER\", ");
+            //sQuery.AppendLine("          T1.REVIEW_SAMPLE_FLAG AS \"REVIEWSAMPLE\", ");
+            //sQuery.AppendLine("          T1.IMAGES AS \"IMAGECOUNT\", ");
+            //sQuery.AppendLine("          ADDER AS ADDER, ");
+            //sQuery.AppendLine("          T2.LAYER_ID AS FIRST_STEP, ");
+            //sQuery.AppendLine("          -1 AS RETICLE_REPEAT_ID, ");
+            //sQuery.AppendLine("          -1 AS DIE_REPEAT_ID, ");
+            //sQuery.AppendLine("          T1.MANUAL_OPTICAL_CLASS AS MAN_OPT_CLASS, ");
+            //sQuery.AppendLine("          T1.AUTOMATED_OPTICAL_CLASS AS AUTO_OPT_CLASS, ");
+            //sQuery.AppendLine("          T1.AUTOMATED_OFFLINE_SEM_CLASS AS MAN_SEM_CLASS, ");
+            //sQuery.AppendLine("          T1.AUTOMATED_ONLINE_SEM_CLASS AS AUTO_SEM_CLASS ");
+            //sQuery.AppendLine("     FROM INSP_DEFECT T1, ");
+            //sQuery.AppendLine("          (SELECT T1.INSPECTION_TIME, ");
+            //sQuery.AppendLine("                  T1.WAFER_KEY, ");
+            //sQuery.AppendLine("                  T1.INSPECTION_FILENAME, ");
+            //sQuery.AppendLine("                  T2.RECIPE_KEY, ");
+            //sQuery.AppendLine("                  T2.RECIPE_ID, ");
+            //sQuery.AppendLine("                  T2.LAYER_ID, ");
+            //sQuery.AppendLine("                  T2.DIE_SIZE_X, ");
+            //sQuery.AppendLine("                  T2.DIE_SIZE_Y, ");
+            //sQuery.AppendLine("                  T2.ORIGIN_INDEX_X, ");
+            //sQuery.AppendLine("                  T2.ORIGIN_INDEX_Y, ");
+            //sQuery.AppendLine("                  T2.ORIGIN_DIE_X, ");
+            //sQuery.AppendLine("                  T2.ORIGIN_DIE_Y, ");
+            //sQuery.AppendLine("                  T2.ROTATION_ANGLE, ");
+            //sQuery.AppendLine("                  T1.CENTER_X, ");
+            //sQuery.AppendLine("                  T1.CENTER_Y, ");
+            //sQuery.AppendLine("                  T1.ORIGIN_X, ");
+            //sQuery.AppendLine("                  T1.ORIGIN_Y, ");
+            //sQuery.AppendLine("                  CASE WHEN T2.ROTATION_ANGLE = '0' THEN T1.CENTER_X - T1.ORIGIN_X ");
+            //sQuery.AppendLine("                       WHEN T2.ROTATION_ANGLE = '90' THEN T2.DIE_SIZE_X + (T1.CENTER_X - T1.ORIGIN_X) ");
+            //sQuery.AppendLine("                       WHEN T2.ROTATION_ANGLE = '180' THEN T1.CENTER_X - T1.ORIGIN_X ");
+            //sQuery.AppendLine("                       WHEN T2.ROTATION_ANGLE = '270' THEN T1.CENTER_X - T1.ORIGIN_X END AS \"ORIGIN_X_CAL\", -- SAMPLE CENTER LOCATION X ");
+            //sQuery.AppendLine("                  CASE WHEN T2.ROTATION_ANGLE = '0' THEN T1.CENTER_Y - T1.ORIGIN_Y ");
+            //sQuery.AppendLine("                       WHEN T2.ROTATION_ANGLE = '90' THEN T1.CENTER_Y - T1.ORIGIN_Y ");
+            //sQuery.AppendLine("                       WHEN T2.ROTATION_ANGLE = '180' THEN T1.CENTER_Y - T1.ORIGIN_Y ");
+            //sQuery.AppendLine("                       WHEN T2.ROTATION_ANGLE = '270' THEN T2.DIE_SIZE_Y + (T1.CENTER_Y - T1.ORIGIN_X) END AS \"ORIGIN_Y_CAL\" -- SAMPLE CENTER LOCATION Y ");
+            //sQuery.AppendLine("             FROM INSP_WAFER_SUMMARY T1, INSP_RECIPE T2 ");
+            //sQuery.AppendLine("            WHERE     1 = 1 ");
+            //sQuery.AppendLine("                  AND T1.RECIPE_KEY = T2.RECIPE_KEY ");
+            //sQuery.AppendLine("                  AND T1.INSPECTION_TIME = TO_DATE(:inspdatetime, 'YYYYMMDDHH24MISS')  ");
+            //sQuery.AppendLine("                  AND T1.WAFER_KEY = :waferkey  ");
+            //sQuery.AppendLine("           ) T2 ");
+            //sQuery.AppendLine("    WHERE     1 = 1 ");
+            //sQuery.AppendLine("          AND T1.INSPECTION_TIME = T2.INSPECTION_TIME ");
+            //sQuery.AppendLine("          AND T1.WAFER_KEY = T2.WAFER_KEY ");
+            //sQuery.AppendLine(" ORDER BY T1.DEFECT_ID ");
+
+            //--
+
+            sQuery.AppendLine(" SELECT '' AS \"STEP_SEQ\", ");
+            sQuery.AppendLine("          T1.DEFECT_ID, ");
+            sQuery.AppendLine("          '' AS \"WAFER_SEQ\", ");
+            sQuery.AppendLine("          (T2.DIE_SIZE_X * T1.INDEX_X) + (T1.WAFER_X - (T2.DIE_SIZE_X * T1.INDEX_X)) - T2.CENTER_X AS \"X\", ");
+            sQuery.AppendLine("          (T2.DIE_SIZE_Y * T1.INDEX_Y) + (T1.WAFER_Y - (T2.DIE_SIZE_Y * T1.INDEX_Y)) - T2.CENTER_Y AS \"Y\", ");
+            sQuery.AppendLine("          T1.WAFER_X - (T2.DIE_SIZE_X * T1.INDEX_X) AS \"XREF\", ");
+            sQuery.AppendLine("          T1.WAFER_Y - (T2.DIE_SIZE_Y * T1.INDEX_Y) AS \"YREF\", ");
+            sQuery.AppendLine("          T1.INDEX_X - T2.DIFF_INDEX_X + 1 AS \"XINDEX\", ");
+            sQuery.AppendLine("          T1.INDEX_Y - T2.DIFF_INDEX_Y + 1 AS \"YINDEX\", ");
+            sQuery.AppendLine("          T1.SIZE_X AS \"XSIZE\", ");
+            sQuery.AppendLine("          T1.SIZE_Y AS \"YSIZE\", ");
+            sQuery.AppendLine("          T1.AREA AS \"DEFECTAREA\", ");
+            sQuery.AppendLine("          T1.SIZE_D AS \"DSIZE\", ");
+            sQuery.AppendLine("          T1.CLASS_NUMBER AS \"CLASSNUMBER\", ");
+            sQuery.AppendLine("          T1.TEST_ID AS \"TEST\", ");
+            sQuery.AppendLine("          NVL(T1.CLUSTER_ID, 0) AS \"CLUSTERNUMBER\", ");
+            sQuery.AppendLine("          T1.ROUGH_BIN_CLASS AS \"ROUGHBINCLASS\", ");
+            sQuery.AppendLine("          '0' AS \"FINEBINNUMBER\", ");
+            sQuery.AppendLine("          T1.REVIEW_SAMPLE_FLAG AS \"REVIEWSAMPLE\", ");
+            sQuery.AppendLine("          T1.IMAGES AS \"IMAGECOUNT\", ");
+            sQuery.AppendLine("          ADDER AS ADDER, ");
+            sQuery.AppendLine("          T2.LAYER_ID AS FIRST_STEP, ");
+            sQuery.AppendLine("          -1 AS RETICLE_REPEAT_ID, ");
+            sQuery.AppendLine("          -1 AS DIE_REPEAT_ID, ");
+            sQuery.AppendLine("          T1.MANUAL_OPTICAL_CLASS AS MAN_OPT_CLASS, ");
+            sQuery.AppendLine("          T1.AUTOMATED_OPTICAL_CLASS AS AUTO_OPT_CLASS, ");
+            sQuery.AppendLine("          T1.AUTOMATED_OFFLINE_SEM_CLASS AS MAN_SEM_CLASS, ");
+            sQuery.AppendLine("          T1.AUTOMATED_ONLINE_SEM_CLASS AS AUTO_SEM_CLASS ");
+            sQuery.AppendLine("     FROM INSP_DEFECT T1, ");
+            sQuery.AppendLine("          (SELECT T1.INSPECTION_TIME, ");
+            sQuery.AppendLine("                  T1.WAFER_KEY, ");
+            sQuery.AppendLine("                  T1.INSPECTION_FILENAME, ");
+            sQuery.AppendLine("                  T2.RECIPE_KEY, ");
+            sQuery.AppendLine("                  T2.RECIPE_ID,  ");
+            sQuery.AppendLine("                  T1.LAYER_ID,   ");
+            sQuery.AppendLine("                  T2.DIE_SIZE_X, ");
+            sQuery.AppendLine("                  T2.DIE_SIZE_Y, ");
+            sQuery.AppendLine("                  T2.ORIGIN_INDEX_X, ");
+            sQuery.AppendLine("                  T2.ORIGIN_INDEX_Y, ");
+            sQuery.AppendLine("                  T2.DIFF_INDEX_X, ");
+            sQuery.AppendLine("                  T2.DIFF_INDEX_Y, ");
+            sQuery.AppendLine("                  T2.ORIGIN_DIE_X, ");
+            sQuery.AppendLine("                  T2.ORIGIN_DIE_Y, ");
+            sQuery.AppendLine("                  T2.ROTATION_ANGLE, ");
+            sQuery.AppendLine("                  T1.CENTER_X, ");
+            sQuery.AppendLine("                  T1.CENTER_Y, ");
+            sQuery.AppendLine("                  T1.ORIGIN_X, ");
+            sQuery.AppendLine("                  T1.ORIGIN_Y, ");
+            sQuery.AppendLine("                  CASE WHEN T2.ROTATION_ANGLE = '0' THEN T1.CENTER_X - T1.ORIGIN_X ");
+            sQuery.AppendLine("                       WHEN T2.ROTATION_ANGLE = '90' THEN T2.DIE_SIZE_X + (T1.CENTER_X - T1.ORIGIN_X) ");
+            sQuery.AppendLine("                       WHEN T2.ROTATION_ANGLE = '180' THEN T1.CENTER_X - T1.ORIGIN_X ");
+            sQuery.AppendLine("                       WHEN T2.ROTATION_ANGLE = '270' THEN T1.CENTER_X - T1.ORIGIN_X ");
+            sQuery.AppendLine("                   END AS \"ORIGIN_X_CAL\", -- SAMPLE CENTER LOCATION X ");
+            sQuery.AppendLine("                  CASE WHEN T2.ROTATION_ANGLE = '0' THEN T1.CENTER_Y - T1.ORIGIN_Y ");
+            sQuery.AppendLine("                       WHEN T2.ROTATION_ANGLE = '90' THEN T1.CENTER_Y - T1.ORIGIN_Y ");
+            sQuery.AppendLine("                       WHEN T2.ROTATION_ANGLE = '180' THEN T1.CENTER_Y - T1.ORIGIN_Y ");
+            sQuery.AppendLine("                       WHEN T2.ROTATION_ANGLE = '270' THEN T2.DIE_SIZE_Y + (T1.CENTER_Y - T1.ORIGIN_Y) ");
+            sQuery.AppendLine("                   END AS \"ORIGIN_Y_CAL\" -- SAMPLE CENTER LOCATION Y ");
+            sQuery.AppendLine("             FROM INSP_WAFER_SUMMARY T1, ");
+            sQuery.AppendLine("                  (  SELECT T3.RECIPE_KEY, ");
+            sQuery.AppendLine("                            T3.RECIPE_ID, ");
+            sQuery.AppendLine("                            T3.RECIPE_TIME, ");
+            sQuery.AppendLine("                            T3.WAFER_SIZE, ");
+            sQuery.AppendLine("                            T3.ROTATION_ANGLE, ");
+            sQuery.AppendLine("                            T3.DIE_SIZE_X, ");
+            sQuery.AppendLine("                            T3.DIE_SIZE_Y, ");
+            sQuery.AppendLine("                            T3.ORIGIN_INDEX_X AS \"ORIGIN_INDEX_X\", ");
+            sQuery.AppendLine("                            T3.ORIGIN_INDEX_Y AS \"ORIGIN_INDEX_Y\", ");
+            sQuery.AppendLine("                            T3.ORIGIN_DIE_X, ");
+            sQuery.AppendLine("                            T3.ORIGIN_DIE_Y, ");
+            sQuery.AppendLine("                            MIN(T4.INDEX_X) AS \"DIFF_INDEX_X\", ");
+            sQuery.AppendLine("                            MIN(T4.INDEX_Y) AS \"DIFF_INDEX_Y\" ");
+            sQuery.AppendLine("                       FROM INSP_WAFER_SUMMARY T1, INSP_WAFER_TEST_SUMMARY T2, INSP_RECIPE T3, INSP_REGION T4 ");
+            sQuery.AppendLine("                      WHERE 1 = 1 ");
+            sQuery.AppendLine("                            AND T1.INSPECTION_TIME = T2.INSPECTION_TIME ");
+            sQuery.AppendLine("                            AND T1.WAFER_KEY = T2.WAFER_KEY ");
+            sQuery.AppendLine("                            AND T1.RECIPE_KEY = T3.RECIPE_KEY ");
+            sQuery.AppendLine("                            AND T1.RECIPE_KEY = T4.RECIPE_KEY ");
+            sQuery.AppendLine("                            AND T2.TEST_ID = T4.TEST_ID ");
+            sQuery.AppendLine("                            AND T1.INSPECTION_TIME = TO_DATE(:inspdatetime, 'YYYYMMDDHH24MISS') ");
+            sQuery.AppendLine("                            AND T1.WAFER_KEY = :waferkey ");
+            sQuery.AppendLine("                   GROUP BY T3.RECIPE_KEY, ");
+            sQuery.AppendLine("                            T3.RECIPE_ID, ");
+            sQuery.AppendLine("                            T3.RECIPE_TIME, ");
+            sQuery.AppendLine("                            T3.WAFER_SIZE, ");
+            sQuery.AppendLine("                            T3.ROTATION_ANGLE, ");
+            sQuery.AppendLine("                            T3.DIE_SIZE_X, ");
+            sQuery.AppendLine("                            T3.DIE_SIZE_Y, ");
+            sQuery.AppendLine("                            T3.ORIGIN_INDEX_X, ");
+            sQuery.AppendLine("                            T3.ORIGIN_INDEX_Y, ");
+            sQuery.AppendLine("                            T3.ORIGIN_DIE_X, ");
+            sQuery.AppendLine("                            T3.ORIGIN_DIE_Y ");
+            sQuery.AppendLine("                      ) T2 ");
+            sQuery.AppendLine("            WHERE     1 = 1 ");
+            sQuery.AppendLine("                  AND T1.RECIPE_KEY = T2.RECIPE_KEY ");
+            sQuery.AppendLine("                  AND T1.INSPECTION_TIME = TO_DATE(:inspdatetime, 'YYYYMMDDHH24MISS') ");
+            sQuery.AppendLine("                  AND T1.WAFER_KEY = :waferkey ");
+            sQuery.AppendLine("                  ) T2 ");
+            sQuery.AppendLine("    WHERE     1 = 1 ");
+            sQuery.AppendLine("          AND T1.INSPECTION_TIME = T2.INSPECTION_TIME ");
+            sQuery.AppendLine("          AND T1.WAFER_KEY = T2.WAFER_KEY ");
+            sQuery.AppendLine("          AND T1.INSPECTION_TIME = TO_DATE(:inspdatetime, 'YYYYMMDDHH24MISS') ");
+            sQuery.AppendLine("          AND T1.WAFER_KEY = :waferkey ");
+            sQuery.AppendLine(" ORDER BY T1.DEFECT_ID ");
+
+            //--
+
+            dicParams = new Dictionary<string, Parameter>();
+            #region [ Setting Parameter ]
+            Parameter p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = rv.InspDateTime;
+            dicParams.Add("inspdatetime", p);
+
+            //--
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = rv.WaferKey;
+            dicParams.Add("waferkey", p);
+
+            #endregion [ Setting Parameter ]
+
+            //--
+
+            DataTable dt = base.ExecuteQuery(
+                oConnection,
+                Constract.FUNCATION_NAME_DEFECT,
+                sQuery.ToString(),
+                dicParams
+                );
+
+            return dt;
+        }
+
+        public DataTable GetDefectImage(
+            DwResultValue rv
+            )
+        {
+            Dictionary<string, Parameter> dicParams = null;
+            StringBuilder sQuery = new StringBuilder();
+
+            //--
+
+            sQuery.AppendLine(" SELECT t1.wafer_key AS 	STEP_SEQ	, ");
+            sQuery.AppendLine("        t1.inspection_time, ");
+            sQuery.AppendLine("        T2.DEFECT_ID AS 	DEFECT_ID	, ");
+            sQuery.AppendLine("        T2.IMAGE_ID AS 	IMAGE_ID	, ");
+            sQuery.AppendLine("        '' AS 	WAFER_SEQ	, ");
+            sQuery.AppendLine("        T1.TEST_ID AS 	TEST	, ");
+            sQuery.AppendLine("        T2.IMAGE_TYPE AS 	IMAGE_TYPE	, ");
+            sQuery.AppendLine("        T2.IMAGE_FILESPEC AS 	IMAGE_FILESPEC	, "); // Source FTP image path
+            sQuery.AppendLine("        'DEFACTIMAGE/' || TO_CHAR (T1.INSPECTION_TIME, 'YYYY') || '/' || TO_CHAR (T1.INSPECTION_TIME, 'MM') || '/' ");
+            sQuery.AppendLine("        || TO_CHAR (T1.INSPECTION_TIME, 'DD') || '/' || T1.DEVICE  || '/' ");
+            sQuery.AppendLine("        || T1.LOT_ID || '/' || TRIM(TO_CHAR(T1.SLOT_ID, '00')) AS	IMAGE_PATH	, ");
+            sQuery.AppendLine("        SUBSTR (T2.IMAGE_FILESPEC, INSTR (T2.IMAGE_FILESPEC, '/', -1, 1) + 1) AS 	IMAGE_FILENAME	, ");
+            sQuery.AppendLine("        T2.IMAGE_SERVER_ID AS 	IMAGE_SERVER	, ");
+            sQuery.AppendLine("        'DEFACTIMAGE/' || TO_CHAR (T1.INSPECTION_TIME, 'YYYY') || '/' || TO_CHAR (T1.INSPECTION_TIME, 'MM') || '/' ");
+            sQuery.AppendLine("        || TO_CHAR (T1.INSPECTION_TIME, 'DD') || '/' || T1.DEVICE  || '/' ");
+            sQuery.AppendLine("        || T1.LOT_ID || '/' || TRIM(TO_CHAR(T1.SLOT_ID, '00')) || '/THUMB' AS 	THUMB_PATH	, ");
+            sQuery.AppendLine("        SUBSTR (T2.IMAGE_FILESPEC, INSTR (T2.IMAGE_FILESPEC, '/', -1, 1) + 1) AS 	THUMB_FILENAME ");
+            sQuery.AppendLine("   FROM (SELECT T1.INSPECTION_TIME, ");
+            sQuery.AppendLine("                T1.WAFER_KEY, ");
+            sQuery.AppendLine("                T1.LOT_ID, ");
+            sQuery.AppendLine("                T1.DEVICE, ");
+            sQuery.AppendLine("                T1.WAFER_ID, ");
+            sQuery.AppendLine("                T1.SLOT_ID, ");
+            sQuery.AppendLine("                T1.INSPECT_EQUIP_ID, ");
+            sQuery.AppendLine("                T2.TEST_ID ");
+            sQuery.AppendLine("           FROM INSP_WAFER_SUMMARY T1, INSP_WAFER_TEST_SUMMARY T2 ");
+            sQuery.AppendLine("          WHERE     1 = 1 ");
+            sQuery.AppendLine("                AND T1.INSPECTION_TIME = T2.INSPECTION_TIME ");
+            sQuery.AppendLine("                AND T1.WAFER_KEY = T2.WAFER_KEY ");
+            sQuery.AppendLine("                AND T1.INSPECTION_TIME = TO_DATE(:inspdatetime, 'YYYYMMDDHH24MISS')  ");
+            sQuery.AppendLine("                AND T1.WAFER_KEY = :waferkey  ");
+            sQuery.AppendLine("        ) T1, ");
+            sQuery.AppendLine("        INSP_WAFER_IMAGE T2 ");
+            sQuery.AppendLine("  WHERE     1 = 1 ");
+            sQuery.AppendLine("        AND T1.INSPECTION_TIME = T2.INSPECTION_TIME ");
+            sQuery.AppendLine("        AND T1.WAFER_KEY = T2.WAFER_KEY ");
+            sQuery.AppendLine("        AND T1.INSPECTION_TIME = TO_DATE(:inspdatetime, 'YYYYMMDDHH24MISS')  ");
+            sQuery.AppendLine("        AND T1.WAFER_KEY = :waferkey  ");
+
+            //--
+
+            dicParams = new Dictionary<string, Parameter>();
+            #region [ Setting Parameter ]
+            Parameter p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = rv.InspDateTime;
+            dicParams.Add("inspdatetime", p);
+
+            //--
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = rv.WaferKey;
+            dicParams.Add("waferkey", p);
+
+            #endregion [ Setting Parameter ]
+
+            //--
+
+            DataTable dt = base.ExecuteQuery(
+                oConnection,
+                Constract.FUNCATION_NAME_DEFECT_IMAGE,
+                sQuery.ToString(),
+                dicParams
+                );
+
+            return dt;
+        }
+
+        public void Dispose()
+        {
+            base.DbClose(
+                oConnection
+                );
+        }
+    }
+}

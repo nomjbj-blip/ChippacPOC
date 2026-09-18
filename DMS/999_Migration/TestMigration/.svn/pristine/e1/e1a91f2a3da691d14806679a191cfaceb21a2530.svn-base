@@ -1,0 +1,552 @@
+﻿using System;
+using System.Data;
+using System.Windows.Forms;
+using FabTwoToMigrationTools.Source;
+using Infragistics.Win.UltraWinEditors;
+using Infragistics.Win.UltraWinGrid;
+using FabTwoToMigrationTools.Target;
+
+namespace FabTwoToMigrationTools
+{
+    public partial class Form3 : Form
+    {
+        private SuperQueue<TwLotInfo> sQueue = null;
+
+        public Form3()
+        {
+            InitializeComponent();
+            dtStart.Value = DateTime.Now.AddDays(-1);
+            dtEnd.Value = DateTime.Now;
+
+            InitQueueAction();
+        }
+
+        private void InitQueueAction()
+        {
+            sQueue = new SuperQueue<TwLotInfo>(1, new Action<TwLotInfo>(delegate(TwLotInfo lot)
+            {
+                TwResultValue rv = new TwResultValue(lot);
+
+                TestData source = new TestData();
+                MiracomTPS target = new MiracomTPS();
+
+                DataTable dtMap = null;
+                DataTable dtProgram = null;
+                DataTable dtProgramParameter = null;
+                DataSet dsRawData = null;
+                DataTable dtTables = null;
+                DataTable dtWafer = null;
+                DataTable dtTemp = null;
+
+                int BSL_LOG_STEP = 0;
+
+                //--
+
+                BSL_LOG_STEP = 100;
+                //NT DB 상에서 기준 정보를 가져 온다.
+                dtProgram = source.GetProgram(
+                    rv.Program,
+                    rv.TestArea,
+                    rv.Device
+                    );
+
+                //Factory 정보를 미리 정의하여 놓는다.
+                if (dtProgram != null && dtProgram.Rows.Count > 0)
+                {
+                    rv.Factory = dtProgram.Rows[0]["FACTORY"].ToString();
+                }
+
+                //TQP_PROGRAM 상에 정보가 있는지 확인 후 없으면 생성 한다.
+                if (target.CheckedProgram(rv) <= 0)
+                    target.SetProgram(rv, dtProgram);
+
+
+
+                //TQP_PRODUCT 조회 하여 있는지 확인 한다.
+                dtTemp = target.GetTQP_PRODUCT(
+                     rv.Factory,
+                     rv.Device
+                    );
+
+                //TQP_PRODUCT 에 정보가 없을 경우 생성 한다.
+                if (dtTemp == null || dtTemp.Rows.Count <= 0)
+                    target.SetTQP_PRODUCT(rv);
+
+                //--
+
+                BSL_LOG_STEP = 200;
+
+                //Program 및 Table 정보를 가져 온다.
+                dtTables = source.GetDataTable(
+                    rv.LotID,
+                    rv.Program
+                    );
+
+                //Data 가 없을 경우 TQP_DATA_TABLES 생성
+                if (target.CheckedDataTables(ref rv) <= 0)
+                    target.SetDataTable(rv, dtTables);
+
+                //--
+
+                BSL_LOG_STEP = 300;
+                #region Program Parameter
+
+                //Parameger 별 Spec 정보를 가져온다.
+                dtProgramParameter = source.GetProgramParameter(
+                    rv.Factory,
+                    rv.Program
+                    );
+
+                DataRow[] drParams = dtProgramParameter.Select("[PARAM_NAME] = 'XY'");
+                foreach (DataRow row in drParams)
+                {
+                    DataRow inRow = dtProgramParameter.NewRow();
+                    inRow["PROGRAM"] = row["PROGRAM"];
+                    inRow["PROGRAM_REV"] = row["PROGRAM_REV"];
+                    inRow["PARAM_INDEX"] = -1;
+                    inRow["PARAM_NAME"] = "X";
+                    inRow["PARAM_TYPE"] = row["PARAM_TYPE"];
+                    inRow["PARAM_DESC"] = row["PARAM_DESC"];
+                    inRow["CREATE_TIME"] = row["CREATE_TIME"];
+                    inRow["CREATE_USER"] = row["CREATE_USER"];
+                    inRow["UPDATE_TIME"] = row["UPDATE_TIME"];
+                    inRow["UPDATE_USER"] = row["UPDATE_USER"];
+                    inRow["TABLE_NAME"] = row["TABLE_NAME"];
+                    inRow["DECIMAL_PLACES"] = row["DECIMAL_PLACES"];
+                    inRow["RUNTIME_DEFINED"] = row["RUNTIME_DEFINED"];
+                    inRow["UOM"] = row["UOM"];
+                    inRow["LSL"] = row["LSL"];
+                    inRow["TARGET"] = row["TARGET"];
+                    inRow["USL"] = row["USL"];
+                    inRow["LCL"] = row["LCL"];
+                    inRow["UCL"] = row["UCL"];
+                    inRow["TEST_LOW"] = row["TEST_LOW"];
+                    inRow["TEST_HIGH"] = row["TEST_HIGH"];
+                    dtProgramParameter.Rows.Add(inRow);
+
+                    inRow = dtProgramParameter.NewRow();
+                    inRow["PROGRAM"] = row["PROGRAM"];
+                    inRow["PROGRAM_REV"] = row["PROGRAM_REV"];
+                    inRow["PARAM_INDEX"] = 0;
+                    inRow["PARAM_NAME"] = "Y";
+                    inRow["PARAM_TYPE"] = row["PARAM_TYPE"];
+                    inRow["PARAM_DESC"] = row["PARAM_DESC"];
+                    inRow["CREATE_TIME"] = row["CREATE_TIME"];
+                    inRow["CREATE_USER"] = row["CREATE_USER"];
+                    inRow["UPDATE_TIME"] = row["UPDATE_TIME"];
+                    inRow["UPDATE_USER"] = row["UPDATE_USER"];
+                    inRow["TABLE_NAME"] = row["TABLE_NAME"];
+                    inRow["DECIMAL_PLACES"] = row["DECIMAL_PLACES"];
+                    inRow["RUNTIME_DEFINED"] = row["RUNTIME_DEFINED"];
+                    inRow["UOM"] = row["UOM"];
+                    inRow["LSL"] = row["LSL"];
+                    inRow["TARGET"] = row["TARGET"];
+                    inRow["USL"] = row["USL"];
+                    inRow["LCL"] = row["LCL"];
+                    inRow["UCL"] = row["UCL"];
+                    inRow["TEST_LOW"] = row["TEST_LOW"];
+                    inRow["TEST_HIGH"] = row["TEST_HIGH"];
+                    dtProgramParameter.Rows.Add(inRow);
+
+                    dtProgramParameter.Rows.Remove(row);
+                }
+                dtProgramParameter.DefaultView.Sort = "PROGRAM_REV ASC, PARAM_INDEX ASC";
+                dtProgramParameter = dtProgramParameter.DefaultView.ToTable(true);
+
+                //TQP_PARASPEC 확인 후 없으면 생성 한다.
+                if (target.CheckedProgramParameter(ref rv) <= 0)
+                    target.SetProgramParameter(ref rv, dtProgramParameter);
+                #endregion Program Parameter
+
+                BSL_LOG_STEP = 400;
+
+                //Meassure Data 를 담는 Table 정보를 생성 한다. 
+                if (rv.TableName.Count > 0)
+                {
+                    target.CreateTable(rv);
+                }
+
+                BSL_LOG_STEP = 500;
+
+                //Wafer Die 별 Index 정보를 가져온다.
+                dtMap = source.GetMapInfo(
+                    rv.Factory,
+                    rv.Program,
+                    ""
+                    );
+
+                // TQP_USEMAP Table 상의 데이터를 확인 하여 없으면 생성 한다.
+                if (target.CheckedDieInfo(rv) <= 0)
+                    target.SetDieInfo(rv, dtMap);
+
+                // Map Def 생성을 위해 Index 상의 Max, Min 값을 저장 한다.
+                if (dtMap != null && dtMap.Rows.Count > 0)
+                {
+                    rv.MaxX = Convert.ToInt32(dtMap.Compute("MAX(X)", ""));
+                    rv.MaxY = Convert.ToInt32(dtMap.Compute("MAX(Y)", ""));
+                    rv.MinX = Convert.ToInt32(dtMap.Compute("MIN(X)", ""));
+                    rv.MinY = Convert.ToInt32(dtMap.Compute("MIN(Y)", ""));
+                }
+
+
+                //TQP_MAPDEF 조회 하여 있는지 확인 한다.
+                dtTemp = target.GetTQP_MAPDEF(
+                     rv.Program
+                    );
+
+                //TQP_MAPDEF 에 정보가 없을 경우 생성 한다.
+                if (dtTemp == null || dtTemp.Rows.Count <= 0)
+                    target.SetTQP_MAPDEF(rv.Program, 0, rv.MaxX, rv.MaxY, rv.MinX, rv.MinY, dtMap.Rows.Count - 1, rv);
+
+                //--
+
+                BSL_LOG_STEP = 600;
+
+                //Wafer 기준정보를 가져온다.
+                dtWafer = source.GetWafer(
+                    lot.LotID,
+                    lot.LotSequence_Prev
+                    );
+
+                //Wafer 별로  foreach 를 돌아 제품 Table 상에 Data 를 저장한다.
+                foreach (DataRow drWafer in dtWafer.Rows)
+                {
+                    rv.WaferID = drWafer["WAFER_ID"].ToString();
+                    rv.WaferSequence_Prev = long.Parse(drWafer["WAFER_SEQ"].ToString());
+
+                    if (target.CheckedWafer(ref rv) <= 0)
+                        target.SetWafer(ref rv, drWafer);
+
+                    //--
+
+                    BSL_LOG_STEP = 601;
+                    dsRawData = source.GetRawData(
+                        rv.WaferSequence_Prev,
+                        rv.TableName
+                        );
+
+                    if (dsRawData != null && dsRawData.Tables.Count > 0)
+                    {
+                        if (target.CheckedRawData(rv) <= 0)
+                            target.SetRawData(rv, dsRawData);
+
+                    }
+
+                }
+            }));
+        }
+
+        #region [ Event Handler ]
+        private void btnQuery_Click(
+            object sender,
+            EventArgs e
+            )
+        {
+            DataTable dtLot = null;
+            using (TestData data = new TestData())
+            {
+                dtLot = data.GetLot(
+                    dtStart.Value,
+                    dtEnd.Value
+                    );
+
+                data.Dispose();
+            }
+
+            ugLot.DataSource = null;
+            ugLot.DataSource = dtLot;
+        }
+
+        private void btnExecute_Click(
+            object sender,
+            EventArgs e
+            )
+        {
+            TwLotInfo lotinfo = null;
+            using (MiracomTPS target = new MiracomTPS())
+            {
+                // 선택된 Row
+                foreach (UltraGridRow urLot in ugLot.Rows)
+                {
+                    if (!string.Equals(urLot.Cells["FLAG"].Value, "True"))
+                        continue;
+
+                    //--
+
+                    lotinfo = new TwLotInfo();
+                    lotinfo.Factory = urLot.Cells["FACTORY"].Text;
+                    lotinfo.Device = urLot.Cells["DEVICE"].Text;
+                    lotinfo.Program = urLot.Cells["PROGRAM"].Text;
+                    lotinfo.TestArea = urLot.Cells["TEST_AREA"].Text;
+                    lotinfo.LotID = urLot.Cells["LOT"].Text;
+                    lotinfo.LotType = urLot.Cells["LOT_TYPE"].Text;
+                    lotinfo.LotSequence_Prev = long.Parse(urLot.Cells["LOT_SEQ"].Text);
+
+                    if (target.CheckedLot(ref lotinfo) <= 0)
+                        target.SetLot(ref lotinfo, urLot);
+
+                    InitQueueAction(lotinfo);
+                    //sQueue.EnqueueTask(lotinfo);
+                }
+
+                target.Dispose();
+            }
+        }
+
+        private void btnSave_Click(
+            object sender,
+            EventArgs e
+            )
+        {
+
+        }
+
+        private void ugLot_InitializeLayout(
+            object sender,
+            InitializeLayoutEventArgs e
+            )
+        {
+            UltraGridColumn ugcChecked = e.Layout.Bands[0].Columns.Add("FLAG", "FLAG");
+            ugcChecked.Style = Infragistics.Win.UltraWinGrid.ColumnStyle.CheckBox;
+            ugcChecked.CellActivation = Activation.AllowEdit;
+            ugcChecked.Header.VisiblePosition = 0;
+        }
+
+        private void uceUgdAll_CheckedChanged(
+            object sender,
+            EventArgs e
+            )
+        {
+            UltraCheckEditor editor = sender as UltraCheckEditor;
+            foreach (UltraGridRow row in ugLot.Rows)
+            {
+                row.Cells["FLAG"].Value = editor.Checked;
+            }
+        }
+
+        #endregion [ Event Handler ]
+
+        private void InitQueueAction(TwLotInfo lot)
+        {
+            TwResultValue rv = new TwResultValue(lot);
+
+            TestData source = new TestData();
+            MiracomTPS target = new MiracomTPS();
+
+            DataTable dtMap = null;
+            DataTable dtProgram = null;
+            DataTable dtProgramParameter = null;
+            DataSet dsRawData = null;
+            DataTable dtTables = null;
+            DataTable dtWafer = null;
+            DataTable dtTemp = null;
+
+            int BSL_LOG_STEP = 0;
+
+            //--
+
+            BSL_LOG_STEP = 100;
+            //NT DB 상에서 기준 정보를 가져 온다.
+            dtProgram = source.GetProgram(
+                rv.Program,
+                rv.TestArea,
+                rv.Device
+                );
+
+            //Factory 정보를 미리 정의하여 놓는다.
+            if (dtProgram != null && dtProgram.Rows.Count > 0)
+            {
+                rv.Factory = dtProgram.Rows[0]["FACTORY"].ToString();
+            }
+
+            //TQP_PROGRAM 상에 정보가 있는지 확인 후 없으면 생성 한다.
+            if (target.CheckedProgram(rv) <= 0)
+                target.SetProgram(rv, dtProgram);
+
+            //TQP_PRODUCT 조회 하여 있는지 확인 한다.
+            dtTemp = target.GetTQP_PRODUCT(
+                    rv.Factory,
+                    rv.Device
+                );
+
+            //TQP_PRODUCT 에 정보가 없을 경우 생성 한다.
+            if (dtTemp == null || dtTemp.Rows.Count <= 0)
+                target.SetTQP_PRODUCT(rv);
+
+            //--
+
+            BSL_LOG_STEP = 200;
+
+            //Program 및 Table 정보를 가져 온다.
+            dtTables = source.GetDataTable(
+                rv.LotID,
+                rv.Program
+                );
+
+            //Data 가 없을 경우 TQP_DATA_TABLES 생성
+            if (target.CheckedDataTables(ref rv) <= 0)
+                target.SetDataTable(rv, dtTables);
+
+            //--
+
+            BSL_LOG_STEP = 300;
+            #region Program Parameter
+
+            //Parameger 별 Spec 정보를 가져온다.
+            dtProgramParameter = source.GetProgramParameter(
+                rv.Factory,
+                rv.Program
+                );
+
+            DataRow[] drParams = dtProgramParameter.Select("[PARAM_NAME] = 'XY'");
+            foreach (DataRow row in drParams)
+            {
+                DataRow inRow = dtProgramParameter.NewRow();
+                inRow["FACTORY"] = rv.Factory;
+                inRow["PROGRAM"] = row["PROGRAM"];
+                inRow["PPD_SEQ"] = row["PPD_SEQ"]; // WAFER 데이터 MAPPING을 위해 필요
+                inRow["PROGRAM_REV"] = row["PROGRAM_REV"];
+                inRow["PARAM_INDEX"] = -1;
+                inRow["PARAM_NAME"] = "X";
+                inRow["PARAM_TYPE"] = row["PARAM_TYPE"];
+                inRow["PARAM_DESC"] = row["PARAM_DESC"];
+                inRow["CREATE_TIME"] = row["CREATE_TIME"];
+                inRow["CREATE_USER"] = row["CREATE_USER"];
+                inRow["UPDATE_TIME"] = row["UPDATE_TIME"];
+                inRow["UPDATE_USER"] = row["UPDATE_USER"];
+                inRow["TABLE_NAME"] = row["TABLE_NAME"];
+                inRow["DECIMAL_PLACES"] = row["DECIMAL_PLACES"];
+                inRow["RUNTIME_DEFINED"] = row["RUNTIME_DEFINED"];
+                inRow["UOM"] = row["UOM"];
+                inRow["LSL"] = row["LSL"];
+                inRow["TARGET"] = row["TARGET"];
+                inRow["USL"] = row["USL"];
+                inRow["LCL"] = row["LCL"];
+                inRow["UCL"] = row["UCL"];
+                inRow["TEST_LOW"] = row["TEST_LOW"];
+                inRow["TEST_HIGH"] = row["TEST_HIGH"];
+                dtProgramParameter.Rows.Add(inRow);
+
+                inRow = dtProgramParameter.NewRow();
+                inRow["FACTORY"] = rv.Factory;
+                inRow["PROGRAM"] = row["PROGRAM"];
+                inRow["PPD_SEQ"] = row["PPD_SEQ"]; // WAFER 데이터 MAPPING을 위해 필요
+                inRow["PROGRAM_REV"] = row["PROGRAM_REV"];
+                inRow["PARAM_INDEX"] = 0;
+                inRow["PARAM_NAME"] = "Y";
+                inRow["PARAM_TYPE"] = row["PARAM_TYPE"];
+                inRow["PARAM_DESC"] = row["PARAM_DESC"];
+                inRow["CREATE_TIME"] = row["CREATE_TIME"];
+                inRow["CREATE_USER"] = row["CREATE_USER"];
+                inRow["UPDATE_TIME"] = row["UPDATE_TIME"];
+                inRow["UPDATE_USER"] = row["UPDATE_USER"];
+                inRow["TABLE_NAME"] = row["TABLE_NAME"];
+                inRow["DECIMAL_PLACES"] = row["DECIMAL_PLACES"];
+                inRow["RUNTIME_DEFINED"] = row["RUNTIME_DEFINED"];
+                inRow["UOM"] = row["UOM"];
+                inRow["LSL"] = row["LSL"];
+                inRow["TARGET"] = row["TARGET"];
+                inRow["USL"] = row["USL"];
+                inRow["LCL"] = row["LCL"];
+                inRow["UCL"] = row["UCL"];
+                inRow["TEST_LOW"] = row["TEST_LOW"];
+                inRow["TEST_HIGH"] = row["TEST_HIGH"];
+                dtProgramParameter.Rows.Add(inRow);
+
+                dtProgramParameter.Rows.Remove(row);
+            }
+
+            dtProgramParameter = dtProgramParameter.Select("1 = 1", "PROGRAM_REV ASC, PARAM_INDEX ASC").CopyToDataTable<DataRow>();
+            dtProgramParameter.AcceptChanges();
+
+            //TQP_PARASPEC 확인 후 없으면 생성 한다.
+            if (target.CheckedProgramParameter(ref rv) <= 0)
+                target.SetProgramParameter(ref rv, dtProgramParameter);
+            #endregion Program Parameter
+
+            BSL_LOG_STEP = 400;
+
+            //GetTableList
+
+            //Meassure Data 를 담는 Table 정보를 생성 한다. 
+            if (rv.TableName.Count > 0)
+            {
+                target.CreateTable(rv);
+            }
+
+            BSL_LOG_STEP = 600;
+
+            //Wafer 기준정보를 가져온다.
+            dtWafer = source.GetWafer(
+                lot.LotID,
+                lot.LotSequence_Prev
+                );
+
+
+            //Wafer 별로  foreach 를 돌아 제품 Table 상에 Data 를 저장한다.
+            foreach (DataRow drWafer in dtWafer.Rows)
+            {
+                rv.WaferID = drWafer["WAFER_ID"].ToString();
+                rv.WaferSequence_Prev = long.Parse(drWafer["WAFER_SEQ"].ToString());
+
+                //===================================================================================
+
+                // TQP_USEMAP Table 상의 데이터를 확인 하여 없으면 생성 한다.
+                if (target.CheckedDieInfo(rv) <= 0)
+                {
+                    //Wafer Die 별 Index 정보를 가져온다.
+                    dtMap = source.GetMapInfo(
+                        rv.Factory,
+                        rv.Program,
+                        drWafer["PDM_SEQ"].ToString()
+                        );
+                 
+                    target.SetDieInfo(rv, dtMap);
+                }
+
+                // Map Def 생성을 위해 Index 상의 Max, Min 값을 저장 한다.
+                if (dtMap != null && dtMap.Rows.Count > 0)
+                {
+                    rv.MaxX = Convert.ToInt32(dtMap.Compute("MAX(X)", ""));
+                    rv.MaxY = Convert.ToInt32(dtMap.Compute("MAX(Y)", ""));
+                    rv.MinX = Convert.ToInt32(dtMap.Compute("MIN(X)", ""));
+                    rv.MinY = Convert.ToInt32(dtMap.Compute("MIN(Y)", ""));
+                }
+
+
+                //Wafer Table 상의 PDM Seq 를 가져오기 위해 넣는다.
+                //TQP_MAPDEF 조회 하여 있는지 확인 한다.
+                dtTemp = target.GetTQP_MAPDEF(
+                        rv.Program
+                    );
+
+                //TQP_MAPDEF 에 정보가 없을 경우 생성 한다.
+                if (dtTemp == null || dtTemp.Rows.Count <= 0)
+                    target.SetTQP_MAPDEF(rv.Device, 0, rv.MaxX, rv.MaxY, rv.MinX, rv.MinY, dtMap.Rows.Count - 1, rv);
+
+                //--
+
+                //===================================================================================
+
+
+                if (target.CheckedWafer(ref rv) <= 0)
+                    target.SetWafer(ref rv, drWafer);
+
+                //--
+
+                BSL_LOG_STEP = 601;
+                dsRawData = source.GetRawData(
+                    rv.WaferSequence_Prev,
+                    rv.TableName
+                    );
+
+                if (dsRawData != null && dsRawData.Tables.Count > 0)
+                {
+                    if (target.CheckedRawData(rv) <= 0)
+                        target.SetRawData(rv, dsRawData);
+                }
+                
+            };
+        }
+    }
+}

@@ -1,0 +1,14 @@
+D:\PROJECT\DB하이텍\gitlab\100_ClientBin\DACrux.SEMDMS.Interface.dll
+D:\PROJECT\DB하이텍\gitlab\100_ClientBin\DACrux.SEMDMS.Interface.pdb
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Interface\obj\Debug\DACrux.SEMDMS.Interface.csproj.AssemblyReference.cache
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Interface\obj\Debug\DACrux.SEMDMS.Interface.csproj.CoreCompileInputs.cache
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Interface\obj\Debug\DACrux.S.3F4F9C3E.Up2Date
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Interface\obj\Debug\DACrux.SEMDMS.Interface.dll
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Interface\obj\Debug\DACrux.SEMDMS.Interface.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\100_ClientBin\DACrux.SEMDMS.Interface.dll
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\100_ClientBin\DACrux.SEMDMS.Interface.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Interface\obj\Debug\DACrux.SEMDMS.Interface.csproj.AssemblyReference.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Interface\obj\Debug\DACrux.SEMDMS.Interface.csproj.CoreCompileInputs.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Interface\obj\Debug\DACrux.S.3F4F9C3E.Up2Date
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Interface\obj\Debug\DACrux.SEMDMS.Interface.dll
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Interface\obj\Debug\DACrux.SEMDMS.Interface.pdb

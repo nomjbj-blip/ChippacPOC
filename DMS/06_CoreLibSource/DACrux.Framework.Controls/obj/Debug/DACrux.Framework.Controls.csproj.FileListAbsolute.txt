@@ -1,0 +1,54 @@
+D:\PROJECT\DB하이텍\gitlab\07_CoreLib\DACrux.Framework.Controls.dll
+D:\PROJECT\DB하이텍\gitlab\07_CoreLib\DACrux.Framework.Controls.pdb
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Framework.Controls\obj\Debug\DACrux.Framework.Controls.csproj.AssemblyReference.cache
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Framework.Controls\obj\Debug\DACrux.Framework.Controls.DUCAlarmStatusView.resources
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Framework.Controls\obj\Debug\DACrux.Framework.Controls.DUCComboBox.resources
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Framework.Controls\obj\Debug\DACrux.Framework.Controls.DUCControlSpread.resources
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Framework.Controls\obj\Debug\DACrux.Framework.Controls.DUCEngStatusView.resources
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Framework.Controls\obj\Debug\DACrux.Framework.Controls.DUCListBox.resources
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Framework.Controls\obj\Debug\DACrux.Framework.Controls.DUCNumericUpDown.resources
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Framework.Controls\obj\Debug\DACrux.Framework.Controls.DUCPeriodPicker.resources
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Framework.Controls\obj\Debug\DACrux.Framework.Controls.DUCTitlePanel.resources
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Framework.Controls\obj\Debug\DACrux.Framework.Controls.DUCTextBox.resources
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Framework.Controls\obj\Debug\DACrux.Framework.Controls.DUCUpDownListView.resources
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Framework.Controls\obj\Debug\DACrux.Framework.Controls.DUCItemSelector.resources
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Framework.Controls\obj\Debug\DACrux.Framework.Controls.DUCUserIDValidator.resources
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Framework.Controls\obj\Debug\DACrux.Framework.Controls.frmAddLot.resources
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Framework.Controls\obj\Debug\DACrux.Framework.Controls.frmDUCListBox.resources
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Framework.Controls\obj\Debug\DACrux.Framework.Controls.frmRetestMsgBoxControl.resources
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Framework.Controls\obj\Debug\DACrux.Framework.Controls.Properties.Resources.resources
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Framework.Controls\obj\Debug\DACrux.Framework.Controls.DUCStatusView.resources
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Framework.Controls\obj\Debug\DACrux.Framework.Controls.DUCLotGroup.resources
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Framework.Controls\obj\Debug\DACrux.Framework.Controls.csproj.GenerateResource.cache
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Framework.Controls\obj\Debug\DACrux.Framework.Controls.dll.licenses
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Framework.Controls\obj\Debug\DACrux.Framework.Controls.csproj.CoreCompileInputs.cache
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Framework.Controls\obj\Debug\DACrux.F.13AA4015.Up2Date
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Framework.Controls\obj\Debug\DACrux.Framework.Controls.dll
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Framework.Controls\obj\Debug\DACrux.Framework.Controls.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Framework.Controls\obj\Debug\DACrux.Framework.Controls.csproj.AssemblyReference.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Framework.Controls\obj\Debug\DACrux.Framework.Controls.DUCAlarmStatusView.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Framework.Controls\obj\Debug\DACrux.Framework.Controls.DUCComboBox.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Framework.Controls\obj\Debug\DACrux.Framework.Controls.DUCControlSpread.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Framework.Controls\obj\Debug\DACrux.Framework.Controls.DUCEngStatusView.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Framework.Controls\obj\Debug\DACrux.Framework.Controls.DUCListBox.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Framework.Controls\obj\Debug\DACrux.Framework.Controls.DUCNumericUpDown.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Framework.Controls\obj\Debug\DACrux.Framework.Controls.DUCPeriodPicker.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Framework.Controls\obj\Debug\DACrux.Framework.Controls.DUCTitlePanel.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Framework.Controls\obj\Debug\DACrux.Framework.Controls.DUCTextBox.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Framework.Controls\obj\Debug\DACrux.Framework.Controls.DUCUpDownListView.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Framework.Controls\obj\Debug\DACrux.Framework.Controls.DUCItemSelector.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Framework.Controls\obj\Debug\DACrux.Framework.Controls.DUCUserIDValidator.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Framework.Controls\obj\Debug\DACrux.Framework.Controls.frmAddLot.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Framework.Controls\obj\Debug\DACrux.Framework.Controls.frmDUCListBox.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Framework.Controls\obj\Debug\DACrux.Framework.Controls.frmRetestMsgBoxControl.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Framework.Controls\obj\Debug\DACrux.Framework.Controls.Properties.Resources.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Framework.Controls\obj\Debug\DACrux.Framework.Controls.DUCStatusView.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Framework.Controls\obj\Debug\DACrux.Framework.Controls.DUCLotGroup.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Framework.Controls\obj\Debug\DACrux.Framework.Controls.csproj.GenerateResource.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Framework.Controls\obj\Debug\DACrux.Framework.Controls.dll.licenses
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Framework.Controls\obj\Debug\DACrux.Framework.Controls.csproj.CoreCompileInputs.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\07_CoreLib\DACrux.Framework.Controls.dll
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\07_CoreLib\DACrux.Framework.Controls.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Framework.Controls\obj\Debug\DACrux.F.13AA4015.Up2Date
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Framework.Controls\obj\Debug\DACrux.Framework.Controls.dll
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Framework.Controls\obj\Debug\DACrux.Framework.Controls.pdb

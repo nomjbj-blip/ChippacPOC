@@ -1,0 +1,20 @@
+D:\PROJECT\DB하이텍\gitlab\07_CoreLib\DACrux.Utility.dll
+D:\PROJECT\DB하이텍\gitlab\07_CoreLib\DACrux.Utility.pdb
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Utility\obj\Debug\DACrux.Utility.csproj.AssemblyReference.cache
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Utility\obj\Debug\DACrux.Utility.FtpFolderBrowserDialog.resources
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Utility\obj\Debug\DACrux.Utility.HButton.resources
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Utility\obj\Debug\DACrux.Utility.csproj.GenerateResource.cache
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Utility\obj\Debug\DACrux.Utility.csproj.CoreCompileInputs.cache
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Utility\obj\Debug\DACrux.U.A7876E00.Up2Date
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Utility\obj\Debug\DACrux.Utility.dll
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Utility\obj\Debug\DACrux.Utility.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\07_CoreLib\DACrux.Utility.dll
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\07_CoreLib\DACrux.Utility.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Utility\obj\Debug\DACrux.Utility.csproj.AssemblyReference.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Utility\obj\Debug\DACrux.Utility.FtpFolderBrowserDialog.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Utility\obj\Debug\DACrux.Utility.HButton.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Utility\obj\Debug\DACrux.Utility.csproj.GenerateResource.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Utility\obj\Debug\DACrux.Utility.csproj.CoreCompileInputs.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Utility\obj\Debug\DACrux.U.A7876E00.Up2Date
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Utility\obj\Debug\DACrux.Utility.dll
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Utility\obj\Debug\DACrux.Utility.pdb

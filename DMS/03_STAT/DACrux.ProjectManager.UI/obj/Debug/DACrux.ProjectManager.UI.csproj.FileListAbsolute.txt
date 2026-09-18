@@ -1,0 +1,44 @@
+D:\PROJECT\DB하이텍\gitlab\03_STAT\DACrux.ProjectManager.UI\obj\Debug\DACrux.ProjectManager.UI.csproj.AssemblyReference.cache
+D:\PROJECT\DB하이텍\gitlab\03_STAT\DACrux.ProjectManager.UI\obj\Debug\DACrux.ProjectManager.UI.Dialog.DlgDataViewTranspose.resources
+D:\PROJECT\DB하이텍\gitlab\03_STAT\DACrux.ProjectManager.UI\obj\Debug\DACrux.ProjectManager.UI.StatView.resources
+D:\PROJECT\DB하이텍\gitlab\03_STAT\DACrux.ProjectManager.UI\obj\Debug\DACrux.ProjectManager.UI.GraphPanel.resources
+D:\PROJECT\DB하이텍\gitlab\03_STAT\DACrux.ProjectManager.UI\obj\Debug\DACrux.ProjectManager.UI.DataView.resources
+D:\PROJECT\DB하이텍\gitlab\03_STAT\DACrux.ProjectManager.UI\obj\Debug\DACrux.ProjectManager.UI.DataViewImage.resources
+D:\PROJECT\DB하이텍\gitlab\03_STAT\DACrux.ProjectManager.UI\obj\Debug\DACrux.ProjectManager.UI.Dialog.DlgDataViewSplit.resources
+D:\PROJECT\DB하이텍\gitlab\03_STAT\DACrux.ProjectManager.UI\obj\Debug\DACrux.ProjectManager.UI.Dialog.DlgDataViewSort.resources
+D:\PROJECT\DB하이텍\gitlab\03_STAT\DACrux.ProjectManager.UI\obj\Debug\DACrux.ProjectManager.UI.Dialog.DlgDataViewColumnSetting.resources
+D:\PROJECT\DB하이텍\gitlab\03_STAT\DACrux.ProjectManager.UI\obj\Debug\DACrux.ProjectManager.UI.Dialog.DlgDataViewInsertRemove.resources
+D:\PROJECT\DB하이텍\gitlab\03_STAT\DACrux.ProjectManager.UI\obj\Debug\DACrux.ProjectManager.UI.Dialog.DlgDataViewMoveColumn.resources
+D:\PROJECT\DB하이텍\gitlab\03_STAT\DACrux.ProjectManager.UI\obj\Debug\DACrux.ProjectManager.UI.GradientPanel.resources
+D:\PROJECT\DB하이텍\gitlab\03_STAT\DACrux.ProjectManager.UI\obj\Debug\DACrux.ProjectManager.UI.GraphView.resources
+D:\PROJECT\DB하이텍\gitlab\03_STAT\DACrux.ProjectManager.UI\obj\Debug\DACrux.ProjectManager.UI.Properties.Resources.resources
+D:\PROJECT\DB하이텍\gitlab\03_STAT\DACrux.ProjectManager.UI\obj\Debug\DACrux.ProjectManager.UI.csproj.GenerateResource.cache
+D:\PROJECT\DB하이텍\gitlab\03_STAT\DACrux.ProjectManager.UI\obj\Debug\DACrux.ProjectManager.UI.dll.licenses
+D:\PROJECT\DB하이텍\gitlab\03_STAT\DACrux.ProjectManager.UI\obj\Debug\DACrux.ProjectManager.UI.csproj.CoreCompileInputs.cache
+D:\PROJECT\DB하이텍\gitlab\71_CoreLib\DACrux.ProjectManager.UI.dll
+D:\PROJECT\DB하이텍\gitlab\71_CoreLib\DACrux.ProjectManager.UI.pdb
+D:\PROJECT\DB하이텍\gitlab\03_STAT\DACrux.ProjectManager.UI\obj\Debug\DACrux.P.65956192.Up2Date
+D:\PROJECT\DB하이텍\gitlab\03_STAT\DACrux.ProjectManager.UI\obj\Debug\DACrux.ProjectManager.UI.dll
+D:\PROJECT\DB하이텍\gitlab\03_STAT\DACrux.ProjectManager.UI\obj\Debug\DACrux.ProjectManager.UI.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\03_STAT\DACrux.ProjectManager.UI\obj\Debug\DACrux.ProjectManager.UI.csproj.AssemblyReference.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\71_CoreLib\DACrux.ProjectManager.UI.dll
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\71_CoreLib\DACrux.ProjectManager.UI.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\03_STAT\DACrux.ProjectManager.UI\obj\Debug\DACrux.ProjectManager.UI.Dialog.DlgDataViewTranspose.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\03_STAT\DACrux.ProjectManager.UI\obj\Debug\DACrux.ProjectManager.UI.StatView.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\03_STAT\DACrux.ProjectManager.UI\obj\Debug\DACrux.ProjectManager.UI.GraphPanel.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\03_STAT\DACrux.ProjectManager.UI\obj\Debug\DACrux.ProjectManager.UI.DataView.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\03_STAT\DACrux.ProjectManager.UI\obj\Debug\DACrux.ProjectManager.UI.DataViewImage.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\03_STAT\DACrux.ProjectManager.UI\obj\Debug\DACrux.ProjectManager.UI.Dialog.DlgDataViewSplit.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\03_STAT\DACrux.ProjectManager.UI\obj\Debug\DACrux.ProjectManager.UI.Dialog.DlgDataViewSort.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\03_STAT\DACrux.ProjectManager.UI\obj\Debug\DACrux.ProjectManager.UI.Dialog.DlgDataViewColumnSetting.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\03_STAT\DACrux.ProjectManager.UI\obj\Debug\DACrux.ProjectManager.UI.Dialog.DlgDataViewInsertRemove.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\03_STAT\DACrux.ProjectManager.UI\obj\Debug\DACrux.ProjectManager.UI.Dialog.DlgDataViewMoveColumn.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\03_STAT\DACrux.ProjectManager.UI\obj\Debug\DACrux.ProjectManager.UI.GradientPanel.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\03_STAT\DACrux.ProjectManager.UI\obj\Debug\DACrux.ProjectManager.UI.GraphView.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\03_STAT\DACrux.ProjectManager.UI\obj\Debug\DACrux.ProjectManager.UI.Properties.Resources.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\03_STAT\DACrux.ProjectManager.UI\obj\Debug\DACrux.ProjectManager.UI.csproj.GenerateResource.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\03_STAT\DACrux.ProjectManager.UI\obj\Debug\DACrux.ProjectManager.UI.dll.licenses
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\03_STAT\DACrux.ProjectManager.UI\obj\Debug\DACrux.ProjectManager.UI.csproj.CoreCompileInputs.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\03_STAT\DACrux.ProjectManager.UI\obj\Debug\DACrux.P.65956192.Up2Date
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\03_STAT\DACrux.ProjectManager.UI\obj\Debug\DACrux.ProjectManager.UI.dll
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\03_STAT\DACrux.ProjectManager.UI\obj\Debug\DACrux.ProjectManager.UI.pdb

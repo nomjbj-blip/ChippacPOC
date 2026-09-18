@@ -1,0 +1,22 @@
+D:\PROJECT\DB하이텍\gitlab\101_ServerBin\DACrux.SEMDMS.Inspection.DataService.exe.config
+D:\PROJECT\DB하이텍\gitlab\101_ServerBin\DACrux.SEMDMS.Inspection.DataService.exe
+D:\PROJECT\DB하이텍\gitlab\101_ServerBin\DACrux.SEMDMS.Inspection.DataService.pdb
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Inspection.DataService\obj\Debug\DACrux.SEMDMS.Inspection.DataService.csproj.AssemblyReference.cache
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Inspection.DataService\obj\Debug\DACrux.SEMDMS.Inspection.DataService.InspectionDataService.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Inspection.DataService\obj\Debug\DACrux.SEMDMS.Inspection.DataService.ProjectInstaller.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Inspection.DataService\obj\Debug\DACrux.SEMDMS.Inspection.DataService.csproj.GenerateResource.cache
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Inspection.DataService\obj\Debug\DACrux.SEMDMS.Inspection.DataService.csproj.CoreCompileInputs.cache
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Inspection.DataService\obj\Debug\DACrux.S.89277F96.Up2Date
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Inspection.DataService\obj\Debug\DACrux.SEMDMS.Inspection.DataService.exe
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Inspection.DataService\obj\Debug\DACrux.SEMDMS.Inspection.DataService.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\101_ServerBin\DACrux.SEMDMS.Inspection.DataService.exe.config
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\101_ServerBin\DACrux.SEMDMS.Inspection.DataService.exe
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\101_ServerBin\DACrux.SEMDMS.Inspection.DataService.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Inspection.DataService\obj\Debug\DACrux.SEMDMS.Inspection.DataService.csproj.AssemblyReference.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Inspection.DataService\obj\Debug\DACrux.SEMDMS.Inspection.DataService.InspectionDataService.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Inspection.DataService\obj\Debug\DACrux.SEMDMS.Inspection.DataService.ProjectInstaller.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Inspection.DataService\obj\Debug\DACrux.SEMDMS.Inspection.DataService.csproj.GenerateResource.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Inspection.DataService\obj\Debug\DACrux.SEMDMS.Inspection.DataService.csproj.CoreCompileInputs.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Inspection.DataService\obj\Debug\DACrux.S.89277F96.Up2Date
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Inspection.DataService\obj\Debug\DACrux.SEMDMS.Inspection.DataService.exe
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Inspection.DataService\obj\Debug\DACrux.SEMDMS.Inspection.DataService.pdb

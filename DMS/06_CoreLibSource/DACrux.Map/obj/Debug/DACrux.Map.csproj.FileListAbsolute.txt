@@ -1,0 +1,36 @@
+D:\PROJECT\DB하이텍\gitlab\07_CoreLib\DACrux.Map.dll
+D:\PROJECT\DB하이텍\gitlab\07_CoreLib\DACrux.Map.pdb
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Map\obj\Debug\DACrux.Map.csproj.AssemblyReference.cache
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Map\obj\Debug\DACrux.Map.DefectMap.resources
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Map\obj\Debug\DACrux.Map.EditTESTMap.resources
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Map\obj\Debug\DACrux.Map.EditWaferMap.resources
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Map\obj\Debug\DACrux.Map.Resource.resources
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Map\obj\Debug\DACrux.Map.WaferMap.resources
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Map\obj\Debug\DACrux.Map.WaferMapShotOption.resources
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Map\obj\Debug\DACrux.Map.WaferMapZoneOption.resources
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Map\obj\Debug\DACrux.Map.Zonal.resources
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Map\obj\Debug\DACrux.Map.ZoneIDSelectControl.resources
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Map\obj\Debug\DACrux.Map.ZoneIDSelectControlPopup.resources
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Map\obj\Debug\DACrux.Map.csproj.GenerateResource.cache
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Map\obj\Debug\DACrux.Map.csproj.CoreCompileInputs.cache
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Map\obj\Debug\DACrux.Map.csproj.Up2Date
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Map\obj\Debug\DACrux.Map.dll
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Map\obj\Debug\DACrux.Map.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Map\obj\Debug\DACrux.Map.csproj.AssemblyReference.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\07_CoreLib\DACrux.Map.dll
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\07_CoreLib\DACrux.Map.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Map\obj\Debug\DACrux.Map.DefectMap.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Map\obj\Debug\DACrux.Map.EditTESTMap.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Map\obj\Debug\DACrux.Map.EditWaferMap.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Map\obj\Debug\DACrux.Map.Resource.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Map\obj\Debug\DACrux.Map.WaferMap.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Map\obj\Debug\DACrux.Map.WaferMapShotOption.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Map\obj\Debug\DACrux.Map.WaferMapZoneOption.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Map\obj\Debug\DACrux.Map.Zonal.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Map\obj\Debug\DACrux.Map.ZoneIDSelectControl.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Map\obj\Debug\DACrux.Map.ZoneIDSelectControlPopup.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Map\obj\Debug\DACrux.Map.csproj.GenerateResource.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Map\obj\Debug\DACrux.Map.csproj.CoreCompileInputs.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Map\obj\Debug\DACrux.Map.csproj.Up2Date
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Map\obj\Debug\DACrux.Map.dll
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Map\obj\Debug\DACrux.Map.pdb

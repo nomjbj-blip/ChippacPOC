@@ -1,0 +1,24 @@
+D:\PROJECT\DB하이텍\gitlab\101_ServerBin\DACrux.RPNet.Service.exe.config
+D:\PROJECT\DB하이텍\gitlab\101_ServerBin\DACrux.RPNet.Service.exe
+D:\PROJECT\DB하이텍\gitlab\101_ServerBin\DACrux.RPNet.Service.pdb
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.RPNet.Service\obj\Debug\DACrux.RPNet.Service.csproj.AssemblyReference.cache
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.RPNet.Service\obj\Debug\DACrux.RPNet.Service.DACruxRPNet.resources
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.RPNet.Service\obj\Debug\DACrux.RPNet.Service.Debug.resources
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.RPNet.Service\obj\Debug\DACrux.RPNet.Service.ProjectInstaller.resources
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.RPNet.Service\obj\Debug\DACrux.RPNet.Service.Properties.Resources.resources
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.RPNet.Service\obj\Debug\DACrux.RPNet.Service.csproj.GenerateResource.cache
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.RPNet.Service\obj\Debug\DACrux.RPNet.Service.csproj.CoreCompileInputs.cache
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.RPNet.Service\obj\Debug\DACrux.RPNet.Service.exe
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.RPNet.Service\obj\Debug\DACrux.RPNet.Service.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\101_ServerBin\DACrux.RPNet.Service.exe.config
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\101_ServerBin\DACrux.RPNet.Service.exe
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\101_ServerBin\DACrux.RPNet.Service.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.RPNet.Service\obj\Debug\DACrux.RPNet.Service.csproj.AssemblyReference.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.RPNet.Service\obj\Debug\DACrux.RPNet.Service.DACruxRPNet.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.RPNet.Service\obj\Debug\DACrux.RPNet.Service.Debug.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.RPNet.Service\obj\Debug\DACrux.RPNet.Service.ProjectInstaller.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.RPNet.Service\obj\Debug\DACrux.RPNet.Service.Properties.Resources.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.RPNet.Service\obj\Debug\DACrux.RPNet.Service.csproj.GenerateResource.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.RPNet.Service\obj\Debug\DACrux.RPNet.Service.csproj.CoreCompileInputs.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.RPNet.Service\obj\Debug\DACrux.RPNet.Service.exe
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.RPNet.Service\obj\Debug\DACrux.RPNet.Service.pdb

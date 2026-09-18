@@ -1,0 +1,20 @@
+D:\PROJECT\DB하이텍\gitlab\101_ServerBin\DACrux.TEST.PCM.StatusService.exe.config
+D:\PROJECT\DB하이텍\gitlab\101_ServerBin\DACrux.TEST.PCM.StatusService.exe
+D:\PROJECT\DB하이텍\gitlab\101_ServerBin\DACrux.TEST.PCM.StatusService.pdb
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.TEST.PCM.StatusService\obj\Debug\DACrux.TEST.PCM.StatusService.csproj.AssemblyReference.cache
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.TEST.PCM.StatusService\obj\Debug\DACrux.TEST.PCM.StatusService.ProjectInstaller.resources
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.TEST.PCM.StatusService\obj\Debug\DACrux.TEST.PCM.StatusService.csproj.GenerateResource.cache
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.TEST.PCM.StatusService\obj\Debug\DACrux.TEST.PCM.StatusService.csproj.CoreCompileInputs.cache
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.TEST.PCM.StatusService\obj\Debug\DACrux.T.17B2FDD6.Up2Date
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.TEST.PCM.StatusService\obj\Debug\DACrux.TEST.PCM.StatusService.exe
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.TEST.PCM.StatusService\obj\Debug\DACrux.TEST.PCM.StatusService.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\101_ServerBin\DACrux.TEST.PCM.StatusService.exe.config
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\101_ServerBin\DACrux.TEST.PCM.StatusService.exe
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\101_ServerBin\DACrux.TEST.PCM.StatusService.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.PCM.StatusService\obj\Debug\DACrux.TEST.PCM.StatusService.csproj.AssemblyReference.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.PCM.StatusService\obj\Debug\DACrux.TEST.PCM.StatusService.ProjectInstaller.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.PCM.StatusService\obj\Debug\DACrux.TEST.PCM.StatusService.csproj.GenerateResource.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.PCM.StatusService\obj\Debug\DACrux.TEST.PCM.StatusService.csproj.CoreCompileInputs.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.PCM.StatusService\obj\Debug\DACrux.T.17B2FDD6.Up2Date
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.PCM.StatusService\obj\Debug\DACrux.TEST.PCM.StatusService.exe
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.PCM.StatusService\obj\Debug\DACrux.TEST.PCM.StatusService.pdb

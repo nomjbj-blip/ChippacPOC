@@ -1,0 +1,20 @@
+D:\PROJECT\DB하이텍\gitlab\101_ServerBin\DACrux.SEMDMS.Review.DataService.exe.config
+D:\PROJECT\DB하이텍\gitlab\101_ServerBin\DACrux.SEMDMS.Review.DataService.exe
+D:\PROJECT\DB하이텍\gitlab\101_ServerBin\DACrux.SEMDMS.Review.DataService.pdb
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Review.DataService\obj\Debug\DACrux.SEMDMS.Review.DataService.csproj.AssemblyReference.cache
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Review.DataService\obj\Debug\DACrux.TEST.PCM.DataService.ProjectInstaller.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Review.DataService\obj\Debug\DACrux.SEMDMS.Review.DataService.csproj.GenerateResource.cache
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Review.DataService\obj\Debug\DACrux.SEMDMS.Review.DataService.csproj.CoreCompileInputs.cache
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Review.DataService\obj\Debug\DACrux.S.ECCA592A.Up2Date
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Review.DataService\obj\Debug\DACrux.SEMDMS.Review.DataService.exe
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Review.DataService\obj\Debug\DACrux.SEMDMS.Review.DataService.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\101_ServerBin\DACrux.SEMDMS.Review.DataService.exe.config
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\101_ServerBin\DACrux.SEMDMS.Review.DataService.exe
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\101_ServerBin\DACrux.SEMDMS.Review.DataService.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Review.DataService\obj\Debug\DACrux.SEMDMS.Review.DataService.csproj.AssemblyReference.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Review.DataService\obj\Debug\DACrux.TEST.PCM.DataService.ProjectInstaller.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Review.DataService\obj\Debug\DACrux.SEMDMS.Review.DataService.csproj.GenerateResource.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Review.DataService\obj\Debug\DACrux.SEMDMS.Review.DataService.csproj.CoreCompileInputs.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Review.DataService\obj\Debug\DACrux.S.ECCA592A.Up2Date
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Review.DataService\obj\Debug\DACrux.SEMDMS.Review.DataService.exe
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Review.DataService\obj\Debug\DACrux.SEMDMS.Review.DataService.pdb

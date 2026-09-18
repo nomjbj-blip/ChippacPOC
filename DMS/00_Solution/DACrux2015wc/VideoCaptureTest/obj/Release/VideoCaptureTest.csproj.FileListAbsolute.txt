@@ -1,0 +1,17 @@
+D:\PROJECT\DB하이텍\gitlab\00_Solution\DACrux2015wc\VideoCaptureTest\bin\Release\VideoCaptureTest.exe
+D:\PROJECT\DB하이텍\gitlab\00_Solution\DACrux2015wc\VideoCaptureTest\bin\Release\VideoCaptureTest.pdb
+D:\PROJECT\DB하이텍\gitlab\00_Solution\DACrux2015wc\VideoCaptureTest\bin\Release\AForge.Controls.dll
+D:\PROJECT\DB하이텍\gitlab\00_Solution\DACrux2015wc\VideoCaptureTest\bin\Release\AForge.Video.DirectShow.dll
+D:\PROJECT\DB하이텍\gitlab\00_Solution\DACrux2015wc\VideoCaptureTest\bin\Release\AForge.Video.dll
+D:\PROJECT\DB하이텍\gitlab\00_Solution\DACrux2015wc\VideoCaptureTest\bin\Release\DACrux.Common.VideoCapture.dll
+D:\PROJECT\DB하이텍\gitlab\00_Solution\DACrux2015wc\VideoCaptureTest\bin\Release\DACrux.Common.VideoCapture.pdb
+D:\PROJECT\DB하이텍\gitlab\00_Solution\DACrux2015wc\VideoCaptureTest\bin\Release\DACrux.Common.VideoCapture.dll.config
+D:\PROJECT\DB하이텍\gitlab\00_Solution\DACrux2015wc\VideoCaptureTest\obj\Release\VideoCaptureTest.csproj.AssemblyReference.cache
+D:\PROJECT\DB하이텍\gitlab\00_Solution\DACrux2015wc\VideoCaptureTest\obj\Release\VideoCaptureTest.Form1.resources
+D:\PROJECT\DB하이텍\gitlab\00_Solution\DACrux2015wc\VideoCaptureTest\obj\Release\VideoCaptureTest.Form2.resources
+D:\PROJECT\DB하이텍\gitlab\00_Solution\DACrux2015wc\VideoCaptureTest\obj\Release\VideoCaptureTest.Properties.Resources.resources
+D:\PROJECT\DB하이텍\gitlab\00_Solution\DACrux2015wc\VideoCaptureTest\obj\Release\VideoCaptureTest.csproj.GenerateResource.cache
+D:\PROJECT\DB하이텍\gitlab\00_Solution\DACrux2015wc\VideoCaptureTest\obj\Release\VideoCaptureTest.csproj.CoreCompileInputs.cache
+D:\PROJECT\DB하이텍\gitlab\00_Solution\DACrux2015wc\VideoCaptureTest\obj\Release\VideoCap.5C0B10C6.Up2Date
+D:\PROJECT\DB하이텍\gitlab\00_Solution\DACrux2015wc\VideoCaptureTest\obj\Release\VideoCaptureTest.exe
+D:\PROJECT\DB하이텍\gitlab\00_Solution\DACrux2015wc\VideoCaptureTest\obj\Release\VideoCaptureTest.pdb

@@ -1,0 +1,14 @@
+D:\PROJECT\DB하이텍\gitlab\07_CoreLib\DACrux.Framework.Interface.dll
+D:\PROJECT\DB하이텍\gitlab\07_CoreLib\DACrux.Framework.Interface.pdb
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Framework.Interface\obj\Debug\DACrux.Framework.Interface.csproj.AssemblyReference.cache
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Framework.Interface\obj\Debug\DACrux.Framework.Interface.csproj.CoreCompileInputs.cache
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Framework.Interface\obj\Debug\DACrux.Framework.Interface.dll
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Framework.Interface\obj\Debug\DACrux.Framework.Interface.pdb
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Framework.Interface\obj\Debug\DACrux.F.22988FBD.Up2Date
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\07_CoreLib\DACrux.Framework.Interface.dll
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\07_CoreLib\DACrux.Framework.Interface.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Framework.Interface\obj\Debug\DACrux.Framework.Interface.csproj.AssemblyReference.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Framework.Interface\obj\Debug\DACrux.Framework.Interface.csproj.CoreCompileInputs.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Framework.Interface\obj\Debug\DACrux.Framework.Interface.dll
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Framework.Interface\obj\Debug\DACrux.Framework.Interface.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Framework.Interface\obj\Debug\DACrux.F.22988FBD.Up2Date

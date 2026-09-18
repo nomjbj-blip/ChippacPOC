@@ -1,0 +1,1577 @@
+﻿using System.Collections.Generic;
+using System.Data;
+using System.Text;
+using Oracle.ManagedDataAccess.Client;
+using System.Collections;
+using System;
+
+namespace FabTwoToMigrationTools.Target
+{
+    public class MiracomDMS : BaseInfo, IDisposable
+    {
+        private readonly string UserID = "DMSMGR";
+        private readonly string Password = "DMSMGR";
+        private readonly string DataSource = "DMSDEV";
+        private OracleConnection oConnection = null;
+
+        public OracleConnection Connection { get { return oConnection; } set { oConnection = value; } }
+        public OracleTransaction Transaction { get; set; }
+
+        public MiracomDMS(
+            )
+        {
+            base.UserID = this.UserID;
+            base.Password = this.Password;
+            base.DataSource = this.DataSource;
+            oConnection = base.DbOpen();
+        }
+
+        //-----------------------------------------------------------------------------------------------------
+
+        public MiracomDMS(
+            string userid,
+            string password,
+            string connectionname
+            )
+        {
+            base.UserID = userid;
+            base.Password = password;
+            base.DataSource = connectionname;
+            oConnection = base.DbOpen();
+        }
+
+        //-----------------------------------------------------------------------------------------------------
+
+        #region [ TQD_LOT ]
+        public int CheckedLot(
+            ref DwLotInfo lotinfo
+            )
+        {
+            Dictionary<string, Parameter> dicParams = null;
+            StringBuilder sQuery = new StringBuilder();
+
+            //--
+            /// Sql Query
+            //--
+            sQuery.AppendLine("SELECT LOT_SEQ, PRODUCT FROM TQD_LOT ");
+            sQuery.AppendLine(" WHERE 1=1");
+            sQuery.AppendLine("       AND PRODUCT = :product");
+            sQuery.AppendLine("       AND LOT_ID = :lotid");
+
+            //--
+
+            dicParams = new Dictionary<string, Parameter>();
+            #region [ Setting Parameter ]
+            Parameter p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = lotinfo.Device; ;
+            dicParams.Add("product", p);
+
+            //--
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = lotinfo.LotID;
+            dicParams.Add("lotid", p);
+            #endregion [ Setting Parameter ]
+
+            //--
+
+            DataTable checkedDt = base.ExecuteQuery(
+                oConnection,
+                Constract.FUNCATION_NAME_LOT,
+                sQuery.ToString(),
+                dicParams
+                );
+
+            if (checkedDt != null && checkedDt.Rows.Count > 0)
+            {
+                lotinfo.Device = checkedDt.Rows[0]["PRODUCT"].ToString();
+                lotinfo.LotSeq = long.Parse(checkedDt.Rows[0]["LOT_SEQ"].ToString());
+            }
+            else
+            {
+                lotinfo.LotSeq = -1;
+            }
+            return checkedDt.Rows.Count;
+        }
+
+        //--
+
+        public int SetLot(
+            ref DwLotInfo lotinfo
+            )
+        {
+            int iResult = -1;
+            Dictionary<string, Parameter> dicParams = null;
+            StringBuilder sQuery = new StringBuilder();
+
+            sQuery.AppendLine("INSERT INTO TQD_LOT(LOT_SEQ, LOT_ID, PRODUCT, \"COMMENT\") ");
+            sQuery.AppendLine(" VALUES (LOT_SEQ.NEXTVAL, :LOT_ID, :PRODUCT, :CMT)");
+
+            dicParams = new Dictionary<string, Parameter>();
+            #region [ Settring Parameter ]
+            Parameter p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = lotinfo.LotID;
+            dicParams.Add("LOT_ID", p);
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = lotinfo.Device;
+            dicParams.Add("PRODUCT", p);
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = "@COMMENT@";
+            dicParams.Add("CMT", p);
+            #endregion [ Setting Parameter ]
+
+            iResult = ExecuteNonQuery(
+                oConnection,
+                Constract.FUNCATION_NAME_LOT,
+                sQuery.ToString(),
+                dicParams
+                );
+
+            CheckedLot(ref lotinfo);
+
+            return iResult;
+        }
+        #endregion [ TQD_LOT ]
+
+        //-----------------------------------------------------------------------------------------------------
+
+        #region [ TQD_WAFER ]
+        public int CheckedWafer(
+            ref DwResultValue rv,
+            int iSLotId
+            )
+        {
+            Dictionary<string, Parameter> dicParams = null;
+            StringBuilder sQuery = new StringBuilder();
+
+            //--
+            /// Sql Query
+            //--
+            sQuery.AppendLine("SELECT WAFER_SEQ FROM TQD_WAFER ");
+            sQuery.AppendLine(" WHERE 1=1");
+            sQuery.AppendLine("       AND LOT_SEQ = :lotseq");
+            sQuery.AppendLine("       AND WAFER_ID = :waferid");
+            sQuery.AppendLine("       AND SLOT_ID = :slotid");
+
+            dicParams = new Dictionary<string, Parameter>();
+            #region [ Setting Parameter ]
+            Parameter p = new Parameter();
+            p.Type = DbType.Int64;
+            p.Value = rv.LotSeq;
+            dicParams.Add("lotseq", p);
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = rv.WaferID;
+            dicParams.Add("waferid", p);
+
+            p = new Parameter();
+            p.Type = DbType.Int32;
+            p.Value = iSLotId;
+            dicParams.Add("slotid", p);
+            #endregion [ Setting Parameter ]
+
+            DataTable checkedDt = base.ExecuteQuery(
+                oConnection,
+                Constract.FUNCATION_NAME_WAFER,
+                sQuery.ToString(),
+                dicParams
+                );
+
+            if (checkedDt != null && checkedDt.Rows.Count > 0)
+                rv.WaferSeq = long.Parse(checkedDt.Rows[0]["WAFER_SEQ"].ToString());
+            else rv.WaferSeq = -1;
+
+            return checkedDt.Rows.Count;
+        }
+
+        //--
+
+        public int SetWafer(
+            ref DwResultValue rv,
+            int iSLotId
+            )
+        {
+            int iResult = -1;
+            Dictionary<string, Parameter> dicParams = null;
+            StringBuilder sQuery = new StringBuilder();
+            sQuery.AppendLine("INSERT INTO TQD_WAFER(WAFER_SEQ, LOT_SEQ, WAFER_ID, SLOT_ID, \"COMMENT\") ");
+            sQuery.AppendLine("VALUES (WAFER_SEQ.NEXTVAL, :lotseq, :waferid, :slotid, :cmt)");
+
+            dicParams = new Dictionary<string, Parameter>();
+            Parameter p = new Parameter();
+            p.Type = DbType.Int64;
+            p.Value = rv.LotSeq;
+            dicParams.Add("lotseq", p);
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = rv.WaferID;
+            dicParams.Add("waferid", p);
+
+            p = new Parameter();
+            p.Type = DbType.Int32;
+            p.Value = iSLotId;
+            dicParams.Add("slotid", p);
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = "@COMMENT@";
+            dicParams.Add("cmt", p);
+
+            iResult = ExecuteNonQuery(
+                oConnection,
+                Constract.FUNCATION_NAME_WAFER,
+                sQuery.ToString(),
+                dicParams
+                );
+
+            CheckedWafer(ref rv, iSLotId);
+
+            return iResult;
+        }
+        #endregion [ TQD_WAFER ]
+
+        //-----------------------------------------------------------------------------------------------------
+
+        #region [ TQD_PRODUCT ]
+        public int CheckedProduct(
+            ref DwResultValue rv
+            )
+        {
+            Dictionary<string, Parameter> dicParams = null;
+            StringBuilder sQuery = new StringBuilder();
+
+            //--
+            /// Sql Query
+            //--
+            sQuery.AppendLine("SELECT PRODUCT FROM TQD_PRODUCT ");
+            sQuery.AppendLine(" WHERE 1=1");
+            sQuery.AppendLine("       AND PRODUCT = :product");
+
+            dicParams = new Dictionary<string, Parameter>();
+            #region [ Setting Parameter ]
+            Parameter p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = rv.Device;
+            dicParams.Add("product", p);
+            #endregion [ Setting Parameter ]
+
+            DataTable checkedDt = base.ExecuteQuery(
+                oConnection,
+                Constract.FUNCATION_NAME_PRODUCT,
+                sQuery.ToString(),
+                dicParams
+                );
+
+            //if (checkedDt != null && checkedDt.Rows.Count > 0)
+            //    rv.Product = checkedDt.Rows[0]["PRODUCT"].ToString();
+            //else rv.Product = string.Empty;
+
+            return checkedDt.Rows.Count;
+        }
+
+        //--
+
+        public int SetProduct(
+            ref DwResultValue rv,
+            DataRow dr
+            )
+        {
+            StringBuilder sQuery = new StringBuilder();
+            Dictionary<string, Parameter> dicParams = null;
+
+            //--
+            /// Sql Query
+            //--
+            sQuery.AppendLine("INSERT INTO TQD_PRODUCT(PRODUCT, FACILITY, TECHNOLOGY, NETDIE, WAFER_SIZE, ANGLE, NOTCH_TYPE, DIE_PITCH_X, DIE_PITCH_Y, DIE_ORIGIN_X, DIE_ORIGIN_Y, ORIGIN_X, ORIGIN_Y, \"COMMENT\") ");
+            sQuery.AppendLine(" VALUES(:product, :facility, :technology, :netdie, :wafer_size, :angle, :notch_type, :die_pitch_x, :die_pitch_y, :die_origin_x, :die_origin_y, :origin_x, :origin_y, :cmt) ");
+
+            dicParams = new Dictionary<string, Parameter>();
+            #region [ Setting Parameter ]
+            Parameter p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = rv.Device;
+            dicParams.Add("product", p);
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = dr["FACILITY"];
+            dicParams.Add("facility", p);
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = dr["TECHNOLOGY"];
+            dicParams.Add("technology", p);
+
+            p = new Parameter();
+            p.Type = DbType.Int64;
+            p.Value = dr["NETDIE"];
+            dicParams.Add("netdie", p);
+
+            p = new Parameter();
+            p.Type = DbType.Int64;
+            p.Value = dr["WAFER_SIZE"];
+            dicParams.Add("wafer_size", p);
+
+            p = new Parameter();
+            p.Type = DbType.Int32;
+            p.Value = dr["ANGLE"];
+            dicParams.Add("angle", p);
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = dr["NOTCH_TYPE"];
+            dicParams.Add("notch_type", p);
+
+            p = new Parameter();
+            p.Type = DbType.Int64;
+            p.Value = dr["DIE_PITCH_X"];
+            dicParams.Add("die_pitch_x", p);
+
+            p = new Parameter();
+            p.Type = DbType.Int64;
+            p.Value = dr["DIE_PITCH_Y"];
+            dicParams.Add("die_pitch_y", p);
+
+            p = new Parameter();
+            p.Type = DbType.Int64;
+            p.Value = dr["DIE_ORIGIN_X"];
+            dicParams.Add("die_origin_x", p);
+
+            p = new Parameter();
+            p.Type = DbType.Int64;
+            p.Value = dr["DIE_ORIGIN_Y"];
+            dicParams.Add("die_origin_y", p);
+
+            p = new Parameter();
+            p.Type = DbType.Int64;
+            p.Value = dr["ORIGIN_X"];
+            dicParams.Add("origin_x", p);
+
+            p = new Parameter();
+            p.Type = DbType.Int64;
+            p.Value = dr["ORIGIN_Y"];
+            dicParams.Add("origin_y", p);
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = "@COMMENT@";
+            dicParams.Add("cmt", p);
+            #endregion [ Setting Parameter ]
+
+            return ExecuteNonQuery(
+                oConnection,
+                Constract.FUNCATION_NAME_PRODUCT,
+                sQuery.ToString(),
+                dicParams
+                );
+        }
+        #endregion [ TQD_PRODUCT ]
+
+        //-----------------------------------------------------------------------------------------------------
+
+        #region [ TQD_INSP_INFO ]
+        public int CheckedInspInfo(
+            DwResultValue rv
+            )
+        {
+            Dictionary<string, Parameter> dicParams = null;
+            StringBuilder sQuery = new StringBuilder();
+
+            //--
+            /// Sql Query
+            //--
+            sQuery.AppendLine("SELECT STEP_SEQ, WAFER_SEQ, SETUP_SEQ FROM TQD_INSP_INFO ");
+            sQuery.AppendLine(" WHERE 1=1");
+            sQuery.AppendLine("       AND STEP_SEQ = :STEPSEQ");
+            sQuery.AppendLine("       AND WAFER_SEQ = :WAFERSEQ");
+            sQuery.AppendLine("       AND SETUP_SEQ = :SETUPSEQ");
+            sQuery.AppendLine("       AND RESULTTIMESTAMP = TO_DATE(:INSPDATETIME, 'YYYYMMDDHH24MISS') ");
+
+            dicParams = new Dictionary<string, Parameter>();
+            #region [ Setting Parameter ]
+            Parameter p = new Parameter();
+            p.Type = DbType.Int64;
+            p.Value = rv.StepSeq;
+            dicParams.Add("STEPSEQ", p);
+
+            p = new Parameter();
+            p.Type = DbType.Int64;
+            p.Value = rv.WaferSeq;
+            dicParams.Add("WAFERSEQ", p);
+
+            p = new Parameter();
+            p.Type = DbType.Int64;
+            p.Value = rv.SetupSeq;
+            dicParams.Add("SETUPSEQ", p);
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            //p.Value = lSetupSeq;
+            p.Value = rv.InspDateTime;
+            dicParams.Add("INSPDATETIME", p);
+            #endregion [ Setting Parameter ]
+
+            DataTable checkedDt = base.ExecuteQuery(
+                oConnection,
+                Constract.FUNCATION_NAME_INSP_INFO,
+                sQuery.ToString(),
+                dicParams
+                );
+
+            return checkedDt.Rows.Count;
+        }
+
+        //--
+
+        public int SetInspInfo(
+            DataRow dr,
+            DwResultValue rv
+            )
+        {
+            StringBuilder sQuery = new StringBuilder();
+            Dictionary<string, Parameter> dicParams = null;
+
+            //--
+            /// Sql Query
+            //--
+            sQuery.AppendLine("INSERT INTO TQD_INSP_INFO(STEP_SEQ, WAFER_SEQ, RESULTTIMESTAMP, FILETIMESTAMP, FACTORY, TECHNOLOGY, PRODUCT, LOT_ID, WAFER_ID, STEP_ID, TEST, SLOT_ID, SETUP_SEQ, STATUS, MAIN_EQ, ROUTE, OPER,");
+            sQuery.AppendLine(" INSPECTION_EQ, INSPECTION_PARAM, DEFECTS, CLASSIFIED_DEFECTS, KILLER_DEFECTS, RANDOM_DEFECTS, ADDER_KILLER_DEFECT, ADDER_RANDOM_DEFECT, CLUSTERS, ADDER_CLUSTERS, CLUSTER_AREA, DEFECT_DD, KILLER_DEFECT_DD, ");
+            sQuery.AppendLine(" RANDOM_DEFECT_DD, INSPECTED_DIE, DEFECTIVE_DIE, ADDER_DEF_DIE, KILL_DEF_DIE, KILL_ADDER_DEF_DIE, IMAGES, SCAN_AREA, ADDER_DEFECTS, KILL_RND_DEFECTS, \"COMMENT\", RETICLE_ID, INTERLOCK_FLAG, STEPPER_EQ, SUMMARY_FLAG) ");
+            sQuery.AppendLine(" VALUES (:STEP_SEQ, :WAFER_SEQ, TO_DATE(:RESULTTIMESTAMP, 'YYYYMMDDHH24MISS'), TO_DATE(:FILETIMESTAMP, 'YYYYMMDDHH24MISS'), :FACTORY, :TECHNOLOGY, :PRODUCT, :LOT_ID, :WAFER_ID, :STEP_ID, :TEST, :SLOT_ID, :SETUP_SEQ, :STATUS, :MAIN_EQ, :ROUTE, :OPER,");
+            sQuery.AppendLine(" :INSPECTION_EQ, :INSPECTION_PARAM, :DEFECTS, :CLASSIFIED_DEFECTS, :KILLER_DEFECTS, :RANDOM_DEFECTS, :ADDER_KILLER_DEFECT, :ADDER_RANDOM_DEFECT, :CLUSTERS, :ADDER_CLUSTERS, :CLUSTER_AREA, :DEFECT_DD, :KILLER_DEFECT_DD, ");
+            sQuery.AppendLine(" :RANDOM_DEFECT_DD, :INSPECTED_DIE, :DEFECTIVE_DIE, :ADDER_DEF_DIE, :KILL_DEF_DIE, :KILL_ADDER_DEF_DIE, :IMAGES, :SCAN_AREA, :ADDER_DEFECTS, :KILL_RND_DEFECTS, :CMT, :RETICLE_ID, :INTERLOCK_FLAG, :STEPPER_EQ, :SUMMARY_FLAG) ");
+
+            dicParams = new Dictionary<string, Parameter>();
+            #region [ Setting Parameter ]
+            Parameter p = new Parameter();
+            p.Type = DbType.Int64;
+            p.Value = rv.StepSeq;
+            dicParams.Add("STEP_SEQ", p);
+
+            p = new Parameter();
+            p.Type = DbType.Int64;
+            p.Value = rv.WaferSeq;
+            dicParams.Add("WAFER_SEQ", p);
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = dr["RESULTTIMESTAMP"];
+            dicParams.Add("RESULTTIMESTAMP", p);
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = dr["FILETIMESTAMP"];
+            dicParams.Add("FILETIMESTAMP", p);
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = dr["FACTORY"];
+            dicParams.Add("FACTORY", p);
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = dr["TECHNOLOGY"];
+            dicParams.Add("TECHNOLOGY", p);
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = dr["PRODUCT"];
+            dicParams.Add("PRODUCT", p);
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = dr["LOT_ID"];
+            dicParams.Add("LOT_ID", p);
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = dr["WAFER_ID"].ToString().Replace("@", "").Replace("_", "");
+            dicParams.Add("WAFER_ID", p);
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = dr["STEP_ID"];
+            dicParams.Add("STEP_ID", p);
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = dr["TEST"];
+            dicParams.Add("TEST", p);
+
+            p = new Parameter();
+            p.Type = DbType.Int32;
+            p.Value = dr["SLOT_ID"];
+            dicParams.Add("SLOT_ID", p);
+
+            p = new Parameter();
+            p.Type = DbType.Int64;
+            p.Value = rv.SetupSeq;
+            dicParams.Add("SETUP_SEQ", p);
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = dr["STATUS"];
+            dicParams.Add("STATUS", p);
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = dr["MAIN_EQ"];
+            dicParams.Add("MAIN_EQ", p);
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = dr["ROUTE"];
+            dicParams.Add("ROUTE", p);
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = dr["OPER"];
+            dicParams.Add("OPER", p);
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = dr["INSPECTION_EQ"];
+            dicParams.Add("INSPECTION_EQ", p);
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = dr["INSPECTION_PARAM"];
+            dicParams.Add("INSPECTION_PARAM", p);
+
+            p = new Parameter();
+            p.Type = DbType.Int32;
+            p.Value = dr["DEFECTS"];
+            dicParams.Add("DEFECTS", p);
+
+            p = new Parameter();
+            p.Type = DbType.Int32;
+            p.Value = dr["CLASSIFIED_DEFECTS"];
+            dicParams.Add("CLASSIFIED_DEFECTS", p);
+
+            p = new Parameter();
+            p.Type = DbType.Int32;
+            p.Value = dr["KILLER_DEFECTS"];
+            dicParams.Add("KILLER_DEFECTS", p);
+
+            p = new Parameter();
+            p.Type = DbType.Int32;
+            p.Value = dr["RANDOM_DEFECTS"];
+            dicParams.Add("RANDOM_DEFECTS", p);
+
+            p = new Parameter();
+            p.Type = DbType.Int32;
+            p.Value = dr["ADDER_KILLER_DEFECTS"];
+            dicParams.Add("ADDER_KILLER_DEFECT", p);
+
+            p = new Parameter();
+            p.Type = DbType.Int32;
+            p.Value = dr["ADDER_RANDOM_DEFECTS"];
+            dicParams.Add("ADDER_RANDOM_DEFECT", p);
+
+            p = new Parameter();
+            p.Type = DbType.Int32;
+            p.Value = dr["CLUSTERS"];
+            dicParams.Add("CLUSTERS", p);
+
+            p = new Parameter();
+            p.Type = DbType.Int32;
+            p.Value = dr["ADDER_CLUSTERS"];
+            dicParams.Add("ADDER_CLUSTERS", p);
+
+            p = new Parameter();
+            p.Type = DbType.Int32;
+            p.Value = dr["CLUSTER_AREA"];
+            dicParams.Add("CLUSTER_AREA", p);
+
+            p = new Parameter();
+            p.Type = DbType.Double;
+            p.Value = dr["DEFECT_DD"];
+            dicParams.Add("DEFECT_DD", p);
+
+            p = new Parameter();
+            p.Type = DbType.Double;
+            p.Value = dr["KILLER_DEFECT_DD"];
+            dicParams.Add("KILLER_DEFECT_DD", p);
+
+            p = new Parameter();
+            p.Type = DbType.Double;
+            p.Value = dr["RANDOM_DEFECT_DD"];
+            dicParams.Add("RANDOM_DEFECT_DD", p);
+
+            p = new Parameter();
+            p.Type = DbType.Int32;
+            p.Value = dr["INSPECTED_DIE"];
+            dicParams.Add("INSPECTED_DIE", p);
+
+            p = new Parameter();
+            p.Type = DbType.Int32;
+            p.Value = dr["DEFECTIVE_DIE"];
+            dicParams.Add("DEFECTIVE_DIE", p);
+
+            p = new Parameter();
+            p.Type = DbType.Int32;
+            p.Value = dr["ADDER_DEF_DIE"];
+            dicParams.Add("ADDER_DEF_DIE", p);
+
+            p = new Parameter();
+            p.Type = DbType.Int32;
+            p.Value = dr["KILL_DEF_DIE"];
+            dicParams.Add("KILL_DEF_DIE", p);
+
+            p = new Parameter();
+            p.Type = DbType.Int32;
+            p.Value = dr["KILL_ADDER_DEF_DIE"];
+            dicParams.Add("KILL_ADDER_DEF_DIE", p);
+
+            p = new Parameter();
+            p.Type = DbType.Int32;
+            p.Value = dr["IMAGES"];
+            dicParams.Add("IMAGES", p);
+
+            p = new Parameter();
+            p.Type = DbType.Double;
+            p.Value = dr["SCAN_AREA"];
+            dicParams.Add("SCAN_AREA", p);
+
+            p = new Parameter();
+            p.Type = DbType.Int32;
+            p.Value = dr["ADDER_DEFECTS"];
+            dicParams.Add("ADDER_DEFECTS", p);
+
+            p = new Parameter();
+            p.Type = DbType.Int32;
+            p.Value = dr["KILL_RND_DEFECTS"];
+            dicParams.Add("KILL_RND_DEFECTS", p);
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = "@COMMENT@";
+            dicParams.Add("CMT", p);
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = dr["RETICLE_ID"];
+            dicParams.Add("RETICLE_ID", p);
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = dr["INTERLOCK_FLAG"];
+            dicParams.Add("INTERLOCK_FLAG", p);
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = dr["STEPPER_EQ"];
+            dicParams.Add("STEPPER_EQ", p);
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = dr["SUMMARY_FLAG"];
+            dicParams.Add(":SUMMARY_FLAG", p);
+            #endregion [ Setting Parameter ]
+
+            return ExecuteNonQuery(
+                oConnection,
+                Constract.FUNCATION_NAME_INSP_INFO,
+                sQuery.ToString(),
+                dicParams
+                );
+        }
+        #endregion [ TQD_INSP_INFO ]
+
+        //-----------------------------------------------------------------------------------------------------
+
+        #region [ TQD_SETUP ]
+        public int CheckedSetup(
+            ref DwResultValue rv,
+            DateTime dtSetupTime
+            )
+        {
+            Dictionary<string, Parameter> dicParams = null;
+            StringBuilder sQuery = new StringBuilder();
+
+            //--
+            /// Sql Query
+            //--
+            sQuery.AppendLine("SELECT SETUP_SEQ FROM TQD_SETUP ");
+            sQuery.AppendLine(" WHERE 1=1");
+            sQuery.AppendLine("       AND SETUP_ID = :setupid ");
+            sQuery.AppendLine("       AND STEP_ID = :stepid ");
+            sQuery.AppendLine("       AND SETUP_TIME = to_date(:setuptime, 'yyyymmddhh24miss')");
+
+            dicParams = new Dictionary<string, Parameter>();
+            #region [ Setting Parameter ]
+            Parameter p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = rv.SetupID;
+            dicParams.Add("setupid", p);
+
+            //--
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = rv.StepID;
+            dicParams.Add("stepid", p);
+
+            //--
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = dtSetupTime.ToString(Constract.DEFAULT_DATETIME_STRING);
+            dicParams.Add("setuptime", p);
+            #endregion [ Setting Parameter ]
+
+            DataTable checkedDt = base.ExecuteQuery(
+                oConnection,
+                Constract.FUNCATION_NAME_SETUP,
+                sQuery.ToString(),
+                dicParams
+                );
+
+            if (checkedDt != null && checkedDt.Rows.Count > 0)
+                rv.SetupSeq = long.Parse(checkedDt.Rows[0]["SETUP_SEQ"].ToString());
+            else rv.SetupSeq = -1;
+
+            return checkedDt.Rows.Count;
+        }
+
+        //--
+
+        public int SetSetup(
+            ref DwResultValue rv,
+            DateTime dtSetupTime,
+            DataRow dr
+            )
+        {
+            int iResult = -1;
+            StringBuilder sQuery = new StringBuilder();
+            Dictionary<string, Parameter> dicParams = null;
+
+            sQuery.AppendLine("INSERT INTO TQD_SETUP(")
+                  .AppendLine(" SETUP_SEQ,")
+                  .AppendLine(" SETUP_ID,")
+                  .AppendLine(" STEP_ID,")
+                  .AppendLine(" SETUP_TIME,")
+                  .AppendLine(" ANGLE,")
+                  .AppendLine(" WAFER_SIZE,")
+                  .AppendLine(" NOTCH_TYPE,")
+                  .AppendLine(" DIE_PITCH_X,")
+                  .AppendLine(" DIE_PITCH_Y,")
+                  .AppendLine(" DIE_ORIGIN_X,")
+                  .AppendLine(" DIE_ORIGIN_Y,")
+                  .AppendLine(" ORIGIN_X,")
+                  .AppendLine(" ORIGIN_Y")
+                  .AppendLine(" ) VALUES (")
+                  .AppendLine(" SETUP_SEQ.NEXTVAL,")
+                  .AppendLine(" :SETUP_ID,")
+                  .AppendLine(" :STEP_ID,")
+                  .AppendLine(" TO_DATE(:SETUP_TIME, 'YYYYMMDDHH24MISS'),")
+                  .AppendLine(" :ANGLE,")
+                  .AppendLine(" :WAFER_SIZE,")
+                  .AppendLine(" :NOTCH_TYPE,")
+                  .AppendLine(" :DIE_PITCH_X,")
+                  .AppendLine(" :DIE_PITCH_Y,")
+                  .AppendLine(" :DIE_ORIGIN_X,")
+                  .AppendLine(" :DIE_ORIGIN_Y,")
+                  .AppendLine(" :ORIGIN_X,")
+                  .AppendLine(" :ORIGIN_Y")
+                  .AppendLine(" )");
+
+            dicParams = new Dictionary<string, Parameter>();
+            #region [ Setting Parameter ]
+            Parameter p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = rv.SetupID;
+            dicParams.Add("SETUP_ID", p);
+
+            //--
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = rv.StepID;
+            dicParams.Add("STEP_ID", p);
+
+            //--
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = dtSetupTime.ToString(Constract.DEFAULT_DATETIME_STRING);
+            dicParams.Add("SETUP_TIME", p);
+
+            //--
+
+            p = new Parameter();
+            p.Type = DbType.Int32;
+            p.Value = dr["ANGLE"];
+            dicParams.Add("ANGLE", p);
+
+            //--
+
+            p = new Parameter();
+            p.Type = DbType.Int64;
+            p.Value = dr["WAFER_SIZE"];
+            dicParams.Add("WAFER_SIZE", p);
+
+            //--
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = dr["NOTCH_TYPE"];
+            dicParams.Add("NOTCH_TYPE", p);
+
+            //--
+
+            p = new Parameter();
+            p.Type = DbType.Int64;
+            p.Value = dr["DIE_PITCH_X"];
+            dicParams.Add("DIE_PITCH_X", p);
+
+            //--
+
+            p = new Parameter();
+            p.Type = DbType.Int64;
+            p.Value = dr["DIE_PITCH_Y"];
+            dicParams.Add("DIE_PITCH_Y", p);
+
+            //--
+
+            p = new Parameter();
+            p.Type = DbType.Int64;
+            p.Value = dr["DIE_ORIGIN_X"];
+            dicParams.Add("DIE_ORIGIN_X", p);
+
+            //--
+
+            p = new Parameter();
+            p.Type = DbType.Int64;
+            p.Value = dr["DIE_ORIGIN_Y"];
+            dicParams.Add("DIE_ORIGIN_Y", p);
+
+            //--
+
+            p = new Parameter();
+            p.Type = DbType.Int64;
+            p.Value = dr["ORIGIN_X"];
+            dicParams.Add("ORIGIN_X", p);
+
+            //--
+
+            p = new Parameter();
+            p.Type = DbType.Int64;
+            p.Value = dr["ORIGIN_Y"];
+            dicParams.Add("ORIGIN_Y", p);
+            #endregion [ Setting Parameter ]
+
+            iResult = ExecuteNonQuery(
+                oConnection,
+                Constract.FUNCATION_NAME_SETUP,
+                sQuery.ToString(),
+                dicParams
+                );
+
+            CheckedSetup(ref rv, dtSetupTime);
+
+            return iResult;
+        }
+        #endregion [ TQD_SETUP ]
+
+        //-----------------------------------------------------------------------------------------------------
+
+        #region [ TQD_STEP ]
+        public int CheckedStep(
+            ref DwResultValue rv
+            )
+        {
+            Dictionary<string, Parameter> dicParams = null;
+            StringBuilder sQuery = new StringBuilder();
+
+            //--
+            /// Sql Query
+            //--9
+            sQuery.AppendLine("SELECT * FROM TQD_STEP ");
+            sQuery.AppendLine(" WHERE 1=1 ");
+            sQuery.AppendLine("       AND STEP_ID = :STEPID ");
+            sQuery.AppendLine("       AND WAFER_SEQ = :WAFERSEQ ");
+            sQuery.AppendLine("       AND SETUP_SEQ = :SETUPSEQ ");
+            sQuery.AppendLine("       AND RESULTTIMESTAMP = TO_DATE(:INSPDATETIME, 'YYYYMMDDHH24MISS') ");
+
+            dicParams = new Dictionary<string, Parameter>();
+            #region [ Setting Parameters ]
+            Parameter p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = rv.StepID;
+            dicParams.Add("STEPID", p);
+
+            //--
+
+            p = new Parameter();
+            p.Type = DbType.Int64;
+            //p.Value = lWaferSeq;
+            p.Value = rv.WaferSeq;
+            dicParams.Add("WAFERSEQ", p);
+
+            //--
+
+            p = new Parameter();
+            p.Type = DbType.Int64;
+            //p.Value = lSetupSeq;
+            p.Value = rv.SetupSeq;
+            dicParams.Add("SETUPSEQ", p);
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            //p.Value = lSetupSeq;
+            p.Value = rv.InspDateTime;
+            dicParams.Add("INSPDATETIME", p);
+            #endregion [ Setting Parameters ]
+
+            DataTable checkedDt = base.ExecuteQuery(
+                oConnection,
+                Constract.FUNCATION_NAME_STEP,
+                sQuery.ToString(),
+                dicParams
+                );
+
+            if (checkedDt != null && checkedDt.Rows.Count > 0)
+                rv.StepSeq = long.Parse(checkedDt.Rows[0]["STEP_SEQ"].ToString());
+            else rv.StepSeq = -1;
+
+            return checkedDt.Rows.Count;
+        }
+
+        //--
+
+        public int SetStep(
+            ref DwResultValue rv,
+            DataRow dr
+            )
+        {
+            int iResult = -1;
+            StringBuilder sQuery = new StringBuilder();
+            Dictionary<string, Parameter> dicParams = null;
+
+            //--
+            /// Sql Query
+            //--
+            sQuery.AppendLine("INSERT INTO TQD_STEP(STEP_SEQ, TEST, WAFER_SEQ, STEP_ID, SLOT_ID, RESULT_ID, INSPECTION_EQ, REVIEW_EQ, SETUP_SEQ, RESULTTIMESTAMP, FILETIMESTAMP, ");
+            sQuery.AppendLine("MAIN_EQ, ROUTE, OPER, SCAN_AREA, DEFECTIVE_DIE, DEFECTS, IMAGES, DEFECT_DD, INSP_FILENAME, SERVICE_FILENAME, \"COMMENT\" ) ");
+            sQuery.AppendLine(" VALUES ( STEP_SEQ.NEXTVAL, :TEST, :WAFER_SEQ, :STEP_ID, :SLOT_ID, :RESULT_ID, :INSPECTION_EQ, :REVIEW_EQ, :SETUP_SEQ, ");
+            sQuery.AppendLine(" TO_DATE(:RESULTTIMESTAMP, 'YYYYMMDDHH24MISS'), TO_DATE(:FILETIMESTAMP, 'YYYYMMDDHH24MISS'),");
+            sQuery.AppendLine(" :MAIN_EQ, :ROUTE, :OPER, :SCAN_AREA, :DEFECTIVE_DIE, :DEFECTS, :IMAGES, :DEFECT_DD, :INSP_FILENAME, :SERVICE_FILENAME, :CMT ) ");
+
+            dicParams = new Dictionary<string, Parameter>();
+            #region [ Setting Parameter ]
+            Parameter p = new Parameter();
+            p.Type = DbType.Int32;
+            p.Value = dr["TEST"];
+            dicParams.Add("TEST", p);
+
+            //--
+
+            p = new Parameter();
+            p.Type = DbType.Int64;
+            //p.Value = lWaferSeq;
+            p.Value = rv.WaferSeq;
+            dicParams.Add("WAFER_SEQ", p);
+
+            //--
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = rv.StepID;
+            dicParams.Add("STEP_ID", p);
+
+            //--
+
+            p = new Parameter();
+            p.Type = DbType.Int32;
+            p.Value = dr["SLOT_ID"];
+            dicParams.Add("SLOT_ID", p);
+
+            //--
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = dr["RESULT_ID"];
+            dicParams.Add("RESULT_ID", p);
+
+            //--
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = dr["INSPECTION_EQ"];
+            dicParams.Add("INSPECTION_EQ", p);
+
+            //--
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = dr["REVIEW_EQ"];
+            dicParams.Add("REVIEW_EQ", p);
+
+            //--
+
+            p = new Parameter();
+            p.Type = DbType.Int64;
+            p.Value = rv.SetupSeq;
+            dicParams.Add("SETUP_SEQ", p);
+
+            //--
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = dr["RESULTTIMESTAMP"];
+            dicParams.Add("RESULTTIMESTAMP", p);
+
+            //--
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = dr["FILETIMESTAMP"];
+            dicParams.Add("FILETIMESTAMP", p);
+
+            //--
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = dr["MAIN_EQ"];
+            dicParams.Add("MAIN_EQ", p);
+
+            //--
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = dr["ROUTE"];
+            dicParams.Add("ROUTE", p);
+
+            //--
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = dr["OPER"];
+            dicParams.Add("OPER", p);
+
+            //--
+
+            p = new Parameter();
+            p.Type = DbType.Double;
+            p.Value = dr["SCAN_AREA"];
+            dicParams.Add("SCAN_AREA", p);
+
+            //--
+
+            p = new Parameter();
+            p.Type = DbType.Int64;
+            p.Value = dr["DEFECTIVE_DIE"];
+            dicParams.Add("DEFECTIVE_DIE", p);
+
+            //--
+
+            p = new Parameter();
+            p.Type = DbType.Int32;
+            p.Value = dr["DEFECTS"];
+            dicParams.Add("DEFECTS", p);
+
+            //--
+
+            p = new Parameter();
+            p.Type = DbType.Int32;
+            p.Value = dr["IMAGES"];
+            dicParams.Add("IMAGES", p);
+
+            //--
+
+            p = new Parameter();
+            p.Type = DbType.Double;
+            p.Value = dr["DEFECT_DD"];
+            dicParams.Add("DEFECT_DD", p);
+
+            //--
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = dr["INSP_FILENAME"];
+            dicParams.Add("INSP_FILENAME", p);
+
+            //--
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = dr["SERVICE_FILENAME"];
+            dicParams.Add("SERVICE_FILENAME", p);
+
+            //--
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = "@COMMENT@";
+            dicParams.Add("CMT", p);
+            #endregion [ Setting Parameter ]
+
+            iResult = ExecuteNonQuery(
+                oConnection,
+                Constract.FUNCATION_NAME_STEP,
+                sQuery.ToString(),
+                dicParams
+                );
+
+            CheckedStep(ref rv);
+
+            return iResult;
+        }
+
+        #endregion [ TQD_STEP ]
+
+        //-----------------------------------------------------------------------------------------------------
+
+        #region [ TQD_SCAN_SAMPLE ]
+        public int CheckedMapInfo(
+            DwResultValue rv
+            )
+        {
+            Dictionary<string, Parameter> dicParams = null;
+            StringBuilder sQuery = new StringBuilder();
+
+            //--
+            /// Sql Query
+            //--
+            sQuery.AppendLine("SELECT * FROM TQD_SCAN_SAMPLE ");
+            sQuery.AppendLine(" WHERE 1=1 ");
+            sQuery.AppendLine("       AND STEP_SEQ = :STEPSEQ ");
+
+            dicParams = new Dictionary<string, Parameter>();
+            #region [ Setting Parameters ]
+            Parameter p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = rv.StepSeq;
+            dicParams.Add("STEPSEQ", p);
+            #endregion [ Setting Parameters ]
+
+            DataTable checkedDt = base.ExecuteQuery(
+                oConnection,
+                Constract.FUNCATION_NAME_SETUP_MAP,
+                sQuery.ToString(),
+                dicParams
+                );
+
+            return checkedDt.Rows.Count;
+        }
+
+        //--
+
+        public int SetMapInfo(
+            DwResultValue rv,
+            DataTable dt
+            )
+        {
+            StringBuilder sQuery = new StringBuilder();
+            int iBindCnt = -1;
+            Dictionary<string, DataTableParameters> dicParams = null;
+
+            sQuery.AppendLine("INSERT INTO TQD_SCAN_SAMPLE(")
+                  .AppendLine(" STEP_SEQ,")
+                  .AppendLine(" TEST,")
+                  .AppendLine(" INDEX_X,")
+                  .AppendLine(" INDEX_Y ")
+                  .AppendLine(" ) VALUES (")
+                  .AppendLine(" :STEP_SEQ,")
+                  .AppendLine(" :TEST,")
+                  .AppendLine(" :INDEX_X,")
+                  .AppendLine(" :INDEX_Y ")
+                  .AppendLine(" )");
+
+            dicParams = new Dictionary<string, DataTableParameters>();
+            #region [ Setting Parameter ]
+            foreach (DataRow row in dt.Rows)
+            {
+                foreach (DataColumn col in dt.Columns)
+                {
+                    DataTableParameters dtParams = new DataTableParameters();
+                    if (dicParams.ContainsKey(col.ColumnName))
+                    {
+                        dtParams = dicParams[col.ColumnName];
+
+                        if (string.Equals(col.ColumnName, "STEP_SEQ"))
+                            dtParams.Values.Add(rv.StepSeq);
+                        else
+                            dtParams.Values.Add(row[col]);
+
+                        dicParams[col.ColumnName] = dtParams;
+                    }
+                    else
+                    {
+                        if (dtParams.Values == null)
+                            dtParams.Values = new ArrayList();
+
+                        if (string.Equals(col.ColumnName, "STEP_SEQ"))
+                            dtParams.Values.Add(rv.StepSeq);
+                        else
+                            dtParams.Values.Add(row[col]);
+
+                        dtParams.DataTableColumnType = base.GetDbTypeByName(col.DataType);
+                        dicParams.Add(col.ColumnName, dtParams);
+                    }
+                    iBindCnt = dtParams.Values.Count;
+                }
+            }
+            #endregion [ Setting Parameter ]
+
+            return ExecuteNonQuery(
+                oConnection,
+                sQuery.ToString(),
+                iBindCnt,
+                dicParams
+                );
+        }
+        #endregion [ TQD_SCAN_SAMPLE ]
+
+        //-----------------------------------------------------------------------------------------------------
+
+        #region [ TQD_SETUP_MAP ]
+        public int CheckedMapInfo_NEW(
+            DwResultValue rv
+            )
+        {
+            Dictionary<string, Parameter> dicParams = null;
+            StringBuilder sQuery = new StringBuilder();
+
+            //--
+            /// Sql Query
+            //--
+            sQuery.AppendLine("SELECT * FROM TQD_SETUP_MAP ");
+            sQuery.AppendLine(" WHERE 1=1 ");
+            sQuery.AppendLine("       AND SETUP_SEQ = :SETUP_SEQ ");
+
+            dicParams = new Dictionary<string, Parameter>();
+            #region [ Setting Parameters ]
+            Parameter p = new Parameter();
+            p.Type = DbType.Int64;
+            p.Value = rv.SetupSeq;
+            dicParams.Add("SETUP_SEQ", p);
+            #endregion [ Setting Parameters ]
+
+            DataTable checkedDt = base.ExecuteQuery(
+                oConnection,
+                Constract.FUNCATION_NAME_SETUP_MAP,
+                sQuery.ToString(),
+                dicParams
+                );
+
+            return checkedDt.Rows.Count;
+        }
+
+        //--
+
+        public int SetMapInfo_NEW(
+            DwResultValue rv,
+            DataTable dt
+            )
+        {
+            StringBuilder sQuery = new StringBuilder();
+            int iBindCnt = -1;
+            Dictionary<string, DataTableParameters> dicParams = null;
+
+            sQuery.AppendLine("INSERT INTO TQD_SETUP_MAP(")
+                  .AppendLine(" SETUP_SEQ,")
+                  .AppendLine(" TEST,")
+                  .AppendLine(" INDEX_X,")
+                  .AppendLine(" INDEX_Y ")
+                  .AppendLine(" ) VALUES (")
+                  .AppendLine(" :SETUP_SEQ,")
+                  .AppendLine(" :TEST,")
+                  .AppendLine(" :INDEX_X,")
+                  .AppendLine(" :INDEX_Y ")
+                  .AppendLine(" )");
+
+            dicParams = new Dictionary<string, DataTableParameters>();
+            #region [ Setting Parameter ]
+            foreach (DataRow row in dt.Rows)
+            {
+                foreach (DataColumn col in dt.Columns)
+                {
+                    DataTableParameters dtParams = new DataTableParameters();
+                    if (dicParams.ContainsKey(col.ColumnName))
+                    {
+                        dtParams = dicParams[col.ColumnName];
+
+                        if (string.Equals(col.ColumnName, "SETUP_SEQ"))
+                            dtParams.Values.Add(rv.SetupSeq);
+                        else
+                            dtParams.Values.Add(row[col]);
+
+                        dicParams[col.ColumnName] = dtParams;
+                    }
+                    else
+                    {
+                        if (dtParams.Values == null)
+                            dtParams.Values = new ArrayList();
+
+                        if (string.Equals(col.ColumnName, "SETUP_SEQ"))
+                            dtParams.Values.Add(rv.SetupSeq);
+                        else
+                            dtParams.Values.Add(row[col]);
+
+                        dtParams.DataTableColumnType = base.GetDbTypeByName(col.DataType);
+                        dicParams.Add(col.ColumnName, dtParams);
+                    }
+                    iBindCnt = dtParams.Values.Count;
+                }
+            }
+            #endregion [ Setting Parameter ]
+
+            return ExecuteNonQuery(
+                oConnection,
+                Constract.FUNCATION_NAME_SETUP_MAP,
+                sQuery.ToString(),
+                iBindCnt,
+                dicParams
+                );
+        }
+        #endregion [ TQD_SETUP_MAP ]
+
+        //-----------------------------------------------------------------------------------------------------
+
+        #region [ TQD_DEFECT ]
+        public int CheckedDefect(
+            DwResultValue rv
+            )
+        {
+            Dictionary<string, Parameter> dicParams = null;
+            StringBuilder sQuery = new StringBuilder();
+
+            //--
+            /// Sql Query
+            //--
+            sQuery.AppendLine("SELECT * FROM TQD_DEFECT ");
+            sQuery.AppendLine(" WHERE 1=1 ");
+            sQuery.AppendLine("       AND STEP_SEQ = :STEPSEQ ");
+
+            dicParams = new Dictionary<string, Parameter>();
+            #region [ Setting Parameters ]
+            Parameter p = new Parameter();
+            p.Type = DbType.Int64;
+            p.Value = rv.StepSeq;
+            dicParams.Add("STEPSEQ", p);
+            #endregion [ Setting Parameters ]
+
+            DataTable checkedDt = base.ExecuteQuery(
+                oConnection,
+                Constract.FUNCATION_NAME_DEFECT,
+                sQuery.ToString(),
+                dicParams
+                );
+
+            return checkedDt.Rows.Count;
+        }
+
+        //--
+
+        public int SetDefect(
+            DwResultValue rv,
+            DataTable dt
+            )
+        {
+            StringBuilder sQuery = new StringBuilder();
+            int iBindCnt = -1;
+            Dictionary<string, DataTableParameters> dicParams = null;
+
+            sQuery.AppendLine(" INSERT INTO TQD_DEFECT(STEP_SEQ, DEFECTID, WAFER_SEQ, X, Y, XREL, YREL, XINDEX, YINDEX, XSIZE, YSIZE, DEFECTAREA, DSIZE, CLASSNUMBER, \"TEST\", CLUSTERNUMBER, ROUGHBINNUMBER,  ");
+            sQuery.AppendLine("  FINEBINNUMBER, REVIEWSAMPLE, IMAGECOUNT, ADDER, FIRST_STEP, RETICLE_REPEAT_ID, DIE_REPEAT_ID, MAN_OPT_CLASS, AUTO_OPT_CLASS, MAN_SEM_CLASS, AUTO_SEM_CLASS)                  ");
+            sQuery.AppendLine("  VALUES (:STEP_SEQ, :DEFECTID, :WAFER_SEQ, :X, :Y, :XREL, :YREL, :XINDEX, :YINDEX, :XSIZE, :YSIZE, :DEFECTAREA, :DSIZE, :CLASSNUMBER, :TEST, :CLUSTERNUMBER, :ROUGHBINNUMBER, ");
+            sQuery.AppendLine("  :FINEBINNUMBER, :REVIEWSAMPLE, :IMAGECOUNT, :ADDER, :FIRST_STEP, :RETICLE_REPEAT_ID, :DIE_REPEAT_ID, :MAN_OPT_CLASS, :AUTO_OPT_CLASS, :MAN_SEM_CLASS, :AUTO_SEM_CLASS)       ");
+
+            dicParams = new Dictionary<string, DataTableParameters>();
+            #region [ Setting Parameter ]
+            foreach (DataRow row in dt.Rows)
+            {
+                foreach (DataColumn col in dt.Columns)
+                {
+                    DataTableParameters dtParams = new DataTableParameters();
+                    if (dicParams.ContainsKey(col.ColumnName))
+                    {
+                        dtParams = dicParams[col.ColumnName];
+
+                        if (string.Equals(col.ColumnName, "STEP_SEQ"))
+                            dtParams.Values.Add(rv.StepSeq);
+                        else if (string.Equals(col.ColumnName, "WAFER_SEQ"))
+                            dtParams.Values.Add(rv.WaferSeq);
+                        else
+                            dtParams.Values.Add(row[col]);
+                        dicParams[col.ColumnName] = dtParams;
+                    }
+                    else
+                    {
+                        if (dtParams.Values == null)
+                            dtParams.Values = new ArrayList();
+
+                        if (string.Equals(col.ColumnName, "STEP_SEQ"))
+                            dtParams.Values.Add(rv.StepSeq);
+                        else if (string.Equals(col.ColumnName, "WAFER_SEQ"))
+                            dtParams.Values.Add(rv.WaferSeq);
+                        else
+                            dtParams.Values.Add(row[col]);
+
+                        dtParams.DataTableColumnType = base.GetDbTypeByName(col.DataType);
+                        dicParams.Add(col.ColumnName, dtParams);
+                    }
+                    iBindCnt = dtParams.Values.Count;
+                }
+            }
+            #endregion [ Setting Parameter ]
+
+            return ExecuteNonQuery(
+                oConnection,
+                Constract.FUNCATION_NAME_DEFECT,
+                sQuery.ToString(),
+                iBindCnt,
+                dicParams
+                );
+        }
+        #endregion [ TQD_DEFECT ]
+
+        //-----------------------------------------------------------------------------------------------------
+
+        #region [ TQD_DEFECT_IMAGE ]
+        public int CheckedDefectImage(
+            DwResultValue rv,
+            int iDefectID
+            )
+        {
+            Dictionary<string, Parameter> dicParams = null;
+            StringBuilder sQuery = new StringBuilder();
+
+            //--
+            /// Sql Query
+            //--
+            sQuery.AppendLine("SELECT * FROM TQD_IMAGES ");
+            sQuery.AppendLine(" WHERE 1=1 ");
+            sQuery.AppendLine("       AND STEP_SEQ = :stepseq ");
+            sQuery.AppendLine("       AND DEFECTID = :defectid ");
+            sQuery.AppendLine("       AND WAFER_SEQ = :waferseq ");
+
+            dicParams = new Dictionary<string, Parameter>();
+            #region [ Setting Parameters ]
+            Parameter p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = rv.StepSeq;
+            dicParams.Add("stepseq", p);
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = iDefectID;
+            dicParams.Add("defectid", p);
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = rv.WaferSeq;
+            dicParams.Add("waferseq", p);
+            #endregion [ Setting Parameters ]
+
+            DataTable checkedDt = base.ExecuteQuery(
+                oConnection,
+                Constract.FUNCATION_NAME_DEFECT_IMAGE,
+                sQuery.ToString(),
+                dicParams
+                );
+
+            return checkedDt.Rows.Count;
+        }
+
+        public int SetDefectImage(
+            DwResultValue rv,
+            DataRow dr
+            )
+        {
+            StringBuilder sQuery = new StringBuilder();
+            int iBindCnt = -1;
+            Dictionary<string, Parameter> dicParams = null;
+
+            sQuery.AppendLine(" INSERT INTO TQD_IMAGES(STEP_SEQ, DEFECTID, IMAGE_ID, WAFER_SEQ, \"TEST\", IMAGE_TYPE, IMAGE_PATH, IMAGE_FILENAME, IMAGE_SERVER, THUMB_PATH, THUMB_FILENAME) ");
+            sQuery.AppendLine("  VALUES (:stepseq, :defectid, :imageid, :waferseq, :testid, :imagetype, :imagepath, :imagefilename, :imageserver, :thumbpath, :thumbfilename) ");
+
+            dicParams = new Dictionary<string, Parameter>();
+            #region [ Setting Parameter ]
+            Parameter p = new Parameter();
+            p.Type = DbType.Int64;
+            p.Value = rv.StepSeq;
+            dicParams.Add("stepseq", p);
+
+            p = new Parameter();
+            p.Type = DbType.Int32;
+            p.Value = dr["DEFECT_ID"];
+            dicParams.Add("defectid", p);
+
+            p = new Parameter();
+            p.Type = DbType.Int32;
+            p.Value = dr["IMAGE_ID"];
+            dicParams.Add("imageid", p);
+
+            p = new Parameter();
+            p.Type = DbType.Int64;
+            p.Value = rv.WaferSeq;
+            dicParams.Add("waferseq", p);
+
+            p = new Parameter();
+            p.Type = DbType.Int32;
+            p.Value = dr["TEST"];
+            dicParams.Add("testid", p);
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = dr["IMAGE_TYPE"];
+            dicParams.Add("imagetype", p);
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = dr["IMAGE_PATH"];
+            dicParams.Add("imagepath", p);
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = dr["IMAGE_FILENAME"];
+            dicParams.Add("imagefilename", p);
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = dr["IMAGE_SERVER"];
+            dicParams.Add("imageserver", p);
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = dr["THUMB_PATH"];
+            dicParams.Add("thumbpath", p);
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = dr["THUMB_FILENAME"];
+            dicParams.Add("thumbfilename", p);
+
+            #endregion [ Setting Parameter ]
+
+            return ExecuteNonQuery(
+                oConnection,
+                Constract.FUNCATION_NAME_DEFECT_IMAGE,
+                sQuery.ToString(),
+                dicParams
+                );
+        }
+        #endregion [ TQD_DEFECT_IMAGE ]
+
+        //-----------------------------------------------------------------------------------------------------
+
+        public void Dispose()
+        {
+            base.DbClose(
+                oConnection
+                );
+        }
+    }
+}

@@ -1,0 +1,5 @@
+D:\PROJECT\DB하이텍\gitlab\01_WinApp\DebForm\obj\x86\Debug\DebForm.csproj.AssemblyReference.cache
+D:\PROJECT\DB하이텍\gitlab\01_WinApp\DebForm\obj\x86\Debug\DebForm.Form1.resources
+D:\PROJECT\DB하이텍\gitlab\01_WinApp\DebForm\obj\x86\Debug\DebForm.Properties.Resources.resources
+D:\PROJECT\DB하이텍\gitlab\01_WinApp\DebForm\obj\x86\Debug\DebForm.csproj.GenerateResource.cache
+D:\PROJECT\DB하이텍\gitlab\01_WinApp\DebForm\obj\x86\Debug\DebForm.exe.licenses

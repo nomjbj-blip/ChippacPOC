@@ -1,0 +1,100 @@
+D:\PROJECT\DB하이텍\gitlab\100_ClientBin\DACrux.SEMDMS.Control.dll
+D:\PROJECT\DB하이텍\gitlab\100_ClientBin\DACrux.SEMDMS.Control.pdb
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.csproj.AssemblyReference.cache
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCChartAnalysis.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCDataSheetControl.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCDefecMap.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCDefectImgGallery.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCDefectImgGalleryManyStep.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCDefectInfo.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCDefectMapGallery.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCDefectMapGalleryItem.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCDefectMapGalleryOld.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCDefectSourceAnalysis.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCDieStackGallery.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCDieStackViewer.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCImageGallery.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCImageGalleryGrid.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCImageListViewer.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCInformation.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCOption.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCPatternSearch.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCReclassify.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCRepeatedDefect.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCRDSetup.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCStepSelect.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCTestMapOverlay.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCWrapDefectMap.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCZoneDefine.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCZoneMap.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.frmDefectOption.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.ImageControl.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.ImageGalleryControl.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.ImagePopUp.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.LargeImage.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.MSChartController.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCExportToKlarf.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.PopUpAxisY.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.PopUpAxisYConfig.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.Properties.Resources.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCDefecMapViewer.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.SetupSearchItem.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCChartAnalysisDefectList.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCBareDefecMapViewer.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.frmChartYOption.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.csproj.GenerateResource.cache
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.dll.licenses
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.csproj.CoreCompileInputs.cache
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.S.91B31521.Up2Date
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.dll
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.csproj.AssemblyReference.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCChartAnalysis.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCDataSheetControl.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCDefecMap.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCDefectImgGallery.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCDefectImgGalleryManyStep.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCDefectInfo.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCDefectMapGallery.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCDefectMapGalleryItem.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCDefectMapGalleryOld.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCDefectSourceAnalysis.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCDieStackGallery.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCDieStackViewer.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCImageGallery.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCImageGalleryGrid.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCImageListViewer.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCInformation.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCOption.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCPatternSearch.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCReclassify.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCRepeatedDefect.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCRDSetup.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCStepSelect.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCTestMapOverlay.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCWrapDefectMap.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCZoneDefine.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCZoneMap.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.frmDefectOption.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.ImageControl.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.ImageGalleryControl.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.ImagePopUp.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.LargeImage.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.MSChartController.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCExportToKlarf.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.PopUpAxisY.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.PopUpAxisYConfig.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.Properties.Resources.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCDefecMapViewer.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.SetupSearchItem.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCChartAnalysisDefectList.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.DPUCBareDefecMapViewer.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.frmChartYOption.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.csproj.GenerateResource.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.dll.licenses
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\100_ClientBin\DACrux.SEMDMS.Control.dll
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\100_ClientBin\DACrux.SEMDMS.Control.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.csproj.CoreCompileInputs.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.S.91B31521.Up2Date
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.dll
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Control\obj\Debug\DACrux.SEMDMS.Control.pdb

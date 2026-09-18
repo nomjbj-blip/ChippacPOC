@@ -1,0 +1,280 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_POC\\DMS\\00_Solution\\DACrux2015wc\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{EE34AC74-5A6C-4E9F-B0D3-F8F0613DD073}|..\\..\\02_DMS\\DACrux.SEMDMS.ENGUI\\DACrux.SEMDMS.ENGUI.csproj|d:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_poc\\dms\\02_dms\\dacrux.semdms.engui\\admin\\frmdefectalarmreport.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1579A88B-4AEE-41A7-8646-DAFF80567A56}|..\\..\\09_TEST\\DACrux.TEST.ENGUI\\DACrux.TEST.ENGUI.csproj|d:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_poc\\dms\\09_test\\dacrux.test.engui\\analysis\\frmdutbyyieldreport.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1579A88B-4AEE-41A7-8646-DAFF80567A56}|..\\..\\09_TEST\\DACrux.TEST.ENGUI\\DACrux.TEST.ENGUI.csproj|d:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_poc\\dms\\09_test\\dacrux.test.engui\\admin\\frmadmincustomer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{428BEECA-4AB9-461B-9E98-98667A9E9702}|02_DMS{428BEECA-4AB9-461B-9E98-98667A9E9702}|DACrux.SEMDMS.Control||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EE34AC74-5A6C-4E9F-B0D3-F8F0613DD073}|..\\..\\02_DMS\\DACrux.SEMDMS.ENGUI\\DACrux.SEMDMS.ENGUI.csproj|d:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_poc\\dms\\02_dms\\dacrux.semdms.engui\\properties\\licenses.licx||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D70179B9-FC65-4CE9-A31A-FA5822DA9DFF}|..\\..\\06_CoreLibSource\\DACrux.Common.Setup\\DACrux.Common.Setup.csproj|d:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_poc\\dms\\06_corelibsource\\dacrux.common.setup\\frmequipmodelsetup.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1579A88B-4AEE-41A7-8646-DAFF80567A56}|..\\..\\09_TEST\\DACrux.TEST.ENGUI\\DACrux.TEST.ENGUI.csproj|d:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_poc\\dms\\09_test\\dacrux.test.engui\\properties\\licenses.licx||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B3ED24CA-1B2C-401B-ACB7-EBBEBA502E2F}|..\\..\\09_TEST\\DACrux.TEST.Control\\DACrux.TEST.Control.csproj|d:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_poc\\dms\\09_test\\dacrux.test.control\\properties\\licenses.licx||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{72020EB8-BC7A-4A89-86F7-E731B808B344}|..\\..\\03_STAT\\DACrux.ProjectManager.UI\\DACrux.ProjectManager.UI.csproj|d:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_poc\\dms\\03_stat\\dacrux.projectmanager.ui\\properties\\licenses.licx||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D44820F9-5C53-4DCE-90D1-DB4E9C38B098}|03_Core{D44820F9-5C53-4DCE-90D1-DB4E9C38B098}|DACrux.Common.Setup||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0CDDB391-0A29-4850-9198-C529509DA64F}|..\\..\\06_CoreLibSource\\DACrux.Framework.Controls\\DACrux.Framework.Controls.csproj|d:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_poc\\dms\\06_corelibsource\\dacrux.framework.controls\\properties\\licenses.licx||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{178B4C07-961E-4CAF-8C83-FF6188923E7B}|..\\..\\06_CoreLibSource\\DACrux.Framework\\DACrux.Framework.csproj|d:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_poc\\dms\\06_corelibsource\\dacrux.framework\\properties\\licenses.licx||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0CDDB391-0A29-4850-9198-C529509DA64F}|..\\..\\06_CoreLibSource\\DACrux.Framework.Controls\\DACrux.Framework.Controls.csproj|d:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_poc\\dms\\06_corelibsource\\dacrux.framework.controls\\duccontrolspread.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{CD82C23C-C976-4E9D-A08A-ABC27F900B41}|..\\..\\06_CoreLibSource\\DACrux.Common.VideoCapture\\DACrux.Common.VideoCapture.csproj|d:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_poc\\dms\\06_corelibsource\\dacrux.common.videocapture\\videocapturecontrol.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6806275E-4958-4EBE-B132-E199511DF499}|VideoCaptureTest\\VideoCaptureTest.csproj|d:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_poc\\dms\\00_solution\\dacrux2015wc\\videocapturetest\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6806275E-4958-4EBE-B132-E199511DF499}|VideoCaptureTest\\VideoCaptureTest.csproj|solutionrelative:videocapturetest\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6806275E-4958-4EBE-B132-E199511DF499}|VideoCaptureTest\\VideoCaptureTest.csproj|d:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_poc\\dms\\00_solution\\dacrux2015wc\\videocapturetest\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{6806275E-4958-4EBE-B132-E199511DF499}|VideoCaptureTest\\VideoCaptureTest.csproj|solutionrelative:videocapturetest\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D70179B9-FC65-4CE9-A31A-FA5822DA9DFF}|..\\..\\06_CoreLibSource\\DACrux.Common.Setup\\DACrux.Common.Setup.csproj|d:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_poc\\dms\\06_corelibsource\\dacrux.common.setup\\||{B270807C-D8C6-49EB-8EBE-8E8D566637A1}|5e9a8ac2-4f34-4521-858f-4c248ba31532"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C9B0F7D0-E636-42EC-909A-44F0565C735A}|..\\..\\02_DMS\\DACrux.SEMDMS.Control\\DACrux.SEMDMS.Control.csproj|d:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_poc\\dms\\02_dms\\dacrux.semdms.control\\||{B270807C-D8C6-49EB-8EBE-8E8D566637A1}|5e9a8ac2-4f34-4521-858f-4c248ba31532"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 1,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedHeight": 291,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "frmDefectAlarmReport.cs",
+              "DocumentMoniker": "D:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_POC\\DMS\\02_DMS\\DACrux.SEMDMS.ENGUI\\Admin\\frmDefectAlarmReport.cs",
+              "RelativeDocumentMoniker": "..\\..\\02_DMS\\DACrux.SEMDMS.ENGUI\\Admin\\frmDefectAlarmReport.cs",
+              "ToolTip": "D:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_POC\\DMS\\02_DMS\\DACrux.SEMDMS.ENGUI\\Admin\\frmDefectAlarmReport.cs",
+              "RelativeToolTip": "..\\..\\02_DMS\\DACrux.SEMDMS.ENGUI\\Admin\\frmDefectAlarmReport.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAOIAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-17T23:52:59.333Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "frmDutByYieldReport.cs",
+              "DocumentMoniker": "D:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_POC\\DMS\\09_TEST\\DACrux.TEST.ENGUI\\Analysis\\frmDutByYieldReport.cs",
+              "RelativeDocumentMoniker": "..\\..\\09_TEST\\DACrux.TEST.ENGUI\\Analysis\\frmDutByYieldReport.cs",
+              "ToolTip": "D:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_POC\\DMS\\09_TEST\\DACrux.TEST.ENGUI\\Analysis\\frmDutByYieldReport.cs",
+              "RelativeToolTip": "..\\..\\09_TEST\\DACrux.TEST.ENGUI\\Analysis\\frmDutByYieldReport.cs",
+              "ViewState": "AgIAAF4AAAAAAAAAAAAowHsAAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-17T23:52:23.653Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "frmAdminCustomer.cs",
+              "DocumentMoniker": "D:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_POC\\DMS\\09_TEST\\DACrux.TEST.ENGUI\\Admin\\frmAdminCustomer.cs",
+              "RelativeDocumentMoniker": "..\\..\\09_TEST\\DACrux.TEST.ENGUI\\Admin\\frmAdminCustomer.cs",
+              "ToolTip": "D:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_POC\\DMS\\09_TEST\\DACrux.TEST.ENGUI\\Admin\\frmAdminCustomer.cs",
+              "RelativeToolTip": "..\\..\\09_TEST\\DACrux.TEST.ENGUI\\Admin\\frmAdminCustomer.cs",
+              "ViewState": "AgIAAGUAAAAAAAAAAAAswIYAAABTAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-17T23:51:48.344Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "DACrux.SEMDMS.Control",
+              "DocumentMoniker": "D:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_POC\\DMS\\02_DMS\\DACrux.SEMDMS.Control\\DACrux.SEMDMS.Control.csproj",
+              "RelativeDocumentMoniker": "..\\..\\02_DMS\\DACrux.SEMDMS.Control\\DACrux.SEMDMS.Control.csproj",
+              "ToolTip": "D:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_POC\\DMS\\02_DMS\\DACrux.SEMDMS.Control\\DACrux.SEMDMS.Control.csproj",
+              "RelativeToolTip": "..\\..\\02_DMS\\DACrux.SEMDMS.Control\\DACrux.SEMDMS.Control.csproj",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2026-09-17T23:49:39.782Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "frmEquipModelSetup.designer.cs",
+              "DocumentMoniker": "D:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_POC\\DMS\\06_CoreLibSource\\DACrux.Common.Setup\\frmEquipModelSetup.designer.cs",
+              "RelativeDocumentMoniker": "..\\..\\06_CoreLibSource\\DACrux.Common.Setup\\frmEquipModelSetup.designer.cs",
+              "ToolTip": "D:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_POC\\DMS\\06_CoreLibSource\\DACrux.Common.Setup\\frmEquipModelSetup.designer.cs",
+              "RelativeToolTip": "..\\..\\06_CoreLibSource\\DACrux.Common.Setup\\frmEquipModelSetup.designer.cs",
+              "ViewState": "AgIAAAEAAAAAAAAAAAAswBEAAAAlAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-17T23:44:57.47Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "licenses.licx",
+              "DocumentMoniker": "D:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_POC\\DMS\\09_TEST\\DACrux.TEST.ENGUI\\Properties\\licenses.licx",
+              "RelativeDocumentMoniker": "..\\..\\09_TEST\\DACrux.TEST.ENGUI\\Properties\\licenses.licx",
+              "ToolTip": "D:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_POC\\DMS\\09_TEST\\DACrux.TEST.ENGUI\\Properties\\licenses.licx",
+              "RelativeToolTip": "..\\..\\09_TEST\\DACrux.TEST.ENGUI\\Properties\\licenses.licx",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2026-09-17T23:44:39.263Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "licenses.licx",
+              "DocumentMoniker": "D:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_POC\\DMS\\09_TEST\\DACrux.TEST.Control\\Properties\\licenses.licx",
+              "RelativeDocumentMoniker": "..\\..\\09_TEST\\DACrux.TEST.Control\\Properties\\licenses.licx",
+              "ToolTip": "D:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_POC\\DMS\\09_TEST\\DACrux.TEST.Control\\Properties\\licenses.licx",
+              "RelativeToolTip": "..\\..\\09_TEST\\DACrux.TEST.Control\\Properties\\licenses.licx",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2026-09-17T23:44:36.606Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "licenses.licx",
+              "DocumentMoniker": "D:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_POC\\DMS\\03_STAT\\DACrux.ProjectManager.UI\\Properties\\licenses.licx",
+              "RelativeDocumentMoniker": "..\\..\\03_STAT\\DACrux.ProjectManager.UI\\Properties\\licenses.licx",
+              "ToolTip": "D:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_POC\\DMS\\03_STAT\\DACrux.ProjectManager.UI\\Properties\\licenses.licx",
+              "RelativeToolTip": "..\\..\\03_STAT\\DACrux.ProjectManager.UI\\Properties\\licenses.licx",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2026-09-17T23:44:33.739Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "DACrux.Common.Setup",
+              "DocumentMoniker": "D:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_POC\\DMS\\06_CoreLibSource\\DACrux.Common.Setup\\DACrux.Common.Setup.csproj",
+              "RelativeDocumentMoniker": "..\\..\\06_CoreLibSource\\DACrux.Common.Setup\\DACrux.Common.Setup.csproj",
+              "ToolTip": "D:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_POC\\DMS\\06_CoreLibSource\\DACrux.Common.Setup\\DACrux.Common.Setup.csproj",
+              "RelativeToolTip": "..\\..\\06_CoreLibSource\\DACrux.Common.Setup\\DACrux.Common.Setup.csproj",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2026-09-17T23:44:28.307Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "licenses.licx",
+              "DocumentMoniker": "D:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_POC\\DMS\\02_DMS\\DACrux.SEMDMS.ENGUI\\Properties\\licenses.licx",
+              "RelativeDocumentMoniker": "..\\..\\02_DMS\\DACrux.SEMDMS.ENGUI\\Properties\\licenses.licx",
+              "ToolTip": "D:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_POC\\DMS\\02_DMS\\DACrux.SEMDMS.ENGUI\\Properties\\licenses.licx",
+              "RelativeToolTip": "..\\..\\02_DMS\\DACrux.SEMDMS.ENGUI\\Properties\\licenses.licx",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2026-09-17T23:44:25.124Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "licenses.licx",
+              "DocumentMoniker": "D:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_POC\\DMS\\06_CoreLibSource\\DACrux.Framework.Controls\\Properties\\licenses.licx",
+              "RelativeDocumentMoniker": "..\\..\\06_CoreLibSource\\DACrux.Framework.Controls\\Properties\\licenses.licx",
+              "ToolTip": "D:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_POC\\DMS\\06_CoreLibSource\\DACrux.Framework.Controls\\Properties\\licenses.licx",
+              "RelativeToolTip": "..\\..\\06_CoreLibSource\\DACrux.Framework.Controls\\Properties\\licenses.licx",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2026-09-17T23:44:21.783Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "licenses.licx",
+              "DocumentMoniker": "D:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_POC\\DMS\\06_CoreLibSource\\DACrux.Framework\\Properties\\licenses.licx",
+              "RelativeDocumentMoniker": "..\\..\\06_CoreLibSource\\DACrux.Framework\\Properties\\licenses.licx",
+              "ToolTip": "D:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_POC\\DMS\\06_CoreLibSource\\DACrux.Framework\\Properties\\licenses.licx",
+              "RelativeToolTip": "..\\..\\06_CoreLibSource\\DACrux.Framework\\Properties\\licenses.licx",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2026-09-17T23:44:18.694Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "DUCControlSpread.cs",
+              "DocumentMoniker": "D:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_POC\\DMS\\06_CoreLibSource\\DACrux.Framework.Controls\\DUCControlSpread.cs",
+              "RelativeDocumentMoniker": "..\\..\\06_CoreLibSource\\DACrux.Framework.Controls\\DUCControlSpread.cs",
+              "ToolTip": "D:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_POC\\DMS\\06_CoreLibSource\\DACrux.Framework.Controls\\DUCControlSpread.cs",
+              "RelativeToolTip": "..\\..\\06_CoreLibSource\\DACrux.Framework.Controls\\DUCControlSpread.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACMAAAAhAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-17T23:42:47.362Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "VideoCaptureControl.cs [\uB514\uC790\uC778]",
+              "DocumentMoniker": "D:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_POC\\DMS\\06_CoreLibSource\\DACrux.Common.VideoCapture\\VideoCaptureControl.cs",
+              "RelativeDocumentMoniker": "..\\..\\06_CoreLibSource\\DACrux.Common.VideoCapture\\VideoCaptureControl.cs",
+              "ToolTip": "D:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_POC\\DMS\\06_CoreLibSource\\DACrux.Common.VideoCapture\\VideoCaptureControl.cs [\uB514\uC790\uC778]",
+              "RelativeToolTip": "..\\..\\06_CoreLibSource\\DACrux.Common.VideoCapture\\VideoCaptureControl.cs [\uB514\uC790\uC778]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-17T23:31:27.16Z",
+              "EditorCaption": " [\uB514\uC790\uC778]"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "Program.cs",
+              "DocumentMoniker": "D:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_POC\\DMS\\00_Solution\\DACrux2015wc\\VideoCaptureTest\\Program.cs",
+              "RelativeDocumentMoniker": "VideoCaptureTest\\Program.cs",
+              "ToolTip": "D:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_POC\\DMS\\00_Solution\\DACrux2015wc\\VideoCaptureTest\\Program.cs",
+              "RelativeToolTip": "VideoCaptureTest\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-17T23:30:28.54Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "Form1.cs [\uB514\uC790\uC778]",
+              "DocumentMoniker": "D:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_POC\\DMS\\00_Solution\\DACrux2015wc\\VideoCaptureTest\\Form1.cs",
+              "RelativeDocumentMoniker": "VideoCaptureTest\\Form1.cs",
+              "ToolTip": "D:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_POC\\DMS\\00_Solution\\DACrux2015wc\\VideoCaptureTest\\Form1.cs [\uB514\uC790\uC778]",
+              "RelativeToolTip": "VideoCaptureTest\\Form1.cs [\uB514\uC790\uC778]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-17T23:29:11.455Z",
+              "EditorCaption": " [\uB514\uC790\uC778]"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

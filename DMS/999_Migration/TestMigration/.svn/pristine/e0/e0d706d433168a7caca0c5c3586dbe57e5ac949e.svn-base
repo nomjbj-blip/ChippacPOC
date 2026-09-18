@@ -1,0 +1,372 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Collections;
+using System.Data;
+
+namespace FabTwoToMigrationTools
+{
+    public static class Constract
+    {
+        public static readonly string ConnectionString = "User ID={0};Password={1};Data Source={2}; Connection Timeout=600";
+        public static readonly string DEFAULT_DATE_STRING = "yyyyMMdd";
+        public static readonly string DEFAULT_DATETIME_STRING = "yyyyMMddHHmmss";
+        public static readonly string IMAGE_SERVER_IP = "";
+        public static readonly string IMAGE_SERVER_ID = "";
+        public static readonly string IMAGE_SERVER_PW = "";
+        public static readonly string TMP_IMG_PATH = @"D:\Project\DBHiTek\DefectImage\tmp";
+
+        //--
+
+        public static readonly string FUNCATION_NAME_DEFECT = "DEFECT";
+        public static readonly string FUNCATION_NAME_DEFECT_IMAGE = "DEFECT IMAGE";
+        public static readonly string FUNCATION_NAME_PRODUCT = "PRODUCT";
+        public static readonly string FUNCATION_NAME_LOT = "LOT";
+        public static readonly string FUNCATION_NAME_WAFER = "WAFER";
+        public static readonly string FUNCATION_NAME_STEP = "STEP";
+        public static readonly string FUNCATION_NAME_SETUP = "SETUP";
+        public static readonly string FUNCATION_NAME_SETUP_MAP = "SETUP MAP";
+        public static readonly string FUNCATION_NAME_INSP_INFO = "INSP INFO";
+
+        public static int ThreadCount = 1;
+    }
+
+    public struct Parameter
+    {
+        public DbType Type;
+        public object Value;
+
+        public Parameter(
+            DbType type,
+            object value
+            )
+        {
+            this.Type = type;
+            this.Value = value;
+        }
+    }
+
+    public struct DataTableParameters
+    {
+        public DbType DataTableColumnType;
+        public ArrayList Values;
+
+        //--
+
+        public DataTableParameters(
+            DbType type,
+            ArrayList values
+            )
+        {
+            this.DataTableColumnType = type;
+            this.Values = values;
+        }
+    }
+
+    //-----------------------------------------------------------------------------------
+
+    #region [ DM Information ]
+
+    //-----------------------------------------------------------------------------------
+
+    public class DwLotInfo
+    {
+        public string Device;
+        public long WaferKey;
+        public string LotID;
+        public long LotSeq;
+        public string FileName;
+        public string InspDateTime;
+
+        public DwLotInfo(
+            )
+        {
+            this.Device = string.Empty;
+            this.WaferKey = -1;
+            this.LotID = string.Empty;
+            this.LotSeq = -1;
+            this.FileName = string.Empty;
+            this.InspDateTime = string.Empty;
+        }
+
+        public DwLotInfo(
+            string product,
+            long waferkey,
+            string lotid,
+            long lotseq,
+            string filename,
+            string inspdatetime
+            )
+        {
+            this.Device = product;
+            this.WaferKey = waferkey;
+            this.LotID = lotid;
+            this.LotSeq = lotseq;
+            this.FileName = filename;
+            this.InspDateTime = inspdatetime;
+        }
+    }
+
+    //-----------------------------------------------------------------------------------
+
+    public class DwResultValue
+    {
+        public string Device;
+        public string FileName;
+        public string InspDateTime;
+
+        //--
+
+        public long WaferKey;
+        public long RecipeKey;
+        public int DiffX;
+        public int DiffY;
+
+        // --
+
+        public string LotID;
+        public long LotSeq;
+        public string WaferID;
+        public long WaferSeq;
+        public string StepID;
+        public long StepSeq;
+        public string SetupID;
+        public long SetupSeq;
+
+        public DwResultValue(
+            )
+        {
+            this.Device = string.Empty;
+            this.FileName = string.Empty;
+            this.InspDateTime = string.Empty;
+
+            //--
+
+            this.WaferKey = -1;
+            this.RecipeKey = -1;
+            this.DiffX = -1;
+            this.DiffY = -1;
+
+            //--
+
+            this.LotID = string.Empty;
+            this.LotSeq = -1;
+            this.WaferID = string.Empty;
+            this.WaferSeq = -1;
+            this.StepID = string.Empty;
+            this.StepSeq = -1;
+            this.SetupID = string.Empty;
+            this.SetupSeq = -1;
+        }
+
+        public DwResultValue(
+            string sProduct,
+            string sFileName,
+            string sInspDateTime,
+            long lWaferKey,
+            string sLotId,
+            long lotseq
+            )
+        {
+            this.Device = sProduct;
+            this.FileName = sFileName;
+            this.InspDateTime = sInspDateTime;
+
+            //--
+
+            this.WaferKey = lWaferKey;
+            this.RecipeKey = -1;
+            this.DiffX = -1;
+            this.DiffY = -1;
+
+            //--
+
+            this.LotID = sLotId;
+            this.LotSeq = lotseq;
+            this.WaferID = string.Empty;
+            this.WaferSeq = -1;
+            this.StepID = string.Empty;
+            this.StepSeq = -1;
+            this.SetupID = string.Empty;
+            this.SetupSeq = -1;
+        }
+    }
+
+    //-----------------------------------------------------------------------------------
+
+    #endregion [ DM Information ]
+
+    //-----------------------------------------------------------------------------------
+
+    #region [ TestWare Information ]
+
+    public class TwLotInfo
+    {
+        public string Factory;
+        public string Device;
+        public string Program;
+        public string TestArea;
+        public string LotID;
+        public string LotType;
+        public long LotSequence_Prev; // source lot sequence
+        public long LotSequence_Next; // target lot sequence
+
+        public int MaxX;
+        public int MaxY;
+        public int MinX;
+        public int MinY;
+
+        public int Flat_Zone;
+        public int WAFER_DIAM;
+
+        public DateTime StartTime;
+        public DateTime EndTime;
+
+        public TwLotInfo(
+            )
+        {
+            Factory = string.Empty;
+            Device = string.Empty;
+            Program = string.Empty;
+            TestArea = string.Empty;
+            LotID = string.Empty;
+            LotType = string.Empty;
+
+            LotSequence_Prev = long.MinValue;
+            LotSequence_Next = long.MinValue;
+
+            StartTime = DateTime.Now;
+            EndTime = DateTime.Now;
+        }
+    }
+
+    public class TwResultValue : TwLotInfo
+    {
+        public string ProgramRevision;
+        public long PPDSequence_Prev;
+
+        public string WaferID;
+        public long WaferSequence_Prev;
+        public long WaferSequence_Next;
+
+        public List<TwDataTable> TableName = null;
+
+        public TwResultValue(
+            )
+        {
+            base.Factory = string.Empty;
+            base.Device = string.Empty;
+            base.Program = string.Empty;
+            ProgramRevision = string.Empty;
+            PPDSequence_Prev = long.MinValue;
+            base.TestArea = string.Empty;
+            base.LotID = string.Empty;
+            base.LotType = string.Empty;
+
+            base.LotSequence_Prev = long.MinValue;
+            base.LotSequence_Next = long.MinValue;
+
+            base.StartTime = DateTime.Now;
+            base.EndTime = DateTime.Now;
+
+            WaferID = string.Empty;
+            WaferSequence_Prev = long.MinValue;
+            WaferSequence_Next = long.MinValue;
+
+            TableName = new List<TwDataTable>();
+
+            base.MaxX = int.MinValue;
+            base.MaxY = int.MinValue;
+            base.MinX = int.MaxValue;
+            base.MinY = int.MaxValue;
+
+            base.Flat_Zone = 0;
+            base.WAFER_DIAM = 200;
+
+        }
+
+        public TwResultValue(
+            TwLotInfo lot
+            )
+        {
+            base.Factory = lot.Factory;
+            base.Device = lot.Device;
+            base.Program = lot.Program;
+            ProgramRevision = string.Empty;
+            PPDSequence_Prev = long.MinValue;
+            base.TestArea = lot.TestArea;
+            base.LotID = lot.LotID;
+            base.LotType = lot.LotType;
+
+            base.LotSequence_Prev = lot.LotSequence_Prev;
+            base.LotSequence_Next = lot.LotSequence_Next;
+            base.StartTime = lot.StartTime;
+            base.EndTime = lot.EndTime;
+
+            WaferID = string.Empty;
+            WaferSequence_Prev = long.MinValue;
+            WaferSequence_Next = long.MinValue;
+
+            TableName = new List<TwDataTable>();
+        }
+    }
+
+    public class TwDataTable
+    {
+        public string TableName = string.Empty;
+        public List<TwParameter> Params = null;
+
+        public TwDataTable(
+            )
+        {
+            this.TableName = string.Empty;
+            this.Params = new List<TwParameter>();
+        }
+
+        public TwDataTable(
+            string tablename
+            )
+        {
+            this.TableName = tablename;
+            this.Params = new List<TwParameter>();
+        }
+    }
+
+    public class TwParameter
+    {
+        public string Name;
+        public string Type;
+
+        public TwParameter(
+            string name,
+            string type
+            )
+        {
+            this.Name = name;
+            this.Type = type;
+        }
+    }
+
+    #endregion [ TestWare Information ]
+
+    //-----------------------------------------------------------------------------------
+
+    #region [ Bin Information ]
+
+    public class Bin
+    {
+        public int Group = -1;
+        public int ID = -1;
+        public string Name = string.Empty;
+        public string CBin = string.Empty;
+        public string MpsBin = string.Empty;
+        public string MpsBin_Name = string.Empty;
+        public string SoftBin_Name = string.Empty;
+        public string Color = string.Empty;
+        public string Display = "T";
+        public string Description = string.Empty;
+    }
+
+    #endregion [ Bin Information ]
+}

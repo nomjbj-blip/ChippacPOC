@@ -1,0 +1,22 @@
+D:\PROJECT\DB하이텍\gitlab\101_ServerBin\DACrux.TEST.CP.DataService.exe.config
+D:\PROJECT\DB하이텍\gitlab\101_ServerBin\DACrux.TEST.CP.DataService.exe
+D:\PROJECT\DB하이텍\gitlab\101_ServerBin\DACrux.TEST.CP.DataService.pdb
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.TEST.CP.DataService\obj\Debug\DACrux.TEST.CP.DataService.csproj.AssemblyReference.cache
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.TEST.CP.DataService\obj\Debug\DACrux.TEST.CP.DataService.CPDataService.resources
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.TEST.CP.DataService\obj\Debug\DACrux.TEST.CP.DataService.ProjectInstaller.resources
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.TEST.CP.DataService\obj\Debug\DACrux.TEST.CP.DataService.csproj.GenerateResource.cache
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.TEST.CP.DataService\obj\Debug\DACrux.TEST.CP.DataService.csproj.CoreCompileInputs.cache
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.TEST.CP.DataService\obj\Debug\DACrux.T.39D0805C.Up2Date
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.TEST.CP.DataService\obj\Debug\DACrux.TEST.CP.DataService.exe
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.TEST.CP.DataService\obj\Debug\DACrux.TEST.CP.DataService.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\101_ServerBin\DACrux.TEST.CP.DataService.exe.config
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\101_ServerBin\DACrux.TEST.CP.DataService.exe
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\101_ServerBin\DACrux.TEST.CP.DataService.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.CP.DataService\obj\Debug\DACrux.TEST.CP.DataService.csproj.AssemblyReference.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.CP.DataService\obj\Debug\DACrux.TEST.CP.DataService.CPDataService.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.CP.DataService\obj\Debug\DACrux.TEST.CP.DataService.ProjectInstaller.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.CP.DataService\obj\Debug\DACrux.TEST.CP.DataService.csproj.GenerateResource.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.CP.DataService\obj\Debug\DACrux.TEST.CP.DataService.csproj.CoreCompileInputs.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.CP.DataService\obj\Debug\DACrux.T.39D0805C.Up2Date
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.CP.DataService\obj\Debug\DACrux.TEST.CP.DataService.exe
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.CP.DataService\obj\Debug\DACrux.TEST.CP.DataService.pdb

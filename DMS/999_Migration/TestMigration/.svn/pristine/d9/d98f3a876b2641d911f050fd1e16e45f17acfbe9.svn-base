@@ -1,0 +1,696 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.OracleClient;
+using System.Linq;
+using System.Text;
+using System.Diagnostics;
+
+namespace FabTwoToMigrationTools.Source
+{
+    /// <summary>
+    /// DataBase Instance: Oracle 8i
+    /// Client information: Oracle Instance Client 8i
+    /// </summary>
+    public class TestData : IDisposable
+    {
+        private readonly string ConnectionString = "Server={0};User ID={1};password={2}";
+        private readonly string DataSource = "ANAMNTDB";
+        private readonly string UserID = "t_test";
+        private readonly string Password = "t_test";
+        private readonly string m_ESDA_ConnectionString = "Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=10.147.13.13)(PORT=1521)))(CONNECT_DATA =(SERVICE_NAME=anamntdb)));User ID=t_test;Password=t_test;";
+        private OracleConnection oConnection = null;
+        private readonly string strTableName = "TD_";
+
+        public OracleConnection Connection { get { return oConnection; } set { this.oConnection = value; } }
+        public OracleTransaction Transaction { get; set; }
+
+        public TestData(
+            )
+        {
+            DbOpen();
+        }
+
+
+        #region [ Method ]
+
+        //--
+
+        public void DbOpen(
+            )
+        {
+            oConnection = new OracleConnection();
+            oConnection.ConnectionString = m_ESDA_ConnectionString;
+            oConnection.Open();
+        }
+
+        //--
+
+        public void DbClose(
+            )
+        {
+            if (oConnection.State == ConnectionState.Open)
+                oConnection.Close();
+        }
+
+        //--
+
+        public void Dispose(
+            )
+        {
+            DbClose();
+        }
+
+        //-----------------------------------------------------------------------------------
+
+        public DataTable ExecuteQuery(
+            string sQuery,
+            Dictionary<string, Parameter> dicParams
+            )
+        {
+            Stopwatch swt = new Stopwatch();
+            DataTable dt = new DataTable();
+            OracleParameter oParams = null;
+            using (OracleCommand oCommand = oConnection.CreateCommand())
+            {
+                oCommand.CommandText = sQuery;
+#if DEBUG
+                Debug.WriteLine(string.Format("Query: {0}", sQuery));
+#endif
+                oCommand.CommandTimeout = 60;
+                oCommand.CommandType = CommandType.Text;
+
+                foreach (KeyValuePair<string, Parameter> pk in dicParams)
+                {
+                    oParams = new OracleParameter();
+                    Parameter p = pk.Value;
+                    oParams.ParameterName = pk.Key;
+                    oParams.OracleType = GetOracleType(p.Type);
+                    oParams.Value = p.Value;
+
+                    oCommand.Parameters.Add(oParams);
+                }
+
+                OracleDataAdapter oAdapter = new OracleDataAdapter(oCommand);
+                swt.Start();
+                oAdapter.Fill(dt);
+                swt.Stop();
+            }
+
+#if DEBUG
+            Debug.WriteLine(string.Format("ElapsedMilliseconds: {0}", swt.ElapsedMilliseconds));
+#endif
+            return dt;
+        }
+
+        public OracleType GetOracleType(
+            DbType dbType
+            )
+        {
+            OracleType oraType = OracleType.VarChar;
+            switch (dbType)
+            {
+                case DbType.Date:
+                case DbType.DateTime:
+                    oraType = OracleType.DateTime;
+                    break;
+                case DbType.Decimal:
+                    oraType = OracleType.Number;
+                    break;
+                case DbType.Double:
+                    oraType = OracleType.Double;
+                    break;
+                case DbType.Object:
+                    oraType = OracleType.Blob;
+                    break;
+                case DbType.Int16:
+                    oraType = OracleType.Int16;
+                    break;
+                case DbType.Int32:
+                    oraType = OracleType.Int32;
+                    break;
+                case DbType.UInt16:
+                    oraType = OracleType.UInt16;
+                    break;
+                case DbType.UInt32:
+                    oraType = OracleType.UInt32;
+                    break;
+                case DbType.Int64:
+                case DbType.UInt64:
+                    oraType = OracleType.Float;
+                    break;
+                case DbType.Time:
+                    oraType = OracleType.Timestamp;
+                    break;
+                default:
+                    oraType = OracleType.VarChar;
+                    break;
+            }
+
+            return oraType;
+        }
+
+
+        //--
+
+        #endregion [ Method ]
+
+        //-----------------------------------------------------------------------------------
+
+        #region [ Data Tables ]
+
+        public DataTable GetDataTable(
+            string lotid,
+            string program
+            )
+        {
+            Dictionary<string, Parameter> dicParams = null;
+            StringBuilder sQuery = new StringBuilder();
+
+            sQuery.AppendLine(" SELECT DISTINCT DECODE(T1.FACILITY, 'PROBE1', 'FAB2', 'FAB1') AS \"FACTORY\", T2.PROGRAM, ");
+            //sQuery.AppendLine(" T2.TABLE_NAME ");
+            //Table 명 앞에 TD_ 를 붙이도록 한다.
+            sQuery.AppendLine(string.Format( "  '{0}' ||  T1.PROGRAM AS TABLE_NAME ", strTableName));
+            sQuery.AppendLine("   FROM LOT T1, DATA_TABLES T2 ");
+            sQuery.AppendLine("  WHERE     1 = 1 ");
+            sQuery.AppendLine("        AND T1.PROGRAM = T2.PROGRAM ");
+            sQuery.AppendLine("        AND T1.LOT = :lot ");
+            sQuery.AppendLine("        AND T1.PROGRAM = :program ");
+            //sQuery.AppendLine("        AND T1.START_TIME >= TO_DATE(:starttime, 'YYYYMMDDHH24MISS') ");
+            //sQuery.AppendLine("        AND T1.END_TIME < TO_DATE(:endtime, 'YYYYMMDDHH24MISS') ");
+
+
+            //--
+
+            dicParams = new Dictionary<string, Parameter>();
+
+            //--
+
+            #region [ Setting Parameters ]
+
+            //--
+
+            Parameter p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = lotid;
+            dicParams.Add("lot", p);
+
+            //--
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = program;
+            dicParams.Add("program", p);
+
+            //--
+
+            #endregion [ Setting Parameters ]
+
+            //--
+
+            DataTable dt = ExecuteQuery(
+                sQuery.ToString(),
+                dicParams
+                );
+
+            return dt;
+        }
+
+        #endregion [ Data Tables]
+
+        //-----------------------------------------------------------------------------------
+
+        #region [ Lot ]
+
+        public DataTable GetLot(
+            DateTime dStartDate,
+            DateTime dEndDate
+            )
+        {
+            Dictionary<string, Parameter> dicParams = null;
+            StringBuilder sQuery = new StringBuilder();
+
+            sQuery.AppendLine(" SELECT LOT_SEQ, ");
+            sQuery.AppendLine("        LOT, ");
+            sQuery.AppendLine("        LOT_TYPE, ");
+            sQuery.AppendLine("        FABLOT, ");
+            sQuery.AppendLine("        TEST_AREA, ");
+            sQuery.AppendLine("        TEST_TYPE, ");
+            sQuery.AppendLine("        LOGPOINT, ");
+            sQuery.AppendLine("        OPERATION, ");
+            sQuery.AppendLine("        PROGRAM, ");
+            sQuery.AppendLine("        DEVICE, ");
+            sQuery.AppendLine("        SMS_DEVICE, ");
+            sQuery.AppendLine("        DEVICE_ALIAS, ");
+            sQuery.AppendLine("        SMS_ITEM_ID, ");
+            sQuery.AppendLine("        FAMILY, ");
+            sQuery.AppendLine("        DECODE(FACILITY, 'PROBE1', 'FAB2', 'FAB1') AS \"FACTORY\", ");
+            sQuery.AppendLine("        SRCFAB, ");
+            sQuery.AppendLine("        TO_CHAR(START_TIME, 'YYYYMMDDHH24MISS') AS \"START_TIME\", ");
+            sQuery.AppendLine("        TO_CHAR(END_TIME, 'YYYYMMDDHH24MISS') AS \"END_TIME\", ");
+            sQuery.AppendLine("        WAFER_DIAM, ");
+            sQuery.AppendLine("        COMMENTS, ");
+            sQuery.AppendLine("        MERGE_FLAG ");
+            sQuery.AppendLine("   FROM LOT ");
+            sQuery.AppendLine("  WHERE 1 = 1  ");
+            //sQuery.AppendLine("        AND FACILITY = :factory ");
+            sQuery.AppendLine("        AND START_TIME >= TO_DATE(:starttime, 'YYYYMMDDHH24MISS') ");
+            sQuery.AppendLine("        AND END_TIME >= TO_DATE(:endtime, 'YYYYMMDDHH24MISS') ");
+
+            //--
+
+            dicParams = new Dictionary<string, Parameter>();
+            Parameter p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = string.Format("{0}000000", dStartDate.ToString(Constract.DEFAULT_DATE_STRING));
+            dicParams.Add("starttime", p);
+
+            //--
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = string.Format("{0}000000", dEndDate.ToString(Constract.DEFAULT_DATE_STRING));
+            dicParams.Add("endtime", p);
+
+            //--
+
+            DataTable dt = ExecuteQuery(
+                sQuery.ToString(),
+                dicParams
+                );
+
+            return dt;
+        }
+
+        #endregion [ Lot ]
+
+        //-----------------------------------------------------------------------------------
+
+        #region [ Wafer ]
+
+        public DataTable GetWafer(
+            string lot,
+            long lotseq
+            )
+        {
+            Dictionary<string, Parameter> dicParams = null;
+            StringBuilder sQuery = new StringBuilder();
+
+            sQuery.AppendLine(" SELECT DECODE(T1.FACILITY, 'PROBE1', 'FAB2', 'FAB1') AS \"FACTORY\", ");
+            sQuery.AppendLine("        T2.WAFER_SEQ, ");
+            sQuery.AppendLine("        T1.LOT_SEQ, ");
+            sQuery.AppendLine("        T2.WAFER_ID, ");
+            sQuery.AppendLine("        T2.PROBE_CNT, ");
+            sQuery.AppendLine("        TO_CHAR(T2.START_TIME, 'YYYYMMDDHH24MISS') AS \"START_TIME\", ");
+            sQuery.AppendLine("        TO_CHAR(T2.END_TIME, 'YYYYMMDDHH24MISS') AS \"END_TIME\", ");
+            sQuery.AppendLine("        TO_CHAR(T2.LOAD_TIME, 'YYYYMMDDHH24MISS') AS \"LOAD_TIME\", ");
+            sQuery.AppendLine("        T2.TESTER, ");
+            sQuery.AppendLine("        T2.PROBER, ");
+            sQuery.AppendLine("        T2.PROBE_CARD, ");
+            sQuery.AppendLine("        T2.HANDLER_ID, ");
+            sQuery.AppendLine("        T2.OPERATOR, ");
+            sQuery.AppendLine("        '' AS \"PROGRAM\", ");
+            sQuery.AppendLine("        '1' AS \"PROGRAM_REV\", ");
+            sQuery.AppendLine("        T2.START_QTY, ");
+            sQuery.AppendLine("        T2.PARENT, ");
+            sQuery.AppendLine("        T2.FLAGS, ");
+            sQuery.AppendLine("        T2.SCREEN_FLAG, ");
+            sQuery.AppendLine("        T2.SCRAP_FLAG, ");
+            sQuery.AppendLine("        T2.DGRADE_FLAG, ");
+            sQuery.AppendLine("        T2.VENDOR_ID, ");
+            sQuery.AppendLine("        T2.LOADBD, ");
+            sQuery.AppendLine("        T2.HOSTNAME, ");
+            sQuery.AppendLine("        T2.TESTHEAD, ");
+            sQuery.AppendLine("        T2.SW_REV, ");
+            sQuery.AppendLine("        T2.USP_REV, ");
+            sQuery.AppendLine("        T2.MAXX AS \"MAX_X\", ");
+            sQuery.AppendLine("        T2.MAXY AS \"MAX_Y\", ");
+            sQuery.AppendLine("        T2.WAF_FLAT, ");
+            sQuery.AppendLine("        T2.COMMENTS, ");
+            sQuery.AppendLine("        T2.SCRIBE_LOT, ");
+            sQuery.AppendLine("        T2.TEMP, ");
+            sQuery.AppendLine("        T2.TEMP_TYPE, ");
+            sQuery.AppendLine("        T2.TESTER_TYPE, ");
+            sQuery.AppendLine("        T2.PGMPATH, ");
+            sQuery.AppendLine("        T2.SPC_FLAG, ");
+            sQuery.AppendLine("        T2.SPC_RULE, ");
+            sQuery.AppendLine("        T2.DATA_SOURCE, ");
+            sQuery.AppendLine("        T2.LOT_MODE, ");
+            sQuery.AppendLine("        T2.IMMED_REPROBE, ");
+            sQuery.AppendLine("        T2.DELAYED_REPROBE, ");
+            sQuery.AppendLine("        T2.TRUNCATION, ");
+            sQuery.AppendLine("        T2.REF_DIEX AS \"REF_DIE_X\", ");
+            sQuery.AppendLine("        T2.REF_DIEY AS \"REF_DIE_Y\", ");
+            sQuery.AppendLine("        T2.T7SCRIBE, ");
+            sQuery.AppendLine("        T2.M12SCRIBE, ");
+            sQuery.AppendLine("        T2.MERGE_FLAG, ");
+            sQuery.AppendLine("        T2.TWFLAGS, ");
+            sQuery.AppendLine("        T2.TFVERSION, ");
+            sQuery.AppendLine("        T2.ESDA_ID, ");
+            sQuery.AppendLine("        T2.WAF_DIAM_MEAS, ");
+            sQuery.AppendLine("        T2.XREF_VECTOR_MEAS, ");
+            sQuery.AppendLine("        T2.YREF_VECTOR_MEAS, ");
+            sQuery.AppendLine("        T2.SETUP_TIMESIZE, ");
+            sQuery.AppendLine("        T2.LOTDEF_DATABASE, ");
+            sQuery.AppendLine("        T2.MAXSITE, ");
+            sQuery.AppendLine("        T2.AC_RULE_SEQ, ");
+            sQuery.AppendLine("        T2.PROBECARD_TOUCHDOWNS, ");
+            sQuery.AppendLine("        T2.STEPSIZE_X, ");
+            sQuery.AppendLine("        T2.STEPSIZE_Y, ");
+            sQuery.AppendLine("        T2.BURNIN_TYPE, ");
+            sQuery.AppendLine("        T2.PROGRAM_MODE, ");
+            sQuery.AppendLine("        T2.LOTCONTROL_MODE, ");
+            sQuery.AppendLine("        T2.LC_FLAGS, ");
+            sQuery.AppendLine("        T2.AC_FLAGS, ");
+            sQuery.AppendLine("        T2.SMSFAMILY_NAME, ");
+            sQuery.AppendLine("        T2.LOT_CLOSE, ");
+            sQuery.AppendLine("        T2.SPC_ENABLE, ");
+            sQuery.AppendLine("        T2.SPC_STATUS, ");
+            sQuery.AppendLine("        T2.SCREEN_TYPE, ");
+            sQuery.AppendLine("        T2.NUM_DIE, ");
+            sQuery.AppendLine("        T2.TW_VALID_DATA_CNT, ");
+            sQuery.AppendLine("        T2.DATATYPE_FLAG, ");
+            sQuery.AppendLine("        T2.FORCE_SPCFAIL, ");
+            sQuery.AppendLine("        T2.LOTINFO_SEQ, ");
+            sQuery.AppendLine("        T2.AC_DIE_CNT, ");
+            sQuery.AppendLine("        T2.MOD_TIME, ");
+            sQuery.AppendLine("        T2.PDM_SEQ ");
+            sQuery.AppendLine("   FROM LOT T1, WAFER T2");
+            sQuery.AppendLine("  WHERE 1 = 1 ");
+            sQuery.AppendLine("        AND T1.LOT_SEQ = T2.LOT_SEQ ");
+            sQuery.AppendLine("        AND T1.LOT = :lot ");
+            sQuery.AppendLine("        AND T1.LOT_SEQ = :lotseq ");
+            sQuery.AppendLine("  ORDER BY WAFER_SEQ ");
+
+            //--
+
+            dicParams = new Dictionary<string, Parameter>();
+
+            #region [ Setting Parameter ]
+
+            Parameter p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = lot;
+            dicParams.Add("lot", p);
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = lotseq;
+            dicParams.Add("lotseq", p);
+
+            #endregion [ Setting Parameter ]
+            //--
+
+            DataTable dt = ExecuteQuery(
+                sQuery.ToString(),
+                dicParams
+                );
+
+            return dt;
+        }
+
+        #endregion [ Wafer ]
+
+        //-----------------------------------------------------------------------------------
+
+        #region [ Program ]
+
+        public DataTable GetProgram(
+            string program,
+            string testarea,
+            string device
+            )
+        {
+            Dictionary<string, Parameter> dicParams = null;
+            StringBuilder sQuery = new StringBuilder();
+
+            //--
+
+            sQuery.AppendLine(" SELECT FACTORY, ");
+            sQuery.AppendLine("        PROGRAM, ");
+            sQuery.AppendLine("        TEST_AREA, ");
+            sQuery.AppendLine("        DEVICE, ");
+            sQuery.AppendLine("        TO_CHAR(CREATE_TIME, 'YYYYMMDDHH24MISS') AS \"CREATETIME\", ");
+            sQuery.AppendLine("        'MIGRATION' AS CREATEUSER, ");
+            sQuery.AppendLine("        TO_CHAR(UPDATE_TIME, 'YYYYMMDDHH24MISS') AS \"UPDATETIME\", ");
+            sQuery.AppendLine("        'MIGRATION' AS UPDATEUSER ");
+            sQuery.AppendLine("   FROM (  SELECT DECODE(FACILITY, 'PROBE1', 'FAB2', 'FAB1') AS \"FACTORY\", ");
+            sQuery.AppendLine("                  PROGRAM, ");
+            sQuery.AppendLine("                  TEST_AREA, ");
+            sQuery.AppendLine("                  DEVICE, ");
+            sQuery.AppendLine("                  MIN (START_TIME) AS \"CREATE_TIME\", ");
+            sQuery.AppendLine("                  MAX (START_TIME) AS \"UPDATE_TIME\" ");
+            sQuery.AppendLine("             FROM LOT ");
+            sQuery.AppendLine("            WHERE 1 = 1 ");
+            sQuery.AppendLine("                  AND FACILITY IN ('ANAMNTFAB', 'PROBE1') ");
+            sQuery.AppendLine("                  AND PROGRAM = :program ");
+            sQuery.AppendLine("                  AND TEST_AREA = :testarea ");
+            sQuery.AppendLine("                  AND DEVICE = :device ");
+            sQuery.AppendLine("                  AND START_TIME >= SYSDATE - 730 ");
+            sQuery.AppendLine("                  AND END_TIME < SYSDATE ");
+            sQuery.AppendLine("         GROUP BY DECODE(FACILITY, 'PROBE1', 'FAB2', 'FAB1'), ");
+            sQuery.AppendLine("                  PROGRAM, ");
+            sQuery.AppendLine("                  TEST_AREA, ");
+            sQuery.AppendLine("                  DEVICE) ");
+            sQuery.AppendLine("  WHERE 1 = 1 ");
+
+            //--
+
+            dicParams = new Dictionary<string, Parameter>();
+
+            #region [ Setting Parameter ]
+
+            Parameter p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = program;
+            dicParams.Add("program", p);
+
+            //--
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = testarea;
+            dicParams.Add("testarea", p);
+
+            //--
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = device;
+            dicParams.Add("device", p);
+
+            #endregion [ Setting Parameter ]
+
+            //--
+
+            DataTable dt = ExecuteQuery(
+                sQuery.ToString(),
+                dicParams
+                );
+
+            return dt;
+        }
+
+        #endregion [ Program ]
+
+        //-----------------------------------------------------------------------------------
+
+        #region [ Program Parameter ]
+
+        public DataTable GetProgramParameter(
+            string factory,
+            string program
+            )
+        {
+            Dictionary<string, Parameter> dicParams = null;
+            StringBuilder sQuery = new StringBuilder();
+
+            //--
+
+            sQuery.AppendLine(" SELECT :factory AS \"FACTORY\", ");
+            sQuery.AppendLine("        PROGRAM AS \"PROGRAM\", ");
+            sQuery.AppendLine("        DENSE_RANK () OVER (PARTITION BY PROGRAM ORDER BY PPD_SEQ) AS \"PROGRAM_REV\", ");
+            sQuery.AppendLine("        ROW_NUMBER () OVER (PARTITION BY PPD_SEQ ORDER BY PARM) AS \"PARAM_INDEX\", ");
+            sQuery.AppendLine("        PARM AS \"PARAM_NAME\", ");
+            sQuery.AppendLine("        PARM_TYPE AS \"PARAM_TYPE\", ");
+            sQuery.AppendLine("        PARM_DESC AS \"PARAM_DESC\", ");
+            sQuery.AppendLine("        TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS') AS \"CREATE_TIME\", ");
+            sQuery.AppendLine("        'MIGRATION' AS \"CREATE_USER\", ");
+            sQuery.AppendLine("        TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS') AS \"UPDATE_TIME\", ");
+            sQuery.AppendLine("        'MIGRATION' AS \"UPDATE_USER\", ");
+            //sQuery.AppendLine("        TABLE_NAME AS \"TABLE_NAME\", ");
+            sQuery.AppendLine(string.Format("        '{0}' || PROGRAM AS \"TABLE_NAME\", ", strTableName));
+            sQuery.AppendLine("        0 AS \"DECIMAL_PLACES\", ");
+            sQuery.AppendLine("        RUNTIME_DEFINED AS \"RUNTIME_DEFINED\", ");
+            sQuery.AppendLine("        UOM, ");
+            sQuery.AppendLine("        SPEC_LOW AS \"LSL\", ");
+            sQuery.AppendLine("        TARGET AS \"TARGET\", ");
+            sQuery.AppendLine("        SPEC_HI AS \"USL\", ");
+            sQuery.AppendLine("        LCL, ");
+            sQuery.AppendLine("        UCL, ");
+            sQuery.AppendLine("        TEST_LOW, ");
+            sQuery.AppendLine("        TEST_HIGH ");
+            sQuery.AppendLine("   FROM PROGRAM_PARM_DEF ");
+            sQuery.AppendLine("  WHERE 1 = 1  ");
+            sQuery.AppendLine("    AND PROGRAM = :program ");
+            sQuery.AppendLine("    AND TABLE_NAME IS NOT NULL ");
+
+            //--
+
+            dicParams = new Dictionary<string, Parameter>();
+
+            #region [ Setting Parameter ]
+
+            //--
+
+            Parameter p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = program;
+            dicParams.Add("program", p);
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = factory;
+            dicParams.Add("factory", p);
+
+            //--
+
+            #endregion [ Setting Parameter ]
+
+            DataTable dt = ExecuteQuery(
+                sQuery.ToString(),
+                dicParams
+                );
+
+            return dt;
+        }
+
+        #endregion [ Program Parameter ]
+
+        //-----------------------------------------------------------------------------------
+
+        #region [ Die Info ]
+        public DataTable GetMapInfo(
+            string factory,
+            string program,
+            string pdm_seq
+            )
+        {
+            Dictionary<string, Parameter> dicParams = null;
+            StringBuilder sQuery = new StringBuilder();
+
+            //--
+
+            sQuery.AppendLine(" SELECT :factory AS FACTORY, ");
+            sQuery.AppendLine("        PROGRAM, ");
+            sQuery.AppendLine("        0 AS PROGRAM_REV, ");
+            sQuery.AppendLine("        RANK() OVER (ORDER BY X,Y DESC) AS DIE_NUM, ");
+            sQuery.AppendLine("        X,  ");
+            sQuery.AppendLine("        Y,  ");
+            sQuery.AppendLine("        MAX(TW_DIETYPE) AS TW_DIETYPE, ");
+            sQuery.AppendLine("        MAX(DIETYPE_DESC) AS DIETYPE_DESC ");
+            sQuery.AppendLine("   FROM PROGRAM_DIEMAP ");
+            sQuery.AppendLine("  WHERE 1 = 1 ");
+            sQuery.AppendLine("    AND PROGRAM = :program ");
+            sQuery.AppendLine("    AND PDM_SEQ = :pdm_seq ");
+            sQuery.AppendLine("    GROUP BY PROGRAM, X, Y ");
+
+
+            //중복 오류 발생 TPSMGR.SYS_C0016790
+            //sQuery.AppendLine(" SELECT '' AS \"FACTORY\", ");
+            //sQuery.AppendLine("        PROGRAM, ");
+            //sQuery.AppendLine("        DENSE_RANK() OVER(PARTITION BY PDM_SEQ ORDER BY PDM_SEQ) AS \"PROGRAM_REV\", ");
+            //sQuery.AppendLine("        DIE_NUM, ");
+            //sQuery.AppendLine("        X,  ");
+            //sQuery.AppendLine("        Y,  ");
+            //sQuery.AppendLine("        TW_DIETYPE, ");
+            //sQuery.AppendLine("        DIETYPE_DESC ");
+            //sQuery.AppendLine("   FROM PROGRAM_DIEMAP ");
+            //sQuery.AppendLine("  WHERE 1 = 1 ");
+            //sQuery.AppendLine("    AND PROGRAM = :program ");
+
+            //--
+
+            dicParams = new Dictionary<string, Parameter>();
+
+            #region [ Setting Parameter ]
+
+            //--
+
+            Parameter p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = program;
+            dicParams.Add("program", p);
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = factory;
+            dicParams.Add("factory", p);
+
+            p = new Parameter();
+            p.Type = DbType.String;
+            p.Value = pdm_seq;
+            dicParams.Add("pdm_seq", p);
+
+            //--
+
+            #endregion [ Setting Parameter ]
+
+            DataTable dt = ExecuteQuery(
+                sQuery.ToString(),
+                dicParams
+                );
+
+            return dt;
+        }
+        #endregion [ Die Info ]
+
+        //-----------------------------------------------------------------------------------
+
+        #region [ RawData Table ]
+
+        public DataSet GetRawData(
+            long waferseq,
+            List<TwDataTable> tableinfo
+            )
+        {
+            DataSet ds = new DataSet();
+            Dictionary<string, Parameter> dicParams = null;
+            StringBuilder sQuery = new StringBuilder();
+
+            //--
+
+            foreach (TwDataTable d in tableinfo)
+            {
+                //TEST 의 경우 DM 과 다르게 X 는 TRUNC, Y 는 MOD 를 사용 한다.
+                sQuery.Clear();
+                sQuery.AppendLine(string.Format(" SELECT t1.*, TRUNC(T1.XY / 65536) AS \"X\", MOD(T1.XY, 65536) AS \"Y\" FROM  {0} T1", d.TableName.Replace(strTableName, "T")));
+                sQuery.AppendLine("   WHERE 1=1 AND WAFER_SEQ = :waferseq ");
+
+                //--
+
+                dicParams = new Dictionary<string, Parameter>();
+                Parameter p = new Parameter();
+                p.Type = DbType.String;
+                p.Value = waferseq;
+                dicParams.Add("waferseq", p);
+
+                //--
+
+                DataTable dt = ExecuteQuery(
+                    sQuery.ToString(),
+                    dicParams
+                    );
+                dt.TableName = d.TableName;
+                ds.Tables.Add(dt);
+            }
+
+            return ds;
+        }
+
+        #endregion [ RawData Table ]
+
+
+        //-----------------------------------------------------------------------------------
+    }
+}

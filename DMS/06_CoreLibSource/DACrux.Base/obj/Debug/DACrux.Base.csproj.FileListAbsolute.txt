@@ -1,0 +1,12 @@
+D:\PROJECT\DB하이텍\gitlab\07_CoreLib\DACrux.Base.dll
+D:\PROJECT\DB하이텍\gitlab\07_CoreLib\DACrux.Base.pdb
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Base\obj\Debug\DACrux.Base.csproj.AssemblyReference.cache
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Base\obj\Debug\DACrux.Base.csproj.CoreCompileInputs.cache
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Base\obj\Debug\DACrux.Base.dll
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Base\obj\Debug\DACrux.Base.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\07_CoreLib\DACrux.Base.dll
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\07_CoreLib\DACrux.Base.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Base\obj\Debug\DACrux.Base.csproj.AssemblyReference.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Base\obj\Debug\DACrux.Base.csproj.CoreCompileInputs.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Base\obj\Debug\DACrux.Base.dll
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Base\obj\Debug\DACrux.Base.pdb

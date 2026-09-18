@@ -1,0 +1,156 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Windows.Forms;
+using System.Diagnostics;
+
+namespace FabTwoToMigrationTools
+{
+    public partial class Form2 : Form
+    {
+        List<Bin> Bins = null;
+        Dictionary<string, Parameter> dicParams = null;
+        public Form2()
+        {
+            InitializeComponent();
+
+            string[] tmpLabel = GetLabel();
+            string[] tmpColor = GetColor();
+            string[] tmpSoftBin = GetSoftBin();
+            string[] tmpMpsBin = GetMpsBin();
+
+            Bins = new List<Bin>();
+            dicParams = new Dictionary<string, Parameter>();
+            for (int i = 0; i < tmpLabel.Length; i++)
+            {
+                Bin bin = new Bin();
+                bin.Group = 0;
+                bin.ID = int.Parse(tmpLabel[i].Substring(tmpLabel[i].IndexOf('(') + 1, 2).Replace(",", ""));
+                bin.Name = tmpLabel[i].Substring(tmpLabel[i].IndexOf(',') + 1, tmpLabel[i].Length - (tmpLabel[i].IndexOf(',') + 2));
+                bin.CBin = tmpLabel[i].Substring(tmpLabel[i].IndexOf('(') + 1, 2).Replace(",", "");
+                bin.MpsBin = tmpMpsBin.Length > i ? tmpMpsBin[i].Substring(tmpMpsBin[i].LastIndexOf(',') + 1, tmpMpsBin[i].Length - (tmpMpsBin[i].LastIndexOf(',') + 2)) : string.Empty;
+                bin.MpsBin_Name = tmpMpsBin.Length > i ? tmpMpsBin[i].Substring(tmpMpsBin[i].IndexOf(',') + 1, tmpMpsBin[i].Length - (tmpMpsBin[i].LastIndexOf(',') - 1)) : string.Empty;
+                bin.SoftBin_Name = tmpSoftBin.Length > i ? tmpSoftBin[i].Substring(tmpSoftBin[i].IndexOf(',') + 1, tmpSoftBin[i].Length - (tmpSoftBin[i].IndexOf(',') + 2)) : string.Empty;
+                bin.Color = tmpColor.Length > i ? GenerateRgba(string.Format("#{0}", tmpColor[i].Substring(tmpColor[i].IndexOf(',') + 1, tmpColor[i].Length - (tmpColor[i].IndexOf(',') + 2))), 0) : string.Empty;
+                bin.Display = "T";
+                bin.Description = string.Empty;
+                Bins.Add(bin);
+            }
+
+            //--
+
+            BaseInfo oracle = new BaseInfo();
+            oracle.DataSource = "DMSDEV";
+            oracle.UserID = "TPSMGR";
+            oracle.Password = "TPSMGR";
+            Oracle.ManagedDataAccess.Client.OracleConnection oConnection = oracle.DbOpen();
+            Oracle.ManagedDataAccess.Client.OracleTransaction oTransaction = oConnection.BeginTransaction();
+
+            StringBuilder sQuery = new StringBuilder().AppendLine("INSERT INTO TQP_BININFO(ID, NAME, CBIN, MPSBIN, MPSBIN_NAME, SOFTBIN_NAME, COLOR, DISPLAY, DESCRIPTION)")
+                                                      .AppendLine(" VALUES(:ID, :NAME, :CBIN, :MPSBIN, :MPSBIN_NAME, :SOFTBIN_NAME, :COLOR, :DISPLAY, :DESCRIPTION)");
+
+            for (int i = 0; i < Bins.Count; i++)
+            {
+                dicParams.Clear();
+
+                Parameter p = new Parameter();
+                p.Type = oracle.GetDbTypeByName(Bins[i].ID.GetType());
+                p.Value = Bins[i].ID;
+                dicParams.Add("ID", p);
+
+                p = new Parameter();
+                p.Type = oracle.GetDbTypeByName(Bins[i].Name.GetType());
+                p.Value = Bins[i].Name;
+                dicParams.Add("NAME", p);
+
+                p = new Parameter();
+                p.Type = oracle.GetDbTypeByName(Bins[i].CBin.GetType());
+                p.Value = Bins[i].CBin;
+                dicParams.Add("CBIN", p);
+
+                p = new Parameter();
+                p.Type = oracle.GetDbTypeByName(Bins[i].MpsBin.GetType());
+                p.Value = Bins[i].MpsBin;
+                dicParams.Add("MPSBIN", p);
+
+                p = new Parameter();
+                p.Type = oracle.GetDbTypeByName(Bins[i].MpsBin_Name.GetType());
+                p.Value = Bins[i].MpsBin_Name;
+                dicParams.Add("MPSBIN_NAME", p);
+
+                p = new Parameter();
+                p.Type = oracle.GetDbTypeByName(Bins[i].SoftBin_Name.GetType());
+                p.Value = Bins[i].SoftBin_Name;
+                dicParams.Add("SOFTBIN_NAME", p);
+
+                p = new Parameter();
+                p.Type = oracle.GetDbTypeByName(Bins[i].Color.GetType());
+                p.Value = Bins[i].Color;
+                dicParams.Add("COLOR", p);
+
+                p = new Parameter();
+                p.Type = oracle.GetDbTypeByName(Bins[i].Display.GetType());
+                p.Value = Bins[i].Display;
+                dicParams.Add("DISPLAY", p);
+
+                p = new Parameter();
+                p.Type = oracle.GetDbTypeByName(Bins[i].Description.GetType());
+                p.Value = Bins[i].Description;
+                dicParams.Add("DESCRIPTION", p);
+
+                oracle.ExecuteNonQuery(oConnection, sQuery.ToString(), dicParams);
+            }
+
+            oTransaction.Commit();
+            oracle.DbClose(oConnection);
+        }
+
+        #region [ Method ]
+        public string[] GetColor()
+        {
+            StringBuilder sb = new StringBuilder().Append("BIN_COLOR=(1,ff69b5) BIN_COLOR=(2,ff1042) BIN_COLOR=(3,00ff00) BIN_COLOR=(4,5251ff) BIN_COLOR=(5,ffd700) BIN_COLOR=(6,84cfef) BIN_COLOR=(7,a520f7) BIN_COLOR=(8,ffff00)");
+            string[] sTmp = sb.ToString().Split(' ');
+            return sTmp;
+        }
+
+        public string[] GetLabel()
+        {
+            StringBuilder sb = new StringBuilder().Append("BIN_LABEL=(1,GEC) BIN_LABEL=(2,ThgtIDDQ) BIN_LABEL=(3,ThgtVMIN) BIN_LABEL=(4,TghtVMAX) BIN_LABEL=(5,VIAChain) ");
+            sb.Append("BIN_LABEL=(6,SpdSort) BIN_LABEL=(7,DieID) BIN_LABEL=(8,BurnIn) BIN_LABEL=(10,Sync) BIN_LABEL=(11,CPUFunc) ");
+            sb.Append("BIN_LABEL=(12,DARAMFun) BIN_LABEL=(13,SARAMFun) BIN_LABEL=(14,BISTFunc) BIN_LABEL=(15,ROMFunc) BIN_LABEL=(19,JTag) ");
+            sb.Append("BIN_LABEL=(20,StressFn) BIN_LABEL=(30,Vmin_GEN) BIN_LABEL=(31,Vmin_ROM) BIN_LABEL=(32,Vmin_GSM) BIN_LABEL=(35,Vmax_GEN) ");
+            sb.Append("BIN_LABEL=(36,Vmax_ROM) BIN_LABEL=(37,Vmax_GSM) BIN_LABEL=(40,SpeedGEN) BIN_LABEL=(41,SpeedROM) BIN_LABEL=(42,SpeedGSM) ");
+            sb.Append("BIN_LABEL=(44,Level) BIN_LABEL=(45,OPENS) BIN_LABEL=(47,SHORTS) BIN_LABEL=(48,LEAKAGE) BIN_LABEL=(50,IDDQ)");
+            string[] sTmp = sb.ToString().Split(' ');
+            return sTmp;
+        }
+
+        public string[] GetSoftBin()
+        {
+            StringBuilder sb = new StringBuilder().Append("SOFTBIN_LABEL=(1,BIN1) SOFTBIN_LABEL=(2,BIN2) SOFTBIN_LABEL=(3,BIN3) SOFTBIN_LABEL=(4,BIN4)");
+            string[] sTmp = sb.ToString().Split(' ');
+            return sTmp;
+        }
+
+        public string[] GetMpsBin()
+        {
+            StringBuilder sb = new StringBuilder().Append("MPSBIN=(1,BIN1,1) MPSBIN=(2,BIN2,2) MPSBIN=(3,BIN3,3) MPSBIN=(4,BIN4,4)");
+            string[] sTmp = sb.ToString().Split(' ');
+            return sTmp;
+        }
+
+        public string GenerateRgba(string hexBackgroundColor, decimal backgroundOpacity)
+        {
+            Color color = ColorTranslator.FromHtml(hexBackgroundColor);
+            int r = Convert.ToInt16(color.R);
+            int g = Convert.ToInt16(color.G);
+            int b = Convert.ToInt16(color.B);
+            return string.Format("{0}{1}{2}", r.ToString("D3"), g.ToString("D3"), b.ToString("D3"), hexBackgroundColor);
+        }
+        #endregion [ Method ]
+    }
+}

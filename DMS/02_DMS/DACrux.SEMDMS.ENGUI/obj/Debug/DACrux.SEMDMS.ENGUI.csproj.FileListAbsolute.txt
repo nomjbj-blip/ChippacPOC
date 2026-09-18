@@ -1,0 +1,112 @@
+D:\PROJECT\DB하이텍\gitlab\100_ClientBin\DACrux.SEMDMS.ENGUI.dll
+D:\PROJECT\DB하이텍\gitlab\100_ClientBin\DACrux.SEMDMS.ENGUI.pdb
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.csproj.AssemblyReference.cache
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmConfiguration.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmDefectAlarmReport.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmDefectAlarmReport_ChartItem.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmDefectAlarmSetup.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmDefectAlarmSetup_Code.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmDefectAlarmSetup_Notify.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmDefectTypeDefine_VerTwo.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmZipTest.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmZoneDefine.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmDefectColorDefine_Property.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmDefectTypeDefine_Property.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmDMDataMaint.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmGlobalConfiguration.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmDefectTypeGroup_Property.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.DataSelecter.LegendItem.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.DataSelecter.LegendList.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmDefectImageGallery.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmDefectImgGalleryManyStep.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmDefectMap.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmDefectMapGallery.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmDefectPatternSearch.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmDefectPatternSearchNew.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmDefectSourceAnalysis.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmDefectColoring.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmDieStackAnalysis.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmDieStackGallery.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmDMSStepSelect.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmExportToKlarf.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmRepeatedDefect.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmViewMapParsingResult.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmTestMapOverlay.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmDefectMapViewer.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmDefectBareMapViewer.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.Properties.Resources.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmChartAnalysis.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmChartAnalysisNew.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.dlgSizePopup.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmCommonalityLotList.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmDataSheet.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmDefectDataSummary.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmDMDataTrend.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmInspectionDetail.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmInspInfoReport.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmCommonalityStudy.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmKillRate.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmEquipDefectTrend.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmLossYieldProspect.resources
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.csproj.GenerateResource.cache
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.dll.licenses
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.csproj.CoreCompileInputs.cache
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.S.9F34B053.Up2Date
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.dll
+D:\PROJECT\DB하이텍\gitlab\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.csproj.AssemblyReference.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmConfiguration.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmDefectAlarmReport.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmDefectAlarmReport_ChartItem.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmDefectAlarmSetup.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmDefectAlarmSetup_Code.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmDefectAlarmSetup_Notify.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmDefectTypeDefine_VerTwo.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmZipTest.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmZoneDefine.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmDefectColorDefine_Property.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmDefectTypeDefine_Property.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmDMDataMaint.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmGlobalConfiguration.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmDefectTypeGroup_Property.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.DataSelecter.LegendItem.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.DataSelecter.LegendList.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmDefectImageGallery.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmDefectImgGalleryManyStep.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmDefectMap.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmDefectMapGallery.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmDefectPatternSearch.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmDefectPatternSearchNew.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmDefectSourceAnalysis.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmDefectColoring.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmDieStackAnalysis.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmDieStackGallery.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmDMSStepSelect.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmExportToKlarf.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmRepeatedDefect.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmViewMapParsingResult.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmTestMapOverlay.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmDefectMapViewer.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmDefectBareMapViewer.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.Properties.Resources.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmChartAnalysis.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmChartAnalysisNew.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.dlgSizePopup.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmCommonalityLotList.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmDataSheet.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmDefectDataSummary.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmDMDataTrend.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmInspectionDetail.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmInspInfoReport.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmCommonalityStudy.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmKillRate.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmEquipDefectTrend.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmLossYieldProspect.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.csproj.GenerateResource.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.dll.licenses
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.csproj.CoreCompileInputs.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\100_ClientBin\DACrux.SEMDMS.ENGUI.dll
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\100_ClientBin\DACrux.SEMDMS.ENGUI.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.S.9F34B053.Up2Date
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.dll
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.pdb

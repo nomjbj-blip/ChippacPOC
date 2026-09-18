@@ -1,0 +1,34 @@
+D:\PROJECT\DB하이텍\gitlab\00_Solution\DACrux2015wc\VideoCaptureTest\bin\Debug\VideoCaptureTest.exe
+D:\PROJECT\DB하이텍\gitlab\00_Solution\DACrux2015wc\VideoCaptureTest\bin\Debug\VideoCaptureTest.pdb
+D:\PROJECT\DB하이텍\gitlab\00_Solution\DACrux2015wc\VideoCaptureTest\bin\Debug\AForge.Controls.dll
+D:\PROJECT\DB하이텍\gitlab\00_Solution\DACrux2015wc\VideoCaptureTest\bin\Debug\AForge.Video.DirectShow.dll
+D:\PROJECT\DB하이텍\gitlab\00_Solution\DACrux2015wc\VideoCaptureTest\bin\Debug\AForge.Video.dll
+D:\PROJECT\DB하이텍\gitlab\00_Solution\DACrux2015wc\VideoCaptureTest\bin\Debug\DACrux.Common.VideoCapture.dll
+D:\PROJECT\DB하이텍\gitlab\00_Solution\DACrux2015wc\VideoCaptureTest\bin\Debug\DACrux.Common.VideoCapture.pdb
+D:\PROJECT\DB하이텍\gitlab\00_Solution\DACrux2015wc\VideoCaptureTest\bin\Debug\DACrux.Common.VideoCapture.dll.config
+D:\PROJECT\DB하이텍\gitlab\00_Solution\DACrux2015wc\VideoCaptureTest\obj\Debug\VideoCaptureTest.csproj.AssemblyReference.cache
+D:\PROJECT\DB하이텍\gitlab\00_Solution\DACrux2015wc\VideoCaptureTest\obj\Debug\VideoCaptureTest.Form1.resources
+D:\PROJECT\DB하이텍\gitlab\00_Solution\DACrux2015wc\VideoCaptureTest\obj\Debug\VideoCaptureTest.Form2.resources
+D:\PROJECT\DB하이텍\gitlab\00_Solution\DACrux2015wc\VideoCaptureTest\obj\Debug\VideoCaptureTest.Properties.Resources.resources
+D:\PROJECT\DB하이텍\gitlab\00_Solution\DACrux2015wc\VideoCaptureTest\obj\Debug\VideoCaptureTest.csproj.GenerateResource.cache
+D:\PROJECT\DB하이텍\gitlab\00_Solution\DACrux2015wc\VideoCaptureTest\obj\Debug\VideoCaptureTest.csproj.CoreCompileInputs.cache
+D:\PROJECT\DB하이텍\gitlab\00_Solution\DACrux2015wc\VideoCaptureTest\obj\Debug\VideoCap.5C0B10C6.Up2Date
+D:\PROJECT\DB하이텍\gitlab\00_Solution\DACrux2015wc\VideoCaptureTest\obj\Debug\VideoCaptureTest.exe
+D:\PROJECT\DB하이텍\gitlab\00_Solution\DACrux2015wc\VideoCaptureTest\obj\Debug\VideoCaptureTest.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\00_Solution\DACrux2015wc\VideoCaptureTest\bin\Debug\VideoCaptureTest.exe
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\00_Solution\DACrux2015wc\VideoCaptureTest\bin\Debug\VideoCaptureTest.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\00_Solution\DACrux2015wc\VideoCaptureTest\bin\Debug\AForge.Controls.dll
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\00_Solution\DACrux2015wc\VideoCaptureTest\bin\Debug\AForge.Video.DirectShow.dll
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\00_Solution\DACrux2015wc\VideoCaptureTest\bin\Debug\AForge.Video.dll
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\00_Solution\DACrux2015wc\VideoCaptureTest\bin\Debug\DACrux.Common.VideoCapture.dll
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\00_Solution\DACrux2015wc\VideoCaptureTest\bin\Debug\DACrux.Common.VideoCapture.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\00_Solution\DACrux2015wc\VideoCaptureTest\bin\Debug\DACrux.Common.VideoCapture.dll.config
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\00_Solution\DACrux2015wc\VideoCaptureTest\obj\Debug\VideoCaptureTest.csproj.AssemblyReference.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\00_Solution\DACrux2015wc\VideoCaptureTest\obj\Debug\VideoCaptureTest.Form1.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\00_Solution\DACrux2015wc\VideoCaptureTest\obj\Debug\VideoCaptureTest.Form2.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\00_Solution\DACrux2015wc\VideoCaptureTest\obj\Debug\VideoCaptureTest.Properties.Resources.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\00_Solution\DACrux2015wc\VideoCaptureTest\obj\Debug\VideoCaptureTest.csproj.GenerateResource.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\00_Solution\DACrux2015wc\VideoCaptureTest\obj\Debug\VideoCaptureTest.csproj.CoreCompileInputs.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\00_Solution\DACrux2015wc\VideoCaptureTest\obj\Debug\VideoCap.5C0B10C6.Up2Date
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\00_Solution\DACrux2015wc\VideoCaptureTest\obj\Debug\VideoCaptureTest.exe
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\00_Solution\DACrux2015wc\VideoCaptureTest\obj\Debug\VideoCaptureTest.pdb

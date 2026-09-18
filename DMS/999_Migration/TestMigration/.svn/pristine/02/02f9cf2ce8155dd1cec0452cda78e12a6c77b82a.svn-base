@@ -1,0 +1,134 @@
+﻿namespace FabTwoToMigrationTools
+{
+    partial class Form2
+    {
+        /// <summary>
+        /// Required designer variable.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
+
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        #region Windows Form Designer generated code
+
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
+            this.components = new System.ComponentModel.Container();
+            this.ultraPanel1 = new Infragistics.Win.Misc.UltraPanel();
+            this.ultraDockManager1 = new Infragistics.Win.UltraWinDock.UltraDockManager(this.components);
+            this._Form2UnpinnedTabAreaLeft = new Infragistics.Win.UltraWinDock.UnpinnedTabArea();
+            this._Form2UnpinnedTabAreaRight = new Infragistics.Win.UltraWinDock.UnpinnedTabArea();
+            this._Form2UnpinnedTabAreaTop = new Infragistics.Win.UltraWinDock.UnpinnedTabArea();
+            this._Form2UnpinnedTabAreaBottom = new Infragistics.Win.UltraWinDock.UnpinnedTabArea();
+            this._Form2AutoHideControl = new Infragistics.Win.UltraWinDock.AutoHideControl();
+            this.ultraPanel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.ultraDockManager1)).BeginInit();
+            this.SuspendLayout();
+            // 
+            // ultraPanel1
+            // 
+            this.ultraPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ultraPanel1.Location = new System.Drawing.Point(0, 0);
+            this.ultraPanel1.Name = "ultraPanel1";
+            this.ultraPanel1.Size = new System.Drawing.Size(784, 562);
+            this.ultraPanel1.TabIndex = 0;
+            // 
+            // ultraDockManager1
+            // 
+            this.ultraDockManager1.CompressUnpinnedTabs = false;
+            this.ultraDockManager1.HostControl = this;
+            // 
+            // _Form2UnpinnedTabAreaLeft
+            // 
+            this._Form2UnpinnedTabAreaLeft.Dock = System.Windows.Forms.DockStyle.Left;
+            this._Form2UnpinnedTabAreaLeft.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this._Form2UnpinnedTabAreaLeft.Location = new System.Drawing.Point(0, 0);
+            this._Form2UnpinnedTabAreaLeft.Name = "_Form2UnpinnedTabAreaLeft";
+            this._Form2UnpinnedTabAreaLeft.Owner = this.ultraDockManager1;
+            this._Form2UnpinnedTabAreaLeft.Size = new System.Drawing.Size(0, 562);
+            this._Form2UnpinnedTabAreaLeft.TabIndex = 1;
+            // 
+            // _Form2UnpinnedTabAreaRight
+            // 
+            this._Form2UnpinnedTabAreaRight.Dock = System.Windows.Forms.DockStyle.Right;
+            this._Form2UnpinnedTabAreaRight.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this._Form2UnpinnedTabAreaRight.Location = new System.Drawing.Point(784, 0);
+            this._Form2UnpinnedTabAreaRight.Name = "_Form2UnpinnedTabAreaRight";
+            this._Form2UnpinnedTabAreaRight.Owner = this.ultraDockManager1;
+            this._Form2UnpinnedTabAreaRight.Size = new System.Drawing.Size(0, 562);
+            this._Form2UnpinnedTabAreaRight.TabIndex = 2;
+            // 
+            // _Form2UnpinnedTabAreaTop
+            // 
+            this._Form2UnpinnedTabAreaTop.Dock = System.Windows.Forms.DockStyle.Top;
+            this._Form2UnpinnedTabAreaTop.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this._Form2UnpinnedTabAreaTop.Location = new System.Drawing.Point(0, 0);
+            this._Form2UnpinnedTabAreaTop.Name = "_Form2UnpinnedTabAreaTop";
+            this._Form2UnpinnedTabAreaTop.Owner = this.ultraDockManager1;
+            this._Form2UnpinnedTabAreaTop.Size = new System.Drawing.Size(784, 0);
+            this._Form2UnpinnedTabAreaTop.TabIndex = 3;
+            // 
+            // _Form2UnpinnedTabAreaBottom
+            // 
+            this._Form2UnpinnedTabAreaBottom.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this._Form2UnpinnedTabAreaBottom.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this._Form2UnpinnedTabAreaBottom.Location = new System.Drawing.Point(0, 562);
+            this._Form2UnpinnedTabAreaBottom.Name = "_Form2UnpinnedTabAreaBottom";
+            this._Form2UnpinnedTabAreaBottom.Owner = this.ultraDockManager1;
+            this._Form2UnpinnedTabAreaBottom.Size = new System.Drawing.Size(784, 0);
+            this._Form2UnpinnedTabAreaBottom.TabIndex = 4;
+            // 
+            // _Form2AutoHideControl
+            // 
+            this._Form2AutoHideControl.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this._Form2AutoHideControl.Location = new System.Drawing.Point(0, 0);
+            this._Form2AutoHideControl.Name = "_Form2AutoHideControl";
+            this._Form2AutoHideControl.Owner = this.ultraDockManager1;
+            this._Form2AutoHideControl.Size = new System.Drawing.Size(0, 0);
+            this._Form2AutoHideControl.TabIndex = 5;
+            // 
+            // Form2
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.ClientSize = new System.Drawing.Size(784, 562);
+            this.Controls.Add(this.ultraPanel1);
+            this.Controls.Add(this._Form2AutoHideControl);
+            this.Controls.Add(this._Form2UnpinnedTabAreaBottom);
+            this.Controls.Add(this._Form2UnpinnedTabAreaTop);
+            this.Controls.Add(this._Form2UnpinnedTabAreaRight);
+            this.Controls.Add(this._Form2UnpinnedTabAreaLeft);
+            this.Name = "Form2";
+            this.Text = "Form2";
+            this.ultraPanel1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.ultraDockManager1)).EndInit();
+            this.ResumeLayout(false);
+
+        }
+
+        #endregion
+
+        private Infragistics.Win.Misc.UltraPanel ultraPanel1;
+        private Infragistics.Win.UltraWinDock.UltraDockManager ultraDockManager1;
+        private Infragistics.Win.UltraWinDock.AutoHideControl _Form2AutoHideControl;
+        private Infragistics.Win.UltraWinDock.UnpinnedTabArea _Form2UnpinnedTabAreaBottom;
+        private Infragistics.Win.UltraWinDock.UnpinnedTabArea _Form2UnpinnedTabAreaTop;
+        private Infragistics.Win.UltraWinDock.UnpinnedTabArea _Form2UnpinnedTabAreaRight;
+        private Infragistics.Win.UltraWinDock.UnpinnedTabArea _Form2UnpinnedTabAreaLeft;
+    }
+}

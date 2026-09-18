@@ -1,0 +1,245 @@
+﻿namespace FabTwoToMigrationTools
+{
+    partial class Form1
+    {
+        /// <summary>
+        /// 필수 디자이너 변수입니다.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
+
+        /// <summary>
+        /// 사용 중인 모든 리소스를 정리합니다.
+        /// </summary>
+        /// <param name="disposing">관리되는 리소스를 삭제해야 하면 true이고, 그렇지 않으면 false입니다.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        #region Windows Form 디자이너에서 생성한 코드
+
+        /// <summary>
+        /// 디자이너 지원에 필요한 메서드입니다.
+        /// 이 메서드의 내용을 코드 편집기로 수정하지 마십시오.
+        /// </summary>
+        private void InitializeComponent()
+        {
+            Infragistics.Win.Appearance appearance1 = new Infragistics.Win.Appearance();
+            Infragistics.Win.Appearance appearance2 = new Infragistics.Win.Appearance();
+            Infragistics.Win.Appearance appearance3 = new Infragistics.Win.Appearance();
+            Infragistics.Win.Appearance appearance4 = new Infragistics.Win.Appearance();
+            Infragistics.Win.Appearance appearance5 = new Infragistics.Win.Appearance();
+            Infragistics.Win.Appearance appearance6 = new Infragistics.Win.Appearance();
+            Infragistics.Win.Appearance appearance7 = new Infragistics.Win.Appearance();
+            Infragistics.Win.Appearance appearance8 = new Infragistics.Win.Appearance();
+            Infragistics.Win.Appearance appearance9 = new Infragistics.Win.Appearance();
+            Infragistics.Win.Appearance appearance10 = new Infragistics.Win.Appearance();
+            Infragistics.Win.Appearance appearance11 = new Infragistics.Win.Appearance();
+            Infragistics.Win.Appearance appearance12 = new Infragistics.Win.Appearance();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.btnExecute = new System.Windows.Forms.Button();
+            this.btnSave = new System.Windows.Forms.Button();
+            this.btnQuery = new System.Windows.Forms.Button();
+            this.dtEnd = new System.Windows.Forms.DateTimePicker();
+            this.dtStart = new System.Windows.Forms.DateTimePicker();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.ugLot = new Infragistics.Win.UltraWinGrid.UltraGrid();
+            this.txtLog = new System.Windows.Forms.TextBox();
+            this.uceUgdAll = new Infragistics.Win.UltraWinEditors.UltraCheckEditor();
+            this.panel1.SuspendLayout();
+            this.panel2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.ugLot)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.uceUgdAll)).BeginInit();
+            this.SuspendLayout();
+            // 
+            // panel1
+            // 
+            this.panel1.Controls.Add(this.uceUgdAll);
+            this.panel1.Controls.Add(this.btnExecute);
+            this.panel1.Controls.Add(this.btnSave);
+            this.panel1.Controls.Add(this.btnQuery);
+            this.panel1.Controls.Add(this.dtEnd);
+            this.panel1.Controls.Add(this.dtStart);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panel1.Location = new System.Drawing.Point(0, 0);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(784, 73);
+            this.panel1.TabIndex = 0;
+            // 
+            // btnExecute
+            // 
+            this.btnExecute.Location = new System.Drawing.Point(586, 3);
+            this.btnExecute.Name = "btnExecute";
+            this.btnExecute.Size = new System.Drawing.Size(75, 39);
+            this.btnExecute.TabIndex = 4;
+            this.btnExecute.Text = "Execute";
+            this.btnExecute.UseVisualStyleBackColor = true;
+            this.btnExecute.Click += new System.EventHandler(this.btnExecute_Click);
+            // 
+            // btnSave
+            // 
+            this.btnSave.Location = new System.Drawing.Point(667, 3);
+            this.btnSave.Name = "btnSave";
+            this.btnSave.Size = new System.Drawing.Size(75, 39);
+            this.btnSave.TabIndex = 3;
+            this.btnSave.Text = "Save";
+            this.btnSave.UseVisualStyleBackColor = true;
+            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
+            // 
+            // btnQuery
+            // 
+            this.btnQuery.Location = new System.Drawing.Point(424, 3);
+            this.btnQuery.Name = "btnQuery";
+            this.btnQuery.Size = new System.Drawing.Size(156, 39);
+            this.btnQuery.TabIndex = 2;
+            this.btnQuery.Text = "Load To Lot List";
+            this.btnQuery.UseVisualStyleBackColor = true;
+            this.btnQuery.Click += new System.EventHandler(this.btnQuery_Click);
+            // 
+            // dtEnd
+            // 
+            this.dtEnd.CustomFormat = "yyyyMMdd";
+            this.dtEnd.Location = new System.Drawing.Point(218, 12);
+            this.dtEnd.Name = "dtEnd";
+            this.dtEnd.Size = new System.Drawing.Size(200, 21);
+            this.dtEnd.TabIndex = 1;
+            // 
+            // dtStart
+            // 
+            this.dtStart.CustomFormat = "yyyyMMdd";
+            this.dtStart.Location = new System.Drawing.Point(12, 12);
+            this.dtStart.Name = "dtStart";
+            this.dtStart.Size = new System.Drawing.Size(200, 21);
+            this.dtStart.TabIndex = 0;
+            this.dtStart.Value = new System.DateTime(2019, 4, 24, 9, 22, 20, 0);
+            // 
+            // panel2
+            // 
+            this.panel2.Controls.Add(this.ugLot);
+            this.panel2.Controls.Add(this.txtLog);
+            this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel2.Location = new System.Drawing.Point(0, 73);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(784, 489);
+            this.panel2.TabIndex = 1;
+            // 
+            // ugLot
+            // 
+            appearance1.BackColor = System.Drawing.SystemColors.Window;
+            appearance1.BorderColor = System.Drawing.SystemColors.InactiveCaption;
+            this.ugLot.DisplayLayout.Appearance = appearance1;
+            this.ugLot.DisplayLayout.BorderStyle = Infragistics.Win.UIElementBorderStyle.Solid;
+            this.ugLot.DisplayLayout.CaptionVisible = Infragistics.Win.DefaultableBoolean.False;
+            appearance2.BackColor = System.Drawing.SystemColors.ActiveBorder;
+            appearance2.BackColor2 = System.Drawing.SystemColors.ControlDark;
+            appearance2.BackGradientStyle = Infragistics.Win.GradientStyle.Vertical;
+            appearance2.BorderColor = System.Drawing.SystemColors.Window;
+            this.ugLot.DisplayLayout.GroupByBox.Appearance = appearance2;
+            appearance3.ForeColor = System.Drawing.SystemColors.GrayText;
+            this.ugLot.DisplayLayout.GroupByBox.BandLabelAppearance = appearance3;
+            this.ugLot.DisplayLayout.GroupByBox.BorderStyle = Infragistics.Win.UIElementBorderStyle.Solid;
+            appearance4.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            appearance4.BackColor2 = System.Drawing.SystemColors.Control;
+            appearance4.BackGradientStyle = Infragistics.Win.GradientStyle.Horizontal;
+            appearance4.ForeColor = System.Drawing.SystemColors.GrayText;
+            this.ugLot.DisplayLayout.GroupByBox.PromptAppearance = appearance4;
+            this.ugLot.DisplayLayout.MaxColScrollRegions = 1;
+            this.ugLot.DisplayLayout.MaxRowScrollRegions = 1;
+            appearance5.BackColor = System.Drawing.SystemColors.Window;
+            appearance5.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.ugLot.DisplayLayout.Override.ActiveCellAppearance = appearance5;
+            appearance6.BackColor = System.Drawing.SystemColors.Highlight;
+            appearance6.ForeColor = System.Drawing.SystemColors.HighlightText;
+            this.ugLot.DisplayLayout.Override.ActiveRowAppearance = appearance6;
+            this.ugLot.DisplayLayout.Override.BorderStyleCell = Infragistics.Win.UIElementBorderStyle.Dotted;
+            this.ugLot.DisplayLayout.Override.BorderStyleRow = Infragistics.Win.UIElementBorderStyle.Dotted;
+            appearance7.BackColor = System.Drawing.SystemColors.Window;
+            this.ugLot.DisplayLayout.Override.CardAreaAppearance = appearance7;
+            appearance8.BorderColor = System.Drawing.Color.Silver;
+            appearance8.TextTrimming = Infragistics.Win.TextTrimming.EllipsisCharacter;
+            this.ugLot.DisplayLayout.Override.CellAppearance = appearance8;
+            this.ugLot.DisplayLayout.Override.CellClickAction = Infragistics.Win.UltraWinGrid.CellClickAction.EditAndSelectText;
+            this.ugLot.DisplayLayout.Override.CellPadding = 0;
+            appearance9.BackColor = System.Drawing.SystemColors.Control;
+            appearance9.BackColor2 = System.Drawing.SystemColors.ControlDark;
+            appearance9.BackGradientAlignment = Infragistics.Win.GradientAlignment.Element;
+            appearance9.BackGradientStyle = Infragistics.Win.GradientStyle.Horizontal;
+            appearance9.BorderColor = System.Drawing.SystemColors.Window;
+            this.ugLot.DisplayLayout.Override.GroupByRowAppearance = appearance9;
+            appearance10.TextHAlignAsString = "Left";
+            this.ugLot.DisplayLayout.Override.HeaderAppearance = appearance10;
+            this.ugLot.DisplayLayout.Override.HeaderClickAction = Infragistics.Win.UltraWinGrid.HeaderClickAction.SortMulti;
+            this.ugLot.DisplayLayout.Override.HeaderStyle = Infragistics.Win.HeaderStyle.WindowsXPCommand;
+            appearance11.BackColor = System.Drawing.SystemColors.Window;
+            appearance11.BorderColor = System.Drawing.Color.Silver;
+            this.ugLot.DisplayLayout.Override.RowAppearance = appearance11;
+            this.ugLot.DisplayLayout.Override.RowSelectors = Infragistics.Win.DefaultableBoolean.False;
+            appearance12.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.ugLot.DisplayLayout.Override.TemplateAddRowAppearance = appearance12;
+            this.ugLot.DisplayLayout.ScrollBounds = Infragistics.Win.UltraWinGrid.ScrollBounds.ScrollToFill;
+            this.ugLot.DisplayLayout.ScrollStyle = Infragistics.Win.UltraWinGrid.ScrollStyle.Immediate;
+            this.ugLot.DisplayLayout.ViewStyleBand = Infragistics.Win.UltraWinGrid.ViewStyleBand.OutlookGroupBy;
+            this.ugLot.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ugLot.Location = new System.Drawing.Point(0, 0);
+            this.ugLot.Name = "ugLot";
+            this.ugLot.Size = new System.Drawing.Size(784, 398);
+            this.ugLot.TabIndex = 1;
+            this.ugLot.Text = "ultraGrid1";
+            this.ugLot.InitializeLayout += new Infragistics.Win.UltraWinGrid.InitializeLayoutEventHandler(this.ugLot_InitializeLayout);
+            // 
+            // txtLog
+            // 
+            this.txtLog.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.txtLog.Location = new System.Drawing.Point(0, 398);
+            this.txtLog.Multiline = true;
+            this.txtLog.Name = "txtLog";
+            this.txtLog.Size = new System.Drawing.Size(784, 91);
+            this.txtLog.TabIndex = 0;
+            // 
+            // uceUgdAll
+            // 
+            this.uceUgdAll.Location = new System.Drawing.Point(12, 47);
+            this.uceUgdAll.Name = "uceUgdAll";
+            this.uceUgdAll.Size = new System.Drawing.Size(200, 20);
+            this.uceUgdAll.TabIndex = 5;
+            this.uceUgdAll.Text = "ALL";
+            this.uceUgdAll.CheckedChanged += new System.EventHandler(this.uceUgdAll_CheckedChanged);
+            // 
+            // Form1
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.ClientSize = new System.Drawing.Size(784, 562);
+            this.Controls.Add(this.panel2);
+            this.Controls.Add(this.panel1);
+            this.Name = "Form1";
+            this.Text = "Form1";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form1_FormClosed);
+            this.panel1.ResumeLayout(false);
+            this.panel2.ResumeLayout(false);
+            this.panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.ugLot)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.uceUgdAll)).EndInit();
+            this.ResumeLayout(false);
+
+        }
+
+        #endregion
+
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.DateTimePicker dtStart;
+        private System.Windows.Forms.DateTimePicker dtEnd;
+        private System.Windows.Forms.Button btnQuery;
+        private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.TextBox txtLog;
+        private System.Windows.Forms.Button btnSave;
+        private System.Windows.Forms.Button btnExecute;
+        private Infragistics.Win.UltraWinGrid.UltraGrid ugLot;
+        private Infragistics.Win.UltraWinEditors.UltraCheckEditor uceUgdAll;
+    }
+}
+

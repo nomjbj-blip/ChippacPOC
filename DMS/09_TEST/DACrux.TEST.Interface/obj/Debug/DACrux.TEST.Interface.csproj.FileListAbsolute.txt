@@ -1,0 +1,14 @@
+D:\PROJECT\DB하이텍\gitlab\101_ServerBin\DACrux.TEST.Interface.dll
+D:\PROJECT\DB하이텍\gitlab\101_ServerBin\DACrux.TEST.Interface.pdb
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.TEST.Interface\obj\Debug\DACrux.TEST.Interface.csproj.AssemblyReference.cache
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.TEST.Interface\obj\Debug\DACrux.TEST.Interface.csproj.CoreCompileInputs.cache
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.TEST.Interface\obj\Debug\DACrux.T.310442E4.Up2Date
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.TEST.Interface\obj\Debug\DACrux.TEST.Interface.dll
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.TEST.Interface\obj\Debug\DACrux.TEST.Interface.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\101_ServerBin\DACrux.TEST.Interface.dll
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\101_ServerBin\DACrux.TEST.Interface.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.Interface\obj\Debug\DACrux.TEST.Interface.csproj.AssemblyReference.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.Interface\obj\Debug\DACrux.TEST.Interface.csproj.CoreCompileInputs.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.Interface\obj\Debug\DACrux.T.310442E4.Up2Date
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.Interface\obj\Debug\DACrux.TEST.Interface.dll
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.Interface\obj\Debug\DACrux.TEST.Interface.pdb

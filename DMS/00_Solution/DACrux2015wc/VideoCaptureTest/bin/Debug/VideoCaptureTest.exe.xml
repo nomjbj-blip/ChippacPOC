@@ -1,0 +1,26 @@
+<NewDataSet>
+  <xs:schema id="NewDataSet" xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xs:element name="NewDataSet" msdata:IsDataSet="true" msdata:MainDataTable="VideoCaptureTest.exe" msdata:UseCurrentLocale="true">
+      <xs:complexType>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="VideoCaptureTest.exe">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="VIDEO_DEVICE" type="xs:string" minOccurs="0" />
+                <xs:element name="DISPLAY_RESOLUTION" type="xs:string" minOccurs="0" />
+                <xs:element name="IMAGE_FORMAT" type="xs:string" minOccurs="0" />
+                <xs:element name="SHOW_CROSSHAIR" type="xs:string" minOccurs="0" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <VideoCaptureTest.exe>
+    <VIDEO_DEVICE>Camera Sensor OV02C10</VIDEO_DEVICE>
+    <DISPLAY_RESOLUTION>1920x1080</DISPLAY_RESOLUTION>
+    <IMAGE_FORMAT>Jpeg</IMAGE_FORMAT>
+    <SHOW_CROSSHAIR>True</SHOW_CROSSHAIR>
+  </VideoCaptureTest.exe>
+</NewDataSet>

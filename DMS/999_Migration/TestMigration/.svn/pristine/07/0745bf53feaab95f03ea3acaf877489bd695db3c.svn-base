@@ -1,0 +1,467 @@
+﻿using System;
+using System.Data;
+using System.Diagnostics;
+using System.Globalization;
+using System.IO;
+using System.Windows.Forms;
+using FabTwoToMigrationTools.Source;
+using FabTwoToMigrationTools.Target;
+using Infragistics.Win.UltraWinGrid;
+using Infragistics.Win.UltraWinEditors;
+using FabTwoToMigrationTools.Common;
+using System.Text;
+
+namespace FabTwoToMigrationTools
+{
+    public partial class Form1 : Form
+    {
+
+        //private FabTwoToDM source = null;
+        //private MiracomDMS target = null;
+        private SuperQueue<DwLotInfo> sQueue = null;
+
+        public Form1()
+        {
+            InitializeComponent();
+            Constract.ThreadCount = 10;
+
+            dtStart.Value = DateTime.Now.AddDays(-1);
+            dtEnd.Value = DateTime.Now;
+
+            //source = new FabTwoToDM();
+            //target = new MiracomDMS();
+
+            InitQueueAction();
+        }
+
+        #region [ Event Handler ]
+
+        private void Form1_FormClosed(
+            object sender,
+            FormClosedEventArgs e
+            )
+        {
+            //source.Dispose();
+            //target.Dispose();
+        }
+
+        //------------------------------------------------------------------
+
+        private void btnQuery_Click(
+            object sender,
+            EventArgs e
+            )
+        {
+            DataTable dtLot = null;
+            using (FabTwoToDM source = new FabTwoToDM())
+            {
+                dtLot = source.GetLot(
+                    dtStart.Value,
+                    dtEnd.Value
+                    );
+
+                source.Dispose();
+            }
+
+            ugLot.DataSource = null;
+            ugLot.DataSource = dtLot;
+        }
+
+        private void btnExecute_Click(
+            object sender,
+            EventArgs e
+            )
+        {
+            DwLotInfo lotinfo = null;
+            SetText(string.Format(" ◎ Selected Lot Count: {0}", ugLot.Rows.Count));
+            using (MiracomDMS target = new MiracomDMS())
+            {
+                foreach (UltraGridRow urLot in ugLot.Rows)
+                {
+                    if (!string.Equals(urLot.Cells["FLAG"].Value, "True"))
+                        continue;
+
+                    lotinfo = new DwLotInfo();
+                    lotinfo.LotID = urLot.Cells["LOT_ID"].Text;
+                    lotinfo.Device = urLot.Cells["DEVICE"].Text;
+                    lotinfo.WaferKey = long.Parse(urLot.Cells["WAFER_KEY"].Text);
+                    lotinfo.FileName = urLot.Cells["INSPECTION_FILENAME"].Text;
+                    lotinfo.InspDateTime = urLot.Cells["INSPECTION_TIME"].Text;
+
+                    if (target.CheckedLot(ref lotinfo) <= 0)
+                        target.SetLot(ref lotinfo);
+#if DEBUG
+                    SetText(string.Format(" Product: {0}, Lot ID: {1}", lotinfo.Device, lotinfo.LotID));
+                    SetText(string.Format(" ◎ Lot Sequence: {0}", lotinfo.LotSeq));
+#endif
+
+                    //--
+
+                    sQueue.EnqueueTask(lotinfo);
+                }
+
+                target.Dispose();
+            }
+        }
+
+        //--
+
+        private void btnSave_Click(
+            object sender,
+            EventArgs e
+            )
+        {
+            SaveFileDialog dlg = new SaveFileDialog();
+            dlg.Title = "Migration Log Save Dialog";
+            if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.Cancel)
+                return;
+
+            using (StreamWriter sw = new StreamWriter(dlg.FileName))
+            {
+                sw.WriteLine(this.txtLog.Text);
+                sw.Flush();
+                sw.Close();
+            }
+        }
+
+        //--
+
+        private void ugLot_InitializeLayout(
+            object sender,
+            InitializeLayoutEventArgs e
+            )
+        {
+            UltraGridColumn ugcChecked = e.Layout.Bands[0].Columns.Add("FLAG", "FLAG");
+            ugcChecked.Style = Infragistics.Win.UltraWinGrid.ColumnStyle.CheckBox;
+            ugcChecked.CellActivation = Activation.AllowEdit;
+            ugcChecked.Header.VisiblePosition = 0;
+        }
+
+        //--
+
+        private void uceUgdAll_CheckedChanged(
+            object sender,
+            EventArgs e
+            )
+        {
+            UltraCheckEditor editor = sender as UltraCheckEditor;
+            foreach (UltraGridRow row in ugLot.Rows)
+            {
+                row.Cells["FLAG"].Value = editor.Checked;
+            }
+        }
+
+        #endregion [ Event Handler ]
+
+        //--------------------------------------------------------------------------------------
+
+        #region [ Method ]
+
+        //--------------------------------------------------------------------------------------
+
+        private void InitQueueAction(
+            )
+        {
+            sQueue = new SuperQueue<DwLotInfo>(Constract.ThreadCount, new Action<DwLotInfo>(delegate(DwLotInfo lot)
+            {
+                DwResultValue rv = new DwResultValue(lot.Device, lot.FileName, lot.InspDateTime, lot.WaferKey, lot.LotID, lot.LotSeq);
+
+                FabTwoToDM source = new FabTwoToDM();
+                MiracomDMS target = new MiracomDMS();
+
+                DataTable dtDefect = null;
+                DataTable dtDefectImages = null;
+                DataTable dtProduct = null;
+                DataTable dtInspInfo = null;
+                DataTable dtScanSample = null;
+                DataTable dtSetup = null;
+                DataTable dtStep = null;
+                DataTable dtWafer = null;
+
+                DateTime dateSetupTime = DateTime.Now;
+                int iSlotId = -1;
+                int iDefectID = -1;
+                int BSL_LOG_STEP = 0;
+
+                dtWafer = source.GetWafer(
+                    rv
+                    );
+                foreach (DataRow drWafer in dtWafer.Rows)
+                {
+                    try
+                    {
+                        target.Transaction = target.Connection.BeginTransaction();
+
+                        //--
+                        BSL_LOG_STEP = 100;
+                        rv.WaferID = drWafer["WAFER_ID"].ToString();
+                        iSlotId = int.Parse(drWafer["SLOT_ID"].ToString());
+                        if (target.CheckedWafer(ref rv, iSlotId) <= 0)
+                            target.SetWafer(ref rv, iSlotId);
+#if DEBUG
+                        Debug.WriteLine(string.Format(" INSPECTION TIME: {0}, WAFER KEY: {1}, WAFER ID: {2}, SLOTID: {3}", rv.InspDateTime, rv.WaferKey, rv.WaferID, iSlotId));
+                        Debug.WriteLine(string.Format(" ◎ Lot Sequence: {0}, Wafer Sequence: {1}", rv.LotSeq, rv.WaferSeq));
+#endif
+                        //--
+
+                        #region [ Product Query ]
+                        dtProduct = source.GetProduct(
+                            rv
+                            );
+
+                        BSL_LOG_STEP = 200;
+                        foreach (DataRow drProduct in dtProduct.Rows)
+                        {
+                            if (target.CheckedProduct(ref rv) <= 0)
+                                target.SetProduct(ref rv, drProduct);
+                        }
+#if DEBUG
+                        Debug.WriteLine(string.Format(" ◎ Product: {0}", rv.Device));
+#endif
+
+                        #endregion [ Product Query ]
+
+                        //--
+
+                        #region [ Setup Query ]
+
+                        dtSetup = source.GetSetup(
+                            rv
+                            );
+
+                        BSL_LOG_STEP = 300;
+                        foreach (DataRow drSetup in dtSetup.Rows)
+                        {
+                            rv.RecipeKey = long.Parse(drSetup["RECIPE_KEY"].ToString());
+                            rv.SetupID = drSetup["SETUP_ID"].ToString();
+                            rv.StepID = drSetup["STEP_ID"].ToString();
+                            dateSetupTime = DateTime.ParseExact(
+                                drSetup["SETUP_TIME"].ToString(),
+                                Constract.DEFAULT_DATETIME_STRING,
+                                CultureInfo.InvariantCulture,
+                                DateTimeStyles.None
+                                );
+
+                            if (target.CheckedSetup(ref rv, dateSetupTime) <= 0)
+                                target.SetSetup(ref rv, dateSetupTime, drSetup);
+
+#if DEBUG
+                            Debug.WriteLine(string.Format(" Setup ID: {0}", rv.SetupID));
+                            Debug.WriteLine(string.Format(" ◎ Setup Sequence: {0}", rv.SetupSeq));
+#endif
+                        }
+
+                        #endregion [ Setup Query ]
+
+                        //--
+
+                        #region [ Step Query ]
+
+                        dtStep = source.GetStep(
+                            rv
+                            );
+
+                        BSL_LOG_STEP = 400;
+                        foreach (DataRow drStep in dtStep.Rows)
+                        {
+                            if (target.CheckedStep(ref rv) <= 0)
+                                target.SetStep(ref rv, drStep);
+
+#if DEBUG
+                            Debug.WriteLine(string.Format(" Step ID: {0}", rv.StepID));
+                            Debug.WriteLine(string.Format(" ◎ Step Sequence: {0}", rv.StepSeq));
+#endif
+                        }
+
+                        #endregion [ Step Query ]
+
+                        //--
+
+                        #region [ Inspection Query ]
+
+                        dtInspInfo = source.GetInspInfo(
+                            rv
+                            );
+
+                        BSL_LOG_STEP = 500;
+                        foreach (DataRow drInspInfo in dtInspInfo.Rows)
+                        {
+                            if (target.CheckedInspInfo(rv) <= 0)
+                                target.SetInspInfo(drInspInfo, rv);
+                        }
+
+                        #endregion [ Inspection Query ]
+
+                        //--
+
+                        #region [ Map Query ]
+
+                        dtScanSample = source.GetSetupMap(
+                            rv
+                            );
+
+                        BSL_LOG_STEP = 600;
+                        if (target.CheckedMapInfo_NEW(rv) <= 0)
+                            target.SetMapInfo_NEW(rv, dtScanSample);
+#if DEBUG
+                        Debug.WriteLine(string.Format(" TQD_SETUP_MAP Insert Complated! "));
+#endif
+                        #endregion [ Map Query ]
+
+                        //--
+
+                        #region [ Defect Query ]
+
+                        dtDefect = source.GetDefect(
+                            rv
+                            );
+
+                        BSL_LOG_STEP = 700;
+                        if (dtDefect != null && dtDefect.Rows.Count > 0)
+                            if (target.CheckedDefect(rv) <= 0)
+                                target.SetDefect(rv, dtDefect);
+#if DEBUG
+                        Debug.WriteLine(string.Format(" TQD_DEFECT Insert Complated! "));
+#endif
+
+                        #endregion [ Defect Query ]
+
+                        //--
+
+                        #region [ Defect Image Query ]
+                        dtDefectImages = source.GetDefectImage(
+                            rv
+                            );
+
+                        BSL_LOG_STEP = 800;
+                        foreach (DataRow drDefect in dtDefectImages.Rows)
+                        {
+                            iDefectID = int.Parse(drDefect["DEFECT_ID"].ToString());
+                            if (target.CheckedDefectImage(rv, iDefectID) <= 0)
+                                target.SetDefectImage(rv, drDefect);
+                        }
+#if DEBUG
+                        Debug.WriteLine(string.Format(" TQD_DEFECT IMAGE Insert Complated! "));
+#endif
+                        #endregion [ Defect Image Query ]
+
+                        //--
+
+                        target.Transaction.Commit();
+                    }
+                    catch (Exception ex)
+                    {
+                        StringBuilder sb = new StringBuilder();
+                        sb.AppendLine(string.Format("STEP: {0}", BSL_LOG_STEP));
+                        sb.AppendLine(string.Format("PRODUCT: {0}, LOT ID: {1}, WAFER ID: {2}, INSPECTION TIME: {3}, INSPECTION FILENAME: {4}", rv.Device, rv.LotID, rv.WaferID, rv.InspDateTime, rv.FileName));
+                        sb.AppendLine(string.Format("Exception: {0}", ex.Message));
+                        sb.AppendLine(string.Format("       ==> {0}", ex.StackTrace));
+
+                        WriteLog(sb);
+                        target.Transaction.Rollback();
+                    }
+                    finally
+                    {
+                        #region [ DISPOSE AREA ]
+
+                        //--
+
+                        dtDefect.Dispose();
+                        dtDefect = null;
+
+                        //--
+
+                        dtDefectImages.Dispose();
+                        dtDefectImages = null;
+
+                        //--
+
+                        dtProduct.Dispose();
+                        dtProduct = null;
+
+                        //--
+
+                        dtInspInfo.Dispose();
+                        dtInspInfo = null;
+
+                        //--
+
+                        dtScanSample.Dispose();
+                        dtScanSample = null;
+
+                        //--
+
+                        dtSetup.Dispose();
+                        dtSetup = null;
+
+                        //--
+
+                        dtStep.Dispose();
+                        dtStep = null;
+
+                        //--
+
+                        dtWafer.Dispose();
+                        dtWafer = null;
+
+                        //--
+
+                        target.Dispose();
+                        target = null;
+
+                        //--
+
+                        source.Dispose();
+                        source = null;
+
+                        //--
+
+                        #endregion [ DISPOSE AREA ]
+                    }
+                }
+            }));
+        }
+
+        //--------------------------------------------------------------------------------------
+
+        private void SetText(
+            string sText
+            )
+        {
+            if (this.txtLog.InvokeRequired)
+                SetText(sText);
+            else
+                this.txtLog.Text += sText + Environment.NewLine;
+        }
+
+        private void GetImage(
+            string sSourcePath,
+            string sTargetPath
+            )
+        {
+            FtpClient client = new FtpClient(
+                Constract.IMAGE_SERVER_IP,
+                Constract.IMAGE_SERVER_ID,
+                Constract.IMAGE_SERVER_PW
+                );
+
+            client.download(sSourcePath, Constract.TMP_IMG_PATH);
+
+        }
+
+        private void WriteLog(
+            StringBuilder sb
+            )
+        {
+            using (StreamWriter sw = new StreamWriter(
+                string.Format(@"D:\Project\Documents\LOG\dms_migration_{0}.log", DateTime.Now.ToString(Constract.DEFAULT_DATE_STRING)), true, System.Text.Encoding.UTF8)
+                )
+            {
+                sw.Write(sb.ToString());
+                sw.Close();
+            }
+        }
+
+        #endregion [ Method ]
+    }
+}

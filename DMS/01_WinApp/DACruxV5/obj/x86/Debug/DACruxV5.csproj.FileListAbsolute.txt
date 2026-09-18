@@ -1,0 +1,4 @@
+D:\PROJECT\DB하이텍\gitlab\01_WinApp\DACruxV5\obj\x86\Debug\DACruxV5.csproj.AssemblyReference.cache
+D:\PROJECT\DB하이텍\gitlab\01_WinApp\DACruxV5\obj\x86\Debug\DACruxV5.Properties.Resources.resources
+D:\PROJECT\DB하이텍\gitlab\01_WinApp\DACruxV5\obj\x86\Debug\DACruxV5.csproj.GenerateResource.cache
+D:\PROJECT\DB하이텍\gitlab\01_WinApp\DACruxV5\obj\x86\Debug\DACruxV5.csproj.CoreCompileInputs.cache

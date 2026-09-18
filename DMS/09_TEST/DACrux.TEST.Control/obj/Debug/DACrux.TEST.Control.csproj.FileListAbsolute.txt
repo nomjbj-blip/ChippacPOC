@@ -1,0 +1,56 @@
+D:\PROJECT\DB하이텍\gitlab\100_ClientBin\DACrux.TEST.Control.dll
+D:\PROJECT\DB하이텍\gitlab\100_ClientBin\DACrux.TEST.Control.pdb
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.TEST.Control.csproj.AssemblyReference.cache
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.TEST.Control.PopUpAxisY.resources
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.TEST.Control.ucParameterTrend.resources
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.TEST.Control.ucTrendChart.resources
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.TEST.Control.ImagePopUp.resources
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.TEST.Control.Image.PopUpAVIImageSave.resources
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.TEST.Control.Image.TPUAVIImage.resources
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.TEST.Control.TPUImageInfo.resources
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.TEST.Control.ImageControl.resources
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.TEST.Control.Properties.Resources.resources
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.TEST.Control.TPUCMapEdit.resources
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.MapAnalysis.Control.TPUCMapView.resources
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.TEST.Control.TPUCPCMView.resources
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.TEST.Control.TPUCQCInspection.resources
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.TEST.Control.TPUCRS232Option.resources
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.TEST.Control.WrapMap.resources
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.MapAnalysis.Control.TPUCMapDefine.resources
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.MapAnalysis.Control.TPUCMapConfig.resources
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.MapAnalysis.Control.TPUCMapControl.resources
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.MapAnalysis.Control.TPUCMapGallery.resources
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.TEST.Control.csproj.GenerateResource.cache
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.TEST.Control.dll.licenses
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.TEST.Control.csproj.CoreCompileInputs.cache
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.T.CCAEBDF0.Up2Date
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.TEST.Control.dll
+D:\PROJECT\DB하이텍\gitlab\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.TEST.Control.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.TEST.Control.csproj.AssemblyReference.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.TEST.Control.PopUpAxisY.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.TEST.Control.ucParameterTrend.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.TEST.Control.ucTrendChart.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.TEST.Control.ImagePopUp.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.TEST.Control.Image.PopUpAVIImageSave.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.TEST.Control.Image.TPUAVIImage.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.TEST.Control.TPUImageInfo.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.TEST.Control.ImageControl.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.TEST.Control.Properties.Resources.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.TEST.Control.TPUCMapEdit.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.MapAnalysis.Control.TPUCMapView.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.TEST.Control.TPUCPCMView.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.TEST.Control.TPUCQCInspection.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.TEST.Control.TPUCRS232Option.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.TEST.Control.WrapMap.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.MapAnalysis.Control.TPUCMapDefine.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.MapAnalysis.Control.TPUCMapConfig.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.MapAnalysis.Control.TPUCMapControl.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.MapAnalysis.Control.TPUCMapGallery.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.TEST.Control.csproj.GenerateResource.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.TEST.Control.dll.licenses
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\100_ClientBin\DACrux.TEST.Control.dll
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\100_ClientBin\DACrux.TEST.Control.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.TEST.Control.csproj.CoreCompileInputs.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.T.CCAEBDF0.Up2Date
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.TEST.Control.dll
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.TEST.Control.pdb

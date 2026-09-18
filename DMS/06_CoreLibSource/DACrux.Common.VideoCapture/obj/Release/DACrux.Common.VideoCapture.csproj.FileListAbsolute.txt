@@ -1,0 +1,14 @@
+D:\PROJECT\DB하이텍\gitlab\07_CoreLib\DACrux.Common.VideoCapture.dll.config
+D:\PROJECT\DB하이텍\gitlab\07_CoreLib\DACrux.Common.VideoCapture.dll
+D:\PROJECT\DB하이텍\gitlab\07_CoreLib\DACrux.Common.VideoCapture.pdb
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Common.VideoCapture\obj\Release\DACrux.Common.VideoCapture.csproj.AssemblyReference.cache
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Common.VideoCapture\obj\Release\DACrux.Common.VideoCapture.FrmSnapshotPopup.resources
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Common.VideoCapture\obj\Release\DACrux.Common.VideoCapture.FrmVideoCaptureOption.resources
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Common.VideoCapture\obj\Release\DACrux.Common.VideoCapture.Properties.Resources.resources
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Common.VideoCapture\obj\Release\DACrux.Common.VideoCapture.VideoCaptureControl.resources
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Common.VideoCapture\obj\Release\DACrux.Common.VideoCapture.VideoCaptureControl_Old.resources
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Common.VideoCapture\obj\Release\DACrux.Common.VideoCapture.csproj.GenerateResource.cache
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Common.VideoCapture\obj\Release\DACrux.Common.VideoCapture.csproj.CoreCompileInputs.cache
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Common.VideoCapture\obj\Release\DACrux.C.FC185F5A.Up2Date
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Common.VideoCapture\obj\Release\DACrux.Common.VideoCapture.dll
+D:\PROJECT\DB하이텍\gitlab\06_CoreLibSource\DACrux.Common.VideoCapture\obj\Release\DACrux.Common.VideoCapture.pdb
