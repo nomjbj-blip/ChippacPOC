@@ -29,9 +29,11 @@ namespace NexplantQMS.GdsMap
 			lib = new GdsLibrary();
 
 			const int READ_BUFFER = 1024 * 1024; // 1MB 버퍼
-			using var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, READ_BUFFER, FileOptions.SequentialScan);
-			using var bs = new BufferedStream(fs, READ_BUFFER);
-			using var br = new BinaryReader(bs);
+			// C# 7.3에서도 파일, 버퍼, 리더 자원을 자동 해제하기 위해 기존 using 블록 문법을 사용한다.
+			using (var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, READ_BUFFER, FileOptions.SequentialScan))
+			using (var bs = new BufferedStream(fs, READ_BUFFER))
+			using (var br = new BinaryReader(bs))
+			{
 
 			long length = fs.Length;
 			var bytes = new byte[65536];
@@ -75,7 +77,8 @@ namespace NexplantQMS.GdsMap
 				}
 			}
 
-			return lib;
+				return lib;
+			}
 		}
 
 		private ushort BE16(BinaryReader br)

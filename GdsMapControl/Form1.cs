@@ -30,7 +30,9 @@ namespace NexplantQMS.GdsMap
 
 		private void button1_Click(object sender, EventArgs e)
 		{
-			using var dlg = new OpenFileDialog();
+			// C# 7.3 환경에서도 파일 선택 창 자원을 자동 해제하기 위해 using 블록을 사용한다.
+			using (var dlg = new OpenFileDialog())
+			{
 			dlg.Filter = "GDS files (*.gds)|*.gds|All files (*.*)|*.*";
 
 			if (dlg.ShowDialog() != DialogResult.OK)
@@ -62,15 +64,15 @@ namespace NexplantQMS.GdsMap
 			map.ShowStructure(lib);
 
 			// list
-			var list = str.Layers.SelectMany(s => s.Elements).Select(e =>
+			var list = str.Layers.SelectMany(s => s.Elements).Select(element =>
 			{
-				var etc = e is GdsText ? (e as GdsText).Text : e is GdsPath ? (e as GdsPath).Width.ToString() : String.Empty;
+				var etc = element is GdsText ? (element as GdsText).Text : element is GdsPath ? (element as GdsPath).Width.ToString() : String.Empty;
 
 				return new
 				{
-					e.LayerID,
-					e.ElementName,
-					e.Bounds,
+					element.LayerID,
+					element.ElementName,
+					element.Bounds,
 					etc
 				};
 			});
@@ -82,6 +84,7 @@ namespace NexplantQMS.GdsMap
 
 			foreach (var layer in str.Layers.Select(a => a.LayerID))
 				checkedListBox1.Items.Add(layer, true);
+			}
 		}
 
 		private void btnSave_Click(object sender, EventArgs e)
