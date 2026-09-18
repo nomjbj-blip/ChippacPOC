@@ -1,0 +1,899 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Insert" queryid="CREATE_DEFECT" commandtype="Text" description="Defect Data 추가" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQD_DEFECT
+    (STEP_SEQ,
+    DEFECTID,
+    WAFER_SEQ,
+    X,
+    Y,
+    XREL,
+    YREL,
+    XINDEX,
+    YINDEX,
+    XSIZE,
+    YSIZE,
+    DEFECTAREA,
+    DSIZE,
+    CLASSNUMBER,
+    TEST,
+    CLUSTERNUMBER,
+    ROUGHBINNUMBER,
+    FINEBINNUMBER,
+    REVIEWSAMPLE,
+    IMAGECOUNT,
+    ADDER,
+    FIRST_STEP,
+    RETICLE_REPEAT_ID,
+    DIE_REPEAT_ID,
+    MAN_OPT_CLASS,
+    AUTO_OPT_CLASS,
+    MAN_SEM_CLASS,
+    AUTO_SEM_CLASS)
+VALUES(
+:step_seq,:defectid,:wafer_seq,:x,:y
+,:xrel,:yrel,:xindex,:yindex,:xsize
+,:ysize,:defectarea,:dsize,:classnumber,:test
+,:clusternumber,:roughbinnumber,:finebinnumber,:reviewsample
+,:imagecount,:adder,:first_step,:reticle_repeat_id,:die_repeat_id,:man_opt_class
+,:auto_opt_class,:man_sem_class,:auto_sem_class) ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0" description="step seq">:step_seq</param>
+            <param direction="Input" dbtype="Number" size="0" description="defectid">:defectid</param>
+            <param direction="Input" dbtype="Number" size="0" description="wafer_seq">:wafer_seq</param>
+            <param direction="Input" dbtype="Number" size="0" description="x">:x</param>
+            <param direction="Input" dbtype="Number" size="0" description="y">:y</param>
+            <param direction="Input" dbtype="Number" size="0" description="xrel">:xrel</param>
+            <param direction="Input" dbtype="Number" size="0" description="yrel">:yrel</param>
+            <param direction="Input" dbtype="Number" size="0" description="xindex">:xindex</param>
+            <param direction="Input" dbtype="Number" size="0" description="yindex">:yindex</param>
+            <param direction="Input" dbtype="Number" size="0" description="xsize">:xsize</param>
+            <param direction="Input" dbtype="Number" size="0" description="ysize">:ysize</param>
+            <param direction="Input" dbtype="Number" size="0">:defectarea</param>
+            <param direction="Input" dbtype="Number" size="0">:dsize</param>
+            <param direction="Input" dbtype="Number" size="0">:classnumber</param>
+            <param direction="Input" dbtype="Number" size="0">:test</param>
+            <param direction="Input" dbtype="Number" size="0">:clusternumber</param>
+            <param direction="Input" dbtype="Number" size="0">:roughbinnumber</param>
+            <param direction="Input" dbtype="Number" size="0">:finebinnumber</param>
+            <param direction="Input" dbtype="Number" size="0">:reviewsample</param>
+            <param direction="Input" dbtype="Number" size="0">:imagecount</param>
+            <param direction="Input" dbtype="Number" size="0">:adder</param>
+            <param direction="Input" dbtype="VarChar" size="0">:first_step</param>
+            <param direction="Input" dbtype="Number" size="0">:reticle_repeat_id</param>
+            <param direction="Input" dbtype="Number" size="0">:die_repeat_id</param>
+            <param direction="Input" dbtype="Number" size="0">:man_opt_class</param>
+            <param direction="Input" dbtype="Number" size="0">:auto_opt_class</param>
+            <param direction="Input" dbtype="Number" size="0">:man_sem_class</param>
+            <param direction="Input" dbtype="Number" size="0">:auto_sem_class</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_DEFECT_COUNT" commandtype="Text" description="DEFECT 개수 조회" commandtimeout="60">
+        <commandtext><![CDATA[SELECT COUNT(*) FROM TQD_DEFECT
+WHERE WAFER_SEQ = :wafer_seq
+AND STEP_SEQ = :step_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0" description="wafer seq">:wafer_seq</param>
+            <param direction="Input" dbtype="Number" size="0" description="step seq">:step_seq</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="IMPORT_DEFECT" commandtype="StoredProcedure" description="Import 방식의 Query문" commandtimeout="60">
+        <commandtext><![CDATA[IMPORT FROM :file OF DEL INSERT INTO TDMS_DEFECT]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:file</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_DEFECTS" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT STEP_SEQ,DEFECTID,WAFER_SEQ,X,Y,XREL,YREL,XINDEX,YINDEX,XSIZE,YSIZE,DEFECTAREA,DSIZE,CLASSNUMBER,TEST,CLUSTERNUMBER,ROUGHBINNUMBER,FINEBINNUMBER,REVIEWSAMPLE,IMAGECOUNT,ADDER,FIRST_STEP,RETICLE_REPEAT_ID,DIE_REPEAT_ID,MAN_OPT_CLASS,AUTO_OPT_CLASS,MAN_SEM_CLASS,AUTO_SEM_CLASS 
+FROM TQD_DEFECT
+WHERE WAFER_SEQ = :wafer_seq
+AND STEP_SEQ = :step_seq
+AND TEST = :test]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0" description="wafer_seq">:wafer_seq</param>
+            <param direction="Input" dbtype="Number" size="0" description="step_seq">:step_seq</param>
+            <param direction="Input" dbtype="Number" size="0">:test</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_DEFECT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQD_DEFECT 
+   SET CLASSNUMBER = :classnumber
+     , ROUGHBINNUMBER = :roughbinnumber
+     , FINEBINNUMBER = :finebinnumber
+     , REVIEWSAMPLE = :reviewsample
+     , IMAGECOUNT = :imagecount
+ WHERE WAFER_SEQ = :wafer_seq
+   AND STEP_SEQ = :step_seq
+   AND DEFECTID = :defectid]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:step_seq</param>
+            <param direction="Input" dbtype="Number" size="0">:defectid</param>
+            <param direction="Input" dbtype="Number" size="0">:wafer_seq</param>
+            <param direction="Input" dbtype="Number" size="0">:classnumber</param>
+            <param direction="Input" dbtype="Number" size="0">:roughbinnumber</param>
+            <param direction="Input" dbtype="Number" size="0">:finebinnumber</param>
+            <param direction="Input" dbtype="Number" size="0">:reviewsample</param>
+            <param direction="Input" dbtype="Number" size="0">:imagecount</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_DEFECT_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQD_DEFECT 
+   SET CLASSNUMBER = :classnumber
+     , ROUGHBINNUMBER = :roughbinnumber
+     , FINEBINNUMBER = :finebinnumber
+     , REVIEWSAMPLE = :reviewsample
+ WHERE WAFER_SEQ = :wafer_seq
+   AND STEP_SEQ = :step_seq
+   AND DEFECTID = :defectid]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:step_seq</param>
+            <param direction="Input" dbtype="Number" size="0">:defectid</param>
+            <param direction="Input" dbtype="Number" size="0">:wafer_seq</param>
+            <param direction="Input" dbtype="Number" size="0">:classnumber</param>
+            <param direction="Input" dbtype="Number" size="0">:roughbinnumber</param>
+            <param direction="Input" dbtype="Number" size="0">:finebinnumber</param>
+            <param direction="Input" dbtype="Number" size="0">:reviewsample</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_DEFECTEV_DIE_001" commandtype="Text" description="DEFECTIVE DIE를 가지고 온당!!!" commandtimeout="60">
+        <commandtext><![CDATA[SELECT COUNT(*) AS CNT FROM 
+    (SELECT DISTINCT XINDEX,YINDEX 
+     FROM TQD_DEFECT 
+     WHERE STEP_SEQ=:step_seq
+    ) AS INDEXES]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:step_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_DEFECTEV_DIE_002" commandtype="Text" description="RANDOM DEFECTEV DIE를 가지고 온당!!!" commandtimeout="60">
+        <commandtext><![CDATA[SELECT COUNT(*) AS CNT FROM 
+    (SELECT DISTINCT XINDEX,YINDEX 
+     FROM TQD_DEFECT 
+     WHERE STEP_SEQ=:step_Seq
+     AND CLUSTERNUMBER=0
+    ) AS TB]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:step_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_DEFECTEV_DIE_003" commandtype="Text" description="CLUSTER DEFECTEV DIE만 가지고 온당" commandtimeout="60">
+        <commandtext><![CDATA[SELECT COUNT(*) AS CNT FROM 
+    (SELECT DISTINCT XINDEX,YINDEX 
+     FROM TQD_DEFECT 
+     WHERE STEP_SEQ=:step_seq
+     AND CLUSTERNUMBER>0
+    ) AS TB]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:step_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_DEFECTEV_DIE_011" commandtype="Text" description="NEW DEFECTIVE DIE를 가지고 온당!!!" commandtimeout="60">
+        <commandtext><![CDATA[SELECT COUNT(*) AS CNT FROM 
+    (SELECT DISTINCT XINDEX,YINDEX 
+     FROM TQD_DEFECT 
+     WHERE STEP_SEQ=:step_Seq
+     AND ADDER = 1
+    ) AS INDEXES]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:step_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_DEFECTEV_DIE_012" commandtype="Text" description="NEW RANDOM DEFECTEV DIE를 가지고 온당!!!" commandtimeout="60">
+        <commandtext><![CDATA[SELECT COUNT(*) AS CNT FROM 
+    (SELECT DISTINCT XINDEX,YINDEX 
+     FROM TQD_DEFECT 
+     WHERE STEP_SEQ=:step_Seq
+     AND CLUSTERNUMBER=0
+     AND ADDER = 1
+    ) AS TB]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:step_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_DEFECTEV_DIE_013" commandtype="Text" description="NEW CLUSTER DEFECTEV DIE만 가지고 온당" commandtimeout="60">
+        <commandtext><![CDATA[SELECT COUNT(*) AS CNT FROM 
+    (SELECT DISTINCT XINDEX,YINDEX 
+     FROM TQD_DEFECT 
+     WHERE STEP_SEQ=:step_seq
+     AND CLUSTERNUMBER>0
+     AND ADDER = 1
+    ) AS TB]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:step_seq</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="CALL_UPDATE_ADDER_DEFECT" commandtype="StoredProcedure" description="ADDER DEFECT에 대해 UPDATE한다." commandtimeout="60">
+        <commandtext><![CDATA[CALL UPDATE_ADDER_DEFECT]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:wafer_seq</param>
+            <param direction="Input" dbtype="Number" size="0">:step_seq</param>
+            <param direction="Input" dbtype="Number" size="0">:tol</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_DEFECT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT
+STEP_SEQ,
+DEFECTID,
+WAFER_SEQ,
+X,
+Y,
+XREL,
+YREL,
+XINDEX,
+YINDEX,
+XSIZE,
+YSIZE,
+DEFECTAREA,
+DSIZE,
+CLASSNUMBER,
+TEST,
+CLUSTERNUMBER,
+ROUGHBINNUMBER,
+FINEBINNUMBER,
+REVIEWSAMPLE,
+IMAGECOUNT,
+ADDER,
+FIRST_STEP,
+RETICLE_REPEAT_ID,
+DIE_REPEAT_ID,
+MAN_OPT_CLASS,
+AUTO_OPT_CLASS,
+MAN_SEM_CLASS,
+AUTO_SEM_CLASS
+FROM TQD_DEFECT WHERE STEP_SEQ = :step_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:step_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="CREATE_TEMP_TABLE" commandtype="Text" description="TEMP TABLE  CREATE" commandtimeout="60">
+        <commandtext><![CDATA[DECLARE GLOBAL TEMPORARY TABLE ?? LIKE TQD_DEFECT ON COMMIT PRESERVE ROWS]]></commandtext>
+    </query>
+    <query statement="Insert" queryid="CREATE_DEFECT2" commandtype="Text" description="TEMP TABLE에 Data넣는 쿼리" commandtimeout="60">
+        <commandtext><![CDATA[??]]></commandtext>
+    </query>
+    <query statement="Select" queryid="MOVE_DEFECT" commandtype="Text" description="TEMP TABLE에서 TDMS_DEFECT이동" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQD_DEFECT SELECT * FROM ?? WHERE STEP_SEQ=:step_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:step_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_DEFECS_BY_XY" commandtype="Text" description="각 Die별 Defect의 개수를 가져온다." commandtimeout="60">
+        <commandtext><![CDATA[SELECT XINDEX,YINDEX,COUNT(*) CNT FROM TQD_DEFECT
+WHERE STEP_SEQ = :step_seq GROUP BY XINDEX,YINDEX]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:step_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_DYNAMIC_DEFECTIVE_DIE" commandtype="Text" description="TDMS_CONFIG Table의 YIELD_MODEL Parameter SQL을 Arg로 받아 실행후 그 결과를 Return한다" commandtimeout="60">
+        <commandtext><![CDATA[??]]></commandtext>
+    </query>
+    <query statement="Select" queryid="GET_DEFECT_MULTI" commandtype="Text" description="여러Step의 Defect Data를 가져온다." commandtimeout="60">
+        <commandtext><![CDATA[SELECT
+STEP_SEQ,
+DEFECTID,
+WAFER_SEQ,
+X,
+Y,
+XREL,
+YREL,
+XINDEX,
+YINDEX,
+XSIZE,
+YSIZE,
+DEFECTAREA,
+DSIZE,
+CLASSNUMBER,
+TEST,
+CLUSTERNUMBER,
+ROUGHBINNUMBER,
+FINEBINNUMBER,
+REVIEWSAMPLE,
+IMAGECOUNT,
+ADDER,
+FIRST_STEP,
+RETICLE_REPEAT_ID,
+DIE_REPEAT_ID,
+MAN_OPT_CLASS,
+AUTO_OPT_CLASS,
+MAN_SEM_CLASS,
+AUTO_SEM_CLASS
+FROM TQD_DEFECT
+WHERE STEP_SEQ IN (??)]]></commandtext>
+    </query>
+    <query statement="Select" queryid="GET_DYNAMIC_DEFECTS" commandtype="Text" description="Dynamic Query를 던져서 Raw Data를 가져온다" commandtimeout="60">
+        <commandtext><![CDATA[??]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_DEFECT_COUNT2" commandtype="Text" description="Defect Count 를 반환한다." commandtimeout="60">
+        <commandtext><![CDATA[SELECT COUNT(*)
+FROM TQD_DEFECT
+WHERE STEP_SEQ = :step_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:step_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="UPDATE_QUERY_BATCH" commandtype="Text" description="UPDATE_DEFECT_BATCH" commandtimeout="60">
+        <commandtext><![CDATA[??]]></commandtext>
+    </query>
+    <query statement="Select" queryid="GET_DENSITY" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2013-09-14 11:33:22
+SELECT B.INDEX_X,
+       B.INDEX_Y,
+       DECODE (A.DEFECT_CNT, NULL, 0, A.DEFECT_CNT) AS DEFECT_CNT
+  FROM (  SELECT DISTINCT
+                 XINDEX AS INDEX_X, YINDEX AS INDEX_Y, COUNT (*) AS DEFECT_CNT
+            FROM TQD_DEFECT
+           WHERE STEP_SEQ = :step_seq
+        GROUP BY XINDEX, YINDEX) A,
+       (SELECT DISTINCT INDEX_X, INDEX_Y
+          FROM TQD_SETUP_MAP
+         WHERE SETUP_SEQ IN (SELECT SETUP_SEQ
+                               FROM TQD_INSP_INFO
+                              WHERE 1 = 1 AND STEP_SEQ = :step_seq)) B
+ WHERE A.INDEX_X(+) = B.INDEX_X AND A.INDEX_Y(+) = B.INDEX_Y ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:step_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_DEFECT_COUNT_02" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2013-09-14 11:36:29
+SELECT TO_CHAR(??) ??, COUNT(??) CNT
+FROM TQD_DEFECT
+WHERE STEP_SEQ IN (??)
+GROUP BY ??
+ORDER BY ??
+]]></commandtext>
+    </query>
+    <query statement="Select" queryid="GET_NEW_DEFECT_CNT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2013-09-14 15:09:50
+SELECT COUNT(*) CNT, 'N' NEW_CARRYOVER_MISSING
+FROM TQD_DEFECT
+WHERE STEP_SEQ=:stepSeq
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:stepSeq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_DSA_CNT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2013-09-14 15:23:02
+SELECT NEW_CARRYOVER_MISSING, COUNT(NEW_CARRYOVER_MISSING) CNT
+FROM
+(
+-- NEW, front 20170, back 20292
+SELECT TQD_DEFECT.*, 'N' NEW_CARRYOVER_MISSING
+FROM TQD_DEFECT
+WHERE STEP_SEQ=:secondStepSeq
+AND (ROUND(X / ??), ROUND(Y / ??)) NOT IN
+(
+SELECT ROUND(X / ??), ROUND(Y / ??)
+FROM TQD_DEFECT
+WHERE STEP_SEQ=:firstStepSeq
+)
+UNION ALL
+-- CARRYOVER, front 20170, back 20292
+SELECT TQD_DEFECT.*, 'C' NEW_CARRYOVER_MISSING
+FROM TQD_DEFECT
+WHERE STEP_SEQ=:firstStepSeq
+AND (ROUND(X / ??), ROUND(Y / ??)) IN
+(
+SELECT ROUND(X / ??), ROUND(Y / ??)
+FROM TQD_DEFECT
+WHERE STEP_SEQ=:secondStepSeq
+)
+UNION ALL
+-- MISSING, front 20170, back 20292
+SELECT TQD_DEFECT.*, 'M' NEW_CARRYOVER_MISSING
+FROM TQD_DEFECT
+WHERE STEP_SEQ=:firstStepSeq
+AND (ROUND(X / ??), ROUND(Y / ??)) NOT IN
+(
+SELECT ROUND(X / ??), ROUND(Y / ??)
+FROM TQD_DEFECT
+WHERE STEP_SEQ=:secondStepSeq
+)
+)
+GROUP BY NEW_CARRYOVER_MISSING
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:secondStepSeq</param>
+            <param direction="Input" dbtype="VarChar" size="40">:firstStepSeq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_DSA_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2013-09-14 15:40:38
+-- NEW, front 20170, back 20292
+SELECT TQD_DEFECT.*, 'N' NEW_CARRYOVER_MISSING
+FROM TQD_DEFECT
+WHERE STEP_SEQ=:secondStepSeq
+AND (ROUND(X / ??), ROUND(Y / ??)) NOT IN
+(
+SELECT ROUND(X / ??), ROUND(Y / ??)
+FROM TQD_DEFECT
+WHERE STEP_SEQ=:firstStepSeq
+)
+UNION ALL
+-- CARRYOVER, front 20170, back 20292
+SELECT TQD_DEFECT.*, 'C' NEW_CARRYOVER_MISSING
+FROM TQD_DEFECT
+WHERE STEP_SEQ=:firstStepSeq
+AND (ROUND(X / ??), ROUND(Y / ??)) IN
+(
+SELECT ROUND(X / ??), ROUND(Y / ??)
+FROM TQD_DEFECT
+WHERE STEP_SEQ=:secondStepSeq
+)
+UNION ALL
+-- MISSING, front 20170, back 20292
+SELECT TQD_DEFECT.*, 'M' NEW_CARRYOVER_MISSING
+FROM TQD_DEFECT
+WHERE STEP_SEQ=:firstStepSeq
+AND (ROUND(X / ??), ROUND(Y / ??)) NOT IN
+(
+SELECT ROUND(X / ??), ROUND(Y / ??)
+FROM TQD_DEFECT
+WHERE STEP_SEQ=:secondStepSeq
+)
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:firstStepSeq</param>
+            <param direction="Input" dbtype="VarChar" size="40">:secondStepSeq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_DEFECT_CNT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2013-09-14 11:36:29
+SELECT TO_CHAR(??) ??, COUNT(??) CNT
+FROM TQD_DEFECT
+WHERE STEP_SEQ IN (??)
+GROUP BY ??
+ORDER BY ??
+]]></commandtext>
+    </query>
+    <query statement="Select" queryid="GET_DENSITY_02" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2013-09-14 11:33:22
+SELECT B.INDEX_X,B.INDEX_Y,DECODE(A.DEFECT_CNT,NULL,0,A.DEFECT_CNT) AS DEFECT_CNT
+FROM 
+(
+    SELECT DISTINCT XINDEX AS INDEX_X,YINDEX AS INDEX_Y,COUNT(*) AS DEFECT_CNT 
+    FROM TQD_DEFECT 
+    WHERE STEP_SEQ = :step_seq
+    AND CLASSNUMBER IN (??)
+    GROUP BY XINDEX,YINDEX
+) A,
+(
+    SELECT DISTINCT INDEX_X,INDEX_Y FROM TQD_SETUP_MAP
+    WHERE SETUP_SEQ IN (SELECT SETUP_SEQ FROM TQD_INSP_INFO WHERE 1=1 AND STEP_SEQ = :step_seq)
+) B
+WHERE A.INDEX_X(+) = B.INDEX_X
+AND A.INDEX_Y(+) = B.INDEX_Y]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:step_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_NEW_DEFECT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2013-11-13 22:11:05
+SELECT TQD_DEFECT.*, 'N' NEW_CARRYOVER_MISSING
+FROM TQD_DEFECT
+WHERE STEP_SEQ=:StepSeq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:StepSeq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_DEFECT_DESCRIPTION_CNT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2014-12-11 17:41:39
+SELECT TO_CHAR(A.??) ??, DECODE(B.BIN_NAME, '', '['||TO_CHAR(A.??)||']', B.BIN_NAME||'['||TO_CHAR(A.??)||']') BIN_DESC, COUNT(A.??) CNT
+FROM TQD_DEFECT A, TQP_BINDESC B
+WHERE A.STEP_SEQ IN (??)
+  AND A.FIRST_STEP = B.TESTAREA(+)
+  AND A.CLASSNUMBER = B.BIN(+)
+GROUP BY A.??, DECODE(B.BIN_NAME, '', '['||TO_CHAR(A.??)||']', B.BIN_NAME||'['||TO_CHAR(A.??)||']')
+ORDER BY COUNT(A.??) DESC]]></commandtext>
+    </query>
+    <query statement="Select" queryid="REPEAT_LIST_BY_DIE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2015-03-09 11:45:50
+SELECT * FROM
+(
+SELECT ROUND(XREL / ??) REPEAT_XREL, ROUND(YREL / ??) REPEAT_YREL, COUNT(*) CNT
+FROM TQD_DEFECT
+WHERE STEP_SEQ=:stepSeq
+GROUP BY ROUND(XREL / ??), ROUND(YREL / ??)
+)
+WHERE CNT >= :cnt]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:stepSeq</param>
+            <param direction="Input" dbtype="VarChar" size="40">:cnt</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="DIE_REPEAT_DEFECT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2015-03-09 11:47:03
+SELECT TQD_DEFECT.*, ROUND(XREL / ??) REPEAT_XREL, ROUND(YREL / ??) REPEAT_YREL
+FROM TQD_DEFECT
+WHERE STEP_SEQ=:stepSeq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:stepSeq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SHOT_REPEAT_DEFECT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2015-03-09 11:47:27
+SELECT A.*
+, ROUND((A.XREL + B.DIE_SHOT_X * ??) / ??) REPEAT_XREL
+, ROUND((A.YREL + B.DIE_SHOT_Y * ??) / ??) REPEAT_YREL
+FROM TQD_DEFECT A, TQD_SHOT B
+WHERE A.STEP_SEQ=:stepSeq
+AND B.PRODUCT=:product
+AND A.XINDEX=B.INDEX_X
+AND A.YINDEX=B.INDEX_Y]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:stepSeq</param>
+            <param direction="Input" dbtype="VarChar" size="40">:product</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="REPEAT_LIST_BY_SHOT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2015-03-09 11:47:42
+SELECT * FROM
+(
+SELECT
+ROUND((A.XREL + B.DIE_SHOT_X * ??) / ??) REPEAT_XREL
+, ROUND((A.YREL + B.DIE_SHOT_Y * ??) / ??) REPEAT_YREL
+, COUNT(*) CNT
+FROM TQD_DEFECT A, TQD_SHOT B
+WHERE A.STEP_SEQ=:stepSeq
+AND B.PRODUCT=:product
+AND A.XINDEX=B.INDEX_X
+AND A.YINDEX=B.INDEX_Y
+GROUP BY ROUND((A.XREL + B.DIE_SHOT_X * ??) / ??)
+, ROUND((A.YREL + B.DIE_SHOT_Y * ??) / ??)
+)
+WHERE CNT >= ??]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:stepSeq</param>
+            <param direction="Input" dbtype="VarChar" size="40">:product</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_DEFECT_MULTI" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT
+    A.STEP_SEQ,
+    A.DEFECTID,
+    A.WAFER_SEQ,
+    A.X,
+    A.Y,
+    A.XREL,
+    A.YREL,
+    A.XINDEX,
+    A.YINDEX,
+    A.XSIZE,
+    A.YSIZE,
+    A.DEFECTAREA,
+    A.DSIZE,
+    A.CLASSNUMBER,
+    NVL(B.NAME, A.CLASSNUMBER) || '(' || A.CLASSNUMBER || ')' AS CLASSNUMBER_DESC,
+    NVL(B.DEFECT_COLOR, '#FF0000') AS DEFECT_COLOR,
+    A.TEST,
+    A.CLUSTERNUMBER,
+    A.ROUGHBINNUMBER,
+    A.FINEBINNUMBER,
+    A.REVIEWSAMPLE,
+    A.IMAGECOUNT,
+    A.ADDER,
+    A.FIRST_STEP,
+    A.RETICLE_REPEAT_ID,
+    A.DIE_REPEAT_ID,
+    A.MAN_OPT_CLASS,
+    A.AUTO_OPT_CLASS,
+    A.MAN_SEM_CLASS,
+    A.AUTO_SEM_CLASS,
+    C.IMAGE_ID,
+    C.IMAGE_TYPE,
+    C.IMAGE_PATH,
+    C.IMAGE_FILENAME,
+    C.IMAGE_SERVER,
+    C.THUMB_PATH,
+    C.THUMB_FILENAME,
+    D.WAFER_ID,
+    D.STEP_ID,
+    D.RESULTTIMESTAMP
+FROM TQD_DEFECT A, TQD_DEFECT_TYPE B , TQD_IMAGES C, TQD_INSP_INFO D
+ WHERE 1 = 1 
+ AND A.STEP_SEQ IN (??)
+ AND A.STEP_SEQ = D.STEP_SEQ
+ AND A.CLASSNUMBER = B.CLASSNUMBER(+)
+ AND A.STEP_SEQ = C.STEP_SEQ(+)
+ AND A.DEFECTID = C.DEFECTID(+)
+  ORDER BY STEP_SEQ, DEFECTID]]></commandtext>
+    </query>
+    <query statement="Update" queryid="UPDATE_RECLASSIFY_DEFECT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-06-24 09:49:00
+UPDATE TQD_DEFECT
+   SET CLASSNUMBER = :newclass
+ WHERE 1=1
+   AND STEP_SEQ = :stepseq
+   AND DEFECTID = :defectid
+   AND WAFER_SEQ = :waferseq
+   AND CLASSNUMBER = :classnum]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="stepseq">:stepseq</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="defectid">:defectid</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="waferseq">:waferseq</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="classnum">:classnum</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="newclass">:newclass</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_RECLASSIFIED_DEFECT_CNT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-07-18 14:22:14
+SELECT STEP_SEQ, WAFER_SEQ, COUNT(CLASSNUMBER) AS "CNT"
+  FROM TQD_DEFECT
+ WHERE 1=1
+   AND STEP_SEQ IN (??)
+   AND CLASSNUMBER != 0 
+ GROUP BY STEP_SEQ, WAFER_SEQ
+ ORDER BY STEP_SEQ, WAFER_SEQ]]></commandtext>
+    </query>
+    <query statement="Select" queryid="GET_DEFECT_LIST_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-08-07 09:30:02
+SELECT T2.STEP_SEQ,
+         T2.DEFECTID,
+         T2.WAFER_SEQ,
+         T2.X,
+         T2.Y,
+         T2.XREL,
+         T2.YREL,
+         ((T2.XINDEX - :minX) + 1) AS "XINDEX", 
+         ((T2.YINDEX  - :minY) + 1) AS "YINDEX",
+         T2.XSIZE,
+         T2.YSIZE,
+         T2.DEFECTAREA,
+         T2.DSIZE,
+         T2.CLASSNUMBER,
+         T2.TEST,
+         T2.CLUSTERNUMBER,
+         T2.ROUGHBINNUMBER,
+         T2.FINEBINNUMBER,
+         T2.REVIEWSAMPLE,
+         T2.IMAGECOUNT,
+         T2.ADDER,
+         T2.FIRST_STEP,
+         T2.RETICLE_REPEAT_ID,
+         T2.DIE_REPEAT_ID,
+         T2.MAN_OPT_CLASS,
+         T2.AUTO_OPT_CLASS,
+         T2.MAN_SEM_CLASS,
+         T2.AUTO_SEM_CLASS,
+         T3.NAME,
+         T3.DESCRIPTION
+  FROM tqd_insp_info t1, tqd_defect t2, tqd_defect_type t3
+ WHERE     1 = 1
+       AND t1.step_seq = t2.step_seq
+       AND t1.wafer_seq = t2.wafer_seq
+       AND t2.classnumber = t3.classnumber(+)
+       AND T1.STEP_SEQ = :stepseq
+       AND T1.WAFER_SEQ = :waferseq
+ ORDER BY T2.STEP_SEQ, T2.DEFECTID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="stepseq">:stepseq</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="waferseq">:waferseq</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="minX">:minX</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="minY">:minY</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_DEFECT_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT STEP_SEQ,
+       DEFECTID,
+       WAFER_SEQ,
+       XINDEX || ',' || YINDEX AS XY,
+       X,
+       Y,
+       XREL,
+       YREL,
+       XINDEX,
+       YINDEX,
+       XSIZE,
+       YSIZE,
+       DEFECTAREA,
+       DSIZE,
+       CLASSNUMBER,
+       TEST,
+       CLUSTERNUMBER,
+       ROUGHBINNUMBER,
+       FINEBINNUMBER,
+       REVIEWSAMPLE,
+       IMAGECOUNT,
+       ADDER,
+       FIRST_STEP,
+       RETICLE_REPEAT_ID,
+       DIE_REPEAT_ID,
+       MAN_OPT_CLASS,
+       AUTO_OPT_CLASS,
+       MAN_SEM_CLASS,
+       AUTO_SEM_CLASS
+  FROM TQD_DEFECT
+WHERE WAFER_SEQ = :wafer_seq
+AND STEP_SEQ = :step_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="wafer_seq">:wafer_seq</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="step_seq">:step_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_LAST_WAFER_DEFECT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT X, Y
+FROM TQD_DEFECT
+WHERE STEP_SEQ IN (
+    SELECT STEP_SEQ 
+    FROM (
+        SELECT STEP_SEQ
+        FROM TQD_STEP
+        WHERE WAFER_SEQ IN (
+            SELECT WAFER_SEQ
+            FROM TQD_WAFER
+            WHERE WAFER_ID = :WAFER_ID
+                AND TEST_ORDER = 0
+        )
+        AND STEP_ID <> :STEP_ID
+        AND RESULTTIMESTAMP < TO_DATE(:RESULTTIMESTAMP, 'YYYY-MM-DD HH24:MI:SS')
+        ORDER BY RESULTTIMESTAMP DESC
+    )
+)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="WAFER_ID">:WAFER_ID</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="STEP_ID">:STEP_ID</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="RESULTTIMESTAMP">:RESULTTIMESTAMP</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_DEFECT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[DELETE FROM TQD_DEFECT
+WHERE WAFER_SEQ = :wafer_seq
+AND STEP_SEQ = :step_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="wafer_seq">:wafer_seq</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="step_seq">:step_seq</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_AREA_ZERO" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQD_DEFECT SET DEFECTAREA = 0
+WHERE 1 = 1 
+AND STEP_SEQ = :step_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="step_seq">:step_seq</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_MAINT_SEQ" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[ UPDATE TQD_DEFECT SET STEP_SEQ = :newstepseq, WAFER_SEQ = :newwaferseq
+ WHERE 1 = 1 
+ AND STEP_SEQ = :oristepseq
+ AND WAFER_SEQ = :oriwaferseq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="newstepseq">:newstepseq</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="newwaferseq">:newwaferseq</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="oristepseq">:oristepseq</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="oriwaferseq">:oriwaferseq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_INDEX_GRP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[  SELECT XINDEX, YINDEX, COUNT (*) AS CNT
+    FROM TQD_DEFECT
+    WHERE 1 = 1 AND STEP_SEQ IN (??)
+GROUP BY XINDEX, YINDEX]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_DEFECT_VIEW" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT
+    A.DEFECTID,
+    A.X,
+    A.Y,
+    A.XREL,
+    A.YREL,
+    A.XSIZE,
+    A.YSIZE,
+    A.DEFECTAREA,
+    A.DSIZE,
+    A.CLASSNUMBER,
+    --NVL(B.NAME, A.CLASSNUMBER) || '(' || A.CLASSNUMBER || ')' AS CLASSNUMBER_DESC,
+    --NVL(B.DEFECT_COLOR, '#FF0000') AS DEFECT_COLOR,
+    A.TEST,
+    A.CLUSTERNUMBER,
+    --A.ROUGHBINNUMBER,
+    --A.FINEBINNUMBER,
+    --A.REVIEWSAMPLE,
+    A.IMAGECOUNT,
+    A.ADDER,
+    --A.FIRST_STEP,
+    --A.RETICLE_REPEAT_ID,
+    --A.DIE_REPEAT_ID,
+    --A.MAN_OPT_CLASS,
+    A.XINDEX,
+    A.YINDEX,
+    --A.AUTO_OPT_CLASS,
+    --A.MAN_SEM_CLASS,
+    --A.AUTO_SEM_CLASS,
+    --C.IMAGE_ID,
+    --C.IMAGE_TYPE,
+    --C.IMAGE_PATH,
+    --C.IMAGE_FILENAME,
+    --C.IMAGE_SERVER,
+    --C.THUMB_PATH,
+    --C.THUMB_FILENAME,
+    --D.WAFER_ID,
+    --D.STEP_ID,
+    --D.RESULTTIMESTAMP,
+    A.STEP_SEQ,
+    A.WAFER_SEQ
+FROM TQD_DEFECT A
+--TQD_DEFECT_TYPE B,
+--TQD_IMAGES C, 
+--TQD_INSP_INFO D
+ WHERE 1 = 1 
+ AND A.STEP_SEQ IN (??)
+ --AND A.STEP_SEQ = D.STEP_SEQ
+ --AND A.CLASSNUMBER = B.CLASSNUMBER(+)
+ --AND A.STEP_SEQ = C.STEP_SEQ(+)
+ --AND A.DEFECTID = C.DEFECTID(+)
+ ??
+ ORDER BY STEP_SEQ, DEFECTID
+]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_DEFECT_VIEW_CHART" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT
+    A.DEFECTID,
+    A.X,
+    A.Y,
+    A.XREL,
+    A.YREL,
+    A.XINDEX,
+    A.YINDEX,
+    A.XSIZE,
+    A.YSIZE,
+    A.DEFECTAREA,
+    A.DSIZE,
+    A.CLASSNUMBER,
+    NVL(B.NAME, A.CLASSNUMBER) || '(' || A.CLASSNUMBER || ')' AS CLASSNUMBER_DESC,
+    NVL(B.DEFECT_COLOR, '#FF0000') AS DEFECT_COLOR,
+    A.CLUSTERNUMBER,
+    A.ROUGHBINNUMBER,
+    A.FINEBINNUMBER,
+    A.REVIEWSAMPLE,
+    A.IMAGECOUNT,
+    A.ADDER,
+    A.FIRST_STEP,
+    A.RETICLE_REPEAT_ID,
+    A.DIE_REPEAT_ID,
+    A.MAN_OPT_CLASS,
+    A.AUTO_OPT_CLASS,
+    A.MAN_SEM_CLASS,
+    A.AUTO_SEM_CLASS,
+    D.WAFER_ID,
+    D.STEP_ID,
+    D.RESULTTIMESTAMP,
+    A.STEP_SEQ,
+    A.WAFER_SEQ
+FROM TQD_DEFECT A, TQD_DEFECT_TYPE B , TQD_INSP_INFO D
+ WHERE 1 = 1 
+ AND A.STEP_SEQ IN (??)
+ AND A.STEP_SEQ = D.STEP_SEQ
+ AND A.CLASSNUMBER = B.CLASSNUMBER(+)
+ ??]]></commandtext>
+    </query>
+    <query statement="Update" queryid="UPDATE_IMAGECOUNT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQD_DEFECT A
+SET A.IMAGECOUNT = (
+    SELECT COUNT(B.STEP_SEQ)
+    FROM TQD_IMAGES B
+    WHERE A.STEP_SEQ = B.STEP_SEQ(+) 
+    AND A.DEFECTID = B.DEFECTID(+)
+)
+WHERE A.STEP_SEQ = :STEP_SEQ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="0" value="0">:STEP_SEQ</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_XY_LIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT STEP_SEQ, X, Y 
+FROM TQD_DEFECT
+WHERE STEP_SEQ IN (??)
+ORDER BY STEP_SEQ, DEFECTID]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_XY_LIST_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT X, Y 
+FROM TQD_DEFECT
+WHERE STEP_SEQ = :STEP_SEQ
+ORDER BY DEFECTID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0" value="STEP_SEQ">:STEP_SEQ</param>
+        </parameters>
+    </query>
+</queryxml>

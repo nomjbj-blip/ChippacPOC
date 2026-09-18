@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Insert" queryid="CREATE_WAFER" commandtype="Text" description="Wafer를 Insert 한다." commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQD_WAFER(WAFER_SEQ,LOT_SEQ,WAFER_ID,SLOT_ID,"COMMENT") VALUES(WAFER_SEQ.NEXTVAL,:lot_seq,:wafer_id,:slot_id, '')]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0" description="Lot Create sequence">:lot_seq</param>
+            <param direction="Input" dbtype="VarChar" size="0" description="'02' '03'">:wafer_id</param>
+            <param direction="Input" dbtype="Number" size="0" description="1,2">:slot_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_WAFER_SEQ" commandtype="Text" description="Wafer Seq 조회" commandtimeout="60">
+        <commandtext><![CDATA[SELECT WAFER_SEQ FROM TQD_WAFER WHERE LOT_SEQ=:lot_seq AND WAFER_ID=:wafer_id]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0" description="lot_seq">:lot_seq</param>
+            <param direction="Input" dbtype="VarChar" size="0" description="wafer id">:wafer_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_WAFER_INFO_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2015-04-15 22:00:33
+SELECT * FROM TQP_WAFER
+WHERE 1=1
+AND LOT_SEQ = :lot_seq
+AND WAFER_ID = :wafer_id
+AND PROBE_CNT = :probe_cnt]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:lot_seq</param>
+            <param direction="Input" dbtype="VarChar" size="40">:wafer_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:probe_cnt</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_WAFER_INFO_02" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- CREATE DATE : 2019-08-03 15:30:22
+  SELECT T1.PRODUCT, T1.LOT_ID, T2.WAFER_ID
+    FROM TQD_LOT T1, TQD_WAFER T2
+   WHERE 1 = 1 
+     AND T1.LOT_SEQ = T2.LOT_SEQ
+     AND LOT_ID = :lotid
+   ORDER BY LOT_ID, WAFER_ID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="lotid">:lotid</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_STEP_SLOTID" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQD_WAFER 
+SET SLOT_ID=:slotid
+WHERE 1 = 1
+AND WAFER_SEQ = :waferseq
+AND LOT_SEQ = :lot_seq
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="slotid">:slotid</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="waferseq">:waferseq</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="lot_seq">:lot_seq</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_STEP_WAFERID" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQD_WAFER 
+SET WAFER_ID=:waferid
+WHERE 1 = 1
+AND WAFER_SEQ = :waferseq
+AND LOT_SEQ = :lot_seq
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="waferid">:waferid</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="waferseq">:waferseq</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="lot_seq">:lot_seq</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_MAINT_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQD_WAFER SET LOT_SEQ = :lot_seq, WAFER_ID = :lot_id || '-' ||  LPAD(SLOT_ID, 2, '0')
+ WHERE     1 = 1
+       AND WAFER_SEQ IN (SELECT WAFER_SEQ
+                           FROM TQD_INSP_INFO
+                           WHERE 1 = 1 AND STEP_SEQ IN (??))]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="lot_seq">:lot_seq</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="lot_id">:lot_id</param>
+        </parameters>
+    </query>
+</queryxml>

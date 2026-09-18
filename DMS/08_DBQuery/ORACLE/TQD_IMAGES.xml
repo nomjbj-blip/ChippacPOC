@@ -1,0 +1,249 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Insert" queryid="CREATE_IMAGE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO 
+    TQD_IMAGES (
+    STEP_SEQ,
+    DEFECTID,
+    IMAGE_ID,
+    TEST,
+    WAFER_SEQ,
+    IMAGE_TYPE,
+    IMAGE_PATH,
+    IMAGE_FILENAME,
+    IMAGE_SERVER
+) VALUES (
+    :step_seq,
+    :defect_id,
+    (SELECT NVL(MAX(IMAGE_ID),-1) + 1 + :image_id FROM TQD_IMAGES WHERE STEP_SEQ = :step_seq AND DEFECTID = :defect_id),
+    :test,
+    :wafer_seq
+    :image_type,
+    :image_path,
+    :image_filename,
+    :image_server
+)
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="100" value="100000001">:step_seq</param>
+            <param direction="Input" dbtype="Number" size="100" value="159">:defect_id</param>
+            <param direction="Input" dbtype="Number" size="100" value="0">:image_id</param>
+            <param direction="Input" dbtype="Number" size="100" description="testid" value="1">:test</param>
+            <param direction="Input" dbtype="VarChar" size="100" value="10000000">:wafer_seq</param>
+            <param direction="Input" dbtype="VarChar" size="100" value="JPG">:image_type</param>
+            <param direction="Input" dbtype="VarChar" size="100" value="C:\DEFECTIMAGE">:image_path</param>
+            <param direction="Input" dbtype="VarChar" size="100" description="filename" value="P_D134MTDNH01U_191T34_01_45,84_A">:image_filename</param>
+            <param direction="Input" dbtype="VarChar" size="100" value="10.144.251.226">:image_server</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_IMAGE_COUNT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DEFECTID,MAX(IMAGE_ID)+1 AS NEXT_IMAGE_ID FROM TQD_IMAGES
+WHERE STEP_SEQ = :step_seq
+GROUP BY DEFECTID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0" description="step_seq">:step_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_DEFECT_IMAGE_OF_STEP_DEFECTID" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2013-09-14 11:46:10
+SELECT * FROM TQD_IMAGES
+WHERE STEP_SEQ = :step_seq
+AND DEFECTID IN (??)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:step_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_DEFECT_IMAGE_OF_STEP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2013-11-13 12:05:14
+SELECT * FROM TQD_IMAGES
+WHERE STEP_SEQ = :step_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:step_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_IMAGE_LIST_OF_STEP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2013-11-13 12:48:02
+-- SELECT * FROM 
+-- (SELECT * FROM TQD_DEFECT WHERE STEP_SEQ = :step_seq) D,
+-- (SELECT * FROM TQD_IMAGES WHERE STEP_SEQ = :step_seq) I
+-- WHERE D.STEP_SEQ = I.STEP_SEQ
+-- AND D.DEFECTID = I.DEFECTID
+ 
+
+
+SELECT * FROM 
+              (SELECT DFT.*, INS.LOT_ID, INS.WAFER_ID, INS.PRODUCT
+              FROM TQD_DEFECT DFT, TQD_INSP_INFO INS
+                WHERE 1=1
+                  AND DFT.STEP_SEQ = :step_seq
+                  AND DFT.STEP_SEQ = INS.STEP_SEQ
+                  AND DFT.WAFER_SEQ = INS.WAFER_SEQ) D,
+              (SELECT * FROM TQD_IMAGES WHERE STEP_SEQ = :step_seq) I
+ WHERE D.STEP_SEQ = I.STEP_SEQ
+   AND D.DEFECTID = I.DEFECTID ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:step_seq</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="CREATE_IMAGES" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[
+INSERT INTO TQD_IMAGES (
+    STEP_SEQ,
+    DEFECTID,
+    IMAGE_ID,
+    WAFER_SEQ,
+    TEST,
+    IMAGE_TYPE,
+    IMAGE_PATH,
+    IMAGE_FILENAME,
+    IMAGE_SERVER,
+    THUMB_PATH,
+    THUMB_FILENAME,
+    UPLOAD
+) VALUES ( 
+    :step_seq,
+    :defect_id, 
+    (SELECT NVL(MAX(IMAGE_ID),-1) + 1 + :image_id FROM TQD_IMAGES WHERE STEP_SEQ = :step_seq AND DEFECTID = :defect_id),
+    :wafer_seq,
+    :test,
+    :image_type,
+    :image_path,
+    :image_filename,
+    :image_server,
+    :thumb_path,
+    :thumb_filename,
+    :upload
+)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="0">:step_seq</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="0">:defect_id</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="0">:image_id</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="0">:wafer_seq</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="0">:test</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="0">:image_type</param>
+            <param direction="Input" dbtype="VarChar" size="200" value="image_path">:image_path</param>
+            <param direction="Input" dbtype="VarChar" size="200" value="image_filename">:image_filename</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="image_server">:image_server</param>
+            <param direction="Input" dbtype="VarChar" size="200" value="thumb_path">:thumb_path</param>
+            <param direction="Input" dbtype="VarChar" size="200" value="thumb_filename">:thumb_filename</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="upload">:upload</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_DEFECT_INFO" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT A.*,
+       B.IMAGE_ID,
+       B.TEST,
+       B.IMAGE_TYPE,
+       B.IMAGE_PATH,
+       B.IMAGE_FILENAME,
+       B.IMAGE_SERVER,
+       B.THUMB_PATH,
+       B.THUMB_FILENAME
+  FROM TQD_DEFECT A, TQD_IMAGES B
+ WHERE     1 = 1
+       AND A.STEP_SEQ = :step_seq
+       AND A.DEFECTID IN (??)
+       AND A.STEP_SEQ = B.STEP_SEQ
+       AND A.DEFECTID = B.DEFECTID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="step_seq">:step_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_DEFECT_IMAGE_ALL" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-06-18 19:44:13
+  SELECT T1.RESULTTIMESTAMP,
+         T1.WAFER_ID,
+         T1.STEP_ID,
+         T2.*,
+         T3.IMAGE_ID,
+         T3.TEST,
+         T3.IMAGE_TYPE,
+         T3.IMAGE_PATH,
+         T3.IMAGE_FILENAME,
+         T3.IMAGE_SERVER,
+         T3.THUMB_PATH,
+         T3.THUMB_FILENAME
+    FROM TQD_INSP_INFO T1, TQD_DEFECT T2, TQD_IMAGES T3
+   WHERE     1 = 1
+         AND T1.STEP_SEQ = T2.STEP_SEQ
+         AND T1.WAFER_SEQ = T2.WAFER_SEQ
+         AND T2.STEP_SEQ = T3.STEP_SEQ
+         AND T2.WAFER_SEQ = T3.WAFER_SEQ
+         AND T2.DEFECTID = T3.DEFECTID
+         AND T1.STEP_SEQ IN (??)
+ORDER BY T1.RESULTTIMESTAMP, T1.WAFER_ID, T1.STEP_ID,T2.DEFECTID, T3.IMAGE_ID]]></commandtext>
+    </query>
+    <query statement="Select" queryid="GET_IMAGE_PATH" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-07-12 10:16:17
+SELECT * FROM TQD_IMAGES
+ WHERE 1=1
+   AND STEP_SEQ = :step
+   AND WAFER_SEQ = :wafer
+   AND DEFECTID = :defectid
+   AND IMAGE_ID = :imageid]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="step">:step</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="wafer">:wafer</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="defectid">:defectid</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="imageid">:imageid</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_IMAGES" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[DELETE FROM TQD_IMAGES
+WHERE 1 = 1 
+AND STEP_SEQ = :step_seq
+AND WAFER_SEQ = :wafer_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="step_seq">:step_seq</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="wafer_seq">:wafer_seq</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_MAINT_SEQ" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[ UPDATE TQD_IMAGES SET STEP_SEQ = :newstepseq, WAFER_SEQ = :newwaferseq
+ WHERE 1 = 1 
+ AND STEP_SEQ = :oristepseq
+ AND WAFER_SEQ = :oriwaferseq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="newstepseq">:newstepseq</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="newwaferseq">:newwaferseq</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="oristepseq">:oristepseq</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="oriwaferseq">:oriwaferseq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_IMAGE_PATH01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT 
+    STEP_SEQ, 
+    DEFECTID,
+    IMAGE_ID,
+    IMAGE_PATH,
+    IMAGE_FILENAME,
+    THUMB_PATH,
+    THUMB_FILENAME 
+FROM TQD_IMAGES
+WHERE STEP_SEQ IN (??)]]></commandtext>
+    </query>
+    <query statement="Delete" queryid="DELETE_DEFECT_IMAGES" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-11-19 12:05:27
+DELETE FROM TQD_IMAGES
+ WHERE 1=1
+   AND STEP_SEQ = :stepseq
+   AND DEFECTID = :defectid
+   AND WAFER_SEQ = :waferseq
+   AND IMAGE_ID = :imageid]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="stepseq">:stepseq</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="defectid">:defectid</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="waferseq">:waferseq</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="imageid">:imageid</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_IMAGE_PATH02" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DEFECTID,IMAGE_PATH || '/' || IMAGE_FILENAME "PATH" 
+FROM TQD_IMAGES
+WHERE STEP_SEQ = :STEP_SEQ
+ORDER BY DEFECTID, IMAGE_ID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0" value="STEP_SEQ">:STEP_SEQ</param>
+        </parameters>
+    </query>
+</queryxml>

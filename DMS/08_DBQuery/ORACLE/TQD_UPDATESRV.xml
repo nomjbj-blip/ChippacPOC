@@ -1,0 +1,207 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Select" queryid="SELECT_EQUIPINF" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT EQUIP_ID
+,FACILITY
+,EQUIP_TYPE
+,EQUIP_DESC
+,EQUIP_MODEL
+,EQUIP_IP
+,ACTIVE_FLAG
+,SVC_FLAG
+,SVC_FLAG2
+,RESULT_PATH
+,SERVICE_PATH
+,SERVICE_PATH2
+,BACKUP_PATH
+,EQUIP_PATH
+,VIRTUAL_PATH
+,FTP_ID
+,FTP_PW
+,PORT_NO
+,PROTOCOL
+,METHOD
+FROM TQD_UPDATESRV
+WHERE ACTIVE_FLAG = 'Y']]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_EQUIP_INFO" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT EQUIP_ID,
+FACILITY,
+EQUIP_TYPE,
+EQUIP_MODEL,
+EQUIP_DESC,
+EQUIP_IP,
+ACTIVE_FLAG,
+SVC_FLAG,
+SVC_FLAG2,
+RESULT_PATH,
+SERVICE_PATH,
+SERVICE_PATH2,
+BACKUP_PATH,
+EQUIP_PATH,
+VIRTUAL_PATH,
+FTP_ID,
+FTP_PW,
+PORT_NO,
+PROTOCOL,
+METHOD
+FROM TQD_UPDATESRV
+WHERE EQUIP_ID = :equip_id]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:equip_id</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_FLAG" commandtype="Text" description="ACTIVE FLAG UPDATE" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQD_UPDATESRV 
+SET ACTIVE_FLAG = :active_flag
+,SVC_FLAG  = :svc_flag
+,SVC_FLAG2  =  :svc_flag2]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Char" size="1">:active_flag</param>
+            <param direction="Input" dbtype="Char" size="1">:svc_flag</param>
+            <param direction="Input" dbtype="Char" size="1">:svc_flag2</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_EQUIP_01" commandtype="Text" description="Update All" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQD_UPDATESRV 
+SET
+EQUIP_TYPE    = :equip_type ,
+FACILITY = :facility,  
+EQUIP_MODEL   = :equip_model ,
+EQUIP_DESC    = :equip_desc ,
+EQUIP_IP      = :equip_ip ,
+ACTIVE_FLAG   = :active_flag ,
+SVC_FLAG      = :svc_flag ,
+SVC_FLAG2     = :svc_flag2 ,
+RESULT_PATH   = :result_path ,
+SERVICE_PATH  = :service_path ,
+SERVICE_PATH2 = :service_path2 ,
+BACKUP_PATH   = :backup_path ,
+EQUIP_PATH    = :equip_path ,
+VIRTUAL_PATH  = :virtual_path ,
+FTP_ID        = :ftp_id ,
+FTP_PW        = :ftp_pw,
+PORT_NO       = :port_no ,
+PROTOCOL      = :protocol ,
+METHOD        = :method 
+WHERE EQUIP_ID = :equip_id]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:equip_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:facility</param>
+            <param direction="Input" dbtype="VarChar" size="0">:equip_type</param>
+            <param direction="Input" dbtype="VarChar" size="0">:equip_model</param>
+            <param direction="Input" dbtype="VarChar" size="0">:equip_desc</param>
+            <param direction="Input" dbtype="VarChar" size="0">:equip_ip</param>
+            <param direction="Input" dbtype="Char" size="1">:active_flag</param>
+            <param direction="Input" dbtype="Char" size="1">:svc_flag</param>
+            <param direction="Input" dbtype="Char" size="1">:svc_flag2</param>
+            <param direction="Input" dbtype="VarChar" size="0">:result_path</param>
+            <param direction="Input" dbtype="VarChar" size="0">:service_path</param>
+            <param direction="Input" dbtype="VarChar" size="0">:service_path2</param>
+            <param direction="Input" dbtype="VarChar" size="0">:backup_path</param>
+            <param direction="Input" dbtype="VarChar" size="0">:equip_path</param>
+            <param direction="Input" dbtype="VarChar" size="0">:virtual_path</param>
+            <param direction="Input" dbtype="VarChar" size="0">:ftp_id</param>
+            <param direction="Input" dbtype="VarChar" size="0">:ftp_pw</param>
+            <param direction="Input" dbtype="VarChar" size="0">:port_no</param>
+            <param direction="Input" dbtype="VarChar" size="0">:protocol</param>
+            <param direction="Input" dbtype="VarChar" size="0">:method</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_FACILITY" commandtype="Text" description="장비의 FACILITY를 반환한다." commandtimeout="60">
+        <commandtext><![CDATA[SELECT FACILITY FROM TQD_UPDATESRV
+WHERE EQUIP_ID = :equip_id]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" description="장비 ID">:equip_id</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="CREATE_EQUIP_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQD_UPDATESRV(EQUIP_ID
+            ,FACILITY
+            ,EQUIP_TYPE
+            ,EQUIP_MODEL
+            ,EQUIP_DESC
+            ,EQUIP_IP
+            ,ACTIVE_FLAG
+            ,SVC_FLAG
+            ,SVC_FLAG2
+            ,RESULT_PATH
+            ,SERVICE_PATH
+            ,SERVICE_PATH2
+            ,BACKUP_PATH
+            ,EQUIP_PATH
+            ,VIRTUAL_PATH
+            ,FTP_ID
+            ,FTP_PW
+            ,PORT_NO
+            ,PROTOCOL
+            ,METHOD)
+        VALUES(:equip_id
+            ,:facility
+            ,:equip_type
+            ,:equip_model
+            ,:equip_desc
+            ,:equip_ip
+            ,:active_flag
+            ,:svc_flag
+            ,:svc_flag2
+            ,:result_path
+            ,:service_path
+            ,:service_path2
+            ,:backup_path
+            ,:equip_path
+            ,:virtual_path
+            ,:ftp_id
+            ,:ftp_pw
+            ,:port_no
+            ,:protocol
+            ,:method)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:equip_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:facility</param>
+            <param direction="Input" dbtype="VarChar" size="40">:equip_type</param>
+            <param direction="Input" dbtype="VarChar" size="40">:equip_model</param>
+            <param direction="Input" dbtype="VarChar" size="40">:equip_desc</param>
+            <param direction="Input" dbtype="VarChar" size="40">:equip_ip</param>
+            <param direction="Input" dbtype="VarChar" size="40">:active_flag</param>
+            <param direction="Input" dbtype="VarChar" size="40">:svc_flag</param>
+            <param direction="Input" dbtype="VarChar" size="40">:svc_flag2</param>
+            <param direction="Input" dbtype="VarChar" size="40">:result_path</param>
+            <param direction="Input" dbtype="VarChar" size="40">:service_path</param>
+            <param direction="Input" dbtype="VarChar" size="40">:service_path2</param>
+            <param direction="Input" dbtype="VarChar" size="40">:backup_path</param>
+            <param direction="Input" dbtype="VarChar" size="40">:equip_path</param>
+            <param direction="Input" dbtype="VarChar" size="40">:virtual_path</param>
+            <param direction="Input" dbtype="VarChar" size="40">:ftp_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:ftp_pw</param>
+            <param direction="Input" dbtype="VarChar" size="40">:port_no</param>
+            <param direction="Input" dbtype="VarChar" size="40">:protocol</param>
+            <param direction="Input" dbtype="VarChar" size="40">:method</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_EQUIP_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2013-09-12 17:02:51
+DELETE FROM TQD_UPDATESRV
+WHERE EQUIP_ID = :equip_id]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:equip_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="TEST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2013-11-08 10:49:50
+SELECT * from tab
+where abcd = :abcd]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_EQUIPLIST_PROBE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT EQUIP_ID FROM TQD_UPDATESRV
+WHERE EQUIP_TYPE = 'PROBETEST'
+ORDER BY EQUIP_ID]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_EQUIP_FTPURL" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT EQUIP_IP, FTP_ID, FTP_PW FROM TQD_UPDATESRV
+WHERE EQUIP_ID = :EQUIP_ID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:EQUIP_ID</param>
+        </parameters>
+    </query>
+</queryxml>

@@ -1,0 +1,185 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="QMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Select" queryid="READ_ALLUSERLIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[ SELECT * FROM TQC_USER ]]></commandtext>
+    </query>
+    <query statement="Select" queryid="GETMYINFO" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT *
+   FROM TQC_USER 
+ WHERE USER_ID = :UserID ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" description="DUMMY" value="DUMMY">:UserID</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATEMYINFO" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQC_USER SET 
+PASSWORD = :Passwd 
+, PHONE_OFFICE = :PhoneOffice 
+, PHONE_MOBILE = :PhoneMobile 
+, PHONE_HOME = :PhoneHome 
+, PHONE_OTHER= :PhoneEtc 
+, EMAIL_ID = :EmailID 
+WHERE USER_ID = :UserID 
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:UserID</param>
+            <param direction="Input" dbtype="VarChar" size="128">:Passwd</param>
+            <param direction="Input" dbtype="VarChar" size="50">:PhoneOffice</param>
+            <param direction="Input" dbtype="VarChar" size="50">:PhoneMobile</param>
+            <param direction="Input" dbtype="VarChar" size="50">:PhoneHome</param>
+            <param direction="Input" dbtype="VarChar" size="50">:PhoneEtc</param>
+            <param direction="Input" dbtype="VarChar" size="50">:EmailID</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="LOADSECURITYUSER" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[Select USER_ID, USER_NAME, PASSWORD, USER_CMF_1, USER_CMF_2, USER_CMF_3, USER_CMF_4, USER_CMF_5, USER_CMF_6
+         , USER_CMF_7, USER_CMF_8, USER_CMF_9, USER_CMF_10, SEC_GRP_ID, PHONE_OFFICE, PHONE_MOBILE, PHONE_HOME, PHONE_OTHER, EMAIL_ID 
+ From TQC_USER  ]]></commandtext>
+    </query>
+    <query statement="Select" queryid="COUNTBYDEPARTMENT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT USER_CMF_1 AS USER_CMF_1, count(*) as CNT
+  FROM TQC_USER 
+  where USER_CMF_1 is not null
+ GROUP BY USER_CMF_1 
+order by USER_CMF_1
+]]></commandtext>
+    </query>
+    <query statement="Select" queryid="LOADJOINUSERNAME2" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT USER_CMF_1 AS USER_CMF_1, USER_NAME, USER_ID
+   FROM TQC_USER
+  WHERE USER_CMF_1 is not null
+order by USER_NAME ]]></commandtext>
+    </query>
+    <query statement="Delete" queryid="DELETEUSER" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[ DELETE FROM TQC_USER where USER_ID=:strUserID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:strUserID</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="INSERTUSER" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[Insert into TQC_USER
+(USER_ID, USER_NAME, PASSWORD, PHONE_OFFICE,  PHONE_MOBILE, PHONE_HOME, PHONE_OTHER, EMAIL_ID, USER_CMF_1 ) 
+values(:strUserID,  :strUserName, :strPass, :strPnOffice, :strPnMobile, :strPnHome, :strPnOther, :strEmail, :strGrp)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:strUserID</param>
+            <param direction="Input" dbtype="VarChar" size="40">:strUserName</param>
+            <param direction="Input" dbtype="VarChar" size="40">:strPass</param>
+            <param direction="Input" dbtype="VarChar" size="40">:strPnOffice</param>
+            <param direction="Input" dbtype="VarChar" size="40">:strPnMobile</param>
+            <param direction="Input" dbtype="VarChar" size="40">:strPnHome</param>
+            <param direction="Input" dbtype="VarChar" size="40">:strPnOther</param>
+            <param direction="Input" dbtype="VarChar" size="40">:strEmail</param>
+            <param direction="Input" dbtype="VarChar" size="40">:strGrp</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="CHECKID" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT COUNT(*) FROM TQC_USER WHERE USER_ID=:strID ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="20" value="aaaaa">:strID</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="CHECKACCOUNT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQC_USER
+ WHERE USER_ID = :UserID
+       AND PASSWORD = :Passwd]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:UserID</param>
+            <param direction="Input" dbtype="VarChar" size="128">:Passwd</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="UPDATEUSER" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[Update TQC_USER 
+ Set ??
+ WHERE USER_ID = :strUser]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:strUser</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_USER_INFO" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQC_USER 
+SET
+??
+WHERE USER_ID = :user_id]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:user_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_EMAIL_USER" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT EMAIL_ID
+FROM TQC_USER
+WHERE USER_ID = :user_id]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:user_id</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="INSERTMULTIUSER" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2014-01-22 18:29:58
+Insert into TQC_USER
+(USER_ID, USER_NAME, PASSWORD, PHONE_OFFICE,  PHONE_MOBILE, PHONE_HOME, PHONE_OTHER, EMAIL_ID, USER_CMF_1 ) 
+values(:strUserID,  :strUserName, :strPass, :strPnOffice, :strPnMobile, :strPnHome, :strPnOther, :strEmail, :strGrp)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:strUserID</param>
+            <param direction="Input" dbtype="VarChar" size="40">:strUserName</param>
+            <param direction="Input" dbtype="VarChar" size="40">:strPass</param>
+            <param direction="Input" dbtype="VarChar" size="40">:strPnOffice</param>
+            <param direction="Input" dbtype="VarChar" size="40">:strPnMobile</param>
+            <param direction="Input" dbtype="VarChar" size="40">:strPnHome</param>
+            <param direction="Input" dbtype="VarChar" size="40">:strPnOther</param>
+            <param direction="Input" dbtype="VarChar" size="40">:strEmail</param>
+            <param direction="Input" dbtype="VarChar" size="40">:strGrp</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_ALL_USER" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2014-01-22 18:37:20
+DELETE FROM TQC_USER]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_USER_SEC_GROUP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2014-01-22 19:05:49
+SELECT B.SEC_GRP_ID, A.*
+FROM TQC_USER A, TQC_GROUP_USER B
+WHERE 1=1 
+AND A.USER_ID = B.USER_ID
+ORDER BY B.SEC_GRP_ID , A.USER_ID]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_EMAIL_USERS" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2014-01-23 13:31:20
+SELECT USER_ID, USER_NAME, EMAIL_ID FROM TQC_USER
+ WHERE 1=1
+ AND USER_ID IN (??)
+ AND EMAIL_ID IS NOT NULL]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_USER_LIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2014-01-24 09:04:07
+SELECT A.USER_ID, A.USER_NAME, A.EMAIL_ID, B.SEC_GRP_ID, C.SEC_GRP_DESC
+FROM TQC_USER A, TQC_GROUP_USER B, TQC_SECURITY_GROUP C
+WHERE 1=1 
+AND A.USER_ID  = B.USER_ID
+AND B.SEC_GRP_ID = C.SEC_GRP_ID
+AND C.SEC_GRP_DESC = DECODE(:grp_name, 'ALL', C.SEC_GRP_DESC, NULL, C.SEC_GRP_DESC, :grp_name)
+AND A.EMAIL_ID is not null
+ORDER BY A.USER_ID ASC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:grp_name</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_USER_DT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2014-01-27 10:14:31
+UPDATE TQC_USER
+SET 
+??
+WHERE 1 = 1
+AND USER_ID = :user_id]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:user_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_USER_NAME" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-09-08 19:36:24
+SELECT USER_NAME
+FROM TQC_USER
+WHERE USER_ID = :USER_ID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="USER_ID">:USER_ID</param>
+        </parameters>
+    </query>
+</queryxml>

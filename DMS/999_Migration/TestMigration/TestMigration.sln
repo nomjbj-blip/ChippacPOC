@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestDataMigration", "..\TestDataMigration\TestDataMigration.csproj", "{8713A460-EF42-4F4C-94DC-705D0FD7AC03}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestDataMigrationRemotingService", "..\TestDataMigrationRemotingService\TestDataMigrationRemotingService.csproj", "{D2A02AF8-53DB-450D-8CB8-76F911D8D391}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8713A460-EF42-4F4C-94DC-705D0FD7AC03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8713A460-EF42-4F4C-94DC-705D0FD7AC03}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8713A460-EF42-4F4C-94DC-705D0FD7AC03}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8713A460-EF42-4F4C-94DC-705D0FD7AC03}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D2A02AF8-53DB-450D-8CB8-76F911D8D391}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D2A02AF8-53DB-450D-8CB8-76F911D8D391}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D2A02AF8-53DB-450D-8CB8-76F911D8D391}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D2A02AF8-53DB-450D-8CB8-76F911D8D391}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

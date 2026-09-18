@@ -1,0 +1,338 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="TPSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Insert" queryid="EXECUTE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[??]]></commandtext>
+    </query>
+    <query statement="Delete" queryid="DELETE_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-07-12 19:12:59
+DELETE FROM
+??
+WHERE WAFER_SEQ = :WAFER_SEQ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="WAFER_SEQ">:WAFER_SEQ</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_RAW_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-07-17 11:25:23
+SELECT 'BIN'||BIN BIN, COUNT(*) CNT
+  FROM ??
+ WHERE WAFER_SEQ = :waferseq
+       AND BIN < 100
+ GROUP BY BIN
+ ORDER BY BIN]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="waferseq">:waferseq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_BIN_XY_DATA_SINGLE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-07-31 16:44:39
+SELECT DIE_NUM, 
+       ((X - :minX) + 1) AS "X", 
+       ((Y  - :minY) + 1) AS "Y", 
+       DECODE(T2.BIN, NULL, T1.BIN, T2.BIN) AS "BIN", 
+       DECODE(T2.BIN_NAME, NULL, NULL, T2.BIN_NAME) AS "BIN_NAME", 
+       DECODE(T2.HIGH_GEC, NULL, NULL, T2.HIGH_GEC) AS "HIGH_GEC"
+  FROM ?? T1, TQP_BINDESC T2
+ WHERE 1=1
+       AND T1.BIN = T2.BIN(+)
+       AND T1.WAFER_SEQ = :waferseq
+       AND T2.PROGRAM(+) = :program
+ ORDER BY DIE_NUM]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="waferseq">:waferseq</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="program">:program</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="minX">:minX</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="minY">:minY</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_BIN_XY_DATA_MULTI" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-07-31 16:48:24
+SELECT DIE_NUM, 
+       X, Y
+       DECODE(T2.BIN, NULL, T1.BIN, T2.BIN) AS "BIN",
+       DECODE(T2.BIN_NAME, NULL, NULL, T2.BIN_NAME) AS "BIN_NAME", 
+       DECODE(T2.HIGH_GEC, NULL, NULL, T2.HIGH_GEC) AS "HIGH_GEC"
+  FROM (
+        SELECT T1.DIE_NUM,
+               BIN,
+               ((X - :minX) + 1) AS "X", 
+               ((Y - :minY) + 1) AS "Y", 
+          FROM ?? T1, ?? T2
+         WHERE T1.WAFER_SEQ = T2.WAFER_SEQ
+               AND T1.DIE_NUM = T2.DIE_NUM
+               AND T1.WAFER_SEQ = :waferseq
+       ) T1, 
+       TQP_BINDESC T2
+ WHERE 1=1 
+       AND T1.BIN = T2.BIN(+)
+       AND T2.PROGRAM(+) = :program
+ ORDER BY T1.DIE_NUM]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="waferseq">:waferseq</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="program">:program</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="minX">:minX</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="minY">:minY</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_PCM_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-08-13 19:36:24
+SELECT TO_CHAR(T1.START_TIME, 'YYYY-MM-DD HH24:MI') AS "LOT_START_TIME",
+       TO_CHAR(T1.END_TIME, 'YYYY-MM-DD HH24:MI') AS "LOT_END_TIME",
+       TO_CHAR(T2.START_TIME, 'YYYY-MM-DD HH24:MI') AS "WAFER_START_TIME",
+       TO_CHAR(T2.END_TIME, 'YYYY-MM-DD HH24:MI') AS "WAFER_END_TIME",
+       T1.PROGRAM,
+       T1.LOT_ID,
+       T2.TESTER,
+       T2.PROBE_CARD,
+       T2.OPERATOR,
+       A.WAFER_SEQ,
+       T2.WAFER_ID,
+       A.DIE_NUM,
+       A.DIEPROBE_CNT,
+       ??
+  FROM TQP_LOT T1, TQP_WAFER T2, ??
+ WHERE     1 = 1
+       AND T1.LOT_SEQ = T2.LOT_SEQ
+       AND T1.FACTORY = T2.FACTORY
+       AND T2.WAFER_SEQ = A.WAFER_SEQ
+       ??
+       AND T1.FACTORY = :factory
+       AND T1.LOT_SEQ IN (??)
+       AND T2.WAFER_SEQ IN (??)
+ ORDER BY LOT_ID, WAFER_ID, DIE_NUM]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="factory">:factory</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_PCM_STATISTICS" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-08-13 19:37:17
+SELECT T1.LOT_ID,
+       T1.PROGRAM,
+       T2.WAFER_ID,
+       T1.START_TIME AS "LOT_START_TIME",
+       T1.END_TIME AS "LOT_END_TIME",
+       T2.START_TIME AS "WAFER_START_TIME",
+       T2.END_TIME AS "WAFER_END_TIME",
+       T2.TESTER,
+       T2.PROBE_CARD,
+       MAX (T3.LSL) AS "LSL",
+       MAX (T3.TARGET) AS "TARGET",
+       MAX (T3.USL) AS "USL",
+       MAX (T3.LCL) AS "LCL",
+       MAX (T3.UCL) AS "UCL",
+       COUNT (??) AS "CNT",
+       ROUND(MIN (??), 15) AS "MININUM",
+       ROUND(PERCENTILE_DISC (.25) WITHIN GROUP (ORDER BY ??), 15) Q1,
+       ROUND(MEDIAN (??), 15) AS "MEDIAN",
+       ROUND(PERCENTILE_DISC (.75) WITHIN GROUP (ORDER BY ??), 15) Q3,
+       ROUND(MAX (??), 15) AS "MAXINUM",
+       ROUND(AVG (??), 15) AS "AVERAGE",
+       ROUND(STDDEV (??), 15) AS "STDDEV"
+  FROM TQP_LOT T1, TQP_WAFER T2, TQP_PARASPEC T3, ?? T4
+ WHERE     1 = 1
+   AND T1.LOT_SEQ = T2.LOT_SEQ
+   AND T1.FACTORY = T2.FACTORY
+   AND T2.WAFER_SEQ = T4.WAFER_SEQ
+   -- AND T1.PROGRAM = T3.PROGRAM
+   AND t2.PROGRAM = T3.PROGRAM
+   AND t2.PROGRAM_REV = T3.PROGRAM_REV
+   AND T1.FACTORY = :factory
+   AND T3.PARAM_NAME = :param_name
+   AND T1.LOT_SEQ IN (??)
+   AND T2.WAFER_SEQ IN (??)
+   AND DECODE(T3.TEST_LOW, NULL, '-10000000', T3.TEST_LOW) <= ??
+   AND DECODE(T3.TEST_HIGH, NULL, '10000000', T3.TEST_HIGH) >= ??
+ GROUP BY T1.LOT_ID,
+       T1.PROGRAM,
+       T2.WAFER_ID,
+       T1.START_TIME,
+       T1.END_TIME,
+       T2.START_TIME,
+       T2.END_TIME,
+       T2.TESTER,
+       T2.PROBE_CARD
+ ORDER BY LOT_ID, WAFER_ID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="factory">:factory</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="param_name">:param_name</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_TEST_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-08-20 18:30:03
+SELECT T1.LOT_ID,
+       T1.PROGRAM,
+       T2.WAFER_ID,
+       T1.START_TIME AS "LOT_START_TIME",
+       T1.END_TIME AS "LOT_END_TIME",
+       T2.START_TIME AS "WAFER_START_TIME",
+       T2.END_TIME AS "WAFER_END_TIME",
+       T2.TESTER,
+       T2.PROBE_CARD,
+       T2.YIELD,
+       ??
+  FROM TQP_LOT T1, TQP_WAFER_SUM T2, ??
+ WHERE     1 = 1
+       AND T1.LOT_SEQ = T2.LOT_SEQ
+       AND T1.FACTORY = T2.FACILITY
+       AND ??
+       AND T1.FACTORY = :factory
+       AND T1.LOT_SEQ IN (??)
+       AND T2.WAFER_SEQ IN (??)
+ ORDER BY 1, 3, 12
+       ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="factory">:factory</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_TEST_STATISTICS" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-08-20 18:30:04
+  SELECT T1.LOT_ID,
+         T1.PROGRAM,
+         T2.WAFER_ID,
+         T1.START_TIME AS "LOT_START_TIME",
+         T1.END_TIME AS "LOT_END_TIME",
+         T2.START_TIME AS "WAFER_START_TIME",
+         T2.END_TIME AS "WAFER_END_TIME",
+         T2.TESTER,
+         T2.PROBE_CARD,
+         AVG(T2.YIELD) AS "YIELD",
+         MAX (T3.LSL) AS "LSL",
+         MAX (T3.TARGET) AS "TARGET",
+         MAX (T3.USL) AS "USL",
+         MAX (T3.LCL) AS "LCL",
+         MAX (T3.UCL) AS "UCL",
+         COUNT(??) AS "CNT",
+         ROUND(MIN (??), 15) AS "MININUM",
+         ROUND(PERCENTILE_DISC (.25) WITHIN GROUP (ORDER BY ??), 15) Q1,
+         ROUND(MEDIAN (??), 15) AS "MEDIAN",
+         ROUND(PERCENTILE_DISC (.75) WITHIN GROUP (ORDER BY ??), 15) Q3,
+         ROUND(MAX (??), 15) AS "MAXINUM", 
+         ROUND(AVG (??), 15) AS "AVERAGE",
+         ROUND(STDDEV (??), 15) AS "STDDEV"
+    FROM TQP_LOT T1, TQP_WAFER_SUM T2, TQP_PARASPEC T3, ?? T4
+   WHERE     1 = 1
+     AND T1.LOT_SEQ = T2.LOT_SEQ
+     AND T1.FACTORY = T2.FACILITY
+     AND T2.WAFER_SEQ = T4.WAFER_SEQ
+     -- AND T1.PROGRAM = T3.PROGRAM
+     AND t2.PROGRAM = T3.PROGRAM
+     AND T1.FACTORY = :factory
+     AND T3.PARAM_NAME = :paramname
+     AND T1.LOT_SEQ IN (??)
+     AND T2.WAFER_SEQ IN (??)
+     AND DECODE(T3.TEST_LOW, NULL, '-10000000', T3.TEST_LOW) <= ??
+     AND DECODE(T3.TEST_HIGH, NULL, '10000000', T3.TEST_HIGH) >= ??
+GROUP BY T1.LOT_ID,
+         T1.PROGRAM,
+         T2.WAFER_ID,
+         T1.START_TIME,
+         T1.END_TIME,
+         T2.START_TIME,
+         T2.END_TIME,
+         T2.TESTER,
+         T2.PROBE_CARD
+ORDER BY T2.WAFER_ID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="factory">:factory</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="paramname">:paramname</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_BIN_XY_MINMAX_SINGLE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-08-24 11:23:23
+SELECT MIN(X) MIN_X, MAX(X) MAX_X, MIN(Y) MIN_Y, MAX(Y) MAX_Y
+  FROM ??
+ WHERE 1=1
+   AND WAFER_SEQ = :waferseq
+ ORDER BY DIE_NUM]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="waferseq">:waferseq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_BIN_XY_MINMAX_MULTI" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-08-24 11:31:16
+SELECT MIN(X) MIN_X, MAX(X) MAX_X, MIN(Y) MIN_Y, MAX(Y) MAX_Y
+  FROM ?? T1, ?? T2
+ WHERE T1.WAFER_SEQ = T2.WAFER_SEQ
+   AND T1.DIE_NUM = T2.DIE_NUM
+   AND T1.WAFER_SEQ = :waferseq
+ ORDER BY T1.DIE_NUM]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="waferseq">:waferseq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ALL_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-09-03 14:29:24
+-- RAW DATA
+SELECT NULL CHECKBOX, W.WAFER_ID, A.DIE_NUM "NUM",
+    A.WAFER_SEQ, A.DIE_NUM, X, Y, ??
+FROM
+TQP_WAFER W,
+??
+--TD_P_TL13_5P A,
+--TD_P_TL13_5PA B
+WHERE W.WAFER_SEQ = A.WAFER_SEQ
+??
+--AND A.WAFER_SEQ = B.WAFER_SEQ(+) AND A.DIE_NUM = B.DIE_NUM(+)
+AND A.WAFER_SEQ IN (??)
+ORDER BY A.WAFER_SEQ, A.DIE_NUM]]></commandtext>
+    </query>
+    <query statement="Delete" queryid="DELETE_DATA_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[DELETE FROM
+??
+WHERE WAFER_SEQ IN (
+??
+)]]></commandtext>
+    </query>
+    <query statement="Select" queryid="EXISTS_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT 1
+FROM ??
+WHERE ROWNUM = 1]]></commandtext>
+    </query>
+    <query statement="Delete" queryid="DROP_VIEW" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[DROP VIEW TPSMGR.??]]></commandtext>
+    </query>
+    <query statement="Delete" queryid="DROP_TABLE_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[ALTER TABLE TPSMGR.??
+DROP PRIMARY KEY CASCADE
+]]></commandtext>
+    </query>
+    <query statement="Delete" queryid="DROP_TABLE_02" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[DROP TABLE TPSMGR.?? CASCADE CONSTRAINTS]]></commandtext>
+    </query>
+    <query statement="Select" queryid="GET_TEST_PARAMETER" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-10-17 21:40:47
+SELECT ??
+  FROM ??
+ WHERE WAFER_SEQ IN (??)
+   AND DIE_NUM < 100]]></commandtext>
+    </query>
+    <query statement="Select" queryid="GET_TEST_RAWDATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-10-18 09:15:39
+SELECT *
+  FROM ??
+ WHERE     1 = 1
+       AND WAFER_SEQ IN (??)]]></commandtext>
+    </query>
+    <query statement="Select" queryid="EXISTS_TABLE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT *
+  FROM ALL_TABLES
+ WHERE 1 = 1 
+ AND TABLE_NAME = :tb]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="tb">:tb</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="EXISTS_VIEW" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[     SELECT *
+  FROM USER_VIEWS
+ WHERE 1 = 1 
+ AND VIEW_NAME = :vi
+ ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="vi">:vi</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_DYNAMIC" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[??]]></commandtext>
+    </query>
+</queryxml>

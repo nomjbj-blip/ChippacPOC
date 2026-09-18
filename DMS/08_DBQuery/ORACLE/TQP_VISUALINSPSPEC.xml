@@ -1,0 +1,113 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="BUMPFA" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Select" queryid="SELECT_VISUALINSPSPEC_LIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT INSPTYPE FROM TQP_VISUALINSPSPEC]]></commandtext>
+    </query>
+    <query statement="Insert" queryid="CREATE_VISUALINSPSPECTYPE" commandtype="Text" description="새로운 TYPE의 VISUAL INSP 255개를 생성한다." commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_VISUALINSPSPEC VALUES(:insptype, :bin_code, :bin_name, :color, SYSDATE, SYSDATE , :description, :keymap )]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="20">:insptype</param>
+            <param direction="Input" dbtype="Number" size="3">:bin_code</param>
+            <param direction="Input" dbtype="VarChar" size="20">:bin_name</param>
+            <param direction="Input" dbtype="VarChar" size="9">:color</param>
+            <param direction="Input" dbtype="VarChar" size="100">:description</param>
+            <param direction="Input" dbtype="VarChar" size="100">:keymap</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_SEPC_OF_TYPE" commandtype="Text" description="지정한 Type의 Spec 255개를 Return합니다." commandtimeout="60">
+        <commandtext><![CDATA[SELECT BIN,BIN_NAME,DESCRIPTION,COLOR,KEYMAP FROM TQP_VISUALINSPSPEC WHERE INSPTYPE = :insptype]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="20">:insptype</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_INSPTYPE" commandtype="Text" description="INSPTYPE 에 해당하는 255개의 SPEC을 삭제합니다." commandtimeout="60">
+        <commandtext><![CDATA[DELETE FROM TQP_VISUALINSPSPEC WHERE INSPTYPE = :insptype]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="20">:insptype</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_SEPC" commandtype="Text" description="INSPTYPE에서 Update된 Spec을 저장합니다." commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_VISUALINSPSPEC SET EDIT_DATE = SYSDATE, BIN_NAME=:bin_name,DESCRIPTION= :description,COLOR= :color,KEYMAP=:keymap
+WHERE INSPTYPE= :insptype
+AND BIN= :bin_code]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="20">:bin_name</param>
+            <param direction="Input" dbtype="VarChar" size="100">:description</param>
+            <param direction="Input" dbtype="VarChar" size="9">:color</param>
+            <param direction="Input" dbtype="VarChar" size="20">:insptype</param>
+            <param direction="Input" dbtype="Number" size="3">:bin_code</param>
+            <param direction="Input" dbtype="VarChar" size="10">:keymap</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="__DYNAMIC" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[select ?? from ??]]></commandtext>
+    </query>
+    <query statement="Select" queryid="GET_SPECLIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQP_VISUALINSPSPEC
+WHERE INSPTYPE = :insptype
+AND BIN_NAME <> 'NOTUSE'
+ORDER BY INSPTYPE,BIN]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:insptype</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_EDSBINDESC" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQP_BINDESC
+WHERE PROGRAM = :program]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Varchar" size="30">:program</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_RAWDATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE ??
+SET VISUALINSP = :visualinsp
+WHERE 1=1
+AND WAFER_SEQ = :wafer_seq
+AND X = :x
+AND Y = :y]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:visualinsp</param>
+            <param direction="Input" dbtype="Number" size="0">:wafer_seq</param>
+            <param direction="Input" dbtype="Number" size="0">:x</param>
+            <param direction="Input" dbtype="Number" size="0">:y</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_RETURN_RAWDATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE ??
+SET VISUALINSP = '0'
+WHERE WAFER_SEQ = :wafer_seq
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:wafer_seq</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_RETURN_RAWDATA_DMS" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQD_SCAN_SAMPLE
+SET VISUALINSP = '0'
+WHERE STEP_SEQ = :STEP_SEQ
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:STEP_SEQ</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_RAWDATA_DMS" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQD_SCAN_SAMPLE
+SET VISUALINSP = :visualinsp
+WHERE 1=1
+AND INDEX_X  = (SELECT MAX(INDEX_X) MAX_X 
+                            FROM   TQD_SCAN_SAMPLE 
+                            WHERE 1=1
+                            AND STEP_SEQ = :step_seq)
+                             + 1 - ??
+AND INDEX_Y  = (SELECT MAX(INDEX_Y) MAX_Y 
+                            FROM   TQD_SCAN_SAMPLE 
+                            WHERE 1=1
+                            AND STEP_SEQ = :step_seq)
+                             + 1 - ??
+AND STEP_SEQ = :step_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="3">:visualinsp</param>
+            <param direction="Input" dbtype="Number" size="9">:step_seq</param>
+        </parameters>
+    </query>
+</queryxml>

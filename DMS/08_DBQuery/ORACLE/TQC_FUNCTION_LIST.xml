@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="QMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Select" queryid="LOADGROUPFUNCTION" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[Select a.func_code, a.FUNC_CODE||'   '||FUNC_NAME "FUNC_NAME" , help_url  
+   from TQC_FUNCTION_LIST a, 
+          (Select func_code 
+            from TQC_GROUP_FUNCTION 
+            where sec_grp_id=:strSelVal) b  
+            where a.func_code=b.func_code
+            ORDER BY func_code ASC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="20" description="Selected Group Code" value="G001">:strSelVal</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="LOADALLFUNCTION" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[Select  * from TQC_FUNCTION_LIST 
+ ORDER BY FUNC_CODE]]></commandtext>
+    </query>
+    <query statement="Select" queryid="LOADOUTFUNCTION" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT FUNC_CODE , FUNC_CODE||'   '||FUNC_NAME "FUNC_NAME" FROM TQC_FUNCTION_LIST
+        WHERE FUNC_CODE NOT IN (
+                SELECT FUNC_CODE
+        FROM TQC_GROUP_FUNCTION
+        WHERE SEC_GRP_ID = :strSelVal)
+       ORDER BY func_code ASC        
+      ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="20" description="Selected Group Code" value="G001">:strSelVal</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="CHECKFUNCTIONCODE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQC_FUNCTION_LIST WHERE FUNC_CODE = :strValue]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="20" description="Check Function Code" value="F0101">:strValue</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="CHECKFUNCTIONNAME" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQC_FUNCTION_LIST WHERE FUNC_NAME = :strValue]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="50" description="Check Function Name" value="testByAndyKuo">:strValue</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="INSERTFUNCTION" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[Insert into TQC_FUNCTION_LIST
+(FUNC_CODE,FUNC_NAME,HELP_URL ) 
+values(:strFuncCode,  :strFuncName, :strHelpUrl)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="20" description="Insert Function Code">strFuncCode</param>
+            <param direction="Input" dbtype="VarChar" size="50" description="Insert Function Name">strFuncName</param>
+            <param direction="Input" dbtype="VarChar" size="50" description="Insert Help Url">strHelpUrl</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATEFUNCTION" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQC_FUNCTION_LIST SET
+FUNC_CODE = :strFuncCode  
+  , FUNC_NAME = :strFuncName 
+  , HELP_URL = :strHelpUrl 
+WHERE FUNC_CODE = :strOldFuncCode ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:strFuncCode</param>
+            <param direction="Input" dbtype="VarChar" size="40">:strFuncName</param>
+            <param direction="Input" dbtype="VarChar" size="40">:strHelpUrl</param>
+            <param direction="Input" dbtype="VarChar" size="40">:strOldFuncCode</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="CHECKGROUPFUNCTION" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[Select * from TQC_GROUP_FUNCTION where FUNC_CODE =:strValue]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="20" description="Select Function Code" value="F0401">:strValue</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETEGROUPFUNCTION" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[Delete TQC_GROUP_FUNCTION where FUNC_CODE =:strValue]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:strValue</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETEFUNCTION" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[Delete TQC_FUNCTION_LIST where FUNC_CODE =:strValue]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:strValue</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_GROUP_FUNCTION" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQC_GROUP_FUNCTION SET
+FUNC_CODE = :strFuncCode  
+WHERE FUNC_CODE = :strOldFuncCode ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:strFuncCode</param>
+            <param direction="Input" dbtype="VarChar" size="40">:strOldFuncCode</param>
+        </parameters>
+    </query>
+</queryxml>

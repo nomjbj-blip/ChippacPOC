@@ -1,0 +1,959 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="TPSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Select" queryid="GET_AREALIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT TESTAREA FROM TQP_PROGRAM WHERE 1=1
+ORDER BY TESTAREA]]></commandtext>
+    </query>
+    <query statement="Insert" queryid="CREATE_PROGRAM" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_PROGRAM VALUES(
+:program,
+:version,
+:product,
+:testarea,
+SYSDATE,
+SYSDATE,
+:target_yield,
+'T'
+)
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0" value="a">:program</param>
+            <param direction="Input" dbtype="VarChar" size="0">:version</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="a">:product</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="a">:testarea</param>
+            <param direction="Input" dbtype="Number" size="0">:target_yield</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_PROGRAMLIST" commandtype="Text" description="Program List를 가져온다." commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT PROGRAM 
+FROM TQP_PROGRAM 
+WHERE 1=1
+      AND TESTAREA LIKE DECODE(:testarea, NULL, '%', :testarea)
+      AND DEVICE LIKE DECODE(:device, NULL, '%', :device)
+ORDER BY PROGRAM]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="25" value="a">:testarea</param>
+            <param direction="Input" dbtype="VarChar" size="20">:device</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_PROGRAMINFO" commandtype="Text" description="주어진 Program의 정보를 가져옵니다." commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQP_PROGRAM WHERE PROGRAM = :program]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="25" description="Program Name 넣는곳" value="TSTPGMDDD">:program</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_PROGRAM" commandtype="Text" description="PROGRAM을 삭제합니다." commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_PROGRAM SET 
+TESTAREA=:testarea,
+PRODUCT=:product,
+TARGET_YIELD=:target_yield,
+LASTMODIFY=SYSDATE,
+VERSION = :version
+WHERE PROGRAM = :program]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:testarea</param>
+            <param direction="Input" dbtype="VarChar" size="0">:product</param>
+            <param direction="Input" dbtype="Number" size="0">:target_yield</param>
+            <param direction="Input" dbtype="VarChar" size="0">:program</param>
+            <param direction="Input" dbtype="VarChar" size="0">:version</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_PROGRAM" commandtype="Text" description="주어진 Program을 삭제합니다." commandtimeout="60">
+        <commandtext><![CDATA[DELETE FROM TQP_PROGRAM WHERE PROGRAM = :program]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:program</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_USEFLAG" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_PROGRAM SET USE_FLAG=:use_flag
+WHERE PROGRAM = :program]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Char" size="0">:use_flag</param>
+            <param direction="Input" dbtype="VarChar" size="0">:program</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="CREATE_PROGRAM_TABLE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[CREATE TABLE ??(
+WAFER_SEQ    NUMBER(8)    NOT NULL,
+DIEID        INTEGER    NOT NULL,
+X        INTEGER    NOT NULL,
+Y        INTEGER    NOT NULL,
+BIN        INTEGER    NOT NULL,
+HBIN        INTEGER    NOT NULL,
+CHARBIN    VarChar(4),
+SITE        INTEGER,
+VISUALINSP    INTEGER,
+AVI        INTEGER
+??
+)
+]]></commandtext>
+    </query>
+    <query statement="Select" queryid="DYNAMIC_QUERY" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQP_PROGRAM
+WHERE PROGRAM IN ( ?? )]]></commandtext>
+    </query>
+    <query statement="Delete" queryid="DROP_PROGRAM_TABLE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[DROP TABLE ??]]></commandtext>
+    </query>
+    <query statement="Insert" queryid="CREATE_PROGRAM_SITE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_PROGRAM VALUES(
+:program,
+:version,
+:product,
+:testarea,
+SYSDATE,
+SYSDATE,
+:target_yield,
+'T',
+:siteCnt
+)
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0" value="a">:program</param>
+            <param direction="Input" dbtype="VarChar" size="0">:version</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="a">:product</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="a">:testarea</param>
+            <param direction="Input" dbtype="Number" size="0">:target_yield</param>
+            <param direction="Input" dbtype="Number" size="0">:siteCnt</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="TABLE_EXIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT COUNT(*) AS CNT FROM USER_TABLES WHERE TABLE_NAME = :tName]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:tName</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="CREATE_PROGRAM_TABLE_PCM" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[CREATE TABLE ??(
+WAFER_SEQ    NUMBER(8)    NOT NULL,
+DIEID        INTEGER    NOT NULL,
+X        INTEGER    NOT NULL,
+Y        INTEGER    NOT NULL
+??
+)
+]]></commandtext>
+    </query>
+    <query statement="Insert" queryid="CREATE_IDX01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[CREATE INDEX IDX_??01 ON ?? (WAFER_SEQ, X, Y)]]></commandtext>
+    </query>
+    <query statement="Insert" queryid="CREATE_IDX02" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[CREATE INDEX IDX_??02 ON ?? (WAFER_SEQ, BIN)]]></commandtext>
+    </query>
+    <query statement="Insert" queryid="CREATE_PCM_IDX01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[CREATE INDEX IDX_??01 ON T_PCM_?? (WAFER_SEQ)]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_PROGRAMINFO2" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQP_PROGRAM
+WHERE PRODUCT=:product
+AND PROGRAM = :program
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:product</param>
+            <param direction="Input" dbtype="VarChar" size="0">:program</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_MAPDATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TD_??
+ WHERE WAFER_SEQ = :waferseq order by die_num asc]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="10" value="30">:waferseq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_MAPDATA_MULTI" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DECODE(A.X,NULL,B.X,A.X) AS X
+,DECODE(A.Y,NULL,B.Y,A.Y) AS Y
+,DECODE(A.COUNT,NULL,B.COUNT,A.COUNT) AS COUNT 
+FROM
+    (
+    SELECT X,Y,COUNT(*) AS COUNT 
+    FROM TD_??
+    WHERE WAFER_SEQ IN (??)
+    AND BIN IN (??)
+    GROUP BY X,Y
+    ) A,
+    (
+    SELECT X,Y,0 AS COUNT
+    FROM TD_??
+    WHERE WAFER_SEQ IN (??)
+    ) B
+WHERE A.X(+) = B.X
+AND A.Y(+) = B.Y]]></commandtext>
+    </query>
+    <query statement="Select" queryid="GET_PCM_MAPDATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT WAFER_SEQ,DIEID,X,Y,?? AS PCMVALUE,0 AS BIN FROM T_PCM_??
+WHERE WAFER_SEQ = :waferseq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="10">:waferseq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="UPDATE_VIFAIL" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE ?? SET VISUALINSP=:vifail
+WHERE WAFER_SEQ = :wafer_seq
+AND X = :x
+AND Y=:y]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="10">:vifail</param>
+            <param direction="Input" dbtype="Number" size="10">:wafer_seq</param>
+            <param direction="Input" dbtype="Number" size="4">:x</param>
+            <param direction="Input" dbtype="Number" size="4">:y</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_AREA" commandtype="Text" description="해당 Program에 TestArea를 가져온다." commandtimeout="60">
+        <commandtext><![CDATA[SELECT TESTAREA FROM TQP_PROGRAM 
+WHERE UPPER(PROGRAM) = UPPER(:program)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30" value="aa">program</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_PROGRAM" commandtype="Text" description="Program을 가져온다" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT PROGRAM FROM TQP_PROGRAM WHERE PRODUCT = :product
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">product</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_BIN_DISTRIBUTION" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DECODE(DECODE(A.BIN,NULL,B.BIN,A.BIN), NULL, 0, DECODE(A.BIN,NULL,B.BIN,A.BIN)) AS BIN
+,DECODE(A.BIN_NAME,NULL,'BIN' || B.BIN,A.BIN_NAME) AS BIN_NAME,CNT
+,NVL(COLOR, '#FFFFFF') AS COLOR
+,UPPER_LIMIT_CNT
+,LOWER_LIMIT_CNT 
+FROM
+    (SELECT * 
+     FROM TQP_BINDESC 
+     WHERE PROGRAM = :program) A,
+    (SELECT BIN,COUNT(*) AS CNT 
+    FROM TD_??
+     WHERE WAFER_SEQ = :wafer_seq
+     GROUP BY BIN) B
+WHERE A.BIN(+) = B.BIN
+ORDER BY BIN]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30" value="K39VAGSL13_PT1">:program</param>
+            <param direction="Input" dbtype="VarChar" size="10" value="49903">:wafer_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_BIN_DISTRIBUTION_MULTI_WAFER" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DECODE(A.BIN,NULL,B.BIN,A.BIN) AS BIN
+, DECODE(A.CHAR_BIN,NULL,'EMPTY',A.CHAR_BIN) AS CHAR_BIN
+, DECODE(HIGH_GEC,NULL,'EMPTY', HIGH_GEC) AS HIGH_GEC
+, DECODE(A.BIN_NAME,NULL,'BIN' || B.BIN,A.BIN_NAME) AS BIN_NAME
+, CNT
+, NVL(COLOR, '#FFFFFF') AS COLOR
+, UPPER_LIMIT_CNT
+, LOWER_LIMIT_CNT 
+FROM
+    (
+        SELECT * 
+        FROM TQP_BINDESC 
+        WHERE PROGRAM = :program
+        ) A,
+    (
+        SELECT BIN,COUNT(*) AS CNT 
+        FROM TD_??
+        WHERE WAFER_SEQ IN (??)
+        GROUP BY BIN) B
+WHERE A.BIN(+) = B.BIN
+ORDER BY BIN]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30" value="K39VAGSL13_PT1">:program</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_BIN_DESC" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQP_BINDESC
+WHERE PROGRAM = :program]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:program</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_RAW_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[DELETE FROM ?? WHERE WAFER_SEQ = :wafer_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:wafer_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_TESTAREA_LIST" commandtype="Text" description="Testarea List를 가져온다." commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT TESTAREA FROM TQP_PROGRAM]]></commandtext>
+    </query>
+    <query statement="Select" queryid="GET_PRODUCT_LIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT PRODUCT FROM TQP_PROGRAM
+WHERE TESTAREA=:testarea]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30" value="MULTIPROBE">:testarea</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_PROGRAM_LIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT PROGRAM FROM TQP_PROGRAM
+WHERE TESTAREA = :testarea
+AND DEVICE = :product]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30" value="MULTIPROBE">:testarea</param>
+            <param direction="Input" dbtype="VarChar" size="30">:product</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_DEFECT_OVERLAY_MAPDATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT WAFER_SEQ, DIEID, X - 25 X, Y - 25 Y, BIN, HBIN, CHARBIN, SITE, VISUALINSP, AVI FROM TD_??
+WHERE WAFER_SEQ = :waferseq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="10">:waferseq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_PARA_MAP_DATA" commandtype="Text" description="parameter map data를 가져온다" commandtimeout="60">
+        <commandtext><![CDATA[SELECT WAFER_SEQ , DIEID, X, Y , CASE WHEN PARABIN > ( TO_NUMBER(:gap) - 1) THEN ( TO_NUMBER(:gap) - 1)
+                                            WHEN PARABIN < 0 THEN 0
+                                            ELSE PARABIN END BIN
+    , "??"
+FROM
+(
+SELECT WAFER_SEQ , DIE_NUM AS DIEID, X, Y, "??" ,ROUND( ("??" - C.MINVALUE)  / ((C.MAXVALUE - C.MINVALUE)/ ( TO_NUMBER(:gap) - 1))  , 0) AS PARABIN
+FROM TD_??
+,(SELECT MAX("??") MAXVALUE ,MIN("??") MINVALUE
+    FROM TD_??,(SELECT LSL,USL FROM TQP_PARASPEC WHERE 1 = 1 
+    AND PROGRAM=:program AND PARAM_NAME='??') S
+    WHERE WAFER_SEQ=:waferSeq
+    AND "??" BETWEEN S.LSL AND S.USL) C
+WHERE WAFER_SEQ=:waferSeq
+)
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Int32" size="0">:waferSeq</param>
+            <param direction="Input" dbtype="Int32" size="0">:gap</param>
+            <param direction="Input" dbtype="VarChar" size="0">:program</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_PARA_MAP_CNT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT BIN, COUNT(BIN) CNT FROM
+(
+    SELECT WAFER_SEQ , DIEID, X, Y , CASE WHEN PARABIN > ( TO_NUMBER(:gap) - 1) THEN ( TO_NUMBER(:gap) - 1)
+                                                WHEN PARABIN < 0 THEN 0
+                                                ELSE PARABIN END BIN
+        , "??"
+    FROM
+    (
+    SELECT WAFER_SEQ , DIE_NUM AS DIEID, X, Y, "??" ,DECODE(C.MAXVALUE - C.MINVALUE, 0, 0,ROUND( ("??" - C.MINVALUE)  / ((C.MAXVALUE - C.MINVALUE)/ ( TO_NUMBER(:gap) - 1))  , 0)) AS PARABIN
+        FROM TD_??
+            ,(
+                SELECT MAX("??") MAXVALUE ,MIN("??") MINVALUE
+                FROM TD_??,
+                (
+                SELECT LSL,USL 
+                    FROM TQP_PARASPEC 
+                    WHERE 1 = 1
+                    AND PROGRAM=:program 
+                    AND PARAM_NAME='??'
+                ) S
+                WHERE WAFER_SEQ=:waferSeq
+                AND "??" BETWEEN S.LSL AND S.USL
+            ) C
+        WHERE WAFER_SEQ=:waferSeq
+    )
+)
+GROUP BY BIN
+ORDER BY BIN
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Int32" size="0">:waferSeq</param>
+            <param direction="Input" dbtype="Int32" size="0">:gap</param>
+            <param direction="Input" dbtype="VarChar" size="0">:program</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_FAIL_MAPDATA_MULTI" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT 
+DECODE(A.X,NULL,B.X,A.X) AS X
+,DECODE(A.Y,NULL,B.Y,A.Y) AS Y
+,DECODE(A.BIN,NULL,B.BIN,A.BIN) AS BIN 
+FROM
+( 
+    SELECT X,Y,min(BIN) as BIN 
+    FROM ?? 
+    WHERE 1=1 
+    AND WAFER_SEQ in (??) 
+    AND BIN > 1 
+    GROUP BY X,Y
+) A,
+
+(
+    SELECT X,Y,1 as BIN 
+    FROM ??
+    WHERE 1=1 
+    AND WAFER_SEQ in (??)
+) B 
+WHERE 1=1
+AND A.X(+) = B.X 
+AND A.Y(+) = B.Y]]></commandtext>
+    </query>
+    <query statement="Select" queryid="GET_CUM_MAPDATA_MULTI" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT X,Y,count(BIN) as CNT FROM TD_??
+ WHERE 1=1 AND WAFER_SEQ in (??) AND BIN in (??) group by x, y
+ ]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_PROGRAMINFO_BY_TESTAREA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * 
+FROM TQP_PROGRAM 
+WHERE 1=1
+AND PROGRAM = :program
+AND TESTAREA = :testarea]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="25" value="621-SETH1102">:program</param>
+            <param direction="Input" dbtype="VarChar" size="25" value="ALL">:testarea</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_PROGRAM_DMS" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_PROGRAM SET 
+TESTAREA=:testarea,
+PRODUCT=:product,
+TARGET_YIELD=:target_yield,
+LASTMODIFY=SYSDATE
+WHERE 1=1
+AND PROGRAM = :program
+AND TESTAREA = :testarea]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:testarea</param>
+            <param direction="Input" dbtype="VarChar" size="0">:product</param>
+            <param direction="Input" dbtype="Number" size="0">:target_yield</param>
+            <param direction="Input" dbtype="VarChar" size="0">:program</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_PROGRAM_BY_TESTAREA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[DELETE 
+FROM TQP_PROGRAM 
+WHERE 1=1
+AND PROGRAM = :program
+AND TESTAREA = :testarea
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:program</param>
+            <param direction="Input" dbtype="VarChar" size="0">:testarea</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="CREATE_PROGRAM_TABLE_AVI" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[CREATE TABLE ??(
+WAFER_SEQ    NUMBER(8)    NOT NULL,
+DIEID        INTEGER    NOT NULL,
+X        INTEGER    NOT NULL,
+Y        INTEGER    NOT NULL,
+VISUALINSP    INTEGER,
+IQC        INTEGER,
+RDL        INTEGER,
+PBO1        INTEGER,
+PBO2        INTEGER,
+UBM        INTEGER,
+BUMP        INTEGER
+)]]></commandtext>
+    </query>
+    <query statement="Insert" queryid="CREATE_AVI_IDX01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[CREATE INDEX IDX_??01 ON T_AVI_?? (WAFER_SEQ, X, Y)]]></commandtext>
+    </query>
+    <query statement="Select" queryid="GET_DEFAULT_PROGAM_LIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2013-09-28 16:35:52
+
+SELECT PROGRAM, PRODUCT
+FROM TQP_PROGRAM 
+WHERE DEFAULT_FLAG = 'Y']]></commandtext>
+    </query>
+    <query statement="Select" queryid="GET_BIN_DISTRIBUTION_BY_ALL" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DECODE(A.BIN,NULL,B.BIN,A.BIN) AS BIN
+, DECODE(A.BIN_NAME,NULL,'BIN' || B.BIN,A.BIN_NAME) AS BIN_NAME
+, CNT
+, NVL(COLOR, '#FFFFFF') AS COLOR
+, UPPER_LIMIT_CNT
+, LOWER_LIMIT_CNT 
+FROM
+    (WITH RT AS (
+    SELECT A.*,
+    --(DECODE(A.CUSTOMER, :customer, 1, 0)
+    (DECODE(A.PRODUCT, :product, 10, 0)
+           + DECODE(A.TESTAREA, :testarea, 20, 0))AS NUM
+           --+ DECODE(A.FORMAT, :format, 30, 0)) AS NUM 
+        FROM TQP_BINDESC A
+        WHERE 1=1
+        --AND A.CUSTOMER IN (' ', :customer)
+        AND A.PRODUCT IN (' ',  :product)
+        AND A.TESTAREA IN (' ', :testarea)
+        --AND A.FORMAT IN (' ', :format)
+        )
+    SELECT * FROM RT
+    WHERE 1=1
+    AND NUM = (SELECT MAX(NUM) FROM RT)
+    ORDER BY BIN) A,
+    (SELECT BIN ,COUNT(*) AS CNT 
+     FROM ??
+     WHERE WAFER_SEQ = :wafer_seq
+     GROUP BY BIN) B
+WHERE A.BIN(+) = B.BIN
+ORDER BY BIN]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:product</param>
+            <param direction="Input" dbtype="VarChar" size="40">:testarea</param>
+            <param direction="Input" dbtype="VarChar" size="10">:wafer_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_BIN_DISTRIBUTION_MULTI_WAFER_BY_ALL" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DECODE(A.BIN,NULL,B.BIN,A.BIN) AS BIN
+, DECODE(A.IN_CHAR_BIN,NULL,'EMPTY',A.IN_CHAR_BIN) AS CHAR_BIN
+, DECODE(HIGH_GEC,NULL,'EMPTY', HIGH_GEC) AS HIGH_GEC
+, DECODE(A.BIN_NAME,NULL,'BIN' || B.BIN,A.BIN_NAME) AS BIN_NAME
+, CNT
+, NVL(COLOR, '#FFFFFF') AS COLOR
+, UPPER_LIMIT_CNT
+, LOWER_LIMIT_CNT 
+FROM
+    (
+        WITH RT AS (
+        SELECT A.*,
+        --(DECODE(A.CUSTOMER, :customer, 1, 0)
+        (DECODE(A.PRODUCT, :product, 10, 0)
+               + DECODE(A.TESTAREA, :testarea, 20, 0)) AS NUM
+               --+ DECODE(A.FORMAT, :format, 30, 0)) AS NUM 
+            FROM TQP_BINDESC A
+            WHERE 1=1
+            --AND A.CUSTOMER IN (' ', :customer)
+            AND A.PRODUCT IN (' ',  :product)
+            AND A.TESTAREA IN (' ', :testarea)
+            --AND A.FORMAT IN (' ', :format)
+            )
+        SELECT * FROM RT
+        WHERE 1=1
+        AND NUM = (SELECT MAX(NUM) FROM RT)
+        ORDER BY BIN) A,
+    (
+        SELECT BIN,COUNT(*) AS CNT 
+        FROM ??
+        WHERE WAFER_SEQ IN (??)
+        GROUP BY BIN) B
+WHERE A.BIN(+) = B.BIN
+ORDER BY BIN]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:product</param>
+            <param direction="Input" dbtype="VarChar" size="40">:testarea</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_BIN_DISTRIBUTION_BY_ALL_BOTH" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DECODE(A.BIN,NULL,B.BIN,A.BIN) AS BIN
+, DECODE(A.IN_CHAR_BIN,NULL,'EMPTY',A.IN_CHAR_BIN) AS CHAR_BIN
+, DECODE(HIGH_GEC,NULL,'EMPTY', HIGH_GEC) AS HIGH_GEC
+, DECODE(A.BIN_NAME,NULL,'BIN' || B.BIN,A.BIN_NAME) AS BIN_NAME
+, CNT
+, NVL(COLOR, '#FFFFFF') AS COLOR
+, UPPER_LIMIT_CNT
+, LOWER_LIMIT_CNT 
+FROM
+    (SELECT BIN, IN_CHAR_BIN, HIGH_GEC, BIN_NAME, COLOR, UPPER_LIMIT_CNT, LOWER_LIMIT_CNT
+     FROM
+         (
+             ??
+         )
+     GROUP BY BIN, IN_CHAR_BIN, HIGH_GEC, BIN_NAME, COLOR, UPPER_LIMIT_CNT, LOWER_LIMIT_CNT
+     ORDER BY BIN
+    ) A,
+    (SELECT BIN,COUNT(*) AS CNT 
+     FROM ??
+     WHERE WAFER_SEQ IN (??)
+     GROUP BY BIN) B
+     WHERE A.BIN(+)= B.BIN
+ORDER BY BIN]]></commandtext>
+    </query>
+    <query statement="Select" queryid="GET_BIN_DISTRIBUTION_FOR_PROBE_VI" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT BIN, NVL(COLOR, '#FFFFFF')
+FROM
+(
+    ??
+)
+ORDER BY BIN]]></commandtext>
+    </query>
+    <query statement="Insert" queryid="CREATE_INCUST_AOI_TABLE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[CREATE TABLE ??(
+WAFER_SEQ    NUMBER(8)    NOT NULL,
+DIEID        INTEGER    NOT NULL,
+X        INTEGER    NOT NULL,
+Y        INTEGER    NOT NULL,
+BIN        INTEGER    NOT NULL,
+CHARBIN    VarChar(4),
+VISUALINSP    INTEGER
+)
+]]></commandtext>
+    </query>
+    <query statement="Insert" queryid="CREATE_PNP_TABLE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[CREATE TABLE ??(
+WAFER_SEQ    NUMBER(8)    NOT NULL,
+DIEID        INTEGER    NOT NULL,
+X        INTEGER    NOT NULL,
+Y        INTEGER    NOT NULL,
+BIN        INTEGER    NOT NULL,
+CHARBIN    VarChar(4),
+REEL_ID     VarChar(100),
+REEL_NO     NUMBER(3),
+REEL_POS    VarChar(10)
+)
+ ]]></commandtext>
+    </query>
+    <query statement="Select" queryid="GET_BIN_DISTRIBUTION_FOR_AVI" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DECODE(A.BIN,NULL,B.BIN,A.BIN) AS BIN
+, DECODE(A.BIN_NAME,NULL,'BIN' || B.BIN,A.BIN_NAME) AS BIN_NAME
+, CNT
+, NVL(COLOR, '#FFFFFF') AS COLOR
+, UPPER_LIMIT_CNT
+, LOWER_LIMIT_CNT 
+FROM
+    (WITH RT AS (
+    SELECT A.*,
+           (DECODE(A.CUSTOMER, :customer, 1, 0)
+           + DECODE(A.PRODUCT, :product, 10, 0)
+           + DECODE(A.TESTAREA, :testarea, 20, 0)
+           + DECODE(A.FORMAT, :format, 30, 0)) AS NUM 
+        FROM TQP_BINDESC A
+        WHERE 1=1
+        AND A.CUSTOMER IN (' ', :customer)
+        AND A.PRODUCT IN (' ',  :product)
+        AND A.TESTAREA IN (' ', :testarea)
+        --AND A.FORMAT IN (' ', :format)
+        )
+    SELECT * FROM RT
+    WHERE 1=1
+    AND NUM = (SELECT MAX(NUM) FROM RT)
+    ORDER BY BIN) A,
+    (SELECT 1 AS BIN, 1 AS CNT FROM DUAL
+    UNION
+    SELECT CLASSNUMBER AS BIN, 1 AS CNT
+    FROM TQD_DEFECT
+    WHERE STEP_SEQ = (SELECT STEP_SEQ
+                        FROM
+                        (
+                            SELECT * 
+                            FROM TQD_INSP_INFO
+                            WHERE LOT_ID = :lot_id
+                            AND WAFER_ID = :wafer_id
+                            AND STEP_ID = :testarea
+                        )
+                        WHERE ROWNUM = 1
+                    )
+    GROUP BY CLASSNUMBER) B
+WHERE A.BIN(+) = B.BIN
+ORDER BY BIN]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:customer</param>
+            <param direction="Input" dbtype="VarChar" size="40">:product</param>
+            <param direction="Input" dbtype="VarChar" size="40">:testarea</param>
+            <param direction="Input" dbtype="VarChar" size="40">:format</param>
+            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:wafer_id</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="CREATE_TEMP_TABLE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2015-03-23 15:22:40
+INSERT INTO ??(WAFER_SEQ,DIEID,X,Y,BIN,HBIN,CHARBIN,VISUALINSP,AVI)
+SELECT WAFER_SEQ,DIEID,X,Y,BIN,HBIN,CHARBIN,VISUALINSP,AVI
+FROM ??]]></commandtext>
+    </query>
+    <query statement="Delete" queryid="DROP_TEMP_TABLE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2015-03-23 15:23:13
+DROP TABLE ??]]></commandtext>
+    </query>
+    <query statement="Insert" queryid="COPY_TEMP_TABLE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2015-03-23 15:23:45
+INSERT INTO ??(WAFER_SEQ,DIEID,X,Y,BIN,HBIN,CHARBIN,VISUALINSP,AVI)
+SELECT WAFER_SEQ,DIEID,X,Y,BIN,HBIN,CHARBIN,VISUALINSP,AVI
+FROM ??]]></commandtext>
+    </query>
+    <query statement="Insert" queryid="COPY_TEMP_TABLE_TO_ITEM" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2015-03-23 15:24:00
+INSERT INTO ??
+SELECT *
+FROM ??]]></commandtext>
+    </query>
+    <query statement="Insert" queryid="SELECT_BINDATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2015-03-23 15:30:59
+SELECT BIN, COUNT(*)  
+FROM ?? 
+WHERE WAFER_SEQ = :wafer_seq  
+GROUP BY BIN]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:wafer_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_BIN_DISTRIBUTION_FOR_PCM" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[  SELECT BIN,
+         NULL AS BIN_NAME,
+         CNT,
+         '#FFFFFF' AS COLOR,
+         NULL AS UPPER_LIMIT_CNT,
+         NULL AS LOWER_LIMIT_CNT
+    FROM (  SELECT NVL (BIN, 0) AS BIN, COUNT (*) AS CNT
+            FROM ??
+             GROUP BY BIN) A
+WHERE 1 = 1 
+ORDER BY BIN]]></commandtext>
+    </query>
+    <query statement="Select" queryid="GET_MAP_TABLES" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT ROWNUM AS RN, TQP_DATA_TABLES.*
+  FROM TQP_DATA_TABLES
+  WHERE 1 = 1 AND PROGRAM = :pgm]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:pgm</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_MAPDATA_PCM" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM 
+  ??
+  order by A.die_num asc]]></commandtext>
+    </query>
+    <query statement="Select" queryid="GET_DRAW_TEST_MAP_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT T1.WAFER_ID,
+       A.WAFER_SEQ,
+       A.DIE_NUM,
+       A.DIEPROBE_CNT,
+       X,
+       Y,
+       NVL(BIN, 0) AS BIN 
+       ??
+  FROM TQP_WAFER T1,
+  ??
+ ORDER BY T1.WAFER_ID, A.DIE_NUM ASC]]></commandtext>
+    </query>
+    <query statement="Select" queryid="GET_BIN_SUMMARY" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[  SELECT A.BIN,
+         NVL(B.BIN_NAME, A.BIN) AS BIN_NAME,
+         A.CNT,
+         NVL(B.COLOR, '#FFFFFF') AS COLOR,
+         B.UPPER_LIMIT_CNT AS UPPER_LIMIT_CNT,
+         B.LOWER_LIMIT_CNT AS LOWER_LIMIT_CNT
+    FROM (  SELECT NVL (BIN, 0) AS BIN, COUNT (*) AS CNT
+              FROM TQP_WAFER T1, ??
+             GROUP BY BIN) A,
+            (SELECT * FROM TQP_BINDESC WHERE  PROGRAM = :pgm) B
+WHERE 1 = 1 
+AND A.BIN = B.BIN(+)
+ORDER BY A.BIN]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:pgm</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_PROGRAMLIST_MULTI" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-05-30 15:21:36
+SELECT DISTINCT PROGRAM 
+FROM TQP_PROGRAM 
+WHERE 1=1
+      ??
+ORDER BY PROGRAM]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_ITEM_GROUP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT
+       ITEM,
+       ROUND(MIN (RAW_VALUE) OVER (PARTITION BY ITEM), 5) AS MIN,
+        ROUND(PERCENTILE_DISC (0.25)
+          WITHIN GROUP (ORDER BY RAW_VALUE)
+          OVER (PARTITION BY ITEM), 5)
+          AS Q1,
+        ROUND(PERCENTILE_DISC (0.5)
+          WITHIN GROUP (ORDER BY RAW_VALUE)
+          OVER (PARTITION BY ITEM), 5)
+          AS MEDIAN,
+        ROUND(PERCENTILE_DISC (0.75)
+          WITHIN GROUP (ORDER BY RAW_VALUE)
+          OVER (PARTITION BY ITEM), 5)
+          AS Q3,
+        ROUND(MAX (RAW_VALUE) OVER (PARTITION BY ITEM), 5) AS MAX,
+        ROUND(COUNT (RAW_VALUE) OVER (PARTITION BY ITEM), 5) AS CNT,
+        ROUND(STDDEV (RAW_VALUE) OVER (PARTITION BY ITEM), 5) AS STDDEV,
+        ROUND(SUM (RAW_VALUE) OVER (PARTITION BY ITEM), 5) AS SUM,
+        ROUND(AVG (RAW_VALUE) OVER (PARTITION BY ITEM), 5) AS AVG
+  FROM (WITH RAWDATA
+             AS (SELECT ??
+                FROM ??)
+        SELECT *
+          FROM RAWDATA UNPIVOT (RAW_VALUE
+                       FOR ITEM
+                       IN  (??)))]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_ITEM_DETAIL" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT A.WAFER_SEQ,
+    A.DIE_NUM,
+    A.DIEPROBE_CNT,
+    X,
+    Y,
+    NVL(BIN, 0) AS BIN
+    ??
+    FROM 
+  ??
+  ORDER BY A.DIE_NUM ASC]]></commandtext>
+    </query>
+    <query statement="Select" queryid="GET_DRAW_TEST_MAP_DATA_CFG" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT T1.WAFER_ID
+    A.WAFER_SEQ,
+    A.DIE_NUM,
+    A.DIEPROBE_CNT,
+    --X,
+    --Y,
+    --DECODE(:angle, 0, A.X, 90, MAX(A.Y) OVER() + MIN(A.Y) OVER() - A.Y, 180, MAX(A.X) OVER() + MIN(A.X) OVER() - A.X, 270, A.Y) + :xoffset AS X,
+    --DECODE(:angle, 0, A.Y, 90, A.X, 180, MAX(A.Y) OVER() + MIN(A.Y) OVER() - A.Y, 270, MAX(A.X) OVER() + MIN(A.X) OVER() - A.X) + :yoffset AS Y,
+    DECODE(:angle, 0, A.X, 90, A.Y , 180, MAX(A.X) OVER() + MIN(A.X) OVER() - A.X, 270,MAX(A.Y) OVER() + MIN(A.Y) OVER() - A.Y) + :xoffset AS X,
+    DECODE(:angle, 0, A.Y, 90, MAX(A.X) OVER() + MIN(A.X) OVER() - A.X, 180, MAX(A.Y) OVER() + MIN(A.Y) OVER() - A.Y, 270, A.X) + :yoffset AS Y,
+    NVL(BIN, 0) AS BIN 
+    ??
+    FROM TQP_WAFER T1
+         ??
+  order by A.DIE_NUM asc]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:angle</param>
+            <param direction="Input" dbtype="VarChar" size="40">:xoffset</param>
+            <param direction="Input" dbtype="VarChar" size="40">:yoffset</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="MERGE_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[MERGE INTO TQP_PROGRAM
+USING DUAL
+ON ( FACTORY = :FACTORY 
+    AND PROGRAM = :PROGRAM
+    AND TESTAREA = :TESTAREA
+    AND DEVICE = :DEVICE
+)
+WHEN NOT MATCHED THEN
+INSERT  (FACTORY, PROGRAM, TESTAREA, DEVICE, CREATE_TIME, CREATE_USER)
+VALUES (:FACTORY,:PROGRAM,:TESTAREA,:DEVICE, SYSDATE,'AUTO')
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0" value="FACTORY">:FACTORY</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="PROGRAM">:PROGRAM</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="TESTAREA">:TESTAREA</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="DEVICE">:DEVICE</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_PGM_DUPLE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQP_PROGRAM
+WHERE 1 = 1 
+AND FACTORY = :factory
+AND PROGRAM = :pgm
+AND TESTAREA = :area
+AND DEVICE = :device]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="factory">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="pgm">:pgm</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="area">:area</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="device">:device</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="INSERT_PROGRAM" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_PROGRAM
+(FACTORY    ,
+PROGRAM ,
+TESTAREA    ,
+DEVICE  ,
+CREATE_TIME ,
+CREATE_USER)
+ VALUES
+ (:factory    ,
+:program    ,
+:testarea    ,
+:device    ,
+SYSDATE    ,
+:create_user)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0" value="factory">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="program">:program</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="testarea">:testarea</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="device">:device</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="create_user">:create_user</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_AREALIST_NOT_PCM" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-08-20 18:10:33
+SELECT DISTINCT TESTAREA 
+  FROM TQP_PROGRAM 
+ WHERE 1=1
+       AND TESTAREA NOT IN ('PARAMETRIC', 'INLINE', 'AVI', 'SCOPE')
+ ORDER BY TESTAREA]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_CONDITION_DEVICE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-09-03 14:14:25
+SELECT DISTINCT DEVICE
+FROM TQP_PROGRAM A,
+TQP_PRODUCT B
+WHERE A.DEVICE = B.PRODUCT
+    AND TESTAREA IN (??)
+ORDER BY 1
+]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_CONDITION_PROGRAM" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-09-03 14:15:08
+SELECT DISTINCT PROGRAM
+FROM TQP_PROGRAM A,
+TQP_PRODUCT B
+WHERE A.DEVICE = B.PRODUCT
+    AND TESTAREA IN (??)
+    AND PRODUCT IN (??)
+ORDER BY 1]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_TESTAREA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-09-03 15:42:44
+SELECT 'PARAMETRIC' TESTAREA FROM DUAL UNION ALL
+SELECT 'MULTIPROBE' FROM DUAL UNION ALL
+SELECT 'PRELASER' FROM DUAL UNION ALL
+SELECT 'INLINE' FROM DUAL UNION ALL
+SELECT 'POSTLASER' FROM DUAL UNION ALL
+SELECT 'AVI' FROM DUAL]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_MAP_INDEX_TABLE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT TABLE_NAME
+  FROM TQP_PARASPEC
+ WHERE 1 = 1 
+  AND PROGRAM = :pgm
+  AND PARAM_NAME IN ('X', 'Y')]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="pgm">:pgm</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_MAP_RAW_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT WAFER_SEQ,DIE_NUM,X,Y
+    FROM ??
+    WHERE 1 = 1 
+    AND WAFER_SEQ = :wafer_seq
+  order by DIE_NUM asc]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="wafer_seq">:wafer_seq</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_DATA_TABLE_INDEX" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE ?? SET X = :xindex, Y = :yindex
+    WHERE 1 = 1 
+    AND WAFER_SEQ = :wafer_seq
+    AND DIE_NUM = :dienum]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="0" value="wafer_seq">:wafer_seq</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="dienum">:dienum</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="xindex">:xindex</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="yindex">:yindex</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_MEASURE_RAW_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT   WF.LOT_ID,
+         WF.WAFER_ID,
+         WF.TESTAREA,
+         WF.DEVICE_ALIAS,
+         WF.PRODUCT,
+         WF.CUSTOMER,
+         A.DIE_NUM,
+         A.DIEPROBE_CNT,
+         X,
+         Y,
+         NVL (BIN, 0) AS BIN
+         ??
+    FROM 
+    TQP_WAFER_SUM WF,  ??
+     AND WF.WAFER_SEQ = A.WAFER_SEQ
+  ORDER BY A.WAFER_SEQ, A.DIE_NUM]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_PROGRAM_NOT_EXIST_BIN" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-10-28 12:02:43
+  SELECT DISTINCT T1.PROGRAM
+    FROM TQP_PROGRAM T1, TQP_BINDESC T2
+   WHERE     1 = 1
+         AND T1.PROGRAM = T2.PROGRAM
+         AND T1.TESTAREA = :TESTAREA
+         AND T1.PROGRAM LIKE :PROGRAM
+ORDER BY 1]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="TESTAREA">:TESTAREA</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="PROGRAM">:PROGRAM</param>
+        </parameters>
+    </query>
+</queryxml>

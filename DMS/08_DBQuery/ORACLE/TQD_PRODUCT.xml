@@ -1,0 +1,55 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Insert" queryid="CREATE_PRODUCT" commandtype="Text" description="Product Name을 Insert하는 문장" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQD_PRODUCT VALUES(:product,:facility,:technology,:netdie,:wafer_size,:angle,:notch_type,:die_pitch_x,:die_pitch_y,:die_origin_x,:die_origin_y,:origin_x,:origin_y,:description)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" description="Device 이름을 관리">:product</param>
+            <param direction="Input" dbtype="VarChar" size="40" description="FAB 이름을 관리">:facility</param>
+            <param direction="Input" dbtype="VarChar" size="40" description="Device의 Technology를 명시">:technology</param>
+            <param direction="Input" dbtype="Number" size="0" description="Device의 유효한 Die Count">:netdie</param>
+            <param direction="Input" dbtype="Number" size="0" description="Wafer Size이며 nm 단위임">:wafer_size</param>
+            <param direction="Input" dbtype="Number" size="0" description="0,90,180,270">:angle</param>
+            <param direction="Input" dbtype="Char" size="1" description="‘F’,’N’">:notch_type</param>
+            <param direction="Input" dbtype="Number" size="0" description="Die x Size이며 nm 단위임">:die_pitch_x</param>
+            <param direction="Input" dbtype="Number" size="0" description="Die y Size이며 nm 단위임">:die_pitch_y</param>
+            <param direction="Input" dbtype="Number" size="0" description="기준 Die의 Index X">:die_origin_x</param>
+            <param direction="Input" dbtype="Number" size="0" description="기준 Die의 Index Y">:die_origin_y</param>
+            <param direction="Input" dbtype="Number" size="0" description="기준 Point의 X 좌표이며 nm 단위임">:origin_x</param>
+            <param direction="Input" dbtype="Number" size="0" description="기준 Point의 Y 좌표이며 nm 단위임">:origin_y</param>
+            <param direction="Input" dbtype="VarChar" size="128" description="Product에 대한 Comment">:description</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_PRODUCT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQD_PRODUCT WHERE PRODUCT = :product]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:product</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="PRODUCT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQD_PRODUCT ]]></commandtext>
+    </query>
+    <query statement="Insert" queryid="CREATE_COPY_PRODUCT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQD_PRODUCT
+SELECT :prd AS PRODUCT,
+       FACTORY,
+       TECHNOLOGY,
+       NETDIE,
+       WAFER_SIZE,
+       ANGLE,
+       NOTCH_TYPE,
+       DIE_PITCH_X,
+       DIE_PITCH_Y,
+       DIE_ORIGIN_X,
+       DIE_ORIGIN_Y,
+       ORIGIN_X,
+       ORIGIN_Y,
+       'Maint Update' AS "COMMENT"
+  FROM TQD_PRODUCT
+ WHERE 1 = 1 
+ AND PRODUCT = :oriprd]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="prd">:prd</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="oriprd">:oriprd</param>
+        </parameters>
+    </query>
+</queryxml>

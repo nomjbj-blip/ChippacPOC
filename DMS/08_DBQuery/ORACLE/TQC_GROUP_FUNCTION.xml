@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="QMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Insert" queryid="INSERTGROUPFUNCTION" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[Insert into TQC_GROUP_FUNCTION  values(:strGrpCode, :strFunCode)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:strGrpCode</param>
+            <param direction="Input" dbtype="VarChar" size="40">:strFunCode</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETEGROUPALLFUNCTION" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[ delete from TQC_GROUP_FUNCTION where SEC_GRP_ID=:strGrpCode]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:strGrpCode</param>
+        </parameters>
+    </query>
+</queryxml>

@@ -1,0 +1,160 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="BUMPFA" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Select" queryid="SELECT_MERGE_LIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT RULE_NAME
+FROM T_TPS_MERGERULE
+WHERE CUSTOMER = :customer
+ORDER BY RULE_NAME]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">customer</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_MERGE_LIST_BY_PRODUCT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT RULE_NAME
+FROM T_TPS_MERGERULE
+WHERE CUSTOMER = :customer
+AND PRODUCT = :product
+ORDER BY RULE_NAME]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">customer</param>
+            <param direction="Input" dbtype="VarChar" size="30">product</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_MERGE_RULE_WITHOUT_PRODUCT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT RULE_VALUE AS "Rule Value", RULE_ORDER AS "Rule Order"
+FROM T_TPS_MERGERULE
+WHERE CUSTOMER = :customer
+AND PRODUCT = :product
+AND RULE_NAME = :rule_name
+ORDER BY RULE_NAME]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value=" ">:customer</param>
+            <param direction="Input" dbtype="VarChar" size="40" value=" ">:product</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="CP_MERGE">:rule_name</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_MERGE_RULE_BY_PRODUCT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT RULE_NAME
+FROM T_TPS_MERGERULE
+WHERE CUSTOMER = :customer
+AND PRODUCT = :product
+ORDER BY RULE_NAME]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">customer</param>
+            <param direction="Input" dbtype="VarChar" size="30">product</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="CREATE_MERGE_RULE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO T_TPS_MERGERULE VALUES(
+:customer,
+:product,
+:ruletype,
+:rulevalue,
+:ruleorder,
+:downmap_create,
+:outputmap_create,
+:map_type
+)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:customer</param>
+            <param direction="Input" dbtype="VarChar" size="40">:product</param>
+            <param direction="Input" dbtype="VarChar" size="40">:ruletype</param>
+            <param direction="Input" dbtype="VarChar" size="40">:rulevalue</param>
+            <param direction="Input" dbtype="VarChar" size="40">:ruleorder</param>
+            <param direction="Input" dbtype="VarChar" size="2">:downmap_create</param>
+            <param direction="Input" dbtype="VarChar" size="2">:outputmap_create</param>
+            <param direction="Input" dbtype="VarChar" size="40">:map_type</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_MERGE_RULE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[DELETE FROM T_TPS_MERGERULE 
+WHERE 1=1
+AND CUSTOMER = :customer
+AND PRODUCT = :product
+AND RULE_NAME = :ruletype 
+ ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:customer</param>
+            <param direction="Input" dbtype="VarChar" size="40">:product</param>
+            <param direction="Input" dbtype="VarChar" size="40">:ruletype</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_MERGE_RULE_EDITABLE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT RULE_VALUE AS "Rule Value", RULE_ORDER AS "Rule Order", DOWNMAP_CREATE, OUTPUTMAP_CREATE, MAP_TYPE
+FROM T_TPS_MERGERULE 
+WHERE CUSTOMER = :customer
+AND PRODUCT = :product
+AND RULE_NAME = :rule_name
+ORDER BY RULE_ORDER ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value=" ">:customer</param>
+            <param direction="Input" dbtype="VarChar" size="40" value=" ">:product</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="CP_MERGE">:rule_name</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_MERGE_RULE_BY_ELEMENT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT *
+FROM T_TPS_MERGERULE
+WHERE 1=1
+??]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_MERGE_RULE_WITHOUT_RULENAME" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT RULE_NAME, RULE_VALUE, RULE_ORDER, AREA_DESC
+FROM T_TPS_MERGERULE A, T_TPS_TESTAREA B
+WHERE A.CUSTOMER = :customer
+AND A.PRODUCT = :product
+AND A.ACT_TESTAREA = :act_testarea
+AND TESTAREA (+)= RULE_VALUE
+ORDER BY RULE_ORDER ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:customer</param>
+            <param direction="Input" dbtype="VarChar" size="40">:product</param>
+            <param direction="Input" dbtype="VarChar" size="40">:act_testarea</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_MERGE_RULE_BY_RULE_NAME" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[WITH RT AS (
+SELECT A.*,
+       (DECODE(A.CUSTOMER, :customer, 100, 0)
+       + DECODE(A.PRODUCT, :product, 1000, 0)
+       + DECODE(A.RULE_NAME, :rule_name, 10000, 0)) AS NUM 
+    FROM T_TPS_MERGERULE A
+    WHERE 1=1
+    AND A.CUSTOMER IN (' ', :customer)
+    AND A.PRODUCT IN (' ',  :product)
+    AND A.RULE_NAME IN (' ', :rule_name)
+    )
+SELECT * FROM RT A, T_TPS_TESTAREA B
+WHERE 1=1
+AND NUM = (SELECT MAX(NUM) FROM RT)
+AND TESTAREA(+) = RULE_VALUE
+ORDER BY RULE_ORDER]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:customer</param>
+            <param direction="Input" dbtype="VarChar" size="2048">:product</param>
+            <param direction="Input" dbtype="VarChar" size="40">:rule_name</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_DISTINCT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT ??
+FROM T_TPS_MERGERULE
+WHERE 1=1
+]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_DISTINCT_BY_FILTER" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT ??
+FROM T_TPS_MERGERULE
+WHERE ??]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_MERGE_RULE_LIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT CUSTOMER as "Customer", 
+       PRODUCT as "Product", 
+       RULE_NAME as "Rule Name",
+       DOWNMAP_CREATE as "Download Map Create",
+       OUTPUTMAP_CREATE as "Output Map Create",
+       MAP_TYPE as "Map Type"
+FROM T_TPS_MERGERULE
+GROUP BY CUSTOMER,PRODUCT,RULE_NAME,MAP_TYPE,DOWNMAP_CREATE,OUTPUTMAP_CREATE
+ORDER BY CUSTOMER DESC,PRODUCT DESC,RULE_NAME]]></commandtext>
+    </query>
+</queryxml>

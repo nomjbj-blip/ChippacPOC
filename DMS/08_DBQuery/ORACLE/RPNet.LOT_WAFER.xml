@@ -1,0 +1,197 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="TPSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Select" queryid="GET_WAFER_LIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT ??,L.LOT_SEQ,W.WAFER_SEQ FROM TQP_LOT L,TQP_WAFER W
+WHERE TEST_AREA = 'MULTIPROBE'
+AND L.END_TIME  BETWEEN TO_DATE(:stime,'YYYY-MM-DD') AND TO_DATE(:etime,'YYYY-MM-DD')  
+AND L.LOT_SEQ = W.LOT_SEQ
+AND W.PROBE_CNT = 0
+??]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="stime">:stime</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="etime">:etime</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_WAFER_INFO" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT 
+    L.LOT_SEQ,
+    LOT_ID LOT,
+    LOT_TYPE,
+    FABLOT,
+    TEST_AREA,
+    NULL TEST_TYPE,
+    NULL LOGPOINT,
+    OPERATION,
+    W.PROGRAM,
+    DEVICE,
+    SMS_DEVICE,
+    DEVICE_ALIAS,
+    SMS_ITEM_ID,
+    FAMILY,
+    W.FACTORY FACILITY,
+    W.FACTORY SRCFAB,
+    TO_CHAR(L.START_TIME,'YYMMDDHH24MI')  AS LSTIME,
+    TO_CHAR(L.END_TIME,'YYMMDDHH24MI')  AS LETIME,
+    WAFER_DIAM,
+    L.COMMENTS,
+    L.MERGE_FLAG,
+    WAFER_SEQ,
+    WAFER_ID,
+    PROBE_CNT,
+    TO_CHAR(W.START_TIME,'YYMMDDHH24MI') AS WSTIME,
+    TO_CHAR(W.END_TIME,'YYMMDDHH24MI')  AS WETIME,
+    TO_CHAR(W.LOAD_TIME,'YYMMDDHH24MI')  AS WLTIME,
+    TESTER,
+    PROBER,
+    PROBE_CARD,
+    HANDLER_ID,
+    OPERATOR,
+    START_QTY,
+    PARENT,
+    FLAGS,
+    SCREEN_FLAG,
+    SCRAP_FLAG,
+    DGRADE_FLAG,
+    VENDOR_ID,
+    LOADBD,
+    HOSTNAME,
+    TESTHEAD,
+    SW_REV,
+    USP_REV,
+    NVL(MAX_X,0) MAXX,
+    NVL(MAX_Y,0) MAXY,
+    WAF_FLAT,
+    W.COMMENTS,
+    NULL PLD_SEQ,
+    NULL PPD_SEQ,
+    SCRIBE_LOT,
+    TEMP,
+    TEMP_TYPE,
+    NULL TESTER_TYPE,
+    PGMPATH,
+    SPC_FLAG,
+    SPC_RULE,
+    DATA_SOURCE,
+    LOT_MODE,
+    IMMED_REPROBE,
+    DELAYED_REPROBE,
+    TRUNCATION,
+    NVL((SELECT ORIGIN_INDEX_X FROM TQP_MAPDEF WHERE MAPID = L.DEVICE_ALIAS),0) REF_DIEX,
+    NVL((SELECT ORIGIN_INDEX_Y FROM TQP_MAPDEF WHERE MAPID = L.DEVICE_ALIAS),0) REF_DIEY,
+    NULL PDM_SEQ,
+    T7SCRIBE,
+    M12SCRIBE,
+    W.MERGE_FLAG,
+    TWFLAGS,
+    TFVERSION,
+    ESDA_ID,
+    WAF_DIAM_MEAS,
+    XREF_VECTOR_MEAS,
+    YREF_VECTOR_MEAS,
+    SETUP_TIMESIZE,
+    LOTDEF_DATABASE,
+    MAXSITE,
+    AC_RULE_SEQ,
+    PROBECARD_TOUCHDOWNS,
+    STEPSIZE_X,
+    STEPSIZE_Y,
+    BURNIN_TYPE,
+    PROGRAM_MODE,
+    LOTCONTROL_MODE,
+    LC_FLAGS,
+    AC_FLAGS,
+    SMSFAMILY_NAME,
+    LOT_CLOSE,
+    SPC_ENABLE,
+    SPC_STATUS,
+    SCREEN_TYPE,
+    NUM_DIE,
+    TW_VALID_DATA_CNT,
+    DATATYPE_FLAG,
+    FORCE_SPCFAIL,
+    LOTINFO_SEQ,
+    AC_DIE_CNT,
+    MOD_TIME
+FROM TQP_LOT L,TQP_WAFER W
+WHERE W.WAFER_SEQ = :waferseq
+AND L.LOT_SEQ = W.LOT_SEQ
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="0" value="waferseq">:waferseq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_PROGRAM" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT PROGRAM,LOT_SEQ FROM TQP_LOT
+WHERE TEST_AREA='MULTIPROBE'
+AND DEVICE = :device
+AND LOT_ID =:lot
+ORDER BY 1]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="device">:device</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="lot">:lot</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_WAFER_SEQ" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT WAFER_SEQ FROM TQP_WAFER
+WHERE LOT_SEQ = :lot_seq
+AND WAFER_ID = :wafer_id
+AND PROBE_CNT = :probe_cnt]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="0" value="lot_seq">:lot_seq</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="wafer_id">:wafer_id</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="probe_cnt">:probe_cnt</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_DIST_TESTAREA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT 'MULTIPROBE' TEST_AREA FROM DUAL]]></commandtext>
+    </query>
+    <query statement="Select" queryid="GET_DIST_PROGRAM" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT PROGRAM FROM TQP_LOT WHERE TEST_AREA = :test_area
+??
+ORDER BY 1]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="test_area">:test_area</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_DIST_LOT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT LOT_ID LOT,LOT_SEQ FROM TQP_LOT
+WHERE TEST_AREA = :test_area
+AND PROGRAM = :program
+??
+ORDER BY 1 DESC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="test_area">:test_area</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="program">:program</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_DIST_WAFER" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT WAFER_ID,WAFER_SEQ FROM TQP_WAFER
+WHERE LOT_SEQ = (
+        SELECT LOT_SEQ FROM TQP_LOT
+        WHERE TEST_AREA = :test_area
+                AND PROGRAM = :program
+                AND LOT_ID = :lot
+)
+??
+AND PROBE_CNT = 0
+ORDER BY 1]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="test_area">:test_area</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="program">:program</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="lot">:lot</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="SAVE_MAP_SHIFT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_MAPDEF
+SET 
+    USER_REF_X = :USER_REF_X,
+    USER_REF_Y = :USER_REF_Y
+WHERE MAPID = :MAPID
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="0">:MAPID</param>
+            <param direction="Input" dbtype="VarChar2" size="0">:USER_REF_X</param>
+            <param direction="Input" dbtype="VarChar2" size="0">:USER_REF_Y</param>
+        </parameters>
+    </query>
+</queryxml>

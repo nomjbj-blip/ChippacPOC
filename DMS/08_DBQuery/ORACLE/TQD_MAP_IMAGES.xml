@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Insert" queryid="CREATE_WAFERMAP" commandtype="Text" description="Wafer Map 저장" commandtimeout="3600">
+        <commandtext><![CDATA[INSERT INTO TQD_MAP_IMAGES
+VALUES(:step_seq,:test,:map_image_type,:map_image_path,:map_image_filename,:map_image_server,:small_map_image)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:step_seq</param>
+            <param direction="Input" dbtype="Number" size="0">:test</param>
+            <param direction="Input" dbtype="VarChar" size="0">:map_image_type</param>
+            <param direction="Input" dbtype="VarChar" size="0">:map_image_path</param>
+            <param direction="Input" dbtype="VarChar" size="0">:map_image_filename</param>
+            <param direction="Input" dbtype="VarChar" size="0">:map_image_server</param>
+            <param direction="Input" dbtype="Blob" size="0">:small_map_image</param>
+        </parameters>
+    </query>
+</queryxml>

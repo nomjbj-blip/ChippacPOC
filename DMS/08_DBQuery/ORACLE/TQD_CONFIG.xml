@@ -1,0 +1,86 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Select" queryid="GET_VALUE" commandtype="Text" description="Configuration Value를 가져온다." commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQD_CONFIG
+WHERE CATEGORY = :category
+AND NAME = :name]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="100">:category</param>
+            <param direction="Input" dbtype="VarChar" size="100">:name</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_CATEGORY" commandtype="Text" description="Category전체 Data를 가져온다" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQD_CONFIG
+WHERE CATEGORY = :category ORDER BY NAME]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="100">:category</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_RND_YIELD_PERIOD_PARM" commandtype="Text" description="주어진 기간동안 특정 Parameter값의 Killer Ratio을 가져온다." commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQD_YMODEL_RDY
+WHERE PARAMETER = :parameter
+AND STEP_SEQ IN (SELECT STEP_SEQ FROM TDMS_STEP WHERE RESULTTIMESTAMP BETWEEN :start AND :end)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="100">:parameter</param>
+            <param direction="Input" dbtype="VarChar" size="19">:start</param>
+            <param direction="Input" dbtype="VarChar" size="19">:end</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="CREATE_CONFIG_VALUE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQD_CONFIG(CATEGORY,NAME,VALUE,TYPE,DESCRIPTION)
+VALUES(:category,:name,:value,:type,:description)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:category</param>
+            <param direction="Input" dbtype="VarChar" size="40">:name</param>
+            <param direction="Input" dbtype="VarChar" size="40">:value</param>
+            <param direction="Input" dbtype="VarChar" size="40">:type</param>
+            <param direction="Input" dbtype="VarChar" size="40">:description</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_CONFIG_VALUE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQD_CONFIG SET VALUE=:value ,TYPE= :type ,"DESCRIPTION" = :cmt
+WHERE CATEGORY = :category
+AND NAME = :name]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:value</param>
+            <param direction="Input" dbtype="VarChar" size="40">:type</param>
+            <param direction="Input" dbtype="VarChar" size="40">:cmt</param>
+            <param direction="Input" dbtype="VarChar" size="40">:category</param>
+            <param direction="Input" dbtype="VarChar" size="40">:name</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_CONFIG_ALL" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQD_CONFIG
+ORDER BY CATEGORY,NAME]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_DEFECT_FTP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT 
+       MAX (DECODE (NAME, 'IP', VALUE)) AS IP,
+       MAX (DECODE (NAME, 'PORT', VALUE)) AS PORT,
+       MAX (DECODE (NAME, 'ID', VALUE)) AS ID,
+       MAX (DECODE (NAME, 'PASS', VALUE)) AS PASS,
+       MAX (DECODE (NAME, 'MAIN_PATH', VALUE)) AS MAIN_PATH
+  FROM TQD_CONFIG
+  WHERE 1 = 1 AND CATEGORY = 'DEFECT_FTP']]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_AVI_FTP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT 
+       MAX (DECODE (NAME, 'IP', VALUE)) AS IP,
+       MAX (DECODE (NAME, 'PORT', VALUE)) AS PORT,
+       MAX (DECODE (NAME, 'ID', VALUE)) AS ID,
+       MAX (DECODE (NAME, 'PASS', VALUE)) AS PASS,
+       MAX (DECODE (NAME, 'MAIN_PATH', VALUE)) AS MAIN_PATH
+  FROM TQD_CONFIG
+  WHERE 1 = 1 AND CATEGORY = 'AVI_FTP']]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_AVI_MAP_UPLOAD" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT 
+       MAX (DECODE (NAME, 'IP', VALUE)) AS IP,
+       MAX (DECODE (NAME, 'PORT', VALUE)) AS PORT,
+       MAX (DECODE (NAME, 'ID', VALUE)) AS ID,
+       MAX (DECODE (NAME, 'PASS', VALUE)) AS PASS,
+       MAX (DECODE (NAME, 'MAIN_PATH', VALUE)) AS MAIN_PATH
+  FROM TQD_CONFIG
+  WHERE 1 = 1 AND CATEGORY = 'AVI_MAP_FTP']]></commandtext>
+    </query>
+</queryxml>

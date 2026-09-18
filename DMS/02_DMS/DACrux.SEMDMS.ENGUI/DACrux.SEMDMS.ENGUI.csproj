@@ -1,0 +1,557 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{EE34AC74-5A6C-4E9F-B0D3-F8F0613DD073}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DACrux.SEMDMS.ENGUI</RootNamespace>
+    <AssemblyName>DACrux.SEMDMS.ENGUI</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\100_ClientBin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\100_ClientBin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="DACrux.Base, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\07_CoreLib\DACrux.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="DACrux.Data.Handler, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\..\101_ServerBin\DACrux.Data.Handler.dll</HintPath>
+    </Reference>
+    <Reference Include="DACrux.FPDMap, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\07_CoreLib\DACrux.FPDMap.dll</HintPath>
+    </Reference>
+    <Reference Include="DACrux.Framework.Base, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\07_CoreLib\DACrux.Framework.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="DACrux.Framework.Controls, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\07_CoreLib\DACrux.Framework.Controls.dll</HintPath>
+    </Reference>
+    <Reference Include="DACrux.Framework.Interface, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\07_CoreLib\DACrux.Framework.Interface.dll</HintPath>
+    </Reference>
+    <Reference Include="DACrux.Framework.PropertyGrid, Version=1.0.1.1, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\07_CoreLib\DACrux.Framework.PropertyGrid.dll</HintPath>
+    </Reference>
+    <Reference Include="DACrux.Framework.RO, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL" />
+    <Reference Include="DACrux.Map, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\07_CoreLib\DACrux.Map.dll</HintPath>
+    </Reference>
+    <Reference Include="DACrux.TEST.Interface, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+    <Reference Include="DACrux.TEST.RO, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL" />
+    <Reference Include="DACrux.Utility, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\07_CoreLib\DACrux.Utility.dll</HintPath>
+    </Reference>
+    <Reference Include="FarPoint.Win, Version=5.0.3518.2008, Culture=neutral, PublicKeyToken=327c3516b1b18457, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files (x86)\GrapeCity\Spread.WinForms.5.dotNet35\v5.0.3518\Bin\FarPoint.Win.dll</HintPath>
+    </Reference>
+    <Reference Include="FarPoint.Win.Spread, Version=5.0.3518.2008, Culture=neutral, PublicKeyToken=327c3516b1b18457, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files (x86)\GrapeCity\Spread.WinForms.5.dotNet35\v5.0.3518\Bin\FarPoint.Win.Spread.dll</HintPath>
+    </Reference>
+    <Reference Include="Infragistics4.Win.UltraWinChart.v12.1, Version=12.1.20121.2135, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb" />
+    <Reference Include="Infragistics4.Win.UltraWinEditors.v12.1, Version=12.1.20121.2135, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL" />
+    <Reference Include="Infragistics4.Win.UltraWinGrid.v12.1, Version=12.1.20121.2135, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL" />
+    <Reference Include="Infragistics4.Win.UltraWinListView.v12.1, Version=12.1.20121.2135, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL" />
+    <Reference Include="Infragistics4.Win.UltraWinTabControl.v12.1, Version=12.1.20121.2135, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL" />
+    <Reference Include="Infragistics4.Win.UltraWinTree.v12.1, Version=12.1.20121.2135, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL" />
+    <Reference Include="Infragistics4.Win.v12.1, Version=12.1.20121.2135, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL" />
+    <Reference Include="Infragistics4.Win.UltraWinToolbars.v12.1, Version=12.1.20121.2135, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL" />
+    <Reference Include="Infragistics4.Win.UltraWinTabbedMdi.v12.1, Version=12.1.20121.2135, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL" />
+    <Reference Include="Infragistics4.Win.UltraWinDock.v12.1, Version=12.1.20121.2135, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL" />
+    <Reference Include="Infragistics4.Win.Misc.v12.1, Version=12.1.20121.2135, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL" />
+    <Reference Include="Infragistics4.Shared.v12.1, Version=12.1.20121.2135, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.Office.Interop.Excel, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization.Formatters.Soap" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Forms.DataVisualization" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Admin\frmConfiguration.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\frmConfiguration.designer.cs">
+      <DependentUpon>frmConfiguration.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\frmDefectAlarmReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\frmDefectAlarmReport.Designer.cs">
+      <DependentUpon>frmDefectAlarmReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\frmDefectAlarmReport_ChartItem.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Admin\frmDefectAlarmReport_ChartItem.Designer.cs">
+      <DependentUpon>frmDefectAlarmReport_ChartItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\frmDefectAlarmSetup.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\frmDefectAlarmSetup.Designer.cs">
+      <DependentUpon>frmDefectAlarmSetup.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\frmDefectAlarmSetup_Code.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\frmDefectAlarmSetup_Code.Designer.cs">
+      <DependentUpon>frmDefectAlarmSetup_Code.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\frmDefectAlarmSetup_Notify.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\frmDefectAlarmSetup_Notify.Designer.cs">
+      <DependentUpon>frmDefectAlarmSetup_Notify.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\frmDefectTypeDefine_VerTwo.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\frmDefectTypeDefine_VerTwo.Designer.cs">
+      <DependentUpon>frmDefectTypeDefine_VerTwo.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\frmZoneDefine.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\frmDefectColorDefine_Property.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\frmDefectColorDefine_Property.Designer.cs">
+      <DependentUpon>frmDefectColorDefine_Property.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\frmDefectTypeDefine_Property.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\frmDefectTypeDefine_Property.Designer.cs">
+      <DependentUpon>frmDefectTypeDefine_Property.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\frmDMDataMaint.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\frmDMDataMaint.Designer.cs">
+      <DependentUpon>frmDMDataMaint.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\frmGlobalConfiguration.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\frmGlobalConfiguration.designer.cs">
+      <DependentUpon>frmGlobalConfiguration.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\frmDefectTypeGroup_Property.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\frmDefectTypeGroup_Property.Designer.cs">
+      <DependentUpon>frmDefectTypeGroup_Property.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DataSelecter\LegendItem.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DataSelecter\LegendItem.Designer.cs">
+      <DependentUpon>LegendItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DataSelecter\LegendList.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DefectMapAnalysis\frmDefectImageGallery.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DefectMapAnalysis\frmDefectImageGallery.designer.cs">
+      <DependentUpon>frmDefectImageGallery.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DefectMapAnalysis\frmDefectImgGalleryManyStep.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DefectMapAnalysis\frmDefectMap.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DefectMapAnalysis\frmDefectMap.Designer.cs">
+      <DependentUpon>frmDefectMap.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DefectMapAnalysis\frmDefectMapGallery.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DefectMapAnalysis\frmDefectPatternSearch.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DefectMapAnalysis\frmDefectPatternSearchNew.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DefectMapAnalysis\frmDefectPatternSearchNew.Designer.cs">
+      <DependentUpon>frmDefectPatternSearchNew.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DefectMapAnalysis\frmDefectSourceAnalysis.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\frmDefectColoring.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\frmDefectColoring.Designer.cs">
+      <DependentUpon>frmDefectColoring.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DefectMapAnalysis\frmDieStackGallery.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DefectMapAnalysis\frmDieStackGallery.Designer.cs">
+      <DependentUpon>frmDieStackGallery.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DefectMapAnalysis\frmDMSStepSelect.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DefectMapAnalysis\frmDMSStepSelect.Designer.cs">
+      <DependentUpon>frmDMSStepSelect.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DefectMapAnalysis\frmExportToKlarf.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DefectMapAnalysis\frmExportToKlarf.Designer.cs">
+      <DependentUpon>frmExportToKlarf.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DefectMapAnalysis\frmRepeatedDefect.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DefectMapAnalysis\frmViewMapParsingResult.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DefectMapAnalysis\frmViewMapParsingResult.Designer.cs">
+      <DependentUpon>frmViewMapParsingResult.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DefectMapAnalysis\frmTestMapOverlay.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DefectMapAnalysis\frmDefectMapViewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DefectMapAnalysis\frmDefectMapViewer.Designer.cs">
+      <DependentUpon>frmDefectMapViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DefectMapAnalysis\frmDieStackAnalysis.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DefectMapAnalysis\frmDieStackAnalysis.Designer.cs">
+      <DependentUpon>frmDieStackAnalysis.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DefectMapAnalysis\frmDefectBareMapViewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DefectMapAnalysis\frmDefectBareMapViewer.Designer.cs">
+      <DependentUpon>frmDefectBareMapViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\frmZipTest.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\frmZipTest.Designer.cs">
+      <DependentUpon>frmZipTest.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="DefectMapAnalysis\frmChartAnalysis.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DefectMapAnalysis\frmChartAnalysis.Designer.cs">
+      <DependentUpon>frmChartAnalysis.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Report\dlgSizePopup.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Report\dlgSizePopup.Designer.cs">
+      <DependentUpon>dlgSizePopup.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Report\frmCommonalityLotList.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Report\frmCommonalityLotList.Designer.cs">
+      <DependentUpon>frmCommonalityLotList.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Report\frmDataSheet.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Report\frmDataSheet.Designer.cs">
+      <DependentUpon>frmDataSheet.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Report\frmDefectDataSummary.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Report\frmDefectDataSummary.Designer.cs">
+      <DependentUpon>frmDefectDataSummary.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Report\frmDMDataTrend.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Report\frmDMDataTrend.Designer.cs">
+      <DependentUpon>frmDMDataTrend.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Report\frmInspectionDetail.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Report\frmInspectionDetail.Designer.cs">
+      <DependentUpon>frmInspectionDetail.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Report\frmInspInfoReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Report\frmInspInfoReport.Designer.cs">
+      <DependentUpon>frmInspInfoReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DefectMapAnalysis\frmChartAnalysisNew.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DefectMapAnalysis\frmChartAnalysisNew.Designer.cs">
+      <DependentUpon>frmChartAnalysisNew.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Report\frmCommonalityStudy.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Report\frmCommonalityStudy.Designer.cs">
+      <DependentUpon>frmCommonalityStudy.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Report\frmKillRate.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Report\frmKillRate.Designer.cs">
+      <DependentUpon>frmKillRate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Report\frmEquipDefectTrend.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Report\frmEquipDefectTrend.Designer.cs">
+      <DependentUpon>frmEquipDefectTrend.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Report\frmLossYieldProspect.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Report\frmLossYieldProspect.Designer.cs">
+      <DependentUpon>frmLossYieldProspect.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Admin\frmConfiguration.resx">
+      <DependentUpon>frmConfiguration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\frmDefectAlarmReport.resx">
+      <DependentUpon>frmDefectAlarmReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\frmDefectAlarmReport_ChartItem.resx">
+      <DependentUpon>frmDefectAlarmReport_ChartItem.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\frmDefectAlarmSetup.resx">
+      <DependentUpon>frmDefectAlarmSetup.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\frmDefectAlarmSetup_Code.resx">
+      <DependentUpon>frmDefectAlarmSetup_Code.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\frmDefectAlarmSetup_Notify.resx">
+      <DependentUpon>frmDefectAlarmSetup_Notify.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\frmDefectTypeDefine_VerTwo.resx">
+      <DependentUpon>frmDefectTypeDefine_VerTwo.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\frmZipTest.resx">
+      <DependentUpon>frmZipTest.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\frmZoneDefine.resx">
+      <DependentUpon>frmZoneDefine.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\frmDefectColorDefine_Property.resx">
+      <DependentUpon>frmDefectColorDefine_Property.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\frmDefectTypeDefine_Property.resx">
+      <DependentUpon>frmDefectTypeDefine_Property.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\frmDMDataMaint.resx">
+      <DependentUpon>frmDMDataMaint.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\frmGlobalConfiguration.resx">
+      <DependentUpon>frmGlobalConfiguration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\frmDefectTypeGroup_Property.resx">
+      <DependentUpon>frmDefectTypeGroup_Property.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataSelecter\LegendItem.resx">
+      <DependentUpon>LegendItem.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataSelecter\LegendList.resx">
+      <DependentUpon>LegendList.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DefectMapAnalysis\frmDefectImageGallery.resx">
+      <DependentUpon>frmDefectImageGallery.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DefectMapAnalysis\frmDefectImgGalleryManyStep.resx">
+      <DependentUpon>frmDefectImgGalleryManyStep.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DefectMapAnalysis\frmDefectMap.resx">
+      <DependentUpon>frmDefectMap.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DefectMapAnalysis\frmDefectMapGallery.resx">
+      <DependentUpon>frmDefectMapGallery.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DefectMapAnalysis\frmDefectPatternSearch.resx">
+      <DependentUpon>frmDefectPatternSearch.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DefectMapAnalysis\frmDefectPatternSearchNew.resx">
+      <DependentUpon>frmDefectPatternSearchNew.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DefectMapAnalysis\frmDefectSourceAnalysis.resx">
+      <DependentUpon>frmDefectSourceAnalysis.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\frmDefectColoring.resx">
+      <DependentUpon>frmDefectColoring.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DefectMapAnalysis\frmDieStackAnalysis.resx">
+      <DependentUpon>frmDieStackAnalysis.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DefectMapAnalysis\frmDieStackGallery.resx">
+      <DependentUpon>frmDieStackGallery.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DefectMapAnalysis\frmDMSStepSelect.resx">
+      <DependentUpon>frmDMSStepSelect.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DefectMapAnalysis\frmExportToKlarf.resx">
+      <DependentUpon>frmExportToKlarf.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DefectMapAnalysis\frmRepeatedDefect.resx">
+      <DependentUpon>frmRepeatedDefect.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DefectMapAnalysis\frmViewMapParsingResult.resx">
+      <DependentUpon>frmViewMapParsingResult.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DefectMapAnalysis\frmTestMapOverlay.resx">
+      <DependentUpon>frmTestMapOverlay.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DefectMapAnalysis\frmDefectMapViewer.resx">
+      <DependentUpon>frmDefectMapViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DefectMapAnalysis\frmDefectBareMapViewer.resx">
+      <DependentUpon>frmDefectBareMapViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\licenses.licx" />
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DefectMapAnalysis\frmChartAnalysis.resx">
+      <DependentUpon>frmChartAnalysis.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DefectMapAnalysis\frmChartAnalysisNew.resx">
+      <DependentUpon>frmChartAnalysisNew.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Report\dlgSizePopup.resx">
+      <DependentUpon>dlgSizePopup.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Report\frmCommonalityLotList.resx">
+      <DependentUpon>frmCommonalityLotList.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Report\frmDataSheet.resx">
+      <DependentUpon>frmDataSheet.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Report\frmDefectDataSummary.resx">
+      <DependentUpon>frmDefectDataSummary.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Report\frmDMDataTrend.resx">
+      <DependentUpon>frmDMDataTrend.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Report\frmInspectionDetail.resx">
+      <DependentUpon>frmInspectionDetail.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Report\frmInspInfoReport.resx">
+      <DependentUpon>frmInspInfoReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Report\frmCommonalityStudy.resx">
+      <DependentUpon>frmCommonalityStudy.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Report\frmKillRate.resx">
+      <DependentUpon>frmKillRate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Report\frmEquipDefectTrend.resx">
+      <DependentUpon>frmEquipDefectTrend.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Report\frmLossYieldProspect.resx">
+      <DependentUpon>frmLossYieldProspect.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\06_CoreLibSource\DACrux.Common.RO\DACrux.Common.RO.csproj">
+      <Project>{46A137A3-7FE3-476D-B2C4-0ED113DB4378}</Project>
+      <Name>DACrux.Common.RO</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\09_TEST\DACrux.TEST.Control\DACrux.TEST.Control.csproj">
+      <Project>{B3ED24CA-1B2C-401B-ACB7-EBBEBA502E2F}</Project>
+      <Name>DACrux.TEST.Control</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\09_TEST\DACrux.TEST.ENGUI\DACrux.TEST.ENGUI.csproj">
+      <Project>{1579A88B-4AEE-41A7-8646-DAFF80567A56}</Project>
+      <Name>DACrux.TEST.ENGUI</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DACrux.SEMDMS.Control\DACrux.SEMDMS.Control.csproj">
+      <Project>{C9B0F7D0-E636-42EC-909A-44F0565C735A}</Project>
+      <Name>DACrux.SEMDMS.Control</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DACrux.SEMDMS.Interface\DACrux.SEMDMS.Interface.csproj">
+      <Project>{21875FB0-5B25-45E6-834D-72B4949B49F6}</Project>
+      <Name>DACrux.SEMDMS.Interface</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DACrux.SEMDMS.RO\DACrux.SEMDMS.RO.csproj">
+      <Project>{B3DE56DD-3EC4-4359-BDA2-2F3289699C8B}</Project>
+      <Name>DACrux.SEMDMS.RO</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

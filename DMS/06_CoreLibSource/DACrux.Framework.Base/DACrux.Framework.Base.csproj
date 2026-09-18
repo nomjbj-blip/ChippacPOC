@@ -1,0 +1,172 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{E6E7F026-C24D-4B25-81FE-290BDA3D4AEB}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DACrux.Framework.Base</RootNamespace>
+    <AssemblyName>DACrux.Framework.Base</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>..\..\07_CoreLib\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <CodeAnalysisLogFile>bin\Debug\DACrux.Framework.Base.dll.CodeAnalysisLog.xml</CodeAnalysisLogFile>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSetDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
+    <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <OutputPath>..\..\71_CoreLib\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <CodeAnalysisLogFile>bin\Release\DACrux.Framework.Base.dll.CodeAnalysisLog.xml</CodeAnalysisLogFile>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSetDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
+    <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BasicControl\DACruxCTLBasic00.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="BasicControl\DACruxCTLBasic00.Designer.cs">
+      <DependentUpon>DACruxCTLBasic00.cs</DependentUpon>
+    </Compile>
+    <Compile Include="BasicControl\DACruxCTLBasic01.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="BasicControl\DACruxCTLBasic01.Designer.cs">
+      <DependentUpon>DACruxCTLBasic01.cs</DependentUpon>
+    </Compile>
+    <Compile Include="BasicForm\DACruxUXBasic00.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="BasicForm\DACruxUXBasic00.Designer.cs">
+      <DependentUpon>DACruxUXBasic00.cs</DependentUpon>
+    </Compile>
+    <Compile Include="BasicForm\DACruxUXBasic01.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="BasicForm\DACruxUXBasic01.Designer.cs">
+      <DependentUpon>DACruxUXBasic01.cs</DependentUpon>
+    </Compile>
+    <Compile Include="BasicForm\DACruxUXBasic02.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="BasicForm\DACruxUXBasic02.Designer.cs">
+      <DependentUpon>DACruxUXBasic02.cs</DependentUpon>
+    </Compile>
+    <Compile Include="BasicForm\DACruxUXBasicDefectLink.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DCMH.cs" />
+    <Compile Include="frmErrorBox.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmErrorBox.designer.cs">
+      <DependentUpon>frmErrorBox.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmInforBox.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmInforBox.Designer.cs">
+      <DependentUpon>frmInforBox.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmMsgBox.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmMsgBox.designer.cs">
+      <DependentUpon>frmMsgBox.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UXUtil.cs" />
+    <EmbeddedResource Include="BasicForm\DACruxUXBasic00.resx">
+      <DependentUpon>DACruxUXBasic00.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="BasicForm\DACruxUXBasic01.resx">
+      <DependentUpon>DACruxUXBasic01.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="BasicForm\DACruxUXBasic02.resx">
+      <DependentUpon>DACruxUXBasic02.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmErrorBox.resx">
+      <DependentUpon>frmErrorBox.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmInforBox.resx">
+      <DependentUpon>frmInforBox.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmMsgBox.resx">
+      <DependentUpon>frmMsgBox.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DACrux.Base\DACrux.Base.csproj">
+      <Project>{EBEDC52F-2DE6-45EB-9E37-805FC298A0ED}</Project>
+      <Name>DACrux.Base</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DACrux.Framework.Interface\DACrux.Framework.Interface.csproj">
+      <Project>{636E5325-AF9E-4C53-B14F-093638CE695D}</Project>
+      <Name>DACrux.Framework.Interface</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DACrux.Framework.RO\DACrux.Framework.RO.csproj">
+      <Project>{E34A0690-0C47-4CEA-8740-7DA4EAACAC21}</Project>
+      <Name>DACrux.Framework.RO</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

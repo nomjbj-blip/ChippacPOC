@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="TPSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Select" queryid="SELECT_ALARM_USER" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT USER_ID
+FROM TQD_ALARM_USER A]]></commandtext>
+    </query>
+    <query statement="Delete" queryid="DELETE_ALARM_USER" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-12-17 21:28:25
+DELETE TQD_ALARM_USER]]></commandtext>
+    </query>
+    <query statement="Insert" queryid="INSERT_ALARM_USER" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQD_ALARM_USER
+VALUES (
+    :FACTORY,
+    :USER_ID,
+    :CREATE_USER,
+    SYSDATE
+)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0" value="FACTORY">:FACTORY</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="USER_ID">:USER_ID</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="CREATE_USER">:CREATE_USER</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ALARM_MAIL" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT EMAIL
+FROM (
+    SELECT (SELECT EMAIL_ID FROM TQC_USER WHERE USER_ID = A.USER_ID AND LENGTH(EMAIL_ID) > 10) EMAIL
+    FROM TQD_ALARM_USER A
+)
+WHERE EMAIL IS NOT NULL]]></commandtext>
+    </query>
+</queryxml>

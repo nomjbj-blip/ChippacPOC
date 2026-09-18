@@ -1,0 +1,224 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{7DE5B98B-E6CF-4E1D-8CC3-D88D2B0F9454}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DACrux.Map</RootNamespace>
+    <AssemblyName>DACrux.Map</AssemblyName>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\07_CoreLib\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\71_CoreLib\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.XML" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="DefectMap.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DefectMap.Designer.cs">
+      <DependentUpon>DefectMap.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DefectSourceAnalysis.cs" />
+    <Compile Include="EditTESTMap.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="EditWaferMap.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="EditWaferMap.Designer.cs">
+      <DependentUpon>EditWaferMap.cs</DependentUpon>
+    </Compile>
+    <Compile Include="IDefectMap.cs" />
+    <Compile Include="RepeatedDefect.cs" />
+    <Compile Include="Resource.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resource.resx</DependentUpon>
+    </Compile>
+    <Compile Include="ShotMap.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ShotMap.Designer.cs">
+      <DependentUpon>ShotMap.cs</DependentUpon>
+    </Compile>
+    <Compile Include="WaferMap.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="WaferMap.Designer.cs">
+      <DependentUpon>WaferMap.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WaferMapShotOption.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="WaferMapShotOption.Designer.cs">
+      <DependentUpon>WaferMapShotOption.cs</DependentUpon>
+    </Compile>
+    <Compile Include="WaferMapZoneOption.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="WaferMapZoneOption.Designer.cs">
+      <DependentUpon>WaferMapZoneOption.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Zonal.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ZoneIDSelectControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ZoneIDSelectControl.Designer.cs">
+      <DependentUpon>ZoneIDSelectControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ZoneIDSelectControlPopup.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ZoneIDSelectControlPopup.Designer.cs">
+      <DependentUpon>ZoneIDSelectControlPopup.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ZoneWaferMap.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ZoneWaferMap.Designer.cs">
+      <DependentUpon>ZoneWaferMap.cs</DependentUpon>
+    </Compile>
+    <Service Include="{94E38DFF-614B-4cbd-B67C-F211BB35CE8B}" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="DefectMap.resx">
+      <DependentUpon>DefectMap.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EditTESTMap.resx">
+      <DependentUpon>EditTESTMap.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EditWaferMap.resx">
+      <DependentUpon>EditWaferMap.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resource.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resource.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="WaferMap.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>WaferMap.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="WaferMapShotOption.resx">
+      <DependentUpon>WaferMapShotOption.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="WaferMapZoneOption.resx">
+      <DependentUpon>WaferMapZoneOption.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Zonal.resx">
+      <DependentUpon>Zonal.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ZoneIDSelectControl.resx">
+      <DependentUpon>ZoneIDSelectControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ZoneIDSelectControlPopup.resx">
+      <DependentUpon>ZoneIDSelectControlPopup.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 2.0%28x86%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.0%28x86%29</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DACrux.Base\DACrux.Base.csproj">
+      <Project>{EBEDC52F-2DE6-45EB-9E37-805FC298A0ED}</Project>
+      <Name>DACrux.Base</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

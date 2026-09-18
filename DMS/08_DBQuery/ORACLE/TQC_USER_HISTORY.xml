@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="QMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Insert" queryid="INSERT_USER_HISTORY" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQC_USER_HISTORY(USER_SEQ, USER_ID, USER_NAME, PASSWORD, TRAN_TIME, SEC_GRP_ID, PHONE_OFFICE,  PHONE_MOBILE, PHONE_HOME, PHONE_OTHER, EMAIL_ID, USER_CMF_1, USER_CMF_2, USER_CMF_3, USER_CMF_4, USER_CMF_5) VALUES(USER_SEQ.NEXTVAL, :strUserID,  :strUserName, :strPass, :tran_time, :strPnOffice, :strPnMobile, :strPnHome, :strPnOther, :strEmail, :strGrp, :strUserCmf1, :strUserCmf2,:strUserCmf3,:strUserCmf4,:strUserCmf5)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:strUserID</param>
+            <param direction="Input" dbtype="VarChar" size="40">:strUserName</param>
+            <param direction="Input" dbtype="VarChar" size="40">:strPass</param>
+            <param direction="Input" dbtype="VarChar" size="40">:tran_time</param>
+            <param direction="Input" dbtype="VarChar" size="40">:strPnOffice</param>
+            <param direction="Input" dbtype="VarChar" size="40">:strPnMobile</param>
+            <param direction="Input" dbtype="VarChar" size="40">:strPnHome</param>
+            <param direction="Input" dbtype="VarChar" size="40">:strPnOther</param>
+            <param direction="Input" dbtype="VarChar" size="40">:strEmail</param>
+            <param direction="Input" dbtype="VarChar" size="40">:strGrp</param>
+            <param direction="Input" dbtype="VarChar" size="40">:strUserCmf1</param>
+            <param direction="Input" dbtype="VarChar" size="40">:strUserCmf2</param>
+            <param direction="Input" dbtype="VarChar" size="40">:strUserCmf3</param>
+            <param direction="Input" dbtype="VarChar" size="40">:strUserCmf4</param>
+            <param direction="Input" dbtype="VarChar" size="40">:strUserCmf5</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_USER_HISTORY" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2014-01-21 09:48:32
+SELECT USER_CMF_1 AS STATUS, USER_SEQ, USER_ID, USER_NAME, TRAN_TIME, SEC_GRP_ID, PHONE_OFFICE, PHONE_MOBILE, PHONE_HOME, PHONE_OTHER, EMAIL_ID, USER_CMF_2 AS USER_SEC_GROUP FROM TQC_USER_HISTORY
+WHERE 1=1
+AND TRAN_TIME BETWEEN TO_TIMESTAMP(:st_time,'YYYY-MM-DD HH24:MI:SS.FF')
+                    AND TO_TIMESTAMP(:end_time,'YYYY-MM-DD HH24:MI:SS.FF')
+ORDER BY TRAN_TIME DESC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:st_time</param>
+            <param direction="Input" dbtype="VarChar" size="40">:end_time</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_USER_HISTORY_BYUSER" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2014-01-24 09:28:43
+SELECT USER_CMF_1 AS STATUS, USER_SEQ, USER_ID, USER_NAME, TRAN_TIME, SEC_GRP_ID, PHONE_OFFICE, PHONE_MOBILE, PHONE_HOME, PHONE_OTHER, EMAIL_ID FROM TQC_USER_HISTORY
+WHERE 1=1
+AND TRAN_TIME BETWEEN TO_TIMESTAMP(:st_time,'YYYY-MM-DD HH24:MI:SS.FF')
+                    AND TO_TIMESTAMP(:end_time,'YYYY-MM-DD HH24:MI:SS.FF')
+AND USER_NAME = :user_name                    
+ORDER BY TRAN_TIME DESC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:st_time</param>
+            <param direction="Input" dbtype="VarChar" size="40">:end_time</param>
+            <param direction="Input" dbtype="VarChar" size="40">:user_name</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_DELETE_USER" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2014-01-27 16:24:27
+SELECT USER_CMF_1 AS STATUS, USER_SEQ, USER_ID, USER_NAME, TRAN_TIME, SEC_GRP_ID, PHONE_OFFICE, PHONE_MOBILE, PHONE_HOME, PHONE_OTHER, EMAIL_ID FROM TQC_USER_HISTORY
+WHERE 1=1
+AND TRAN_TIME BETWEEN TO_TIMESTAMP(:st_time,'YYYY-MM-DD HH24:MI:SS.FF')
+                    AND TO_TIMESTAMP(:end_time,'YYYY-MM-DD HH24:MI:SS.FF')
+AND USER_CMF_1 = 'Delete'                    
+ORDER BY TRAN_TIME DESC, USER_ID ASC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:st_time</param>
+            <param direction="Input" dbtype="VarChar" size="40">:end_time</param>
+        </parameters>
+    </query>
+</queryxml>

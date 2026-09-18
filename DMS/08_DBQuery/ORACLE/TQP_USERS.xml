@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="BUMPFA" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Select" queryid="GET_USERLIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQP_SECUSR]]></commandtext>
+    </query>
+    <query statement="Insert" queryid="CREATE_USER" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_SECUSR (FACTORY,USER_NAME,USER_GROUP,PASSWORD,USER_DESC,DEPARTMENT,PHONE_NUMBER,EMAIL_ID,JOIN_DATE,RESV_FIELD1,RESV_FIELD2)
+VALUES('ALT',:user_name,:user_group,:password,:user_desc,:department,:phone_number,:email_id,TO_CHAR(SYSDATE,'YYYYMMDD'),:expire_date, :customer)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="20">:user_name</param>
+            <param direction="Input" dbtype="VarChar" size="20">:user_group</param>
+            <param direction="Input" dbtype="VarChar" size="20">:password</param>
+            <param direction="Input" dbtype="VarChar" size="40">:user_desc</param>
+            <param direction="Input" dbtype="VarChar" size="20">:department</param>
+            <param direction="Input" dbtype="VarChar" size="20">:phone_number</param>
+            <param direction="Input" dbtype="VarChar" size="40">:email_id</param>
+            <param direction="Input" dbtype="VarChar" size="30">:expire_date</param>
+            <param direction="Input" dbtype="VarChar" size="30">:customer</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_USERINFO" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQP_SECUSR WHERE USER_NAME = :userid]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="20" value="ysim">:userid</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_USER" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[DELETE FROM TQP_SECUSR WHERE USER_NAME = :userid]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="20">:userid</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="UPDATE_USER" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_SECUSR SET USER_GROUP=:user_group
+		,PASSWORD=:password
+		,USER_DESC=:user_desc
+		,DEPARTMENT=:department
+		,PHONE_NUMBER=:phone_number
+		,EMAIL_ID=:email_id
+		,RESV_FIELD1=:expire_date
+		,RESV_FIELD2=:customer
+ WHERE 
+USER_NAME = :user_name]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="20">:user_group</param>
+            <param direction="Input" dbtype="VarChar" size="20">:password</param>
+            <param direction="Input" dbtype="VarChar" size="40">:user_desc</param>
+            <param direction="Input" dbtype="VarChar" size="20">:department</param>
+            <param direction="Input" dbtype="VarChar" size="20">:phone_number</param>
+            <param direction="Input" dbtype="VarChar" size="40">:email_id</param>
+            <param direction="Input" dbtype="VarChar" size="30">:expire_date</param>
+            <param direction="Input" dbtype="VarChar" size="20">:user_name</param>
+            <param direction="Input" dbtype="VarChar" size="30">:customer</param>
+        </parameters>
+    </query>
+</queryxml>

@@ -1,0 +1,473 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="TPSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Insert" queryid="CREATE_BIN" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_BINDESC(PROGRAM, BIN, BIN_NAME, CHAR_BIN, HIGH_GEC, DISPLAY, UPPER_LIMIT_CNT, LOWER_LIMIT_CNT, COLOR, DESCRIPTION)
+ VALUES (:program, :bin, :name, :charbin, :high_gec, :display, :upper_limit_cnt, :lower_limit_cnt, :color, :description)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0" value="program">:program</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="bin">:bin</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="bin_desc">:name</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="char_bin">:charbin</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="high_gec">:high_gec</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="display">:display</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="upper_limit_cnt">:upper_limit_cnt</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="lower_limit_cnt">:lower_limit_cnt</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="color">:color</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="description">:description</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_BIN_EDITABLE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[/*
+SELECT TESTAREA AS "Test Area", BIN AS "Soft Bin", BIN_GROUP AS "Hard Bin", BIN_NAME AS "Bin Desc", CHAR_BIN AS "Map Symbol", 
+DECODE(HIGH_GEC,'T','True','False') AS "Is Gec", DECODE(DISPLAY,'T','True','False') AS "Is Display",
+UPPER_LIMIT_CNT AS "Upper Limit", LOWER_LIMIT_CNT AS "Lower Limit", COLOR AS "Color", DESCRIPTION AS "Description"
+FROM TQP_BINDESC
+WHERE PROGRAM = :program 
+order by bin, testarea asc
+*/
+
+SELECT '' AS "EDITMODE", 
+       T1.PROGRAM,
+       T1.BIN,
+       T1.BIN_NAME,
+       T1.CHAR_BIN,
+       DECODE(T1.HIGH_GEC, 'Y', 'True', 'False') AS "HIGH_GEC",
+       DECODE(T1.DISPLAY, 'Y', 'True', 'False') AS "DISPLAY",
+       T1.UPPER_LIMIT_CNT,
+       T1.LOWER_LIMIT_CNT,
+       T1.COLOR,
+       T1.DESCRIPTION
+  FROM TQP_BINDESC T1
+ WHERE 1=1
+   AND PROGRAM = :program
+ ORDER BY PROGRAM, BIN]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="25" value="TESTPROG">:program</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_BINDESC_DISTINCT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT(??)
+FROM TQP_BINDESC
+WHERE ?? != ' '
+ORDER BY ??
+]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_BIN_EDITABLE_BY_ALL" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT BIN AS "Soft Bin", BIN_GROUP AS "Hard Bin", BIN_NAME AS "Bin Desc", IN_CHAR_BIN AS "In Map Symbol", 
+DECODE(HIGH_GEC,'T','True','False') AS "Is Gec", DECODE(DISPLAY,'T','True','False') AS "Is Display",
+UPPER_LIMIT_CNT AS "Upper Limit", LOWER_LIMIT_CNT AS "Lower Limit", COLOR AS "Color", DESCRIPTION AS "Description"
+FROM TQP_BINDESC
+WHERE PRODUCT = :product 
+AND TESTAREA = :testarea
+order by bin, testarea asc]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="25" value="TESTPROG">:product</param>
+            <param direction="Input" dbtype="VarChar" size="25" value="TESTPROG">:testarea</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_PROGRAM_BIN" commandtype="Text" description="선택한 Program의 Bin DELETE" commandtimeout="60">
+        <commandtext><![CDATA[DELETE FROM TQP_BINDESC WHERE PROGRAM=:program AND BIN=:bin]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:program</param>
+            <param direction="Input" dbtype="VarChar" size="0">:bin</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_PROGRAM_BIN_ALL" commandtype="Text" description="선택한 Program의 Bin DELETE" commandtimeout="60">
+        <commandtext><![CDATA[DELETE FROM TQP_BINDESC WHERE PROGRAM=:program]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:program</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_PRODUCT_TEMP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_BINDESC 
+SET PRODUCT = 'UPDATE_TEMP' 
+WHERE PRODUCT = :product
+AND TESTAREA = :testarea]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:product</param>
+            <param direction="Input" dbtype="VarChar" size="0">:testarea</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="ROLLBACK_BINDESC_TEMP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_BINDESC 
+SET PRODUCT = :product 
+WHERE PRODUCT = 'UPDATE_TEMP']]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:product</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_TEMP_PRODUCT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[DELETE 
+FROM TQP_BINDESC 
+WHERE PRODUCT = 'UPDATE_TEMP']]></commandtext>
+    </query>
+    <query statement="Select" queryid="DYNAMIC_QUERY" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[?? from ??]]></commandtext>
+    </query>
+    <query statement="Select" queryid="GET_BINLIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT BIN,(BIN ||  '-' || BIN_NAME) AS BIN_DESC FROM TQP_BINDESC
+WHERE PRODUCT = :product
+AND PROGRAM = :program]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:product</param>
+            <param direction="Input" dbtype="VarChar" size="30">:program</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_BININFO" commandtype="Text" description="Bin 정보를 가져온다." commandtimeout="60">
+        <commandtext><![CDATA[SELECT  BIN, BIN_GROUP, CHAR_BIN, HIGH_GEC FROM TQP_BINDESC 
+WHERE UPPER(PROGRAM) = UPPER(:program)
+AND UPPER(PRODUCT) = UPPER(:product)
+ORDER BY BIN]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30" value="SEPS225F0A-CP-REV0">:program</param>
+            <param direction="Input" dbtype="VarChar" size="30" value="SEPS225F0A">:product</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_GECBIN" commandtype="Text" description="Gecbin 값을 가져온다." commandtimeout="60">
+        <commandtext><![CDATA[SELECT T1.*, 'BIN' || T1.BIN AS "BIN_CODE"
+  FROM TQP_BINDESC T1
+ WHERE HIGH_GEC = 'Y' 
+       AND PROGRAM = :program 
+ ORDER BY BIN]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30" value="SEPS225F0A-CP-REV0">:program</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_GECBIN_BY_ALL" commandtype="Text" description="Gecbin 값을 가져온다." commandtimeout="60">
+        <commandtext><![CDATA[SELECT *
+  FROM TQP_BINDESC 
+ WHERE HIGH_GEC = 'Y' 
+       AND PRODUCT = :product 
+ ORDER BY BIN]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30" value="SEPS225F0A-CP-REV0">:product</param>
+            <param direction="Input" dbtype="VarChar" size="30" value="SEPS225F0A">:testarea</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_BIN_BY_CHARBIN" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[ SELECT BIN FROM TQP_BINDESC WHERE product = :program AND CHAR_BIN = :char_bin]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="20" value="104-SFHSB127">:program</param>
+            <param direction="Input" dbtype="VarChar" size="20" value="4">:char_bin</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_BIN_EDITABLE_BY_TESTAREA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT TESTAREA AS "Test Area", BIN AS "Soft Bin", BIN_GROUP AS "Hard Bin", BIN_NAME AS "Bin Desc", CHAR_BIN AS "Map Symbol", KEYMAP AS "Key", 
+DECODE(HIGH_GEC,'T','True','False') AS "Is Gec", DECODE(DISPLAY,'T','True','False') AS "Is Display",
+UPPER_LIMIT_CNT AS "Upper Limit", LOWER_LIMIT_CNT AS "Lower Limit", COLOR AS "Color", DESCRIPTION AS "Description" 
+FROM TQP_BINDESC
+WHERE PROGRAM = :program
+AND TESTAREA = :testarea
+order by bin, testarea asc]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="104-SFHSB127">:program</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="4">:testarea</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_PROGRAM_TEMP_BY_TESTAREA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_BINDESC
+SET PROGRAM='UPDATE_TEMP'
+WHERE 1=1
+AND PROGRAM = :program
+AND TESTAREA = :testarea]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0" value="104-SFHSB127">:program</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="4">:testarea</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_PROGRAM_BIN_BY_TESTAREA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[DELETE FROM TQP_BINDESC 
+WHERE 1=1
+AND PROGRAM = :program
+AND TESTAREA = :testarea]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:program</param>
+            <param direction="Input" dbtype="VarChar" size="0">:testarea</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_BININFO_BY_TESTAREA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT  * FROM TQP_BINDESC 
+WHERE UPPER(PROGRAM) = UPPER(:program)
+AND UPPER(PRODUCT) = UPPER(:product)
+AND UPPER(TESTAREA) = UPPER(:testarea)
+ORDER BY BIN]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:program</param>
+            <param direction="Input" dbtype="VarChar" size="40">:product</param>
+            <param direction="Input" dbtype="VarChar" size="40">:testarea</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_BIN_BY_ALL" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[DELETE FROM TQP_BINDESC 
+WHERE PRODUCT = :product
+AND TESTAREA = :testarea
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:customer</param>
+            <param direction="Input" dbtype="VarChar" size="0">:product</param>
+            <param direction="Input" dbtype="VarChar" size="0">:testarea</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_BINDESC_BY_ELEMENT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT *
+FROM TQP_BINDESC
+WHERE 1=1
+??
+]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_BININFO_BY_ALL" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT  * 
+FROM TQP_BINDESC 
+WHERE 1=1
+AND PRODUCT = :product
+AND TESTAREA = :testarea
+ORDER BY BIN]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:product</param>
+            <param direction="Input" dbtype="VarChar" size="40">:testarea</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_BININFO_BY_ALL_1" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[WITH RT AS (
+SELECT A.*,
+       (DECODE(A.PRODUCT, :product, 10, 0)
+       + DECODE(A.TESTAREA, :testarea, 20, 0))
+    FROM TQP_BINDESC A
+    WHERE 1=1
+    AND A.CUSTOMER IN (' ', :customer)
+    AND A.PRODUCT IN (' ',  :product)
+    AND A.TESTAREA IN (' ', :testarea)
+    )
+SELECT * FROM RT
+ORDER BY BIN]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:customer</param>
+            <param direction="Input" dbtype="VarChar" size="40">:product</param>
+            <param direction="Input" dbtype="VarChar" size="40">:testarea</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_BININFO_BY_ALL_AT_ONCE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[WITH RT AS (
+SELECT A.*,
+       (DECODE(A.PRODUCT, :product, 10, 0)
+       + DECODE(A.TESTAREA, :testarea, 20, 0))
+    FROM TQP_BINDESC A
+    WHERE 1=1
+    AND A.PRODUCT IN (' ',  :product)
+    AND A.TESTAREA IN (' ', :testarea)
+    )
+SELECT * FROM RT
+ORDER BY BIN]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="610">:product</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="INCUST">:testarea</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_GEC_BIN_BY_ALL_AT_ONCE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[WITH RT AS (
+SELECT A.*,
+        (DECODE(A.PRODUCT, :product, 10, 0)
+        + DECODE(A.TESTAREA, :testarea, 20, 0))
+    FROM TQP_BINDESC A
+    WHERE 1=1
+    AND A.PRODUCT IN (' ',  :product)
+    AND A.TESTAREA IN (' ', :testarea)
+    )
+SELECT * FROM RT
+WHERE 1=1
+AND HIGH_GEC = 'T'
+ORDER BY BIN]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:product</param>
+            <param direction="Input" dbtype="VarChar" size="40">:testarea</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_BIN_RULE_LIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT 
+  PRODUCT AS "Product",
+  TESTAREA AS "TestArea",
+FROM TQP_BINDESC
+ORDER BY CUSTOMER,
+  PRODUCT,
+  TESTAREA,]]></commandtext>
+    </query>
+    <query statement="Update" queryid="UPDATE_PROGRAM_TEMP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2015-03-19 16:58:16
+UPDATE TQP_BINDESC SET PROGRAM='UPDATE_TEMP' WHERE PROGRAM = :program]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:program</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_TEMP_PROGRAM" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2015-03-19 17:04:44
+DELETE FROM TQP_BINDESC WHERE PROGRAM='UPDATE_TEMP']]></commandtext>
+    </query>
+    <query statement="Update" queryid="UPDATE_PROGRAM_BIN" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-06-03 14:41:39
+UPDATE TQP_BINDESC
+   SET BIN_NAME = :name
+     , CHAR_BIN = :charbin
+     , HIGH_GEC = :highgec
+     , DISPLAY = :display
+     , UPPER_LIMIT_CNT = :upperlimitcnt
+     , LOWER_LIMIT_CNT = :lowerlimitcnt
+     , COLOR = :color
+     , DESCRIPTION = :description
+ WHERE 1=1
+       AND PROGRAM = :program
+       AND BIN = :bin]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0" value="program">:program</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="bin">:bin</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="name">:name</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="charbin">:charbin</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="highgec">:highgec</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="display">:display</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="upperlimitcnt">:upperlimitcnt</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="lowerlimitcnt">:lowerlimitcnt</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="color">:color</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="description">:description</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_BIN_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT  BIN, NVL(COLOR, '#FFFFFF') AS BIN_COLOR, BIN AS BIN_DESC, NVL (BIN_NAME, BIN) AS DESCRIPTION, HIGH_GEC
+  FROM TQP_BINDESC
+ WHERE 1 = 1 
+ AND PROGRAM = :pgm]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:pgm</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_BIN_DESC" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT PROGRAM,
+       BIN,
+       NVL(BIN_NAME, BIN) AS BIN_NAME,
+       HIGH_GEC,
+       NVL(COLOR, '#FFFFFF') AS BIN_COLOR
+  FROM TQP_BINDESC
+ WHERE 1 = 1
+ AND PROGRAM = :pgm]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:pgm</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_BIN_DESC_ALL" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[  SELECT :program AS PROGRAM,
+         A.BIN AS BIN,
+         A.BIN AS BIN_NAME,
+         A.HIGH_GEC AS HIGH_GEC,
+         '#FFFFFF' AS BIN_COLOR
+    FROM (  SELECT DISTINCT BIN, MIN (HIGH_GEC) AS HIGH_GEC
+              FROM TQP_BINDESC
+             WHERE 1 = 1
+          GROUP BY BIN) A
+ORDER BY 2]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:program</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_PGM_BIN" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQP_BINDESC
+WHERE 1 = 1 
+AND PROGRAM = :program
+AND BIN = :bin]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="program">:program</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="bin">:bin</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="INSERT_BIN_DESC" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_BINDESC
+(
+ PROGRAM,
+ BIN,
+ CHAR_BIN,
+ DESCRIPTION,
+ HIGH_GEC)
+ VALUES (
+ :program, 
+ :bin, 
+ :charbin,
+ :description
+ ,'N')]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0" value="program">:program</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="bin">:bin</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="charbin">:charbin</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="description">:description</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="CREATE_COPY_BIN" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-10-28 12:17:47
+INSERT INTO TQP_BINDESC
+SELECT :targetProgram, BIN, BIN_GROUP, BIN_NAME, CHAR_BIN, HIGH_GEC, DISPLAY, UPPER_LIMIT_CNT, LOWER_LIMIT_CNT, COLOR, DESCRIPTION
+  FROM TQP_BINDESC
+ WHERE 1=1 
+   AND PROGRAM = :sourceProgram]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="0" value="targetProgram">:targetProgram</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="sourceProgram">:sourceProgram</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="EXISTS_BIN_INFO" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-11-11 17:22:45
+SELECT COUNT(1)
+  FROM TQP_BINDESC 
+ WHERE PROGRAM = :program
+   AND BIN = :bin]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="program">:program</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="bin">:bin</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="MERGE_BIN" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-12-06 11:20:53
+MERGE INTO tqp_bindesc t1
+     USING DUAL
+        ON (t1.program = :program AND t1.bin = :bin)
+WHEN MATCHED
+THEN
+   UPDATE SET bin_name = :bname,
+              char_bin = :cbin,
+              high_gec = :hgec,
+              display = :display,
+              upper_limit_cnt = :upper_limit_cnt,
+              lower_limit_cnt = :lower_limit_cnt,
+              color = :color,
+              description = :description
+WHEN NOT MATCHED
+THEN
+   INSERT     (program,
+               bin,
+               bin_name,
+               char_bin,
+               high_gec,
+               display,
+               upper_limit_cnt,
+               lower_limit_cnt,
+               color,
+               description)
+       VALUES ( :program,
+               :bin,
+               :bname,
+               :cbin,
+               :hgec,
+               :display,
+               :upper_limit_cnt,
+               :lower_limit_cnt,
+               :color,
+               :description)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="program">:program</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="bin">:bin</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="bname">:bname</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="cbin">:cbin</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="hgec">:hgec</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="display">:display</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="upper_limit_cnt">:upper_limit_cnt</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="lower_limit_cnt">:lower_limit_cnt</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="color">:color</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="description">:description</param>
+        </parameters>
+    </query>
+</queryxml>

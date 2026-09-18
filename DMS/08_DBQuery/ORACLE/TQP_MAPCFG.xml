@@ -1,0 +1,244 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="TPSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Select" queryid="SELECT_MAPCFG" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT MAP_CFG_SEQ,
+       TESTAREA,
+       DEVICE_ALIAS,
+       PROGRAM,
+       ALTER_ANGLE,
+       ALTER_INDEX_X,
+       ALTER_INDEX_Y,
+       CREATE_USER,
+       CREATE_TIME,
+       UPDATE_USER,
+       UPDATE_TIME,
+       USER_COMMENT FROM TQP_MAPCFG
+    WHERE 1 = 1 
+    AND TESTAREA = :testarea
+    AND DEVICE_ALIAS = :device
+    AND PROGRAM IN (:pgm, 'ALL')
+    AND NVL(DELETE_FLAG, 'N') = 'N'
+    ORDER BY DECODE(PROGRAM, 'ALL', 99999, 1), MAP_CFG_SEQ DESC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:testarea</param>
+            <param direction="Input" dbtype="VarChar" size="40">:device</param>
+            <param direction="Input" dbtype="VarChar" size="40">:pgm</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="CREATE_MATCFG" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_MAPCFG
+(
+ MAP_CFG_SEQ,
+ REV_NO,
+ TESTAREA,
+ DEVICE_ALIAS,
+ PROGRAM,
+ ALTER_DIRECTION,
+ ALTER_ANGLE,
+ ALTER_INDEX_X,
+ ALTER_INDEX_Y,
+ CREATE_USER,
+ CREATE_TIME,
+ USER_COMMENT    
+) 
+ VALUES
+ (
+   MAP_CFG_SEQ.NEXTVAL,
+   :rev_no,
+   :testarea,
+   :device_alias,
+   :pgm,
+   :alter_dir,
+   :alter_angle,
+   :alter_index_x,
+   :alter_index_y,
+   :create_user,
+   SYSDATE,
+   :user_comment
+  ) ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="0">:rev_no</param>
+            <param direction="Input" dbtype="VarChar" size="0">:testarea</param>
+            <param direction="Input" dbtype="VarChar" size="0">:device_alias</param>
+            <param direction="Input" dbtype="VarChar" size="0">:pgm</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="alter_dir">:alter_dir</param>
+            <param direction="Input" dbtype="VarChar" size="0">:alter_angle</param>
+            <param direction="Input" dbtype="VarChar" size="0">:alter_index_x</param>
+            <param direction="Input" dbtype="VarChar" size="0">:alter_index_y</param>
+            <param direction="Input" dbtype="VarChar" size="0">:create_user</param>
+            <param direction="Input" dbtype="VarChar" size="0">:user_comment</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_MAPCFG" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[--UPDATE TQP_MAPCFG SET
+ ALTER_ANGLE = :alter_angle,
+ ALTER_INDEX_X = :alter_index_x,
+ ALTER_INDEX_Y = :alter_index_y,
+ UPDATE_USER = :update_user,
+ UPDATE_TIME = SYSDATE,
+ USER_COMMENT  = :user_comment
+WHERE 1 = 1 
+AND TESTAREA = :testarea
+AND DEVICE_ALIAS = :device_alias
+AND PROGRAM = :pgm
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:testarea</param>
+            <param direction="Input" dbtype="VarChar" size="40">:device_alias</param>
+            <param direction="Input" dbtype="VarChar" size="40">:pgm</param>
+            <param direction="Input" dbtype="VarChar" size="40">:alter_angle</param>
+            <param direction="Input" dbtype="VarChar" size="0">:alter_index_x</param>
+            <param direction="Input" dbtype="VarChar" size="0">:alter_index_y</param>
+            <param direction="Input" dbtype="VarChar" size="0">:update_user</param>
+            <param direction="Input" dbtype="VarChar" size="0">:user_comment</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="DELETE_MAPCFG" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_MAPCFG SET
+ DELETE_FLAG = 'Y',
+ UPDATE_USER = :update_user,
+ UPDATE_TIME = SYSDATE
+WHERE 1 = 1 
+    AND TESTAREA = :testarea
+    AND DEVICE_ALIAS = :device
+    AND PROGRAM = :pgm
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="0" value="update_user">:update_user</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="testarea">:testarea</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="device">:device</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="pgm">:pgm</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_CORRECTION_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM (
+SELECT /*+ INDEX_DESC(A PK_TQP_MAPCFG) */
+    ALTER_DIRECTION, ALTER_ANGLE, ALTER_INDEX_X, ALTER_INDEX_Y
+FROM TQP_MAPCFG A
+WHERE 1 = 1
+    AND TESTAREA = :TESTAREA
+    AND DEVICE_ALIAS = :DEVICE_ALIAS
+    AND PROGRAM = :PROGRAM
+UNION ALL
+SELECT /*+ INDEX_DESC(A PK_TQP_MAPCFG) */
+    ALTER_DIRECTION, ALTER_ANGLE, ALTER_INDEX_X, ALTER_INDEX_Y 
+FROM TQP_MAPCFG A
+WHERE 1 = 1
+    AND TESTAREA = :TESTAREA
+    AND DEVICE_ALIAS = :DEVICE_ALIAS
+AND PROGRAM = 'ALL'
+)
+WHERE ROWNUM = 1]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="TESTAREA">:TESTAREA</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="DEVICE_ALIAS">:DEVICE_ALIAS</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="PROGRAM">:PROGRAM</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_MAPCFG_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQP_MAPCFG
+    WHERE 1 = 1 
+    AND TESTAREA = :testarea
+    AND DEVICE_ALIAS = :device
+    AND PROGRAM = :pgm
+    AND NVL(DELETE_FLAG, 'N') = 'N'
+    ORDER BY DECODE(PROGRAM, 'ALL', 99999, 1), MAP_CFG_SEQ DESC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="testarea">:testarea</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="device">:device</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="pgm">:pgm</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_MAPCFG_02" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT PROGRAM FROM TQP_MAPCFG
+    WHERE 1 = 1 
+    AND TESTAREA = 'MULTIPROBE'
+    AND DEVICE_ALIAS = :device
+    ORDER BY PROGRAM]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="device">:device</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_MAPCFG_VIEW" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT 
+     MAP_CFG_SEQ,
+     REV_NO,
+     'RevNO : ' ||LPAD(REV_NO, 2, '0') || ' (SEQ : ' || LPAD(MAP_CFG_SEQ, 5, '0') || ')' AS SEQ_REV_NO,
+     TESTAREA,
+     DEVICE_ALIAS,
+     PROGRAM,
+     ALTER_DIRECTION,
+     ALTER_ANGLE,
+     ALTER_INDEX_X,
+     ALTER_INDEX_Y,
+     CREATE_USER,
+     CREATE_TIME,
+     UPDATE_USER,
+     UPDATE_TIME,
+     USER_COMMENT,
+     DELETE_FLAG
+ FROM TQP_MAPCFG
+    WHERE 1 = 1 
+     ??
+    ORDER BY TESTAREA, DEVICE_ALIAS, PROGRAM, REV_NO]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_MAPCFG_03" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQP_MAPCFG
+    WHERE 1 = 1 
+    AND TESTAREA = :testarea
+    AND DEVICE_ALIAS = :device
+    AND PROGRAM = :pgm
+    ORDER BY REV_NO DESC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="0" value="testarea">:testarea</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="device">:device</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="pgm">:pgm</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="DELETE_MAPCFG_SEQ" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_MAPCFG SET
+ DELETE_FLAG = 'Y',
+ UPDATE_USER = :update_user,
+ UPDATE_TIME = SYSDATE,
+ USER_COMMENT = :user_comment
+WHERE 1 = 1 
+    AND MAP_CFG_SEQ = :map_seq
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="0" value="update_user">:update_user</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="user_comment">:user_comment</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="map_seq">:map_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_CORRECTION_SET" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[  SELECT *
+    FROM (SELECT *
+            FROM TQP_MAPCFG
+           WHERE 1 = 1 
+           AND TESTAREA = :testarea
+           AND DEVICE_ALIAS = :device)
+           WHERE :prgram LIKE PROGRAM ESCAPE '\' OR PROGRAM = 'ALL'
+           AND DELETE_FLAG = 'N'
+ORDER BY   CASE
+              WHEN PROGRAM = 'ALL' THEN 1000
+              WHEN INSTR (PROGRAM, '%') > 0 THEN 2000
+              WHEN INSTR (PROGRAM, '_') > 0 THEN 3000
+              ELSE 10000
+           END
+         + LENGTH (PROGRAM) DESC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="0" value="testarea">:testarea</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="device">:device</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="prgram">:prgram</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_MAPCFG_SEQ" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT *
+  FROM TQP_MAPCFG
+ WHERE 1 = 1
+ AND MAP_CFG_SEQ = :cfg_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="0" value="cfg_seq">:cfg_seq</param>
+        </parameters>
+    </query>
+</queryxml>

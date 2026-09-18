@@ -1,0 +1,547 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{8FCC693A-F9A3-4194-8F8E-9678D5DA3A45}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DACrux.BStats</RootNamespace>
+    <AssemblyName>DACrux.BStats</AssemblyName>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\71_CoreLib\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\71_CoreLib\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="DACrux.Base, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\07_CoreLib\DACrux.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="DACrux.BStats.Core, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\07_CoreLib\DACrux.BStats.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="FarPoint.Win, Version=5.0.3522.2008, Culture=neutral, PublicKeyToken=327c3516b1b18457, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\GrapeCity\Spread.WinForms.5.dotNet35\v5.0.3518\Bin\FarPoint.Win.dll</HintPath>
+    </Reference>
+    <Reference Include="FarPoint.Win.Spread, Version=5.0.3522.2008, Culture=neutral, PublicKeyToken=327c3516b1b18457, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="NMathCoreKernel, Version=2.4.0.0, Culture=neutral, PublicKeyToken=873235918a322639, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\CenterSpace\NMath\Core 2.4\Assemblies\NMathCoreKernel.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="NMathCoreMath, Version=2.4.0.0, Culture=neutral, PublicKeyToken=873235918a322639, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\CenterSpace\NMath\Core 2.4\Assemblies\NMathCoreMath.dll</HintPath>
+    </Reference>
+    <Reference Include="NMathCoreShared, Version=2.4.0.0, Culture=neutral, PublicKeyToken=873235918a322639, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\CenterSpace\NMath\Core 2.4\Assemblies\NMathCoreShared.dll</HintPath>
+    </Reference>
+    <Reference Include="NMathMatrixKernel, Version=2.3.0.0, Culture=neutral, PublicKeyToken=873235918a322639, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\CenterSpace\NMath\Matrix 2.3\Assemblies\NMathMatrixKernel.dll</HintPath>
+    </Reference>
+    <Reference Include="NMathMatrixMain, Version=2.3.0.0, Culture=neutral, PublicKeyToken=873235918a322639, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\CenterSpace\NMath\Matrix 2.3\Assemblies\NMathMatrixMain.dll</HintPath>
+    </Reference>
+    <Reference Include="NMathStatsKernel, Version=2.3.0.0, Culture=neutral, PublicKeyToken=873235918a322639, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\CenterSpace\NMath\Stats 2.3\Assemblies\NMathStatsKernel.dll</HintPath>
+    </Reference>
+    <Reference Include="NMathStatsMain, Version=2.3.0.0, Culture=neutral, PublicKeyToken=873235918a322639, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\CenterSpace\NMath\Stats 2.3\Assemblies\NMathStatsMain.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Design" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Management" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Combination.cs" />
+    <Compile Include="Common.cs" />
+    <Compile Include="DataTableUtil.cs" />
+    <Compile Include="FactorialDesign.cs" />
+    <Compile Include="GraphDialog\_DlgBarGraph.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GraphDialog\_DlgBarGraph.Designer.cs">
+      <DependentUpon>_DlgBarGraph.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GraphDialog\DlgBoxPlotGraph.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GraphDialog\DlgBoxPlotGraph.Designer.cs">
+      <DependentUpon>DlgBoxPlotGraph.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GraphDialog\DlgHistogramGraph.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GraphDialog\DlgHistogramGraph.Designer.cs">
+      <DependentUpon>DlgHistogramGraph.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GraphDialog\DlgParetoGraph.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GraphDialog\DlgParetoGraph.Designer.cs">
+      <DependentUpon>DlgParetoGraph.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GraphDialog\DlgScatterGraph.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GraphDialog\DlgScatterGraph.Designer.cs">
+      <DependentUpon>DlgScatterGraph.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GraphDialog\DlgPieGraph.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GraphDialog\DlgPieGraph.Designer.cs">
+      <DependentUpon>DlgPieGraph.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GraphDialog\DlgBarGraph.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GraphDialog\DlgBarGraph.Designer.cs">
+      <DependentUpon>DlgBarGraph.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GraphDialog\DlgLineGraph.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GraphDialog\DlgLineGraph.Designer.cs">
+      <DependentUpon>DlgLineGraph.cs</DependentUpon>
+    </Compile>
+    <Compile Include="HtmlConverter.cs" />
+    <Compile Include="MenuOption.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="StatDialog\Delegate.cs" />
+    <Compile Include="StatDialog\DlgANOVA.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="StatDialog\DlgANOVA.Designer.cs">
+      <DependentUpon>DlgANOVA.cs</DependentUpon>
+    </Compile>
+    <Compile Include="StatDialog\DlgANOVA_\DlgGraph.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="StatDialog\DlgANOVA_\DlgGraph.Designer.cs">
+      <DependentUpon>DlgGraph.cs</DependentUpon>
+    </Compile>
+    <Compile Include="StatDialog\DlgCapaContinuous.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="StatDialog\DlgCapaContinuous.Designer.cs">
+      <DependentUpon>DlgCapaContinuous.cs</DependentUpon>
+    </Compile>
+    <Compile Include="StatDialog\DlgCapaContinuous_\DlgCapaContinuousOptions.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="StatDialog\DlgCapaContinuous_\DlgCapaContinuousOptions.Designer.cs">
+      <DependentUpon>DlgCapaContinuousOptions.cs</DependentUpon>
+    </Compile>
+    <Compile Include="StatDialog\DlgCapaContinuous_\DlgEstimationofStandardDeviation.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="StatDialog\DlgCapaContinuous_\DlgEstimationofStandardDeviation.Designer.cs">
+      <DependentUpon>DlgEstimationofStandardDeviation.cs</DependentUpon>
+    </Compile>
+    <Compile Include="StatDialog\DlgCorrelation.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="StatDialog\DlgCorrelation.Designer.cs">
+      <DependentUpon>DlgCorrelation.cs</DependentUpon>
+    </Compile>
+    <Compile Include="StatDialog\DlgDescriptiveStatistics.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="StatDialog\DlgDescriptiveStatistics.Designer.cs">
+      <DependentUpon>DlgDescriptiveStatistics.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GraphAnalysisManager.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StatAnalysisManager.cs" />
+    <Compile Include="StatDialog\DlgDescriptiveStatistics_\DlgGraph.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="StatDialog\DlgDescriptiveStatistics_\DlgGraph.Designer.cs">
+      <DependentUpon>DlgGraph.cs</DependentUpon>
+    </Compile>
+    <Compile Include="StatDialog\DlgDescriptiveStatistics_\DlgStatistics.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="StatDialog\DlgDescriptiveStatistics_\DlgStatistics.Designer.cs">
+      <DependentUpon>DlgStatistics.cs</DependentUpon>
+    </Compile>
+    <Compile Include="StatDialog\DlgFactorialAnalysis.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="StatDialog\DlgHypothesisTesting.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="StatDialog\DlgHypothesisTesting.Designer.cs">
+      <DependentUpon>DlgHypothesisTesting.cs</DependentUpon>
+    </Compile>
+    <Compile Include="StatDialog\DlgHypothesisTesting_\DlgHypothesisOptions.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="StatDialog\DlgHypothesisTesting_\DlgHypothesisOptions.Designer.cs">
+      <DependentUpon>DlgHypothesisOptions.cs</DependentUpon>
+    </Compile>
+    <Compile Include="StatDialog\DlgHypothesisTesting_\DlgOneSampleT.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="StatDialog\DlgHypothesisTesting_\DlgOneSampleT.Designer.cs">
+      <DependentUpon>DlgOneSampleT.cs</DependentUpon>
+    </Compile>
+    <Compile Include="StatDialog\DlgHypothesisTesting_\DlgOneSampleZ.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="StatDialog\DlgHypothesisTesting_\DlgOneSampleZ.Designer.cs">
+      <DependentUpon>DlgOneSampleZ.cs</DependentUpon>
+    </Compile>
+    <Compile Include="StatDialog\DlgHypothesisTesting_\DlgTwoSamplePaired.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="StatDialog\DlgHypothesisTesting_\DlgTwoSamplePaired.Designer.cs">
+      <DependentUpon>DlgTwoSamplePaired.cs</DependentUpon>
+    </Compile>
+    <Compile Include="StatDialog\DlgHypothesisTesting_\DlgTwoSampleUnpaired.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="StatDialog\DlgHypothesisTesting_\DlgTwoSampleUnpaired.Designer.cs">
+      <DependentUpon>DlgTwoSampleUnpaired.cs</DependentUpon>
+    </Compile>
+    <Compile Include="StatDialog\DlgRegression.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="StatDialog\DlgRegression.Designer.cs">
+      <DependentUpon>DlgRegression.cs</DependentUpon>
+    </Compile>
+    <Compile Include="StatDialog\DlgRegression_\DlgRegressionMethods.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="StatDialog\DlgRegression_\DlgRegressionMethods.Designer.cs">
+      <DependentUpon>DlgRegressionMethods.cs</DependentUpon>
+    </Compile>
+    <Compile Include="StatDialog\DlgRegression_\DlgRegressionOptions.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="StatDialog\DlgRegression_\DlgRegressionOptions.Designer.cs">
+      <DependentUpon>DlgRegressionOptions.cs</DependentUpon>
+    </Compile>
+    <Compile Include="StatDialog\DlgTaguchi.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="StatDialog\DlgTaguchi.designer.cs">
+      <DependentUpon>DlgTaguchi.cs</DependentUpon>
+    </Compile>
+    <Compile Include="StatDialog\DlgTaguchiAnalysis2.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="StatDialog\DlgTaguchiAnalysis2.designer.cs">
+      <DependentUpon>DlgTaguchiAnalysis2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="StatDialog\Taguchi_\DlgCloseEffect.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="StatDialog\Taguchi_\DlgCloseEffect.designer.cs">
+      <DependentUpon>DlgCloseEffect.cs</DependentUpon>
+    </Compile>
+    <Compile Include="StatDialog\Taguchi_\DlgTaguchiAnalysisDetail.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="StatDialog\Taguchi_\DlgTaguchiAnalysisDetail.designer.cs">
+      <DependentUpon>DlgTaguchiAnalysisDetail.cs</DependentUpon>
+    </Compile>
+    <Compile Include="StatDialog\Taguchi_\DlgTaguchiAnalysisGraph.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="StatDialog\Taguchi_\DlgTaguchiAnalysisGraph.designer.cs">
+      <DependentUpon>DlgTaguchiAnalysisGraph.cs</DependentUpon>
+    </Compile>
+    <Compile Include="StatDialog\Taguchi_\DlgTaguchiAnalysisOption.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="StatDialog\Taguchi_\DlgTaguchiAnalysisOption.designer.cs">
+      <DependentUpon>DlgTaguchiAnalysisOption.cs</DependentUpon>
+    </Compile>
+    <Compile Include="StatDialog\Taguchi_\DlgTaguchiDesign.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="StatDialog\Taguchi_\DlgTaguchiDesign.designer.cs">
+      <DependentUpon>DlgTaguchiDesign.cs</DependentUpon>
+    </Compile>
+    <Compile Include="StatDialog\Taguchi_\DlgTaguchiDesignList.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="StatDialog\Taguchi_\DlgTaguchiDesignList.designer.cs">
+      <DependentUpon>DlgTaguchiDesignList.cs</DependentUpon>
+    </Compile>
+    <Compile Include="StatDialog\Taguchi_\DlgTaguchiFactor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="StatDialog\Taguchi_\DlgTaguchiFactor.designer.cs">
+      <DependentUpon>DlgTaguchiFactor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="StatisticsInput\inputANOVA.cs" />
+    <Compile Include="StatisticsInput\inputCapaContinuous.cs" />
+    <Compile Include="StatisticsInput\inputCorrelation.cs" />
+    <Compile Include="StatisticsInput\inputDefault.cs" />
+    <Compile Include="StatisticsInput\inputDescriptiveStatistics.cs" />
+    <Compile Include="StatisticsInput\inputFactorAnalysis.cs" />
+    <Compile Include="StatisticsInput\inputHypothesisTesting.cs" />
+    <Compile Include="StatisticsInput\inputRegression.cs" />
+    <Compile Include="StatisticsInput\inputTaguchi.cs" />
+    <Compile Include="Statistics\CapaContinuous.cs" />
+    <Compile Include="Statistics\Correlation.cs" />
+    <Compile Include="Statistics\DACruxSet.cs" />
+    <Compile Include="Statistics\DACruxTable.cs">
+    </Compile>
+    <Compile Include="Statistics\DescriptiveStatistics.cs" />
+    <Compile Include="Statistics\FactorAnalysis.cs" />
+    <Compile Include="Statistics\HypothesisTesting.cs" />
+    <Compile Include="Statistics\OneWayANOVA.cs" />
+    <Compile Include="Statistics\Regression.cs" />
+    <Compile Include="Statistics\TaguchiAnalyusis2.cs" />
+    <Service Include="{94E38DFF-614B-4cbd-B67C-F211BB35CE8B}" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="GraphDialog\_DlgBarGraph.resx">
+      <DependentUpon>_DlgBarGraph.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GraphDialog\DlgBoxPlotGraph.resx">
+      <DependentUpon>DlgBoxPlotGraph.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GraphDialog\DlgHistogramGraph.resx">
+      <DependentUpon>DlgHistogramGraph.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GraphDialog\DlgParetoGraph.resx">
+      <DependentUpon>DlgParetoGraph.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GraphDialog\DlgScatterGraph.resx">
+      <DependentUpon>DlgScatterGraph.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GraphDialog\DlgPieGraph.resx">
+      <DependentUpon>DlgPieGraph.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GraphDialog\DlgBarGraph.resx">
+      <DependentUpon>DlgBarGraph.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GraphDialog\DlgLineGraph.resx">
+      <DependentUpon>DlgLineGraph.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\licenses.licx" />
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <SubType>Designer</SubType>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="StatDialog\DlgANOVA.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>DlgANOVA.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="StatDialog\DlgANOVA_\DlgGraph.resx">
+      <DependentUpon>DlgGraph.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="StatDialog\DlgCapaContinuous.resx">
+      <DependentUpon>DlgCapaContinuous.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="StatDialog\DlgCapaContinuous_\DlgCapaContinuousOptions.resx">
+      <DependentUpon>DlgCapaContinuousOptions.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="StatDialog\DlgCapaContinuous_\DlgEstimationofStandardDeviation.resx">
+      <DependentUpon>DlgEstimationofStandardDeviation.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="StatDialog\DlgCorrelation.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>DlgCorrelation.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="StatDialog\DlgDescriptiveStatistics.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>DlgDescriptiveStatistics.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="StatDialog\DlgDescriptiveStatistics_\DlgGraph.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>DlgGraph.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="StatDialog\DlgDescriptiveStatistics_\DlgStatistics.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>DlgStatistics.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="StatDialog\DlgFactorialAnalysis.resx">
+      <DependentUpon>DlgFactorialAnalysis.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="StatDialog\DlgHypothesisTesting.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>DlgHypothesisTesting.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="StatDialog\DlgHypothesisTesting_\DlgHypothesisOptions.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>DlgHypothesisOptions.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="StatDialog\DlgHypothesisTesting_\DlgOneSampleT.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>DlgOneSampleT.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="StatDialog\DlgHypothesisTesting_\DlgOneSampleZ.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>DlgOneSampleZ.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="StatDialog\DlgHypothesisTesting_\DlgTwoSamplePaired.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>DlgTwoSamplePaired.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="StatDialog\DlgHypothesisTesting_\DlgTwoSampleUnpaired.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>DlgTwoSampleUnpaired.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="StatDialog\DlgRegression.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>DlgRegression.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="StatDialog\DlgRegression_\DlgRegressionMethods.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>DlgRegressionMethods.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="StatDialog\DlgRegression_\DlgRegressionOptions.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>DlgRegressionOptions.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="StatDialog\DlgTaguchi.resx">
+      <DependentUpon>DlgTaguchi.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="StatDialog\DlgTaguchiAnalysis2.resx">
+      <DependentUpon>DlgTaguchiAnalysis2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="StatDialog\Taguchi_\DlgCloseEffect.resx">
+      <DependentUpon>DlgCloseEffect.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="StatDialog\Taguchi_\DlgTaguchiAnalysisDetail.resx">
+      <DependentUpon>DlgTaguchiAnalysisDetail.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="StatDialog\Taguchi_\DlgTaguchiAnalysisGraph.resx">
+      <DependentUpon>DlgTaguchiAnalysisGraph.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="StatDialog\Taguchi_\DlgTaguchiAnalysisOption.resx">
+      <DependentUpon>DlgTaguchiAnalysisOption.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="StatDialog\Taguchi_\DlgTaguchiDesign.resx">
+      <DependentUpon>DlgTaguchiDesign.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="StatDialog\Taguchi_\DlgTaguchiDesignList.resx">
+      <DependentUpon>DlgTaguchiDesignList.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="StatDialog\Taguchi_\DlgTaguchiFactor.resx">
+      <DependentUpon>DlgTaguchiFactor.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\70_CoreLibSource\DACrux.Framework.Base\DACrux.Framework.Base.csproj">
+      <Project>{E6E7F026-C24D-4B25-81FE-290BDA3D4AEB}</Project>
+      <Name>DACrux.Framework.Base</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DACrux.ProjectManager.UI\DACrux.ProjectManager.UI.csproj">
+      <Project>{72020EB8-BC7A-4A89-86F7-E731B808B344}</Project>
+      <Name>DACrux.ProjectManager.UI</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

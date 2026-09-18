@@ -1,0 +1,261 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{0DA58177-BA2F-4916-9FCB-0316214F089B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DACrux.SP.Controls</RootNamespace>
+    <AssemblyName>DACrux.SP.Controls</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\07_CoreLib\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\71_CoreLib\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Drawing.Design" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Common.cs" />
+    <Compile Include="DockExtender.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="EnumComboBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Extensions.cs" />
+    <Compile Include="FlagEnumCheckedListBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="FlagEnumUITypeEditor.cs" />
+    <Compile Include="HeaderLabel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="LineNumberControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ListViewEx.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="PageLister.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RegexBuilder.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="RegexBuilder.designer.cs">
+      <DependentUpon>RegexBuilder.cs</DependentUpon>
+    </Compile>
+    <Compile Include="RegexEntityControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="RegexEntityControl.designer.cs">
+      <DependentUpon>RegexEntityControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="RegexSectionControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="RegexSectionControl.designer.cs">
+      <DependentUpon>RegexSectionControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="res.Designer.cs" />
+    <Compile Include="RichTextBoxEx.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="SmartListbox2.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SmartListbox2.designer.cs">
+      <DependentUpon>SmartListbox2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SmartListView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="SmartListView2.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="SmartSelector2.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SmartSelector2.designer.cs">
+      <DependentUpon>SmartSelector2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SmartTextBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="SmartTextBox.designer.cs">
+      <DependentUpon>SmartTextBox.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SmartTextViewer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SmartTextViewer.designer.cs">
+      <DependentUpon>SmartTextViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SyntaxRichTextBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="TabControlEx.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="TitlePanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="TitlePanel.designer.cs">
+      <DependentUpon>TitlePanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="uclFileUploader.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="uclFileUploader.designer.cs">
+      <DependentUpon>uclFileUploader.cs</DependentUpon>
+    </Compile>
+    <Compile Include="uclLabel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="uclLabel2.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="uclMonthPicker.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="uclMonthPicker.designer.cs">
+      <DependentUpon>uclMonthPicker.cs</DependentUpon>
+    </Compile>
+    <Compile Include="uclOperType_Modify.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="uclOperType_Modify.designer.cs">
+      <DependentUpon>uclOperType_Modify.cs</DependentUpon>
+    </Compile>
+    <Compile Include="uclPeriodPicker.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="uclPeriodPicker.designer.cs">
+      <DependentUpon>uclPeriodPicker.cs</DependentUpon>
+    </Compile>
+    <Compile Include="uclTextBox.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="uclTextBox.designer.cs">
+      <DependentUpon>uclTextBox.cs</DependentUpon>
+    </Compile>
+    <Compile Include="uclTitle.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="uclTitle.designer.cs">
+      <DependentUpon>uclTitle.cs</DependentUpon>
+    </Compile>
+    <Compile Include="uclWeekPicker.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="uclWeekPicker.designer.cs">
+      <DependentUpon>uclWeekPicker.cs</DependentUpon>
+    </Compile>
+    <Compile Include="uclYieldType.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="uclYieldType.designer.cs">
+      <DependentUpon>uclYieldType.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="PageLister.resx">
+      <DependentUpon>PageLister.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="RegexBuilder.resx">
+      <DependentUpon>RegexBuilder.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="RegexEntityControl.resx">
+      <DependentUpon>RegexEntityControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="RegexSectionControl.resx">
+      <DependentUpon>RegexSectionControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="res.resx" />
+    <EmbeddedResource Include="SmartListbox2.resx">
+      <DependentUpon>SmartListbox2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SmartListView.resx">
+      <DependentUpon>SmartListView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SmartListView2.resx">
+      <DependentUpon>SmartListView2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SmartSelector2.resx">
+      <DependentUpon>SmartSelector2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SmartTextViewer.resx">
+      <DependentUpon>SmartTextViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TitlePanel.resx">
+      <DependentUpon>TitlePanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="uclFileUploader.resx">
+      <DependentUpon>uclFileUploader.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="uclLabel.resx">
+      <DependentUpon>uclLabel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="uclLabel2.resx">
+      <DependentUpon>uclLabel2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="uclMonthPicker.resx">
+      <DependentUpon>uclMonthPicker.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="uclOperType_Modify.resx">
+      <DependentUpon>uclOperType_Modify.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="uclPeriodPicker.resx">
+      <DependentUpon>uclPeriodPicker.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="uclTextBox.resx">
+      <DependentUpon>uclTextBox.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="uclTitle.resx">
+      <DependentUpon>uclTitle.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="uclWeekPicker.resx">
+      <DependentUpon>uclWeekPicker.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="uclYieldType.resx">
+      <DependentUpon>uclYieldType.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

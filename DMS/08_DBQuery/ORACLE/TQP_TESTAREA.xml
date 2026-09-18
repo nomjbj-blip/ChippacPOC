@@ -1,0 +1,81 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="BUMPFA" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Select" queryid="SELECT_TESTAREA_LIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT *
+FROM TQP_TESTAREA
+ORDER BY TESTAREA ]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_TESTAREA_FOR_BINDESC" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT *
+FROM TQP_TESTAREA
+WHERE 1=1
+AND AREA_GROUP != 'MERGE'
+AND TESTAREA NOT LIKE '%MERGE'
+ORDER BY TESTAREA ]]></commandtext>
+    </query>
+    <query statement="Insert" queryid="CREATE_TESTAREA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_TESTAREA VALUES(:testarea, :area_group, :area_desc, :save_table)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:testarea</param>
+            <param direction="Input" dbtype="VarChar" size="40">:area_group</param>
+            <param direction="Input" dbtype="VarChar" size="0">:area_desc</param>
+            <param direction="Input" dbtype="VarChar" size="0">:save_table</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_TESTAREA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[DELETE
+FROM TQP_TESTAREA
+WHERE TESTAREA = :testarea]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:testarea</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_TESTAREA_FOR_VIINSP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT *
+FROM TQP_TESTAREA
+WHERE 1=1
+AND AREA_GROUP NOT LIKE 'VI'
+AND AREA_GROUP NOT LIKE 'MERGE'
+ORDER BY TESTAREA ]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_TESETAREA_FOR_MERGERULE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT *
+FROM TQP_TESTAREA
+WHERE AREA_GROUP NOT LIKE 'VI%'
+AND AREA_GROUP NOT LIKE '%MERGE%'
+ORDER BY TESTAREA   ]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_AREA_GROUP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT AREA_GROUP 
+FROM TQP_TESTAREA
+WHERE TESTAREA= :testarea]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:testarea</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_TESTAREA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT *
+FROM TQP_TESTAREA
+WHERE TESTAREA = :testarea]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:testarea</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_MERGE_TESTAERA_LIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT *
+FROM TQP_TESTAREA
+WHERE AREA_GROUP LIKE '%MERGE%'
+ORDER BY TESTAREA]]></commandtext>
+    </query>
+    <query statement="Update" queryid="UPDATE_TESTAREA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_TESTAREA
+SET AREA_GROUP = :area_group, AREA_DESC = :area_desc, SAVE_TABLE = :save_table
+WHERE TESTAREA = :testarea]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:area_group</param>
+            <param direction="Input" dbtype="VarChar" size="0">:area_desc</param>
+            <param direction="Input" dbtype="VarChar" size="40">:save_table</param>
+            <param direction="Input" dbtype="VarChar" size="40">:testarea</param>
+        </parameters>
+    </query>
+</queryxml>

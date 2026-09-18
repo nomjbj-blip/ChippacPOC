@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="BUMPFA" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Select" queryid="SELECT_GROUP" commandtype="Text" description="group 목록을 가져온다" commandtimeout="60">
+        <commandtext><![CDATA[SELECT USER_GROUP, GROUP_DESC, FUNCTION_LIST FROM TQP_SECGRP]]></commandtext>
+    </query>
+    <query statement="Delete" queryid="DELETE_GROUP" commandtype="Text" description="gropu 을 지운다" commandtimeout="60">
+        <commandtext><![CDATA[DELETE TQP_SECGRP WHERE USER_GROUP=:GROUP_ID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30" description="group id (name)">:GROUP_ID</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="INSERT_GROUP" commandtype="Text" description="group를 등록한다" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_SECGRP
+VALUES (:GROUP_ID, :FUNCTION_LIST, :GROUP_DESC)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30" description="group id">:GROUP_ID</param>
+            <param direction="Input" dbtype="VarChar" size="2048" description="group grade">:FUNCTION_LIST</param>
+            <param direction="Input" dbtype="VarChar" size="256" description="group description">:GROUP_DESC</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_GROUP" commandtype="Text" description="group 을 update한다" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_SECGRP
+SET FUNCTION_LIST=:FUNCTION_LIST, GROUP_DESC=:GROUP_DESC
+WHERE USER_GROUP=:GROUP_ID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30" description="group id">:GROUP_ID</param>
+            <param direction="Input" dbtype="VarChar" size="2048" description="group grade">FUNCTION_LIST</param>
+            <param direction="Input" dbtype="VarChar" size="256" description="group desc">:GROUP_DESC</param>
+        </parameters>
+    </query>
+</queryxml>

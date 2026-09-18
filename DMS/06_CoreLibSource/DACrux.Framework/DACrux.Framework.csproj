@@ -1,0 +1,286 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{178B4C07-961E-4CAF-8C83-FF6188923E7B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DACrux.Framework</RootNamespace>
+    <AssemblyName>DACrux.Framework</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\07_CoreLib\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\07_CoreLib\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="DACrux.BStats">
+      <HintPath>..\..\07_CoreLib\DACrux.BStats.dll</HintPath>
+    </Reference>
+    <Reference Include="DACrux.Framework.PropertyGrid">
+      <HintPath>..\..\07_CoreLib\DACrux.Framework.PropertyGrid.dll</HintPath>
+    </Reference>
+    <Reference Include="DACrux.SP.Common, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+    <Reference Include="DACrux.SP.Controls, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL" />
+    <Reference Include="Infragistics4.Win.v12.1, Version=12.1.20121.2135, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Infragistics4.Win.UltraWinToolbars.v12.1, Version=12.1.20121.2135, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Infragistics4.Win.UltraWinTabControl.v12.1, Version=12.1.20121.2135, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Infragistics4.Win.UltraWinTabbedMdi.v12.1, Version=12.1.20121.2135, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Infragistics4.Win.UltraWinStatusBar.v12.1, Version=12.1.20121.2135, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Infragistics4.Win.UltraWinDock.v12.1, Version=12.1.20121.2135, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Infragistics4.Win.Misc.v12.1, Version=12.1.20121.2135, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Infragistics4.Shared.v12.1, Version=12.1.20121.2135, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="FarPoint.Excel, Version=5.0.3522.2008, Culture=neutral, PublicKeyToken=327c3516b1b18457, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="FarPoint.Win, Version=5.0.3522.2008, Culture=neutral, PublicKeyToken=327c3516b1b18457, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="FarPoint.Win.Spread, Version=5.0.3522.2008, Culture=neutral, PublicKeyToken=327c3516b1b18457, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Design" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization.Formatters.Soap" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Forms.DataVisualization" />
+    <Reference Include="System.XML" />
+    <Reference Include="System.Xml.Linq" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="DACruxMain.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DACruxMain.Designer.cs">
+      <DependentUpon>DACruxMain.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FrameworkInfo.cs" />
+    <Compile Include="frmAboutDACrux.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmAboutDACrux.designer.cs">
+      <DependentUpon>frmAboutDACrux.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmChoiceGroup.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmChoiceGroup.designer.cs">
+      <DependentUpon>frmChoiceGroup.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmFunctionManagement.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmFunctionManagement.designer.cs">
+      <DependentUpon>frmFunctionManagement.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmGroupManagement.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmGroupManagement.designer.cs">
+      <DependentUpon>frmGroupManagement.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmLoginDACrux.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmLoginDACrux.designer.cs">
+      <DependentUpon>frmLoginDACrux.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmServiceLog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmServiceLog.Designer.cs">
+      <DependentUpon>frmServiceLog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmSystemOption.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmSystemOption.designer.cs">
+      <DependentUpon>frmSystemOption.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmUpdate.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmUpdate.Designer.cs">
+      <DependentUpon>frmUpdate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmUserEnvironment.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmUserEnvironment.designer.cs">
+      <DependentUpon>frmUserEnvironment.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmUserManagement.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmUserManagement.designer.cs">
+      <DependentUpon>frmUserManagement.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmUserMonitor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmUserMonitor.designer.cs">
+      <DependentUpon>frmUserMonitor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MenuHelper.cs" />
+    <Compile Include="Notice\frmNotice.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Notice\frmNotice.Designer.cs">
+      <DependentUpon>frmNotice.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Notice\frmNoticeManager.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Notice\frmNoticeManager.Designer.cs">
+      <DependentUpon>frmNoticeManager.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="DACruxMain.resx">
+      <DependentUpon>DACruxMain.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmAboutDACrux.resx">
+      <DependentUpon>frmAboutDACrux.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmChoiceGroup.resx">
+      <DependentUpon>frmChoiceGroup.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmFunctionManagement.resx">
+      <DependentUpon>frmFunctionManagement.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmGroupManagement.resx">
+      <DependentUpon>frmGroupManagement.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmLoginDACrux.resx">
+      <DependentUpon>frmLoginDACrux.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmServiceLog.resx">
+      <DependentUpon>frmServiceLog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmSystemOption.resx">
+      <DependentUpon>frmSystemOption.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmUpdate.resx">
+      <DependentUpon>frmUpdate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmUserEnvironment.resx">
+      <DependentUpon>frmUserEnvironment.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmUserManagement.resx">
+      <DependentUpon>frmUserManagement.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmUserMonitor.resx">
+      <DependentUpon>frmUserMonitor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Notice\frmNotice.resx">
+      <DependentUpon>frmNotice.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Notice\frmNoticeManager.resx">
+      <DependentUpon>frmNoticeManager.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\licenses.licx" />
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\03_STAT\DACrux.ProjectManager.UI\DACrux.ProjectManager.UI.csproj">
+      <Project>{72020eb8-bc7a-4a89-86f7-e731b808b344}</Project>
+      <Name>DACrux.ProjectManager.UI</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\03_STAT\DACrux.ProjectManager\DACrux.ProjectManager.csproj">
+      <Project>{0ab12528-a26b-4d41-a24f-b0dee4ab676b}</Project>
+      <Name>DACrux.ProjectManager</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DACrux.Base\DACrux.Base.csproj">
+      <Project>{EBEDC52F-2DE6-45EB-9E37-805FC298A0ED}</Project>
+      <Name>DACrux.Base</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DACrux.Framework.Base\DACrux.Framework.Base.csproj">
+      <Project>{E6E7F026-C24D-4B25-81FE-290BDA3D4AEB}</Project>
+      <Name>DACrux.Framework.Base</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DACrux.Framework.Controls\DACrux.Framework.Controls.csproj">
+      <Project>{0CDDB391-0A29-4850-9198-C529509DA64F}</Project>
+      <Name>DACrux.Framework.Controls</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DACrux.Framework.Interface\DACrux.Framework.Interface.csproj">
+      <Project>{636E5325-AF9E-4C53-B14F-093638CE695D}</Project>
+      <Name>DACrux.Framework.Interface</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DACrux.Framework.RO\DACrux.Framework.RO.csproj">
+      <Project>{E34A0690-0C47-4CEA-8740-7DA4EAACAC21}</Project>
+      <Name>DACrux.Framework.RO</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DACrux.Utility\DACrux.Utility.csproj">
+      <Project>{CE3BFF6D-E027-4833-B8C3-28B0DB081390}</Project>
+      <Name>DACrux.Utility</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Select" queryid="GET_LOT_INFO" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-07-15 16:01:03
+SELECT * 
+  FROM TQP_LOT_STS
+ WHERE 1=1
+   AND LOT_ID = :lotid]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="lotid">:lotid</param>
+        </parameters>
+    </query>
+</queryxml>

@@ -1,0 +1,337 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{09FE62E4-F938-48C0-8969-95C40FE16D02}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SmartParser.Designer</RootNamespace>
+    <AssemblyName>SmartParser.Designer</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <UpgradeBackupLocation />
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <TargetFrameworkProfile />
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetZone>LocalIntranet</TargetZone>
+  </PropertyGroup>
+  <PropertyGroup>
+    <GenerateManifests>true</GenerateManifests>
+  </PropertyGroup>
+  <PropertyGroup />
+  <PropertyGroup>
+    <StartupObject>
+    </StartupObject>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="IPAddressControlLib">
+      <HintPath>..\..\07_CoreLib\IPAddressControlLib.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.OracleClient" />
+    <Reference Include="System.Drawing.Design" />
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="frmSPRRegistration.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmSPRRegistration.designer.cs">
+      <DependentUpon>frmSPRRegistration.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Script Dialog\dlgScript.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Script Dialog\dlgScript.Designer.cs">
+      <DependentUpon>dlgScript.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Task Dialog\dlgTaskEntityTraverse.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Task Dialog\dlgTaskEntityTraverse.Designer.cs">
+      <DependentUpon>dlgTaskEntityTraverse.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Task Dialog\dlgTaskEntityValue.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Task Dialog\dlgTaskEntityValue.Designer.cs">
+      <DependentUpon>dlgTaskEntityValue.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Task Dialog\dlgTaskDB.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Task Dialog\dlgTaskDB.Designer.cs">
+      <DependentUpon>dlgTaskDB.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Task Dialog\dlgTaskComPlus.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Task Dialog\dlgTaskComPlus.Designer.cs">
+      <DependentUpon>dlgTaskComPlus.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmActionManagement.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmActionManagement.Designer.cs">
+      <DependentUpon>frmActionManagement.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmDefaultTemplate.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmDefaultTemplate.Designer.cs">
+      <DependentUpon>frmDefaultTemplate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmTableDataMatching.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmTableDataMatching.Designer.cs">
+      <DependentUpon>frmTableDataMatching.cs</DependentUpon>
+    </Compile>
+    <Compile Include="dlgDatabaseConnection.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="dlgDatabaseConnection.designer.cs">
+      <DependentUpon>dlgDatabaseConnection.cs</DependentUpon>
+    </Compile>
+    <Compile Include="dlgOption.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="dlgOption.Designer.cs">
+      <DependentUpon>dlgOption.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmRegistration.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmRegistration.Designer.cs">
+      <DependentUpon>frmRegistration.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmMain.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmMain.Designer.cs">
+      <DependentUpon>frmMain.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="dlgOption.resx">
+      <DependentUpon>dlgOption.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmRegistration.resx">
+      <DependentUpon>frmRegistration.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmMain.resx">
+      <DependentUpon>frmMain.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmSPRRegistration.resx">
+      <DependentUpon>frmSPRRegistration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="app.config" />
+    <None Include="lang">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Properties\app.manifest" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="frmLang.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmLang.Designer.cs">
+      <DependentUpon>frmLang.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmConvert.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmConvert.Designer.cs">
+      <DependentUpon>frmConvert.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmHanaMap.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmHanaMap.Designer.cs">
+      <DependentUpon>frmHanaMap.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="entity.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Script Dialog\dlgScript.resx">
+      <DependentUpon>dlgScript.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Task Dialog\dlgTaskEntityTraverse.resx">
+      <DependentUpon>dlgTaskEntityTraverse.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Task Dialog\dlgTaskEntityValue.resx">
+      <DependentUpon>dlgTaskEntityValue.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Task Dialog\dlgTaskDB.resx">
+      <DependentUpon>dlgTaskDB.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Task Dialog\dlgTaskComPlus.resx">
+      <DependentUpon>dlgTaskComPlus.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmActionManagement.resx">
+      <DependentUpon>frmActionManagement.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmDefaultTemplate.resx">
+      <DependentUpon>frmDefaultTemplate.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmTableDataMatching.resx">
+      <DependentUpon>frmTableDataMatching.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="dlgDatabaseConnection.resx">
+      <DependentUpon>dlgDatabaseConnection.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="section.png" />
+    <EmbeddedResource Include="frmLang.resx">
+      <DependentUpon>frmLang.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmConvert.resx">
+      <DependentUpon>frmConvert.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmHanaMap.resx">
+      <DependentUpon>frmHanaMap.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Lang.xml">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DACrux.Framework.Base\DACrux.Framework.Base.csproj">
+      <Project>{E6E7F026-C24D-4B25-81FE-290BDA3D4AEB}</Project>
+      <Name>DACrux.Framework.Base</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DACrux.SP.Common\DACrux.SP.Common.csproj">
+      <Project>{C69F38AC-4444-4145-BDC4-42ADFECEC1EB}</Project>
+      <Name>DACrux.SP.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DACrux.SP.Controls\DACrux.SP.Controls.csproj">
+      <Project>{0DA58177-BA2F-4916-9FCB-0316214F089B}</Project>
+      <Name>DACrux.SP.Controls</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

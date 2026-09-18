@@ -1,0 +1,157 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="TPSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Insert" queryid="INSERT_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQD_DEFECT_DIE
+SELECT 
+    A.WAFER_SEQ TEST_WAFER_SEQ,
+    A.DIE_NUM TEST_DIE_NUM,
+    B.DM_STEP_SEQ,
+    B.DEFECTID DM_DEFECTID,
+    A.X,
+    A.Y,
+    A.BIN,
+    B.CLASSNUMBER
+FROM ?? A,
+(
+    SELECT
+        W.WAFER_SEQ TEST_WAFER_SEQ,
+        I.STEP_SEQ DM_STEP_SEQ,        
+        TRUNC((((M.ORIGIN_INDEX_X * M.CHIP_SIZE_X) + M.ORIGIN_MICRO_X) + D.X) / M.CHIP_SIZE_X, 0) AS XINDEX,
+        TRUNC((((M.ORIGIN_INDEX_Y * M.CHIP_SIZE_Y) + (M.CHIP_SIZE_Y - M.ORIGIN_MICRO_Y)) + D.Y) / M.CHIP_SIZE_Y, 0) AS YINDEX, 
+        D.DEFECTID,
+        D.CLASSNUMBER
+    FROM
+    TQP_LOT L,
+    TQP_WAFER W,
+    TQC_LOT_STS S,
+    TQP_MAPDEF M,
+    TQD_INSP_INFO I,
+    TQD_DEFECT D
+    WHERE 1 = 1
+    AND L.FACTORY = W.FACTORY
+    AND L.LOT_SEQ = W.LOT_SEQ 
+    AND L.FACTORY = M.FACTORY
+    AND S.MASK_ID = M.MAPID
+    AND S.LOT_NO = L.LOT_ID
+    AND L.LOT_ID = I.LOT_ID
+    AND I.SLOT_ID = TO_NUMBER(SUBSTR(W.WAFER_ID, INSTR(W.WAFER_ID,'-')+1))
+    AND M.DELETE_FLAG <> 'Y'
+    AND I.STEP_SEQ = D.STEP_SEQ
+    AND I.TEST = 1
+) B
+WHERE A.WAFER_SEQ = B.TEST_WAFER_SEQ
+    AND A.X = B.XINDEX
+    AND A.Y = B.YINDEX
+    AND A.WAFER_SEQ = :test_wafer_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40">:test_wafer_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_PROGRAM_BIN_TABLE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT TABLE_NAME 
+FROM ALL_TAB_COLUMNS
+WHERE OWNER = 'TPSMGR'
+AND COLUMN_NAME IN ('X', 'Y', 'BIN') 
+AND TABLE_NAME IN (
+    SELECT TABLE_NAME FROM TQP_DATA_TABLES
+    WHERE PROGRAM = :program
+)
+GROUP BY TABLE_NAME
+HAVING COUNT(*) = 3
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40">:program</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[DELETE FROM TQD_DEFECT_DIE
+     WHERE 1 = 1 
+     AND TEST_WAFER_SEQ = :test_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="test_seq">:test_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_DEFECT_DIE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-11-12 21:22:40
+SELECT TO_CHAR(T1.RESULTTIMESTAMP, 'YYYY') AS "YEAR", 
+       TO_CHAR(T1.RESULTTIMESTAMP, 'MM') AS "MONTH", 
+       TO_CHAR(T1.RESULTTIMESTAMP, 'WW') AS "WW", 
+       T1.PRODUCT AS "DEVICE", 
+       T1.LOT_ID, 
+       T1.WAFER_ID, 
+       TO_CHAR(T1.RESULTTIMESTAMP, 'YYYY-MM-DD HH24:MI') AS "INSPECTION_TIME", 
+       T1.STEP_ID, 
+       T4.PROGRAM,
+       T4.NETDIE, 
+       T4.TESTED_DIE, 
+       T4.GEC, 
+       T4.YIELD,
+       ??
+  FROM TQD_INSP_INFO T1,
+       (SELECT *
+          FROM (  SELECT STEP_SEQ,
+                         WAFER_SEQ,
+                         DECODE (GROUPING (CLASSNUMBER), 0, TO_CHAR (CLASSNUMBER), 'SUM') AS CLASSNUMBER,
+                         COUNT (CLASSNUMBER) CNT
+                    FROM (  SELECT DISTINCT T1.STEP_SEQ, T1.WAFER_SEQ, T2.XINDEX * 65536 + T2.YINDEX, T2.CLASSNUMBER
+                              FROM TQD_INSP_INFO T1, TQD_DEFECT T2
+                             WHERE     1 = 1
+                                   AND T1.STEP_SEQ = T2.STEP_SEQ
+                                   AND T1.WAFER_SEQ = T2.WAFER_SEQ
+                                   AND T1.RESULTTIMESTAMP BETWEEN TO_DATE ( :FROMDATE, 'yyyymmdd') AND TO_DATE ( :TODATE, 'yyyymmdd')
+                                   AND T1.LOT_ID IN (??) 
+                                   AND T1.WAFER_SEQ IN (??)
+                                   AND T1.STEP_ID IN (??)
+                                   AND T2.CLASSNUMBER IN (??))
+                GROUP BY STEP_SEQ, WAFER_SEQ, ROLLUP (CLASSNUMBER)) PIVOT (SUM (CNT)
+                                                         FOR CLASSNUMBER
+                                                         IN  (??))) T2,
+       (SELECT T1.*
+          FROM (SELECT TEST_WAFER_SEQ,
+                       DM_STEP_SEQ,
+                       CLASSNUMBER,
+                       CLASSNUMBER_CNT CNT
+                  FROM (  SELECT TEST_WAFER_SEQ,
+                                 DM_STEP_SEQ,
+                                 DECODE (GROUPING (CLASSNUMBER), 0, TO_CHAR (CLASSNUMBER), 'SUM') AS CLASSNUMBER,
+                                 COUNT (CLASSNUMBER) AS CLASSNUMBER_CNT
+                            FROM (  SELECT DISTINCT T2.TEST_WAFER_SEQ, T2.TEST_DIE_NUM, T2.DM_STEP_SEQ, T2.X * 65536 + T2.Y, T2.BIN, T2.CLASSNUMBER
+                                      FROM TQD_INSP_INFO T1, TQD_DEFECT_DIE T2
+                                     WHERE 1 = 1 
+                                           AND T1.STEP_SEQ = T2.DM_STEP_SEQ
+                                           AND T1.RESULTTIMESTAMP BETWEEN TO_DATE ( :FROMDATE, 'yyyymmdd') AND TO_DATE ( :TODATE, 'yyyymmdd')
+                                           AND T1.LOT_ID IN (??)
+                                           AND T1.WAFER_SEQ IN (??)
+                                           AND T1.STEP_ID IN (??)
+                                           AND T2.BIN NOT IN (??) -- high gec
+                                           AND T2.CLASSNUMBER IN (??))
+                           WHERE 1 = 1
+                        GROUP BY TEST_WAFER_SEQ,
+                                 DM_STEP_SEQ,
+                                 ROLLUP (CLASSNUMBER))
+                 WHERE 1 = 1) PIVOT (SUM (CNT)
+                              FOR CLASSNUMBER
+                              IN  (??)) T1
+         WHERE     1 = 1) T3,
+      (SELECT DISTINCT T1.LOT_ID, 
+              CASE WHEN T1.WAFER_ID LIKE 'AK%' THEN SUBSTR (T1.WAFER_ID, 3) ELSE T1.WAFER_ID END AS WAFER_ID, 
+              T1.PROGRAM,
+              DECODE(T1.NETDIE, NULL, T2.NETDIE, T1.NETDIE) AS NETDIE, 
+              T1.TESTED_DIE, 
+              T1.GEC, 
+              T1.YIELD
+         FROM TQP_WAFER_SUM T1, TQP_MAPDEF T2
+        WHERE 1 = 1 AND T1.DEVICE_ALIAS = T2.MAPID AND T1.TESTAREA IN ('MULTIPROBE') AND T1.PROBE_CNT = 0) T4
+ WHERE 1 = 1 
+   AND T1.STEP_SEQ = T3.DM_STEP_SEQ(+)
+   AND T1.LOT_ID = T4.LOT_ID
+   AND T1.WAFER_ID = T4.WAFER_ID
+   AND T1.STEP_SEQ = T2.STEP_SEQ
+   AND T1.WAFER_SEQ = T2.WAFER_SEQ
+ ORDER BY T1.WAFER_ID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="FROMDATE">:FROMDATE</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="TODATE">:TODATE</param>
+        </parameters>
+    </query>
+</queryxml>

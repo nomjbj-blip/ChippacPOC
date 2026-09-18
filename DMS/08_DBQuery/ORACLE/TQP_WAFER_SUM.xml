@@ -1,0 +1,2825 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="TPSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Select" queryid="GET_WAFER_LIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT ??,LOT_SEQ,WAFER_SEQ FROM TQP_WAFER_SUM
+??]]></commandtext>
+    </query>
+    <query statement="Select" queryid="GET_WAFER_LIST_WITH_SEQ" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT ?? FROM TQP_WAFER_SUM
+WHERE WAFER_SEQ = :wafer_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:wafer_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_WAFER_INFO" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQP_WAFER_SUM
+WHERE WAFER_SEQ = :wafer_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="10">:wafer_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_WAFER_INFO_MULTI" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQP_WAFER_SUM
+WHERE WAFER_SEQ IN ( ?? )]]></commandtext>
+    </query>
+    <query statement="Select" queryid="GET_AVI_WAFER_SUM" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT WAFER_SEQ,'BIN' || BIN AS BIN_NAME,COUNT(*) CNT FROM TD_?? WHERE VISUALINSP = 0
+AND WAFER_SEQ IN (??)
+GROUP BY WAFER_SEQ,BIN
+UNION
+SELECT WAFER_SEQ,'CAT' || VISUALINSP AS BIN_NAME,COUNT(*)  CNT  FROM TD_?? WHERE VISUALINSP > 0
+AND WAFER_SEQ IN (??)
+GROUP BY WAFER_SEQ,VISUALINSP]]></commandtext>
+    </query>
+    <query statement="Select" queryid="GET_WAFER_INFO_ALL" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQP_WAFER_SUM]]></commandtext>
+    </query>
+    <query statement="Delete" queryid="DELETE_WAFER_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[DELETE FROM TQP_WAFER_SUM WHERE WAFER_SEQ = :wafer_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:wafer_seq</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_MAINT_PROBE_CNT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_WAFER_SUM SET PROBE_CNT=:probe_cnt WHERE WAFER_SEQ = :wafer_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:probe_cnt</param>
+            <param direction="Input" dbtype="Number" size="0">:wafer_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_K39VAGSL14_PT1" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT LOT_SEQ,WAFER_SEQ,ROUND(YIELD,2) FROM TQP_WAFER_SUM
+WHERE PROGRAM='K39VAGSL14_PT1'
+ORDER BY LOT_SEQ,WAFER_ID]]></commandtext>
+    </query>
+    <query statement="Select" queryid="GET_STD_MAP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT X,Y,1 AS BIN FROM TQP_USEMAP
+WHERE MAPID = (SELECT MAPID FROM TQP_PRODUCT WHERE PRODUCT = (SELECT PRODUCT FROM TQP_PROGRAM WHERE PROGRAM = :program))
+AND USECODE=1]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:program</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="CREATE_NEW_LOT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_LOT(
+LOT_SEQ,
+PRODUCT,
+TESTAREA,
+PROGRAM,
+LOT_ID,
+MOTHER_LOT_ID,
+LOT_TYPE,
+FABLOT,
+FAMILY,
+FACILITY,
+DEVICE_ALIAS,
+START_TIME,
+END_TIME,
+WIP_STATUS,
+WAFERS)
+VALUES(
+lot_seq.nextval,
+:product,
+:testarea,
+:program,
+:lot_id,
+:mother_lot_id,
+'PRODUCTION',
+'',
+'',
+'',
+'',
+sysdate,
+sysdate,
+'1000',
+25)
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:product</param>
+            <param direction="Input" dbtype="VarChar" size="0">:testarea</param>
+            <param direction="Input" dbtype="VarChar" size="0">:program</param>
+            <param direction="Input" dbtype="VarChar" size="0">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="0">:mother_lot_id</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="CREATE_NEW_WAFER" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_WAFER
+(WAFER_SEQ, LOT_SEQ, WAFER_ID, TESTER, PROBE_CARD, OPERATOR, PROBE_CNT,TESTED_DIE, START_TIME, END_TIME)
+VALUES(
+wafer_seq.nextval,
+:lot_seq,
+:wafer_id,
+'ADV001',
+'DEMO01',
+'YSLIM',
+0,
+:testeddie,
+TO_DATE(:start_time,'YYYY-MM-DD HH24:MI:SS'),
+TO_DATE(:end_time,'YYYY-MM-DD HH24:MI:SS'))]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:lot_seq</param>
+            <param direction="Input" dbtype="VarChar" size="0">:wafer_id</param>
+            <param direction="Input" dbtype="Number" size="0">:testeddie</param>
+            <param direction="Input" dbtype="VarChar" size="0">:start_time</param>
+            <param direction="Input" dbtype="VarChar" size="0">:end_time</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_PICK_WAFERS" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT *
+FROM TQP_WAFER_SUM
+WHERE LOT_SEQ = :lot_seq
+AND PROBE_CNT = 0
+AND WAFER_ID IN(??)
+ORDER BY WAFER_ID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="8">:lot_seq</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="CREATE_MAP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TD_??
+(WAFER_SEQ, DIEID, X, Y, BIN, HBIN, CHARBIN, SITE, VISUALINSP, AVI)
+VALUES
+(:wafer_seq, :dieid, :x, :y, :bin, :hbin, '0',0,0,0)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:wafer_seq</param>
+            <param direction="Input" dbtype="Number" size="0">:dieid</param>
+            <param direction="Input" dbtype="Number" size="0">:x</param>
+            <param direction="Input" dbtype="Number" size="0">:y</param>
+            <param direction="Input" dbtype="Number" size="0">:bin</param>
+            <param direction="Input" dbtype="Number" size="0">:hbin</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_MAX_LOTSEQ" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT MAX(LOT_SEQ) AS CURR_LOT_SEQ FROM TQP_LOT]]></commandtext>
+    </query>
+    <query statement="Select" queryid="GET_MAX_WAFERSEQ" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT MAX(WAFER_SEQ) AS CURR_WAFER_SEQ FROM TQP_WAFER]]></commandtext>
+    </query>
+    <query statement="Select" queryid="GET_BINDESC" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT BIN FROM TQP_BINDESC
+WHERE PROGRAM = :program
+AND DISPLAY='T'
+ORDER BY BIN]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="K39VAGSL14_PT1">:program</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_LOT_TIME" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_LOT 
+SET START_TIME = TO_DATE(:stime,'YYYY-MM-DD HH24:MI:SS')
+,END_TIME = TO_DATE(:etime,'YYYY-MM-DD HH24:MI:SS')
+WHERE LOT_SEQ = :lot_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:stime</param>
+            <param direction="Input" dbtype="VarChar" size="0">:etime</param>
+            <param direction="Input" dbtype="Number" size="0">:lot_seq</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="PROC_RUN_PRB_SUMMARY" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[CALL PROC_RUN_PRB_SUMMARY(:testarea,:product,:program,:waferseq,:gec)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:testarea</param>
+            <param direction="Input" dbtype="VarChar" size="0">:product</param>
+            <param direction="Input" dbtype="VarChar" size="0">:program</param>
+            <param direction="Input" dbtype="Number" size="0">:waferseq</param>
+            <param direction="Input" dbtype="VarChar" size="0">:gec</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_MES_WAFER_LIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT *
+FROM TQP_WAFER_SUM
+WHERE 1=1
+AND TESTAREA = :oper
+AND LOT_ID = :lot_id
+AND WAFER_ID = :wafer_id]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="10">:oper</param>
+            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="2">:wafer_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_WAFER_INFO_2" commandtype="Text" description="Defect Map과 Overlay 할 수 있는 wafer list" commandtimeout="60">
+        <commandtext><![CDATA[SELECT *
+FROM TQP_WAFER_SUM
+WHERE PRODUCT=:product
+AND LOT_ID=:lotId
+AND WAFER_ID=:waferId]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:product</param>
+            <param direction="Input" dbtype="VarChar" size="0">:lotId</param>
+            <param direction="Input" dbtype="VarChar" size="0">:waferId</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_WAFER_IN_DEFECT_WAFER" commandtype="Text" description="defect data에 있는 wafer 를 가져온다" commandtimeout="60">
+        <commandtext><![CDATA[SELECT LOT_ID, WAFER_ID, PROGRAM, CUSTOMER, FACILITY, PRODUCT, TESTAREA, MOTHER_LOT_ID, TESTER, PROBE_CARD, OPERATOR, PROBE_CNT, NETDIE, START_TIME, END_TIME, WAFER_CAT, LOSS_DIE, TESTED_DIE, YIELD, LOT_SEQ, WAFER_SEQ
+FROM TQP_WAFER_SUM
+WHERE PROGRAM=:program
+AND LOT_ID || '_' || WAFER_ID IN
+(
+SELECT DISTINCT LOT_ID || '_' || WAFER_ID
+FROM BUMPFA.TQD_INSP_INFO
+)
+AND WAFER_SEQ IN (??)
+ORDER BY LOT_ID, WAFER_ID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:program</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="YIELD_REPORT_BY_DAY" commandtype="Text" description="Yield by day" commandtimeout="60">
+        <commandtext><![CDATA[SELECT TO_CHAR(END_TIME, 'yyyy-MM-dd') "DATE", ROUND(AVG(YIELD), 2) AVG FROM TQP_WAFER_SUM
+WHERE WAFER_SEQ IN (??)
+GROUP BY TO_CHAR(END_TIME, 'yyyy-MM-dd')
+ORDER BY "DATE"]]></commandtext>
+    </query>
+    <query statement="Select" queryid="GET_WAFER_LIST_02" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQP_WAFER_SUM
+WHERE END_TIME BETWEEN TO_DATE(:sTime,'YYYY-MM-DD') AND TO_DATE(:eTime,'YYYY-MM-DD')
+AND TESTAREA='MULTIPROBE'
+AND PRODUCT=:product
+AND LOT_ID IN (??)
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:sTime</param>
+            <param direction="Input" dbtype="VarChar" size="0">:eTime</param>
+            <param direction="Input" dbtype="VarChar" size="0">:product</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_WAFERINFO" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQP_WAFER_SUM
+WHERE TESTAREA=:testarea
+AND PRODUCT=:product
+AND LOT_ID = :lot_id
+AND WAFER_ID = :wafer_id
+AND PROBE_CNT=0
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:testarea</param>
+            <param direction="Input" dbtype="VarChar" size="30">:product</param>
+            <param direction="Input" dbtype="VarChar" size="30">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="30">:wafer_id</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_FTA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_WAFER_SUM SET FTA=:fta
+WHERE WAFER_SEQ=:wafer_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:fta</param>
+            <param direction="Input" dbtype="Number" size="0">:wafer_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_ONLYVI" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT COUNT(*) CNT FROM TD_??
+WHERE WAFER_SEQ = :wafer_seq
+AND BIN=0 AND AVI=0 AND VISUALINSP>0]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="10">:wafer_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_YIELD_BYWAFER" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT LOT_ID || '-'  || WAFER_ID AS WAFER_ID, YIELD FROM TQP_WAFER_SUM
+WHERE WAFER_SEQ IN (??) ORDER BY END_TIME]]></commandtext>
+    </query>
+    <query statement="Select" queryid="GET_YIELD_BYLOT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT LOT_ID , ROUND(AVG(YIELD),2) AS YIELD FROM TQP_WAFER_SUM
+WHERE WAFER_SEQ IN (??) GROUP BY LOT_ID]]></commandtext>
+    </query>
+    <query statement="Select" queryid="GET_YIELD_BYDATE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT TO_CHAR(END_TIME,'YYYY-MM-DD') AS DAY, ROUND(AVG(YIELD),2) AS YIELD FROM TQP_WAFER_SUM
+WHERE WAFER_SEQ IN (??) GROUP BY TO_CHAR(END_TIME,'YYYY-MM-DD') ORDER BY TO_CHAR(END_TIME,'YYYY-MM-DD') ]]></commandtext>
+    </query>
+    <query statement="Select" queryid="GET_BOX_YIELD_BYLOT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT LOT_ID,WAFER_ID,ROUND(YIELD,2) AS YIELD FROM TQP_WAFER_SUM
+WHERE WAFER_SEQ IN (??)]]></commandtext>
+    </query>
+    <query statement="Select" queryid="GET_BOX_YIELD_BYDATE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT TO_CHAR(END_TIME,'YYYY-MM-DD') AS DAY,WAFER_ID,ROUND(YIELD,2) AS YIELD  FROM TQP_WAFER_SUM
+WHERE WAFER_SEQ IN (??)]]></commandtext>
+    </query>
+    <query statement="Insert" queryid="CREATE_WAFER" commandtype="Text" description="Wafer Sum 생성한다." commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_WAFER_SUM VALUES( ?? )]]></commandtext>
+    </query>
+    <query statement="Update" queryid="UPDATE_DATA_PROBE_CNT" commandtype="Text" description="Probe Count를 1씩 증가 시킨다." commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_WAFER_SUM SET PROBE_CNT= PROBE_CNT + 1 
+WHERE LOT_SEQ = :lot_seq 
+AND TRIM(UPPER(WAFER_ID)) =  TRIM(UPPER(:wafer_id))]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:lot_seq</param>
+            <param direction="Input" dbtype="VarChar" size="0">:wafer_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_BINSUM" commandtype="Text" description="Bin합계를 가져온다." commandtimeout="60">
+        <commandtext><![CDATA[SELECT
+    SUM(BIN0),
+    SUM(BIN1),SUM(BIN2),SUM(BIN3),SUM(BIN4), SUM(BIN5),SUM(BIN6),SUM(BIN7),SUM(BIN8),SUM(BIN9), SUM(BIN10),
+    SUM(BIN11),SUM(BIN12),SUM(BIN13),SUM(BIN14), SUM(BIN15),SUM(BIN16),SUM(BIN17),SUM(BIN18),SUM(BIN19), SUM(BIN20),
+    SUM(BIN21),SUM(BIN22),SUM(BIN23),SUM(BIN24), SUM(BIN25),SUM(BIN26),SUM(BIN27),SUM(BIN28),SUM(BIN29), SUM(BIN30),
+    SUM(BIN31),SUM(BIN32),SUM(BIN33),SUM(BIN34), SUM(BIN35),SUM(BIN36),SUM(BIN37),SUM(BIN38),SUM(BIN39), SUM(BIN40),
+    SUM(BIN41),SUM(BIN42),SUM(BIN43),SUM(BIN44), SUM(BIN45),SUM(BIN46),SUM(BIN47),SUM(BIN48),SUM(BIN49), SUM(BIN50),
+    SUM(BIN51),SUM(BIN52),SUM(BIN53),SUM(BIN54), SUM(BIN55),SUM(BIN56),SUM(BIN57),SUM(BIN58),SUM(BIN59), SUM(BIN60),
+    SUM(BIN61),SUM(BIN62),SUM(BIN63),SUM(BIN64), SUM(BIN65),SUM(BIN66),SUM(BIN67),SUM(BIN68),SUM(BIN69), SUM(BIN70),
+    SUM(BIN71),SUM(BIN72),SUM(BIN73),SUM(BIN74), SUM(BIN75),SUM(BIN76),SUM(BIN77),SUM(BIN78),SUM(BIN79), SUM(BIN80),
+    SUM(BIN81),SUM(BIN82),SUM(BIN83),SUM(BIN84), SUM(BIN85),SUM(BIN86),SUM(BIN87),SUM(BIN88),SUM(BIN89), SUM(BIN90),
+    SUM(BIN91),SUM(BIN92),SUM(BIN93),SUM(BIN94), SUM(BIN95),SUM(BIN96),SUM(BIN97),SUM(BIN98),SUM(BIN99), SUM(BIN100),
+    SUM(BIN101),SUM(BIN102),SUM(BIN103),SUM(BIN104), SUM(BIN105),SUM(BIN106),SUM(BIN107),SUM(BIN108),SUM(BIN109), SUM(BIN110),
+    SUM(BIN111),SUM(BIN112),SUM(BIN113),SUM(BIN114), SUM(BIN115),SUM(BIN116),SUM(BIN117),SUM(BIN118),SUM(BIN119), SUM(BIN120),
+    SUM(BIN121),SUM(BIN122),SUM(BIN123),SUM(BIN124), SUM(BIN125),SUM(BIN126),SUM(BIN127),SUM(BIN128),SUM(BIN129), SUM(BIN130),
+    SUM(BIN131),SUM(BIN132),SUM(BIN133),SUM(BIN134), SUM(BIN135),SUM(BIN136),SUM(BIN137),SUM(BIN138),SUM(BIN139), SUM(BIN140),
+    SUM(BIN141),SUM(BIN142),SUM(BIN143),SUM(BIN144), SUM(BIN145),SUM(BIN146),SUM(BIN147),SUM(BIN148),SUM(BIN149), SUM(BIN150),
+    SUM(BIN151),SUM(BIN152),SUM(BIN153),SUM(BIN154), SUM(BIN155),SUM(BIN156),SUM(BIN157),SUM(BIN158),SUM(BIN159), SUM(BIN160),
+    SUM(BIN161),SUM(BIN162),SUM(BIN163),SUM(BIN164), SUM(BIN165),SUM(BIN166),SUM(BIN167),SUM(BIN168),SUM(BIN169), SUM(BIN170),
+    SUM(BIN171),SUM(BIN172),SUM(BIN173),SUM(BIN174), SUM(BIN175),SUM(BIN176),SUM(BIN177),SUM(BIN178),SUM(BIN179), SUM(BIN180),
+    SUM(BIN181),SUM(BIN182),SUM(BIN183),SUM(BIN184), SUM(BIN185),SUM(BIN186),SUM(BIN187),SUM(BIN188),SUM(BIN189), SUM(BIN190),
+    SUM(BIN191),SUM(BIN192),SUM(BIN193),SUM(BIN194), SUM(BIN195),SUM(BIN196),SUM(BIN197),SUM(BIN198),SUM(BIN199), SUM(BIN200),
+    SUM(BIN201),SUM(BIN202),SUM(BIN203),SUM(BIN204), SUM(BIN205),SUM(BIN206),SUM(BIN207),SUM(BIN208),SUM(BIN209), SUM(BIN210),
+    SUM(BIN211),SUM(BIN212),SUM(BIN213),SUM(BIN214), SUM(BIN215),SUM(BIN216),SUM(BIN217),SUM(BIN218),SUM(BIN219), SUM(BIN220),
+    SUM(BIN221),SUM(BIN222),SUM(BIN223),SUM(BIN224), SUM(BIN225),SUM(BIN226),SUM(BIN227),SUM(BIN228),SUM(BIN229), SUM(BIN230),
+    SUM(BIN231),SUM(BIN232),SUM(BIN233),SUM(BIN234), SUM(BIN235),SUM(BIN236),SUM(BIN237),SUM(BIN238),SUM(BIN239), SUM(BIN240),
+    SUM(BIN241),SUM(BIN242),SUM(BIN243),SUM(BIN244), SUM(BIN245),SUM(BIN246),SUM(BIN247),SUM(BIN248),SUM(BIN249), SUM(BIN250),
+    SUM(BIN251),SUM(BIN252),SUM(BIN253),SUM(BIN254), SUM(BIN255),    
+    SUM(GEC) AS GEC,SUM(LOSS_DIE) AS LOSS_DIE, SUM(TESTED_DIE) AS TESTED_DIE
+FROM TQP_WAFER_SUM WHERE LOT_SEQ = :lot_seq AND PROBE_CNT =  0]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="9">:lot_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_GEC" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT GEC FROM TQP_WAFER_SUM
+WHERE WAFER_SEQ = :wafer_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="8">:wafer_seq</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_LOSSDIE" commandtype="Text" description="Loss Die Update" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_WAFER_SUM
+SET LOSS_DIE = :loss_die
+WHERE WAFER_SEQ = :wafer_seq
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:wafer_seq</param>
+            <param direction="Input" dbtype="Number" size="0">:loss_die</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_WAFER_ID_AVI" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT WAFER_ID FROM TQP_WAFER_SUM
+WHERE PRODUCT = :product
+AND PROGRAM = :program
+AND LOT_ID = :lot_id
+AND TESTAREA = 'AVI'
+ORDER BY to_number(WAFER_ID)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:product</param>
+            <param direction="Input" dbtype="VarChar" size="30">:program</param>
+            <param direction="Input" dbtype="VarChar" size="30">:lot_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_WAFER_ID_RETEST" commandtype="Text" description="WaferID 와 Retest 정보를 가져온다." commandtimeout="60">
+        <commandtext><![CDATA[SELECT TA.WAFER_ID, PROBE_CNT, RETESTCOUNT, TA.WAFER_ID || '     ' || TO_CHAR(PROBE_CNT) RNAME FROM
+(SELECT WAFER_ID, PROBE_CNT FROM TQP_WAFER_SUM
+WHERE PRODUCT = :product
+AND PROGRAM = :program
+AND LOT_ID = :lot_id) TA,
+(SELECT WAFER_ID, COUNT(PROBE_CNT) RETESTCOUNT FROM TQP_WAFER_SUM
+WHERE PRODUCT = :product
+AND PROGRAM = :program
+AND LOT_ID = :lot_id
+GROUP BY WAFER_ID) TB
+WHERE TA.WAFER_ID = TB.WAFER_ID
+AND PROBE_CNT IN( ?? )
+ORDER BY WAFER_ID, PROBE_CNT]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30" value="LGDP4213A">:product</param>
+            <param direction="Input" dbtype="VarChar" size="30" value="LGDP4213A-EDS-REV1A">:program</param>
+            <param direction="Input" dbtype="VarChar" size="30" value="LGJ03810.1">:lot_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_PROBE_CNT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT PROBE_CNT FROM TQP_WAFER_SUM
+WHERE PRODUCT = :product
+AND PROGRAM = :program
+AND LOT_ID = :lot_id]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:product</param>
+            <param direction="Input" dbtype="VarChar" size="30">:program</param>
+            <param direction="Input" dbtype="VarChar" size="30">:lot_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_WAFER_ID_VI" commandtype="Text" description="VI data 가 있는 Wafer 만 가져온다." commandtimeout="60">
+        <commandtext><![CDATA[SELECT WAFER_ID FROM
+(SELECT DISTINCT WAFER_ID, WAFER_SEQ FROM TQP_WAFER_SUM
+WHERE PRODUCT = :product
+AND PROGRAM = :program
+AND LOT_ID = :lot_id
+AND PROBE_CNT = 0) TA,
+(SELECT WAFER_SEQ, COUNT(*) FROM ??
+WHERE WAFER_SEQ IN (SELECT DISTINCT WAFER_SEQ FROM TQP_WAFER_SUM
+                    WHERE PRODUCT = :product
+                    AND PROGRAM = :program
+                    AND LOT_ID = :lot_id
+                    AND PROBE_CNT = 0)
+AND VISUALINSP <> 0
+GROUP BY WAFER_SEQ) TB
+WHERE TA.WAFER_SEQ = TB.WAFER_SEQ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:product</param>
+            <param direction="Input" dbtype="VarChar" size="30">:program</param>
+            <param direction="Input" dbtype="VarChar" size="30">:lot_id</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="CREATE_DEVICE_TABLE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[CREATE TABLE ??(
+WAFER_SEQ    NUMBER(8)    NOT NULL,
+DIEID        INTEGER    NOT NULL,
+X        INTEGER    NOT NULL,
+Y        INTEGER    NOT NULL,
+BIN        INTEGER    NOT NULL,
+HBIN        INTEGER    NOT NULL,
+CHARBIN    VarChar(4),
+SITE        INTEGER,
+VISUALINSP    INTEGER,
+AVI        INTEGER
+)
+]]></commandtext>
+    </query>
+    <query statement="Select" queryid="Select_MaxWaferSeq" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[ Select max(WAFER_SEQ) from ??]]></commandtext>
+    </query>
+    <query statement="Select" queryid="GET_WAFER_INFO_MULTI_OVER_THOUSAND" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[select * from TQP_WAFER_SUM WHERE WAFER_SEQ in (select level from dual connect by level <= ??) AND WAFER_SEQ >= ?? AND WAFER_SEQ <= ??]]></commandtext>
+    </query>
+    <query statement="Select" queryid="GET_WAFER_INFO_MULTI_OVER_THOUSAND_BET" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[select * from TQP_WAFER_SUM WHERE WAFER_SEQ in (select level from dual connect by level <= ??) AND WAFER_SEQ >= ?? AND WAFER_SEQ <= ?? AND LOT_ID in (??)]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_WAFER_SUM_INFO" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT *
+FROM TQP_WAFER_SUM
+WHERE LOT_ID = :lot_id
+AND WAFER_ID = :wafer_id
+AND PROBE_CNT = 0]]></commandtext>
+    </query>
+    <query statement="Select" queryid="GET_WAFER_INFOS" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQP_WAFER_SUM
+WHERE 1=1
+AND PRODUCT=:product
+AND LOT_ID = :lot_id
+AND WAFER_ID = :wafer_id
+AND PROBE_CNT=0
+AND TESTAREA IN ( ?? ) ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:product</param>
+            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:wafer_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_WAFER_INFO_LOT_WAFER_TESTAREA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT *
+FROM TQP_WAFER_SUM
+WHERE 1=1
+AND LOT_ID = :lot_id
+AND WAFER_ID = :wafer_id
+AND TESTAREA = :testarea
+AND PROBE_CNT = 0  ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="8293360">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="AK8293360-21">:wafer_id</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="MULTIPROBE">:testarea</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_ONLYVI_ALL" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT COUNT(*) CNT FROM TD_??
+WHERE WAFER_SEQ = :wafer_seq
+AND BIN=0 AND AVI=0 AND VISUALINSP>0]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_WAFER_SUM_MAX_SEQ_MERGE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT MAX(WAFER_SEQ)
+FROM TQP_WAFER_SUM
+WHERE LOT_ID = :lot_id
+AND WAFER_ID = :wafer_id
+AND TESTAREA LIKE '%MERGE'
+ ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:wafer_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_WAFER_SUM_BY_LOTID" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT *
+FROM TQP_WAFER_SUM
+WHERE LOT_ID = :lot_id]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="COPY_WAFER_SUM" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_WAFER_SUM
+SELECT CUSTOMER, FACILITY, PRODUCT, :testarea AS TESTAREA, PROGRAM, FORMAT, MOTHER_LOT_ID, LOT_ID
+, :lot_seq AS LOT_SEQ, WAFER_ID, :wafer_seq AS WAFER_SEQ, TESTER, PROBE_CARD, OPERATOR, GOLDEN_CHECK
+, 0, NETDIE, TO_DATE(:start_time,'YYYY-MM-DD HH24:MI:SS'), TO_DATE(:end_time,'YYYY-MM-DD HH24:MI:SS')
+, WAFER_CAT, :loss_die AS LOSS_DIE, TESTED_DIE, :yield AS YIELD, FTA, 
+??, BIN0, :copy_flag
+FROM TQP_WAFER_SUM
+WHERE WAFER_SEQ = :pre_wafer_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:testarea</param>
+            <param direction="Input" dbtype="Number" size="0">:lot_seq</param>
+            <param direction="Input" dbtype="Number" size="0">:wafer_seq</param>
+            <param direction="Input" dbtype="VarChar" size="0">:start_time</param>
+            <param direction="Input" dbtype="VarChar" size="0">:end_time</param>
+            <param direction="Input" dbtype="Number" size="0">:loss_die</param>
+            <param direction="Input" dbtype="Number" size="0">:yield</param>
+            <param direction="Input" dbtype="VarChar" size="0">:copy_flag</param>
+            <param direction="Input" dbtype="Number" size="0">:pre_wafer_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_BY_DYNAMIC" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[??]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_GOLDEN_CHECK_LIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT GOLDEN_CHECK, WAFER_ID
+FROM TQP_WAFER_SUM
+WHERE 1=1
+AND LOT_ID = :lot_id
+AND WAFER_ID IN (??)
+AND TESTAREA = :testarea
+AND PROBE_CNT = 0
+ORDER BY WAFER_ID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:testarea</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_WAFER_INFO_BY_TESTAREA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT *
+FROM TQP_WAFER_SUM
+WHERE TESTAREA = :testarea
+AND LOT_ID = :lot_id
+AND WAFER_ID = :wafer_id]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:testarea</param>
+            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:wafer_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_WAFER_INFO_WITHOUT_PRODUCT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQP_WAFER_SUM
+WHERE TESTAREA=:testarea
+AND LOT_ID = :lot_id
+AND WAFER_ID = :wafer_id
+AND PROBE_CNT=0
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:testarea</param>
+            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:wafer_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_MERGE_SUM" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DECODE(A.BIN, null, B.BIN, A.BIN) AS BIN, DECODE(A.CNT, null, 0, A.CNT) AS CNT
+FROM (SELECT BIN, COUNT(BIN) AS CNT
+        FROM ??
+        WHERE 1=1
+        AND WAFER_SEQ = :wafer_seq
+        GROUP BY BIN) A, 
+        (SELECT LEVEL AS BIN
+        FROM DUAL CONNECT BY LEVEL <= 255
+        ) B
+WHERE A.BIN (+)=B.BIN
+ORDER BY BIN]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="20">:wafer_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_WAFER_INFO_LIST_BY_TESTAREA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT *
+FROM TQP_WAFER_SUM
+WHERE TESTAREA = :testarea
+AND LOT_ID = :lot_id
+AND PROBE_CNT = 0]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:testarea</param>
+            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_GOLDEN_CHECK_MERGE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT GOLDEN_CHECK, WAFER_ID
+FROM TQP_WAFER_SUM
+WHERE LOT_ID = :lot_id
+AND WAFER_ID IN ]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_GOLDEN_CHECK_1" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT X,Y
+FROM TQP_USEMAP
+WHERE MAPID = :mapid
+AND USECODE = 1
+MINUS
+SELECT X,Y
+FROM ?? 
+WHERE WAFER_SEQ = :wafer_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:mapid</param>
+            <param direction="Input" dbtype="Number" size="20">:wafer_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_GOLDEN_CHECK_2" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT X,Y
+FROM ?? 
+WHERE WAFER_SEQ = :wafer_seq
+MINUS
+SELECT X,Y
+FROM TQP_USEMAP
+WHERE MAPID = :mapid
+AND USECODE = 1]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="20">:wafer_seq</param>
+            <param direction="Input" dbtype="VarChar" size="40">:mapid</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_GOLDEN_FLAG" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_WAFER_SUM
+SET GOLDEN_CHECK = 'T'
+WHERE WAFER_SEQ = :wafer_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:wafer_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_GOLDEN_CHECK_AVI" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DECODE(SELECTED_WAFER_ID, null, 'T','F') AS GOLDEN_CHECK, ALL_WAFER_ID AS WAFER_ID 
+FROM (SELECT LPAD(LEVEL,2,'0') ALL_WAFER_ID
+                        from dual 
+                        CONNECT BY LEVEL IN (??)) A,
+(
+    SELECT DISTINCT WAFER_ID AS SELECTED_WAFER_ID
+    FROM
+    (
+        SELECT *
+        FROM
+        (
+            SELECT
+            A.WAFER_ID
+            ,( A.X - B.MIN_X +1) X --X
+            , (B.MAX_Y - A.Y +1 ) Y  --Y
+            FROM 
+            (
+                SELECT A.WAFER_ID, INDEX_X AS X, INDEX_Y AS Y  
+                FROM 
+                (
+                    SELECT B.WAFER_ID, STEP_SEQ, RESULTTIMESTAMP
+                    , RANK() OVER (ORDER BY RESULTTIMESTAMP DESC) AS RANK
+                    FROM TQD_LOT A, TQD_WAFER B, TQD_STEP C
+                    WHERE 1=1
+                    AND A.LOT_ID = :lot_id
+                    AND A.PRODUCT = :product
+                    AND A.LOT_SEQ = B.LOT_SEQ
+                    AND B.WAFER_ID IN (??)
+                    AND B.WAFER_SEQ = C.WAFER_SEQ
+                    AND C.STEP_ID = :step_id
+                    ) A, TQD_SCAN_SAMPLE B
+                WHERE A.RANK = 1
+                AND A.STEP_SEQ = B.STEP_SEQ
+            ) A,
+            (
+                SELECT
+                MAX(INDEX_X) MAX_X, MAX(INDEX_Y) MAX_Y
+                , MIN(INDEX_X) MIN_X, MIN(INDEX_Y) MIN_Y
+                FROM(
+                    SELECT B.WAFER_ID, STEP_SEQ, RESULTTIMESTAMP, RANK() OVER (ORDER BY RESULTTIMESTAMP DESC) AS RANK
+                    FROM TQD_LOT A, TQD_WAFER B, TQD_STEP C 
+                    WHERE 1=1
+                    AND A.LOT_ID = :lot_id
+                    AND A.PRODUCT = :product
+                    AND A.LOT_SEQ = B.LOT_SEQ
+                    AND B.WAFER_ID IN (??)
+                    AND B.WAFER_SEQ = C.WAFER_SEQ
+                    AND C.STEP_ID = :step_id
+                    ) A, TQD_SCAN_SAMPLE B    
+                WHERE A.RANK = 1
+                AND A.STEP_SEQ = B.STEP_SEQ       
+            ) B 
+            GROUP BY A.WAFER_ID,( A.X - B.MIN_X +1),  (B.MAX_Y - A.Y +1 )
+            MINUS
+            SELECT B.WAFER_ID WAFER_ID, X, Y
+            FROM TQP_USEMAP
+                        , (SELECT LPAD(LEVEL,2,'0') AS WAFER_ID 
+                            from dual 
+                            CONNECT BY LEVEL IN (??)) B
+                            WHERE MAPID = :product
+            AND USECODE = 1
+            GROUP BY WAFER_ID, X, Y
+        ) 
+        UNION ALL
+        SELECT *
+        FROM
+        (
+            SELECT B.WAFER_ID WAFER_ID, X, Y
+            FROM TQP_USEMAP
+                        , (SELECT LPAD(LEVEL,2,'0') AS WAFER_ID 
+                            from dual 
+                            CONNECT BY LEVEL IN (??)) B
+                            WHERE MAPID = :product
+            AND USECODE = 1
+            GROUP BY WAFER_ID, X, Y
+            MINUS
+            SELECT
+            A.WAFER_ID
+            ,( A.X - B.MIN_X +1) X --X
+            , (B.MAX_Y - A.Y +1 ) Y  --Y
+            FROM 
+            (
+                SELECT B.WAFER_ID, INDEX_X AS X, INDEX_Y AS Y 
+                FROM TQD_LOT A, TQD_WAFER B, TQD_STEP C, TQD_SCAN_SAMPLE D
+                WHERE 1=1
+                AND A.LOT_ID = :lot_id
+                AND A.LOT_SEQ = B.LOT_SEQ
+                AND B.WAFER_ID IN (??)
+                AND B.WAFER_SEQ = C.WAFER_SEQ
+                AND C.STEP_ID = :step_id
+                AND C.STEP_SEQ = D.STEP_SEQ
+                GROUP BY B.WAFER_ID, INDEX_X, INDEX_Y
+            ) A,
+            (
+                SELECT
+                MAX(INDEX_X) MAX_X, MAX(INDEX_Y) MAX_Y
+                , MIN(INDEX_X) MIN_X, MIN(INDEX_Y) MIN_Y
+                FROM TQD_LOT A, TQD_WAFER B, TQD_STEP C, TQD_SCAN_SAMPLE D
+                WHERE 1=1
+                AND A.LOT_ID = :lot_id
+                AND A.LOT_SEQ = B.LOT_SEQ
+                AND B.WAFER_ID IN (??)
+                AND B.WAFER_SEQ = C.WAFER_SEQ
+                AND C.STEP_ID = :step_id
+                AND C.STEP_SEQ = D.STEP_SEQ    
+            ) B 
+            GROUP BY A.WAFER_ID,( A.X - B.MIN_X +1),  (B.MAX_Y - A.Y +1 )
+         ) B
+    )
+)B
+WHERE SELECTED_WAFER_ID (+)= ALL_WAFER_ID
+ORDER BY ALL_WAFER_ID
+
+
+
+
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:step_id</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="31702">:product</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_GOLDEN_CHECK_WAFER_QTY" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT *
+FROM TQP_WAFER_SUM
+WHERE LOT_ID = :lot_id
+AND TESTAREA = :testarea
+AND WAFER_ID IN (??)
+AND PROBE_CNT = 0]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:testarea</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_GOLDEN_CHECK_AVI_EACH" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT
+( A.X - B.MIN_X +1) X --X
+, (B.MAX_Y - A.Y +1 ) Y  --Y
+FROM 
+(
+    SELECT INDEX_X AS X, INDEX_Y AS Y  
+    FROM 
+    (
+        SELECT STEP_SEQ, RESULTTIMESTAMP
+        , RANK() OVER (ORDER BY RESULTTIMESTAMP DESC) AS RANK
+        FROM TQD_LOT A, TQD_WAFER B, TQD_STEP C
+        WHERE 1=1
+        AND A.LOT_ID = :lot_id
+        AND A.PRODUCT = :product
+        AND A.LOT_SEQ = B.LOT_SEQ
+        AND B.WAFER_ID = :wafer_id
+        AND B.WAFER_SEQ = C.WAFER_SEQ
+        AND C.STEP_ID = :step_id
+        ) A, TQD_SCAN_SAMPLE B
+    WHERE A.RANK = 1
+    AND A.STEP_SEQ = B.STEP_SEQ
+) A,
+(
+    SELECT
+    MAX(INDEX_X) MAX_X, MAX(INDEX_Y) MAX_Y
+    , MIN(INDEX_X) MIN_X, MIN(INDEX_Y) MIN_Y
+    FROM(
+        SELECT B.WAFER_ID, STEP_SEQ, RESULTTIMESTAMP, RANK() OVER (ORDER BY RESULTTIMESTAMP DESC) AS RANK
+        FROM TQD_LOT A, TQD_WAFER B, TQD_STEP C 
+        WHERE 1=1
+        AND A.LOT_ID = :lot_id
+        AND A.PRODUCT = :product
+        AND A.LOT_SEQ = B.LOT_SEQ
+        AND B.WAFER_ID = :wafer_id
+        AND B.WAFER_SEQ = C.WAFER_SEQ
+        AND C.STEP_ID = :step_id
+        ) A, TQD_SCAN_SAMPLE B    
+    WHERE A.RANK = 1
+    AND A.STEP_SEQ = B.STEP_SEQ       
+) B 
+MINUS
+SELECT  X, Y
+FROM TQP_USEMAP
+WHERE MAPID = :product
+AND USECODE = 1
+UNION ALL
+SELECT  X, Y
+FROM TQP_USEMAP
+WHERE MAPID = :product
+AND USECODE = 1
+MINUS
+SELECT
+( A.X - B.MIN_X +1) X --X
+, (B.MAX_Y - A.Y +1 ) Y  --Y
+FROM 
+(
+    SELECT INDEX_X AS X, INDEX_Y AS Y  
+    FROM 
+    (
+        SELECT STEP_SEQ, RESULTTIMESTAMP
+        , RANK() OVER (ORDER BY RESULTTIMESTAMP DESC) AS RANK
+        FROM TQD_LOT A, TQD_WAFER B, TQD_STEP C
+        WHERE 1=1
+        AND A.LOT_ID = :lot_id
+        AND A.PRODUCT = :product
+        AND A.LOT_SEQ = B.LOT_SEQ
+        AND B.WAFER_ID = :wafer_id
+        AND B.WAFER_SEQ = C.WAFER_SEQ
+        AND C.STEP_ID = :step_id
+        ) A, TQD_SCAN_SAMPLE B
+    WHERE A.RANK = 1
+    AND A.STEP_SEQ = B.STEP_SEQ
+) A,
+(
+    SELECT
+    MAX(INDEX_X) MAX_X, MAX(INDEX_Y) MAX_Y
+    , MIN(INDEX_X) MIN_X, MIN(INDEX_Y) MIN_Y
+    FROM(
+        SELECT B.WAFER_ID, STEP_SEQ, RESULTTIMESTAMP, RANK() OVER (ORDER BY RESULTTIMESTAMP DESC) AS RANK
+        FROM TQD_LOT A, TQD_WAFER B, TQD_STEP C 
+        WHERE 1=1
+        AND A.LOT_ID = :lot_id
+        AND A.PRODUCT = :product
+        AND A.LOT_SEQ = B.LOT_SEQ
+        AND B.WAFER_ID = :wafer_id
+        AND B.WAFER_SEQ = C.WAFER_SEQ
+        AND C.STEP_ID = :step_id
+        ) A, TQD_SCAN_SAMPLE B    
+    WHERE A.RANK = 1
+    AND A.STEP_SEQ = B.STEP_SEQ       
+) B ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:product</param>
+            <param direction="Input" dbtype="VarChar" size="40">:wafer_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:step_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_WAFER_LIST_BY_ALL" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT *
+FROM TQP_WAFER_SUM
+WHERE LOT_ID = :lot_id
+AND PRODUCT = :product
+AND TESTAREA = :testarea
+AND PROBE_CNT = 0
+ORDER BY WAFER_ID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:product</param>
+            <param direction="Input" dbtype="VarChar" size="40">:testarea</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_TESTAREA_LAST_MERGE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT TESTAREA, START_TIME, END_TIME
+FROM TQP_WAFER_SUM
+WHERE 1=1
+AND LOT_ID = :lot_id
+AND WAFER_ID = :wafer_id
+AND PRODUCT = :product
+AND TESTAREA LIKE '%MERGE'
+ORDER BY START_TIME DESC , END_TIME DESC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:wafer_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:product</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="CREATE_DMS_WAFER" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2014-11-27 20:02:41
+INSERT INTO TQP_WAFER_SUM 
+(LOT_SEQ, LOT_ID, TESTAREA, PRODUCT, PROGRAM, CUSTOMER, FACILITY, START_TIME, END_TIME, WAFER_SEQ, WAFER_ID, GOLDEN_CHECK, PROBE_CNT) 
+VALUES 
+(:LOT_SEQ, :LOT_ID, :TESTAREA, :PRODUCT, :PROGRAM, :CUSTOMER, :FACILITY, TO_DATE(:START_TIME,'YYYY-MM-DD HH24:MI:SS'), TO_DATE(:END_TIME,'YYYY-MM-DD HH24:MI:SS'), :WAFER_SEQ, :WAFER_ID, 'T', '0')]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:LOT_SEQ</param>
+            <param direction="Input" dbtype="VarChar" size="0">:LOT_ID</param>
+            <param direction="Input" dbtype="VarChar" size="0">:TESTAREA</param>
+            <param direction="Input" dbtype="VarChar" size="0">:PRODUCT</param>
+            <param direction="Input" dbtype="VarChar" size="0">:PROGRAM</param>
+            <param direction="Input" dbtype="VarChar" size="0">:CUSTOMER</param>
+            <param direction="Input" dbtype="VarChar" size="0">:FACILITY</param>
+            <param direction="Input" dbtype="VarChar" size="0">:START_TIME</param>
+            <param direction="Input" dbtype="VarChar" size="0">:END_TIME</param>
+            <param direction="Input" dbtype="VarChar" size="0">:WAFER_SEQ</param>
+            <param direction="Input" dbtype="VarChar" size="0">:WAFER_ID</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_BIN_INFO_DMS" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2014-11-29 16:21:04
+UPDATE TQP_WAFER_SUM 
+SET ??
+WHERE WAFER_SEQ = :WAFER_SEQ
+AND LOT_SEQ = :LOT_SEQ
+AND LOT_ID = :LOT_ID
+AND TESTAREA = :TESTAREA]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:WAFER_SEQ</param>
+            <param direction="Input" dbtype="VarChar" size="0">:LOT_SEQ</param>
+            <param direction="Input" dbtype="VarChar" size="0">:LOT_ID</param>
+            <param direction="Input" dbtype="VarChar" size="0">:TESTAREA</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_DMS_WAFER_BY_LOT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2014-12-01 10:51:37
+SELECT * FROM TQP_WAFER_SUM
+WHERE LOT_SEQ = :LOT_SEQ
+AND LOT_ID = :LOT_ID
+AND TESTAREA = :TESTAREA
+AND PROBE_CNT = 0]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_WAFER_INFO_BY_LOT_SLOT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2015-03-19 14:57:44
+SELECT *
+FROM TQP_WAFER_SUM
+WHERE 1=1
+AND LOT_ID = :lot_id
+AND SLOT_ID = :slot_id
+AND TESTAREA = :testarea]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:slot_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:testarea</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_WAFER_INFO_BY_WAFER_ID" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2015-03-19 15:00:21
+SELECT *
+FROM TQP_WAFER_SUM
+WHERE 1=1
+AND WAFER_ID = :wafer_id
+AND TESTAREA = :testarea]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:wafer_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:testarea</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="PROBE_CNT_PLUS" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2015-04-16 10:09:29
+UPDATE TQP_WAFER_SUM SET PROBE_CNT = PROBE_CNT + 1
+WHERE LOT_SEQ = :lot_seq
+AND WAFER_ID = :wafer_id]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:lot_seq</param>
+            <param direction="Input" dbtype="VarChar" size="0">:wafer_id</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="PROC_RUN_AVI_SUMMARY" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2015-04-17 16:14:54
+CALL PROC_RUN_AVI_SUMMARY(:product, :wafer_seq)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:product</param>
+            <param direction="Input" dbtype="VarChar" size="0">:wafer_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_WAFER_INFO_03" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2015-04-22 14:49:56
+SELECT * FROM TQP_WAFER_SUM
+WHERE TESTAREA = :testarea
+AND PRODUCT = :product
+AND PROGRAM = NVL(:program,PROGRAM)
+AND LOT_ID = :lot_id
+AND WAFER_ID = :wafer_id
+AND PROBE_CNT = :probe_cnt]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:testarea</param>
+            <param direction="Input" dbtype="VarChar" size="40">:product</param>
+            <param direction="Input" dbtype="VarChar" size="40">:program</param>
+            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:wafer_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:probe_cnt</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_WAFER_INFO_04" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2015-04-23 09:14:41
+WITH OPER AS
+(
+    SELECT 'B1000' AS OPERCODE, 'IQC' AS TESTAREA FROM DUAL
+    UNION
+    SELECT 'B6600' AS OPERCODE, 'AVI' AS TESTAREA FROM DUAL
+    UNION
+    SELECT 'T9900' AS OPERCODE, 'MULTIPROBE' AS TESTAREA FROM DUAL
+    UNION
+    SELECT :testarea AS OPERCODE, :testarea AS TESTAREA FROM DUAL    
+) 
+SELECT * FROM TQP_WAFER_SUM WS
+             ,(SELECT MAX(WAFER_SEQ) AS WAFER_SEQ 
+               FROM TQP_WAFER_SUM S,(SELECT DECODE(:testarea,'IQC','B1000'
+                                   ,'AVI','B6600'
+                                   ,'MULTIPROBE','T9900'
+                                   ,:testarea) AS OPERCODE FROM DUAL) A, OPER B 
+                WHERE 1= 1
+                AND S.TESTAREA = B.TESTAREA
+                AND B.OPERCODE <= A.OPERCODE
+                AND PRODUCT = :product
+                AND PROGRAM = NVL(:program,PROGRAM)
+                AND (LOT_ID = :lot_id OR 1=1)
+                AND WAFER_ID = :wafer_id
+                AND PROBE_CNT = NVL(:probe_cnt,0)) WM
+WHERE WS.WAFER_SEQ = WM.WAFER_SEQ
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:testarea</param>
+            <param direction="Input" dbtype="VarChar" size="40">:product</param>
+            <param direction="Input" dbtype="VarChar" size="40">:program</param>
+            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:wafer_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:probe_cnt</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_WAFER_INFO_MULTI(BY_WAFERIDS)" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2015-04-29 16:56:35
+SELECT * FROM TQP_WAFER_SUM
+WHERE WAFER_ID IN ( ?? )]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_TEST_WAFER_LIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[  SELECT 
+       PROGRAM,
+       LOT_ID,
+       WAFER_ID,
+       TESTER,
+       PROBE_CARD,
+       CUSTOMER ,
+       PRODUCT,
+       DEVICE_ALIAS,
+       TESTAREA,
+       PROBE_CNT,
+       START_TIME,
+       END_TIME,
+       TESTED_DIE,
+       YIELD,
+       LOT_SEQ,
+       WAFER_SEQ
+  FROM TQP_WAFER_SUM
+ WHERE  1 = 1
+   ??
+  ORDER BY LOT_ID, WAFER_ID, CUSTOMER, PRODUCT, DEVICE_ALIAS, TESTAREA, PROGRAM, PROBE_CNT, START_TIME, END_TIME ]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_WAFER_CUM_REPORT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT A.DEVICE_ALIAS,
+       A.PRODUCT,
+       A.TESTAREA,
+       A.PROGRAM,
+       A.LOT_ID,
+       A.WAFER_ID,
+       TO_CHAR(A.START_TIME, 'YYYY/MM/DD HH24:MI:SS') AS START_TIME,
+       TO_CHAR(A.END_TIME, 'YYYY/MM/DD HH24:MI:SS') AS END_TIME,
+       NVL(A.TESTED_DIE, 0) AS TESTED_DIE,
+       ROUND(NVL(A.YIELD, 0), 1) AS YIELD,
+       NVL(A.BIN0, 0) AS BIN0, 
+        NVL(A.BIN1, 0) AS BIN1, 
+        NVL(A.BIN2, 0) AS BIN2, 
+        NVL(A.BIN3, 0) AS BIN3, 
+        NVL(A.BIN4, 0) AS BIN4, 
+        NVL(A.BIN5, 0) AS BIN5, 
+        NVL(A.BIN6, 0) AS BIN6, 
+        NVL(A.BIN7, 0) AS BIN7, 
+        NVL(A.BIN8, 0) AS BIN8, 
+        NVL(A.BIN9, 0) AS BIN9, 
+        NVL(A.BIN10, 0) AS BIN10, 
+        NVL(A.BIN11, 0) AS BIN11, 
+        NVL(A.BIN12, 0) AS BIN12, 
+        NVL(A.BIN13, 0) AS BIN13, 
+        NVL(A.BIN14, 0) AS BIN14, 
+        NVL(A.BIN15, 0) AS BIN15, 
+        NVL(A.BIN16, 0) AS BIN16, 
+        NVL(A.BIN17, 0) AS BIN17, 
+        NVL(A.BIN18, 0) AS BIN18, 
+        NVL(A.BIN19, 0) AS BIN19, 
+        NVL(A.BIN20, 0) AS BIN20, 
+        NVL(A.BIN21, 0) AS BIN21, 
+        NVL(A.BIN22, 0) AS BIN22, 
+        NVL(A.BIN23, 0) AS BIN23, 
+        NVL(A.BIN24, 0) AS BIN24, 
+        NVL(A.BIN25, 0) AS BIN25, 
+        NVL(A.BIN26, 0) AS BIN26, 
+        NVL(A.BIN27, 0) AS BIN27, 
+        NVL(A.BIN28, 0) AS BIN28, 
+        NVL(A.BIN29, 0) AS BIN29, 
+        NVL(A.BIN30, 0) AS BIN30, 
+        NVL(A.BIN31, 0) AS BIN31, 
+        NVL(A.BIN32, 0) AS BIN32, 
+        NVL(A.BIN33, 0) AS BIN33, 
+        NVL(A.BIN34, 0) AS BIN34, 
+        NVL(A.BIN35, 0) AS BIN35, 
+        NVL(A.BIN36, 0) AS BIN36, 
+        NVL(A.BIN37, 0) AS BIN37, 
+        NVL(A.BIN38, 0) AS BIN38, 
+        NVL(A.BIN39, 0) AS BIN39, 
+        NVL(A.BIN40, 0) AS BIN40, 
+        NVL(A.BIN41, 0) AS BIN41, 
+        NVL(A.BIN42, 0) AS BIN42, 
+        NVL(A.BIN43, 0) AS BIN43, 
+        NVL(A.BIN44, 0) AS BIN44, 
+        NVL(A.BIN45, 0) AS BIN45, 
+        NVL(A.BIN46, 0) AS BIN46, 
+        NVL(A.BIN47, 0) AS BIN47, 
+        NVL(A.BIN48, 0) AS BIN48, 
+        NVL(A.BIN49, 0) AS BIN49, 
+        NVL(A.BIN50, 0) AS BIN50, 
+        NVL(A.BIN51, 0) AS BIN51, 
+        NVL(A.BIN52, 0) AS BIN52, 
+        NVL(A.BIN53, 0) AS BIN53, 
+        NVL(A.BIN54, 0) AS BIN54, 
+        NVL(A.BIN55, 0) AS BIN55, 
+        NVL(A.BIN56, 0) AS BIN56, 
+        NVL(A.BIN57, 0) AS BIN57, 
+        NVL(A.BIN58, 0) AS BIN58, 
+        NVL(A.BIN59, 0) AS BIN59, 
+        NVL(A.BIN60, 0) AS BIN60, 
+        NVL(A.BIN61, 0) AS BIN61, 
+        NVL(A.BIN62, 0) AS BIN62, 
+        NVL(A.BIN63, 0) AS BIN63, 
+        NVL(A.BIN64, 0) AS BIN64, 
+        NVL(A.BIN65, 0) AS BIN65, 
+        NVL(A.BIN66, 0) AS BIN66, 
+        NVL(A.BIN67, 0) AS BIN67, 
+        NVL(A.BIN68, 0) AS BIN68, 
+        NVL(A.BIN69, 0) AS BIN69, 
+        NVL(A.BIN70, 0) AS BIN70, 
+        NVL(A.BIN71, 0) AS BIN71, 
+        NVL(A.BIN72, 0) AS BIN72, 
+        NVL(A.BIN73, 0) AS BIN73, 
+        NVL(A.BIN74, 0) AS BIN74, 
+        NVL(A.BIN75, 0) AS BIN75, 
+        NVL(A.BIN76, 0) AS BIN76, 
+        NVL(A.BIN77, 0) AS BIN77, 
+        NVL(A.BIN78, 0) AS BIN78, 
+        NVL(A.BIN79, 0) AS BIN79, 
+        NVL(A.BIN80, 0) AS BIN80, 
+        NVL(A.BIN81, 0) AS BIN81, 
+        NVL(A.BIN82, 0) AS BIN82, 
+        NVL(A.BIN83, 0) AS BIN83, 
+        NVL(A.BIN84, 0) AS BIN84, 
+        NVL(A.BIN85, 0) AS BIN85, 
+        NVL(A.BIN86, 0) AS BIN86, 
+        NVL(A.BIN87, 0) AS BIN87, 
+        NVL(A.BIN88, 0) AS BIN88, 
+        NVL(A.BIN89, 0) AS BIN89, 
+        NVL(A.BIN90, 0) AS BIN90, 
+        NVL(A.BIN91, 0) AS BIN91, 
+        NVL(A.BIN92, 0) AS BIN92, 
+        NVL(A.BIN93, 0) AS BIN93, 
+        NVL(A.BIN94, 0) AS BIN94, 
+        NVL(A.BIN95, 0) AS BIN95, 
+        NVL(A.BIN96, 0) AS BIN96, 
+        NVL(A.BIN97, 0) AS BIN97, 
+        NVL(A.BIN98, 0) AS BIN98, 
+        NVL(A.BIN99, 0) AS BIN99, 
+        NVL(A.BIN100, 0) AS BIN100, 
+        NVL(A.BIN101, 0) AS BIN101, 
+        NVL(A.BIN102, 0) AS BIN102, 
+        NVL(A.BIN103, 0) AS BIN103, 
+        NVL(A.BIN104, 0) AS BIN104, 
+        NVL(A.BIN105, 0) AS BIN105, 
+        NVL(A.BIN106, 0) AS BIN106, 
+        NVL(A.BIN107, 0) AS BIN107, 
+        NVL(A.BIN108, 0) AS BIN108, 
+        NVL(A.BIN109, 0) AS BIN109, 
+        NVL(A.BIN110, 0) AS BIN110, 
+        NVL(A.BIN111, 0) AS BIN111, 
+        NVL(A.BIN112, 0) AS BIN112, 
+        NVL(A.BIN113, 0) AS BIN113, 
+        NVL(A.BIN114, 0) AS BIN114, 
+        NVL(A.BIN115, 0) AS BIN115, 
+        NVL(A.BIN116, 0) AS BIN116, 
+        NVL(A.BIN117, 0) AS BIN117, 
+        NVL(A.BIN118, 0) AS BIN118, 
+        NVL(A.BIN119, 0) AS BIN119, 
+        NVL(A.BIN120, 0) AS BIN120, 
+        NVL(A.BIN121, 0) AS BIN121, 
+        NVL(A.BIN122, 0) AS BIN122, 
+        NVL(A.BIN123, 0) AS BIN123, 
+        NVL(A.BIN124, 0) AS BIN124, 
+        NVL(A.BIN125, 0) AS BIN125, 
+        NVL(A.BIN126, 0) AS BIN126, 
+        NVL(A.BIN127, 0) AS BIN127, 
+        NVL(A.BIN128, 0) AS BIN128, 
+        NVL(A.BIN129, 0) AS BIN129, 
+        NVL(A.BIN130, 0) AS BIN130, 
+        NVL(A.BIN131, 0) AS BIN131, 
+        NVL(A.BIN132, 0) AS BIN132, 
+        NVL(A.BIN133, 0) AS BIN133, 
+        NVL(A.BIN134, 0) AS BIN134, 
+        NVL(A.BIN135, 0) AS BIN135, 
+        NVL(A.BIN136, 0) AS BIN136, 
+        NVL(A.BIN137, 0) AS BIN137, 
+        NVL(A.BIN138, 0) AS BIN138, 
+        NVL(A.BIN139, 0) AS BIN139, 
+        NVL(A.BIN140, 0) AS BIN140, 
+        NVL(A.BIN141, 0) AS BIN141, 
+        NVL(A.BIN142, 0) AS BIN142, 
+        NVL(A.BIN143, 0) AS BIN143, 
+        NVL(A.BIN144, 0) AS BIN144, 
+        NVL(A.BIN145, 0) AS BIN145, 
+        NVL(A.BIN146, 0) AS BIN146, 
+        NVL(A.BIN147, 0) AS BIN147, 
+        NVL(A.BIN148, 0) AS BIN148, 
+        NVL(A.BIN149, 0) AS BIN149, 
+        NVL(A.BIN150, 0) AS BIN150, 
+        ROUND(NVL(A.BIN0, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN0,
+        ROUND(NVL(A.BIN1, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN1,
+        ROUND(NVL(A.BIN2, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN2,
+        ROUND(NVL(A.BIN3, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN3,
+        ROUND(NVL(A.BIN4, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN4,
+        ROUND(NVL(A.BIN5, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN5,
+        ROUND(NVL(A.BIN6, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN6,
+        ROUND(NVL(A.BIN7, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN7,
+        ROUND(NVL(A.BIN8, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN8,
+        ROUND(NVL(A.BIN9, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN9,
+        ROUND(NVL(A.BIN10, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN10,
+        ROUND(NVL(A.BIN11, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN11,
+        ROUND(NVL(A.BIN12, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN12,
+        ROUND(NVL(A.BIN13, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN13,
+        ROUND(NVL(A.BIN14, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN14,
+        ROUND(NVL(A.BIN15, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN15,
+        ROUND(NVL(A.BIN16, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN16,
+        ROUND(NVL(A.BIN17, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN17,
+        ROUND(NVL(A.BIN18, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN18,
+        ROUND(NVL(A.BIN19, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN19,
+        ROUND(NVL(A.BIN20, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN20,
+        ROUND(NVL(A.BIN21, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN21,
+        ROUND(NVL(A.BIN22, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN22,
+        ROUND(NVL(A.BIN23, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN23,
+        ROUND(NVL(A.BIN24, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN24,
+        ROUND(NVL(A.BIN25, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN25,
+        ROUND(NVL(A.BIN26, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN26,
+        ROUND(NVL(A.BIN27, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN27,
+        ROUND(NVL(A.BIN28, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN28,
+        ROUND(NVL(A.BIN29, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN29,
+        ROUND(NVL(A.BIN30, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN30,
+        ROUND(NVL(A.BIN31, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN31,
+        ROUND(NVL(A.BIN32, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN32,
+        ROUND(NVL(A.BIN33, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN33,
+        ROUND(NVL(A.BIN34, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN34,
+        ROUND(NVL(A.BIN35, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN35,
+        ROUND(NVL(A.BIN36, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN36,
+        ROUND(NVL(A.BIN37, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN37,
+        ROUND(NVL(A.BIN38, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN38,
+        ROUND(NVL(A.BIN39, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN39,
+        ROUND(NVL(A.BIN40, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN40,
+        ROUND(NVL(A.BIN41, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN41,
+        ROUND(NVL(A.BIN42, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN42,
+        ROUND(NVL(A.BIN43, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN43,
+        ROUND(NVL(A.BIN44, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN44,
+        ROUND(NVL(A.BIN45, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN45,
+        ROUND(NVL(A.BIN46, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN46,
+        ROUND(NVL(A.BIN47, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN47,
+        ROUND(NVL(A.BIN48, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN48,
+        ROUND(NVL(A.BIN49, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN49,
+        ROUND(NVL(A.BIN50, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN50,
+        ROUND(NVL(A.BIN51, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN51,
+        ROUND(NVL(A.BIN52, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN52,
+        ROUND(NVL(A.BIN53, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN53,
+        ROUND(NVL(A.BIN54, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN54,
+        ROUND(NVL(A.BIN55, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN55,
+        ROUND(NVL(A.BIN56, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN56,
+        ROUND(NVL(A.BIN57, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN57,
+        ROUND(NVL(A.BIN58, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN58,
+        ROUND(NVL(A.BIN59, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN59,
+        ROUND(NVL(A.BIN60, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN60,
+        ROUND(NVL(A.BIN61, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN61,
+        ROUND(NVL(A.BIN62, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN62,
+        ROUND(NVL(A.BIN63, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN63,
+        ROUND(NVL(A.BIN64, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN64,
+        ROUND(NVL(A.BIN65, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN65,
+        ROUND(NVL(A.BIN66, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN66,
+        ROUND(NVL(A.BIN67, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN67,
+        ROUND(NVL(A.BIN68, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN68,
+        ROUND(NVL(A.BIN69, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN69,
+        ROUND(NVL(A.BIN70, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN70,
+        ROUND(NVL(A.BIN71, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN71,
+        ROUND(NVL(A.BIN72, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN72,
+        ROUND(NVL(A.BIN73, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN73,
+        ROUND(NVL(A.BIN74, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN74,
+        ROUND(NVL(A.BIN75, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN75,
+        ROUND(NVL(A.BIN76, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN76,
+        ROUND(NVL(A.BIN77, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN77,
+        ROUND(NVL(A.BIN78, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN78,
+        ROUND(NVL(A.BIN79, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN79,
+        ROUND(NVL(A.BIN80, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN80,
+        ROUND(NVL(A.BIN81, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN81,
+        ROUND(NVL(A.BIN82, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN82,
+        ROUND(NVL(A.BIN83, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN83,
+        ROUND(NVL(A.BIN84, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN84,
+        ROUND(NVL(A.BIN85, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN85,
+        ROUND(NVL(A.BIN86, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN86,
+        ROUND(NVL(A.BIN87, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN87,
+        ROUND(NVL(A.BIN88, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN88, 
+        ROUND(NVL(A.BIN89, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN89,
+        ROUND(NVL(A.BIN90, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN90,
+        ROUND(NVL(A.BIN91, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN91,
+        ROUND(NVL(A.BIN92, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN92,
+        ROUND(NVL(A.BIN93, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN93,
+        ROUND(NVL(A.BIN94, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN94,
+        ROUND(NVL(A.BIN95, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN95,
+        ROUND(NVL(A.BIN96, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN96,
+        ROUND(NVL(A.BIN97, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN97,
+        ROUND(NVL(A.BIN98, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN98,
+        ROUND(NVL(A.BIN99, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN99,
+        ROUND(NVL(A.BIN100, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN100,
+        ROUND(NVL(A.BIN101, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN101,
+        ROUND(NVL(A.BIN102, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN102,
+        ROUND(NVL(A.BIN103, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN103,
+        ROUND(NVL(A.BIN104, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN104,
+        ROUND(NVL(A.BIN105, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN105,
+        ROUND(NVL(A.BIN106, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN106,
+        ROUND(NVL(A.BIN107, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN107,
+        ROUND(NVL(A.BIN108, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN108,
+        ROUND(NVL(A.BIN109, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN109,
+        ROUND(NVL(A.BIN110, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN110,
+        ROUND(NVL(A.BIN111, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN111,
+        ROUND(NVL(A.BIN112, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN112,
+        ROUND(NVL(A.BIN113, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN113,
+        ROUND(NVL(A.BIN114, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN114,
+        ROUND(NVL(A.BIN115, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN115,
+        ROUND(NVL(A.BIN116, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN116,
+        ROUND(NVL(A.BIN117, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN117,
+        ROUND(NVL(A.BIN118, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN118,
+        ROUND(NVL(A.BIN119, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN119,
+        ROUND(NVL(A.BIN120, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN120,
+        ROUND(NVL(A.BIN121, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN121,
+        ROUND(NVL(A.BIN122, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN122,
+        ROUND(NVL(A.BIN123, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN123,
+        ROUND(NVL(A.BIN124, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN124,
+        ROUND(NVL(A.BIN125, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN125,
+        ROUND(NVL(A.BIN126, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN126,
+        ROUND(NVL(A.BIN127, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN127,
+        ROUND(NVL(A.BIN128, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN128,
+        ROUND(NVL(A.BIN129, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN129,
+        ROUND(NVL(A.BIN130, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN130,
+        ROUND(NVL(A.BIN131, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN131,
+        ROUND(NVL(A.BIN132, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN132,
+        ROUND(NVL(A.BIN133, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN133,
+        ROUND(NVL(A.BIN134, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN134,
+        ROUND(NVL(A.BIN135, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN135,
+        ROUND(NVL(A.BIN136, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN136,
+        ROUND(NVL(A.BIN137, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN137,
+        ROUND(NVL(A.BIN138, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN138,
+        ROUND(NVL(A.BIN139, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN139,
+        ROUND(NVL(A.BIN140, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN140,
+        ROUND(NVL(A.BIN141, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN141,
+        ROUND(NVL(A.BIN142, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN142,
+        ROUND(NVL(A.BIN143, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN143,
+        ROUND(NVL(A.BIN144, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN144,
+        ROUND(NVL(A.BIN145, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN145,
+        ROUND(NVL(A.BIN146, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN146,
+        ROUND(NVL(A.BIN147, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN147,
+        ROUND(NVL(A.BIN148, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN148,
+        ROUND(NVL(A.BIN149, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN149,
+        ROUND(NVL(A.BIN150, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN150,
+       LOT_SEQ,
+       WAFER_SEQ
+  FROM TQP_WAFER_SUM  A
+ WHERE     1 = 1
+    AND A.WAFER_SEQ IN ( ?? )
+    ORDER BY A.DEVICE_ALIAS, A.PRODUCT, A.TESTAREA, A.PROGRAM, A.LOT_ID, A.WAFER_ID, A.END_TIME]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_WAFER_BIN_WAFER_BASE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT A.DEVICE_ALIAS,
+       A.PRODUCT,
+       A.TESTAREA,
+       A.PROGRAM,
+       A.LOT_ID,
+       A.WAFER_ID,
+       TO_CHAR (A.START_TIME, 'YYYY/MM/DD HH24:MI:SS') AS START_TIME,
+       TO_CHAR (A.END_TIME, 'YYYY/MM/DD HH24:MI:SS') AS END_TIME,
+       NVL(A.TESTED_DIE, 0) AS TESTED_DIE,
+       ROUND(NVL(A.YIELD, 0), 2) AS YIELD,
+       (100 - ROUND(NVL(A.YIELD, 0), 2)) AS DEFECT_RATE,
+       A.TESTED_DIE - ROUND (A.TESTED_DIE * (A.YIELD / 100)) AS DEFECT_CNT,
+       NVL(A.BIN0, 0) AS BIN0, 
+        NVL(A.BIN1, 0) AS BIN1, 
+        NVL(A.BIN2, 0) AS BIN2, 
+        NVL(A.BIN3, 0) AS BIN3, 
+        NVL(A.BIN4, 0) AS BIN4, 
+        NVL(A.BIN5, 0) AS BIN5, 
+        NVL(A.BIN6, 0) AS BIN6, 
+        NVL(A.BIN7, 0) AS BIN7, 
+        NVL(A.BIN8, 0) AS BIN8, 
+        NVL(A.BIN9, 0) AS BIN9, 
+        NVL(A.BIN10, 0) AS BIN10, 
+        NVL(A.BIN11, 0) AS BIN11, 
+        NVL(A.BIN12, 0) AS BIN12, 
+        NVL(A.BIN13, 0) AS BIN13, 
+        NVL(A.BIN14, 0) AS BIN14, 
+        NVL(A.BIN15, 0) AS BIN15, 
+        NVL(A.BIN16, 0) AS BIN16, 
+        NVL(A.BIN17, 0) AS BIN17, 
+        NVL(A.BIN18, 0) AS BIN18, 
+        NVL(A.BIN19, 0) AS BIN19, 
+        NVL(A.BIN20, 0) AS BIN20, 
+        NVL(A.BIN21, 0) AS BIN21, 
+        NVL(A.BIN22, 0) AS BIN22, 
+        NVL(A.BIN23, 0) AS BIN23, 
+        NVL(A.BIN24, 0) AS BIN24, 
+        NVL(A.BIN25, 0) AS BIN25, 
+        NVL(A.BIN26, 0) AS BIN26, 
+        NVL(A.BIN27, 0) AS BIN27, 
+        NVL(A.BIN28, 0) AS BIN28, 
+        NVL(A.BIN29, 0) AS BIN29, 
+        NVL(A.BIN30, 0) AS BIN30, 
+        NVL(A.BIN31, 0) AS BIN31, 
+        NVL(A.BIN32, 0) AS BIN32, 
+        NVL(A.BIN33, 0) AS BIN33, 
+        NVL(A.BIN34, 0) AS BIN34, 
+        NVL(A.BIN35, 0) AS BIN35, 
+        NVL(A.BIN36, 0) AS BIN36, 
+        NVL(A.BIN37, 0) AS BIN37, 
+        NVL(A.BIN38, 0) AS BIN38, 
+        NVL(A.BIN39, 0) AS BIN39, 
+        NVL(A.BIN40, 0) AS BIN40, 
+        NVL(A.BIN41, 0) AS BIN41, 
+        NVL(A.BIN42, 0) AS BIN42, 
+        NVL(A.BIN43, 0) AS BIN43, 
+        NVL(A.BIN44, 0) AS BIN44, 
+        NVL(A.BIN45, 0) AS BIN45, 
+        NVL(A.BIN46, 0) AS BIN46, 
+        NVL(A.BIN47, 0) AS BIN47, 
+        NVL(A.BIN48, 0) AS BIN48, 
+        NVL(A.BIN49, 0) AS BIN49, 
+        NVL(A.BIN50, 0) AS BIN50, 
+        NVL(A.BIN51, 0) AS BIN51, 
+        NVL(A.BIN52, 0) AS BIN52, 
+        NVL(A.BIN53, 0) AS BIN53, 
+        NVL(A.BIN54, 0) AS BIN54, 
+        NVL(A.BIN55, 0) AS BIN55, 
+        NVL(A.BIN56, 0) AS BIN56, 
+        NVL(A.BIN57, 0) AS BIN57, 
+        NVL(A.BIN58, 0) AS BIN58, 
+        NVL(A.BIN59, 0) AS BIN59, 
+        NVL(A.BIN60, 0) AS BIN60, 
+        NVL(A.BIN61, 0) AS BIN61, 
+        NVL(A.BIN62, 0) AS BIN62, 
+        NVL(A.BIN63, 0) AS BIN63, 
+        NVL(A.BIN64, 0) AS BIN64, 
+        NVL(A.BIN65, 0) AS BIN65, 
+        NVL(A.BIN66, 0) AS BIN66, 
+        NVL(A.BIN67, 0) AS BIN67, 
+        NVL(A.BIN68, 0) AS BIN68, 
+        NVL(A.BIN69, 0) AS BIN69, 
+        NVL(A.BIN70, 0) AS BIN70, 
+        NVL(A.BIN71, 0) AS BIN71, 
+        NVL(A.BIN72, 0) AS BIN72, 
+        NVL(A.BIN73, 0) AS BIN73, 
+        NVL(A.BIN74, 0) AS BIN74, 
+        NVL(A.BIN75, 0) AS BIN75, 
+        NVL(A.BIN76, 0) AS BIN76, 
+        NVL(A.BIN77, 0) AS BIN77, 
+        NVL(A.BIN78, 0) AS BIN78, 
+        NVL(A.BIN79, 0) AS BIN79, 
+        NVL(A.BIN80, 0) AS BIN80, 
+        NVL(A.BIN81, 0) AS BIN81, 
+        NVL(A.BIN82, 0) AS BIN82, 
+        NVL(A.BIN83, 0) AS BIN83, 
+        NVL(A.BIN84, 0) AS BIN84, 
+        NVL(A.BIN85, 0) AS BIN85, 
+        NVL(A.BIN86, 0) AS BIN86, 
+        NVL(A.BIN87, 0) AS BIN87, 
+        NVL(A.BIN88, 0) AS BIN88, 
+        NVL(A.BIN89, 0) AS BIN89, 
+        NVL(A.BIN90, 0) AS BIN90, 
+        NVL(A.BIN91, 0) AS BIN91, 
+        NVL(A.BIN92, 0) AS BIN92, 
+        NVL(A.BIN93, 0) AS BIN93, 
+        NVL(A.BIN94, 0) AS BIN94, 
+        NVL(A.BIN95, 0) AS BIN95, 
+        NVL(A.BIN96, 0) AS BIN96, 
+        NVL(A.BIN97, 0) AS BIN97, 
+        NVL(A.BIN98, 0) AS BIN98, 
+        NVL(A.BIN99, 0) AS BIN99, 
+        NVL(A.BIN100, 0) AS BIN100, 
+        NVL(A.BIN101, 0) AS BIN101, 
+        NVL(A.BIN102, 0) AS BIN102, 
+        NVL(A.BIN103, 0) AS BIN103, 
+        NVL(A.BIN104, 0) AS BIN104, 
+        NVL(A.BIN105, 0) AS BIN105, 
+        NVL(A.BIN106, 0) AS BIN106, 
+        NVL(A.BIN107, 0) AS BIN107, 
+        NVL(A.BIN108, 0) AS BIN108, 
+        NVL(A.BIN109, 0) AS BIN109, 
+        NVL(A.BIN110, 0) AS BIN110, 
+        NVL(A.BIN111, 0) AS BIN111, 
+        NVL(A.BIN112, 0) AS BIN112, 
+        NVL(A.BIN113, 0) AS BIN113, 
+        NVL(A.BIN114, 0) AS BIN114, 
+        NVL(A.BIN115, 0) AS BIN115, 
+        NVL(A.BIN116, 0) AS BIN116, 
+        NVL(A.BIN117, 0) AS BIN117, 
+        NVL(A.BIN118, 0) AS BIN118, 
+        NVL(A.BIN119, 0) AS BIN119, 
+        NVL(A.BIN120, 0) AS BIN120, 
+        NVL(A.BIN121, 0) AS BIN121, 
+        NVL(A.BIN122, 0) AS BIN122, 
+        NVL(A.BIN123, 0) AS BIN123, 
+        NVL(A.BIN124, 0) AS BIN124, 
+        NVL(A.BIN125, 0) AS BIN125, 
+        NVL(A.BIN126, 0) AS BIN126, 
+        NVL(A.BIN127, 0) AS BIN127, 
+        NVL(A.BIN128, 0) AS BIN128, 
+        NVL(A.BIN129, 0) AS BIN129, 
+        NVL(A.BIN130, 0) AS BIN130, 
+        NVL(A.BIN131, 0) AS BIN131, 
+        NVL(A.BIN132, 0) AS BIN132, 
+        NVL(A.BIN133, 0) AS BIN133, 
+        NVL(A.BIN134, 0) AS BIN134, 
+        NVL(A.BIN135, 0) AS BIN135, 
+        NVL(A.BIN136, 0) AS BIN136, 
+        NVL(A.BIN137, 0) AS BIN137, 
+        NVL(A.BIN138, 0) AS BIN138, 
+        NVL(A.BIN139, 0) AS BIN139, 
+        NVL(A.BIN140, 0) AS BIN140, 
+        NVL(A.BIN141, 0) AS BIN141, 
+        NVL(A.BIN142, 0) AS BIN142, 
+        NVL(A.BIN143, 0) AS BIN143, 
+        NVL(A.BIN144, 0) AS BIN144, 
+        NVL(A.BIN145, 0) AS BIN145, 
+        NVL(A.BIN146, 0) AS BIN146, 
+        NVL(A.BIN147, 0) AS BIN147, 
+        NVL(A.BIN148, 0) AS BIN148, 
+        NVL(A.BIN149, 0) AS BIN149, 
+        NVL(A.BIN150, 0) AS BIN150, 
+        ROUND(NVL(A.BIN0, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN0,
+        ROUND(NVL(A.BIN1, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN1,
+        ROUND(NVL(A.BIN2, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN2,
+        ROUND(NVL(A.BIN3, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN3,
+        ROUND(NVL(A.BIN4, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN4,
+        ROUND(NVL(A.BIN5, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN5,
+        ROUND(NVL(A.BIN6, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN6,
+        ROUND(NVL(A.BIN7, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN7,
+        ROUND(NVL(A.BIN8, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN8,
+        ROUND(NVL(A.BIN9, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN9,
+        ROUND(NVL(A.BIN10, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN10,
+        ROUND(NVL(A.BIN11, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN11,
+        ROUND(NVL(A.BIN12, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN12,
+        ROUND(NVL(A.BIN13, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN13,
+        ROUND(NVL(A.BIN14, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN14,
+        ROUND(NVL(A.BIN15, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN15,
+        ROUND(NVL(A.BIN16, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN16,
+        ROUND(NVL(A.BIN17, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN17,
+        ROUND(NVL(A.BIN18, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN18,
+        ROUND(NVL(A.BIN19, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN19,
+        ROUND(NVL(A.BIN20, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN20,
+        ROUND(NVL(A.BIN21, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN21,
+        ROUND(NVL(A.BIN22, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN22,
+        ROUND(NVL(A.BIN23, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN23,
+        ROUND(NVL(A.BIN24, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN24,
+        ROUND(NVL(A.BIN25, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN25,
+        ROUND(NVL(A.BIN26, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN26,
+        ROUND(NVL(A.BIN27, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN27,
+        ROUND(NVL(A.BIN28, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN28,
+        ROUND(NVL(A.BIN29, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN29,
+        ROUND(NVL(A.BIN30, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN30,
+        ROUND(NVL(A.BIN31, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN31,
+        ROUND(NVL(A.BIN32, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN32,
+        ROUND(NVL(A.BIN33, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN33,
+        ROUND(NVL(A.BIN34, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN34,
+        ROUND(NVL(A.BIN35, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN35,
+        ROUND(NVL(A.BIN36, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN36,
+        ROUND(NVL(A.BIN37, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN37,
+        ROUND(NVL(A.BIN38, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN38,
+        ROUND(NVL(A.BIN39, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN39,
+        ROUND(NVL(A.BIN40, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN40,
+        ROUND(NVL(A.BIN41, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN41,
+        ROUND(NVL(A.BIN42, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN42,
+        ROUND(NVL(A.BIN43, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN43,
+        ROUND(NVL(A.BIN44, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN44,
+        ROUND(NVL(A.BIN45, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN45,
+        ROUND(NVL(A.BIN46, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN46,
+        ROUND(NVL(A.BIN47, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN47,
+        ROUND(NVL(A.BIN48, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN48,
+        ROUND(NVL(A.BIN49, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN49,
+        ROUND(NVL(A.BIN50, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN50,
+        ROUND(NVL(A.BIN51, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN51,
+        ROUND(NVL(A.BIN52, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN52,
+        ROUND(NVL(A.BIN53, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN53,
+        ROUND(NVL(A.BIN54, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN54,
+        ROUND(NVL(A.BIN55, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN55,
+        ROUND(NVL(A.BIN56, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN56,
+        ROUND(NVL(A.BIN57, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN57,
+        ROUND(NVL(A.BIN58, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN58,
+        ROUND(NVL(A.BIN59, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN59,
+        ROUND(NVL(A.BIN60, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN60,
+        ROUND(NVL(A.BIN61, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN61,
+        ROUND(NVL(A.BIN62, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN62,
+        ROUND(NVL(A.BIN63, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN63,
+        ROUND(NVL(A.BIN64, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN64,
+        ROUND(NVL(A.BIN65, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN65,
+        ROUND(NVL(A.BIN66, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN66,
+        ROUND(NVL(A.BIN67, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN67,
+        ROUND(NVL(A.BIN68, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN68,
+        ROUND(NVL(A.BIN69, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN69,
+        ROUND(NVL(A.BIN70, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN70,
+        ROUND(NVL(A.BIN71, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN71,
+        ROUND(NVL(A.BIN72, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN72,
+        ROUND(NVL(A.BIN73, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN73,
+        ROUND(NVL(A.BIN74, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN74,
+        ROUND(NVL(A.BIN75, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN75,
+        ROUND(NVL(A.BIN76, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN76,
+        ROUND(NVL(A.BIN77, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN77,
+        ROUND(NVL(A.BIN78, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN78,
+        ROUND(NVL(A.BIN79, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN79,
+        ROUND(NVL(A.BIN80, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN80,
+        ROUND(NVL(A.BIN81, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN81,
+        ROUND(NVL(A.BIN82, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN82,
+        ROUND(NVL(A.BIN83, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN83,
+        ROUND(NVL(A.BIN84, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN84,
+        ROUND(NVL(A.BIN85, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN85,
+        ROUND(NVL(A.BIN86, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN86,
+        ROUND(NVL(A.BIN87, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN87,
+        ROUND(NVL(A.BIN88, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN88, 
+        ROUND(NVL(A.BIN89, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN89,
+        ROUND(NVL(A.BIN90, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN90,
+        ROUND(NVL(A.BIN91, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN91,
+        ROUND(NVL(A.BIN92, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN92,
+        ROUND(NVL(A.BIN93, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN93,
+        ROUND(NVL(A.BIN94, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN94,
+        ROUND(NVL(A.BIN95, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN95,
+        ROUND(NVL(A.BIN96, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN96,
+        ROUND(NVL(A.BIN97, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN97,
+        ROUND(NVL(A.BIN98, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN98,
+        ROUND(NVL(A.BIN99, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN99,
+        ROUND(NVL(A.BIN100, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN100,
+        ROUND(NVL(A.BIN101, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN101,
+        ROUND(NVL(A.BIN102, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN102,
+        ROUND(NVL(A.BIN103, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN103,
+        ROUND(NVL(A.BIN104, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN104,
+        ROUND(NVL(A.BIN105, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN105,
+        ROUND(NVL(A.BIN106, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN106,
+        ROUND(NVL(A.BIN107, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN107,
+        ROUND(NVL(A.BIN108, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN108,
+        ROUND(NVL(A.BIN109, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN109,
+        ROUND(NVL(A.BIN110, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN110,
+        ROUND(NVL(A.BIN111, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN111,
+        ROUND(NVL(A.BIN112, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN112,
+        ROUND(NVL(A.BIN113, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN113,
+        ROUND(NVL(A.BIN114, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN114,
+        ROUND(NVL(A.BIN115, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN115,
+        ROUND(NVL(A.BIN116, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN116,
+        ROUND(NVL(A.BIN117, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN117,
+        ROUND(NVL(A.BIN118, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN118,
+        ROUND(NVL(A.BIN119, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN119,
+        ROUND(NVL(A.BIN120, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN120,
+        ROUND(NVL(A.BIN121, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN121,
+        ROUND(NVL(A.BIN122, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN122,
+        ROUND(NVL(A.BIN123, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN123,
+        ROUND(NVL(A.BIN124, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN124,
+        ROUND(NVL(A.BIN125, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN125,
+        ROUND(NVL(A.BIN126, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN126,
+        ROUND(NVL(A.BIN127, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN127,
+        ROUND(NVL(A.BIN128, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN128,
+        ROUND(NVL(A.BIN129, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN129,
+        ROUND(NVL(A.BIN130, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN130,
+        ROUND(NVL(A.BIN131, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN131,
+        ROUND(NVL(A.BIN132, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN132,
+        ROUND(NVL(A.BIN133, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN133,
+        ROUND(NVL(A.BIN134, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN134,
+        ROUND(NVL(A.BIN135, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN135,
+        ROUND(NVL(A.BIN136, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN136,
+        ROUND(NVL(A.BIN137, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN137,
+        ROUND(NVL(A.BIN138, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN138,
+        ROUND(NVL(A.BIN139, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN139,
+        ROUND(NVL(A.BIN140, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN140,
+        ROUND(NVL(A.BIN141, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN141,
+        ROUND(NVL(A.BIN142, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN142,
+        ROUND(NVL(A.BIN143, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN143,
+        ROUND(NVL(A.BIN144, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN144,
+        ROUND(NVL(A.BIN145, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN145,
+        ROUND(NVL(A.BIN146, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN146,
+        ROUND(NVL(A.BIN147, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN147,
+        ROUND(NVL(A.BIN148, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN148,
+        ROUND(NVL(A.BIN149, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN149,
+        ROUND(NVL(A.BIN150, 0) / A.TESTED_DIE * 100, 2) AS YLD_BIN150,
+        A.WAFER_SEQ
+  FROM TQP_WAFER_SUM  A
+ WHERE 1 = 1 
+    AND A.WAFER_SEQ IN ( ?? )
+ORDER BY A.DEVICE_ALIAS, A.PRODUCT, A.TESTAREA, A.PROGRAM, A.LOT_ID, A.WAFER_ID, A.END_TIME]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_WAFER_BIN_LOT_BASE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[ SELECT A.DEVICE_ALIAS,
+        A.PRODUCT,
+        A.TESTAREA,
+        A.PROGRAM,
+        A.LOT_ID,
+        TO_CHAR (MIN(A.START_TIME), 'YYYY/MM/DD HH24:MI:SS') AS START_TIME,
+        TO_CHAR (MAX(A.END_TIME), 'YYYY/MM/DD HH24:MI:SS') AS END_TIME,
+        SUM(NVL(A.TESTED_DIE, 0)) AS TESTED_DIE,
+        DECODE(A.TESTAREA, 'AVI', ROUND(SUM(NVL(A.BIN0, 0))/ SUM(A.TESTED_DIE) * 100, 2),  ROUND(SUM(NVL(A.BIN1, 0))/ SUM(A.TESTED_DIE) * 100, 2)) AS YIELD,
+        (100 - DECODE(A.TESTAREA, 'AVI', ROUND(SUM(NVL(A.BIN0, 0))/ SUM(A.TESTED_DIE) * 100, 2),  ROUND(SUM(NVL(A.BIN1, 0))/ SUM(A.TESTED_DIE) * 100, 2))) AS DEFECT_RATE,
+        SUM(NVL(A.TESTED_DIE, 0)) - SUM(NVL(A.GEC, 0)) AS DEFECT_CNT,
+        SUM(NVL(A.BIN0,0)) AS BIN0,
+        SUM(NVL(A.BIN1,0)) AS BIN1,
+        SUM(NVL(A.BIN2,0)) AS BIN2,
+        SUM(NVL(A.BIN3,0)) AS BIN3,
+        SUM(NVL(A.BIN4,0)) AS BIN4,
+        SUM(NVL(A.BIN5,0)) AS BIN5,
+        SUM(NVL(A.BIN6,0)) AS BIN6,
+        SUM(NVL(A.BIN7,0)) AS BIN7,
+        SUM(NVL(A.BIN8,0)) AS BIN8,
+        SUM(NVL(A.BIN9,0)) AS BIN9,
+        SUM(NVL(A.BIN10,0)) AS BIN10,
+        SUM(NVL(A.BIN11,0)) AS BIN11,
+        SUM(NVL(A.BIN12,0)) AS BIN12,
+        SUM(NVL(A.BIN13,0)) AS BIN13,
+        SUM(NVL(A.BIN14,0)) AS BIN14,
+        SUM(NVL(A.BIN15,0)) AS BIN15,
+        SUM(NVL(A.BIN16,0)) AS BIN16,
+        SUM(NVL(A.BIN17,0)) AS BIN17,
+        SUM(NVL(A.BIN18,0)) AS BIN18,
+        SUM(NVL(A.BIN19,0)) AS BIN19,
+        SUM(NVL(A.BIN20,0)) AS BIN20,
+        SUM(NVL(A.BIN21,0)) AS BIN21,
+        SUM(NVL(A.BIN22,0)) AS BIN22,
+        SUM(NVL(A.BIN23,0)) AS BIN23,
+        SUM(NVL(A.BIN24,0)) AS BIN24,
+        SUM(NVL(A.BIN25,0)) AS BIN25,
+        SUM(NVL(A.BIN26,0)) AS BIN26,
+        SUM(NVL(A.BIN27,0)) AS BIN27,
+        SUM(NVL(A.BIN28,0)) AS BIN28,
+        SUM(NVL(A.BIN29,0)) AS BIN29,
+        SUM(NVL(A.BIN30,0)) AS BIN30,
+        SUM(NVL(A.BIN31,0)) AS BIN31,
+        SUM(NVL(A.BIN32,0)) AS BIN32,
+        SUM(NVL(A.BIN33,0)) AS BIN33,
+        SUM(NVL(A.BIN34,0)) AS BIN34,
+        SUM(NVL(A.BIN35,0)) AS BIN35,
+        SUM(NVL(A.BIN36,0)) AS BIN36,
+        SUM(NVL(A.BIN37,0)) AS BIN37,
+        SUM(NVL(A.BIN38,0)) AS BIN38,
+        SUM(NVL(A.BIN39,0)) AS BIN39,
+        SUM(NVL(A.BIN40,0)) AS BIN40,
+        SUM(NVL(A.BIN41,0)) AS BIN41,
+        SUM(NVL(A.BIN42,0)) AS BIN42,
+        SUM(NVL(A.BIN43,0)) AS BIN43,
+        SUM(NVL(A.BIN44,0)) AS BIN44,
+        SUM(NVL(A.BIN45,0)) AS BIN45,
+        SUM(NVL(A.BIN46,0)) AS BIN46,
+        SUM(NVL(A.BIN47,0)) AS BIN47,
+        SUM(NVL(A.BIN48,0)) AS BIN48,
+        SUM(NVL(A.BIN49,0)) AS BIN49,
+        SUM(NVL(A.BIN50,0)) AS BIN50,
+        SUM(NVL(A.BIN51,0)) AS BIN51,
+        SUM(NVL(A.BIN52,0)) AS BIN52,
+        SUM(NVL(A.BIN53,0)) AS BIN53,
+        SUM(NVL(A.BIN54,0)) AS BIN54,
+        SUM(NVL(A.BIN55,0)) AS BIN55,
+        SUM(NVL(A.BIN56,0)) AS BIN56,
+        SUM(NVL(A.BIN57,0)) AS BIN57,
+        SUM(NVL(A.BIN58,0)) AS BIN58,
+        SUM(NVL(A.BIN59,0)) AS BIN59,
+        SUM(NVL(A.BIN60,0)) AS BIN60,
+        SUM(NVL(A.BIN61,0)) AS BIN61,
+        SUM(NVL(A.BIN62,0)) AS BIN62,
+        SUM(NVL(A.BIN63,0)) AS BIN63,
+        SUM(NVL(A.BIN64,0)) AS BIN64,
+        SUM(NVL(A.BIN65,0)) AS BIN65,
+        SUM(NVL(A.BIN66,0)) AS BIN66,
+        SUM(NVL(A.BIN67,0)) AS BIN67,
+        SUM(NVL(A.BIN68,0)) AS BIN68,
+        SUM(NVL(A.BIN69,0)) AS BIN69,
+        SUM(NVL(A.BIN70,0)) AS BIN70,
+        SUM(NVL(A.BIN71,0)) AS BIN71,
+        SUM(NVL(A.BIN72,0)) AS BIN72,
+        SUM(NVL(A.BIN73,0)) AS BIN73,
+        SUM(NVL(A.BIN74,0)) AS BIN74,
+        SUM(NVL(A.BIN75,0)) AS BIN75,
+        SUM(NVL(A.BIN76,0)) AS BIN76,
+        SUM(NVL(A.BIN77,0)) AS BIN77,
+        SUM(NVL(A.BIN78,0)) AS BIN78,
+        SUM(NVL(A.BIN79,0)) AS BIN79,
+        SUM(NVL(A.BIN80,0)) AS BIN80,
+        SUM(NVL(A.BIN81,0)) AS BIN81,
+        SUM(NVL(A.BIN82,0)) AS BIN82,
+        SUM(NVL(A.BIN83,0)) AS BIN83,
+        SUM(NVL(A.BIN84,0)) AS BIN84,
+        SUM(NVL(A.BIN85,0)) AS BIN85,
+        SUM(NVL(A.BIN86,0)) AS BIN86,
+        SUM(NVL(A.BIN87,0)) AS BIN87,
+        SUM(NVL(A.BIN88,0)) AS BIN88,
+        SUM(NVL(A.BIN89,0)) AS BIN89,
+        SUM(NVL(A.BIN90,0)) AS BIN90,
+        SUM(NVL(A.BIN91,0)) AS BIN91,
+        SUM(NVL(A.BIN92,0)) AS BIN92,
+        SUM(NVL(A.BIN93,0)) AS BIN93,
+        SUM(NVL(A.BIN94,0)) AS BIN94,
+        SUM(NVL(A.BIN95,0)) AS BIN95,
+        SUM(NVL(A.BIN96,0)) AS BIN96,
+        SUM(NVL(A.BIN97,0)) AS BIN97,
+        SUM(NVL(A.BIN98,0)) AS BIN98,
+        SUM(NVL(A.BIN99,0)) AS BIN99,
+        SUM(NVL(A.BIN100,0)) AS BIN100,
+        SUM(NVL(A.BIN101,0)) AS BIN101,
+        SUM(NVL(A.BIN102,0)) AS BIN102,
+        SUM(NVL(A.BIN103,0)) AS BIN103,
+        SUM(NVL(A.BIN104,0)) AS BIN104,
+        SUM(NVL(A.BIN105,0)) AS BIN105,
+        SUM(NVL(A.BIN106,0)) AS BIN106,
+        SUM(NVL(A.BIN107,0)) AS BIN107,
+        SUM(NVL(A.BIN108,0)) AS BIN108,
+        SUM(NVL(A.BIN109,0)) AS BIN109,
+        SUM(NVL(A.BIN110,0)) AS BIN110,
+        SUM(NVL(A.BIN111,0)) AS BIN111,
+        SUM(NVL(A.BIN112,0)) AS BIN112,
+        SUM(NVL(A.BIN113,0)) AS BIN113,
+        SUM(NVL(A.BIN114,0)) AS BIN114,
+        SUM(NVL(A.BIN115,0)) AS BIN115,
+        SUM(NVL(A.BIN116,0)) AS BIN116,
+        SUM(NVL(A.BIN117,0)) AS BIN117,
+        SUM(NVL(A.BIN118,0)) AS BIN118,
+        SUM(NVL(A.BIN119,0)) AS BIN119,
+        SUM(NVL(A.BIN120,0)) AS BIN120,
+        SUM(NVL(A.BIN121,0)) AS BIN121,
+        SUM(NVL(A.BIN122,0)) AS BIN122,
+        SUM(NVL(A.BIN123,0)) AS BIN123,
+        SUM(NVL(A.BIN124,0)) AS BIN124,
+        SUM(NVL(A.BIN125,0)) AS BIN125,
+        SUM(NVL(A.BIN126,0)) AS BIN126,
+        SUM(NVL(A.BIN127,0)) AS BIN127,
+        SUM(NVL(A.BIN128,0)) AS BIN128,
+        SUM(NVL(A.BIN129,0)) AS BIN129,
+        SUM(NVL(A.BIN130,0)) AS BIN130,
+        SUM(NVL(A.BIN131,0)) AS BIN131,
+        SUM(NVL(A.BIN132,0)) AS BIN132,
+        SUM(NVL(A.BIN133,0)) AS BIN133,
+        SUM(NVL(A.BIN134,0)) AS BIN134,
+        SUM(NVL(A.BIN135,0)) AS BIN135,
+        SUM(NVL(A.BIN136,0)) AS BIN136,
+        SUM(NVL(A.BIN137,0)) AS BIN137,
+        SUM(NVL(A.BIN138,0)) AS BIN138,
+        SUM(NVL(A.BIN139,0)) AS BIN139,
+        SUM(NVL(A.BIN140,0)) AS BIN140,
+        SUM(NVL(A.BIN141,0)) AS BIN141,
+        SUM(NVL(A.BIN142,0)) AS BIN142,
+        SUM(NVL(A.BIN143,0)) AS BIN143,
+        SUM(NVL(A.BIN144,0)) AS BIN144,
+        SUM(NVL(A.BIN145,0)) AS BIN145,
+        SUM(NVL(A.BIN146,0)) AS BIN146,
+        SUM(NVL(A.BIN147,0)) AS BIN147,
+        SUM(NVL(A.BIN148,0)) AS BIN148,
+        SUM(NVL(A.BIN149,0)) AS BIN149,
+        SUM(NVL(A.BIN150,0)) AS BIN150,
+        ROUND(SUM(NVL(A.BIN0, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN0,
+        ROUND(SUM(NVL(A.BIN1, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN1,
+        ROUND(SUM(NVL(A.BIN2, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN2,
+        ROUND(SUM(NVL(A.BIN3, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN3,
+        ROUND(SUM(NVL(A.BIN4, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN4,
+        ROUND(SUM(NVL(A.BIN5, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN5,
+        ROUND(SUM(NVL(A.BIN6, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN6,
+        ROUND(SUM(NVL(A.BIN7, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN7,
+        ROUND(SUM(NVL(A.BIN8, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN8,
+        ROUND(SUM(NVL(A.BIN9, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN9,
+        ROUND(SUM(NVL(A.BIN10, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN10,
+        ROUND(SUM(NVL(A.BIN11, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN11,
+        ROUND(SUM(NVL(A.BIN12, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN12,
+        ROUND(SUM(NVL(A.BIN13, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN13,
+        ROUND(SUM(NVL(A.BIN14, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN14,
+        ROUND(SUM(NVL(A.BIN15, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN15,
+        ROUND(SUM(NVL(A.BIN16, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN16,
+        ROUND(SUM(NVL(A.BIN17, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN17,
+        ROUND(SUM(NVL(A.BIN18, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN18,
+        ROUND(SUM(NVL(A.BIN19, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN19,
+        ROUND(SUM(NVL(A.BIN20, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN20,
+        ROUND(SUM(NVL(A.BIN21, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN21,
+        ROUND(SUM(NVL(A.BIN22, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN22,
+        ROUND(SUM(NVL(A.BIN23, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN23,
+        ROUND(SUM(NVL(A.BIN24, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN24,
+        ROUND(SUM(NVL(A.BIN25, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN25,
+        ROUND(SUM(NVL(A.BIN26, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN26,
+        ROUND(SUM(NVL(A.BIN27, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN27,
+        ROUND(SUM(NVL(A.BIN28, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN28,
+        ROUND(SUM(NVL(A.BIN29, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN29,
+        ROUND(SUM(NVL(A.BIN30, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN30,
+        ROUND(SUM(NVL(A.BIN31, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN31,
+        ROUND(SUM(NVL(A.BIN32, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN32,
+        ROUND(SUM(NVL(A.BIN33, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN33,
+        ROUND(SUM(NVL(A.BIN34, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN34,
+        ROUND(SUM(NVL(A.BIN35, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN35,
+        ROUND(SUM(NVL(A.BIN36, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN36,
+        ROUND(SUM(NVL(A.BIN37, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN37,
+        ROUND(SUM(NVL(A.BIN38, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN38,
+        ROUND(SUM(NVL(A.BIN39, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN39,
+        ROUND(SUM(NVL(A.BIN40, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN40,
+        ROUND(SUM(NVL(A.BIN41, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN41,
+        ROUND(SUM(NVL(A.BIN42, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN42,
+        ROUND(SUM(NVL(A.BIN43, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN43,
+        ROUND(SUM(NVL(A.BIN44, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN44,
+        ROUND(SUM(NVL(A.BIN45, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN45,
+        ROUND(SUM(NVL(A.BIN46, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN46,
+        ROUND(SUM(NVL(A.BIN47, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN47,
+        ROUND(SUM(NVL(A.BIN48, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN48,
+        ROUND(SUM(NVL(A.BIN49, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN49,
+        ROUND(SUM(NVL(A.BIN50, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN50,
+        ROUND(SUM(NVL(A.BIN51, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN51,
+        ROUND(SUM(NVL(A.BIN52, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN52,
+        ROUND(SUM(NVL(A.BIN53, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN53,
+        ROUND(SUM(NVL(A.BIN54, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN54,
+        ROUND(SUM(NVL(A.BIN55, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN55,
+        ROUND(SUM(NVL(A.BIN56, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN56,
+        ROUND(SUM(NVL(A.BIN57, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN57,
+        ROUND(SUM(NVL(A.BIN58, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN58,
+        ROUND(SUM(NVL(A.BIN59, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN59,
+        ROUND(SUM(NVL(A.BIN60, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN60,
+        ROUND(SUM(NVL(A.BIN61, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN61,
+        ROUND(SUM(NVL(A.BIN62, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN62,
+        ROUND(SUM(NVL(A.BIN63, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN63,
+        ROUND(SUM(NVL(A.BIN64, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN64,
+        ROUND(SUM(NVL(A.BIN65, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN65,
+        ROUND(SUM(NVL(A.BIN66, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN66,
+        ROUND(SUM(NVL(A.BIN67, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN67,
+        ROUND(SUM(NVL(A.BIN68, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN68,
+        ROUND(SUM(NVL(A.BIN69, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN69,
+        ROUND(SUM(NVL(A.BIN70, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN70,
+        ROUND(SUM(NVL(A.BIN71, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN71,
+        ROUND(SUM(NVL(A.BIN72, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN72,
+        ROUND(SUM(NVL(A.BIN73, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN73,
+        ROUND(SUM(NVL(A.BIN74, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN74,
+        ROUND(SUM(NVL(A.BIN75, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN75,
+        ROUND(SUM(NVL(A.BIN76, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN76,
+        ROUND(SUM(NVL(A.BIN77, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN77,
+        ROUND(SUM(NVL(A.BIN78, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN78,
+        ROUND(SUM(NVL(A.BIN79, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN79,
+        ROUND(SUM(NVL(A.BIN80, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN80,
+        ROUND(SUM(NVL(A.BIN81, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN81,
+        ROUND(SUM(NVL(A.BIN82, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN82,
+        ROUND(SUM(NVL(A.BIN83, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN83,
+        ROUND(SUM(NVL(A.BIN84, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN84,
+        ROUND(SUM(NVL(A.BIN85, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN85,
+        ROUND(SUM(NVL(A.BIN86, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN86,
+        ROUND(SUM(NVL(A.BIN87, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN87,
+        ROUND(SUM(NVL(A.BIN88, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN88, 
+        ROUND(SUM(NVL(A.BIN89, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN89,
+        ROUND(SUM(NVL(A.BIN90, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN90,
+        ROUND(SUM(NVL(A.BIN91, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN91,
+        ROUND(SUM(NVL(A.BIN92, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN92,
+        ROUND(SUM(NVL(A.BIN93, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN93,
+        ROUND(SUM(NVL(A.BIN94, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN94,
+        ROUND(SUM(NVL(A.BIN95, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN95,
+        ROUND(SUM(NVL(A.BIN96, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN96,
+        ROUND(SUM(NVL(A.BIN97, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN97,
+        ROUND(SUM(NVL(A.BIN98, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN98,
+        ROUND(SUM(NVL(A.BIN99, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN99,
+        ROUND(SUM(NVL(A.BIN100, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN100,
+        ROUND(SUM(NVL(A.BIN101, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN101,
+        ROUND(SUM(NVL(A.BIN102, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN102,
+        ROUND(SUM(NVL(A.BIN103, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN103,
+        ROUND(SUM(NVL(A.BIN104, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN104,
+        ROUND(SUM(NVL(A.BIN105, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN105,
+        ROUND(SUM(NVL(A.BIN106, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN106,
+        ROUND(SUM(NVL(A.BIN107, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN107,
+        ROUND(SUM(NVL(A.BIN108, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN108,
+        ROUND(SUM(NVL(A.BIN109, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN109,
+        ROUND(SUM(NVL(A.BIN110, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN110,
+        ROUND(SUM(NVL(A.BIN111, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN111,
+        ROUND(SUM(NVL(A.BIN112, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN112,
+        ROUND(SUM(NVL(A.BIN113, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN113,
+        ROUND(SUM(NVL(A.BIN114, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN114,
+        ROUND(SUM(NVL(A.BIN115, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN115,
+        ROUND(SUM(NVL(A.BIN116, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN116,
+        ROUND(SUM(NVL(A.BIN117, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN117,
+        ROUND(SUM(NVL(A.BIN118, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN118,
+        ROUND(SUM(NVL(A.BIN119, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN119,
+        ROUND(SUM(NVL(A.BIN120, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN120,
+        ROUND(SUM(NVL(A.BIN121, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN121,
+        ROUND(SUM(NVL(A.BIN122, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN122,
+        ROUND(SUM(NVL(A.BIN123, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN123,
+        ROUND(SUM(NVL(A.BIN124, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN124,
+        ROUND(SUM(NVL(A.BIN125, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN125,
+        ROUND(SUM(NVL(A.BIN126, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN126,
+        ROUND(SUM(NVL(A.BIN127, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN127,
+        ROUND(SUM(NVL(A.BIN128, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN128,
+        ROUND(SUM(NVL(A.BIN129, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN129,
+        ROUND(SUM(NVL(A.BIN130, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN130,
+        ROUND(SUM(NVL(A.BIN131, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN131,
+        ROUND(SUM(NVL(A.BIN132, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN132,
+        ROUND(SUM(NVL(A.BIN133, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN133,
+        ROUND(SUM(NVL(A.BIN134, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN134,
+        ROUND(SUM(NVL(A.BIN135, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN135,
+        ROUND(SUM(NVL(A.BIN136, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN136,
+        ROUND(SUM(NVL(A.BIN137, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN137,
+        ROUND(SUM(NVL(A.BIN138, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN138,
+        ROUND(SUM(NVL(A.BIN139, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN139,
+        ROUND(SUM(NVL(A.BIN140, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN140,
+        ROUND(SUM(NVL(A.BIN141, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN141,
+        ROUND(SUM(NVL(A.BIN142, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN142,
+        ROUND(SUM(NVL(A.BIN143, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN143,
+        ROUND(SUM(NVL(A.BIN144, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN144,
+        ROUND(SUM(NVL(A.BIN145, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN145,
+        ROUND(SUM(NVL(A.BIN146, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN146,
+        ROUND(SUM(NVL(A.BIN147, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN147,
+        ROUND(SUM(NVL(A.BIN148, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN148,
+        ROUND(SUM(NVL(A.BIN149, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN149,
+        ROUND(SUM(NVL(A.BIN150, 0)) / SUM(A.TESTED_DIE) * 100, 2) AS YLD_BIN150
+    FROM  TQP_WAFER_SUM  A
+   WHERE     1 = 1
+    AND A.WAFER_SEQ IN (??)
+GROUP BY A.DEVICE_ALIAS, A.PRODUCT, A.TESTAREA, A.PROGRAM, A.LOT_ID
+ORDER BY A.DEVICE_ALIAS, A.PRODUCT, A.TESTAREA, A.PROGRAM, A.LOT_ID]]></commandtext>
+    </query>
+    <query statement="Insert" queryid="INSERT_TQP_WAFER_SUM" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[ INSERT INTO TQP_WAFER_SUM
+(
+CUSTOMER    ,
+FACILITY    ,
+PRODUCT ,
+DEVICE_ALIAS    ,
+TESTAREA    ,
+PROGRAM ,
+MOTHER_LOT_ID   ,
+LOT_ID  ,
+LOT_SEQ ,
+WAFER_ID    ,
+WAFER_SEQ   ,
+TESTER  ,
+PROBE_CARD  ,
+OPERATOR    ,
+PROBE_CNT   ,
+NETDIE  ,
+START_TIME  ,
+END_TIME  
+)
+SELECT 'DB',
+       A.FACTORY,
+       B.DEVICE,
+       B.DEVICE_ALIAS,
+       B.TEST_AREA,
+       B.PROGRAM,
+       B.LOT_ID AS MOTHER_LOT_ID,
+       B.LOT_ID,
+       A.LOT_SEQ,
+       A.WAFER_ID,
+       A.WAFER_SEQ,
+       A.TESTER,
+       A.PROBE_CARD,
+       A.OPERATOR,
+       A.PROBE_CNT,
+       NULL AS NETDIE,
+       A.START_TIME,
+       A.END_TIME
+  FROM TQP_WAFER A, TQP_LOT B
+ WHERE 1 = 1 
+ AND A.WAFER_SEQ = :wafer_seq 
+ AND A.LOT_SEQ = B.LOT_SEQ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0" value="wafer_seq">:wafer_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_WAFER_SEARCH" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT *
+  FROM TQP_WAFER_SUM
+ WHERE 1 = 1 
+ AND WAFER_SEQ = :wafer_seq
+ AND PROBE_CNT = :prbcnt]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="wafer_seq">:wafer_seq</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="prbcnt">:prbcnt</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_WAFER_SUMMARY_INFO [LSEQ]" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-07-22 17:40:50
+ SELECT CUSTOMER,
+        FACILITY,
+        PRODUCT,
+        DEVICE_ALIAS,
+        TESTAREA,
+        PROGRAM,
+        MOTHER_LOT_ID,
+        LOT_ID,
+        LOT_SEQ,
+        TO_CHAR (MIN(START_TIME), 'YYYY/MM/DD HH24:MI:SS') AS START_TIME,
+        TO_CHAR (MAX(END_TIME), 'YYYY/MM/DD HH24:MI:SS') AS END_TIME,
+        SUM(LOSS_DIE) AS LOSS_DIE,
+        SUM(TESTED_DIE) AS TESTED_DIE,
+        ROUND(SUM(BIN1)/ SUM(TESTED_DIE) * 100, 2) AS YIELD,
+        SUM(GEC) GEC,
+        COUNT(*) WAFERS,
+        SUM(BIN0) AS BIN0,
+        SUM(BIN1) AS BIN1,
+        SUM(BIN2) AS BIN2,
+        SUM(BIN3) AS BIN3,
+        SUM(BIN4) AS BIN4,
+        SUM(BIN5) AS BIN5,
+        SUM(BIN6) AS BIN6,
+        SUM(BIN7) AS BIN7,
+        SUM(BIN8) AS BIN8,
+        SUM(BIN9) AS BIN9,
+        SUM(BIN10) AS BIN10,
+        SUM(BIN11) AS BIN11,
+        SUM(BIN12) AS BIN12,
+        SUM(BIN13) AS BIN13,
+        SUM(BIN14) AS BIN14,
+        SUM(BIN15) AS BIN15,
+        SUM(BIN16) AS BIN16,
+        SUM(BIN17) AS BIN17,
+        SUM(BIN18) AS BIN18,
+        SUM(BIN19) AS BIN19,
+        SUM(BIN20) AS BIN20,
+        SUM(BIN21) AS BIN21,
+        SUM(BIN22) AS BIN22,
+        SUM(BIN23) AS BIN23,
+        SUM(BIN24) AS BIN24,
+        SUM(BIN25) AS BIN25,
+        SUM(BIN26) AS BIN26,
+        SUM(BIN27) AS BIN27,
+        SUM(BIN28) AS BIN28,
+        SUM(BIN29) AS BIN29,
+        SUM(BIN30) AS BIN30,
+        SUM(BIN31) AS BIN31,
+        SUM(BIN32) AS BIN32,
+        SUM(BIN33) AS BIN33,
+        SUM(BIN34) AS BIN34,
+        SUM(BIN35) AS BIN35,
+        SUM(BIN36) AS BIN36,
+        SUM(BIN37) AS BIN37,
+        SUM(BIN38) AS BIN38,
+        SUM(BIN39) AS BIN39,
+        SUM(BIN40) AS BIN40,
+        SUM(BIN41) AS BIN41,
+        SUM(BIN42) AS BIN42,
+        SUM(BIN43) AS BIN43,
+        SUM(BIN44) AS BIN44,
+        SUM(BIN45) AS BIN45,
+        SUM(BIN46) AS BIN46,
+        SUM(BIN47) AS BIN47,
+        SUM(BIN48) AS BIN48,
+        SUM(BIN49) AS BIN49,
+        SUM(BIN50) AS BIN50,
+        SUM(BIN51) AS BIN51,
+        SUM(BIN52) AS BIN52,
+        SUM(BIN53) AS BIN53,
+        SUM(BIN54) AS BIN54,
+        SUM(BIN55) AS BIN55,
+        SUM(BIN56) AS BIN56,
+        SUM(BIN57) AS BIN57,
+        SUM(BIN58) AS BIN58,
+        SUM(BIN59) AS BIN59,
+        SUM(BIN60) AS BIN60,
+        SUM(BIN61) AS BIN61,
+        SUM(BIN62) AS BIN62,
+        SUM(BIN63) AS BIN63,
+        SUM(BIN64) AS BIN64,
+        SUM(BIN65) AS BIN65,
+        SUM(BIN66) AS BIN66,
+        SUM(BIN67) AS BIN67,
+        SUM(BIN68) AS BIN68,
+        SUM(BIN69) AS BIN69,
+        SUM(BIN70) AS BIN70,
+        SUM(BIN71) AS BIN71,
+        SUM(BIN72) AS BIN72,
+        SUM(BIN73) AS BIN73,
+        SUM(BIN74) AS BIN74,
+        SUM(BIN75) AS BIN75,
+        SUM(BIN76) AS BIN76,
+        SUM(BIN77) AS BIN77,
+        SUM(BIN78) AS BIN78,
+        SUM(BIN79) AS BIN79,
+        SUM(BIN80) AS BIN80,
+        SUM(BIN81) AS BIN81,
+        SUM(BIN82) AS BIN82,
+        SUM(BIN83) AS BIN83,
+        SUM(BIN84) AS BIN84,
+        SUM(BIN85) AS BIN85,
+        SUM(BIN86) AS BIN86,
+        SUM(BIN87) AS BIN87,
+        SUM(BIN88) AS BIN88,
+        SUM(BIN89) AS BIN89,
+        SUM(BIN90) AS BIN90,
+        SUM(BIN91) AS BIN91,
+        SUM(BIN92) AS BIN92,
+        SUM(BIN93) AS BIN93,
+        SUM(BIN94) AS BIN94,
+        SUM(BIN95) AS BIN95,
+        SUM(BIN96) AS BIN96,
+        SUM(BIN97) AS BIN97,
+        SUM(BIN98) AS BIN98,
+        SUM(BIN99) AS BIN99,
+        SUM(BIN100) AS BIN100,
+        SUM(BIN101) AS BIN101,
+        SUM(BIN102) AS BIN102,
+        SUM(BIN103) AS BIN103,
+        SUM(BIN104) AS BIN104,
+        SUM(BIN105) AS BIN105,
+        SUM(BIN106) AS BIN106,
+        SUM(BIN107) AS BIN107,
+        SUM(BIN108) AS BIN108,
+        SUM(BIN109) AS BIN109,
+        SUM(BIN110) AS BIN110,
+        SUM(BIN111) AS BIN111,
+        SUM(BIN112) AS BIN112,
+        SUM(BIN113) AS BIN113,
+        SUM(BIN114) AS BIN114,
+        SUM(BIN115) AS BIN115,
+        SUM(BIN116) AS BIN116,
+        SUM(BIN117) AS BIN117,
+        SUM(BIN118) AS BIN118,
+        SUM(BIN119) AS BIN119,
+        SUM(BIN120) AS BIN120,
+        SUM(BIN121) AS BIN121,
+        SUM(BIN122) AS BIN122,
+        SUM(BIN123) AS BIN123,
+        SUM(BIN124) AS BIN124,
+        SUM(BIN125) AS BIN125,
+        SUM(BIN126) AS BIN126,
+        SUM(BIN127) AS BIN127,
+        SUM(BIN128) AS BIN128,
+        SUM(BIN129) AS BIN129,
+        SUM(BIN130) AS BIN130,
+        SUM(BIN131) AS BIN131,
+        SUM(BIN132) AS BIN132,
+        SUM(BIN133) AS BIN133,
+        SUM(BIN134) AS BIN134,
+        SUM(BIN135) AS BIN135,
+        SUM(BIN136) AS BIN136,
+        SUM(BIN137) AS BIN137,
+        SUM(BIN138) AS BIN138,
+        SUM(BIN139) AS BIN139,
+        SUM(BIN140) AS BIN140,
+        SUM(BIN141) AS BIN141,
+        SUM(BIN142) AS BIN142,
+        SUM(BIN143) AS BIN143,
+        SUM(BIN144) AS BIN144,
+        SUM(BIN145) AS BIN145,
+        SUM(BIN146) AS BIN146,
+        SUM(BIN147) AS BIN147,
+        SUM(BIN148) AS BIN148,
+        SUM(BIN149) AS BIN149,
+        SUM(BIN150) AS BIN150
+    FROM TQP_WAFER_SUM
+   WHERE     1 = 1
+     AND LOT_SEQ = :lotseq
+     AND PROBE_CNT = 0
+GROUP BY CUSTOMER, FACILITY, PRODUCT, DEVICE_ALIAS, TESTAREA, PROGRAM, MOTHER_LOT_ID, LOT_ID, LOT_SEQ
+ORDER BY LOT_SEQ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="lotseq">:lotseq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_ISWAFER" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-07-25 15:06:54
+SELECT WAFER_SEQ FROM TQP_WAFER_SUM WHERE 1=1 AND WAFER_SEQ = :waferseq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="waferseq">:waferseq</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="INSERT_TQP_WAFER_SUM_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_WAFER_SUM
+    (
+    CUSTOMER,
+    FACILITY,
+    PRODUCT,
+    DEVICE_ALIAS,
+    TESTAREA,
+    PROGRAM,
+    MOTHER_LOT_ID,
+    LOT_ID,
+    LOT_SEQ,
+    WAFER_ID,
+    WAFER_SEQ,
+    TESTER,
+    PROBE_CARD,
+    OPERATOR,
+    PROBE_CNT,
+    NETDIE,
+    START_TIME,
+    END_TIME,
+    YIELD,
+    TESTED_DIE,
+    BIN0,
+    BIN1,
+    BIN2,
+    BIN3,
+    BIN4,
+    BIN5,
+    BIN6,
+    BIN7,
+    BIN8,
+    BIN9,
+    BIN10,
+    BIN11,
+    BIN12,
+    BIN13,
+    BIN14,
+    BIN15,
+    BIN16,
+    BIN17,
+    BIN18,
+    BIN19,
+    BIN20,
+    BIN21,
+    BIN22,
+    BIN23,
+    BIN24,
+    BIN25,
+    BIN26,
+    BIN27,
+    BIN28,
+    BIN29,
+    BIN30,
+    BIN31,
+    BIN32,
+    BIN33,
+    BIN34,
+    BIN35,
+    BIN36,
+    BIN37,
+    BIN38,
+    BIN39,
+    BIN40,
+    BIN41,
+    BIN42,
+    BIN43,
+    BIN44,
+    BIN45,
+    BIN46,
+    BIN47,
+    BIN48,
+    BIN49,
+    BIN50,
+    BIN51,
+    BIN52,
+    BIN53,
+    BIN54,
+    BIN55,
+    BIN56,
+    BIN57,
+    BIN58,
+    BIN59,
+    BIN60,
+    BIN61,
+    BIN62,
+    BIN63,
+    BIN64,
+    BIN65,
+    BIN66,
+    BIN67,
+    BIN68,
+    BIN69,
+    BIN70,
+    BIN71,
+    BIN72,
+    BIN73,
+    BIN74,
+    BIN75,
+    BIN76,
+    BIN77,
+    BIN78,
+    BIN79,
+    BIN80,
+    BIN81,
+    BIN82,
+    BIN83,
+    BIN84,
+    BIN85,
+    BIN86,
+    BIN87,
+    BIN88,
+    BIN89,
+    BIN90,
+    BIN91,
+    BIN92,
+    BIN93,
+    BIN94,
+    BIN95,
+    BIN96,
+    BIN97,
+    BIN98,
+    BIN99,
+    BIN100,
+    BIN101,
+    BIN102,
+    BIN103,
+    BIN104,
+    BIN105,
+    BIN106,
+    BIN107,
+    BIN108,
+    BIN109,
+    BIN110,
+    BIN111,
+    BIN112,
+    BIN113,
+    BIN114,
+    BIN115,
+    BIN116,
+    BIN117,
+    BIN118,
+    BIN119,
+    BIN120,
+    BIN121,
+    BIN122,
+    BIN123,
+    BIN124,
+    BIN125,
+    BIN126,
+    BIN127,
+    BIN128,
+    BIN129,
+    BIN130,
+    BIN131,
+    BIN132,
+    BIN133,
+    BIN134,
+    BIN135,
+    BIN136,
+    BIN137,
+    BIN138,
+    BIN139,
+    BIN140,
+    BIN141,
+    BIN142,
+    BIN143,
+    BIN144,
+    BIN145,
+    BIN146,
+    BIN147,
+    BIN148,
+    BIN149,
+    BIN150)
+    SELECT 'DB',
+       MAX (B.FACTORY) AS FACTORY,
+       MAX (C.DEVICE) AS DEVICE,
+       MAX (C.DEVICE_ALIAS) AS DEVICE_ALIAS,
+       MAX (C.TEST_AREA) AS TEST_AREA,
+       MAX (C.PROGRAM) AS PROGRAM,
+       MAX (C.LOT_ID) AS MOTHER_LOT_ID,
+       MAX (C.LOT_ID) AS LOT_ID,
+       MAX (B.LOT_SEQ) AS LOT_SEQ,
+       MAX (B.WAFER_ID) AS WAFER_ID,
+       MAX (B.WAFER_SEQ) AS WAFER_SEQ,
+       MAX (B.TESTER) AS TESTER,
+       MAX (B.PROBE_CARD) AS PROBE_CARD,
+       MAX (B.OPERATOR) AS OPERATOR,
+       -1 AS PROBE_CNT,
+       NULL AS NETDIE,
+       MIN (B.START_TIME) AS START_TIME,
+       MAX (B.END_TIME) AS END_TIME,
+       ROUND (
+            (  SUM (
+                  DECODE (
+                     (SELECT HIGH_GEC
+                        FROM TQP_BINDESC
+                       WHERE     1 = 1
+                             AND PROGRAM = 'AVI'
+                             AND BIN = A.BIN
+                             AND ROWNUM = 1),
+                     'Y', 1,
+                     0))
+             / COUNT (A.BIN))
+          * 100,
+          2)
+          AS YIELD,
+       COUNT (A.BIN) AS TESTED_DIE,
+       SUM (DECODE (A.BIN, 0, 1, 0)) AS BIN0,
+       SUM (DECODE (A.BIN, 1, 1, 0)) AS BIN1,
+       SUM (DECODE (A.BIN, 2, 1, 0)) AS BIN2,
+       SUM (DECODE (A.BIN, 3, 1, 0)) AS BIN3,
+       SUM (DECODE (A.BIN, 4, 1, 0)) AS BIN4,
+       SUM (DECODE (A.BIN, 5, 1, 0)) AS BIN5,
+       SUM (DECODE (A.BIN, 6, 1, 0)) AS BIN6,
+       SUM (DECODE (A.BIN, 7, 1, 0)) AS BIN7,
+       SUM (DECODE (A.BIN, 8, 1, 0)) AS BIN8,
+       SUM (DECODE (A.BIN, 9, 1, 0)) AS BIN9,
+       SUM (DECODE (A.BIN, 10, 1, 0)) AS BIN10,
+       SUM (DECODE (A.BIN, 11, 1, 0)) AS BIN11,
+       SUM (DECODE (A.BIN, 12, 1, 0)) AS BIN12,
+       SUM (DECODE (A.BIN, 13, 1, 0)) AS BIN13,
+       SUM (DECODE (A.BIN, 14, 1, 0)) AS BIN14,
+       SUM (DECODE (A.BIN, 15, 1, 0)) AS BIN15,
+       SUM (DECODE (A.BIN, 16, 1, 0)) AS BIN16,
+       SUM (DECODE (A.BIN, 17, 1, 0)) AS BIN17,
+       SUM (DECODE (A.BIN, 18, 1, 0)) AS BIN18,
+       SUM (DECODE (A.BIN, 19, 1, 0)) AS BIN19,
+       SUM (DECODE (A.BIN, 20, 1, 0)) AS BIN20,
+       SUM (DECODE (A.BIN, 21, 1, 0)) AS BIN21,
+       SUM (DECODE (A.BIN, 22, 1, 0)) AS BIN22,
+       SUM (DECODE (A.BIN, 23, 1, 0)) AS BIN23,
+       SUM (DECODE (A.BIN, 24, 1, 0)) AS BIN24,
+       SUM (DECODE (A.BIN, 25, 1, 0)) AS BIN25,
+       SUM (DECODE (A.BIN, 26, 1, 0)) AS BIN26,
+       SUM (DECODE (A.BIN, 27, 1, 0)) AS BIN27,
+       SUM (DECODE (A.BIN, 28, 1, 0)) AS BIN28,
+       SUM (DECODE (A.BIN, 29, 1, 0)) AS BIN29,
+       SUM (DECODE (A.BIN, 30, 1, 0)) AS BIN30,
+       SUM (DECODE (A.BIN, 31, 1, 0)) AS BIN31,
+       SUM (DECODE (A.BIN, 32, 1, 0)) AS BIN32,
+       SUM (DECODE (A.BIN, 33, 1, 0)) AS BIN33,
+       SUM (DECODE (A.BIN, 34, 1, 0)) AS BIN34,
+       SUM (DECODE (A.BIN, 35, 1, 0)) AS BIN35,
+       SUM (DECODE (A.BIN, 36, 1, 0)) AS BIN36,
+       SUM (DECODE (A.BIN, 37, 1, 0)) AS BIN37,
+       SUM (DECODE (A.BIN, 38, 1, 0)) AS BIN38,
+       SUM (DECODE (A.BIN, 39, 1, 0)) AS BIN39,
+       SUM (DECODE (A.BIN, 40, 1, 0)) AS BIN40,
+       SUM (DECODE (A.BIN, 41, 1, 0)) AS BIN41,
+       SUM (DECODE (A.BIN, 42, 1, 0)) AS BIN42,
+       SUM (DECODE (A.BIN, 43, 1, 0)) AS BIN43,
+       SUM (DECODE (A.BIN, 44, 1, 0)) AS BIN44,
+       SUM (DECODE (A.BIN, 45, 1, 0)) AS BIN45,
+       SUM (DECODE (A.BIN, 46, 1, 0)) AS BIN46,
+       SUM (DECODE (A.BIN, 47, 1, 0)) AS BIN47,
+       SUM (DECODE (A.BIN, 48, 1, 0)) AS BIN48,
+       SUM (DECODE (A.BIN, 49, 1, 0)) AS BIN49,
+       SUM (DECODE (A.BIN, 50, 1, 0)) AS BIN50,
+       SUM (DECODE (A.BIN, 51, 1, 0)) AS BIN51,
+       SUM (DECODE (A.BIN, 52, 1, 0)) AS BIN52,
+       SUM (DECODE (A.BIN, 53, 1, 0)) AS BIN53,
+       SUM (DECODE (A.BIN, 54, 1, 0)) AS BIN54,
+       SUM (DECODE (A.BIN, 55, 1, 0)) AS BIN55,
+       SUM (DECODE (A.BIN, 56, 1, 0)) AS BIN56,
+       SUM (DECODE (A.BIN, 57, 1, 0)) AS BIN57,
+       SUM (DECODE (A.BIN, 58, 1, 0)) AS BIN58,
+       SUM (DECODE (A.BIN, 59, 1, 0)) AS BIN59,
+       SUM (DECODE (A.BIN, 60, 1, 0)) AS BIN60,
+       SUM (DECODE (A.BIN, 61, 1, 0)) AS BIN61,
+       SUM (DECODE (A.BIN, 62, 1, 0)) AS BIN62,
+       SUM (DECODE (A.BIN, 63, 1, 0)) AS BIN63,
+       SUM (DECODE (A.BIN, 64, 1, 0)) AS BIN64,
+       SUM (DECODE (A.BIN, 65, 1, 0)) AS BIN65,
+       SUM (DECODE (A.BIN, 66, 1, 0)) AS BIN66,
+       SUM (DECODE (A.BIN, 67, 1, 0)) AS BIN67,
+       SUM (DECODE (A.BIN, 68, 1, 0)) AS BIN68,
+       SUM (DECODE (A.BIN, 69, 1, 0)) AS BIN69,
+       SUM (DECODE (A.BIN, 70, 1, 0)) AS BIN70,
+       SUM (DECODE (A.BIN, 71, 1, 0)) AS BIN71,
+       SUM (DECODE (A.BIN, 72, 1, 0)) AS BIN72,
+       SUM (DECODE (A.BIN, 73, 1, 0)) AS BIN73,
+       SUM (DECODE (A.BIN, 74, 1, 0)) AS BIN74,
+       SUM (DECODE (A.BIN, 75, 1, 0)) AS BIN75,
+       SUM (DECODE (A.BIN, 76, 1, 0)) AS BIN76,
+       SUM (DECODE (A.BIN, 77, 1, 0)) AS BIN77,
+       SUM (DECODE (A.BIN, 78, 1, 0)) AS BIN78,
+       SUM (DECODE (A.BIN, 79, 1, 0)) AS BIN79,
+       SUM (DECODE (A.BIN, 80, 1, 0)) AS BIN80,
+       SUM (DECODE (A.BIN, 81, 1, 0)) AS BIN81,
+       SUM (DECODE (A.BIN, 82, 1, 0)) AS BIN82,
+       SUM (DECODE (A.BIN, 83, 1, 0)) AS BIN83,
+       SUM (DECODE (A.BIN, 84, 1, 0)) AS BIN84,
+       SUM (DECODE (A.BIN, 85, 1, 0)) AS BIN85,
+       SUM (DECODE (A.BIN, 86, 1, 0)) AS BIN86,
+       SUM (DECODE (A.BIN, 87, 1, 0)) AS BIN87,
+       SUM (DECODE (A.BIN, 88, 1, 0)) AS BIN88,
+       SUM (DECODE (A.BIN, 89, 1, 0)) AS BIN89,
+       SUM (DECODE (A.BIN, 90, 1, 0)) AS BIN90,
+       SUM (DECODE (A.BIN, 91, 1, 0)) AS BIN91,
+       SUM (DECODE (A.BIN, 92, 1, 0)) AS BIN92,
+       SUM (DECODE (A.BIN, 93, 1, 0)) AS BIN93,
+       SUM (DECODE (A.BIN, 94, 1, 0)) AS BIN94,
+       SUM (DECODE (A.BIN, 95, 1, 0)) AS BIN95,
+       SUM (DECODE (A.BIN, 96, 1, 0)) AS BIN96,
+       SUM (DECODE (A.BIN, 97, 1, 0)) AS BIN97,
+       SUM (DECODE (A.BIN, 98, 1, 0)) AS BIN98,
+       SUM (DECODE (A.BIN, 99, 1, 0)) AS BIN99,
+       SUM (DECODE (A.BIN, 100, 1, 0)) AS BIN100,
+       SUM (DECODE (A.BIN, 101, 1, 0)) AS BIN101,
+       SUM (DECODE (A.BIN, 102, 1, 0)) AS BIN102,
+       SUM (DECODE (A.BIN, 103, 1, 0)) AS BIN103,
+       SUM (DECODE (A.BIN, 104, 1, 0)) AS BIN104,
+       SUM (DECODE (A.BIN, 105, 1, 0)) AS BIN105,
+       SUM (DECODE (A.BIN, 106, 1, 0)) AS BIN106,
+       SUM (DECODE (A.BIN, 107, 1, 0)) AS BIN107,
+       SUM (DECODE (A.BIN, 108, 1, 0)) AS BIN108,
+       SUM (DECODE (A.BIN, 109, 1, 0)) AS BIN109,
+       SUM (DECODE (A.BIN, 110, 1, 0)) AS BIN110,
+       SUM (DECODE (A.BIN, 111, 1, 0)) AS BIN111,
+       SUM (DECODE (A.BIN, 112, 1, 0)) AS BIN112,
+       SUM (DECODE (A.BIN, 113, 1, 0)) AS BIN113,
+       SUM (DECODE (A.BIN, 114, 1, 0)) AS BIN114,
+       SUM (DECODE (A.BIN, 115, 1, 0)) AS BIN115,
+       SUM (DECODE (A.BIN, 116, 1, 0)) AS BIN116,
+       SUM (DECODE (A.BIN, 117, 1, 0)) AS BIN117,
+       SUM (DECODE (A.BIN, 118, 1, 0)) AS BIN118,
+       SUM (DECODE (A.BIN, 119, 1, 0)) AS BIN119,
+       SUM (DECODE (A.BIN, 120, 1, 0)) AS BIN120,
+       SUM (DECODE (A.BIN, 121, 1, 0)) AS BIN121,
+       SUM (DECODE (A.BIN, 122, 1, 0)) AS BIN122,
+       SUM (DECODE (A.BIN, 123, 1, 0)) AS BIN123,
+       SUM (DECODE (A.BIN, 124, 1, 0)) AS BIN124,
+       SUM (DECODE (A.BIN, 125, 1, 0)) AS BIN125,
+       SUM (DECODE (A.BIN, 126, 1, 0)) AS BIN126,
+       SUM (DECODE (A.BIN, 127, 1, 0)) AS BIN127,
+       SUM (DECODE (A.BIN, 128, 1, 0)) AS BIN128,
+       SUM (DECODE (A.BIN, 129, 1, 0)) AS BIN129,
+       SUM (DECODE (A.BIN, 130, 1, 0)) AS BIN130,
+       SUM (DECODE (A.BIN, 131, 1, 0)) AS BIN131,
+       SUM (DECODE (A.BIN, 132, 1, 0)) AS BIN132,
+       SUM (DECODE (A.BIN, 133, 1, 0)) AS BIN133,
+       SUM (DECODE (A.BIN, 134, 1, 0)) AS BIN134,
+       SUM (DECODE (A.BIN, 135, 1, 0)) AS BIN135,
+       SUM (DECODE (A.BIN, 136, 1, 0)) AS BIN136,
+       SUM (DECODE (A.BIN, 137, 1, 0)) AS BIN137,
+       SUM (DECODE (A.BIN, 138, 1, 0)) AS BIN138,
+       SUM (DECODE (A.BIN, 139, 1, 0)) AS BIN139,
+       SUM (DECODE (A.BIN, 140, 1, 0)) AS BIN140,
+       SUM (DECODE (A.BIN, 141, 1, 0)) AS BIN141,
+       SUM (DECODE (A.BIN, 142, 1, 0)) AS BIN142,
+       SUM (DECODE (A.BIN, 143, 1, 0)) AS BIN143,
+       SUM (DECODE (A.BIN, 144, 1, 0)) AS BIN144,
+       SUM (DECODE (A.BIN, 145, 1, 0)) AS BIN145,
+       SUM (DECODE (A.BIN, 146, 1, 0)) AS BIN146,
+       SUM (DECODE (A.BIN, 147, 1, 0)) AS BIN147,
+       SUM (DECODE (A.BIN, 148, 1, 0)) AS BIN148,
+       SUM (DECODE (A.BIN, 149, 1, 0)) AS BIN149,
+       SUM (DECODE (A.BIN, 150, 1, 0)) AS BIN150
+  FROM TQP_FOI_DIE A, TQP_WAFER B, TQP_LOT C
+ WHERE     1 = 1
+       AND A.WAFER_SEQ = :waferseq
+       AND A.WAFER_SEQ = B.WAFER_SEQ
+       AND B.LOT_SEQ = C.LOT_SEQ
+       AND B.FACTORY = C.FACTORY]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0" value="waferseq">:waferseq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_WAFER_LOT_INFO" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT T1.WAF_FLAT, T1.MAX_X, T1.MAX_Y, RTRIM(TO_CHAR(ROUND ( (100 - T2.YIELD), 2), 'FM9990.9999'),'.') || '%' AS DEFECT_RATE, T1.DATA_SOURCE, UPPER(SUBSTR(T1.DATA_SOURCE, INSTR(T1.DATA_SOURCE,'.'))) AS EXTENTION, T2.*
+  FROM TQP_WAFER T1, TQP_WAFER_SUM T2
+  WHERE 1 = 1 
+   AND T1.LOT_SEQ = T2.LOT_SEQ
+   AND T1.WAFER_SEQ = T2.WAFER_SEQ
+   AND T2.WAFER_SEQ = :wafer_seq
+  ORDER BY T2.WAFER_ID, T2.PROGRAM]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="wafer_seq">:wafer_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_WAFER_LOT_INFO_MULTI" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT T1.WAF_FLAT, T1.MAX_X, T1.MAX_Y, RTRIM(TO_CHAR(ROUND ( (100 - T2.YIELD), 2), 'FM9990.9999'),'.') || '%' AS DEFECT_RATE, T1.DATA_SOURCE, UPPER(SUBSTR(T1.DATA_SOURCE, INSTR(T1.DATA_SOURCE,'.'))) AS EXTENTION, T2.*
+  FROM TQP_WAFER T1, TQP_WAFER_SUM T2
+  WHERE 1 = 1 
+   AND T1.LOT_SEQ = T2.LOT_SEQ
+   AND T1.WAFER_SEQ = T2.WAFER_SEQ
+   AND T2.WAFER_SEQ IN (??)
+  ORDER BY T2.WAFER_ID, T2.PROGRAM]]></commandtext>
+    </query>
+    <query statement="Update" queryid="UPDATE_LOT_STS" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_WAFER_SUM SET CUSTOMER = :customer, DEVICE_ALIAS = :device
+WHERE 1 = 1 
+ AND WAFER_SEQ = :waferseq
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="0" value="customer">:customer</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="device">:device</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="waferseq">:waferseq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_MAP_CONFIG_LIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT CUSTOMER,
+       PRODUCT,
+       DEVICE_ALIAS,
+       TESTAREA,
+       PROGRAM,
+       LOT_ID,
+       WAFER_ID,
+       TO_CHAR(START_TIME, 'YYYY/MM/DD HH24:MI:SS') AS START_TIME,
+       TO_CHAR(END_TIME,  'YYYY/MM/DD HH24:MI:SS') AS END_TIME,
+       MAP_CFG_SEQ,
+       WAFER_SEQ,
+       LOT_SEQ
+  FROM TQP_WAFER_SUM
+ WHERE     1 = 1
+     AND END_TIME BETWEEN TO_DATE ( :sttime, 'YYYY-MM-DD') AND TO_DATE ( :endtime, 'YYYY-MM-DD') 
+     AND TESTAREA = :teastarea
+     AND DEVICE_ALIAS = :device
+       ??]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="sttime">:sttime</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="endtime">:endtime</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="teastarea">:teastarea</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="device">:device</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_MAP_CFG" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_WAFER_SUM SET MAP_CFG_SEQ = :cfg_seq
+WHERE 1 = 1 
+ AND WAFER_SEQ = :waferseq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="0" value="cfg_seq">:cfg_seq</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="waferseq">:waferseq</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_WAFER_ID" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_WAFER_SUM
+SET WAFER_ID = :WAFER_ID
+  , PROBE_CNT = :PROBE_CNT
+WHERE WAFER_SEQ = :WAFER_SEQ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="0">:WAFER_SEQ</param>
+            <param direction="Input" dbtype="VarChar2" size="0">:WAFER_ID</param>
+            <param direction="Input" dbtype="VarChar2" size="0">:PROBE_CNT</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_LOT_ID" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_WAFER_SUM
+SET 
+    LOT_ID = :LOT_ID,
+    DEVICE_ALIAS = :DEVICE_ALIAS
+WHERE LOT_SEQ = :LOT_SEQ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="0" value="LOT_SEQ">:LOT_SEQ</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="LOT_ID">:LOT_ID</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="DEVICE_ALIAS">:DEVICE_ALIAS</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_LOT_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[DELETE FROM TQP_WAFER_SUM
+WHERE LOT_SEQ = :LOT_SEQ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="0" value="0">:LOT_SEQ</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_WAFER_MATCH" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT *
+  FROM TQP_WAFER_SUM
+ WHERE     1 = 1
+ AND FACILITY = :factory
+ AND LOT_ID = :lotid
+       AND REGEXP_SUBSTR (WAFER_ID, '[^-]+', REGEXP_INSTR (WAFER_ID, '-')) IN (??)
+       AND TESTAREA = :testarea
+       AND PROBE_CNT = 0]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="factory">:factory</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="lotid">:lotid</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="testarea">:testarea</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_PROGRAM" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_WAFER_SUM
+SET 
+    LOT_SEQ = :LOT_SEQ,
+    PROGRAM = :PROGRAM,
+    PROBE_CNT = :PROBE_CNT
+WHERE WAFER_SEQ = :WAFER_SEQ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="0">:WAFER_SEQ</param>
+            <param direction="Input" dbtype="VarChar2" size="0">:LOT_SEQ</param>
+            <param direction="Input" dbtype="VarChar2" size="0">:PROGRAM</param>
+            <param direction="Input" dbtype="VarChar2" size="0">:PROBE_CNT</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_CONFIG_SEQ" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_WAFER_SUM SET  MAP_CFG_SEQ = :configseq
+    WHERE WAFER_SEQ = :waferseq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="0" value="configseq">:configseq</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="waferseq">:waferseq</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="INCREASE_PROBE_COUNT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE 
+TQP_WAFER_SUM
+SET PROBE_CNT = PROBE_CNT + 1
+WHERE LOT_SEQ = :LOT_SEQ
+AND WAFER_ID IN (
+    SELECT WAFER_ID 
+    FROM TQP_WAFER 
+    WHERE WAFER_SEQ = :WAFER_SEQ
+)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="0">:LOT_SEQ</param>
+            <param direction="Input" dbtype="VarChar2" size="0">:WAFER_SEQ</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_WAFER_LIST_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT
+    WAFER_SEQ,
+    0 COUNT,
+    0 RATE,
+    PROGRAM,
+    LOT_ID,
+    WAFER_ID,
+    TESTER,
+    PROBE_CARD,
+    CUSTOMER ,
+    PRODUCT,
+    DEVICE_ALIAS,
+    TESTAREA,
+    PROBE_CNT,
+    START_TIME,
+    END_TIME,
+    TESTED_DIE,
+    YIELD
+FROM TQP_WAFER_SUM
+WHERE WAFER_SEQ IN (??)
+ORDER BY LOT_ID, WAFER_ID ]]></commandtext>
+    </query>
+</queryxml>

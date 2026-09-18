@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Insert" queryid="INSERT_TQP_FOI_IMAGES" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_FOI_IMAGES
+(WAFER_SEQ,
+ X,
+ Y,
+ BIN,
+ IMAGE_PATH,
+ THUMB_PATH,
+ IMAGE_FILE_NAME,
+ THUMB_FILENAME)
+ VALUES
+ (:wafer_seq,
+:xindex,
+:yindex,
+:avi_bin,
+:image_path,
+:thumb_path,
+:image_file_name,
+:thumb_filename)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="0" value="wafer_seq">:wafer_seq</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="xindex">:xindex</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="yindex">:yindex</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="avi_bin">:avi_bin</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="image_path">:image_path</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="thumb_path">:thumb_path</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="image_file_name">:image_file_name</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="thumb_filename">:thumb_filename</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_TQP_FOI_IMAGES" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQP_FOI_IMAGES
+WHERE 1 = 1 
+AND WAFER_SEQ = :waferseq
+ORDER BY X,Y]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="0" value="waferseq">:waferseq</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_TQP_FOI_IMAGES" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[DELETE FROM TQP_FOI_IMAGES
+WHERE 1 = 1 
+AND WAFER_SEQ = :waferseq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="waferseq">:waferseq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_TQP_FOI_IMAGES_MULTI" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT A.*,
+       B.LOT_ID,
+       B.PROGRAM,
+       B.WAFER_ID,
+       B.DEVICE_ALIAS,
+       B.PRODUCT
+  FROM TQP_FOI_IMAGES A, TQP_WAFER_SUM B
+ WHERE     1 = 1
+    AND A.WAFER_SEQ = B.WAFER_SEQ
+    AND A.WAFER_SEQ IN (??)]]></commandtext>
+    </query>
+</queryxml>

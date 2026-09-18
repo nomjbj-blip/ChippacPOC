@@ -1,0 +1,595 @@
+<?xml version="1.0" standalone="yes"?>
+<DocumentElement>
+  <XMLLang>
+    <Item>$</Item>
+    <Kor>$ 줄 혹은 문자의 끝</Kor>
+    <Eng>$   Matches end of the string or line. Use at the end of the expression.</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>(?&lt;name&gt;subexpression)</Item>
+    <Kor>(?&lt;그룹명&gt;정규식)</Kor>
+    <Eng>(?&lt;name&gt;subexpression)   Captures a matched subexpression with name.</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>*</Item>
+    <Kor>* 0 또는 최대치</Kor>
+    <Eng>*   Match zero or more times.</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>?</Item>
+    <Kor>? 0 또는 1</Kor>
+    <Eng>?   Match zero or one time.</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>\d</Item>
+    <Kor>\d 숫자</Kor>
+    <Eng>\d   Matches a number.</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>\D </Item>
+    <Kor>\D 숫자제외</Kor>
+    <Eng>\D   Matches a non-number.</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>\n</Item>
+    <Kor>\n 새 줄</Kor>
+    <Eng>\n   Matches a new line.</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>\r</Item>
+    <Kor>\r 캐리지 리턴</Kor>
+    <Eng>\r   Matches Carriage Return.</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>\s</Item>
+    <Kor>\s 공백</Kor>
+    <Eng>\s   Matches a white space.</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>\S</Item>
+    <Kor>\S 공백제외</Kor>
+    <Eng>\S   Matches a non-white space</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>\t</Item>
+    <Kor>\t 탭</Kor>
+    <Eng>\t   Matches a tab.</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>\w</Item>
+    <Kor>\w 단어</Kor>
+    <Eng>\w   Matches a word.</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>\W</Item>
+    <Kor>\W 단어제외</Kor>
+    <Eng>\W   Matches a non-word.</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>^</Item>
+    <Kor>^ 줄 혹은 문자의 시작</Kor>
+    <Eng>^   Matches start of the string or line. Use at the beginning of the expression.</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>{n, }</Item>
+    <Kor>{n,} n번부터</Kor>
+    <Eng>{n,}   Match at least n times.</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>{n,m}</Item>
+    <Kor>{n,m} n번부터 n번까지</Kor>
+    <Eng>{n,m}   Match from n to m times.</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>{n}</Item>
+    <Kor>{n} n번</Kor>
+    <Eng>{n}   Match exactly n times.</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>+</Item>
+    <Kor>+ 1 또는 최대치</Kor>
+    <Eng>+   Match one or more times.</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Action Managment</Item>
+    <Kor>동작 관리</Kor>
+    <Eng>Action Management</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Add</Item>
+    <Kor>추가</Kor>
+    <Eng>Add</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Analysis</Item>
+    <Kor>분석</Kor>
+    <Eng>Analysis</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Analysis Unit Mode</Item>
+    <Kor>분석 모드</Kor>
+    <Eng>Analysis Unit Mode</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Application</Item>
+    <Kor>응용 프로그램</Kor>
+    <Eng>Application</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Argument</Item>
+    <Kor>인수</Kor>
+    <Eng>Argument</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Argument List</Item>
+    <Kor>인수 목록</Kor>
+    <Eng>Argument List</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>array</Item>
+    <Kor>배열</Kor>
+    <Eng>Array</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Cancel</Item>
+    <Kor>취소</Kor>
+    <Eng>&amp;Cancel</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Close (&amp;X)</Item>
+    <Kor>종료</Kor>
+    <Eng>Close (&amp;X)</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>COM+ Task</Item>
+    <Kor>COM+ 업무</Kor>
+    <Eng>COM+ Task</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Component</Item>
+    <Kor>구성 요소</Kor>
+    <Eng>Component</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Component List</Item>
+    <Kor>구성요소 목록</Kor>
+    <Eng>Component List</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Connection Information</Item>
+    <Kor>연결 정보</Kor>
+    <Eng>Connection Information</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Connection List</Item>
+    <Kor>연결정보</Kor>
+    <Eng>Connection List</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Connection Test</Item>
+    <Kor>연결 테스트</Kor>
+    <Eng>Connection Test</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Database</Item>
+    <Kor>데이터베이스</Kor>
+    <Eng>Database</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>DataBase Connection</Item>
+    <Kor>DB 연결</Kor>
+    <Eng>DataBase Connection</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Database Connection Test</Item>
+    <Kor>DB 연결 테스트</Kor>
+    <Eng>Database Connection Test</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Database Name</Item>
+    <Kor>DB 명</Kor>
+    <Eng>Database Name</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Delete</Item>
+    <Kor>삭제</Kor>
+    <Eng>Delete</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Edit</Item>
+    <Kor>수정</Kor>
+    <Eng>Edit</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Encoding</Item>
+    <Kor>인코딩</Kor>
+    <Eng>Encoding</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Entity</Item>
+    <Kor>구성요소</Kor>
+    <Eng>Entity</Eng>
+    <Other xml:space="preserve"> </Other>
+  </XMLLang>
+  <XMLLang>
+    <Item>Entity Information</Item>
+    <Kor>구성요소 정보</Kor>
+    <Eng>Entity Information</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Entity List</Item>
+    <Kor>구성요소 목록</Kor>
+    <Eng>Entity List</Eng>
+    <Other xml:space="preserve"> </Other>
+  </XMLLang>
+  <XMLLang>
+    <Item>Entity Registration</Item>
+    <Kor>구성요소 등록</Kor>
+    <Eng>Entity Registration</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Entry Value Task</Item>
+    <Kor>구성 요소 값</Kor>
+    <Eng>Entry Value Task</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Etc</Item>
+    <Kor>기타</Kor>
+    <Eng>Etc</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Explorer</Item>
+    <Kor>탐색기</Kor>
+    <Eng>Explorer</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Export</Item>
+    <Kor>추출</Kor>
+    <Eng>Export</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>File Name</Item>
+    <Kor>파일 명</Kor>
+    <Eng>File Name</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Find</Item>
+    <Kor>검색</Kor>
+    <Eng>Find</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>General</Item>
+    <Kor>일반</Kor>
+    <Eng>General</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Grouping</Item>
+    <Kor>그룹화</Kor>
+    <Eng>Grouping</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Help</Item>
+    <Kor>도움말</Kor>
+    <Eng>Help</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Host</Item>
+    <Kor>호스트</Kor>
+    <Eng>Host</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Ignore Case</Item>
+    <Kor>대소문자</Kor>
+    <Eng>Ignore Case</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Index</Item>
+    <Kor>색인</Kor>
+    <Eng>Index</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>k&lt;name&gt;</Item>
+    <Kor>&lt;그룹명&gt; 그룹과 일치하는 문자열</Kor>
+    <Eng>\\k&lt;name&gt;   Match the string from the captured group that is named.</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>LanguageOption</Item>
+    <Kor>언어 옵션</Kor>
+    <Eng>Language Option</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Langs</Item>
+    <Kor>언어</Kor>
+    <Eng>Lang</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Match List</Item>
+    <Kor>매치 목록</Kor>
+    <Eng>Match List</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Method List</Item>
+    <Kor>메소드 목록</Kor>
+    <Eng>Method List</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Multi Unit</Item>
+    <Kor>다중 라인</Kor>
+    <Eng>Multi Unit</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Name</Item>
+    <Kor>명칭</Kor>
+    <Eng>Name</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>New</Item>
+    <Kor>새 파일</Kor>
+    <Eng>&amp;New</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>O&amp;ption</Item>
+    <Kor>옵션</Kor>
+    <Eng>O&amp;ption</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>OK</Item>
+    <Kor>승인</Kor>
+    <Eng>OK</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Open</Item>
+    <Kor>열기</Kor>
+    <Eng>Open</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Option</Item>
+    <Kor>설정</Kor>
+    <Eng>Option</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Parameter List</Item>
+    <Kor>변수 목록</Kor>
+    <Eng>Parameter List</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Parameters</Item>
+    <Kor>변수</Kor>
+    <Eng>Parameters</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Parent Section</Item>
+    <Kor>상위 구역</Kor>
+    <Eng>Parent Section</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Password</Item>
+    <Kor>암호</Kor>
+    <Eng>Password</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Port</Item>
+    <Kor>포트</Kor>
+    <Eng>Port</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Quantifiers</Item>
+    <Kor>수량</Kor>
+    <Eng>Quantifiers</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Query Type</Item>
+    <Kor>질의 종류</Kor>
+    <Eng>Query Type</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Regular Expression</Item>
+    <Kor>정규식</Kor>
+    <Eng>Regular Expression</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Remove</Item>
+    <Kor>삭제</Kor>
+    <Eng>Remove</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Result Usage</Item>
+    <Kor>사용 결과</Kor>
+    <Eng>Result Usage</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Return Type</Item>
+    <Kor>반환 종류</Kor>
+    <Eng>Return Type</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Run Batch Test</Item>
+    <Kor>배치 테스트</Kor>
+    <Eng>Run Batch Test</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Sample File</Item>
+    <Kor>예제 파일</Kor>
+    <Eng>Sample File</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Save</Item>
+    <Kor>저장</Kor>
+    <Eng>&amp;Save</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Save As</Item>
+    <Kor>다른 이름으로</Kor>
+    <Eng>Save &amp;As</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Script List</Item>
+    <Kor>스크립트 목록</Kor>
+    <Eng>Script List</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Section</Item>
+    <Kor>구역</Kor>
+    <Eng>Section</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Section Information</Item>
+    <Kor>구역 정보</Kor>
+    <Eng>Section Information</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Section List</Item>
+    <Kor>구역 목록</Kor>
+    <Eng>Section List</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Section Registration</Item>
+    <Kor>구역 등록</Kor>
+    <Eng>Section Registration</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Select Language</Item>
+    <Kor>언어 선택</Kor>
+    <Eng>Select Lang</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Separator</Item>
+    <Kor>구분자</Kor>
+    <Eng>Separator</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Server Type</Item>
+    <Kor>서버 종류</Kor>
+    <Eng>Server Type</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Setup</Item>
+    <Kor>설정</Kor>
+    <Eng>Setup</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Single Unit</Item>
+    <Kor>단일 라인</Kor>
+    <Eng>Single Unit</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Stream</Item>
+    <Kor>스트림 모드</Kor>
+    <Eng>Stream Mode</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Table List</Item>
+    <Kor>테이블 목록</Kor>
+    <Eng>Table List</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Target Column</Item>
+    <Kor>목표 열</Kor>
+    <Eng>Target Column</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Target File Naming Rule</Item>
+    <Kor>파일명 정규식</Kor>
+    <Eng>Target File Naming Rule</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Target Task</Item>
+    <Kor>목표 업무</Kor>
+    <Eng>Target Task</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Task</Item>
+    <Kor>업무</Kor>
+    <Eng>Task</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Task List</Item>
+    <Kor>업무 목록</Kor>
+    <Eng>Task List</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Task Name</Item>
+    <Kor>업무 명</Kor>
+    <Eng>Task Name</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Task Type</Item>
+    <Kor>업무 종류</Kor>
+    <Eng>Task Type</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Test</Item>
+    <Kor>테스트</Kor>
+    <Eng>Test</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Type</Item>
+    <Kor>종류</Kor>
+    <Eng>Type</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>User ID</Item>
+    <Kor>계정</Kor>
+    <Eng>User ID</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Value</Item>
+    <Kor>값</Kor>
+    <Eng>Value</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Value Group</Item>
+    <Kor>값 그룹</Kor>
+    <Eng>Value Group</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Value must exists</Item>
+    <Kor>값 필수</Kor>
+    <Eng>Value must exists.</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Value Type</Item>
+    <Kor>값 종류</Kor>
+    <Eng>Value Type</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>XML Save</Item>
+    <Kor>XML 저장</Kor>
+    <Eng>&amp;XML Save</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Label</Item>
+    <Kor>라벨</Kor>
+    <Eng>Label</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>First</Item>
+    <Kor>시작 엔트리</Kor>
+    <Eng>Fisrt Entry</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>End</Item>
+    <Kor>끝 엔트리</Kor>
+    <Eng>End Entry</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Item</Item>
+    <Kor>아이템 목록</Kor>
+    <Eng>Item List</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Entry List</Item>
+    <Kor>엔트리 목록</Kor>
+    <Eng>Entry List</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Default</Item>
+    <Kor>기본값</Kor>
+    <Eng>Default</Eng>
+  </XMLLang>
+  <XMLLang>
+    <Item>Convert</Item>
+    <Kor>변환</Kor>
+    <Eng>Convert</Eng>
+  </XMLLang>
+</DocumentElement>

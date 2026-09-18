@@ -1,0 +1,1905 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="BUMPFA" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Insert" queryid="INSERT_EVENT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TBP_EQUIP_EVENT
+(
+	MONTH
+	,RES_ID
+	,EVENT_TIME
+	,EVENT_ID
+	,PROC_MODE
+	,PERIOD
+	,OPER
+	,MAT_ID
+	,RECIPE_ID
+	,LOT_ID
+	,WAFER_ID
+	,FRAME_ID
+	,CMF_FIELD01
+) VALUES(
+	TO_NUMBER(TO_CHAR(TO_DATE(SUBSTR(:event_time,1,19),'YYYY-MM-DD HH24:MI:SS'),'YYYYMM'))
+	,:res_id
+	,TO_TIMESTAMP(:event_time,'YYYY-MM-DD HH24:MI:SS.FF')
+	,:event_id
+	,:proc_mode
+	,:period
+	,:oper
+	,:mat_id
+	,:recipe_id
+	,:lot_id
+	,:wafer_id
+	,:frame_id
+	,:raw_mat_type
+)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:res_id</param>
+            <param direction="Input" dbtype="VarChar" size="25">:event_time</param>
+            <param direction="Input" dbtype="VarChar" size="40">:event_id</param>
+            <param direction="Input" dbtype="VarChar" size="10">:proc_mode</param>
+            <param direction="Input" dbtype="Number" size="20">:period</param>
+            <param direction="Input" dbtype="VarChar" size="10">:oper</param>
+            <param direction="Input" dbtype="VarChar" size="40">:mat_id</param>
+            <param direction="Input" dbtype="VarChar" size="100">:recipe_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:wafer_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:frame_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:raw_mat_type</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="INSERT_EVENT01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TBP_EQUIP_EVENT
+(
+	MONTH
+	,RES_ID
+	,EVENT_TIME
+	,EVENT_ID
+	,PROC_MODE
+	,PERIOD
+	,OPER
+	,MAT_ID
+	,RECIPE_ID
+	,LOT_ID
+	,WAFER_ID
+	,FRAME_ID
+	,CMF_FIELD01
+	,CMF_FIELD02
+) VALUES(
+	TO_NUMBER(TO_CHAR(TO_DATE(SUBSTR(:event_time,1,19),'YYYY-MM-DD HH24:MI:SS'),'YYYYMM'))
+	,:res_id
+	,TO_TIMESTAMP(:event_time,'YYYY-MM-DD HH24:MI:SS.FF')
+	,:event_id
+	,:proc_mode
+	,:period
+	,:oper
+	,:mat_id
+	,:recipe_id
+	,:lot_id
+	,:wafer_id
+	,:frame_id
+	,:raw_mat_type
+	,:abnormal_case
+)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:res_id</param>
+            <param direction="Input" dbtype="VarChar" size="25">:event_time</param>
+            <param direction="Input" dbtype="VarChar" size="40">:event_id</param>
+            <param direction="Input" dbtype="VarChar" size="10">:proc_mode</param>
+            <param direction="Input" dbtype="Number" size="20">:period</param>
+            <param direction="Input" dbtype="VarChar" size="10">:oper</param>
+            <param direction="Input" dbtype="VarChar" size="40">:mat_id</param>
+            <param direction="Input" dbtype="VarChar" size="100">:recipe_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:wafer_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:frame_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:raw_mat_type</param>
+            <param direction="Input" dbtype="VarChar" size="40">:abnormal_case</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_EVENT_PERIOD" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TBP_EQUIP_EVENT
+SET PERIOD = :period
+WHERE RES_ID = :res_id
+AND EVENT_TIME = TO_TIMESTAMP(:event_time,'YYYY-MM-DD HH24:MI:SS.FF')
+AND EVENT_ID = :last_event
+			]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="M-A18">:res_id</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="HANAMD_ERROR_CLEAR">:last_event</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="2013-12-03 14:06:29.000">:event_time</param>
+            <param direction="Input" dbtype="Number" size="10" value="219">:period</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="INSERT_EVENT02" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TBP_EQUIP_EVENT
+(
+	MONTH
+	,RES_ID
+	,EVENT_TIME
+	,EVENT_ID
+	,PROC_MODE
+	,PERIOD
+	,OPER
+	,MAT_ID
+	,RECIPE_ID
+	,LOT_ID
+	,WAFER_ID
+	,FRAME_ID
+	,CMF_FIELD01
+	,CMF_FIELD03
+	,CMF_FIELD04
+	,CMF_FIELD05
+) VALUES(
+	TO_NUMBER(TO_CHAR(TO_DATE(SUBSTR(:event_time,1,19),'YYYY-MM-DD HH24:MI:SS'),'YYYYMM'))
+	,:res_id
+	,TO_TIMESTAMP(:event_time,'YYYY-MM-DD HH24:MI:SS.FF')
+	,:event_id
+	,:proc_mode
+	,:period
+	,:oper
+	,:mat_id
+	,:recipe_id
+	,:lot_id
+	,:wafer_id
+	,:frame_id
+	,:raw_mat_type
+	,:pickup_count
+	,:frame_time
+	,:abr_case
+)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:res_id</param>
+            <param direction="Input" dbtype="VarChar" size="25">:event_time</param>
+            <param direction="Input" dbtype="VarChar" size="40">:event_id</param>
+            <param direction="Input" dbtype="VarChar" size="10">:proc_mode</param>
+            <param direction="Input" dbtype="Number" size="20">:period</param>
+            <param direction="Input" dbtype="VarChar" size="10">:oper</param>
+            <param direction="Input" dbtype="VarChar" size="40">:mat_id</param>
+            <param direction="Input" dbtype="VarChar" size="100">:recipe_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:wafer_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:frame_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:raw_mat_type</param>
+            <param direction="Input" dbtype="VarChar" size="40">:abr_case</param>
+            <param direction="Input" dbtype="VarChar" size="40">:pickup_count</param>
+            <param direction="Input" dbtype="VarChar" size="40">:frame_time</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_EVENT_PERIOD01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TBP_EQUIP_EVENT
+SET CMF_FIELD02 = :abn_case
+WHERE RES_ID = :res_id
+AND EVENT_TIME = TO_TIMESTAMP(:event_time,'YYYY-MM-DD HH24:MI:SS.FF')
+AND EVENT_ID = :last_event
+			]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:res_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:last_event</param>
+            <param direction="Input" dbtype="VarChar" size="40">:event_time</param>
+            <param direction="Input" dbtype="VarChar" size="40">:abn_case</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_EQUIPE_EVENT_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT RES_ID AS "EQUIP ID"
+,TO_CHAR(EVENT_TIME,'YYYY-MM-DD HH24:MI:SS') AS "EVENT TIME"
+,EVENT_ID AS "EVENT ID"
+,PROC_MODE AS "MODE"
+,PERIOD AS "TERM(Sec)"
+,OPER AS "OPER ID"
+,MAT_ID AS "PART ID"
+,RECIPE_ID AS "RECIPE ID"
+,LOT_ID AS "LOT ID"
+,WAFER_ID AS "WAFER ID"
+,FRAME_ID AS "FRAME ID" 
+FROM TBP_EQUIP_EVENT
+WHERE 1=1
+AND RES_ID = :res_id
+AND MONTH BETWEEN :start_month AND :end_month 
+AND EVENT_TIME BETWEEN TO_DATE(:dt_start,'YYYY-MM-DD HH24:MI:SS') AND TO_DATE(:dt_end,'YYYY-MM-DD HH24:MI:SS')
+ORDER BY EVENT_TIME DESC,FRAME_ID DESC
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="10">:start_month</param>
+            <param direction="Input" dbtype="VarChar" size="10">:end_month</param>
+            <param direction="Input" dbtype="VarChar" size="22">:dt_start</param>
+            <param direction="Input" dbtype="VarChar" size="22">:dt_end</param>
+            <param direction="Input" dbtype="VarChar" size="20">:res_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_EQUIPE_EVENT_02" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT RES_ID AS "EQUIP ID"
+,TO_CHAR(EVENT_TIME,'YYYY-MM-DD HH24:MI:SS') AS "EVENT TIME"
+,EVENT_ID AS "EVENT ID"
+,PROC_MODE AS "MODE"
+,PERIOD AS "TERM(Sec)"
+,OPER AS "OPER ID"
+,MAT_ID AS "PART ID"
+,RECIPE_ID AS "RECIPE ID"
+,LOT_ID AS "LOT ID"
+,WAFER_ID AS "WAFER ID"
+,FRAME_ID AS "FRAME ID" 
+FROM TBP_EQUIP_EVENT
+WHERE 1=1
+AND RES_ID = :res_id
+AND MONTH BETWEEN :start_month AND :end_month 
+AND EVENT_TIME BETWEEN TO_DATE(:dt_start,'YYYY-MM-DD HH24:MI:SS') AND TO_DATE(:dt_end,'YYYY-MM-DD HH24:MI:SS')
+
+UNION
+
+SELECT RES_ID AS "EQUIP ID"
+,TO_CHAR(SET_TIME,'YYYY-MM-DD HH24:MI:SS') AS "EVENT TIME"
+,'ALARM' AS "EVENT ID"
+,'DOWN' AS "MODE"
+,PERIOD AS "TERM(Sec)"
+,OPER AS "OPER ID"
+,'' AS "PART ID"
+,RECIPE_ID AS "RECIPE ID"
+,LOT_ID AS "LOT ID"
+,'' AS "WAFER ID"
+,'' AS "FRAME ID" 
+FROM TBP_EQUIP_ALARM
+WHERE 1=1
+AND MONTH BETWEEN :start_month AND :end_month
+AND SET_TIME BETWEEN TO_DATE(:dt_start,'YYYY-MM-DD HH24:MI:SS') AND TO_DATE(:dt_end,'YYYY-MM-DD HH24:MI:SS')
+AND RES_ID = :res_id
+ORDER BY "EVENT TIME" DESC, "FRAME ID" DESC
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="10">:start_month</param>
+            <param direction="Input" dbtype="VarChar" size="10">:end_month</param>
+            <param direction="Input" dbtype="VarChar" size="22">:dt_start</param>
+            <param direction="Input" dbtype="VarChar" size="22">:dt_end</param>
+            <param direction="Input" dbtype="VarChar" size="20">:res_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_EQUIPE_EVENT_03" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT EQEVENT.RES_ID AS "EQUIP ID"
+        , EQEVENT.PROC_MODE
+        , SUM(EQEVENT.PERIOD) AS PERIOD
+        FROM TBP_RESSTS RESSTS, TBP_EQUIP_EVENT EQEVENT 
+				WHERE EQEVENT.MONTH BETWEEN :start_month AND :end_month 
+				AND RESSTS.RES_ID = EQEVENT.RES_ID
+				AND RESSTS.RES_MAKER = :maker
+				AND EQEVENT.EVENT_TIME BETWEEN TO_DATE(:dt_start,'YYYY-MM-DD HH24:MI:SS') AND TO_DATE(:dt_end,'YYYY-MM-DD HH24:MI:SS')
+				GROUP BY EQEVENT.RES_ID, EQEVENT.PROC_MODE 
+				ORDER BY EQEVENT.RES_ID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="10">:start_month</param>
+            <param direction="Input" dbtype="VarChar" size="10">:end_month</param>
+            <param direction="Input" dbtype="VarChar" size="22">:dt_start</param>
+            <param direction="Input" dbtype="VarChar" size="22">:dt_end</param>
+            <param direction="Input" dbtype="VarChar" size="40">:maker</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_EQUIPE_EVENT_04" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[/* SELECT EQEVENT.RES_ID AS "EQUIP ID"
+        , EQEVENT.PROC_MODE
+        , SUM(EQEVENT.PERIOD) AS PERIOD
+        FROM TBP_RESSTS RESSTS, TBP_EQUIP_EVENT EQEVENT 
+				WHERE EQEVENT.MONTH BETWEEN :start_month AND :end_month 
+				AND RESSTS.RES_ID = EQEVENT.RES_ID
+				AND RESSTS.RES_MAKER = :maker
+				AND RESSTS.RES_MODEL = :model
+				AND EQEVENT.EVENT_TIME BETWEEN TO_DATE(:dt_start,'YYYY-MM-DD HH24:MI:SS') AND TO_DATE(:dt_end,'YYYY-MM-DD HH24:MI:SS')
+				GROUP BY EQEVENT.RES_ID, EQEVENT.PROC_MODE 
+				ORDER BY EQEVENT.RES_ID
+*/
+        SELECT /*+ INDEX(TBP_EQUIP_EVENT IDX_TBP_EQUIP_EVENT_01) */ RES_ID AS "EQUIP ID"
+        , PROC_MODE
+        , SUM(PERIOD) AS PERIOD
+        FROM  TBP_EQUIP_EVENT  
+				WHERE RES_ID IN (SELECT RES_ID FROM TBP_RESSTS 
+                                        WHERE RES_MAKER = :maker
+                                        AND RES_MODEL = :model
+                                        )
+				AND EVENT_TIME BETWEEN TO_DATE(:dt_start,'YYYY-MM-DD HH24:MI:SS') AND TO_DATE(:dt_end,'YYYY-MM-DD HH24:MI:SS')
+				AND MONTH BETWEEN :start_month AND :end_month 
+				GROUP BY RES_ID, PROC_MODE 
+				ORDER BY RES_ID
+
+
+/*
+SELECT RS.RES_ID AS "EQUIP ID"
+        , NVL(EE.PROC_MODE, (SELECT PROC_MODE 
+                FROM TBP_EQUIP_EVENT 
+                WHERE 1=1 
+                AND RES_ID = RS.RES_ID 
+                AND EVENT_TIME = (
+                    SELECT MAX(EVENT_TIME) 
+                    FROM TBP_EQUIP_EVENT 
+                    WHERE 1=1 
+                    AND RES_ID = RS.RES_ID
+                    )
+                AND ROWNUM = 1 )) AS "PROC_MODE" 
+        , SUM(EE.PERIOD) AS PERIOD
+        FROM TBP_RESSTS RS 
+            LEFT OUTER JOIN TBP_EQUIP_EVENT EE
+            ON EE.RES_ID = RS.RES_ID
+            AND EE.MONTH BETWEEN :start_month AND :end_month        
+            AND EE.EVENT_TIME BETWEEN TO_DATE(:dt_start,'YYYY-MM-DD HH24:MI:SS') AND TO_DATE(:dt_end,'YYYY-MM-DD HH24:MI:SS')            
+        WHERE RS.RES_MAKER = :maker
+        AND RS.RES_MODEL = :model
+        GROUP BY RS.RES_ID, EE.PROC_MODE 
+        ORDER BY RS.RES_ID
+*/]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="10">:start_month</param>
+            <param direction="Input" dbtype="VarChar" size="10">:end_month</param>
+            <param direction="Input" dbtype="VarChar" size="22">:dt_start</param>
+            <param direction="Input" dbtype="VarChar" size="22">:dt_end</param>
+            <param direction="Input" dbtype="VarChar" size="40">:maker</param>
+            <param direction="Input" dbtype="VarChar" size="20">:model</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_EQUIPE_EVENT_05" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT EQEVENT.RES_ID AS "EQUIP ID"
+        , EQEVENT.PROC_MODE
+        , SUM(EQEVENT.PERIOD) AS PERIOD
+        FROM	TBP_EQUIP_EVENT EQEVENT,
+		(SELECT RES_ID FROM TBP_RESSTS WHERE 1=1 AND FACTORY = 'HMKA1' AND RES_ID = :res_id AND RES_MAKER = :maker AND RES_MODEL = :model) RESSTS
+		WHERE EQEVENT.MONTH BETWEEN :start_month AND :end_month 
+		AND EQEVENT.RES_ID = :res_id
+		--AND RESSTS.RES_MAKER = :maker
+		--AND RESSTS.RES_MODEL = :model
+		AND EQEVENT.EVENT_TIME BETWEEN TO_DATE(:dt_start,'YYYY-MM-DD HH24:MI:SS') AND TO_DATE(:dt_end,'YYYY-MM-DD HH24:MI:SS')
+		AND RESSTS.RES_ID = EQEVENT.RES_ID
+		GROUP BY EQEVENT.RES_ID, EQEVENT.PROC_MODE 
+		ORDER BY EQEVENT.RES_ID
+
+/*
+SELECT EQEVENT.RES_ID AS "EQUIP ID"
+        , EQEVENT.PROC_MODE
+        , SUM(EQEVENT.PERIOD) AS PERIOD
+        FROM TBP_RESSTS RESSTS, TBP_EQUIP_EVENT EQEVENT 
+				WHERE EQEVENT.MONTH BETWEEN :start_month AND :end_month 
+				AND RESSTS.RES_ID = EQEVENT.RES_ID
+				AND RESSTS.RES_MAKER = :maker
+				AND RESSTS.RES_MODEL = :model
+				AND EQEVENT.RES_ID = :res_id
+				AND EQEVENT.EVENT_TIME BETWEEN TO_DATE(:dt_start,'YYYY-MM-DD HH24:MI:SS') AND TO_DATE(:dt_end,'YYYY-MM-DD HH24:MI:SS')
+				GROUP BY EQEVENT.RES_ID, EQEVENT.PROC_MODE 
+				ORDER BY EQEVENT.RES_ID
+*/]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="10">:start_month</param>
+            <param direction="Input" dbtype="VarChar" size="10">:end_month</param>
+            <param direction="Input" dbtype="VarChar" size="22">:dt_start</param>
+            <param direction="Input" dbtype="VarChar" size="22">:dt_end</param>
+            <param direction="Input" dbtype="VarChar" size="40">:maker</param>
+            <param direction="Input" dbtype="VarChar" size="20">:model</param>
+            <param direction="Input" dbtype="VarChar" size="20">:res_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_EQUIPE_EVENT_06" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT RES_ID AS "EQUIP ID"
+,TO_CHAR(EVENT_TIME,'YYYY-MM-DD HH24:MI:SS') AS "EVENT TIME"
+,EVENT_ID AS "EVENT ID"
+,'' AS "UNIT ID" 
+,PROC_MODE AS "MODE"
+,PERIOD AS "TERM(Sec)"
+,OPER AS "OPER ID"
+,MAT_ID AS "PART ID"
+,RECIPE_ID AS "RECIPE ID"
+,LOT_ID AS "LOT ID"
+FROM TBP_EQUIP_EVENT
+WHERE 1=1
+AND RES_ID = :res_id
+AND MONTH BETWEEN :start_month AND :end_month 
+AND EVENT_TIME BETWEEN TO_DATE(:dt_start,'YYYY-MM-DD HH24:MI:SS') - 1 AND TO_DATE(:dt_end,'YYYY-MM-DD HH24:MI:SS') + 1
+AND LOT_ID = DECODE(:lot_id, '', LOT_ID, :lot_id)
+
+UNION
+
+SELECT RES_ID AS "EQUIP ID"
+,TO_CHAR(SET_TIME,'YYYY-MM-DD HH24:MI:SS') AS "EVENT TIME"
+,'ALARM' AS "EVENT ID"
+,'' AS "UNIT ID" 
+,'DOWN' AS "MODE"
+,PERIOD AS "TERM(Sec)"
+,OPER AS "OPER ID"
+,'' AS "PART ID"
+,RECIPE_ID AS "RECIPE ID"
+,LOT_ID AS "LOT ID"
+FROM TBP_EQUIP_ALARM
+WHERE
+AND MONTH BETWEEN :start_month AND :end_month 
+AND RES_ID = :res_id
+AND LOT_ID = DECODE(:lot_id, '', LOT_ID, :lot_id)
+AND SET_TIME BETWEEN TO_DATE(:dt_start,'YYYY-MM-DD HH24:MI:SS') - 1 AND TO_DATE(:dt_end,'YYYY-MM-DD HH24:MI:SS') + 1
+
+UNION
+
+SELECT RES_ID AS "EQUIP ID"
+,TO_CHAR(EVENT_TIME,'YYYY-MM-DD HH24:MI:SS') AS "EVENT TIME"
+,EVENT_ID AS "EVENT ID"
+,UNIT_ID AS "UNIT ID" 
+,PROC_MODE AS "MODE"
+,PERIOD AS "TERM(Sec)"
+,OPER AS "OPER ID"
+,MAT_ID AS "PART ID"
+,RECIPE_ID AS "RECIPE ID"
+,LOT_ID AS "LOT ID"
+FROM TBP_UNIT_EVENT
+WHERE MONTH BETWEEN :start_month AND :end_month 
+AND RES_ID = :res_id
+AND LOT_ID = DECODE(:lot_id, '', LOT_ID, :lot_id)
+AND EVENT_TIME BETWEEN TO_DATE(:dt_start,'YYYY-MM-DD HH24:MI:SS') - 1 AND TO_DATE(:dt_end,'YYYY-MM-DD HH24:MI:SS') + 1
+ORDER BY "EVENT TIME" DESC
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="10">:start_month</param>
+            <param direction="Input" dbtype="VarChar" size="10">:end_month</param>
+            <param direction="Input" dbtype="VarChar" size="22">:dt_start</param>
+            <param direction="Input" dbtype="VarChar" size="22">:dt_end</param>
+            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="20">:res_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_EQUIPE_EVENT_07" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT RES_ID AS "EQUIP ID"
+,TO_CHAR(EVENT_TIME,'YYYY-MM-DD HH24:MI:SS') AS "EVENT TIME"
+,EVENT_ID AS "EVENT ID"
+,'' AS "UNIT ID" 
+,PROC_MODE AS "MODE"
+,PERIOD AS "TERM(Sec)"
+,OPER AS "OPER ID"
+,MAT_ID AS "PART ID"
+,RECIPE_ID AS "RECIPE ID"
+,LOT_ID AS "LOT ID"
+,'' AS "WAFER ID"
+FROM TBP_EQUIP_EVENT
+WHERE MONTH BETWEEN :start_month AND :end_month 
+AND RES_ID = :res_id
+AND LOT_ID = DECODE(:lot_id, '', LOT_ID, :lot_id)
+AND EVENT_TIME BETWEEN TO_DATE(:dt_start,'YYYY-MM-DD HH24:MI:SS') - 1 AND TO_DATE(:dt_end,'YYYY-MM-DD HH24:MI:SS') + 1
+UNION
+SELECT RES_ID AS "EQUIP ID"
+,TO_CHAR(EVENT_TIME,'YYYY-MM-DD HH24:MI:SS') AS "EVENT TIME"
+,EVENT_ID AS "EVENT ID"
+,UNIT_ID AS "UNIT ID" 
+,PROC_MODE AS "MODE"
+,PERIOD AS "TERM(Sec)"
+,OPER AS "OPER ID"
+,MAT_ID AS "PART ID"
+,RECIPE_ID AS "RECIPE ID"
+,LOT_ID AS "LOT ID"
+,'' AS "WAFER ID"
+FROM TBP_UNIT_EVENT
+WHERE MONTH BETWEEN :start_month AND :end_month 
+AND RES_ID = :res_id
+AND LOT_ID = DECODE(:lot_id, '', LOT_ID, :lot_id)
+AND EVENT_TIME BETWEEN TO_DATE(:dt_start,'YYYY-MM-DD HH24:MI:SS') - 1 AND TO_DATE(:dt_end,'YYYY-MM-DD HH24:MI:SS') + 1
+ORDER BY "EVENT TIME" DESC
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="10">:start_month</param>
+            <param direction="Input" dbtype="VarChar" size="10">:end_month</param>
+            <param direction="Input" dbtype="VarChar" size="22">:dt_start</param>
+            <param direction="Input" dbtype="VarChar" size="22">:dt_end</param>
+            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="20">:res_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_EQUIPE_EVENT_08" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT 
+EQEVENT.RES_ID AS "EQUIP ID"
+, EQEVENT.PROC_MODE
+, SUM(EQEVENT.PERIOD) AS PERIOD
+FROM	
+TBP_EQUIP_EVENT EQEVENT,
+(
+  SELECT RES_ID 
+  FROM TBP_RESSTS 
+  WHERE 1=1 
+  AND FACTORY = 'HMKA1' 
+  AND RES_MODEL IN (??)  
+  AND RES_ID IN (?? )  
+  AND RES_MAKER = :maker 
+) RESSTS
+WHERE 1=1
+AND EQEVENT.MONTH BETWEEN :start_month AND :end_month 
+AND EQEVENT.EVENT_TIME BETWEEN TO_DATE(:dt_start,'YYYY-MM-DD HH24:MI:SS') AND TO_DATE(:dt_end,'YYYY-MM-DD HH24:MI:SS')
+AND RESSTS.RES_ID = EQEVENT.RES_ID
+GROUP BY EQEVENT.RES_ID, EQEVENT.PROC_MODE 
+ORDER BY EQEVENT.RES_ID
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="10">:start_month</param>
+            <param direction="Input" dbtype="VarChar" size="10">:end_month</param>
+            <param direction="Input" dbtype="VarChar" size="22">:dt_start</param>
+            <param direction="Input" dbtype="VarChar" size="22">:dt_end</param>
+            <param direction="Input" dbtype="VarChar" size="40">:maker</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_EQUIPE_EVENT_09" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT RES_ID AS "EQUIP ID"
+,TO_CHAR(EVENT_TIME,'YYYY-MM-DD HH24:MI:SS') AS "EVENT TIME"
+,EVENT_ID AS "EVENT ID"
+,'' AS "UNIT ID" 
+,PROC_MODE AS "MODE"
+,PERIOD AS "TERM(Sec)"
+,OPER AS "OPER ID"
+,MAT_ID AS "PART ID"
+,RECIPE_ID AS "RECIPE ID"
+,LOT_ID AS "LOT ID"
+,'' AS "WAFER ID"
+FROM TBP_EQUIP_EVENT
+WHERE MONTH BETWEEN :start_month AND :end_month 
+AND EVENT_TIME BETWEEN TO_DATE(:dt_start,'YYYY-MM-DD HH24:MI:SS') - 1 AND TO_DATE(:dt_end,'YYYY-MM-DD HH24:MI:SS') + 1
+AND OPER = :oper
+AND RES_ID = :res_id
+AND LOT_ID = :lot_id
+UNION
+SELECT RES_ID AS "EQUIP ID"
+,TO_CHAR(EVENT_TIME,'YYYY-MM-DD HH24:MI:SS') AS "EVENT TIME"
+,EVENT_ID AS "EVENT ID"
+,UNIT_ID AS "UNIT ID" 
+,PROC_MODE AS "MODE"
+,PERIOD AS "TERM(Sec)"
+,OPER AS "OPER ID"
+,MAT_ID AS "PART ID"
+,RECIPE_ID AS "RECIPE ID"
+,LOT_ID AS "LOT ID"
+,'' AS "WAFER ID"
+FROM TBP_UNIT_EVENT
+WHERE MONTH BETWEEN :start_month AND :end_month 
+AND EVENT_TIME BETWEEN TO_DATE(:dt_start,'YYYY-MM-DD HH24:MI:SS') - 1 AND TO_DATE(:dt_end,'YYYY-MM-DD HH24:MI:SS') + 1
+AND OPER = :oper
+AND RES_ID = :res_id
+AND LOT_ID = :lot_id
+ORDER BY "EVENT TIME" DESC
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="10">:start_month</param>
+            <param direction="Input" dbtype="VarChar" size="10">:end_month</param>
+            <param direction="Input" dbtype="VarChar" size="22">:dt_start</param>
+            <param direction="Input" dbtype="VarChar" size="22">:dt_end</param>
+            <param direction="Input" dbtype="VarChar" size="20">:oper</param>
+            <param direction="Input" dbtype="VarChar" size="20">:res_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_PROC_HISTORY_EQUIP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[WITH RT AS	(
+SELECT	DECODE(EVENT_ID, 'EAPBSS_PROCESS_START', ROWNUM, 'EAPBSS_PROCESS_END', ROWNUM - 1) AS "NUM",MONTH,RES_ID,
+		DECODE(EVENT_ID, 'EAPBSS_PROCESS_START', EVENT_TIME, 'EAPBSS_PROCESS_END', '') AS "EAPBSS_PROCESS_START",
+		DECODE(EVENT_ID, 'EAPBSS_PROCESS_START', '', 'EAPBSS_PROCESS_END', EVENT_TIME) AS "EAPBSS_PROCESS_END",
+        PROC_MODE,PERIOD,OPER,MAT_ID,RECIPE_ID,LOT_ID,WAFER_ID,FRAME_ID,CMF_FIELD01,CMF_FIELD02,CMF_FIELD03,CMF_FIELD04,CMF_FIELD05
+FROM	TBP_EQUIP_EVENT
+WHERE	1=1
+		AND MONTH BETWEEN TO_NUMBER(SUBSTR(:sTime, 1, 6)) AND TO_NUMBER(SUBSTR(:eTime, 1, 6))
+		AND RES_ID = :res_id
+        AND EVENT_TIME BETWEEN TO_DATE(:sTime, 'YYYYMMDDHH24MISS') AND TO_DATE(:eTime, 'YYYYMMDDHH24MISS')
+        AND EVENT_ID IN ('EAPBSS_PROCESS_START', 'EAPBSS_PROCESS_END')
+ORDER BY EVENT_TIME         
+)               
+SELECT A.NUM,A.MONTH,A.RES_ID,B.EAPBSS_PROCESS_START,B.EAPBSS_PROCESS_END,A.OPER,A.MAT_ID,A.RECIPE_ID,MAX(A.LOT_ID) AS LOT_ID              
+FROM RT A, (SELECT NUM, MAX(EAPBSS_PROCESS_START) AS EAPBSS_PROCESS_START, MAX(EAPBSS_PROCESS_END) AS EAPBSS_PROCESS_END, MAX(MAT_ID) AS MAT_ID, MAX(LOT_ID) AS LOT_ID FROM RT GROUP BY NUM) B
+WHERE 1=1
+AND A.NUM = B.NUM
+AND NVL(A.MAT_ID, ' ') = NVL(B.MAT_ID, ' ')
+GROUP BY A.NUM,A.MONTH,A.RES_ID,B.EAPBSS_PROCESS_START,B.EAPBSS_PROCESS_END,A.OPER,A.MAT_ID,A.RECIPE_ID
+ORDER BY A.NUM]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="20" value="20120411220000">:sTime</param>
+            <param direction="Input" dbtype="VarChar" size="20" value="20120418000000">:eTime</param>
+            <param direction="Input" dbtype="VarChar" size="20" value="BS032">:res_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_PROC_HISTORY_EQUIP_SS" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[WITH RT AS
+( SELECT * 
+  FROM TBP_EQUIP_EVENT
+  WHERE 1=1
+  AND RES_ID = :res_id
+  AND MONTH BETWEEN TO_NUMBER(SUBSTR(:sTime, 1, 6)) AND TO_NUMBER(SUBSTR(:eTime, 1, 6))
+  AND EVENT_TIME BETWEEN TO_DATE(:sTime, 'YYYYMMDDHH24MISS') AND TO_DATE(:eTime, 'YYYYMMDDHH24MISS')
+  AND EVENT_ID IN ('EAPSSS_PROCESS_START', 'EAPSSS_PROCESS_END')
+  --ORDER BY EVENT_TIME
+)
+
+SELECT DISTINCT A.MONTH,A.RES_ID,A.LOT_ID,
+		   TO_CHAR(B.PROCESS_START, 'YYYY-MM-DD HH24:MI:SS') AS "PROCESS_START",
+		   TO_CHAR(B.PROCESS_END, 'YYYY-MM-DD HH24:MI:SS') AS "PROCESS_END",
+		   A.OPER,A.MAT_ID,A.RECIPE_ID
+FROM	(SELECT MONTH,RES_ID,LOT_ID,MIN(EVENT_TIME) AS "PROCESS_START",MAX(EVENT_TIME) AS "PROCESS_END", MIN(EVENT_ID) AS "EVENT_ID" FROM RT GROUP BY MONTH,RES_ID,LOT_ID) B, RT A
+WHERE 1=1
+AND A.MONTH = B.MONTH
+AND A.RES_ID = B.RES_ID
+AND A.EVENT_ID = B.EVENT_ID
+AND NVL(A.LOT_ID, ' ') = NVL(B.LOT_ID, ' ')
+ORDER BY "PROCESS_START"]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="14" value="20120624220000">:sTime</param>
+            <param direction="Input" dbtype="VarChar" size="14" value="20120626215959">:eTime</param>
+            <param direction="Input" dbtype="VarChar" size="20" value="SST09">:res_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_PROC_HISTORY_LOT_SS" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[WITH RT AS
+( SELECT * 
+  FROM TBP_EQUIP_EVENT
+  WHERE 1=1
+  AND MONTH BETWEEN TO_NUMBER(SUBSTR(:sTime, 1, 6)) AND TO_NUMBER(SUBSTR(:eTime, 1, 6))
+  AND EVENT_TIME BETWEEN TO_DATE(:sTime, 'YYYYMMDDHH24MISS') AND TO_DATE(:eTime, 'YYYYMMDDHH24MISS')
+  AND EVENT_ID IN ('EAPSSS_PROCESS_START', 'EAPSSS_PROCESS_END')
+  AND LOT_ID LIKE :lot_id
+  --ORDER BY EVENT_TIME
+)
+
+SELECT DISTINCT A.MONTH,A.RES_ID,A.LOT_ID,
+		   TO_CHAR(B.PROCESS_START, 'YYYY-MM-DD HH24:MI:SS') AS "PROCESS_START",
+		   TO_CHAR(B.PROCESS_END, 'YYYY-MM-DD HH24:MI:SS') AS "PROCESS_END",
+		   A.OPER,A.MAT_ID,A.RECIPE_ID
+FROM	(SELECT MONTH,RES_ID,LOT_ID,MIN(EVENT_TIME) AS "PROCESS_START",MAX(EVENT_TIME) AS "PROCESS_END", MIN(EVENT_ID) AS "EVENT_ID" FROM RT GROUP BY MONTH,RES_ID,LOT_ID) B, RT A
+WHERE 1=1
+AND A.MONTH = B.MONTH
+AND A.RES_ID = B.RES_ID
+AND A.EVENT_ID = B.EVENT_ID
+AND NVL(A.LOT_ID, ' ') = NVL(B.LOT_ID, ' ')
+ORDER BY "PROCESS_START"]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="14" value="20120624220000">:sTime</param>
+            <param direction="Input" dbtype="VarChar" size="14" value="20120626215959">:eTime</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="SST09">:lot_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_EQUIPE_EVENT_10" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TBP_EQUIP_EVENT
+WHERE   1=1
+        AND MONTH IN (:month, TO_CHAR(SYSDATE, 'YYYYMM'))
+        AND RES_ID= :res_id
+        AND EVENT_TIME > TO_DATE(:event_time,'YYYYMMDDHH24MISS')
+        AND EVENT_ID = :event_id
+ORDER BY EVENT_TIME]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="6" value="201309">:month</param>
+            <param direction="Input" dbtype="VarChar" size="20" value="BS054">:res_id</param>
+            <param direction="Input" dbtype="VarChar" size="14" value="20130930211509">:event_time</param>
+            <param direction="Input" dbtype="VarChar" size="50" value="EAPBSS_WAFER_END">:event_id</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_EVENT_PERIOD02" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TBP_EQUIP_EVENT
+SET PERIOD = :period
+ ,CMF_FIELD02 = :abn_case
+ ,CMF_FIELD03 = :pickup_count
+ ,CMF_FIELD04 = :frame_time
+WHERE RES_ID = :res_id
+AND EVENT_TIME = TO_TIMESTAMP(:event_time,'YYYY-MM-DD HH24:MI:SS.FF')
+AND EVENT_ID = :last_event]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:res_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:last_event</param>
+            <param direction="Input" dbtype="VarChar" size="40">:event_time</param>
+            <param direction="Input" dbtype="Number" size="10">:period</param>
+            <param direction="Input" dbtype="VarChar" size="40">:abn_case</param>
+            <param direction="Input" dbtype="VarChar" size="40">:pickup_count</param>
+            <param direction="Input" dbtype="VarChar" size="40">:frame_time</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_FRAME_UNLOAD_PERIOD_TIME" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT  NVL(SUM(FRAME_TIME),0) AS FRAME_TIME
+FROM    (
+SELECT  /*+ INDEX_DESC(EVT UK_TBP_EQUIP_EVENT)*/ 
+ROUND(
+        EXTRACT(HOUR FROM (SYSTIMESTAMP - EVENT_TIME)) * 60 * 60
+        +
+        EXTRACT(MINUTE FROM (SYSTIMESTAMP - EVENT_TIME))* 60
+        + 
+        EXTRACT(SECOND FROM (SYSTIMESTAMP - EVENT_TIME)) 
+        ,2)  AS FRAME_TIME
+FROM    TBP_EQUIP_EVENT EVT
+WHERE   1=1
+        AND RES_ID = :res_id
+        AND EVENT_ID = :event_id
+        AND MONTH  IN (TO_CHAR(ADD_MONTHS(SYSDATE,-1),'YYYYMM'),TO_CHAR(SYSDATE,'YYYYMM'))
+        AND ROWNUM = 1
+        )]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="20" value="BD013">:res_id</param>
+            <param direction="Input" dbtype="VarChar" size="60" value="EAPDA_FRAME_UNLOAD">:event_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_FRAME_IDLE_COUNT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT  COUNT(*)
+FROM    TBP_EQUIP_EVENT
+WHERE   1=1
+        AND RES_ID = :res_id
+        AND (PROC_MODE IN ('IDLE','ALARM') OR EVENT_ID = 'EAPDA_WAFER_END') /* IDLE, ALARM 또는 D/A 공정의 INDEX 제외 */
+        AND MONTH  IN (TO_CHAR(ADD_MONTHS(SYSDATE,-1),'YYYYMM'),TO_CHAR(SYSDATE,'YYYYMM'))
+        AND PERIOD >= 1 /* W/B 공정에서 NSOP Recovery 기능 사용시 1초 이내에 idle, run 이 반복하여 발생함, 0초인 IDLE 은 제외하자 */ 
+        AND EVENT_TIME > (
+            SELECT  /*+ INDEX_DESC(EVT UK_TBP_EQUIP_EVENT)*/ EVENT_TIME
+            FROM    TBP_EQUIP_EVENT EVT
+            WHERE   1=1
+                    AND RES_ID = :res_id
+                    AND EVENT_ID = :event_id
+                    AND MONTH  IN (TO_CHAR(ADD_MONTHS(SYSDATE,-1),'YYYYMM'),TO_CHAR(SYSDATE,'YYYYMM'))
+                    AND ROWNUM = 1
+        )]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="20" value="BW122">:res_id</param>
+            <param direction="Input" dbtype="VarChar" size="50" value="EAPDA_FRAME_BONDING_END">:event_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_EQ_SUM_UPH_ST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[WITH VT AS
+(
+    SELECT  FN_GET_WORK_DATE(TO_CHAR(CAST(A.EVENT_TIME AS DATE),'YYYYMMDDHH24MISS'),'M') AS WORK_MONTH
+            , FN_GET_WORK_DATE(TO_CHAR(CAST(A.EVENT_TIME AS DATE),'YYYYMMDDHH24MISS'),'W') AS WORK_WEEK
+            , FN_GET_WORK_DATE(TO_CHAR(CAST(A.EVENT_TIME AS DATE),'YYYYMMDDHH24MISS'),'D') AS WORK_DAY
+            , A.RES_ID
+            , TO_NUMBER(A.CMF_FIELD04) AS PERIOD
+            , TO_NUMBER(A.CMF_FIELD03) AS PICKUP_CNT
+    FROM
+    (
+            SELECT  * 
+            FROM    TBP_EQUIP_EVENT 
+            WHERE   1=1
+                    AND MONTH IN (SUBSTR(:start_tran_time,0,6), SUBSTR(:end_tran_time,0,6))
+                    AND EVENT_TIME BETWEEN TO_DATE(:start_tran_time,'YYYYMMDDHH24MISS') AND TO_DATE(:end_tran_time,'YYYYMMDDHH24MISS')
+                    AND EVENT_ID = :event_id
+                    AND RES_ID = :res_id
+                    AND TO_NUMBER(CMF_FIELD04) != 0
+                    AND CMF_FIELD05 = 'Y'
+    ) A,
+    (
+            SELECT  MEDIAN(TO_NUMBER(CMF_FIELD04)) AS PERIOD
+            FROM    TBP_EQUIP_EVENT 
+            WHERE   1=1
+                    AND MONTH IN (SUBSTR(:start_tran_time,0,6), SUBSTR(:end_tran_time,0,6))
+                    AND EVENT_TIME BETWEEN TO_DATE(:start_tran_time,'YYYYMMDDHH24MISS') AND TO_DATE(:end_tran_time,'YYYYMMDDHH24MISS')
+                    AND EVENT_ID = :event_id
+                    AND RES_ID = :res_id
+                    AND TO_NUMBER(CMF_FIELD04) != 0
+                    AND CMF_FIELD05 = 'Y'
+    )C,
+    (
+            SELECT  MEDIAN(TO_NUMBER(CMF_FIELD03)) AS PICKUP_CNT
+            FROM    TBP_EQUIP_EVENT 
+            WHERE   1=1
+                    AND MONTH IN (SUBSTR(:start_tran_time,0,6), SUBSTR(:end_tran_time,0,6))
+                    AND EVENT_TIME BETWEEN TO_DATE(:start_tran_time,'YYYYMMDDHH24MISS') AND TO_DATE(:end_tran_time,'YYYYMMDDHH24MISS')
+                    AND EVENT_ID = :event_id
+                    AND RES_ID = :res_id
+                    AND TO_NUMBER(CMF_FIELD04) != 0
+                    AND CMF_FIELD05 = 'Y'
+    )D
+    WHERE   1=1
+            AND TO_NUMBER(A.CMF_FIELD03) > D.PICKUP_CNT*0.8
+            AND TO_NUMBER(A.CMF_FIELD03) < D.PICKUP_CNT*1.2
+            AND TO_NUMBER(A.CMF_FIELD04)> C.PERIOD*0.8
+            AND TO_NUMBER(A.CMF_FIELD04) < C.PERIOD*1.2
+)
+SELECT  WORK_MONTH,WORK_WEEK,WORK_DAY,RES_ID
+        ,MEDIAN(PICKUP_CNT) AS REP_PICKUP_CNT
+        ,MEDIAN(PERIOD) AS REP_PERIOD 
+        , ROUND(MEDIAN(PERIOD)/MEDIAN(PICKUP_CNT),2) AS ST
+        , ROUND(3600/(MEDIAN(PERIOD)/MEDIAN(PICKUP_CNT)),2) AS UPH
+FROM    VT
+        WHERE   1=1
+GROUP BY WORK_MONTH,WORK_WEEK,WORK_DAY,RES_ID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="14">:start_tran_time</param>
+            <param direction="Input" dbtype="VarChar" size="14">:end_tran_time</param>
+            <param direction="Input" dbtype="VarChar" size="20">:res_id</param>
+            <param direction="Input" dbtype="VarChar" size="50">:event_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_EVENT_LIST_PRIOD" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT MONTH,RES_ID,EVENT_TIME,EVENT_ID,PROC_MODE,PERIOD,OPER,MAT_ID,RECIPE_ID,LOT_ID,WAFER_ID,FRAME_ID,CMF_FIELD03 AS PROC_QTY, CMF_FIELD04 AS CYCLE_TIME, CMF_FIELD05 AS RUN_ONLY
+FROM TBP_EQUIP_EVENT
+WHERE   1=1
+        AND MONTH in (SUBSTR(:start_tran_time,0,6), SUBSTR(:end_tran_time,0,6))
+        AND RES_ID= :res_id
+        AND EVENT_TIME BETWEEN TO_DATE(:start_tran_time,'YYYYMMDDHH24MISS') AND TO_DATE(:end_tran_time,'YYYYMMDDHH24MISS')
+        AND EVENT_ID = :event_id
+ORDER BY EVENT_TIME]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="25" value="BD101">:res_id</param>
+            <param direction="Input" dbtype="VarChar" size="14" value="20130722220000">:start_tran_time</param>
+            <param direction="Input" dbtype="VarChar" size="14" value="21030723215959">:end_tran_time</param>
+            <param direction="Input" dbtype="VarChar" size="50" value="EAPDA_FRAME_UNLOAD">:event_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_EQ_SUM_UPEH_ST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[WITH VT AS
+(
+    SELECT  A.*
+    FROM    
+    (
+        SELECT  *
+        FROM    TBP_EQUIP_EVENT 
+        WHERE   1=1
+                AND MONTH IN (SUBSTR(:start_tran_time,0,6), SUBSTR(:end_tran_time,0,6))
+                AND EVENT_TIME BETWEEN TO_DATE(:start_tran_time,'YYYYMMDDHH24MISS') AND TO_DATE(:end_tran_time,'YYYYMMDDHH24MISS')
+                AND EVENT_ID = :event_id
+                AND RES_ID = :res_id
+                AND TO_NUMBER(CMF_FIELD04) != 0
+                AND LOT_ID IS NOT NULL
+    ) A,
+    (
+        SELECT  MEDIAN(TO_NUMBER(CMF_FIELD03)) AS M_PICKUP_COUNT
+                , MEDIAN(TO_NUMBER(CMF_FIELD04)) AS M_CYCLE_TIME
+        FROM    TBP_EQUIP_EVENT
+        WHERE   1=1
+                AND MONTH IN (SUBSTR(:start_tran_time,0,6), SUBSTR(:end_tran_time,0,6))
+                AND EVENT_TIME BETWEEN TO_DATE(:start_tran_time,'YYYYMMDDHH24MISS') AND TO_DATE(:end_tran_time,'YYYYMMDDHH24MISS')
+                AND EVENT_ID = :event_id
+                AND RES_ID = :res_id
+                AND TO_NUMBER(CMF_FIELD04) != 0
+                AND LOT_ID IS NOT NULL
+    ) B
+    WHERE   1=1
+            AND TO_NUMBER(CMF_FIELD03) < B.M_PICKUP_COUNT * 1.2
+            AND TO_NUMBER(CMF_FIELD03) > B.M_PICKUP_COUNT * 0.8
+            AND TO_NUMBER(CMF_FIELD04) < B.M_CYCLE_TIME * 1.2
+            AND TO_NUMBER(CMF_FIELD04) > B.M_CYCLE_TIME * 0.8
+)
+SELECT  NVL(ROUND(MEDIAN(TO_NUMBER(CMF_FIELD04))/MEDIAN(TO_NUMBER(CMF_FIELD03)),2),0) AS UPEH_ST
+        , NVL(ROUND(3600/(MEDIAN(TO_NUMBER(CMF_FIELD04))/MEDIAN(TO_NUMBER(CMF_FIELD03))),2),0) AS UPEH
+FROM    VT 
+WHERE   1=1]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="14">:start_tran_time</param>
+            <param direction="Input" dbtype="VarChar" size="14">:end_tran_time</param>
+            <param direction="Input" dbtype="VarChar" size="40">:event_id</param>
+            <param direction="Input" dbtype="VarChar" size="25">:res_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_EQ_SUM_TIME_QTY" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT  *
+FROM    (
+        SELECT  NVL(SUM(PERIOD),0) AS RUN_TIME
+        FROM    TBP_EQUIP_EVENT
+        WHERE   1=1
+                AND MONTH IN (SUBSTR(:start_tran_time,0,6), SUBSTR(:end_tran_time,0,6))
+                AND EVENT_TIME BETWEEN TO_DATE(:start_tran_time,'YYYYMMDDHH24MISS') AND TO_DATE(:end_tran_time,'YYYYMMDDHH24MISS')
+                AND RES_ID = :res_id
+                AND PROC_MODE = 'RUN'
+        ) A
+        ,
+        (
+        SELECT  NVL(SUM(PERIOD),0) AS INDEX_TIME
+        FROM    TBP_EQUIP_EVENT
+        WHERE   1=1
+                AND MONTH IN (SUBSTR(:start_tran_time,0,6), SUBSTR(:end_tran_time,0,6))
+                AND EVENT_TIME BETWEEN TO_DATE(:start_tran_time,'YYYYMMDDHH24MISS') AND TO_DATE(:end_tran_time,'YYYYMMDDHH24MISS')
+                AND RES_ID = :res_id
+                AND PROC_MODE = 'INDEX'
+        ) B
+        ,
+        (
+        SELECT  NVL(SUM(PERIOD),0) AS ALARM_TIME
+        FROM    TBP_EQUIP_EVENT
+        WHERE   1=1
+                AND MONTH IN (SUBSTR(:start_tran_time,0,6), SUBSTR(:end_tran_time,0,6))
+                AND EVENT_TIME BETWEEN TO_DATE(:start_tran_time,'YYYYMMDDHH24MISS') AND TO_DATE(:end_tran_time,'YYYYMMDDHH24MISS')
+                AND RES_ID = :res_id
+                AND PROC_MODE = 'ALARM'
+        ) C
+        ,
+        
+        (
+        SELECT  NVL(SUM(PERIOD),0) AS IDLE_TIME
+        FROM    TBP_EQUIP_EVENT
+        WHERE   1=1
+                AND MONTH IN (SUBSTR(:start_tran_time,0,6), SUBSTR(:end_tran_time,0,6))
+                AND EVENT_TIME BETWEEN TO_DATE(:start_tran_time,'YYYYMMDDHH24MISS') AND TO_DATE(:end_tran_time,'YYYYMMDDHH24MISS')
+                AND RES_ID = :res_id
+                AND PROC_MODE = 'IDLE'
+        ) D
+        ,
+        (
+        SELECT  NVL(SUM(PERIOD),0) AS DISCONNECT_TIME
+        FROM    TBP_EQUIP_EVENT
+        WHERE   1=1
+                AND MONTH IN (SUBSTR(:start_tran_time,0,6), SUBSTR(:end_tran_time,0,6))
+                AND EVENT_TIME BETWEEN TO_DATE(:start_tran_time,'YYYYMMDDHH24MISS') AND TO_DATE(:end_tran_time,'YYYYMMDDHH24MISS')
+                AND RES_ID = :res_id
+                AND PROC_MODE = 'DISCONNECT'
+        ) E
+        ,
+        (
+        SELECT  NVL(SUM(TO_NUMBER(CMF_FIELD03)),0) AS PROC_QTY
+        FROM    TBP_EQUIP_EVENT
+        WHERE   1=1
+                AND MONTH IN (SUBSTR(:start_tran_time,0,6), SUBSTR(:end_tran_time,0,6))
+                AND EVENT_TIME BETWEEN TO_DATE(:start_tran_time,'YYYYMMDDHH24MISS') AND TO_DATE(:end_tran_time,'YYYYMMDDHH24MISS')
+                AND RES_ID = :res_id
+                AND EVENT_ID = :event_id
+        ) F]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="14">:start_tran_time</param>
+            <param direction="Input" dbtype="VarChar" size="14">:end_tran_time</param>
+            <param direction="Input" dbtype="VarChar" size="20">:res_id</param>
+            <param direction="Input" dbtype="VarChar" size="50">:event_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_EQ_SUM_FA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[WITH VT AS
+(
+    SELECT  A.RECIPE_ID
+                , A.EVENT_TIME
+            , A.RES_ID
+            , TO_NUMBER(A.CMF_FIELD04) AS PERIOD
+            , TO_NUMBER(A.CMF_FIELD03) AS PICKUP_CNT
+            , CMF_FIELD05 AS RUN_ONLY
+            , D.REP_PERIOD
+            , D.REP_PICKUP_COUNT
+            , E.M_PICKUP_COUNT
+            , E.M_CYCLE_TIME
+            , T.RUN_TIME
+            , T.INDEX_TIME
+            , T.ALARM_TIME
+            , T.IDLE_TIME
+            , T.DISCONNECT_TIME
+            , T_PROC.PROC_QTY
+    FROM
+    (
+            SELECT  * 
+            FROM    TBP_EQUIP_EVENT 
+            WHERE   1=1
+                    AND MONTH IN (SUBSTR(:start_tran_time,0,6), SUBSTR(:end_tran_time,0,6))
+                    AND EVENT_TIME BETWEEN TO_DATE(:start_tran_time,'YYYYMMDDHH24MISS') AND TO_DATE(:end_tran_time,'YYYYMMDDHH24MISS')
+                    AND EVENT_ID = :event_id
+                    AND RES_ID = :res_id
+                    AND TO_NUMBER(CMF_FIELD04) != 0
+                    AND LOT_ID IS NOT NULL
+    ) A,
+    (
+            SELECT  MEDIAN(TO_NUMBER(CMF_FIELD04)) AS REP_PERIOD
+                    ,MEDIAN(TO_NUMBER(CMF_FIELD03)) AS REP_PICKUP_COUNT
+            FROM    TBP_EQUIP_EVENT 
+            WHERE   1=1
+                    AND MONTH IN (SUBSTR(:start_tran_time,0,6), SUBSTR(:end_tran_time,0,6))
+                    AND EVENT_TIME BETWEEN TO_DATE(:start_tran_time,'YYYYMMDDHH24MISS') AND TO_DATE(:end_tran_time,'YYYYMMDDHH24MISS')
+                    AND EVENT_ID = :event_id
+                    AND RES_ID = :res_id
+                    AND TO_NUMBER(CMF_FIELD04) != 0
+                    AND LOT_ID IS NOT NULL
+                    AND CMF_FIELD05 = 'Y'
+
+    )D,
+    (
+            SELECT  MEDIAN(TO_NUMBER(CMF_FIELD03)) AS M_PICKUP_COUNT
+                    , MEDIAN(TO_NUMBER(CMF_FIELD04)) AS M_CYCLE_TIME
+            FROM    TBP_EQUIP_EVENT
+            WHERE   1=1
+                    AND MONTH IN (SUBSTR(:start_tran_time,0,6), SUBSTR(:end_tran_time,0,6))
+                    AND EVENT_TIME BETWEEN TO_DATE(:start_tran_time,'YYYYMMDDHH24MISS') AND TO_DATE(:end_tran_time,'YYYYMMDDHH24MISS')
+                    AND EVENT_ID = :event_id
+                    AND RES_ID = :res_id
+                    AND TO_NUMBER(CMF_FIELD04) != 0
+                    AND LOT_ID IS NOT NULL
+    ) E,
+    (
+        SELECT  ROUND(SUM(RUN_TIME)) AS RUN_TIME, ROUND(SUM(INDEX_TIME)) AS INDEX_TIME, ROUND(SUM(IDLE_TIME)) AS IDLE_TIME, ROUND(SUM(ALARM_TIME)) AS ALARM_TIME, ROUND(SUM(DISCONNECT_TIME)) AS DISCONNECT_TIME
+        FROM    (
+            SELECT  DECODE(PROC_MODE,'RUN',SUM(MATH_PERIOD),0) AS RUN_TIME
+                    ,DECODE(PROC_MODE,'INDEX',SUM(MATH_PERIOD),0) AS INDEX_TIME
+                    ,DECODE(PROC_MODE,'IDLE',SUM(MATH_PERIOD),0) AS IDLE_TIME
+                    ,DECODE(PROC_MODE,'ALARM',SUM(MATH_PERIOD),0) AS ALARM_TIME
+                    ,DECODE(PROC_MODE,'DISCONNECT',SUM(MATH_PERIOD),0) AS DISCONNECT_TIME
+            FROM    (
+                    SELECT  EVENT_TIME,PROC_MODE,B.MAX_EVENT, B.MIN_EVENT,PERIOD
+                            ,DECODE(EVENT_TIME, B.MAX_EVENT , ((TO_DATE(:end_tran_time,'YYYYMMDDHH24MISS') - B.MAX_EVENT) * 24*60*60)
+                                    , B.MIN_EVENT, ((B.MIN_EVENT - TO_DATE(:start_tran_time,'YYYYMMDDHH24MISS')) * 24*60*60) 
+                                    , PERIOD) AS MATH_PERIOD
+                    FROM    TBP_EQUIP_EVENT A,
+                            (
+                                SELECT MAX(CAST(EVENT_TIME AS DATE)) MAX_EVENT, MIN(CAST(EVENT_TIME AS DATE)) MIN_EVENT FROM TBP_EQUIP_EVENT WHERE 
+                                MONTH IN (SUBSTR(:start_tran_time,0,6), SUBSTR(:end_tran_time,0,6))
+                                AND EVENT_TIME BETWEEN TO_DATE(:start_tran_time,'YYYYMMDDHH24MISS') AND TO_DATE(:end_tran_time,'YYYYMMDDHH24MISS')
+                                AND RES_ID = :res_id
+                            ) B
+                    WHERE   1=1
+                            AND MONTH IN (SUBSTR(:start_tran_time,0,6), SUBSTR(:end_tran_time,0,6))
+                            AND EVENT_TIME BETWEEN TO_DATE(:start_tran_time,'YYYYMMDDHH24MISS') AND TO_DATE(:end_tran_time,'YYYYMMDDHH24MISS')
+                            AND RES_ID = :res_id
+                    GROUP BY EVENT_TIME,PROC_MODE, B.MAX_EVENT, B.MIN_EVENT,PERIOD
+                    ORDER BY EVENT_TIME DESC
+                )
+            GROUP BY PROC_MODE
+            )
+    ) T,
+    (
+            SELECT  NVL(SUM(TO_NUMBER(CMF_FIELD03)),0) AS PROC_QTY
+            FROM    TBP_EQUIP_EVENT
+            WHERE   1=1
+                    AND MONTH IN (SUBSTR(:start_tran_time,0,6), SUBSTR(:end_tran_time,0,6))
+                    AND EVENT_TIME BETWEEN TO_DATE(:start_tran_time,'YYYYMMDDHH24MISS') AND TO_DATE(:end_tran_time,'YYYYMMDDHH24MISS')
+                    AND RES_ID = :res_id
+                    AND EVENT_ID = :event_id
+    ) T_PROC
+)
+SELECT  MAX(A.RECIPE_ID) AS RECIPE_ID,A.WORK_MONTH,A.WORK_WEEK,A.WORK_DAY, MEDIAN(A.REP_PICKUP_COUNT) AS REP_PICKUP_COUNT
+        , MEDIAN(A.REP_PERIOD) AS REP_PERIOD
+--        , MEDIAN(A.UPEH_ST) AS UPEH_ST
+--        ,MEDIAN(A.UPEH) AS UPEH
+        , FN_GET_MATH_ST(:res_oper -- RES_OPER
+                , MEDIAN(A.UPEH_ST)
+                , :comp_qty -- COMP QTY
+                , :oper)  -- OPER
+              AS UPEH_ST
+        , FN_GET_MATH_UPH_V02(:res_oper -- RES_OPER
+                , :res_model -- RES_MODEL
+                , MEDIAN(A.UPEH) -- UPH
+                , :net_die -- NET DIE
+                , :comp_qty -- COMP_QTY
+                , :oper
+                ,'N') AS UPEH
+        , FN_GET_MATH_UPH_V02(:res_oper -- RES_OPER
+                , :res_model -- RES_MODEL
+                , MEDIAN(A.UPEH) -- UPEH
+                , :net_die -- NET DIE
+                , :comp_qty -- COMP_QTY
+                , :oper
+                ,'Y')  -- OPER
+                AS UPEH_WAFER_CHANGE/**/
+        , FN_GET_MATH_UPH_V02(:res_oper -- RES_OPER
+                , :res_model -- RES_MODEL
+                , MEDIAN(B.UPH) -- UPH
+                , :net_die -- NET DIE
+                , :comp_qty -- COMP_QTY
+                , :oper
+                ,'N')  -- OPER
+                AS UPH/**/
+        , FN_GET_MATH_UPH_V02(:res_oper -- RES_OPER
+                , :res_model -- RES_MODEL
+                , MEDIAN(B.UPH) -- UPH
+                , :net_die -- NET DIE
+                , :comp_qty -- COMP_QTY
+                , :oper
+                ,'Y')  -- OPER
+                AS UPH_WAFER_CHANGE/**/
+        , FN_GET_MATH_ST(:res_oper -- RES_OPER
+                , MEDIAN(B.UPH_ST)
+                , :comp_qty -- COMP QTY
+                , :oper)  -- OPER
+                AS UPH_ST
+        , SUM(RUN_TIME) AS RUN_TIME, SUM(INDEX_TIME) AS INDEX_TIME
+        , SUM(ALARM_TIME) AS ALARM_TIME, SUM(IDLE_TIME) AS IDLE_TIME, SUM(DISCONNECT_TIME) AS DISCONNECT_TIME, SUM(PROC_QTY) AS PICKUP_QTY
+        , B.FRAME_COUNT
+        , FN_GET_MATH_PROC_QTY(
+            :res_oper -- RES_OPER
+            , :res_model -- RES_MODEL
+            , SUM(PROC_QTY) -- PROCESS QTY
+            , :comp_qty -- COMP_QTY
+            , :oper -- OPER
+        ) AS PROC_QTY
+        , COUNT(A.RECIPE_ID) AS RECIPE_COUNT
+FROM    (
+        SELECT  RECIPE_ID,
+                           FN_GET_WORK_DATE(TO_CHAR(CAST(EVENT_TIME AS DATE),'YYYYMMDDHH24MISS'),'M') AS WORK_MONTH
+                , FN_GET_WORK_DATE(TO_CHAR(CAST(EVENT_TIME AS DATE),'YYYYMMDDHH24MISS'),'W') AS WORK_WEEK
+                , FN_GET_WORK_DATE(TO_CHAR(CAST(EVENT_TIME AS DATE),'YYYYMMDDHH24MISS'),'D') AS WORK_DAY
+                , REP_PICKUP_COUNT, REP_PERIOD
+                , VT.RUN_TIME, VT.INDEX_TIME, VT.ALARM_TIME, VT.IDLE_TIME, VT.DISCONNECT_TIME, VT.PROC_QTY
+                , NVL(ROUND(MEDIAN(PERIOD)/MEDIAN(PICKUP_CNT),2),0) AS UPEH_ST
+                , NVL(ROUND(3600/(MEDIAN(PERIOD)/MEDIAN(PICKUP_CNT)),2),0) AS UPEH
+                , COUNT(*) AS FRAME_COUNT
+        FROM VT
+        WHERE   1=1
+                AND PICKUP_CNT < M_PICKUP_COUNT * 1.2
+                AND PICKUP_CNT > M_PICKUP_COUNT * 0.8
+                AND PERIOD < M_CYCLE_TIME * 1.2
+                AND PERIOD > M_CYCLE_TIME * 0.8
+        GROUP BY RECIPE_ID
+                      , FN_GET_WORK_DATE(TO_CHAR(CAST(EVENT_TIME AS DATE),'YYYYMMDDHH24MISS'),'M')
+                , FN_GET_WORK_DATE(TO_CHAR(CAST(EVENT_TIME AS DATE),'YYYYMMDDHH24MISS'),'W')
+                , FN_GET_WORK_DATE(TO_CHAR(CAST(EVENT_TIME AS DATE),'YYYYMMDDHH24MISS'),'D')
+                , REP_PICKUP_COUNT,REP_PERIOD, VT.RUN_TIME, VT.INDEX_TIME, VT.ALARM_TIME, VT.IDLE_TIME, VT.DISCONNECT_TIME, VT.PROC_QTY
+        ) A,
+        (
+        SELECT  FN_GET_WORK_DATE(TO_CHAR(CAST(EVENT_TIME AS DATE),'YYYYMMDDHH24MISS'),'M') AS WORK_MONTH
+                , FN_GET_WORK_DATE(TO_CHAR(CAST(EVENT_TIME AS DATE),'YYYYMMDDHH24MISS'),'W') AS WORK_WEEK
+                , FN_GET_WORK_DATE(TO_CHAR(CAST(EVENT_TIME AS DATE),'YYYYMMDDHH24MISS'),'D') AS WORK_DAY
+                , NVL(ROUND(MEDIAN(PERIOD)/MEDIAN(PICKUP_CNT),2),0) AS UPH_ST
+                , NVL(ROUND(3600/(MEDIAN(PERIOD)/MEDIAN(PICKUP_CNT)),2),0) AS UPH
+                , COUNT(*) AS FRAME_COUNT
+        FROM VT
+        WHERE   1=1
+                AND RUN_ONLY = 'Y'
+                AND PICKUP_CNT < REP_PICKUP_COUNT * 1.2
+                AND PICKUP_CNT > REP_PICKUP_COUNT * 0.8
+                AND PERIOD < REP_PERIOD * 1.2
+                AND PERIOD > REP_PERIOD * 0.8
+        GROUP BY FN_GET_WORK_DATE(TO_CHAR(CAST(EVENT_TIME AS DATE),'YYYYMMDDHH24MISS'),'M')
+                , FN_GET_WORK_DATE(TO_CHAR(CAST(EVENT_TIME AS DATE),'YYYYMMDDHH24MISS'),'W')
+                , FN_GET_WORK_DATE(TO_CHAR(CAST(EVENT_TIME AS DATE),'YYYYMMDDHH24MISS'),'D')
+        ) B
+ WHERE  1=1
+        AND A.WORK_DAY=B.WORK_DAY
+GROUP BY A.WORK_MONTH,A.WORK_WEEK,A.WORK_DAY,B.FRAME_COUNT]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="14" value="20130930220000">:start_tran_time</param>
+            <param direction="Input" dbtype="VarChar" size="14" value="20131001215959">:end_tran_time</param>
+            <param direction="Input" dbtype="VarChar" size="25" value="BD016">:res_id</param>
+            <param direction="Input" dbtype="VarChar" size="50" value="NULL">:event_id</param>
+            <param direction="Input" dbtype="VarChar" size="50" value="DIE ATTACH">:res_oper</param>
+            <param direction="Input" dbtype="VarChar" size="50" value="SPA-300">:res_model</param>
+            <param direction="Input" dbtype="VarChar" size="50" value="981">:net_die</param>
+            <param direction="Input" dbtype="VarChar" size="10" value="0">:comp_qty</param>
+            <param direction="Input" dbtype="VarChar" size="50" value="A0402">:oper</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_EQ_SUM_UPH_MODEL" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[WITH VT AS 
+(
+        SELECT  MONTH,RES_ID,EVENT_TIME,EVENT_ID,PROC_MODE,NVL(RECIPE_ID,' ') AS RECIPE_ID,LOT_ID,WAFER_ID,FRAME_ID,CMF_FIELD01,CMF_FIELD02
+        , TO_NUMBER(A.CMF_FIELD03) AS PICKUP_CNT
+        ,TO_NUMBER(A.CMF_FIELD04) AS PERIOD
+        ,CMF_FIELD05,RN,REP_PERIOD,REP_PICKUP_COUNT
+        ,B.MES_UPH
+        FROM    (
+                SELECT  EVT.*,ROWNUM AS RN
+                FROM    TBP_EQUIP_EVENT EVT,
+                        MRASRESDEF@FATOMES RES
+                WHERE   1=1
+                        AND RES.RES_ID = EVT.RES_ID
+                        AND RES.FACTORY = 'HMKA1'
+                        AND RES.RES_GRP_6 = :res_model
+                        AND EVT.OPER = :oper
+                        AND EVT.MAT_ID = :mat_id
+                        AND EVT.MONTH IN (SUBSTR(:start_tran_time,0,6),SUBSTR(:end_tran_time,0,6))
+                        AND EVT.EVENT_TIME BETWEEN TO_DATE(:start_tran_time,'YYYYMMDDHH24MISS') AND TO_DATE(:end_tran_time,'YYYYMMDDHH24MISS')
+                        AND EVT.EVENT_ID = :event_id
+                        AND EVT.CMF_FIELD05 = 'Y'
+                        AND TO_NUMBER(CMF_FIELD04) != 0
+                        AND TO_NUMBER(CMF_FIELD03) != 0
+                        AND EVT.LOT_ID IS NOT NULL
+                ) A,
+                (
+                SELECT  MEDIAN(TO_NUMBER(CMF_FIELD04)) AS REP_PERIOD
+                        ,MEDIAN(TO_NUMBER(CMF_FIELD03)) AS REP_PICKUP_COUNT
+                FROM    TBP_EQUIP_EVENT EVT,
+                        MRASRESDEF@FATOMES RES
+                WHERE   1=1
+                        AND RES.RES_ID = EVT.RES_ID
+                        AND RES.FACTORY = 'HMKA1'
+                        AND RES.RES_GRP_6 = :res_model
+                        AND EVT.OPER = :oper
+                        AND EVT.MAT_ID = :mat_id
+                        AND EVT.MONTH IN (SUBSTR(:start_tran_time,0,6),SUBSTR(:end_tran_time,0,6))
+                        AND EVT.EVENT_TIME BETWEEN TO_DATE(:start_tran_time,'YYYYMMDDHH24MISS') AND TO_DATE(:end_tran_time,'YYYYMMDDHH24MISS')
+                        AND EVT.EVENT_ID = :event_id
+                        AND EVT.CMF_FIELD05 = 'Y'
+                        AND TO_NUMBER(CMF_FIELD04) != 0
+                        AND TO_NUMBER(CMF_FIELD03) != 0
+                        AND EVT.LOT_ID IS NOT NULL
+                ) M,
+                (
+                SELECT  UPEH AS MES_UPH
+                FROM    CRASUPHDEF@FATOMES
+                WHERE   1=1
+                        AND FACTORY = 'HMKA1'
+                        AND RES_MODEL = :res_model
+                        AND OPER = :oper
+                        AND MAT_ID = :mat_id
+                ) B
+)
+SELECT  FN_GET_WORK_DATE(:end_tran_time,'M') AS WORK_MONTH
+        , FN_GET_WORK_DATE(:end_tran_time,'W') AS WORK_WEEK
+        , FN_GET_WORK_DATE(:end_tran_time,'D') AS WORK_DAY
+        , :res_oper AS RES_OPER
+        , :res_model AS RES_MODEL
+        , :mat_id AS MAT_ID
+        , :oper AS OPER
+        , RECIPE_ID
+        , MAT.MAT_CMF_13 AS NET_DIE_COUNT /**/
+        , NVL(GCM.DATA_1,0) AS COMP_QTY /**/
+        , SUBSTR(:start_tran_time,0,8) AS SEARCH_START_DAY
+        , SUBSTR(:end_tran_time,0,8) AS SEARCH_END_DAY
+        , MAX(RN) AS FRAME_COUNT
+        ,MEDIAN(PICKUP_CNT) AS REP_PICKUP_COUNT ,MEDIAN(PERIOD) AS REP_CYCLE_TIME
+        , MES_UPH
+--        , NVL(ROUND(3600/(MEDIAN(PERIOD)/MEDIAN(PICKUP_CNT)),2),0) AS UPH
+        , FN_GET_MATH_UPH(:res_oper -- RES_OPER
+                , :res_model -- RES_MODEL
+                ,NVL(ROUND(3600/(MEDIAN(PERIOD)/MEDIAN(PICKUP_CNT)),2),0) -- UPH
+                ,MAT.MAT_CMF_13 -- NET DIE
+                , NVL(GCM.DATA_1,0) -- AUTO LOSS QTY
+                ,:oper)  -- OPER
+                AS UPH/**/
+        , FN_GET_MATH_ST(:res_oper -- RES_OPER
+                ,NVL(ROUND(MEDIAN(PERIOD)/MEDIAN(PICKUP_CNT),2),0)
+                , NVL(GCM.DATA_1,0) -- COMP QTY
+                ,:oper)  -- OPER
+                AS UPH_ST
+--        , ROUND((NVL(ROUND(3600/(MEDIAN(PERIOD)/MEDIAN(PICKUP_CNT)),2),0) / MES_UPH) * 100,2) AS RATIO
+           , ROUND((
+                 FN_GET_MATH_UPH(:res_oper -- RES_OPER
+                , :res_model -- RES_MODEL
+                ,NVL(ROUND(3600/(MEDIAN(PERIOD)/MEDIAN(PICKUP_CNT)),2),0) -- UPH
+                ,MAT.MAT_CMF_13 -- NET DIE
+                , NVL(GCM.DATA_1,0) -- AUTO LOSS QTY
+                ,:oper) / MES_UPH)*100
+                 ,2) AS RATIO
+FROM    VT , /**/
+        MWIPMATDEF@FATOMES MAT, /**/
+        (SELECT * FROM MGCMTBLDAT@FATOMES WHERE FACTORY = 'HMKA1' AND TABLE_NAME = 'H_COMP_QTY' AND KEY_2 = :oper) GCM /**/
+WHERE   1=1
+        AND MAT.FACTORY = GCM.FACTORY(+)/**/
+        AND MAT.MAT_ID = GCM.KEY_1(+)/**/
+        AND MAT.FACTORY = 'HMKA1'/**/
+        AND MAT.MAT_ID = :mat_id /**/
+        AND PICKUP_CNT < REP_PICKUP_COUNT * 1.2
+        AND PICKUP_CNT > REP_PICKUP_COUNT * 0.8
+        AND PERIOD < REP_PERIOD * 1.2
+        AND PERIOD > REP_PERIOD * 0.8
+GROUP BY REP_PICKUP_COUNT, REP_PERIOD,RECIPE_ID,MES_UPH,MAT.MAT_CMF_13,GCM.DATA_1/**/]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="50" value="DIE ATTACH">:res_oper</param>
+            <param direction="Input" dbtype="VarChar" size="50" value="SDB-30US">:res_model</param>
+            <param direction="Input" dbtype="VarChar" size="50" value="A0400">:oper</param>
+            <param direction="Input" dbtype="VarChar" size="50" value="HXH5TC2G43EFROR_EJW7">:mat_id</param>
+            <param direction="Input" dbtype="VarChar" size="50" value="20131105220000">:start_tran_time</param>
+            <param direction="Input" dbtype="VarChar" size="50" value="20131205215959">:end_tran_time</param>
+            <param direction="Input" dbtype="VarChar" size="50" value="EAPDA_FRAME_UNLOAD">:event_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_EQ_SUM_UPH_MODEL_COUNT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[
+                SELECT  COUNT(*) AS CNT
+                FROM    TBP_EQUIP_EVENT EVT,
+                        MRASRESDEF@FATOMES RES
+                WHERE   1=1
+                        AND RES.RES_ID = EVT.RES_ID
+                        AND RES.FACTORY = 'HMKA1'
+                        AND RES.RES_GRP_6 = :res_model
+                        AND EVT.OPER = :oper
+                        AND EVT.MAT_ID = :mat_id
+                        AND EVT.MONTH IN (SUBSTR(:start_tran_time,0,6),SUBSTR(:end_tran_time,0,6))
+                        AND EVT.EVENT_TIME BETWEEN TO_DATE(:start_tran_time,'YYYYMMDDHH24MISS') AND TO_DATE(:end_tran_time,'YYYYMMDDHH24MISS')
+                        AND EVT.EVENT_ID = :event_id
+                        AND EVT.CMF_FIELD05 = 'Y'
+                        AND CMF_FIELD04 != '0'
+                        AND CMF_FIELD03 != '0'
+                        AND EVT.LOT_ID IS NOT NULL]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="50" value="SPA-400">:res_model</param>
+            <param direction="Input" dbtype="VarChar" size="50" value="A0403">:oper</param>
+            <param direction="Input" dbtype="VarChar" size="50" value="SEK3PE7E000M-GEVLLP">:mat_id</param>
+            <param direction="Input" dbtype="VarChar" size="50" value="20130824220000">:start_tran_time</param>
+            <param direction="Input" dbtype="VarChar" size="50" value="20130907220000">:end_tran_time</param>
+            <param direction="Input" dbtype="VarChar" size="50" value="EAPDA_FRAME_UNLOAD">:event_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_EQUIP_LAST_EVENT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT MONTH, RES_ID, TO_CHAR(EVENT_TIME, 'YYYYMMDDHH24MISS') EVENT_TIME, 
+EVENT_ID, PROC_MODE, PERIOD, OPER, MAT_ID, RECIPE_ID, LOT_ID, WAFER_ID, 
+FRAME_ID, CMF_FIELD02, CMF_FIELD03, CMF_FIELD04, CMF_FIELD05 
+FROM
+(
+SELECT * FROM TBP_EQUIP_EVENT
+WHERE 1=1
+AND MONTH = TO_NUMBER(TO_CHAR(TO_DATE(SUBSTR(:event_time,1,19),'YYYY-MM-DD HH24:MI:SS'),'YYYYMM'))
+AND RES_ID = :res_id
+AND EVENT_ID = :event_id
+ORDER BY EVENT_TIME DESC
+) 
+WHERE 1=1
+AND ROWNUM = 1]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="25">:event_time</param>
+            <param direction="Input" dbtype="VarChar" size="20">:res_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:event_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_EQ_SUM_UPH_REGIST" commandtype="Text" description="UPH 신규 등록 화면에서 지정한 LOTID로 UPH를 구하는 쿼리" commandtimeout="60">
+        <commandtext><![CDATA[WITH LOT_HIS AS (
+    SELECT TO_CHAR(TO_DATE(PREV.TRAN_TIME, 'YYYYMMDDHH24MISS') + 2/24, 'YYYYMMDD') WORK_DAY, PREV.FACTORY, PREV.RES_ID, PREV.MAT_ID, PREV.LOT_ID  
+         , PREV.HIST_SEQ PREV_SEQ, POST.HIST_SEQ POST_SEQ, PREV.OPER OPER
+         , IN_TIME, OUT_TIME, OPERDEF.OPER_GRP_4 OPERGROUP
+      FROM  
+           (   
+            SELECT TRAN_TIME, FACTORY, RES_ID, MAT_ID, LOT_ID, HIST_SEQ, OPER, QTY_1 IN_QTY, TRAN_TIME IN_TIME  
+              FROM CWIPRESLTH@FATOMES
+             WHERE TRAN_CODE = 'START'  
+               AND HIST_DEL_FLAG = ' '  
+           ) PREV  
+         , (  
+            SELECT FACTORY, END_RES_ID AS RES_ID, MAT_ID, LOT_ID, HIST_SEQ, OLD_OPER AS OPER, QTY_1 AS OUT_QTY, LOSS_QTY_1, TRAN_TIME AS OUT_TIME, TO_NUMBER(START_HIST_SEQ) AS START_SEQ  
+              FROM CWIPLOTEND@FATOMES LOT 
+             WHERE FACTORY  = 'HMKA1' 
+               AND OWNER_CODE='PROD' 
+               AND MAT_VER=1 
+               AND LOT_TYPE='W' 
+               AND END_RES_ID <> ' ' 
+           ) POST
+         , MESMGR.MWIPOPRDEF@FATOMES OPERDEF
+     WHERE 1=1 
+       AND PREV.FACTORY = POST.FACTORY  
+       AND PREV.RES_ID = POST.RES_ID  
+       AND PREV.MAT_ID = POST.MAT_ID  
+       AND PREV.LOT_ID = POST.LOT_ID 
+       AND PREV.HIST_SEQ = POST.START_SEQ  
+       AND PREV.IN_TIME <> POST.OUT_TIME
+       AND PREV.OPER = OPERDEF.OPER
+       AND PREV.LOT_ID = :lot_id  
+       AND OPERDEF.OPER_GRP_4 = :oper_group
+)
+SELECT 
+       LOT.OPERGROUP
+     , LOT.OPER
+     , MAT.MAT_CMF_10 AS PIN_TYPE
+     , EV.MAT_ID
+     , EV.RECIPE_ID
+     , RES.RES_GRP_6 MODEL
+     , EV.LOT_ID
+     , ROUND(SUM ( CASE WHEN PROC_MODE IN ('RUN', 'INDEX') THEN PERIOD ELSE 0 END ) / NULLIF(SUM ( CASE WHEN EV.EVENT_ID = :event_id THEN 1 ELSE 0 END),0),0) AS REP_CYCLE_TIME
+     , ROUND(MEDIAN (TO_NUMBER(EV.CMF_FIELD03)),0) AS PICKUP_COUNT
+     , ROUND(3600 / (SUM ( CASE WHEN PROC_MODE IN ('RUN', 'INDEX') THEN PERIOD ELSE 0 END ) / NULLIF(SUM (EV.CMF_FIELD03),0)),0) AS FA_UPH
+     , ROUND(SUM ( CASE WHEN PROC_MODE IN ('RUN', 'INDEX') THEN PERIOD ELSE 0 END ) / NULLIF(SUM (EV.CMF_FIELD03),0),2) AS FA_ST
+     , SUM ( CASE WHEN EV.EVENT_ID = :event_id THEN 1 ELSE 0 END) FRAME_QTY
+  FROM TBP_EQUIP_EVENT EV, LOT_HIS LOT, MWIPMATDEF@FATOMES MAT, MRASRESDEF@FATOMES RES
+ WHERE 1 = 1
+   AND EV.MONTH = SUBSTR(LOT.IN_TIME, 0, 6)
+   AND EV.LOT_ID = LOT.LOT_ID
+   AND EV.RES_ID = LOT.RES_ID
+   AND EV.RES_ID = RES.RES_ID
+   AND EV.MAT_ID = MAT.MAT_ID
+   AND MAT.FACTORY = 'HMKA1'
+   AND EV.EVENT_TIME BETWEEN TO_TIMESTAMP(LOT.IN_TIME, 'YYYYMMDDHH24MISS') AND TO_TIMESTAMP(LOT.OUT_TIME, 'YYYYMMDDHH24MISS')
+ GROUP BY LOT.OPERGROUP, LOT.OPER, MAT.MAT_CMF_10, EV.MAT_ID, EV.RECIPE_ID, RES.RES_GRP_6, EV.LOT_ID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="HDIC60HD">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="DIE ATTACH">:oper_group</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="EAPDA_FRAME_UNLOAD">:event_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_EQ_SUM_UPH_REGIST_DETAIL" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT 
+       DISTINCT ' ' 선택
+     , CASE WHEN FA_RES_ID IS NULL THEN 'SUMMARY'
+            ELSE 'RAW'
+       END GUBUN
+     , V.RES_OPER
+     , V.OPER
+     , V.RES_MODEL
+     , CASE WHEN FA_RES_ID IS NULL THEN V.MES_RES_ID
+            ELSE V.FA_RES_ID
+       END RES_ID
+     , V.PIN_TYPE
+     , V.PRODUCT
+     , V.LOT_ID
+     , V.RECIPE_ID
+     , V.REP_CYCLE_TIME
+     , V.REP_PICKUP_COUNT
+     , V.FA_UPH
+     , V.FA_ST
+     --, V.FRAME_COUNT
+     , CASE WHEN V.FRAME_COUNT IS NULL THEN 0
+            ELSE COUNT(1) OVER (PARTITION BY V.RES_OPER, V.OPER, V.RES_MODEL,V.RECIPE_ID) - 1 END   FRAME_COUNT
+     , null  AS COMMENTS
+     , EMS_UPH.FA_CYCLE_TIME AS EMS_FA_CYCLE_TIME
+     , EMS_UPH.FA_UPH        AS EMS_FA_UPH
+     , MES_UPH.CYCLE_TIME    AS MES_CYCLE_TIME
+     , MES_UPH.MEDIAN_UPEH   AS MES_MEDIAN_UPEH
+     , MES_UPH.AVG_UPEH      AS MES_AVG_UPEH
+     , MES_UPH.MIN_UPEH      AS MES_MIN_UPEH
+     , MES_UPH.MAX_UPEH      AS MES_MAX_UPEH
+     , EVENT_TIME
+     , EVENT_ID
+     , WAFER_ID
+     , FRAME_ID
+  FROM (
+        SELECT MES.RES_OPER
+             , MES.OPER
+             , MES.RES_MODEL
+             , MAX(MES.RES_ID) MES_RES_ID
+             , V_FA.RES_ID FA_RES_ID
+             , MAT.PIN_TYPE
+             , MAT.PRODUCT
+             , MES.LOT_ID
+             , V_FA.RECIPE_ID
+             , MEDIAN(PERIOD) AS REP_CYCLE_TIME
+             , MEDIAN(PICKUP_CNT) AS REP_PICKUP_COUNT
+             -- 2013. 12. 20 edit
+             --, ROUND(3600/(MEDIAN(PERIOD)/MEDIAN(PICKUP_CNT)),2) AS FA_UPH
+             --, ROUND(MEDIAN(PERIOD)/MEDIAN(PICKUP_CNT),2) AS FA_ST
+             , FN_GET_MATH_UPH(MES.RES_OPER -- RES_OPER
+                            ,  MES.RES_MODEL -- RES_MODEL
+                            ,NVL(ROUND(3600/(MEDIAN(PERIOD)/MEDIAN(PICKUP_CNT)),2),0) -- UPH
+                            , MAX(MAT.MAT_CMF_13) -- NET DIE
+                            , MAX(NVL(GCM.DATA_1,0)) -- AUTO LOSS QTY
+                            ,MES.OPER)  -- OPER
+                            AS FA_UPH   
+             , FN_GET_MATH_ST(MES.RES_OPER -- RES_OPER
+                              ,NVL(ROUND(MEDIAN(PERIOD)/MEDIAN(PICKUP_CNT),2),0)
+                              , MAX(NVL(GCM.DATA_1,0)) -- COMP QTY
+                              ,MES.OPER)  -- OPER
+                AS FA_ST                                         
+             , MAX(V_FA.RN) AS FRAME_COUNT
+             , TO_CHAR(MAX(V_FA.EVENT_TIME), 'YYYY-MM-DD HH24:MI:SS') AS EVENT_TIME
+             , MAX(V_FA.EVENT_ID) AS EVENT_ID
+             , MAX(WAFER_ID) AS WAFER_ID
+             , MAX(FRAME_ID) AS FRAME_ID
+          FROM (
+                SELECT MONTH,A.RES_ID,A.EVENT_TIME,A.EVENT_ID,A.PROC_MODE,A.RECIPE_ID,A.MAT_ID,A.LOT_ID,A.OPER,A.WAFER_ID,A.FRAME_ID,A.CMF_FIELD01,A.CMF_FIELD02
+                     , TO_NUMBER(A.CMF_FIELD03) AS PICKUP_CNT
+                     , TO_NUMBER(A.CMF_FIELD04) AS PERIOD
+                     , A.CMF_FIELD05,RN,CNT,M.REP_PERIOD,M.REP_PICKUP_COUNT
+                     , A.RES_OPER
+                     , A.RES_MODEL
+                  FROM (
+                        SELECT EVT.*
+                             --, ROWNUM AS RN
+                             , ROW_NUMBER() OVER(PARTITION BY EVT.MAT_ID, EVT.OPER ORDER BY EVT.LOT_ID, EVT.EVENT_TIME) RN
+                             , COUNT(1) OVER(PARTITION BY EVT.RES_ID, EVT.MAT_ID, EVT.LOT_ID, EVT.OPER) CNT
+                             , RES.RES_GRP_3 AS RES_OPER
+                             , RES.RES_GRP_6 AS RES_MODEL
+                          FROM TBP_EQUIP_EVENT EVT
+                             , MRASRESDEF@FATOMES RES
+                         WHERE 1=1
+                           AND RES.RES_ID = EVT.RES_ID
+                           AND RES.FACTORY = 'HMKA1'
+                           AND EVT.MONTH BETWEEN SUBSTR(TO_CHAR(TO_DATE(:start_day||'220000', 'YYYYMMDDHH24MISS') - 2, 'YYYYMMDDHH24MISS'),0,6) AND SUBSTR(TO_CHAR(TO_DATE(:end_day||'215959', 'YYYYMMDDHH24MISS') + 1, 'YYYYMMDDHH24MISS'),0,6)
+                           AND EVT.EVENT_TIME BETWEEN TO_DATE(:start_day||'220000', 'YYYYMMDDHH24MISS') - 2 AND TO_DATE(:end_day || '215959','YYYYMMDDHH24MISS') + 1
+                           AND ( (RES.RES_GRP_3 = 'DIE ATTACH' AND EVT.EVENT_ID = 'EAPDA_FRAME_UNLOAD') OR (RES.RES_GRP_3 = 'WIRE BOND' AND EVT.EVENT_ID = 'EAPBPCS_FRAME_BONDING_END') )
+                           AND EVT.CMF_FIELD05 = 'Y'
+                           AND TO_NUMBER(CMF_FIELD04) != 0
+                           AND TO_NUMBER(CMF_FIELD03) != 0
+                           AND EVT.LOT_ID IS NOT NULL
+                       ) A,
+                       (
+                        SELECT MEDIAN(TO_NUMBER(CMF_FIELD04)) AS REP_PERIOD
+                             , MEDIAN(TO_NUMBER(CMF_FIELD03)) AS REP_PICKUP_COUNT
+                             , EVT.RES_ID
+                             , EVT.MAT_ID
+                             , EVT.LOT_ID
+                             , EVT.OPER
+                          FROM TBP_EQUIP_EVENT EVT
+                             , MRASRESDEF@FATOMES RES
+                         WHERE   1=1
+                           AND RES.RES_ID = EVT.RES_ID
+                           AND RES.FACTORY = 'HMKA1'
+                           AND EVT.MONTH BETWEEN SUBSTR(TO_CHAR(TO_DATE(:start_day||'220000', 'YYYYMMDDHH24MISS') - 2, 'YYYYMMDDHH24MISS'),0,6) AND SUBSTR(TO_CHAR(TO_DATE(:end_day||'215959', 'YYYYMMDDHH24MISS') + 1, 'YYYYMMDDHH24MISS'),0,6)
+                           AND EVT.EVENT_TIME BETWEEN TO_DATE(:start_day||'220000', 'YYYYMMDDHH24MISS') - 2 AND TO_DATE(:end_day || '215959','YYYYMMDDHH24MISS') + 1
+                           AND ( (RES.RES_GRP_3 = 'DIE ATTACH' AND EVT.EVENT_ID = 'EAPDA_FRAME_UNLOAD') OR (RES.RES_GRP_3 = 'WIRE BOND' AND EVT.EVENT_ID = 'EAPBPCS_FRAME_BONDING_END') )
+                           AND EVT.CMF_FIELD05 = 'Y'
+                           AND TO_NUMBER(CMF_FIELD04) != 0
+                           AND TO_NUMBER(CMF_FIELD03) != 0
+                           AND EVT.LOT_ID IS NOT NULL
+                         GROUP BY EVT.RES_ID, EVT.MAT_ID, EVT.LOT_ID, EVT.OPER       
+                       ) M
+                 WHERE A.RES_ID = M.RES_ID     
+                   AND A.OPER = M.OPER
+                   AND A.MAT_ID = M.MAT_ID
+                   AND A.LOT_ID = M.LOT_ID
+                   AND A.RES_OPER LIKE :oper_group
+                   AND A.RES_MODEL LIKE '%' 
+                   AND TO_NUMBER(A.CMF_FIELD03) < M.REP_PICKUP_COUNT * 1.2
+                   AND TO_NUMBER(A.CMF_FIELD03) > M.REP_PICKUP_COUNT * 0.8
+                   AND TO_NUMBER(A.CMF_FIELD04) < M.REP_PERIOD * 1.2
+                   AND TO_NUMBER(A.CMF_FIELD04) > M.REP_PERIOD * 0.8           
+               ) V_FA
+             , (
+                SELECT RES_OPER 
+                     , OPER AS OPER
+                     , RES_MODEL AS RES_MODEL
+                     , RES_ID AS RES_ID
+                     , RESV_FIELD_8 AS RESV_FIELD_8
+                     , MAT_ID AS MAT_ID
+                     , LOT_ID AS LOT_ID
+                  FROM (SELECT A.FACTORY AS FACTORY
+                             , RES.RES_OPER
+                             , A.OPER AS OPER
+                             , A.RES_ID AS RES_ID
+                             , A.LOT_ID AS LOT_ID
+                             , A.HIST_SEQ AS HIST_SEQ
+                             , A.MAT_ID AS MAT_ID
+                             , A.RES_MODEL AS RES_MODEL
+                             , A.UPEH_GRP AS UPEH_GRP
+                             , NVL(A.RESV_FIELD_1, ' ') AS RESV_FIELD_1
+                             , DECODE(NVL(B.UPEH, 0), 0, '미등록', '등록') AS RESV_FIELD_2
+                             , NVL(A.RESV_FIELD_3, ' ') AS RESV_FIELD_3
+                             , NVL(B.CREATE_TIME, ' ') AS RESV_FIELD_4
+                             , NVL(A.RESV_FIELD_5, ' ') AS RESV_FIELD_5
+                             , NVL(A.RESV_FIELD_6, ' ') AS RESV_FIELD_6
+                             , NVL(B.UPEH, 0) AS RESV_FIELD_7
+                             , NVL(B.RESV_FIELD_8, ' ') AS RESV_FIELD_8
+                             , NVL(B.RESV_FIELD_9, ' ') AS RESV_FIELD_9
+                             , NVL(B.RESV_FIELD_10, ' ') AS RESV_FIELD_10
+                             , A.USER_ID AS USER_ID
+                             , A.TRAN_TIME AS TRAN_TIME
+                          FROM CRASUPHHIS@FATOMES A, CRASUPHDEF@FATOMES B, MWIPMATDEF@FATOMES C, (SELECT KEY_1 AS OPER
+                                                                            FROM MGCMTBLDAT@FATOMES
+                                                                           WHERE FACTORY = 'HMKA1'
+                                                                             AND TABLE_NAME = 'H_UPEH_OPER_CHECK'
+                                                                             AND DATA_1 = 'Y') D
+                             , (
+                                SELECT RES_GRP_3    AS RES_OPER
+                                     , RES_GRP_5    AS RES_MAKER
+                                     , RES_GRP_6    AS RES_MODEL
+                                     , RES_ID       AS RES_ID
+                                     , RES_CMF_9    AS USE_STATE
+                                  FROM MRASRESDEF@FATOMES RES
+                                 WHERE FACTORY = 'HMKA1'
+                                   AND DELETE_FLAG = ' '
+                                   AND RES_CMF_13 <> 'Y'
+                                   AND RES_GRP_5 <> '-'
+                                   AND RES_GRP_1 <> '-'             
+                               ) RES
+                         WHERE A.FACTORY = B.FACTORY(+)
+                           AND A.OPER = B.OPER(+)
+                           AND A.RES_MODEL = B.RES_MODEL(+)
+                           AND A.UPEH_GRP = B.UPEH_GRP(+)
+                           AND A.MAT_ID = B.MAT_ID(+)
+                           AND A.FACTORY = C.FACTORY
+                           AND A.MAT_ID = C.MAT_ID
+                           AND A.OPER = D.OPER
+                           AND C.MAT_TYPE = 'FG'
+                           AND A.FACTORY = 'HMKA1'
+                           AND A.RES_ID = RES.RES_ID
+                           AND RES_OPER LIKE :oper_group
+                           AND A.TRAN_TIME BETWEEN TO_CHAR(TO_DATE(:start_day||'220000', 'YYYYMMDDHH24MISS') - 1, 'YYYYMMDDHH24MISS')  AND :end_day || '215959')
+                 WHERE RESV_FIELD_2 = '미등록'     
+               ) MES
+             , (SELECT MAT_ID     AS PRODUCT
+                     , MAT_GRP_1  AS CUSTOMER
+                     , MAT_GRP_2  AS FAMILY
+                     , MAT_GRP_3  AS PACKAGE
+                     , MAT_GRP_4  AS TYPE1
+                     , MAT_GRP_5  AS TYPE2
+                     , MAT_GRP_6  AS LEAD_COUNT
+                     , MAT_GRP_7  AS DENSITY
+                     , MAT_GRP_8  AS GENERATION
+                     , MAT_GRP_9  AS MAJ_CODE
+                     , MAT_GRP_10 AS PACKAGE2
+                     , MAT_CMF_10 AS PIN_TYPE
+                     , MAT_CMF_11 AS PACK_CODE
+                     , MAT_CMF_13 AS MAT_CMF_13
+                     , FACTORY
+                  FROM MWIPMATDEF@FATOMES
+                 WHERE FACTORY = 'HMKA1') MAT 
+             , (SELECT * FROM MGCMTBLDAT@FATOMES WHERE FACTORY = 'HMKA1' AND TABLE_NAME = 'H_SEC_AUTO_LOSS') GCM                              
+         WHERE 1=1
+           --AND MES.RES_ID     = V_FA.RES_ID(+)
+           AND MES.MAT_ID     = V_FA.MAT_ID(+)
+           --AND MES.LOT_ID     = V_FA.LOT_ID(+)
+           AND MES.RES_MODEL = V_FA.RES_MODEL(+)
+           AND MES.OPER       = V_FA.OPER  (+)
+           AND MES.MAT_ID     = MAT.PRODUCT
+           AND MAT.PRODUCT    = GCM.KEY_1(+)
+         GROUP BY GROUPING SETS (  (MES.RES_OPER, MES.OPER, MES.RES_MODEL, MAT.PIN_TYPE, MAT.PRODUCT, MES.LOT_ID, V_FA.RECIPE_ID)
+                                 , (MES.RES_OPER, MES.OPER, MES.RES_MODEL, V_FA.RES_ID, MAT.PIN_TYPE, MAT.PRODUCT, MES.LOT_ID, V_FA.RECIPE_ID, V_FA.RN)
+                                )
+       ) V
+     , (
+        SELECT RECIPE_ID, OPER, RES_MODEL
+             , MEDIAN(REP_CYCLE_TIME) FA_CYCLE_TIME
+             , MEDIAN(UPH) FA_UPH
+          FROM (
+                SELECT WORK_DAY, RECIPE_ID, OPER, RES_MODEL
+                     , MAX(WORK_DAY) OVER(PARTITION BY RECIPE_ID, OPER, RES_MODEL) MAX_DAY
+                     , REP_CYCLE_TIME, UPH
+                  FROM TSM_EQUIP_UPH
+                 WHERE 1=1
+                   AND WORK_DAY BETWEEN TO_CHAR(TO_DATE(:start_day||'220000', 'YYYYMMDDHH24MISS') - 30, 'YYYYMMDDHH24MISS') AND :end_day
+               )
+         WHERE WORK_DAY = MAX_DAY       
+         GROUP BY RECIPE_ID, OPER, RES_MODEL               
+       ) EMS_UPH  
+     , (
+        SELECT RESV_FIELD_8 AS RECIPE_ID
+             , OPER
+             , RES_MODEL
+             , MEDIAN( DECODE(RESV_FIELD_9, ' ', 0, RESV_FIELD_9)) CYCLE_TIME
+             , MEDIAN(UPEH) MEDIAN_UPEH
+             , ROUND(AVG(UPEH),2) AVG_UPEH
+             , ROUND(MIN(UPEH),2) MIN_UPEH
+             , ROUND(MAX(UPEH),2) MAX_UPEH
+          FROM CRASUPHDEF@FATOMES
+         WHERE 1 = 1
+           AND FACTORY = 'HMKA1'     
+         GROUP BY RESV_FIELD_8, OPER, RES_MODEL     
+       ) MES_UPH       
+ WHERE V.RECIPE_ID = EMS_UPH.RECIPE_ID(+)
+   AND V.OPER      = EMS_UPH.OPER(+)
+   AND V.RES_MODEL = EMS_UPH.RES_MODEL(+)             
+   AND V.RECIPE_ID = MES_UPH.RECIPE_ID(+)
+   AND V.OPER      = MES_UPH.OPER(+)
+   AND V.RES_MODEL = MES_UPH.RES_MODEL(+)                                  
+ ORDER BY DECODE(GUBUN, 'SUMMARY', 1, 'RAW', 2), RES_OPER, OPER, RES_MODEL, RES_ID, PRODUCT, LOT_ID, FRAME_COUNT
+
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="WIRE BOND">:oper_group</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="20131208">:start_day</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="20131210">:end_day</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_EQUIP_LAST_EVENT_1" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT MONTH, RES_ID, TO_CHAR(EVENT_TIME, 'YYYYMMDDHH24MISS') EVENT_TIME, 
+EVENT_ID, PROC_MODE, PERIOD, OPER, MAT_ID, RECIPE_ID, LOT_ID, WAFER_ID, 
+FRAME_ID, CMF_FIELD02, CMF_FIELD03, CMF_FIELD04, CMF_FIELD05 
+FROM
+(
+SELECT * FROM TBP_EQUIP_EVENT
+WHERE 1=1
+AND MONTH = TO_NUMBER(TO_CHAR(TO_DATE(SUBSTR(:event_time,1,19),'YYYY-MM-DD HH24:MI:SS'),'YYYYMM'))
+AND RES_ID = :res_id
+ORDER BY EVENT_TIME DESC
+) 
+WHERE 1=1
+AND ROWNUM = 1]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="25">:event_time</param>
+            <param direction="Input" dbtype="VarChar" size="20">:res_id</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_EVENT_PERIOD03" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TBP_EQUIP_EVENT
+SET PERIOD = :period
+WHERE MONTH = TO_NUMBER(SUBSTR(:event_time,1,6))
+AND RES_ID = :res_id
+AND TO_CHAR(EVENT_TIME, 'YYYYMMDDHH24MISS') = :event_time
+AND EVENT_ID = :last_event]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="20">:res_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:last_event</param>
+            <param direction="Input" dbtype="VarChar" size="16">:event_time</param>
+            <param direction="Input" dbtype="Number" size="0">:period</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_EQ_SUM_UPH_MODEL_RECIPE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[WITH VT AS
+(
+        SELECT  MONTH,RES_ID,EVENT_TIME,EVENT_ID,PROC_MODE,RECIPE_ID,LOT_ID,WAFER_ID,FRAME_ID,CMF_FIELD01,CMF_FIELD02
+        , TO_NUMBER(A.CMF_FIELD03) AS PICKUP_CNT
+        ,TO_NUMBER(A.CMF_FIELD04) AS PERIOD
+        ,CMF_FIELD05,RN,REP_PERIOD,REP_PICKUP_COUNT
+        ,B.MES_UPH
+        , A.MAT_ID
+        FROM    (
+                SELECT  EVT.*,ROWNUM AS RN
+                FROM    TBP_EQUIP_EVENT EVT,
+                        MRASRESDEF@FATOMES RES
+                WHERE   1=1
+                        AND RES.RES_ID = EVT.RES_ID
+                        AND RES.FACTORY = 'HMKA1'
+                        AND RES.RES_GRP_6 = :res_model
+                        AND EVT.OPER = :oper
+                        AND EVT.RECIPE_ID = :recipe_id
+                        AND EVT.MONTH IN (SUBSTR(:start_tran_time,0,6),SUBSTR(:end_tran_time,0,6))
+                        AND EVT.EVENT_TIME BETWEEN TO_DATE(:start_tran_time,'YYYYMMDDHH24MISS') AND TO_DATE(:end_tran_time,'YYYYMMDDHH24MISS')
+                        AND EVT.EVENT_ID = :event_id
+                        AND EVT.CMF_FIELD05 = 'Y'
+                        AND TO_NUMBER(CMF_FIELD04) != 0
+                        AND TO_NUMBER(CMF_FIELD03) != 0
+                        AND EVT.LOT_ID IS NOT NULL
+                ) A,
+                (
+                SELECT  MEDIAN(TO_NUMBER(CMF_FIELD04)) AS REP_PERIOD
+                        ,MEDIAN(TO_NUMBER(CMF_FIELD03)) AS REP_PICKUP_COUNT
+                FROM    TBP_EQUIP_EVENT EVT,
+                        MRASRESDEF@FATOMES RES
+                WHERE   1=1
+                        AND RES.RES_ID = EVT.RES_ID
+                        AND RES.FACTORY = 'HMKA1'
+                        AND RES.RES_GRP_6 = :res_model
+                        AND EVT.OPER = :oper
+                        AND EVT.RECIPE_ID = :recipe_id
+                        AND EVT.MONTH IN (SUBSTR(:start_tran_time,0,6),SUBSTR(:end_tran_time,0,6))
+                        AND EVT.EVENT_TIME BETWEEN TO_DATE(:start_tran_time,'YYYYMMDDHH24MISS') AND TO_DATE(:end_tran_time,'YYYYMMDDHH24MISS')
+                        AND EVT.EVENT_ID = :event_id
+                        AND EVT.CMF_FIELD05 = 'Y'
+                        AND TO_NUMBER(CMF_FIELD04) != 0
+                        AND TO_NUMBER(CMF_FIELD03) != 0
+                        AND EVT.LOT_ID IS NOT NULL
+                ) M,
+                (
+                SELECT  NVL(AVG(UPEH),1) AS MES_UPH
+                FROM    CRASUPHDEF@FATOMES
+                WHERE   1=1
+                        AND FACTORY = 'HMKA1'
+                        AND RES_MODEL = :res_model
+                        AND OPER = :oper
+                        AND RESV_FIELD_8 = :recipe_id
+                ) B
+)
+SELECT  FN_GET_WORK_DATE(:end_tran_time,'M') AS WORK_MONTH
+        , FN_GET_WORK_DATE(:end_tran_time,'W') AS WORK_WEEK
+        , FN_GET_WORK_DATE(:end_tran_time,'D') AS WORK_DAY
+        , :res_oper AS RES_OPER
+        , :res_model AS RES_MODEL
+        , :recipe_id AS RECIPE_ID
+        , :oper AS OPER
+        , RECIPE_ID
+        , MAT.MAT_CMF_13 AS NET_DIE_COUNT /**/
+        , NVL(GCM.DATA_1,0) AS COMP_QTY /**/
+        , SUBSTR(:start_tran_time,0,8) AS SEARCH_START_DAY
+        , SUBSTR(:end_tran_time,0,8) AS SEARCH_END_DAY
+        , MAX(RN) AS FRAME_COUNT
+        , MEDIAN(PICKUP_CNT) AS REP_PICKUP_COUNT ,MEDIAN(PERIOD) AS REP_CYCLE_TIME
+        , ROUND(MES_UPH,2) AS MES_UPH
+--        , NVL(ROUND(3600/(MEDIAN(PERIOD)/MEDIAN(PICKUP_CNT)),2),0) AS UPH
+        , FN_GET_MATH_UPH(:res_oper -- RES_OPER
+                , :res_model -- RES_MODEL
+                ,NVL(ROUND(3600/(MEDIAN(PERIOD)/MEDIAN(PICKUP_CNT)),2),0) -- UPH
+                ,MAT.MAT_CMF_13 -- NET DIE
+                , NVL(GCM.DATA_1,0) -- COMP QTY
+                ,:oper)  -- OPER
+                AS UPH /**/
+        , FN_GET_MATH_ST(:res_oper -- RES_OPER
+                ,NVL(ROUND(MEDIAN(PERIOD)/MEDIAN(PICKUP_CNT),2),0)
+                , NVL(GCM.DATA_1,0) -- COMP QTY
+                ,:oper)  -- OPER
+                AS UPH_ST
+        , ROUND(
+        NVL(
+        FN_GET_MATH_UPH(:res_oper -- RES_OPER
+                , :res_model -- RES_MODEL
+                ,NVL(ROUND(3600/(MEDIAN(PERIOD)/MEDIAN(PICKUP_CNT)),2),0) -- UPH
+                ,MAT.MAT_CMF_13 -- NET DIE
+                , NVL(GCM.DATA_1,0) -- COMP QTY
+                ,:oper)  -- OPER  
+                / MES_UPH
+        ,0) * 100
+        ,2) AS RATIO
+FROM    VT , /**/
+        MWIPMATDEF@FATOMES MAT, /**/
+        (SELECT * FROM MGCMTBLDAT@FATOMES WHERE FACTORY = 'HMKA1' AND TABLE_NAME = 'H_COMP_QTY' AND KEY_2 = :oper) GCM /**/
+WHERE   1=1
+        AND MAT.FACTORY = GCM.FACTORY(+)/**/
+        AND MAT.MAT_ID = GCM.KEY_1(+)/**/
+        AND MAT.FACTORY = 'HMKA1'/**/
+        AND MAT.MAT_ID = VT.MAT_ID
+        AND PICKUP_CNT < REP_PICKUP_COUNT * 1.2
+        AND PICKUP_CNT > REP_PICKUP_COUNT * 0.8
+        AND PERIOD < REP_PERIOD * 1.2
+        AND PERIOD > REP_PERIOD * 0.8
+GROUP BY REP_PICKUP_COUNT, REP_PERIOD,RECIPE_ID,MES_UPH,MAT.MAT_CMF_13,GCM.DATA_1/**/]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="50" value="WIRE BOND">:res_oper</param>
+            <param direction="Input" dbtype="VarChar" size="50" value="MAXUM ultra">:res_model</param>
+            <param direction="Input" dbtype="VarChar" size="50" value="A0602">:oper</param>
+            <param direction="Input" dbtype="VarChar" size="150" value="5255101C">:recipe_id</param>
+            <param direction="Input" dbtype="VarChar" size="14" value="20131205220000">:start_tran_time</param>
+            <param direction="Input" dbtype="VarChar" size="14" value="20131219215959">:end_tran_time</param>
+            <param direction="Input" dbtype="VarChar" size="50" value="EAPBPCS_FRAME_BONDING_END">:event_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_EQ_SUM_UPH_MODEL_COUNT_RECIPE_ID" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[                SELECT  COUNT(*) AS CNT
+                FROM    TBP_EQUIP_EVENT EVT,
+                        MRASRESDEF@FATOMES RES
+                WHERE   1=1
+                        AND RES.RES_ID = EVT.RES_ID
+                        AND RES.FACTORY = 'HMKA1'
+                        AND RES.RES_GRP_6 = :res_model
+                        AND EVT.OPER = :oper
+                        AND EVT.RECIPE_ID = :recipe_id
+                        AND EVT.MONTH IN (SUBSTR(:start_tran_time,0,6),SUBSTR(:end_tran_time,0,6))
+                        AND EVT.EVENT_TIME BETWEEN TO_DATE(:start_tran_time,'YYYYMMDDHH24MISS') AND TO_DATE(:end_tran_time,'YYYYMMDDHH24MISS')
+                        AND EVT.EVENT_ID = :event_id
+                        AND EVT.CMF_FIELD05 = 'Y'
+                        AND CMF_FIELD04 != '0'
+                        AND CMF_FIELD03 != '0'
+                        AND EVT.LOT_ID IS NOT NULL]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="50">:res_model</param>
+            <param direction="Input" dbtype="VarChar" size="50">:oper</param>
+            <param direction="Input" dbtype="VarChar" size="150">:recipe_id</param>
+            <param direction="Input" dbtype="VarChar" size="14">:start_tran_time</param>
+            <param direction="Input" dbtype="VarChar" size="14">:end_tran_time</param>
+            <param direction="Input" dbtype="VarChar" size="50">:event_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_EVENT_COUNT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT  NVL(COUNT(*),0)
+FROM    TBP_EQUIP_EVENT
+WHERE   1=1
+        AND MONTH IN (SUBSTR(:tran_time,0,6),TO_CHAR(SYSDATE,'YYYYMM'))
+        AND RES_ID = :res_id
+        AND EVENT_ID = :event_id
+        AND EVENT_TIME > TO_DATE(:tran_time,'YYYYMMDDHH24MISS')]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="50" value="BD507">:res_id</param>
+            <param direction="Input" dbtype="VarChar" size="14" value="20140116191452">:tran_time</param>
+            <param direction="Input" dbtype="VarChar" size="100" value="EAPDA_FRAME_UNLOAD">:event_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_CV_COUNT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT NVL(SUM(CMF_FIELD03),0) AS CVCNT
+FROM TBP_EQUIP_EVENT
+WHERE 1=1
+AND RES_ID = :resid
+AND MONTH BETWEEN TO_NUMBER(SUBSTR(:sTime, 1, 6)) AND TO_NUMBER(SUBSTR(:eTime, 1, 6))
+AND EVENT_TIME BETWEEN TO_DATE(:sTime,'YYYY-MM-DD HH24:MI:SS')  AND TO_DATE(:eTime,'YYYY-MM-DD HH24:MI:SS') + 1
+AND LOT_ID = :lotid]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="20">:resid</param>
+            <param direction="Input" dbtype="VarChar" size="14">:sTime</param>
+            <param direction="Input" dbtype="VarChar" size="14">:eTime</param>
+            <param direction="Input" dbtype="VarChar" size="40">:lotid</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_LAST_BLADE_CHANGE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT  /*+ INDEX_DESC(HIS UK_TBP_EQUIP_EVENT) */TO_CHAR(EVENT_TIME,'YYYYMMDDHH24MISS') AS TRAN_TIME 
+FROM    TBP_EQUIP_EVENT HIS
+WHERE   1=1
+        AND MONTH IN (TO_CHAR(SYSDATE,'YYYYMM'), TO_CHAR(ADD_MONTHS(SYSDATE,-1),'YYYYMM'))
+        AND RES_ID = :res_id
+        AND EVENT_ID = 'EAPBSS_BLADE_CHANGE'
+        AND ROWNUM = 1]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="20" value="BS046">:res_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_LAST_DRESSING" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT  /*+ INDEX_DESC(HIS UK_TBP_EQUIP_EVENT) */TO_CHAR(EVENT_TIME,'YYYYMMDDHH24MISS') AS TRAN_TIME 
+FROM    TBP_EQUIP_EVENT HIS
+WHERE   1=1
+        AND MONTH IN (TO_CHAR(SYSDATE,'YYYYMM'), TO_CHAR(ADD_MONTHS(SYSDATE,-1),'YYYYMM'))
+        AND RES_ID = :res_id
+        AND EVENT_ID = 'EAPBSS_BLADE_DRESSING'
+        AND EVENT_TIME > TO_DATE(:event_time,'YYYYMMDDHH24MISS')
+        AND ROWNUM = 1]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="20" value="BS041">:res_id</param>
+            <param direction="Input" dbtype="VarChar" size="14">:event_time</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="INSERT_EVENT03" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TBP_EQUIP_EVENT
+(
+	MONTH
+	,RES_ID
+	,EVENT_TIME
+	,EVENT_ID
+	,PROC_MODE
+	,PERIOD
+	,OPER
+	,MAT_ID
+	,RECIPE_ID
+	,LOT_ID
+	,CMF_FIELD03
+            ,CMF_FIELD04
+            ,CMF_FIELD05
+) VALUES(
+	TO_NUMBER(TO_CHAR(TO_DATE(SUBSTR(:event_time,1,19),'YYYY-MM-DD HH24:MI:SS'),'YYYYMM'))
+	,:res_id
+	,TO_TIMESTAMP(:event_time,'YYYY-MM-DD HH24:MI:SS.FF')
+	,:event_id
+	,:proc_mode
+	,:period
+	,:oper
+	,:mat_id
+	,:recipe_id
+	,:lot_id
+	,:unit_count
+            ,:module_cnt
+	,:module_no
+)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="20">:res_id</param>
+            <param direction="Input" dbtype="VarChar" size="25">:event_time</param>
+            <param direction="Input" dbtype="VarChar" size="40">:event_id</param>
+            <param direction="Input" dbtype="VarChar" size="10">:proc_mode</param>
+            <param direction="Input" dbtype="Number" size="20">:period</param>
+            <param direction="Input" dbtype="VarChar" size="10">:oper</param>
+            <param direction="Input" dbtype="VarChar" size="40">:mat_id</param>
+            <param direction="Input" dbtype="VarChar" size="100">:recipe_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:unit_count</param>
+            <param direction="Input" dbtype="VarChar" size="40">:module_cnt</param>
+            <param direction="Input" dbtype="VarChar" size="40">:module_no</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_CHECK_SETUP_END" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[select * FROM TBP_EQUIP_EVENT
+    where 1=1
+        and oper = :oper
+        and RES_ID = :res_id
+        and EVENT_TIME > TO_DATE(:event_time, 'YYYYMMDDHH24MISS')
+        and EVENT_ID = 'EAPBSS_SETUP_END']]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="10" value="A0200">:oper</param>
+            <param direction="Input" dbtype="VarChar" size="10" value="BS016">:res_id</param>
+            <param direction="Input" dbtype="VarChar" size="14" value="20141230094052">:event_time</param>
+        </parameters>
+    </query>
+</queryxml>

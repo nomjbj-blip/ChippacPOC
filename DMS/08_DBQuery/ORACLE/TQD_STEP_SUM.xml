@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Select" queryid="SELECT_STEP_SUM" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQD_STEP_SUM
+WHERE STEP_SEQ = :step_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0" description="step_seq">:step_seq</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="CALL_UPDATE_STEP_SUM" commandtype="StoredProcedure" commandtimeout="60">
+        <commandtext><![CDATA[CALL UPDATE_STEP_SUM(:step_seq)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:step_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_STEP_INFO" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT LOT_ID
+,WAFER_ID
+,STEP_ID,ROUTE
+,OPER
+,INSPECTION_EQ
+,TO_CHAR(RESULTTIMESTAMP,'YYYY/MM/DD HH24:MI:SS') AS RESULTTIMESTAMP
+,PRODUCT,MAIN_EQ
+,TO_CHAR(CURRENT_TIMESTAMP,'YYYYMMDDHH24MISS')||'_'||LOT_ID||'_'||WAFER_ID||'_'||STEP_ID||'.xml' AS XMLFILE
+FROM TQD_LOT L,TQD_WAFER W,TQD_STEP S
+WHERE S.STEP_SEQ = :step_seq
+AND W.WAFER_SEQ = S.WAFER_SEQ
+AND L.LOT_SEQ = W.LOT_SEQ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0" description="step_seq" value="13">:step_seq</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_STEP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[DELETE FROM TQD_STEP_SUM
+WHERE STEP_SEQ = :step_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:step_seq</param>
+        </parameters>
+    </query>
+</queryxml>

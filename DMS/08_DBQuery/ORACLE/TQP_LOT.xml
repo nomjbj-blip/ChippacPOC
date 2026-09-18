@@ -1,0 +1,499 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="TPSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Insert" queryid="CREATE_LOT" commandtype="Text" description="새로운 Lot을 생성한다" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_LOT VALUES(:lot_seq, :product, :testarea, :program, :lot_id,
+     :mother_lot, :lot_type, :fablot, :family, :facility, :device_alias, TO_DATE(:start_time,'YYYY-MM-DD HH24:MI:SS'),  TO_DATE(:end_time,'YYYY-MM-DD HH24:MI:SS'),       
+     :wip_status, :wafers, :spesail_cmt, :eng_cmt)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:lot_seq</param>
+            <param direction="Input" dbtype="VarChar" size="0">:product</param>
+            <param direction="Input" dbtype="VarChar" size="0">:testarea</param>
+            <param direction="Input" dbtype="VarChar" size="0">:program</param>
+            <param direction="Input" dbtype="VarChar" size="0">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="0">:mother_lot</param>
+            <param direction="Input" dbtype="VarChar" size="0">:lot_type</param>
+            <param direction="Input" dbtype="VarChar" size="0">:fablot</param>
+            <param direction="Input" dbtype="VarChar" size="0">:family</param>
+            <param direction="Input" dbtype="VarChar" size="0">:facility</param>
+            <param direction="Input" dbtype="VarChar" size="0">:device_alias</param>
+            <param direction="Input" dbtype="VarChar" size="0">:start_time</param>
+            <param direction="Input" dbtype="VarChar" size="0">:end_time</param>
+            <param direction="Input" dbtype="VarChar" size="0">:wip_status</param>
+            <param direction="Input" dbtype="Number" size="0">:wafers</param>
+            <param direction="Input" dbtype="VarChar" size="0">:spesail_cmt</param>
+            <param direction="Input" dbtype="VarChar" size="0">:eng_cmt</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_LOTINFO" commandtype="Text" description="Lot 정보를 조회한다" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQP_LOT WHERE LOT_SEQ = :lot_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30" value="11">:lot_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_ISLOT" commandtype="Text" description="해당 Lot 유무를 조회한다" commandtimeout="60">
+        <commandtext><![CDATA[SELECT LOT_SEQ FROM TQP_LOT 
+WHERE UPPER(PRODUCT) = UPPER(:product) 
+AND UPPER(TESTAREA) = UPPER(:testarea)
+AND UPPER(PROGRAM) = UPPER(:program)
+AND UPPER(LOT_ID) = UPPER(:lot_id)
+
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:product</param>
+            <param direction="Input" dbtype="VarChar" size="30">:testarea</param>
+            <param direction="Input" dbtype="VarChar" size="30">:program</param>
+            <param direction="Input" dbtype="VarChar" size="30">:lot_id</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_COUNT" commandtype="Text" description="EndTime, Wafer 수를 Update 한다." commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_LOT SET START_TIME = :start_time,  END_TIME= :end_time, WAFERS = :wafers WHERE LOT_SEQ = :lot_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="DateTime" size="0" value="2006/02/08_17:46:20">:start_time</param>
+            <param direction="Input" dbtype="DateTime" size="0" value="2006/02/08_17:46:20">:end_time</param>
+            <param direction="Input" dbtype="Number" size="0" value="1">:wafers</param>
+            <param direction="Input" dbtype="Number" size="0">:lot_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_LOT" commandtype="Text" description="Lot ID를 가져온다." commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT LOT_ID, LOT_SEQ FROM TQP_LOT 
+WHERE PRODUCT = :product AND PROGRAM = :program]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:product</param>
+            <param direction="Input" dbtype="VarChar" size="30">:program</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_LOT_AVI" commandtype="Text" description="AVI Lot ID를 가져온다." commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT LOT_ID, LOT_SEQ FROM TQP_LOT 
+WHERE PRODUCT = :product 
+AND PROGRAM = :program
+AND TESTAREA = 'AVI']]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:product</param>
+            <param direction="Input" dbtype="VarChar" size="30">:program</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_LOT_LIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT LOT_ID,LOT_SEQ FROM TQP_LOT
+WHERE END_TIME BETWEEN TO_DATE(:sdate,'YYYY-MM-DD') AND TO_DATE(:edate,'YYYY-MM-DD')
+AND TEST_AREA=:testarea
+AND DEVICE_ALIAS =:product
+AND PROGRAM = :program
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="19">:sdate</param>
+            <param direction="Input" dbtype="VarChar" size="19">:edate</param>
+            <param direction="Input" dbtype="VarChar" size="30">:testarea</param>
+            <param direction="Input" dbtype="VarChar" size="30">:product</param>
+            <param direction="Input" dbtype="VarChar" size="30">:program</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_WAFER_COUNT_IN_LOT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT COUNT(*) AS CNT FROM TQP_WAFER WHERE LOT_SEQ = :lot_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="10">:lot_seq</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_LOT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[DELETE FROM TQP_LOT
+WHERE LOT_SEQ = :lot_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="10">:lot_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_TESTAREA_LIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT TEST_AREA FROM TQP_LOT 
+WHERE END_TIME IS NULL 
+OR END_TIME BETWEEN TO_DATE(:start_time,'YYYY-MM-DD') AND TO_DATE(:end_time,'YYYY-MM-DD') ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="19">:start_time</param>
+            <param direction="Input" dbtype="VarChar" size="19">:end_time</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_PRODUCT_LIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT DEVICE_ALIAS FROM TQP_LOT
+WHERE END_TIME IS NULL 
+OR END_TIME BETWEEN TO_DATE(:start_time,'YYYY-MM-DD') AND TO_DATE(:end_time,'YYYY-MM-DD') 
+AND TEST_AREA IN (??)
+ORDER BY DEVICE_ALIAS]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="19">:start_time</param>
+            <param direction="Input" dbtype="VarChar" size="19">:end_time</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_PROGRAM_LIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT PROGRAM 
+FROM TQP_LOT T1. TQP_WAFER T2
+WHERE 1=1
+AND T1.LOT_SEQ = T2.LOT_SEQ
+AND T1.END_TIME IS NULL OR T1.END_TIME BETWEEN TO_DATE(:start_time,'YYYY-MM-DD') AND TO_DATE(:end_time,'YYYY-MM-DD') 
+AND T1.TEST_AREA = :testarea
+AND T1.PRODUCT = :product]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="19">:start_time</param>
+            <param direction="Input" dbtype="VarChar" size="19">:end_time</param>
+            <param direction="Input" dbtype="VarChar" size="30">:testarea</param>
+            <param direction="Input" dbtype="VarChar" size="30">:product</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_LOT_INFO_BY_LOT_ID" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT *
+FROM TQP_LOT
+WHERE LOT_ID = :lot_id
+ORDER BY LOT_SEQ ASC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="COPY_LOT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_LOT 
+SELECT LOT_SEQ.NEXTVAL AS LOT_SEQ, PRODUCT, :testarea AS TESTAREA, PROGRAM, LOT_ID, MOTHER_LOT_ID, LOT_TYPE, FABLOT, FAMILY, FACILITY
+            , DEVICE_ALIAS,TO_DATE(:start_time,'YYYY-MM-DD HH24:MI:SS') AS START_TIMR,  TO_DATE(:end_time,'YYYY-MM-DD HH24:MI:SS') AS END_TIME
+            , WIP_STATUS, 1, SPESAIL_CMT, ENG_CMT, MAP_PRODUCT
+FROM TQP_LOT
+WHERE LOT_SEQ = :pre_lot_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:testarea</param>
+            <param direction="Input" dbtype="VarChar" size="0">:start_time</param>
+            <param direction="Input" dbtype="VarChar" size="0">:end_time</param>
+            <param direction="Input" dbtype="VarChar" size="0">:pre_lot_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_LOT_INFO_BY_LOT_ID_EXCLUDE_FINAL" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT *
+FROM TQP_LOT
+WHERE LOT_ID = :lot_id
+AND TEST_AREA NOT LIKE '%FINAL%'
+AND TEST_AREA LIKE '%MERGE%'
+ORDER BY LOT_SEQ DESC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_NEXT_LOTSEQ" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT LOT_SEQ.NEXTVAL
+FROM DUAL]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_CURTLOT_TESTAREA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT TEST_AREA
+FROM TQP_LOT
+WHERE LOT_SEQ =
+  (SELECT MAX(LOT_SEQ) FROM TQP_LOT WHERE LOT_ID = :LOT_ID
+  )]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:LOT_ID</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="CREATE_LOT_02" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2015-04-15 21:14:57
+INSERT INTO TQP_LOT(
+LOT_SEQ
+,PRODUCT
+,TEST_AREA
+,PROGRAM
+,LOT_ID
+,MOTHER_LOT_ID
+,FACILITY
+,DEVICE_ALIAS
+,START_TIME
+,END_TIME
+) VALUES(
+LOT_SEQ.NEXTVAL
+,:product
+,:testarea
+,:program
+,:lot_id
+,:lot_id
+,'HMKB1'
+,:product
+,sysdate
+,sysdate
+)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:product</param>
+            <param direction="Input" dbtype="VarChar" size="0">:testarea</param>
+            <param direction="Input" dbtype="VarChar" size="0">:program</param>
+            <param direction="Input" dbtype="VarChar" size="0">:lot_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_LOTINFO_02" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2015-04-15 21:25:25
+SELECT * FROM TQP_LOT
+WHERE 1=1
+AND TEST_AREA = :testarea
+AND DEVICE = :product
+AND PROGRAM = :program
+AND LOT_ID = :lot_id]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:testarea</param>
+            <param direction="Input" dbtype="VarChar" size="40">:product</param>
+            <param direction="Input" dbtype="VarChar" size="40">:program</param>
+            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_LOT_SEQ" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT LOT_SEQ
+FROM TQP_LOT
+WHERE 1 = 1
+    AND FACTORY = :FACTORY 
+    AND TEST_AREA = :TEST_AREA 
+    AND LOT_ID = :LOT_ID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="FACTORY">:FACTORY</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="TEST_AREA">:TEST_AREA</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="LOT_ID">:LOT_ID</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_LOT_SEQ_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT LOT_SEQ
+FROM TQP_LOT
+WHERE 1 = 1
+    AND FACTORY = :FACTORY 
+    AND TEST_AREA = :TEST_AREA 
+    AND LOT_ID = :LOT_ID
+    AND PROGRAM = :pgm]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="FACTORY">:FACTORY</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="TEST_AREA">:TEST_AREA</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="LOT_ID">:LOT_ID</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="pgm">:pgm</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="MERGE_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[MERGE INTO TQP_LOT
+USING DUAL
+ON (
+    FACTORY = :FACTORY
+    AND LOT_SEQ = :LOT_SEQ
+)
+WHEN MATCHED THEN
+UPDATE SET
+    END_TIME = TO_DATE(:END_TIME,'YYYY-MM-DD HH24:MI:SS')
+WHEN NOT MATCHED THEN
+INSERT (
+    FACTORY,
+    LOT_SEQ,
+    LOT_ID,
+    TEST_AREA,
+    PROGRAM,
+    DEVICE,
+    DEVICE_ALIAS,
+    START_TIME,
+    END_TIME,
+    WAFER_DIAM
+) VALUES (
+    :FACTORY,
+    :LOT_SEQ,
+    :LOT_ID,
+    :TEST_AREA,
+    :PROGRAM,
+    :DEVICE,
+    :DEVICE_ALIAS,
+    TO_DATE(:START_TIME,'YYYY-MM-DD HH24:MI:SS'),
+    TO_DATE(:END_TIME,'YYYY-MM-DD HH24:MI:SS'),
+    :WAFER_DIAM
+)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0" value="FACTORY">:FACTORY</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="LOT_SEQ">:LOT_SEQ</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="LOT_ID">:LOT_ID</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="TEST_AREA">:TEST_AREA</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="PROGRAM">:PROGRAM</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="DEVICE">:DEVICE</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="DEVICE_ALIAS">:DEVICE_ALIAS</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="START_TIME">:START_TIME</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="END_TIME">:END_TIME</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="WAFER_DIAM">:WAFER_DIAM</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_LOT_AVI" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[DELETE
+FROM TQP_LOT
+WHERE 1 = 1
+    AND FACTORY = :FACTORY 
+    AND TEST_AREA = :TEST_AREA 
+    AND LOT_ID = :LOT_ID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="FACTORY">:FACTORY</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="TEST_AREA">:TEST_AREA</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="LOT_ID">:LOT_ID</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_LOT_LIST_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-08-13 16:48:40
+SELECT DISTINCT T1.LOT_ID, T1.LOT_SEQ 
+  FROM TQP_LOT T1, TQP_WAFER T2
+ WHERE 1=1 
+   AND T1.LOT_SEQ = T2.LOT_SEQ
+   AND T1.END_TIME BETWEEN TO_DATE(:sdate,'YYYY-MM-DD') AND TO_DATE(:edate,'YYYY-MM-DD')
+   AND T1.TEST_AREA IN (??)
+   AND T1.DEVICE_ALIAS =:product
+   AND T2.PROGRAM = :program
+ ORDER BY T1.LOT_ID
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="sdate">:sdate</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="edate">:edate</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="product">:product</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="program">:program</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_CONDITION_LOT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-09-03 14:18:08
+SELECT DISTINCT T1.LOT_ID, T1.LOT_SEQ
+FROM TQP_LOT T1, TQP_WAFER T2
+WHERE 1=1
+  AND T1.LOT_SEQ = T2.LOT_SEQ
+  AND T1.END_TIME > TO_DATE(:FROM_DATE,'YYYYMMDD')
+  AND T1.END_TIME < TO_DATE(:TO_DATE,'YYYYMMDD')
+  AND T1.PROGRAM IN (??)
+ORDER BY 1]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="20180101">:FROM_DATE</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="20190101">:TO_DATE</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_CONDITION_DEVICE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-09-07 18:17:13
+SELECT DISTINCT DEVICE_ALIAS DEVICE
+FROM TQP_LOT 
+WHERE END_TIME > TO_DATE(:FROM_DATE,'YYYYMMDD')
+    AND END_TIME < TO_DATE(:TO_DATE,'YYYYMMDD')
+    AND TEST_AREA IN (??)
+ORDER BY 1 ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="20190101">:FROM_DATE</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="20190630">:TO_DATE</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_CONDITION_PROGRAM" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-09-07 18:17:23
+SELECT DISTINCT T1.PROGRAM
+FROM TQP_LOT T1
+WHERE 1=1
+  AND T1.END_TIME > TO_DATE(:FROM_DATE,'YYYYMMDD')
+  AND T1.END_TIME < TO_DATE(:TO_DATE,'YYYYMMDD')
+  AND T1.TEST_AREA IN (??)
+  AND T1.DEVICE_ALIAS IN (??)
+ORDER BY 1]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="20190101">:FROM_DATE</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="20190630">:TO_DATE</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_LOT_ID" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_LOT
+SET 
+    LOT_ID = :LOT_ID,
+    DEVICE_ALIAS = :DEVICE_ALIAS
+WHERE LOT_SEQ = :LOT_SEQ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="0" value="LOT_SEQ">:LOT_SEQ</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="LOT_ID">:LOT_ID</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="DEVICE_ALIAS">:DEVICE_ALIAS</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_LOT_INFO_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT A.DEVICE_ALIAS DEVICE, A.PROGRAM
+FROM TQP_LOT A
+WHERE 1=1
+AND A.TEST_AREA = :TEST_AREA
+AND A.END_TIME > TO_DATE(:FROM_DATE,'YYYY-MM-DD')
+AND A.END_TIME < TO_DATE(:TO_DATE,'YYYY-MM-DD')
+AND A.LOT_ID = :LOT_ID
+-- AND A.PROBE_CNT = 0
+ORDER BY 1,2]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40">:TEST_AREA</param>
+            <param direction="Input" dbtype="VarChar2" size="40">:FROM_DATE</param>
+            <param direction="Input" dbtype="VarChar2" size="40">:TO_DATE</param>
+            <param direction="Input" dbtype="VarChar2" size="40">:LOT_ID</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_LOT_INFO_02" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-09-24 20:34:40
+SELECT DISTINCT A.DEVICE_ALIAS DEVICE, A.PROGRAM
+FROM TQP_LOT A
+WHERE 1=1
+AND A.TEST_AREA IN (??)
+AND A.END_TIME > TO_DATE(:FROM_DATE,'YYYY-MM-DD')
+AND A.END_TIME < TO_DATE(:TO_DATE,'YYYY-MM-DD')
+AND LOT_ID = :LOT_ID
+-- AND PROBE_CNT = 0
+ORDER BY 1,2]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="FROM_DATE">:FROM_DATE</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="TO_DATE">:TO_DATE</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="LOT_ID">:LOT_ID</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_PROGRAM_LIST_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-09-24 20:46:30
+SELECT DISTINCT T1.PROGRAM 
+  FROM TQP_LOT T1
+ WHERE 1=1
+   AND T1.END_TIME IS NULL OR T1.END_TIME BETWEEN TO_DATE(:start_time,'YYYYMMDD') AND TO_DATE(:end_time,'YYYYMMDD') 
+   AND T1.TEST_AREA IN (??)
+   AND T1.DEVICE_ALIAS IN (??)
+ ORDER BY 1]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="start_time">:start_time</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="end_time">:end_time</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_PROGRAM" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_LOT
+SET 
+    PROGRAM = :PROGRAM
+WHERE LOT_SEQ = :LOT_SEQ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="0">:LOT_SEQ</param>
+            <param direction="Input" dbtype="VarChar2" size="0">:PROGRAM</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_CONDITION_LOT_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-10-17 22:31:51
+SELECT DISTINCT T1.LOT_ID, T1.LOT_SEQ
+FROM TQP_LOT T1, TQP_WAFER T2
+WHERE 1=1
+  AND T1.LOT_SEQ = T2.LOT_SEQ
+  AND T1.END_TIME > TO_DATE(:FROM_DATE,'YYYYMMDD')
+  AND T1.END_TIME < TO_DATE(:TO_DATE,'YYYYMMDD')
+  AND T1.TEST_AREA IN (??)
+  AND T1.DEVICE_ALIAS IN (??)
+  AND T1.PROGRAM IN (??)
+ORDER BY 1]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="FROM_DATE">:FROM_DATE</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="TO_DATE">:TO_DATE</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_DISTINCT_PROGRAM" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-09-03 17:53:54
+SELECT PROGRAM
+FROM TQP_LOT
+WHERE LOT_SEQ IN (??)
+GROUP BY PROGRAM
+ORDER BY 1]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_LOT_INFO_03" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT *
+FROM TQP_LOT
+WHERE LOT_SEQ = :LOT_SEQ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="LOT_SEQ">:LOT_SEQ</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_LOT_INFO_04" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-11-07 02:39:31
+SELECT *
+FROM TQP_LOT
+WHERE LOT_ID = :LOTID
+AND TEST_AREA = :TESTAREA
+AND PROGRAM = :PROGRAM]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="LOTID">:LOTID</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="TESTAREA">:TESTAREA</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="PROGRAM">:PROGRAM</param>
+        </parameters>
+    </query>
+</queryxml>

@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="DACrux.SEMDMS.Control.DmsCacheHelper">
+    <Position X="6" Y="2.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAgABABAAAAAAAAAAAAAAABAAAAACAAAAAAgAAAA=</HashCode>
+      <FileName>DmsCacheHelper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DACrux.SEMDMS.Control.GalleryColumnItem">
+    <Position X="1" Y="0.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>QAAgAAAgAAAAAAAAAAAAAAAAAAAAAgAAAgAgEAFAAAA=</HashCode>
+      <FileName>DmsCacheHelper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DACrux.SEMDMS.Control.GalleryRowItem">
+    <Position X="1" Y="4" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAgAAAAAAAAAAAAAAAAAAAAAAAFAgAAAAAgAAFAAAA=</HashCode>
+      <FileName>DmsCacheHelper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DACrux.SEMDMS.Control.DmsDataGroupBy">
+    <Position X="3.25" Y="2.5" Width="2" />
+    <Compartments>
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <NestedTypes>
+      <Class Name="DACrux.SEMDMS.Control.DmsDataGroupBy.ColRow">
+        <TypeIdentifier>
+          <NewMemberFileName>DmsCacheHelper.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAAAAASAAgAAAAAAEAAAgAACQAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DmsCacheHelper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="맑은 고딕" Size="9" />
+</ClassDiagram>

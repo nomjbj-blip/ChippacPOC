@@ -1,0 +1,667 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{1579A88B-4AEE-41A7-8646-DAFF80567A56}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DACrux.TEST.ENGUI</RootNamespace>
+    <AssemblyName>DACrux.TEST.ENGUI</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath />
+    <SccProvider>
+    </SccProvider>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <OutputPath>..\..\100_ClientBin\</OutputPath>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <OutputPath>..\..\100_ClientBin\</OutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="DACrux.Base, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\07_CoreLib\DACrux.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="DACrux.Framework.Base, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\07_CoreLib\DACrux.Framework.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="DACrux.Framework.Controls, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\07_CoreLib\DACrux.Framework.Controls.dll</HintPath>
+    </Reference>
+    <Reference Include="DACrux.Framework.Interface, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\07_CoreLib\DACrux.Framework.Interface.dll</HintPath>
+    </Reference>
+    <Reference Include="DACrux.Framework.PropertyGrid, Version=1.0.1.2, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\07_CoreLib\DACrux.Framework.PropertyGrid.dll</HintPath>
+    </Reference>
+    <Reference Include="DACrux.Framework.RO, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\07_CoreLib\DACrux.Framework.RO.dll</HintPath>
+    </Reference>
+    <Reference Include="DACrux.Map, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\07_CoreLib\DACrux.Map.dll</HintPath>
+    </Reference>
+    <Reference Include="DACrux.SP.Common">
+      <HintPath>..\..\07_CoreLib\DACrux.SP.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="DACrux.SP.Controls">
+      <HintPath>..\..\07_CoreLib\DACrux.SP.Controls.dll</HintPath>
+    </Reference>
+    <Reference Include="DACrux.SPC.Visualization, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\07_CoreLib\DACrux.SPC.Visualization.dll</HintPath>
+    </Reference>
+    <Reference Include="DACrux.Utility, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\07_CoreLib\DACrux.Utility.dll</HintPath>
+    </Reference>
+    <Reference Include="FarPoint.Excel, Version=5.0.3518.2008, Culture=neutral, PublicKeyToken=327c3516b1b18457, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files (x86)\GrapeCity\Spread.WinForms.5.dotNet35\v5.0.3518\Bin\FarPoint.Excel.dll</HintPath>
+    </Reference>
+    <Reference Include="FarPoint.Win, Version=5.0.3518.2008, Culture=neutral, PublicKeyToken=327c3516b1b18457, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files (x86)\GrapeCity\Spread.WinForms.5.dotNet35\v5.0.3518\Bin\FarPoint.Win.dll</HintPath>
+    </Reference>
+    <Reference Include="FarPoint.Win.Spread, Version=5.0.3518.2008, Culture=neutral, PublicKeyToken=327c3516b1b18457, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files (x86)\GrapeCity\Spread.WinForms.5.dotNet35\v5.0.3518\Bin\FarPoint.Win.Spread.dll</HintPath>
+    </Reference>
+    <Reference Include="FDll">
+      <HintPath>..\..\07_CoreLib\FDll.dll</HintPath>
+    </Reference>
+    <Reference Include="Infragistics4.Win.UltraWinEditors.v12.1, Version=12.1.20121.2135, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files (x86)\Infragistics\NetAdvantage 2012.1\Windows Forms\CLR4.0\Bin\Infragistics4.Win.UltraWinEditors.v12.1.dll</HintPath>
+    </Reference>
+    <Reference Include="Infragistics4.Win.UltraWinTabControl.v12.1, Version=12.1.20121.2135, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL" />
+    <Reference Include="Infragistics4.Win.UltraWinTree.v12.1, Version=12.1.20121.2135, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files (x86)\Infragistics\NetAdvantage 2012.1\Windows Forms\CLR4.0\Bin\Infragistics4.Win.UltraWinTree.v12.1.dll</HintPath>
+    </Reference>
+    <Reference Include="Infragistics4.Win.v12.1, Version=12.1.20121.2135, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL" />
+    <Reference Include="Infragistics4.Win.UltraWinToolbars.v12.1, Version=12.1.20121.2135, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL" />
+    <Reference Include="Infragistics4.Win.UltraWinGrid.v12.1, Version=12.1.20121.2135, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL" />
+    <Reference Include="Infragistics4.Win.UltraWinDock.v12.1, Version=12.1.20121.2135, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL" />
+    <Reference Include="Infragistics4.Win.UltraWinChart.v12.1, Version=12.1.20121.2135, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL" />
+    <Reference Include="Infragistics4.Win.Misc.v12.1, Version=12.1.20121.2135, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL" />
+    <Reference Include="Infragistics4.Shared.v12.1, Version=12.1.20121.2135, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.Office.Interop.Excel, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="policy.5.0.FarPoint.Win, Version=5.0.3522.2008, Culture=neutral, PublicKeyToken=327c3516b1b18457, processorArchitecture=MSIL" />
+    <Reference Include="policy.5.0.FarPoint.Win.Spread, Version=5.0.3522.2008, Culture=neutral, PublicKeyToken=327c3516b1b18457, processorArchitecture=MSIL" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Design" />
+    <Reference Include="System.Runtime.Serialization.Formatters.Soap" />
+    <Reference Include="System.Windows.Forms.DataVisualization" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Admin\DlgBinCopy.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\DlgBinCopy.Designer.cs">
+      <DependentUpon>DlgBinCopy.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\DlgSetOrigin.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\DlgSetOrigin.Designer.cs">
+      <DependentUpon>DlgSetOrigin.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\DlgSetupMap.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\DlgSetupMap.Designer.cs">
+      <DependentUpon>DlgSetupMap.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\dlgSetupProgram.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\dlgSetupProgram.Designer.cs">
+      <DependentUpon>dlgSetupProgram.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\frmAdminCustomer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\frmAdminCustomer.Designer.cs">
+      <DependentUpon>frmAdminCustomer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\frmMapConfigUpdate.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\frmMapConfigUpdate.Designer.cs">
+      <DependentUpon>frmMapConfigUpdate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\frmPcmEquipStatus.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\frmPcmEquipStatus.Designer.cs">
+      <DependentUpon>frmPcmEquipStatus.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\frmSetupShot.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\frmSetupShot.Designer.cs">
+      <DependentUpon>frmSetupShot.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\frmTestDataMaint.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\frmTestDataMaint.Designer.cs">
+      <DependentUpon>frmTestDataMaint.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\frmVisualInspDefine.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\frmVisualInspDefine.Designer.cs">
+      <DependentUpon>frmVisualInspDefine.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\frmSetupParameterSpec.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\frmSetupParameterSpec.Designer.cs">
+      <DependentUpon>frmSetupParameterSpec.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\frmSetupBin.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\frmSetupBin.Designer.cs">
+      <DependentUpon>frmSetupBin.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\frmAVIFileUpload.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\frmAVIFileUpload.Designer.cs">
+      <DependentUpon>frmAVIFileUpload.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\frmTestDataUpload_Pcm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\frmTestDataUpload_Pcm.Designer.cs">
+      <DependentUpon>frmTestDataUpload_Pcm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\frmShotMapInformation.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\frmShotMapInformation.Designer.cs">
+      <DependentUpon>frmShotMapInformation.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Analysis\frmBinStackBar.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Analysis\frmBinStackBar.Designer.cs">
+      <DependentUpon>frmBinStackBar.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Analysis\frmCummapAnalysis.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Analysis\frmCummapAnalysis.Designer.cs">
+      <DependentUpon>frmCummapAnalysis.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Analysis\frmDutByYieldReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Analysis\frmDutByYieldReport.Designer.cs">
+      <DependentUpon>frmDutByYieldReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Analysis\frmPatternSearch.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Analysis\frmPatternSearch.Designer.cs">
+      <DependentUpon>frmPatternSearch.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Analysis\frmPatternSearchNew.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Analysis\frmPatternSearchNew.Designer.cs">
+      <DependentUpon>frmPatternSearchNew.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Analysis\frmProbeBinMapGallery.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Analysis\frmProbeBinMapGallery.Designer.cs">
+      <DependentUpon>frmProbeBinMapGallery.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Analysis\frmSingleMapView.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Analysis\frmSingleMapView.Designer.cs">
+      <DependentUpon>frmSingleMapView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Analysis\frmTPWaferSelect.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Analysis\frmVisualInspection.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Analysis\frmVisualInspection.Designer.cs">
+      <DependentUpon>frmVisualInspection.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Analysis\frmWaferParaAnalysis.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Analysis\frmWaferParaAnalysis.Designer.cs">
+      <DependentUpon>frmWaferParaAnalysis.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Analysis\frmYieldReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Analysis\frmYieldReport.Designer.cs">
+      <DependentUpon>frmYieldReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\frmNewMapID.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\frmNewMapID.Designer.cs">
+      <DependentUpon>frmNewMapID.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\frmSelectMapID.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\frmSelectMapID.Designer.cs">
+      <DependentUpon>frmSelectMapID.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\frmSetupDevice.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\frmSetupDevice.Designer.cs">
+      <DependentUpon>frmSetupDevice.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\frmSetupMap.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\frmSetupMap.Designer.cs">
+      <DependentUpon>frmSetupMap.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\frmSetupProgram.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\frmSetupProgram.Designer.cs">
+      <DependentUpon>frmSetupProgram.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Analysis\frmTESTWaferEdit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Analysis\frmTESTWaferEdit.Designer.cs">
+      <DependentUpon>frmTESTWaferEdit.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Analysis\frmPCMMapView.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Analysis\frmPCMMapView.Designer.cs">
+      <DependentUpon>frmPCMMapView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\frmWaferDefine.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\frmWaferDefine.Designer.cs">
+      <DependentUpon>frmWaferDefine.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Analysis\frmCumMapReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Analysis\frmCumMapReport.Designer.cs">
+      <DependentUpon>frmCumMapReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Analysis\frmWaferBinReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Analysis\frmWaferBinReport.Designer.cs">
+      <DependentUpon>frmWaferBinReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Analysis\frmTESTMapGallery.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Analysis\frmTESTMapGallery.Designer.cs">
+      <DependentUpon>frmTESTMapGallery.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Analysis\frmAVICumMapView.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Analysis\frmAVICumMapView.Designer.cs">
+      <DependentUpon>frmAVICumMapView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Analysis\frmCumMapReport_FOI.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Analysis\frmCumMapReport_FOI.Designer.cs">
+      <DependentUpon>frmCumMapReport_FOI.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DataSelecter\LegendItem.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DataSelecter\LegendItem.designer.cs">
+      <DependentUpon>LegendItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DataSelecter\LegendList.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DataSelecter\SetupSearchItem.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DataSelecter\SetupSearchItem.designer.cs">
+      <DependentUpon>SetupSearchItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Form1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form1.Designer.cs">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\frmTestDataUserComment.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\frmTestDataUserComment.Designer.cs">
+      <DependentUpon>frmTestDataUserComment.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Report\frmSortOption.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Report\frmSortOption.designer.cs">
+      <DependentUpon>frmSortOption.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Analysis\StatCalculation.cs" />
+    <Compile Include="Analysis\TPUCGallery.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Analysis\TPUCGallery.Designer.cs">
+      <DependentUpon>TPUCGallery.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DataSelecter\TPUCSelectWafer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Analysis\WrapMap.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Analysis\WrapMap.Designer.cs">
+      <DependentUpon>WrapMap.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Report\frmStandardReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Report\frmStandardReport.Designer.cs">
+      <DependentUpon>frmStandardReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Report\frmPCMReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Report\frmPCMReport.Designer.cs">
+      <DependentUpon>frmPCMReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Report\frmTestReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Report\frmTestReport.Designer.cs">
+      <DependentUpon>frmTestReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Report\frmPCMDataReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Report\frmPCMDataReport.Designer.cs">
+      <DependentUpon>frmPCMDataReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Report\frmWaferMapMatching.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Report\frmWaferMapMatching.Designer.cs">
+      <DependentUpon>frmWaferMapMatching.cs</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="Admin\DlgBinCopy.resx">
+      <DependentUpon>DlgBinCopy.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\DlgSetOrigin.resx">
+      <DependentUpon>DlgSetOrigin.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\DlgSetupMap.resx">
+      <DependentUpon>DlgSetupMap.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\dlgSetupProgram.resx">
+      <DependentUpon>dlgSetupProgram.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\frmAdminCustomer.resx">
+      <DependentUpon>frmAdminCustomer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\frmMapConfigUpdate.resx">
+      <DependentUpon>frmMapConfigUpdate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\frmNewMapID.resx">
+      <DependentUpon>frmNewMapID.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\frmPcmEquipStatus.resx">
+      <DependentUpon>frmPcmEquipStatus.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\frmSelectMapID.resx">
+      <DependentUpon>frmSelectMapID.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\frmSetupDevice.resx">
+      <DependentUpon>frmSetupDevice.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\frmSetupMap.resx">
+      <DependentUpon>frmSetupMap.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\frmSetupProgram.resx">
+      <DependentUpon>frmSetupProgram.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\frmSetupShot.resx">
+      <DependentUpon>frmSetupShot.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\frmTestDataUserComment.resx">
+      <DependentUpon>frmTestDataUserComment.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\frmTestDataMaint.resx">
+      <DependentUpon>frmTestDataMaint.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\frmVisualInspDefine.resx">
+      <DependentUpon>frmVisualInspDefine.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\frmSetupParameterSpec.resx">
+      <DependentUpon>frmSetupParameterSpec.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\frmSetupBin.resx">
+      <DependentUpon>frmSetupBin.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\frmAVIFileUpload.resx">
+      <DependentUpon>frmAVIFileUpload.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\frmTestDataUpload_Pcm.resx">
+      <DependentUpon>frmTestDataUpload_Pcm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\frmShotMapInformation.resx">
+      <DependentUpon>frmShotMapInformation.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Analysis\frmBinStackBar.resx">
+      <DependentUpon>frmBinStackBar.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Analysis\frmCummapAnalysis.resx">
+      <DependentUpon>frmCummapAnalysis.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Analysis\frmDutByYieldReport.resx">
+      <DependentUpon>frmDutByYieldReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Analysis\frmPatternSearch.resx">
+      <DependentUpon>frmPatternSearch.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Analysis\frmPatternSearchNew.resx">
+      <DependentUpon>frmPatternSearchNew.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Analysis\frmProbeBinMapGallery.resx">
+      <DependentUpon>frmProbeBinMapGallery.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Analysis\frmSingleMapView.resx">
+      <DependentUpon>frmSingleMapView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Analysis\frmTPWaferSelect.resx">
+      <DependentUpon>frmTPWaferSelect.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Analysis\frmVisualInspection.resx">
+      <DependentUpon>frmVisualInspection.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Analysis\frmWaferParaAnalysis.resx">
+      <DependentUpon>frmWaferParaAnalysis.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Analysis\frmYieldReport.resx">
+      <DependentUpon>frmYieldReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Analysis\frmTESTWaferEdit.resx">
+      <DependentUpon>frmTESTWaferEdit.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Analysis\frmPCMMapView.resx">
+      <DependentUpon>frmPCMMapView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\frmWaferDefine.resx">
+      <DependentUpon>frmWaferDefine.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Analysis\frmCumMapReport.resx">
+      <DependentUpon>frmCumMapReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Analysis\frmWaferBinReport.resx">
+      <DependentUpon>frmWaferBinReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Analysis\frmTESTMapGallery.resx">
+      <DependentUpon>frmTESTMapGallery.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Analysis\frmAVICumMapView.resx">
+      <DependentUpon>frmAVICumMapView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Analysis\frmCumMapReport_FOI.resx">
+      <DependentUpon>frmCumMapReport_FOI.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataSelecter\LegendItem.resx">
+      <DependentUpon>LegendItem.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataSelecter\LegendList.resx">
+      <DependentUpon>LegendList.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataSelecter\SetupSearchItem.resx">
+      <DependentUpon>SetupSearchItem.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form1.resx">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Report\frmSortOption.resx">
+      <DependentUpon>frmSortOption.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\licenses.licx" />
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <EmbeddedResource Include="Analysis\TPUCGallery.resx">
+      <DependentUpon>TPUCGallery.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataSelecter\TPUCSelectWafer.resx">
+      <DependentUpon>TPUCSelectWafer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Analysis\WrapMap.resx">
+      <DependentUpon>WrapMap.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Report\frmStandardReport.resx">
+      <DependentUpon>frmStandardReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Report\frmPCMReport.resx">
+      <DependentUpon>frmPCMReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Report\frmTestReport.resx">
+      <DependentUpon>frmTestReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Report\frmPCMDataReport.resx">
+      <DependentUpon>frmPCMDataReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Report\frmWaferMapMatching.resx">
+      <DependentUpon>frmWaferMapMatching.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\02_DMS\DACrux.SEMDMS.Control\DACrux.SEMDMS.Control.csproj">
+      <Project>{C9B0F7D0-E636-42EC-909A-44F0565C735A}</Project>
+      <Name>DACrux.SEMDMS.Control</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\02_DMS\DACrux.SEMDMS.RO\DACrux.SEMDMS.RO.csproj">
+      <Project>{B3DE56DD-3EC4-4359-BDA2-2F3289699C8B}</Project>
+      <Name>DACrux.SEMDMS.RO</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\06_CoreLibSource\DACrux.Common.RO\DACrux.Common.RO.csproj">
+      <Project>{46A137A3-7FE3-476D-B2C4-0ED113DB4378}</Project>
+      <Name>DACrux.Common.RO</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\06_CoreLibSource\DACrux.Data.Handler\DACrux.Data.Handler.csproj">
+      <Project>{AD7EB035-BE84-44A0-91E8-D75D7517617D}</Project>
+      <Name>DACrux.Data.Handler</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\06_CoreLibSource\DACrux.Data.Parser\DACrux.Data.Parser.csproj">
+      <Project>{74090ED2-64BC-45D4-9048-D561EA147A78}</Project>
+      <Name>DACrux.Data.Parser</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DACrux.TEST.Control\DACrux.TEST.Control.csproj">
+      <Project>{B3ED24CA-1B2C-401B-ACB7-EBBEBA502E2F}</Project>
+      <Name>DACrux.TEST.Control</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DACrux.TEST.Interface\DACrux.TEST.Interface.csproj">
+      <Project>{DEF8C916-8445-4FA5-B18B-4AA0F3D0ECB0}</Project>
+      <Name>DACrux.TEST.Interface</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DACrux.TEST.RO\DACrux.TEST.RO.csproj">
+      <Project>{E1AC51DC-7074-45B4-BD2B-92343BC69411}</Project>
+      <Name>DACrux.TEST.RO</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

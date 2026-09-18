@@ -1,0 +1,115 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="TPSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Select" queryid="GET_MAPDATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT WAFER_SEQ,DIE_NUM AS DIEID, X, Y , BIN , NVL(INSPECT,0) AS INSPECT, 1 AS DIEPROP 
+FROM TD_??
+WHERE WAFER_SEQ = :waferseq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Varchar2" size="0" value="waferseq">:waferseq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_BIN_DISTRIBUTION" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT 
+    DECODE(A.BIN,NULL,B.BIN,A.BIN) AS BIN,
+    DECODE(A.BIN_NAME,NULL,'BIN' || B.BIN,A.BIN_NAME) AS BIN_NAME,CNT,
+    DECODE(COLOR,NULL,'FFFFFF',SUBSTR(COLOR,2)) AS COLOR
+FROM (
+    SELECT * FROM TQP_BINDESC 
+    WHERE PROGRAM = :program
+) A, (
+    SELECT BIN,COUNT(*) AS CNT 
+    FROM TD_??
+    WHERE WAFER_SEQ = :wafer_seq
+    GROUP BY BIN
+) B
+WHERE A.BIN(+) = B.BIN
+ORDER BY BIN]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Varchar2" size="0" value="program">:program</param>
+            <param direction="Input" dbtype="Varchar2" size="0" value="wafer_seq">:wafer_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_BIN_DISTRIBUTION_MULTI_WAFER" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT
+    DECODE(A.BIN,NULL,B.BIN,A.BIN) AS BIN,
+    DECODE(A.BIN_NAME,NULL,'BIN' || B.BIN,A.BIN_NAME) AS BIN_NAME,CNT,
+    DECODE(COLOR,NULL,'FFFFFF',SUBSTR(COLOR,2)) AS COLOR
+FROM (
+    SELECT * FROM TQP_BINDESC
+    WHERE PROGRAM = :program
+) A, (
+    SELECT BIN,COUNT(*) AS CNT 
+    FROM TD_??
+    WHERE WAFER_SEQ IN ( ?? )
+    GROUP BY BIN
+) B
+WHERE A.BIN(+) = B.BIN]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Varchar2" size="0" value="program">:program</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_MAPDATA_MULTI" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT 
+    DECODE(A.X,NULL,B.X,A.X) AS X,
+    DECODE(A.Y,NULL,B.Y,A.Y) AS Y,
+    DECODE(A.BIN,NULL,B.BIN,A.BIN) AS BIN
+FROM (
+    SELECT X,Y,COUNT(*) AS BIN
+    FROM TD_??
+    WHERE WAFER_SEQ IN (??)
+    AND BIN IN (??)
+    GROUP BY BIN,X,Y
+) A, (
+    SELECT X,Y,0 AS BIN 
+    FROM TD_??
+    WHERE WAFER_SEQ IN (??)
+) B
+WHERE A.X(+) = B.X
+  AND A.Y(+) = B.Y]]></commandtext>
+    </query>
+    <query statement="Select" queryid="GET_BIN_DESC" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQP_BINDESC
+WHERE PROGRAM = :program]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Varchar2" size="0" value="program">:program</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_TESTAREA_LIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT TESTAREA FROM TQP_PROGRAM]]></commandtext>
+    </query>
+    <query statement="Select" queryid="GET_PRODUCT_LIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT PRODUCT FROM T_TPS_PROGRAM
+WHERE TESTAREA=:testarea]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Varchar2" size="0" value="testarea">:testarea</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_PROGRAM_LIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT PROGRAM FROM T_TPS_PROGRAM
+WHERE TESTAREA = :testarea
+AND PRODUCT = :product]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Varchar2" size="0" value="testarea">:testarea</param>
+            <param direction="Input" dbtype="Varchar2" size="0" value="product">:product</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_MAPDATA_NO_INSPECT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT WAFER_SEQ,DIE_NUM AS DIEID, X, Y , BIN , 0 AS INSPECT, 1 AS DIEPROP 
+FROM TD_??
+WHERE WAFER_SEQ = :waferseq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Varchar2" size="0" value="waferseq">:waferseq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="EXISTS_INSPECT" commandtype="Text" commandtimeout="180">
+        <commandtext><![CDATA[-- Create Date : 2026-05-15 10:06:48
+SELECT 1
+FROM USER_TAB_COLUMNS
+WHERE 1 = 1
+    AND TABLE_NAME = 'TD_' || :TABLE_NAME
+    AND COLUMN_NAME = 'INSPECT']]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Varchar2" size="0">:TABLE_NAME</param>
+        </parameters>
+    </query>
+</queryxml>

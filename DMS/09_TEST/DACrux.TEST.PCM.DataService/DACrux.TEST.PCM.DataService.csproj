@@ -1,0 +1,171 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{F81F3AD4-6C3B-4746-B8AE-36EE6DD5CEA5}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DACrux.TEST.PCM.DataService</RootNamespace>
+    <AssemblyName>DACrux.TEST.PCM.DataService</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>..\..\101_ServerBin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisLogFile>..\..\101_ServerBin\DACrux.TEST.PCM.DataService.exe.CodeAnalysisLog.xml</CodeAnalysisLogFile>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSetDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
+    <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
+    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
+    <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <OutputPath>..\..\101_ServerBin\</OutputPath>
+    <DefineConstants>TRACE;SINGLE_EQUIP</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <CodeAnalysisLogFile>..\..\101_ServerBin\DACrux.TEST.PCM.DataService.exe.CodeAnalysisLog.xml</CodeAnalysisLogFile>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSetDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
+    <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
+    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
+    <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(Configuration)' == 'Debug'">
+    <Reference Include="Miracom.Middleware">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\07_CoreLib\Miracom.Middleware\x86\Miracom.Middleware.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup Condition="'$(Configuration)' == 'Release'">
+    <Reference Include="Miracom.Middleware">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\07_CoreLib\Miracom.Middleware\x64\Miracom.Middleware.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration.Install" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.ServiceProcess" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="PCMDataService.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="PCMDataService.Designer.cs">
+      <DependentUpon>PCMDataService.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="ProjectInstaller.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ProjectInstaller.Designer.cs">
+      <DependentUpon>ProjectInstaller.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="ProjectInstaller.resx">
+      <DependentUpon>ProjectInstaller.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\06_CoreLibSource\DACrux.Common.BSL\DACrux.Common.BSL.csproj">
+      <Project>{B0E5B50A-DF9A-4BF1-ACDC-F345CB0BC43F}</Project>
+      <Name>DACrux.Common.BSL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\06_CoreLibSource\DACrux.Common.Interface\DACrux.Common.Interface.csproj">
+      <Project>{6427C15D-18C9-4123-A289-B9BA75D32348}</Project>
+      <Name>DACrux.Common.Interface</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\06_CoreLibSource\DACrux.Data.Handler\DACrux.Data.Handler.csproj">
+      <Project>{AD7EB035-BE84-44A0-91E8-D75D7517617D}</Project>
+      <Name>DACrux.Data.Handler</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\06_CoreLibSource\DACrux.Data.Parser\DACrux.Data.Parser.csproj">
+      <Project>{74090ED2-64BC-45D4-9048-D561EA147A78}</Project>
+      <Name>DACrux.Data.Parser</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\06_CoreLibSource\DACrux.Framework.Server\DACrux.Framework.Server.csproj">
+      <Project>{DDD104A9-2320-4FEB-B2D7-3C275039581C}</Project>
+      <Name>DACrux.Framework.Server</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DACrux.TEST.BSL\DACrux.TEST.BSL.csproj">
+      <Project>{EF396296-6E9D-48F1-8B74-B7918BA1389A}</Project>
+      <Name>DACrux.TEST.BSL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DACrux.TEST.Interface\DACrux.TEST.Interface.csproj">
+      <Project>{DEF8C916-8445-4FA5-B18B-4AA0F3D0ECB0}</Project>
+      <Name>DACrux.TEST.Interface</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="FAB2_PCM_PROGRAM_INFO.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy "$(TargetPath)" "$(TargetDir)$(TargetName)_AMPT01$(TargetExt)
+copy "$(TargetPath)" "$(TargetDir)$(TargetName)_AMPT02$(TargetExt)
+copy "$(TargetPath)" "$(TargetDir)$(TargetName)_AMPT03$(TargetExt)
+copy "$(TargetPath)" "$(TargetDir)$(TargetName)_AMPT04$(TargetExt)
+copy "$(TargetPath)" "$(TargetDir)$(TargetName)_AMPT05$(TargetExt)
+copy "$(TargetPath)" "$(TargetDir)$(TargetName)_AMPT06$(TargetExt)
+copy "$(TargetPath)" "$(TargetDir)$(TargetName)_AMPT07$(TargetExt)
+copy "$(TargetPath)" "$(TargetDir)$(TargetName)_AMPT08$(TargetExt)
+copy "$(TargetPath)" "$(TargetDir)$(TargetName)_AMPT09$(TargetExt)
+copy "$(TargetPath)" "$(TargetDir)$(TargetName)_AMPT10$(TargetExt)
+copy "$(TargetPath)" "$(TargetDir)$(TargetName)_AMPT11$(TargetExt)
+copy "$(TargetPath)" "$(TargetDir)$(TargetName)_AMPT12$(TargetExt)
+copy "$(TargetPath)" "$(TargetDir)$(TargetName)_AMPT13$(TargetExt)
+copy "$(TargetPath)" "$(TargetDir)$(TargetName)_AMPT14$(TargetExt)
+copy "$(TargetPath)" "$(TargetDir)$(TargetName)_AMPT16$(TargetExt)
+copy "$(TargetPath)" "$(TargetDir)$(TargetName)_AMPT17$(TargetExt)
+copy "$(TargetPath)" "$(TargetDir)$(TargetName)_AMPT44$(TargetExt)
+copy "$(TargetPath)" "$(TargetDir)$(TargetName)_AMPTKVR$(TargetExt)
+copy "$(TargetPath)" "$(TargetDir)$(TargetName)_AMPTSVR$(TargetExt)
+
+copy "$(TargetPath)" "$(TargetDir)$(TargetName)_DTA001$(TargetExt)
+copy "$(TargetPath)" "$(TargetDir)$(TargetName)_FTA001$(TargetExt)
+copy "$(TargetPath)" "$(TargetDir)$(TargetName)_MTA001$(TargetExt)</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

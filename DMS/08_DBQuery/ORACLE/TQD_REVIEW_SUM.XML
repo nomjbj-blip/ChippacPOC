@@ -1,0 +1,414 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Insert" queryid="INSERT_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- INSERT DATA IF NOT EXISTS
+INSERT INTO TQD_REVIEW_SUM
+SELECT * FROM (
+  SELECT 
+    STEP_SEQ,
+    NVL(CAT0, 0) AS CAT0,
+    NVL(CAT1, 0) AS CAT1,
+    NVL(CAT2, 0) AS CAT2,
+    NVL(CAT3, 0) AS CAT3,
+    NVL(CAT4, 0) AS CAT4,
+    NVL(CAT5, 0) AS CAT5,
+    NVL(CAT6, 0) AS CAT6,
+    NVL(CAT7, 0) AS CAT7,
+    NVL(CAT8, 0) AS CAT8,
+    NVL(CAT9, 0) AS CAT9,
+    NVL(CAT10, 0) AS CAT10,
+    NVL(CAT11, 0) AS CAT11,
+    NVL(CAT12, 0) AS CAT12,
+    NVL(CAT13, 0) AS CAT13,
+    NVL(CAT14, 0) AS CAT14,
+    NVL(CAT15, 0) AS CAT15,
+    NVL(CAT16, 0) AS CAT16,
+    NVL(CAT17, 0) AS CAT17,
+    NVL(CAT18, 0) AS CAT18,
+    NVL(CAT19, 0) AS CAT19,
+    NVL(CAT20, 0) AS CAT20,
+    NVL(CAT21, 0) AS CAT21,
+    NVL(CAT22, 0) AS CAT22,
+    NVL(CAT23, 0) AS CAT23,
+    NVL(CAT24, 0) AS CAT24,
+    NVL(CAT25, 0) AS CAT25,
+    NVL(CAT26, 0) AS CAT26,
+    NVL(CAT27, 0) AS CAT27,
+    NVL(CAT28, 0) AS CAT28,
+    NVL(CAT29, 0) AS CAT29,
+    NVL(CAT30, 0) AS CAT30,
+    NVL(CAT31, 0) AS CAT31,
+    NVL(CAT32, 0) AS CAT32,
+    NVL(CAT33, 0) AS CAT33,
+    NVL(CAT34, 0) AS CAT34,
+    NVL(CAT35, 0) AS CAT35,
+    NVL(CAT36, 0) AS CAT36,
+    NVL(CAT37, 0) AS CAT37,
+    NVL(CAT38, 0) AS CAT38,
+    NVL(CAT39, 0) AS CAT39,
+    NVL(CAT40, 0) AS CAT40,
+    NVL(CAT41, 0) AS CAT41,
+    NVL(CAT42, 0) AS CAT42,
+    NVL(CAT43, 0) AS CAT43,
+    NVL(CAT44, 0) AS CAT44,
+    NVL(CAT45, 0) AS CAT45,
+    NVL(CAT46, 0) AS CAT46,
+    NVL(CAT47, 0) AS CAT47,
+    NVL(CAT48, 0) AS CAT48,
+    NVL(CAT49, 0) AS CAT49,
+    NVL(CAT50, 0) AS CAT50,
+    NVL(CAT51, 0) AS CAT51,
+    NVL(CAT52, 0) AS CAT52,
+    NVL(CAT53, 0) AS CAT53,
+    NVL(CAT54, 0) AS CAT54,
+    NVL(CAT55, 0) AS CAT55,
+    NVL(CAT56, 0) AS CAT56,
+    NVL(CAT57, 0) AS CAT57,
+    NVL(CAT58, 0) AS CAT58,
+    NVL(CAT59, 0) AS CAT59,
+    NVL(CAT60, 0) AS CAT60,
+    NVL(CAT61, 0) AS CAT61,
+    NVL(CAT62, 0) AS CAT62,
+    NVL(CAT63, 0) AS CAT63,
+    NVL(CAT64, 0) AS CAT64,
+    NVL(CAT65, 0) AS CAT65,
+    NVL(CAT66, 0) AS CAT66,
+    NVL(CAT67, 0) AS CAT67,
+    NVL(CAT68, 0) AS CAT68,
+    NVL(CAT69, 0) AS CAT69,
+    NVL(CAT70, 0) AS CAT70,
+    NVL(CAT71, 0) AS CAT71,
+    NVL(CAT72, 0) AS CAT72,
+    NVL(CAT73, 0) AS CAT73,
+    NVL(CAT74, 0) AS CAT74,
+    NVL(CAT75, 0) AS CAT75,
+    NVL(CAT76, 0) AS CAT76,
+    NVL(CAT77, 0) AS CAT77,
+    NVL(CAT78, 0) AS CAT78,
+    NVL(CAT79, 0) AS CAT79,
+    NVL(CAT80, 0) AS CAT80,
+    NVL(CAT81, 0) AS CAT81,
+    NVL(CAT82, 0) AS CAT82,
+    NVL(CAT83, 0) AS CAT83,
+    NVL(CAT84, 0) AS CAT84,
+    NVL(CAT85, 0) AS CAT85,
+    NVL(CAT86, 0) AS CAT86,
+    NVL(CAT87, 0) AS CAT87,
+    NVL(CAT88, 0) AS CAT88,
+    NVL(CAT89, 0) AS CAT89,
+    NVL(CAT90, 0) AS CAT90,
+    NVL(CAT91, 0) AS CAT91,
+    NVL(CAT92, 0) AS CAT92,
+    NVL(CAT93, 0) AS CAT93,
+    NVL(CAT94, 0) AS CAT94,
+    NVL(CAT95, 0) AS CAT95,
+    NVL(CAT96, 0) AS CAT96,
+    NVL(CAT97, 0) AS CAT97,
+    NVL(CAT98, 0) AS CAT98,
+    NVL(CAT99, 0) AS CAT99,
+    NVL(CAT100, 0) AS CAT100,
+    NVL(CAT101, 0) AS CAT101,
+    NVL(CAT102, 0) AS CAT102,
+    NVL(CAT103, 0) AS CAT103,
+    NVL(CAT104, 0) AS CAT104,
+    NVL(CAT105, 0) AS CAT105,
+    NVL(CAT106, 0) AS CAT106,
+    NVL(CAT107, 0) AS CAT107,
+    NVL(CAT108, 0) AS CAT108,
+    NVL(CAT109, 0) AS CAT109,
+    NVL(CAT110, 0) AS CAT110,
+    NVL(CAT111, 0) AS CAT111,
+    NVL(CAT112, 0) AS CAT112,
+    NVL(CAT113, 0) AS CAT113,
+    NVL(CAT114, 0) AS CAT114,
+    NVL(CAT115, 0) AS CAT115,
+    NVL(CAT116, 0) AS CAT116,
+    NVL(CAT117, 0) AS CAT117,
+    NVL(CAT118, 0) AS CAT118,
+    NVL(CAT119, 0) AS CAT119,
+    NVL(CAT120, 0) AS CAT120,
+    NVL(CAT121, 0) AS CAT121,
+    NVL(CAT122, 0) AS CAT122,
+    NVL(CAT123, 0) AS CAT123,
+    NVL(CAT124, 0) AS CAT124,
+    NVL(CAT125, 0) AS CAT125,
+    NVL(CAT126, 0) AS CAT126,
+    NVL(CAT127, 0) AS CAT127,
+    NVL(CAT128, 0) AS CAT128,
+    NVL(CAT129, 0) AS CAT129,
+    NVL(CAT130, 0) AS CAT130,
+    NVL(CAT131, 0) AS CAT131,
+    NVL(CAT132, 0) AS CAT132,
+    NVL(CAT133, 0) AS CAT133,
+    NVL(CAT134, 0) AS CAT134,
+    NVL(CAT135, 0) AS CAT135,
+    NVL(CAT136, 0) AS CAT136,
+    NVL(CAT137, 0) AS CAT137,
+    NVL(CAT138, 0) AS CAT138,
+    NVL(CAT139, 0) AS CAT139,
+    NVL(CAT140, 0) AS CAT140,
+    NVL(CAT141, 0) AS CAT141,
+    NVL(CAT142, 0) AS CAT142,
+    NVL(CAT143, 0) AS CAT143,
+    NVL(CAT144, 0) AS CAT144,
+    NVL(CAT145, 0) AS CAT145,
+    NVL(CAT146, 0) AS CAT146,
+    NVL(CAT147, 0) AS CAT147,
+    NVL(CAT148, 0) AS CAT148,
+    NVL(CAT149, 0) AS CAT149,
+    NVL(CAT150, 0) AS CAT150,
+    NVL(CAT151, 0) AS CAT151,
+    NVL(CAT152, 0) AS CAT152,
+    NVL(CAT153, 0) AS CAT153,
+    NVL(CAT154, 0) AS CAT154,
+    NVL(CAT155, 0) AS CAT155,
+    NVL(CAT156, 0) AS CAT156,
+    NVL(CAT157, 0) AS CAT157,
+    NVL(CAT158, 0) AS CAT158,
+    NVL(CAT159, 0) AS CAT159,
+    NVL(CAT160, 0) AS CAT160,
+    NVL(CAT161, 0) AS CAT161,
+    NVL(CAT162, 0) AS CAT162,
+    NVL(CAT163, 0) AS CAT163,
+    NVL(CAT164, 0) AS CAT164,
+    NVL(CAT165, 0) AS CAT165,
+    NVL(CAT166, 0) AS CAT166,
+    NVL(CAT167, 0) AS CAT167,
+    NVL(CAT168, 0) AS CAT168,
+    NVL(CAT169, 0) AS CAT169,
+    NVL(CAT170, 0) AS CAT170,
+    NVL(CAT171, 0) AS CAT171,
+    NVL(CAT172, 0) AS CAT172,
+    NVL(CAT173, 0) AS CAT173,
+    NVL(CAT174, 0) AS CAT174,
+    NVL(CAT175, 0) AS CAT175,
+    NVL(CAT176, 0) AS CAT176,
+    NVL(CAT177, 0) AS CAT177,
+    NVL(CAT178, 0) AS CAT178,
+    NVL(CAT179, 0) AS CAT179,
+    NVL(CAT180, 0) AS CAT180,
+    NVL(CAT181, 0) AS CAT181,
+    NVL(CAT182, 0) AS CAT182,
+    NVL(CAT183, 0) AS CAT183,
+    NVL(CAT184, 0) AS CAT184,
+    NVL(CAT185, 0) AS CAT185,
+    NVL(CAT186, 0) AS CAT186,
+    NVL(CAT187, 0) AS CAT187,
+    NVL(CAT188, 0) AS CAT188,
+    NVL(CAT189, 0) AS CAT189,
+    NVL(CAT190, 0) AS CAT190,
+    NVL(CAT191, 0) AS CAT191,
+    NVL(CAT192, 0) AS CAT192,
+    NVL(CAT193, 0) AS CAT193,
+    NVL(CAT194, 0) AS CAT194,
+    NVL(CAT195, 0) AS CAT195,
+    NVL(CAT196, 0) AS CAT196,
+    NVL(CAT197, 0) AS CAT197,
+    NVL(CAT198, 0) AS CAT198,
+    NVL(CAT199, 0) AS CAT199,
+    NVL(CAT200, 0) AS CAT200,
+    NVL(CAT201, 0) AS CAT201,
+    NVL(CAT202, 0) AS CAT202,
+    NVL(CAT203, 0) AS CAT203,
+    NVL(CAT204, 0) AS CAT204,
+    NVL(CAT205, 0) AS CAT205,
+    NVL(CAT206, 0) AS CAT206,
+    NVL(CAT207, 0) AS CAT207,
+    NVL(CAT208, 0) AS CAT208,
+    NVL(CAT209, 0) AS CAT209,
+    NVL(CAT210, 0) AS CAT210,
+    NVL(CAT211, 0) AS CAT211,
+    NVL(CAT212, 0) AS CAT212,
+    NVL(CAT213, 0) AS CAT213,
+    NVL(CAT214, 0) AS CAT214,
+    NVL(CAT215, 0) AS CAT215,
+    NVL(CAT216, 0) AS CAT216,
+    NVL(CAT217, 0) AS CAT217,
+    NVL(CAT218, 0) AS CAT218,
+    NVL(CAT219, 0) AS CAT219,
+    NVL(CAT220, 0) AS CAT220,
+    NVL(CAT221, 0) AS CAT221,
+    NVL(CAT222, 0) AS CAT222,
+    NVL(CAT223, 0) AS CAT223,
+    NVL(CAT224, 0) AS CAT224,
+    NVL(CAT225, 0) AS CAT225,
+    NVL(CAT226, 0) AS CAT226,
+    NVL(CAT227, 0) AS CAT227,
+    NVL(CAT228, 0) AS CAT228,
+    NVL(CAT229, 0) AS CAT229,
+    NVL(CAT230, 0) AS CAT230,
+    NVL(CAT231, 0) AS CAT231,
+    NVL(CAT232, 0) AS CAT232,
+    NVL(CAT233, 0) AS CAT233,
+    NVL(CAT234, 0) AS CAT234,
+    NVL(CAT235, 0) AS CAT235,
+    NVL(CAT236, 0) AS CAT236,
+    NVL(CAT237, 0) AS CAT237,
+    NVL(CAT238, 0) AS CAT238,
+    NVL(CAT239, 0) AS CAT239,
+    NVL(CAT240, 0) AS CAT240,
+    NVL(CAT241, 0) AS CAT241,
+    NVL(CAT242, 0) AS CAT242,
+    NVL(CAT243, 0) AS CAT243,
+    NVL(CAT244, 0) AS CAT244,
+    NVL(CAT245, 0) AS CAT245,
+    NVL(CAT246, 0) AS CAT246,
+    NVL(CAT247, 0) AS CAT247,
+    NVL(CAT248, 0) AS CAT248,
+    NVL(CAT249, 0) AS CAT249,
+    NVL(CAT250, 0) AS CAT250,
+    NVL(CAT251, 0) AS CAT251,
+    NVL(CAT252, 0) AS CAT252,
+    NVL(CAT253, 0) AS CAT253,
+    NVL(CAT254, 0) AS CAT254,
+    NVL(CAT255, 0) AS CAT255
+    FROM
+    (
+     SELECT STEP_SEQ,  0 CAT0, CLASSNUMBER, SUM (CNT) AS CNT
+            FROM (  SELECT STEP_SEQ,
+                           CLASSNUMBER,
+                           CLUSTERNUMBER,
+                           DECODE (CLUSTERNUMBER, 0, COUNT (*), 1) AS CNT
+                      FROM TQD_DEFECT
+                     WHERE 1 = 1 
+                     AND STEP_SEQ = :step_seq
+                  GROUP BY STEP_SEQ, CLASSNUMBER, CLUSTERNUMBER)
+        GROUP BY STEP_SEQ, CLASSNUMBER
+    )
+    PIVOT 
+    (
+        SUM(CNT)
+        FOR (CLASSNUMBER)
+        IN (
+            1 AS CAT1, 2 AS CAT2, 3 AS CAT3, 4 AS CAT4, 5 AS CAT5, 6 AS CAT6, 7 AS CAT7, 8 AS CAT8, 9 AS CAT9, 10 AS CAT10, 11 AS CAT11, 12 AS CAT12, 13 AS CAT13, 14 AS CAT14, 15 AS CAT15, 16 AS CAT16, 17 AS CAT17, 18 AS CAT18, 19 AS CAT19, 20 AS CAT20, 21 AS CAT21, 22 AS CAT22, 23 AS CAT23, 24 AS CAT24, 25 AS CAT25, 26 AS CAT26, 27 AS CAT27, 28 AS CAT28, 29 AS CAT29, 30 AS CAT30, 31 AS CAT31, 32 AS CAT32, 33 AS CAT33, 34 AS CAT34, 35 AS CAT35, 36 AS CAT36, 37 AS CAT37, 38 AS CAT38, 39 AS CAT39, 40 AS CAT40, 41 AS CAT41, 42 AS CAT42, 43 AS CAT43, 44 AS CAT44, 45 AS CAT45, 46 AS CAT46, 47 AS CAT47, 48 AS CAT48, 49 AS CAT49, 50 AS CAT50, 51 AS CAT51, 52 AS CAT52, 53 AS CAT53, 54 AS CAT54, 55 AS CAT55, 56 AS CAT56, 57 AS CAT57, 58 AS CAT58, 59 AS CAT59, 60 AS CAT60, 61 AS CAT61, 62 AS CAT62, 63 AS CAT63, 64 AS CAT64, 65 AS CAT65, 66 AS CAT66, 67 AS CAT67, 68 AS CAT68, 69 AS CAT69, 70 AS CAT70, 71 AS CAT71, 72 AS CAT72, 73 AS CAT73, 74 AS CAT74, 75 AS CAT75, 76 AS CAT76, 77 AS CAT77, 78 AS CAT78, 79 AS CAT79, 80 AS CAT80, 81 AS CAT81, 82 AS CAT82, 83 AS CAT83, 84 AS CAT84, 85 AS CAT85, 86 AS CAT86, 87 AS CAT87, 88 AS CAT88, 89 AS CAT89, 90 AS CAT90, 91 AS CAT91, 92 AS CAT92, 93 AS CAT93, 94 AS CAT94, 95 AS CAT95, 96 AS CAT96, 97 AS CAT97, 98 AS CAT98, 99 AS CAT99, 100 AS CAT100, 101 AS CAT101, 102 AS CAT102, 103 AS CAT103, 104 AS CAT104, 105 AS CAT105, 106 AS CAT106, 107 AS CAT107, 108 AS CAT108, 109 AS CAT109, 110 AS CAT110, 111 AS CAT111, 112 AS CAT112, 113 AS CAT113, 114 AS CAT114, 115 AS CAT115, 116 AS CAT116, 117 AS CAT117, 118 AS CAT118, 119 AS CAT119, 120 AS CAT120, 121 AS CAT121, 122 AS CAT122, 123 AS CAT123, 124 AS CAT124, 125 AS CAT125, 126 AS CAT126, 127 AS CAT127, 128 AS CAT128, 129 AS CAT129, 130 AS CAT130, 131 AS CAT131, 132 AS CAT132, 133 AS CAT133, 134 AS CAT134, 135 AS CAT135, 136 AS CAT136, 137 AS CAT137, 138 AS CAT138, 139 AS CAT139, 140 AS CAT140, 141 AS CAT141, 142 AS CAT142, 143 AS CAT143, 144 AS CAT144, 145 AS CAT145, 146 AS CAT146, 147 AS CAT147, 148 AS CAT148, 149 AS CAT149, 150 AS CAT150, 151 AS CAT151, 152 AS CAT152, 153 AS CAT153, 154 AS CAT154, 155 AS CAT155, 156 AS CAT156, 157 AS CAT157, 158 AS CAT158, 159 AS CAT159, 160 AS CAT160, 161 AS CAT161, 162 AS CAT162, 163 AS CAT163, 164 AS CAT164, 165 AS CAT165, 166 AS CAT166, 167 AS CAT167, 168 AS CAT168, 169 AS CAT169, 170 AS CAT170, 171 AS CAT171, 172 AS CAT172, 173 AS CAT173, 174 AS CAT174, 175 AS CAT175, 176 AS CAT176, 177 AS CAT177, 178 AS CAT178, 179 AS CAT179, 180 AS CAT180, 181 AS CAT181, 182 AS CAT182, 183 AS CAT183, 184 AS CAT184, 185 AS CAT185, 186 AS CAT186, 187 AS CAT187, 188 AS CAT188, 189 AS CAT189, 190 AS CAT190, 191 AS CAT191, 192 AS CAT192, 193 AS CAT193, 194 AS CAT194, 195 AS CAT195, 196 AS CAT196, 197 AS CAT197, 198 AS CAT198, 199 AS CAT199, 200 AS CAT200, 201 AS CAT201, 202 AS CAT202, 203 AS CAT203, 204 AS CAT204, 205 AS CAT205, 206 AS CAT206, 207 AS CAT207, 208 AS CAT208, 209 AS CAT209, 210 AS CAT210, 211 AS CAT211, 212 AS CAT212, 213 AS CAT213, 214 AS CAT214, 215 AS CAT215, 216 AS CAT216, 217 AS CAT217, 218 AS CAT218, 219 AS CAT219, 220 AS CAT220, 221 AS CAT221, 222 AS CAT222, 223 AS CAT223, 224 AS CAT224, 225 AS CAT225, 226 AS CAT226, 227 AS CAT227, 228 AS CAT228, 229 AS CAT229, 230 AS CAT230, 231 AS CAT231, 232 AS CAT232, 233 AS CAT233, 234 AS CAT234, 235 AS CAT235, 236 AS CAT236, 237 AS CAT237, 238 AS CAT238, 239 AS CAT239, 240 AS CAT240, 241 AS CAT241, 242 AS CAT242, 243 AS CAT243, 244 AS CAT244, 245 AS CAT245, 246 AS CAT246, 247 AS CAT247, 248 AS CAT248, 249 AS CAT249, 250 AS CAT250, 251 AS CAT251, 252 AS CAT252, 253 AS CAT253, 254 AS CAT254, 255 AS CAT255
+        )
+    )
+)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="0">:step_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_DATASHEET_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-10-28 19:28:44
+SELECT t1.product AS "DEVICE",
+       t1.step_id AS "STEP_ID",
+       TO_CHAR (t1.resulttimestamp, 'yy-mm-dd hh24:mi') AS "INSPECTION_TIME",
+       t1.inspection_eq AS "INSEPCTOR",
+       t1.wafer_id AS "WAFER_ID",
+       t1.lot_id,
+       t4.program AS "TST_PGM",
+       t4.YIELD AS "WF_MPY",
+       t1.scan_area,
+       t1.defect_dd AS "DEFECT_DENSITY",
+       ??
+       '' AS TOTAL,
+       t2.*
+  FROM tqd_insp_info t1,
+       (SELECT *
+          FROM (  SELECT STEP_SEQ,
+                         CLASSNUMBER,
+                         SUM (CNT) AS CNT
+                    FROM (  SELECT t2.STEP_SEQ, t2.CLASSNUMBER, t2.CLUSTERNUMBER, DECODE (t2.CLUSTERNUMBER, 0, COUNT (*), 1) AS CNT
+                              FROM TQD_INSP_INFO t1, TQD_DEFECT t2
+                             WHERE     1 = 1
+                                   AND t1.step_seq = t2.step_seq
+                                   AND t1.wafer_seq = t2.wafer_seq
+                                   AND t1.resulttimestamp >= TO_DATE (:fromDate, 'YYYYMMDD')
+                                   AND t1.resulttimestamp < TO_DATE (:toDate, 'YYYYMMDD')
+                                   AND t1.product IN (??)
+                                   AND t1.step_id IN (??)
+                                   AND t1.lot_id IN (??)
+                                   AND t1.wafer_seq IN (??)
+                          GROUP BY t2.STEP_SEQ,
+                                   t2.CLASSNUMBER,
+                                   t2.CLUSTERNUMBER)
+                GROUP BY STEP_SEQ, classnumber) PIVOT (SUM (CNT)
+                                                         FOR (CLASSNUMBER)
+                                                         IN  ( ?? ))) t2,
+       tqd_insp_sum t3,
+       (SELECT lot_id, wafer_id, SUBSTR (wafer_id, INSTR (wafer_id, '-') + 1) slot_id, testarea, program, yield
+          FROM tqp_wafer_sum
+         WHERE 1 = 1 AND testarea IN ('MULTIPROBE') AND probe_cnt = 0) t4
+ WHERE     1 = 1
+       AND t1.step_seq = t2.step_seq
+       AND t1.step_seq = t3.step_seq
+       AND t1.lot_id = t4.lot_id(+)
+       AND t1.slot_id = t4.slot_id(+)
+       AND t1.resulttimestamp >= TO_DATE (:fromDate, 'YYYYMMDD')
+       AND t1.resulttimestamp < TO_DATE (:toDate, 'YYYYMMDD')
+       AND t1.product IN (??)
+       AND t1.step_id IN (??)
+       AND t1.lot_id IN (??)
+       AND t1.wafer_seq IN (??)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="fromDate">:fromDate</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="toDate">:toDate</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_DATASHEET_02" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-10-31 17:29:44
+SELECT t1.product AS "DEVICE",
+       t1.step_id AS "STEP_ID",
+       TO_CHAR (t1.resulttimestamp, 'yy-mm-dd hh24:mi') AS "INSPECTION_TIME",
+       t1.inspection_eq AS "INSEPCTOR",
+       t1.wafer_id AS "WAFER_ID",
+       t1.lot_id,
+       t4.program AS "TST_PGM",
+       t4.YIELD AS "WF_MPY",
+       t1.scan_area,
+       t1.defect_dd AS "DEFECT_DENSITY",
+       ??
+       '' AS TOTAL,
+       t2.*
+  FROM tqd_insp_info t1,
+       (SELECT *
+          FROM (  SELECT STEP_SEQ,
+                         CLASSNUMBER,
+                         SUM (CNT) AS CNT
+                    FROM (  SELECT step_seq, classnumber, CLUSTERNUMBER, DECODE (CLUSTERNUMBER, 0, COUNT (*), 1) AS CNT
+                              FROM (SELECT DISTINCT t2.STEP_SEQ,
+                                                    t2.xindex * 65536 + t2.yindex,
+                                                    t2.CLASSNUMBER,
+                                                    t2.CLUSTERNUMBER
+                                      FROM TQD_INSP_INFO t1, TQD_DEFECT t2
+                                     WHERE     1 = 1
+                                           AND t1.step_seq = t2.step_seq
+                                           AND t1.wafer_seq = t2.wafer_seq
+                                           AND t1.resulttimestamp >= TO_DATE (:fromDate, 'YYYYMMDD')
+                                           AND t1.resulttimestamp < TO_DATE (:toDate, 'YYYYMMDD')
+                                           AND t1.product IN (??)
+                                           AND t1.step_id IN (??)
+                                           AND t1.lot_id IN (??)
+                                           AND t1.wafer_seq IN (??))
+                          GROUP BY step_Seq, classnumber, clusternumber)
+                GROUP BY STEP_SEQ, classnumber) PIVOT (SUM (CNT)
+                                                         FOR (CLASSNUMBER)
+                                                         IN  ( ?? ))) t2,
+       tqd_insp_sum t3,
+       (SELECT lot_id, wafer_id, SUBSTR (wafer_id, INSTR (wafer_id, '-') + 1) slot_id, testarea, program, yield
+          FROM tqp_wafer_sum
+         WHERE 1 = 1 AND testarea IN ('MULTIPROBE') AND probe_cnt = 0) t4
+ WHERE     1 = 1
+       AND t1.step_seq = t2.step_seq
+       AND t1.step_seq = t3.step_seq
+       AND t1.lot_id = t4.lot_id(+)
+       AND t1.slot_id = t4.slot_id(+)
+       AND t1.resulttimestamp >= TO_DATE (:fromDate, 'YYYYMMDD')
+       AND t1.resulttimestamp < TO_DATE (:toDate, 'YYYYMMDD')
+       AND t1.product IN (??)
+       AND t1.step_id IN (??)
+       AND t1.lot_id IN (??)
+       AND t1.wafer_seq IN (??)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="fromDate">:fromDate</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="toDate">:toDate</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[DELETE FROM TQD_REVIEW_SUM
+WHERE STEP_SEQ = :STEP_SEQ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0" value="STEP_SEQ">:STEP_SEQ</param>
+        </parameters>
+    </query>
+</queryxml>

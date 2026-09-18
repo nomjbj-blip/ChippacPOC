@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="BUMPFA" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Select" queryid="SELECT_FUNCTION" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT FUNC_ID, FUNC_DESC FROM TQP_FUNCTION]]></commandtext>
+    </query>
+    <query statement="Insert" queryid="INSERT_FUNCTION" commandtype="Text" description="function을 추가한다" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_FUNCTION
+VALUES(:FUNCTION_ID, :FUNCTION_DESC)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30" description="function id" value="func id2">:FUNCTION_ID</param>
+            <param direction="Input" dbtype="VarChar" size="256" description="func description" value="func description">:FUNCTION_DESC</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_FUNCTION" commandtype="Text" description="function을 제거한다" commandtimeout="60">
+        <commandtext><![CDATA[DELETE FROM TQP_FUNCTION WHERE FUNC_ID=:FUNC_ID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30" description="function id" value="asdf">:FUNC_ID</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="UPDATE_FUNCTION" commandtype="Text" description="function을 update 한다" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_FUNCTION
+SET FUNC_DESC=:FUNC_DESC
+WHERE FUNC_ID=:FUNC_ID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30" description="func id">:FUNC_ID</param>
+            <param direction="Input" dbtype="VarChar" size="256" description="func desc">:FUNC_DESC</param>
+        </parameters>
+    </query>
+</queryxml>

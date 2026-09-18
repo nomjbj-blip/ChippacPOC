@@ -1,0 +1,1935 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Insert" queryid="CREATE_INSP_INFO" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQD_INSP_INFO
+( STEP_SEQ,      
+  WAFER_SEQ,        
+  RESULTTIMESTAMP,
+  FILETIMESTAMP,   
+  TECHNOLOGY,  
+  PRODUCT,   
+  LOT_ID,    
+  WAFER_ID ,    
+  STEP_ID ,     
+  TEST  ,        
+  SLOT_ID,        
+  SETUP_SEQ,      
+  STATUS ,       
+  MAIN_EQ,        
+  ROUTE ,       
+  OPER ,           
+  INSPECTION_EQ,    
+  INSPECTION_PARAM,
+  DEFECTS,     
+  CLASSIFIED_DEFECTS ,
+  KILLER_DEFECTS,  
+  RANDOM_DEFECTS,   
+  ADDER_KILLER_DEFECT,
+  ADDER_RANDOM_DEFECT,
+  CLUSTERS,       
+  ADDER_CLUSTERS ,    
+  CLUSTER_AREA ,    
+  DEFECT_DD,      
+  KILLER_DEFECT_DD,
+  RANDOM_DEFECT_DD,  
+  INSPECTED_DIE,    
+  DEFECTIVE_DIE ,    
+  ADDER_DEF_DIE ,    
+  KILL_DEF_DIE ,    
+  KILL_ADDER_DEF_DIE,
+  IMAGES  ,      
+  SCAN_AREA ,     
+  ADDER_DEFECTS ,    
+  KILL_RND_DEFECTS,
+  RETICLE_ID,     
+  INTERLOCK_FLAG ,   
+  STEPPER_EQ )
+ VALUES(
+:step_seq
+,:wafer_seq
+,TO_TIMESTAMP(:resulttimestamp,'MM-DD-YY HH24:MI:SS')
+,TO_TIMESTAMP(:filetimestamp,'MM-DD-YY HH24:MI:SS')
+,:technology
+,:product
+,:lot_id
+,:wafer_id
+,:step_id
+,:test
+,:slot_id
+,:setup_seq
+,:status
+,NVL(:main_eq,'UNKNOWN')
+,:route
+,:oper
+,:inspection_eq
+,:inspection_param
+,:defects
+,:classified_defects
+,:killer_defects
+,:random_defects
+,:adder_killer_defect
+,:adder_random_defect
+,:clusters
+,:adder_clusters
+,:cluster_area
+,:defect_dd
+,:killer_defect_dd
+,:random_defect_dd
+,:inspected_die
+,:defective_die
+,:adder_def_die
+,:kill_def_die
+,:kill_adder_def_die
+,:images
+,:scan_area
+,:adder_defects
+,:kill_rnd_defects
+,:reticle_id
+,:interlock
+,:stepper_eq)
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:step_seq</param>
+            <param direction="Input" dbtype="Number" size="0">:wafer_seq</param>
+            <param direction="Input" dbtype="VarChar" size="0">:resulttimestamp</param>
+            <param direction="Input" dbtype="VarChar" size="0">:filetimestamp</param>
+            <param direction="Input" dbtype="VarChar" size="0">:technology</param>
+            <param direction="Input" dbtype="VarChar" size="0">:product</param>
+            <param direction="Input" dbtype="VarChar" size="0">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="0">:wafer_id</param>
+            <param direction="Input" dbtype="VarChar" size="0">:step_id</param>
+            <param direction="Input" dbtype="Number" size="0">:test</param>
+            <param direction="Input" dbtype="Number" size="0">:slot_id</param>
+            <param direction="Input" dbtype="Number" size="0">:setup_seq</param>
+            <param direction="Input" dbtype="VarChar" size="0">:status</param>
+            <param direction="Input" dbtype="VarChar" size="0">:main_eq</param>
+            <param direction="Input" dbtype="VarChar" size="0">:route</param>
+            <param direction="Input" dbtype="VarChar" size="0">:oper</param>
+            <param direction="Input" dbtype="VarChar" size="0">:inspection_eq</param>
+            <param direction="Input" dbtype="VarChar" size="0">:inspection_param</param>
+            <param direction="Input" dbtype="Number" size="0">:defects</param>
+            <param direction="Input" dbtype="Number" size="0">:classified_defects</param>
+            <param direction="Input" dbtype="Number" size="0">:killer_defects</param>
+            <param direction="Input" dbtype="Number" size="0">:random_defects</param>
+            <param direction="Input" dbtype="Number" size="0">:adder_killer_defect</param>
+            <param direction="Input" dbtype="Number" size="0">:adder_random_defect</param>
+            <param direction="Input" dbtype="Number" size="0">:clusters</param>
+            <param direction="Input" dbtype="Number" size="0">:adder_clusters</param>
+            <param direction="Input" dbtype="Number" size="0">:cluster_area</param>
+            <param direction="Input" dbtype="Number" size="0">:defect_dd</param>
+            <param direction="Input" dbtype="Number" size="0">:killer_defect_dd</param>
+            <param direction="Input" dbtype="Number" size="0">:random_defect_dd</param>
+            <param direction="Input" dbtype="Number" size="0">:inspected_die</param>
+            <param direction="Input" dbtype="Number" size="0">:defective_die</param>
+            <param direction="Input" dbtype="Number" size="0">:adder_def_die</param>
+            <param direction="Input" dbtype="Number" size="0">:kill_def_die</param>
+            <param direction="Input" dbtype="Number" size="0">:kill_adder_def_die</param>
+            <param direction="Input" dbtype="Number" size="0">:images</param>
+            <param direction="Input" dbtype="Number" size="0">:scan_area</param>
+            <param direction="Input" dbtype="Number" size="0">:adder_defects</param>
+            <param direction="Input" dbtype="Number" size="0">:kill_rnd_defects</param>
+            <param direction="Input" dbtype="VarChar" size="0">:reticle_id</param>
+            <param direction="Input" dbtype="VarChar" size="0">:interlock</param>
+            <param direction="Input" dbtype="VarChar" size="0">:stepper_eq</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_INSP_INFO" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQD_INSP_INFO SET
+FILETIMESTAMP = TO_TIMESTAMP(:filetimestamp,'YYYY-MM-DD HH24:MI:SS') 
+,STATUS = :status
+,CLASSIFIED_DEFECTS = :classified_defects
+,KILLER_DEFECTS = :killer_defects
+,ADDER_KILLER_DEFECT = :adder_killer_defects
+,KILLER_DEFECT_DD = :killer_defect_dd
+,KILL_DEF_DIE = :kill_def_die
+,KILL_ADDER_DEF_DIE = :kill_adder_def_die
+,IMAGES = :images
+,KILL_RND_DEFECTS = :kill_rnd_defects
+WHERE STEP_SEQ = :step_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:filetimestamp</param>
+            <param direction="Input" dbtype="VarChar" size="0">:status</param>
+            <param direction="Input" dbtype="Number" size="0">:classified_defects</param>
+            <param direction="Input" dbtype="Number" size="0">:killer_defects</param>
+            <param direction="Input" dbtype="Number" size="0">:adder_killer_defects</param>
+            <param direction="Input" dbtype="Number" size="0">:killer_defect_dd</param>
+            <param direction="Input" dbtype="Number" size="0">:kill_def_die</param>
+            <param direction="Input" dbtype="Number" size="0">:kill_adder_def_die</param>
+            <param direction="Input" dbtype="Number" size="0">:images</param>
+            <param direction="Input" dbtype="Number" size="0">:kill_rnd_defects</param>
+            <param direction="Input" dbtype="Number" size="0">:step_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_PRODUCT_LIST_PERIOD" commandtype="Text" description="기간내의 Product List를 가져옴" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT PRODUCT FROM TQD_INSP_INFO
+WHERE RESULTTIMESTAMP BETWEEN TO_TIMESTAMP(:fromtime,'YYYY-MM-DD HH24:MI:SS') AND TO_TIMESTAMP(:totime,'YYYY-MM-DD HH24:MI:SS') ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="20" description="FROMTIME">:fromtime</param>
+            <param direction="Input" dbtype="VarChar" size="20" description="TOTIME">:totime</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_LOT_LIST_PERIOD" commandtype="Text" description="기간내의 Lot List를 가져옴" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT LOT_ID FROM TQD_INSP_INFO
+WHERE RESULTTIMESTAMP BETWEEN TO_TIMESTAMP(:fromtime,'YYYY-MM-DD HH24:MI:SS') AND TO_TIMESTAMP(:totime,'YYYY-MM-DD HH24:MI:SS')
+AND PRODUCT = :product]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="20" description="fromtime">:fromtime</param>
+            <param direction="Input" dbtype="VarChar" size="20" description="totime">:totime</param>
+            <param direction="Input" dbtype="VarChar" size="0" description="product">:product</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_WAFER_LIST_PERIOD" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT WAFER_ID FROM TQD_INSP_INFO
+WHERE RESULTTIMESTAMP BETWEEN TO_TIMESTAMP(:fromtime,'YYYY-MM-DD HH24:MI:SS') AND TO_TIMESTAMP(:totime,'YYYY-MM-DD HH24:MI:SS')
+AND PRODUCT = :product
+AND LOT_ID = :lot_id]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="20" description="fromtime">:fromtime</param>
+            <param direction="Input" dbtype="VarChar" size="20" description="totime">:totime</param>
+            <param direction="Input" dbtype="VarChar" size="0" description="product">:product</param>
+            <param direction="Input" dbtype="VarChar" size="0" description="lot_id">:lot_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_STEP_LIST_PERIOD" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT STEP_ID,RESULTTIMESTAMP,STEP_SEQ,SETUP_SEQ FROM TQD_INSP_INFO
+WHERE RESULTTIMESTAMP BETWEEN TO_TIMESTAMP(:fromtime,'YYYY-MM-DD HH24:MI:SS') AND TO_TIMESTAMP(:totime,'YYYY-MM-DD HH24:MI:SS')
+AND PRODUCT = :product
+AND LOT_ID = :lot_id
+AND WAFER_ID = :wafer_id]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="20" description="fromtime">:fromtime</param>
+            <param direction="Input" dbtype="VarChar" size="20" description="totime">:totime</param>
+            <param direction="Input" dbtype="VarChar" size="0" description="product">:product</param>
+            <param direction="Input" dbtype="VarChar" size="0" description="lotid">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="0" description="waferid">:wafer_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_STEP_SEQS" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT STEP_SEQ, WAFER_SEQ
+  FROM TQD_INSP_INFO
+ WHERE 1=1
+       AND FACTORY = :factory
+       AND RESULTTIMESTAMP BETWEEN TO_TIMESTAMP ( :fromtime,
+                                                 'YYYY-MM-DD HH24:MI:SS')
+                               AND TO_TIMESTAMP ( :totime,
+                                                 'YYYY-MM-DD HH24:MI:SS')
+       AND PRODUCT = :product
+       AND LOT_ID = :lot_id
+       AND WAFER_ID = :wafer_id
+       AND STEP_ID IN ( :step_id)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="20">:fromtime</param>
+            <param direction="Input" dbtype="VarChar" size="20">:totime</param>
+            <param direction="Input" dbtype="VarChar" size="0">:product</param>
+            <param direction="Input" dbtype="VarChar" size="0">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="0">:wafer_id</param>
+            <param direction="Input" dbtype="VarChar" size="0">:step_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_SETUP_LIST_IN_PRODUCT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT SETUP_ID,SETUP_SEQ FROM TDMS_SETUP
+WHERE SETUP_SEQ IN (
+SELECT DISTINCT SETUP_SEQ
+FROM TQD_INSP_INFO 
+WHERE PRODUCT=:product
+)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0" description="SETUP_TIME">:product</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="FIND_LOT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT PRODUCT, STEP_ID, LOT_ID
+  FROM TQD_INSP_INFO
+ WHERE RESULTTIMESTAMP BETWEEN TO_TIMESTAMP(:fromtime,'YYYYMMDD') 
+                           AND TO_TIMESTAMP(:totime,'YYYYMMDD')
+   AND LOT_ID LIKE :lot_id]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="20">:fromtime</param>
+            <param direction="Input" dbtype="VarChar" size="20">:totime</param>
+            <param direction="Input" dbtype="VarChar" size="0">:lot_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_STEP_INFO" commandtype="Text" description="Step에대한 Infomation을 가져온다." commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQD_INSP_INFO
+WHERE PRODUCT = :product
+AND LOT_ID = :lot_id
+AND WAFER_ID = :wafer_id
+AND STEP_ID = :step_id
+ORDER BY RESULTTIMESTAMP DESC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:product</param>
+            <param direction="Input" dbtype="VarChar" size="0">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="0">:wafer_id</param>
+            <param direction="Input" dbtype="VarChar" size="0">:step_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_STEP_LIST_BY_WAFER" commandtype="Text" description="주어진 Lot Wafer에 해당하는 Step List를 시간순으로 반환" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQD_INSP_INFO
+WHERE PRODUCT = :product
+AND LOT_ID = :lot_id
+AND WAFER_ID = :wafer_id
+ORDER BY RESULTTIMESTAMP]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:product</param>
+            <param direction="Input" dbtype="VarChar" size="0">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="0">:wafer_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="DYNAMIC" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[??]]></commandtext>
+    </query>
+    <query statement="Update" queryid="UPDATE_INTERLOCK_FLAG" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQD_INSP_INFO SET INTERLOCK_FLAG=:interlock_flag WHERE STEP_SEQ =:step_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:interlock_flag</param>
+            <param direction="Input" dbtype="Number" size="0">:step_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="CHECK_EQUIP_HOLD" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT INTERLOCK_FLAG FROM TQD_INSP_INFO
+WHERE PRODUCT=:product
+AND STEP_ID=:step_id
+AND MAIN_EQ=:main_eq
+AND RESULTTIMESTAMP <= (SELECT RESULTTIMESTAMP FROM TDMS_STEP WHERE STEP_SEQ=:step_seq)
+ORDER BY RESULTTIMESTAMP DESC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:product</param>
+            <param direction="Input" dbtype="VarChar" size="0">:step_id</param>
+            <param direction="Input" dbtype="VarChar" size="0">:main_eq</param>
+            <param direction="Input" dbtype="Number" size="0">:step_seq</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_STEP" commandtype="Text" description="STEP_SEQ 에 맞는 행을 지운다." commandtimeout="60">
+        <commandtext><![CDATA[DELETE FROM TQD_INSP_INFO 
+WHERE step_seq = :step_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:step_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_STEP_LIST_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2013-09-13 20:48:59
+--SELECT ?-? FROM TQD_INSP_INFO
+--WHERE RESULTTIMESTAMP BETWEEN TO_DATE(:stime,'YYYY-MM-DD HH24:MI:SS') AND TO_DATE(:etime,'YYYY-MM-DD HH24:MI:SS') 
+--?-?
+
+
+SELECT ?? 
+  FROM (
+        SELECT A.*,
+                 RANK ()
+                 OVER (PARTITION BY LOT_ID, WAFER_ID, STEP_ID
+                       ORDER BY RESULTTIMESTAMP DESC)
+               - 1
+                  PROBE_COUNT
+          FROM TQD_INSP_INFO A
+         WHERE     1 = 1
+               AND RESULTTIMESTAMP BETWEEN TO_DATE ( :stime, 'YYYY-MM-DD HH24:MI:SS')
+                                       AND TO_DATE ( :etime, 'YYYY-MM-DD HH24:MI:SS') )
+WHERE 1=1
+??]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:stime</param>
+            <param direction="Input" dbtype="VarChar" size="0">:etime</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_INSP_INFO_MULTI_SEQ" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[
+SELECT * FROM (
+    SELECT A.STEP_SEQ,
+           A.WAFER_SEQ,
+           TO_CHAR(A.RESULTTIMESTAMP, 'YYYY/MM/DD HH24:MI:SS') AS RESULTTIMESTAMP,
+           TO_CHAR(A.FILETIMESTAMP, 'YYYY/MM/DD HH24:MI:SS') AS FILETIMESTAMP,
+           A.FACTORY,
+           A.TECHNOLOGY,
+           A.PRODUCT,
+           A.LOT_ID,
+           A.WAFER_ID,
+           A.STEP_ID,
+           A.TEST,
+           A.SLOT_ID,
+           A.SETUP_SEQ,
+           A.STATUS,
+           A.MAIN_EQ,
+           A.ROUTE,
+           A.OPER,
+           A.INSPECTION_EQ,
+           A.INSPECTION_PARAM,
+           A.DEFECTS,
+           A.CLASSIFIED_DEFECTS,
+           A.KILLER_DEFECTS,
+           A.RANDOM_DEFECTS,
+           A.ADDER_KILLER_DEFECT,
+           A.ADDER_RANDOM_DEFECT,
+           A.CLUSTERS,
+           A.ADDER_CLUSTERS,
+           A.CLUSTER_AREA,
+           A.DEFECT_DD,
+           A.KILLER_DEFECT_DD,
+           A.RANDOM_DEFECT_DD,
+           A.INSPECTED_DIE,
+           A.DEFECTIVE_DIE,    
+           ROUND((A.DEFECTIVE_DIE / NULLIF(A.INSPECTED_DIE, 0) * 100), 2) AS "DEFECTIVE_DIE_PERCENTAGES",
+           A.ADDER_DEF_DIE,
+           A.KILL_DEF_DIE,
+           A.KILL_ADDER_DEF_DIE,
+           A.IMAGES,
+           A.SCAN_AREA,
+           A.ADDER_DEFECTS,
+           A.KILL_RND_DEFECTS,
+           A."COMMENT",
+           A.RETICLE_ID,
+           A.INTERLOCK_FLAG,
+           A.STEPPER_EQ,
+           A.SUMMARY_FLAG, 
+           RANK() OVER (PARTITION BY LOT_ID, WAFER_ID, STEP_ID ORDER BY RESULTTIMESTAMP DESC) - 1 PROBE_COUNT,
+           B.ST_XCNT,
+           B.ST_YCNT,
+           B.ST_START_X,
+           B.ST_START_Y ,
+           ROW_NUMBER() OVER (PARTITION BY STEP_SEQ ORDER BY B.MAPID) RN
+      FROM TQD_INSP_INFO A, TQP_MAPDEF B
+     WHERE A.FACTORY = B.FACTORY(+)
+           AND A.PRODUCT = B.MAPID(+)
+           AND STEP_SEQ IN (??)
+     ORDER BY RESULTTIMESTAMP
+      )
+ WHERE RN = 1]]></commandtext>
+    </query>
+    <query statement="Select" queryid="GET_STEP_LIST_BY_STEP_ID" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * 
+FROM TQD_INSP_INFO
+WHERE 1=1
+AND STEP_ID = :step_id
+AND RESULTTIMESTAMP BETWEEN TO_DATE(:stime,'YYYY-MM-DD HH24:MI:SS') AND TO_DATE(:etime,'YYYY-MM-DD HH24:MI:SS')
+??]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:step_id</param>
+            <param direction="Input" dbtype="VarChar" size="19">:stime</param>
+            <param direction="Input" dbtype="VarChar" size="19">:etime</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_INSP_INFO_BY_LOT_ID" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT *
+FROM TQD_INSP_INFO
+WHERE LOT_ID = :lot_id]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_RESULT_BY_LOTID" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT STATUS,
+  LOT_ID,
+  WAFER_ID,
+  STEP_ID,
+  INSPECTION_EQ
+FROM TQD_INSP_INFO
+ORDER BY LOT_ID,
+  WAFER_ID,
+  STEP_ID]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_RESULT_LOTLIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT LOT_ID 
+FROM TQD_INSP_INFO 
+ORDER BY LOT_ID]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_RESULT_WAFERLIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT WAFER_ID 
+FROM TQD_INSP_INFO 
+ORDER BY WAFER_ID]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_RESULT_STEPLIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT STEP_ID 
+FROM TQD_INSP_INFO 
+ORDER BY STEP_ID]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_RESULT_INSPEQLIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT INSPECTION_EQ 
+FROM TQD_INSP_INFO 
+ORDER BY INSPECTION_EQ]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_RESULT_BY_ITEM" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT STATUS,
+  LOT_ID,
+  WAFER_ID,
+  STEP_ID,
+  INSPECTION_EQ
+FROM TQD_INSP_INFO
+WHERE LOT_ID LIKE :LOT_ID
+AND WAFER_ID LIKE :WAFER_ID
+AND STEP_ID LIKE :STEP_ID
+AND INSPECTION_EQ LIKE :INSPECTION_EQ
+ORDER BY LOT_ID,
+  WAFER_ID,
+  STEP_ID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:LOT_ID</param>
+            <param direction="Input" dbtype="VarChar" size="0">:WAFER_ID</param>
+            <param direction="Input" dbtype="VarChar" size="0">:STEP_ID</param>
+            <param direction="Input" dbtype="VarChar" size="40">:INSPECTION_EQ</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_PRODUCT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT A.PRODUCT AS PRODUCT, B.EQUIP_MODEL AS FORMAT
+FROM TQD_INSP_INFO A, TQD_UPDATESRV B
+WHERE A.LOT_ID = :lot_id
+AND A.STEP_ID = :step_id
+AND A.WAFER_ID = :wafer_id
+AND A.INSPECTION_EQ = B.EQUIP_ID
+ORDER BY A.RESULTTIMESTAMP DESC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="CEA81G1">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="BUMP">:step_id</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="18">:wafer_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_STEP_LIST_BY_ALL" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT *
+FROM TQD_INSP_INFO A ,(SELECT MAX(RESULTTIMESTAMP) AS RESULTTIMESTAMP, LOT_ID, WAFER_ID
+                                            FROM TQD_INSP_INFO
+                                            WHERE STEP_ID = :step_id
+                                            AND PRODUCT = :product
+                                            AND LOT_ID = :lot_id
+                                            GROUP BY LOT_ID, WAFER_ID) B
+WHERE A.RESULTTIMESTAMP = B.RESULTTIMESTAMP 
+AND A.LOT_ID = B.LOT_ID
+AND A.WAFER_ID = B.WAFER_ID
+ORDER BY A.WAFER_ID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:step_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:product</param>
+            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_TOTAL_COUNT_BY_STEP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2014-11-26 17:04:59
+SELECT COUNT(*) AS TOTAL 
+FROM TQD_SCAN_SAMPLE
+WHERE STEP_SEQ = :STEP_SEQ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:STEP_SEQ</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="CREATE_INSP_INFO_MIG" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQD_INSP_INFO
+( STEP_SEQ,      
+  WAFER_SEQ,        
+  RESULTTIMESTAMP,
+  FILETIMESTAMP,  
+  FACTORY,
+  TECHNOLOGY,  
+  PRODUCT,   
+  LOT_ID,     
+  WAFER_ID ,    
+  STEP_ID ,     
+  TEST  ,        
+  SLOT_ID,        
+  SETUP_SEQ,      
+  STATUS ,       
+  MAIN_EQ,        
+  ROUTE ,       
+  OPER ,           
+  INSPECTION_EQ,    
+  INSPECTION_PARAM,
+  DEFECTS,     
+  CLASSIFIED_DEFECTS ,
+  KILLER_DEFECTS,  
+  RANDOM_DEFECTS,   
+  ADDER_KILLER_DEFECT,
+  ADDER_RANDOM_DEFECT,
+  CLUSTERS,       
+  ADDER_CLUSTERS ,    
+  CLUSTER_AREA ,    
+  DEFECT_DD,      
+  KILLER_DEFECT_DD,
+  RANDOM_DEFECT_DD,  
+  INSPECTED_DIE,    
+  DEFECTIVE_DIE ,    
+  ADDER_DEF_DIE ,    
+  KILL_DEF_DIE ,    
+  KILL_ADDER_DEF_DIE,
+  IMAGES  ,      
+  SCAN_AREA ,     
+  ADDER_DEFECTS ,    
+  KILL_RND_DEFECTS,
+  "COMMENT",
+  RETICLE_ID,     
+  INTERLOCK_FLAG ,   
+  STEPPER_EQ )
+ VALUES(
+:step_seq
+,:wafer_seq
+,TO_TIMESTAMP(:resulttimestamp,'MM-DD-YY HH24:MI:SS')
+,TO_TIMESTAMP(:filetimestamp,'MM-DD-YY HH24:MI:SS')
+,:factory
+,:technology
+,:product
+,:lot_id
+,:wafer_id
+,:step_id
+,:test
+,:slot_id
+,:setup_seq
+,:status
+,NVL(:main_eq,'UNKNOWN')
+,:route
+,:oper
+,:inspection_eq
+,:inspection_param
+,:defects
+,:classified_defects
+,:killer_defects
+,:random_defects
+,:adder_killer_defect
+,:adder_random_defect
+,:clusters
+,:adder_clusters
+,:cluster_area
+,:defect_dd
+,:killer_defect_dd
+,:random_defect_dd
+,:inspected_die
+,:defective_die
+,:adder_def_die
+,:kill_def_die
+,:kill_adder_def_die
+,:images
+,:scan_area
+,:adder_defects
+,:kill_rnd_defects
+,:commnt
+,:reticle_id
+,:interlock
+,:stepper_eq)
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0" value="step_seq">:step_seq</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="wafer_seq">:wafer_seq</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="resulttimestamp">:resulttimestamp</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="filetimestamp">:filetimestamp</param>
+            <param direction="Input" dbtype="VarChar" size="0">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="technology">:technology</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="product">:product</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="lot_id">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="wafer_id">:wafer_id</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="step_id">:step_id</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="test">:test</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="slot_id">:slot_id</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="setup_seq">:setup_seq</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="status">:status</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="main_eq">:main_eq</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="route">:route</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="oper">:oper</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="inspection_eq">:inspection_eq</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="inspection_param">:inspection_param</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="defects">:defects</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="classified_defects">:classified_defects</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="killer_defects">:killer_defects</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="random_defects">:random_defects</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="adder_killer_defect">:adder_killer_defect</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="adder_random_defect">:adder_random_defect</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="clusters">:clusters</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="adder_clusters">:adder_clusters</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="cluster_area">:cluster_area</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="defect_dd">:defect_dd</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="killer_defect_dd">:killer_defect_dd</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="random_defect_dd">:random_defect_dd</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="inspected_die">:inspected_die</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="defective_die">:defective_die</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="adder_def_die">:adder_def_die</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="kill_def_die">:kill_def_die</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="kill_adder_def_die">:kill_adder_def_die</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="images">:images</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="scan_area">:scan_area</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="adder_defects">:adder_defects</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="kill_rnd_defects">:kill_rnd_defects</param>
+            <param direction="Input" dbtype="VarChar" size="0">:commnt</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="reticle_id">:reticle_id</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="interlock">:interlock</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="stepper_eq">:stepper_eq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_TQD_INSP_INFO_DUPL" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT *
+  FROM TQD_INSP_INFO
+ WHERE 1 = 1 
+    AND STEP_SEQ = :step_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="step_seq">:step_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_IMAGE_GALLERY" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT RESULTTIMESTAMP,
+       FILETIMESTAMP,
+       FACTORY,
+       PRODUCT,
+       LOT_ID,
+       WAFER_ID,
+       STEP_ID,
+       TEST,
+       SLOT_ID,
+       SETUP_SEQ,
+       MAIN_EQ,
+       INSPECTION_EQ,
+       DEFECTS,
+       DEFECTIVE_DIE,
+       IMAGES,
+       SCAN_AREA,
+       PROBE_COUNT
+  FROM (SELECT A.*,
+                 RANK ()
+                 OVER (PARTITION BY LOT_ID, WAFER_ID, STEP_ID
+                       ORDER BY STATUS DESC)
+               - 1
+                  PROBE_COUNT
+          FROM TQD_INSP_INFO A
+          WHERE STEP_SEQ IN (??))]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_DMS_WAFER_LIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[WITH WT AS(
+  SELECT LOT_ID,
+         WAFER_ID,
+         LPAD (SLOT_ID, 2, '0') AS SLOT_ID,
+         PRODUCT,
+         STEP_ID,
+         TEST,
+         INSPECTION_EQ,
+         RESULTTIMESTAMP,
+         DEFECTS,
+         DEFECT_DD,
+         INSPECTED_DIE,
+         DEFECTIVE_DIE,
+         ADDER_DEF_DIE,
+         IMAGES,
+         STEP_SEQ,
+         WAFER_SEQ,
+           RANK ()
+           OVER (PARTITION BY LOT_ID, WAFER_ID, STEP_ID
+                 ORDER BY RESULTTIMESTAMP DESC)
+         - 1
+            PROBE_COUNT
+  FROM TQD_INSP_INFO A
+ WHERE     1 = 1
+ ??  )
+ SELECT * FROM WT
+   WHERE 1 = 1 
+   ??
+  ORDER BY LOT_ID, WAFER_ID, PRODUCT, STEP_ID, TEST, RESULTTIMESTAMP]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_DAS_REPORT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT A.FACTORY,
+       A.LOT_ID,
+       A.WAFER_ID,
+       A.STEP_ID,
+       A.STEP_ID AS STEP_ID_DUPLE,
+       A.MAIN_EQ,
+       A.INSPECTION_EQ,
+       A.RESULTTIMESTAMP,
+       B.STEP_SEQ,
+       B.DEFECTID,
+       B.WAFER_SEQ,
+       B.X,
+       B.Y,
+       ROUND (B.X / :tol) AS X_TOL,
+       ROUND (B.Y / :tol) AS Y_TOL,
+       B.XREL,
+       B.YREL,
+       B.XINDEX,
+       B.YINDEX,
+       B.XSIZE,
+       B.YSIZE,
+       B.DSIZE,
+       B.TEST,
+       B.CLASSNUMBER,
+       B.CLUSTERNUMBER,
+       B.ROUGHBINNUMBER,
+       B.FINEBINNUMBER,
+       B.REVIEWSAMPLE,
+       B.IMAGECOUNT,
+       B.ADDER,
+       B.FIRST_STEP,
+       B.RETICLE_REPEAT_ID,
+       B.DIE_REPEAT_ID,
+       B.MAN_OPT_CLASS,
+       B.AUTO_OPT_CLASS,
+       B.MAN_SEM_CLASS,
+       B.AUTO_SEM_CLASS,
+       B.DEFECTAREA,
+       MAX(A.RESULTTIMESTAMP) OVER (PARTITION BY A.FACTORY, A.STEP_ID) AS MAX_DATE
+  FROM TQD_INSP_INFO A, TQD_DEFECT B
+ WHERE 1 = 1 
+  AND A.STEP_SEQ IN (??)
+  AND A.STEP_SEQ = B.STEP_SEQ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:tol</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_DUPLE_PRODUCT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT PRODUCT FROM TQD_INSP_INFO
+WHERE STEP_SEQ IN (??)]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_DMS_WAFER_ORDER" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[WITH WT AS(
+  SELECT LOT_ID,
+         WAFER_ID,
+		 LPAD (SLOT_ID, 2, '0') AS SLOT_ID,
+		 PRODUCT,
+         STEP_ID,
+         TEST,
+		 INSPECTION_EQ,
+         RESULTTIMESTAMP,
+         DEFECTS,
+         DEFECT_DD,
+         INSPECTED_DIE,
+         DEFECTIVE_DIE,
+         ADDER_DEF_DIE,
+         IMAGES,
+         STEP_SEQ,
+         WAFER_SEQ,
+           RANK ()
+           OVER (PARTITION BY LOT_ID, WAFER_ID, STEP_ID
+                 ORDER BY RESULTTIMESTAMP DESC)
+         - 1
+            PROBE_COUNT
+  FROM TQD_INSP_INFO A
+ WHERE     1 = 1
+ ??  )
+ SELECT DISTINCT STEP_ID, MAX(RESULTTIMESTAMP) AS RESULTTIMESTAMP
+    FROM WT A
+  WHERE     1 = 1
+             ??
+    GROUP BY STEP_ID
+    ORDER BY RESULTTIMESTAMP DESC]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_DMS_WAFER_INFO" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT
+    STEP_SEQ,
+    A.TEST,
+    '' MAKER,
+    '' MODEL,
+    INSPECTION_EQ EQUIP,
+    WAFER_SEQ,
+    TO_CHAR(RESULTTIMESTAMP,'MM-DD-YY HH24:MI:SS') RESULTTIMESTAMP,
+    TO_CHAR(FILETIMESTAMP,'MM-DD-YY HH24:MI:SS') FILETIMESTAMP,
+    PRODUCT,
+    LOT_ID,
+    WAFER_ID,
+    A.STEP_ID,
+    SLOT_ID,
+    B.ANGLE,
+    SETUP_ID,
+    A.SETUP_SEQ,
+    TO_CHAR(SETUP_TIME,'MM-DD-YY HH24:MI:SS') SETUP_TIME,
+    SCAN_AREA,
+    B.WAFER_SIZE,
+    DIE_PITCH_X,
+    DIE_PITCH_Y,
+    DIE_ORIGIN_X,
+    DIE_ORIGIN_Y,
+    ORIGIN_X,
+    ORIGIN_Y,
+    INSPECTION_EQ,
+    C.ST_XCNT,
+    C.ST_YCNT,
+    C.ST_START_X,
+    C.ST_START_Y
+FROM
+TQD_INSP_INFO A,
+TQD_SETUP B, TQP_MAPDEF C
+WHERE A.SETUP_SEQ = B.SETUP_SEQ
+AND A.PRODUCT = C.MAPID(+) 
+AND STEP_SEQ = :STEP_SEQ
+AND ROWNUM = 1]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="1111">:STEP_SEQ</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="CREATE_INSP_INFO_PARSE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQD_INSP_INFO
+( STEP_SEQ,      
+  WAFER_SEQ,        
+  RESULTTIMESTAMP,
+  FILETIMESTAMP,  
+  FACTORY, 
+  TECHNOLOGY,  
+  PRODUCT,   
+  LOT_ID,    
+  WAFER_ID ,    
+  STEP_ID ,     
+  TEST  ,        
+  SLOT_ID,        
+  SETUP_SEQ,      
+  STATUS ,       
+  MAIN_EQ,        
+  ROUTE ,       
+  OPER ,           
+  INSPECTION_EQ,    
+  INSPECTION_PARAM,
+  DEFECTS,     
+  CLASSIFIED_DEFECTS ,
+  KILLER_DEFECTS,  
+  RANDOM_DEFECTS,   
+  ADDER_KILLER_DEFECT,
+  ADDER_RANDOM_DEFECT,
+  CLUSTERS,       
+  ADDER_CLUSTERS ,    
+  CLUSTER_AREA ,    
+  DEFECT_DD,      
+  KILLER_DEFECT_DD,
+  RANDOM_DEFECT_DD,  
+  INSPECTED_DIE,    
+  DEFECTIVE_DIE ,    
+  ADDER_DEF_DIE ,    
+  KILL_DEF_DIE ,    
+  KILL_ADDER_DEF_DIE,
+  IMAGES  ,      
+  SCAN_AREA ,     
+  ADDER_DEFECTS ,    
+  KILL_RND_DEFECTS,
+  "COMMENT",
+  RETICLE_ID,     
+  INTERLOCK_FLAG ,   
+  STEPPER_EQ )
+ VALUES(
+:step_seq
+,:wafer_seq
+,TO_TIMESTAMP(:resulttimestamp,'YYYYMMDD HH24:MI:SS')
+,TO_TIMESTAMP(:filetimestamp,'YYYYMMDD HH24:MI:SS')
+,:factory
+,:technology
+,:product
+,:lot_id
+,:wafer_id
+,:step_id
+,:test
+,:slot_id
+,:setup_seq
+,:status
+,NVL(:main_eq,'UNKNOWN')
+,:route
+,:oper
+,:inspection_eq
+,:inspection_param
+,:defects
+,:classified_defects
+,:killer_defects
+,:random_defects
+,:adder_killer_defect
+,:adder_random_defect
+,:clusters
+,:adder_clusters
+,:cluster_area
+,:defect_dd
+,:killer_defect_dd
+,:random_defect_dd
+,:inspected_die
+,:defective_die
+,:adder_def_die
+,:kill_def_die
+,:kill_adder_def_die
+,:images
+,:scan_area
+,:adder_defects
+,:kill_rnd_defects
+,:commnt
+,:reticle_id
+,:interlock
+,:stepper_eq)
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:step_seq</param>
+            <param direction="Input" dbtype="VarChar" size="0">:wafer_seq</param>
+            <param direction="Input" dbtype="VarChar" size="0">:resulttimestamp</param>
+            <param direction="Input" dbtype="VarChar" size="0">:filetimestamp</param>
+            <param direction="Input" dbtype="VarChar" size="0">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="0">:technology</param>
+            <param direction="Input" dbtype="VarChar" size="0">:product</param>
+            <param direction="Input" dbtype="VarChar" size="0">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="0">:wafer_id</param>
+            <param direction="Input" dbtype="VarChar" size="0">:step_id</param>
+            <param direction="Input" dbtype="VarChar" size="0">:test</param>
+            <param direction="Input" dbtype="VarChar" size="0">:slot_id</param>
+            <param direction="Input" dbtype="VarChar" size="0">:setup_seq</param>
+            <param direction="Input" dbtype="VarChar" size="0">:status</param>
+            <param direction="Input" dbtype="VarChar" size="0">:main_eq</param>
+            <param direction="Input" dbtype="VarChar" size="0">:route</param>
+            <param direction="Input" dbtype="VarChar" size="0">:oper</param>
+            <param direction="Input" dbtype="VarChar" size="0">:inspection_eq</param>
+            <param direction="Input" dbtype="VarChar" size="0">:inspection_param</param>
+            <param direction="Input" dbtype="VarChar" size="0">:defects</param>
+            <param direction="Input" dbtype="VarChar" size="0">:classified_defects</param>
+            <param direction="Input" dbtype="VarChar" size="0">:killer_defects</param>
+            <param direction="Input" dbtype="VarChar" size="0">:random_defects</param>
+            <param direction="Input" dbtype="VarChar" size="0">:adder_killer_defect</param>
+            <param direction="Input" dbtype="VarChar" size="0">:adder_random_defect</param>
+            <param direction="Input" dbtype="VarChar" size="0">:clusters</param>
+            <param direction="Input" dbtype="VarChar" size="0">:adder_clusters</param>
+            <param direction="Input" dbtype="VarChar" size="0">:cluster_area</param>
+            <param direction="Input" dbtype="VarChar" size="0">:defect_dd</param>
+            <param direction="Input" dbtype="VarChar" size="0">:killer_defect_dd</param>
+            <param direction="Input" dbtype="VarChar" size="0">:random_defect_dd</param>
+            <param direction="Input" dbtype="VarChar" size="0">:inspected_die</param>
+            <param direction="Input" dbtype="VarChar" size="0">:defective_die</param>
+            <param direction="Input" dbtype="VarChar" size="0">:adder_def_die</param>
+            <param direction="Input" dbtype="VarChar" size="0">:kill_def_die</param>
+            <param direction="Input" dbtype="VarChar" size="0">:kill_adder_def_die</param>
+            <param direction="Input" dbtype="VarChar" size="0">:images</param>
+            <param direction="Input" dbtype="VarChar" size="0">:scan_area</param>
+            <param direction="Input" dbtype="VarChar" size="0">:adder_defects</param>
+            <param direction="Input" dbtype="VarChar" size="0">:kill_rnd_defects</param>
+            <param direction="Input" dbtype="VarChar" size="0">:commnt</param>
+            <param direction="Input" dbtype="VarChar" size="0">:reticle_id</param>
+            <param direction="Input" dbtype="VarChar" size="0">:interlock</param>
+            <param direction="Input" dbtype="VarChar" size="0">:stepper_eq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_TQD_INSP_INFO_TEST_NO" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT *
+  FROM TQD_INSP_INFO
+ WHERE 1 = 1 
+    AND STEP_SEQ = :step_seq
+    AND TEST = :test ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:step_seq</param>
+            <param direction="Input" dbtype="VarChar" size="40">:test</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_RECLASSIFIED_DEFECT_CNT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-07-18 14:37:55
+UPDATE TQD_INSP_INFO 
+   SET CLASSIFIED_DEFECTS = :cnt
+ WHERE 1=1
+       AND STEP_SEQ = :step
+       AND WAFER_SEQ = :wafer]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="step">:step</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="wafer">:wafer</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="cnt">:cnt</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_DAS_REPORT_NEW" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT A.FACTORY,
+       A.LOT_ID,
+       A.WAFER_ID,
+       A.STEP_ID,
+       A.STEP_ID AS STEP_ID_DUPLE,
+       A.MAIN_EQ,
+       A.INSPECTION_EQ,
+       A.RESULTTIMESTAMP,
+       B.STEP_SEQ,
+       B.DEFECTID,
+       B.WAFER_SEQ,
+       B.X,
+       B.Y,
+       ROUND(SQRT(POWER( B.X, 2 ) + POWER( B.Y, 2 )), 5) AS DEFECT_LT,
+       B.XREL AS X_TOL,
+       B.YREL AS Y_TOL,
+       (B.XREL + B.XSIZE) AS X_TOL_P,
+       (B.XREL - B.XSIZE) AS X_TOL_M,
+       (B.YREL + B.YSIZE) AS Y_TOL_P,
+       (B.YREL - B.YSIZE) AS Y_TOL_M,
+       B.XREL,
+       B.YREL,
+       B.XINDEX,
+       B.YINDEX,
+       B.XSIZE,
+       B.YSIZE,
+       B.DSIZE,
+       B.TEST,
+       B.CLASSNUMBER,
+       B.CLUSTERNUMBER,
+       B.ROUGHBINNUMBER,
+       B.FINEBINNUMBER,
+       B.REVIEWSAMPLE,
+       B.IMAGECOUNT,
+       B.ADDER,
+       B.FIRST_STEP,
+       B.RETICLE_REPEAT_ID,
+       B.DIE_REPEAT_ID,
+       B.MAN_OPT_CLASS,
+       B.AUTO_OPT_CLASS,
+       B.MAN_SEM_CLASS,
+       B.AUTO_SEM_CLASS,
+       B.DEFECTAREA,
+       MAX(A.RESULTTIMESTAMP) OVER (PARTITION BY A.FACTORY, A.STEP_ID) AS MAX_DATE,
+	   C.IMAGE_ID,
+       C.IMAGE_TYPE,
+       C.IMAGE_PATH,
+       C.IMAGE_FILENAME,
+       C.IMAGE_SERVER,
+       C.THUMB_PATH,
+       C.THUMB_FILENAME
+  FROM TQD_INSP_INFO A, TQD_DEFECT B, TQD_IMAGES C
+ WHERE 1 = 1 
+  AND A.STEP_SEQ IN (??)
+  AND A.STEP_SEQ = B.STEP_SEQ
+  AND B.STEP_SEQ = C.STEP_SEQ(+)
+  AND B.DEFECTID = C.DEFECTID(+)]]></commandtext>
+    </query>
+    <query statement="Select" queryid="GET_INSP_INFO_OVERLAY" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-08-26 09:22:18
+SELECT * FROM TQD_INSP_INFO
+ WHERE 1=1
+       AND LOT_ID = :lotid
+       AND SLOT_ID = :slotid]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="lotid">:lotid</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="slotid">:slotid</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_INSP_INFO[REVIEW_PARSER]" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-08-26 20:56:03
+UPDATE TQD_INSP_INFO T1
+   SET CLASSIFIED_DEFECTS = (SELECT COUNT (1) 
+                               FROM TQD_DEFECT T2
+                              WHERE     1 = 1
+                                    AND T1.STEP_SEQ = T2.STEP_SEQ
+                                    AND T1.WAFER_SEQ = T2.WAFER_SEQ
+                                    AND T1.TEST = T2.TEST
+                                    AND T2.CLASSNUMBER > 0)
+     , IMAGES = (SELECT COUNT (1) 
+                   FROM TQD_IMAGES T3
+                  WHERE     1 = 1
+                    AND T1.STEP_SEQ = T3.STEP_SEQ
+                    AND T1.WAFER_SEQ = T3.WAFER_SEQ
+                    AND T1.TEST = T3.TEST)
+ WHERE STEP_SEQ = :stepseq AND WAFER_SEQ = :waferseq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="step">:stepseq</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="wafer">:waferseq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_WAFER_LIST_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT
+    DISTINCT
+    1 CHK,
+    STEP_SEQ,
+    WAFER_SEQ,
+    LOT_ID,
+    WAFER_ID "Wafer ID",
+    SLOT_ID,
+    STEP_ID,
+    PRODUCT,
+    SETUP_SEQ,
+    LOT_ID||'_'||STEP_ID||'_'||SETUP_SEQ || TO_CHAR(RESULTTIMESTAMP,'YYYYMMDDHH24MISS') GROUP_VAL,
+    0 "All",
+    0 "New",
+    0 "Random",
+    0 "Cluster",
+    0 "Group",
+    TO_CHAR(RESULTTIMESTAMP,'YYYY-MM-DD HH24:MI:SS') "Result Time",
+    0 "Save Count",
+    NULL "File Name"
+FROM TQD_INSP_INFO
+WHERE STEP_SEQ IN (
+??
+)
+ORDER BY GROUP_VAL, LOT_ID, STEP_ID, SETUP_SEQ, WAFER_ID
+]]></commandtext>
+    </query>
+    <query statement="Select" queryid="GET_INSP_INFO_OVERLAY[MULTI]" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-09-04 17:58:13
+SELECT * FROM TQD_INSP_INFO
+ WHERE 1=1
+       AND LOT_ID = :lotid
+       AND SLOT_ID IN (??)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="lotid">:lotid</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_MATCH_WAFER" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQD_INSP_INFO
+ WHERE 1=1
+       AND LOT_ID = :lotid
+       AND SLOT_ID = :slotid]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="lotid">:lotid</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="slotid">:slotid</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_DM_MAINT_LOT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[  SELECT A.LOT_ID,
+         A.PRODUCT,
+         A.STEP_ID,
+         A.SLOT_ID,
+         A.WAFER_ID,
+         A.RESULTTIMESTAMP,
+         A.DEFECTS,
+         A.CLASSIFIED_DEFECTS,
+         A.RANDOM_DEFECTS,
+         A.ADDER_RANDOM_DEFECT,
+         A.ADDER_CLUSTERS,
+         A.DEFECT_DD,
+         A.INSPECTED_DIE,
+         A.IMAGES,
+         A.SCAN_AREA,
+         A.SETUP_SEQ,
+         A.STEP_SEQ,
+         A.WAFER_SEQ,
+         B.LOT_SEQ
+    FROM TQD_INSP_INFO A, TQD_WAFER B
+   WHERE     1 = 1
+         AND A.WAFER_SEQ = B.WAFER_SEQ
+         AND B.LOT_SEQ IN (SELECT B.LOT_SEQ
+                             FROM TQD_INSP_INFO A, TQD_WAFER B
+                            WHERE     1 = 1
+                            AND A.STEP_SEQ IN (??)
+                                  AND A.WAFER_SEQ = B.WAFER_SEQ)
+ORDER BY A.LOT_ID, A.WAFER_ID, A.STEP_ID]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_DM_MAINT_WAFER" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT LOT_ID,
+       PRODUCT,
+       STEP_ID,
+       SLOT_ID,
+       WAFER_ID,
+       RESULTTIMESTAMP,
+       DEFECTS,
+       CLASSIFIED_DEFECTS,
+       RANDOM_DEFECTS,
+       ADDER_RANDOM_DEFECT,
+       ADDER_CLUSTERS,
+       DEFECT_DD,
+       INSPECTED_DIE,
+       IMAGES,
+       SCAN_AREA,
+       SETUP_SEQ,
+       STEP_SEQ,
+       WAFER_SEQ
+  FROM TQD_INSP_INFO
+  WHERE 1 = 1 AND STEP_SEQ IN (??)]]></commandtext>
+    </query>
+    <query statement="Update" queryid="UPDATE_STEP_SLOTID" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQD_INSP_INFO 
+SET SLOT_ID=:slotid
+WHERE 1 = 1
+AND STEP_SEQ = :step_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="slotid">:slotid</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="step_seq">:step_seq</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_STEP_WAFERID" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQD_INSP_INFO 
+SET WAFER_ID=:waferid
+WHERE 1 = 1
+AND STEP_SEQ = :step_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="waferid">:waferid</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="step_seq">:step_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_INSP_STEP_WAFER" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT *
+  FROM TQD_INSP_INFO
+  WHERE 1 = 1 
+    AND STEP_SEQ = :step_seq
+    AND WAFER_SEQ = :wafer_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="step_seq">:step_seq</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="wafer_seq">:wafer_seq</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="CREATE_INSP_INFO_MAINT_COPY" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQD_INSP_INFO
+SELECT :newstepseq AS STEP_SEQ,
+       :newwaferseq AS WAFER_SEQ,
+       RESULTTIMESTAMP,
+       FILETIMESTAMP,
+       FACTORY,
+       TECHNOLOGY,
+       :product AS PRODUCT,
+       :lotid AS LOT_ID,
+       :waferid AS WAFER_ID,
+       :stepid AS STEP_ID,
+       TEST,
+       :slotid AS SLOT_ID,
+       SETUP_SEQ,
+       STATUS,
+       MAIN_EQ,
+       ROUTE,
+       OPER,
+       INSPECTION_EQ,
+       INSPECTION_PARAM,
+       DEFECTS,
+       CLASSIFIED_DEFECTS,
+       KILLER_DEFECTS,
+       RANDOM_DEFECTS,
+       ADDER_KILLER_DEFECT,
+       ADDER_RANDOM_DEFECT,
+       CLUSTERS,
+       ADDER_CLUSTERS,
+       CLUSTER_AREA,
+       DEFECT_DD,
+       KILLER_DEFECT_DD,
+       RANDOM_DEFECT_DD,
+       INSPECTED_DIE,
+       DEFECTIVE_DIE,
+       ADDER_DEF_DIE,
+       KILL_DEF_DIE,
+       KILL_ADDER_DEF_DIE,
+       IMAGES,
+       SCAN_AREA,
+       ADDER_DEFECTS,
+       KILL_RND_DEFECTS,
+       'Maint Update' AS "COMMENT",
+       RETICLE_ID,
+       INTERLOCK_FLAG,
+       STEPPER_EQ,
+       SUMMARY_FLAG
+  FROM TQD_INSP_INFO
+ WHERE 1 = 1 
+ AND STEP_SEQ = :oristepseq 
+ AND WAFER_SEQ = :oriwaferseq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="newstepseq">:newstepseq</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="newwaferseq">:newwaferseq</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="product">:product</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="lotid">:lotid</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="waferid">:waferid</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="stepid">:stepid</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="slotid">:slotid</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="oristepseq">:oristepseq</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="oriwaferseq">:oriwaferseq</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_MAINT_STEP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQD_INSP_INFO
+   SET PRODUCT = :product,
+       LOT_ID = :lotid,
+       WAFER_ID = :waferid,
+       STEP_ID = :stepid,
+       SLOT_ID = :slotid
+  FROM TQD_INSP_INFO
+ WHERE 1 = 1
+ AND STEP_SEQ = :stepseq
+ AND WAFER_SEQ = :waferseq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="product">:product</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="lotid">:lotid</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="waferid">:waferid</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="stepid">:stepid</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="slotid">:slotid</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="stepseq">:stepseq</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="waferseq">:waferseq</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_STEP_MAINT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[DELETE FROM TQD_INSP_INFO 
+WHERE 1 = 1 
+ AND STEP_SEQ = :stepseq
+ AND WAFER_SEQ = :waferseq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="stepseq">:stepseq</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="waferseq">:waferseq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_DM_MAINT_WAFER_SINGLE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT A.LOT_ID,
+       A.WAFER_ID,
+       A.PRODUCT,
+       A.STEP_ID,
+       A.SLOT_ID,
+       A.RESULTTIMESTAMP,
+       A.DEFECTS,
+       A.CLASSIFIED_DEFECTS,
+       A.RANDOM_DEFECTS,
+       A.ADDER_RANDOM_DEFECT,
+       A.ADDER_CLUSTERS,
+       A.DEFECT_DD,
+       A.INSPECTED_DIE,
+       A.IMAGES,
+       A.SCAN_AREA,
+       A.SETUP_SEQ,
+       A.STEP_SEQ,
+       A.WAFER_SEQ,
+       C.LOT_SEQ
+  FROM TQD_INSP_INFO A, TQD_WAFER B, TQD_LOT C
+ WHERE     1 = 1
+       AND A.STEP_SEQ = :step_seq
+       AND A.WAFER_SEQ = B.WAFER_SEQ
+       AND B.LOT_SEQ = C.LOT_SEQ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="step_seq">:step_seq</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_MAINT_LOT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQD_INSP_INFO
+   SET LOT_ID = :lotid, 
+   WAFER_ID = :lotid || '-' || LPAD (SLOT_ID, 2, '0')
+   WHERE 1 = 1 AND STEP_SEQ IN (??)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="lotid">:lotid</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_INSP_LOT_OR_WAFER_CNT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-10-10 14:02:29
+WITH RAWDATA
+     AS (  SELECT TO_CHAR (SHIFT_TIME, 'YYYYMMDD') AS SHIFT_TIME,
+                  MODEL,
+                  TO_CHAR (TRUNC (SHIFT_TIME, 'HH24'), 'HH24') AS STIME,
+                  SUM (??) AS CNT
+             FROM (SELECT t1.CMF_FIELD01 AS "MODEL",
+                          CASE WHEN     '00' <= TO_CHAR ( TRUNC (T3.FILETIMESTAMP, 'HH24'), 'HH24') AND TO_CHAR ( TRUNC (T3.FILETIMESTAMP, 'HH24'), 'HH24') < '06'
+                             THEN T3.FILETIMESTAMP - 1
+                             ELSE T3.FILETIMESTAMP
+                          END AS "SHIFT_TIME",
+                          T3.*
+                     FROM TQC_EQUIP_MODEL t1,
+                          TQC_EQUIP T2,
+                          (  SELECT T2.LOT_ID,
+                                    T2.PRODUCT,
+                                    T2.STEP_ID,
+                                    UPPER (T1.INSPECTION_EQ) AS "EQUIP_ID",
+                                    TRUNC(T2.FILETIMESTAMP, 'HH24') AS "FILETIMESTAMP",
+                                    1 AS "LOT_QTY",
+                                    COUNT (WAFER_ID) AS "WAFER_QTY"
+                               FROM TQD_STEP T1, TQD_INSP_INFO T2
+                              WHERE     1 = 1
+                                    AND T1.STEP_SEQ = T2.STEP_SEQ
+                                    AND T1.WAFER_SEQ = T2.WAFER_SEQ
+                                    AND T2.FACTORY = :factory
+                                    AND T2.FILETIMESTAMP >= TO_DATE (:fromdate || '060000', 'yyyymmddhh24miss')
+                                    AND T2.FILETIMESTAMP < TO_DATE (:todate || '060000', 'yyyymmddhh24miss')
+                           GROUP BY T2.LOT_ID,
+                                    T2.PRODUCT,
+                                    T2.STEP_ID,
+                                    T1.INSPECTION_EQ,
+                                    TRUNC(T2.FILETIMESTAMP, 'HH24')) T3
+                    WHERE     1 = 1
+                          AND T1.EQUIP_MODEL = T2.EQUIP_MODEL
+                          AND T2.EQUIP_ID = T3.EQUIP_ID)
+         GROUP BY TO_CHAR (SHIFT_TIME, 'YYYYMMDD'),
+                  MODEL,
+                  TO_CHAR (TRUNC (SHIFT_TIME, 'HH24'), 'HH24'))
+  SELECT *
+    FROM (  SELECT GROUPING (SHIFT_TIME) AS "ORD", 
+                   DECODE (GROUPING (SHIFT_TIME), 1, 'TOTAL', SHIFT_TIME) AS "SHIFT_TIME",
+                   DECODE (GROUPING (MODEL), 1, 'SUM', MODEL) AS "MODEL",
+                   STIME,
+                   SUM (CNT) AS CNT
+              FROM RAWDATA
+          GROUP BY STIME, ROLLUP (SHIFT_TIME, MODEL)) PIVOT (SUM (CNT)
+                                                      FOR STIME
+                                                      IN  ('06' AS "H06",'07' AS "H07",'08' AS "H08",'09' AS "H09",'10' AS "H10",'11' AS "H11",'12' AS "H12",'13' AS "H13",
+                                                           '14' AS "H14",'15' AS "H15",'16' AS "H16",'17' AS "H17",'18' AS "H18",'19' AS "H19",'20' AS "H20",'21' AS "H21",
+                                                           '22' AS "H22",'23' AS "H23",'00' AS "H00",'01' AS "H01",'02' AS "H02",'03' AS "H03",'04' AS "H04",'05' AS "H05"))
+ ORDER BY 1 ASC, 2 DESC, DECODE(MODEL, 'SUM', 'Z', MODEL) ASC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="factory">:factory</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="fromdate">:fromdate</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="todate">:todate</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_REVIEW_LOT_OR_WAFER_CNT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-10-10 14:02:29
+WITH RAWDATA
+     AS (  SELECT TO_CHAR (SHIFT_TIME, 'YYYYMMDD') AS SHIFT_TIME,
+                  MODEL,
+                  TO_CHAR (TRUNC (SHIFT_TIME, 'HH24'), 'HH24') AS STIME,
+                  SUM (??) AS CNT
+             FROM (SELECT t1.CMF_FIELD01 AS "MODEL",
+                          CASE WHEN     '00' <= TO_CHAR ( TRUNC (T3.FILETIMESTAMP, 'HH24'), 'HH24') AND TO_CHAR ( TRUNC (T3.FILETIMESTAMP, 'HH24'), 'HH24') < '06'
+                             THEN T3.FILETIMESTAMP - 1
+                             ELSE T3.FILETIMESTAMP
+                          END AS "SHIFT_TIME",
+                          T3.*
+                     FROM TQC_EQUIP_MODEL t1,
+                          TQC_EQUIP T2,
+                          (  SELECT T2.LOT_ID,
+                                    T2.PRODUCT,
+                                    T2.STEP_ID,
+                                    UPPER (T1.REVIEW_EQ) AS "EQUIP_ID",
+                                    TRUNC(T2.FILETIMESTAMP, 'HH24') AS "FILETIMESTAMP",
+                                    1 AS "LOT_QTY",
+                                    COUNT (T2.WAFER_ID) AS "WAFER_QTY"
+                               FROM TQD_STEP T1, TQD_INSP_INFO T2
+                              WHERE     1 = 1
+                                    AND T1.STEP_SEQ = T2.STEP_SEQ
+                                    AND T1.WAFER_SEQ = T2.WAFER_SEQ
+                                    AND T2.FACTORY = :factory
+                                    AND T2.FILETIMESTAMP >= TO_DATE (:fromdate || '060000', 'yyyymmddhh24miss')
+                                    AND T2.FILETIMESTAMP < TO_DATE (:todate || '060000', 'yyyymmddhh24miss')
+                                    AND T1.REVIEW_EQ IS NOT NULL
+                           GROUP BY T2.LOT_ID,
+                                    T2.PRODUCT,
+                                    T2.STEP_ID,
+                                    T1.REVIEW_EQ,
+                                    TRUNC(T2.FILETIMESTAMP, 'HH24')) T3
+                    WHERE     1 = 1
+                          AND T1.EQUIP_MODEL = T2.EQUIP_MODEL
+                          AND T2.EQUIP_ID = T3.EQUIP_ID)
+         GROUP BY TO_CHAR (SHIFT_TIME, 'YYYYMMDD'),
+                  MODEL,
+                  TO_CHAR (TRUNC (SHIFT_TIME, 'HH24'), 'HH24'))
+  SELECT *
+    FROM (  SELECT GROUPING (SHIFT_TIME) AS "ORD", 
+                   DECODE (GROUPING (SHIFT_TIME), 1, 'TOTAL', SHIFT_TIME) AS "SHIFT_TIME",
+                   DECODE (GROUPING (MODEL), 1, 'SUM', MODEL) AS "MODEL",
+                   STIME,
+                   SUM (CNT) AS CNT
+              FROM RAWDATA
+          GROUP BY STIME, ROLLUP (SHIFT_TIME, MODEL)) PIVOT (SUM (CNT)
+                                                      FOR STIME
+                                                      IN  ('06' AS "H06",'07' AS "H07",'08' AS "H08",'09' AS "H09",'10' AS "H10",'11' AS "H11",'12' AS "H12",'13' AS "H13",
+                                                           '14' AS "H14",'15' AS "H15",'16' AS "H16",'17' AS "H17",'18' AS "H18",'19' AS "H19",'20' AS "H20",'21' AS "H21",
+                                                           '22' AS "H22",'23' AS "H23",'00' AS "H00",'01' AS "H01",'02' AS "H02",'03' AS "H03",'04' AS "H04",'05' AS "H05"))
+ ORDER BY 1 ASC, 2 DESC, 3 ASC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="factory">:factory</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="fromdate">:fromdate</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="todate">:todate</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_INSP_LOT_OR_WAFER_RAWDATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-10-15 17:37:14
+
+SELECT T3.LOT_ID,
+       T3.PRODUCT AS "DEVICE",
+       T3.STEP_ID,
+       T2.EQUIP_ID,
+       T3.FILETIMESTAMP AS "END_TIME",
+       T3.LOT_QTY,
+       T3.WAFER_QTY
+  FROM TQC_EQUIP_MODEL T1,
+       TQC_EQUIP T2,
+       (  SELECT T2.LOT_ID AS "LOT_ID",
+                 T2.PRODUCT,
+                 T2.STEP_ID,
+                 UPPER (T1.INSPECTION_EQ) AS "EQUIP_ID",
+                 T2.FILETIMESTAMP AS "FILETIMESTAMP",
+                 1 AS "LOT_QTY",
+                 COUNT (WAFER_ID) AS "WAFER_QTY"
+            FROM TQD_STEP T1, TQD_INSP_INFO T2
+           WHERE     1 = 1
+                 AND T1.STEP_SEQ = T2.STEP_SEQ
+                 AND T1.WAFER_SEQ = T2.WAFER_SEQ
+                 AND T2.FACTORY = :FACTORY
+                 AND T2.FILETIMESTAMP >=
+                        TO_DATE ( :FROMDATE || '060000', 'yyyymmddhh24miss')
+                 AND T2.FILETIMESTAMP <=
+                        TO_DATE ( :TODATE || '060000', 'yyyymmddhh24miss')
+        GROUP BY T2.LOT_ID,
+                 T2.PRODUCT,
+                 T2.STEP_ID,
+                 T1.INSPECTION_EQ,
+                 T2.FILETIMESTAMP) T3
+ WHERE     1 = 1
+       AND T1.EQUIP_MODEL = T2.EQUIP_MODEL
+       AND T2.EQUIP_ID = T3.EQUIP_ID
+ ORDER BY T3.FILETIMESTAMP]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="factory">:factory</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="fromdate">:fromdate</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="todate">:todate</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_REVIEW_LOT_OR_WAFER_RAWDATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-10-15 17:37:14
+SELECT T3.LOT_ID,
+       T3.PRODUCT AS "DEVICE",
+       T3.STEP_ID,
+       T2.EQUIP_ID,
+       T3.FILETIMESTAMP AS "END_TIME",
+       T3.LOT_QTY,
+       T3.WAFER_QTY
+  FROM TQC_EQUIP_MODEL T1,
+       TQC_EQUIP T2,
+       (  SELECT T2.LOT_ID AS "LOT_ID",
+                 T2.PRODUCT,
+                 T2.STEP_ID,
+                 UPPER (T1.REVIEW_EQ) AS "EQUIP_ID",
+                 T2.FILETIMESTAMP AS "FILETIMESTAMP",
+                 1 AS "LOT_QTY",
+                 COUNT (WAFER_ID) AS "WAFER_QTY"
+            FROM TQD_STEP T1, TQD_INSP_INFO T2
+           WHERE     1 = 1
+                 AND T1.STEP_SEQ = T2.STEP_SEQ
+                 AND T1.WAFER_SEQ = T2.WAFER_SEQ
+                 AND T2.FACTORY = :FACTORY
+                 AND T2.FILETIMESTAMP >=
+                        TO_DATE ( :FROMDATE || '060000', 'yyyymmddhh24miss')
+                 AND T2.FILETIMESTAMP <=
+                        TO_DATE ( :TODATE || '060000', 'yyyymmddhh24miss')
+                 AND T1.REVIEW_EQ IS NOT NULL
+        GROUP BY T2.LOT_ID,
+                 T2.PRODUCT,
+                 T2.STEP_ID,
+                 T1.REVIEW_EQ,
+                 T2.FILETIMESTAMP) T3
+ WHERE     1 = 1
+       AND T1.EQUIP_MODEL = T2.EQUIP_MODEL
+       AND T2.EQUIP_ID = T3.EQUIP_ID
+ ORDER BY T3.FILETIMESTAMP]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="factory">:factory</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="fromdate">:fromdate</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="todate">:todate</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_INSP_DETAIL" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-10-10 15:28:22
+SELECT t1.CMF_FIELD01 AS "MODEL",
+       t3.equip_id,
+       T3.product,
+       T3.lot_id, 
+       t3.wafer_id, 
+       t3.step_id,
+       t3.FILETIMESTAMP as "INSPECTION_TIME"
+  FROM TQC_EQUIP_MODEL t1,
+       TQC_EQUIP T2,
+       (  SELECT T2.LOT_ID,
+                 T2.PRODUCT,
+                 T2.STEP_ID,
+                 UPPER (T1.INSPECTION_EQ) AS "EQUIP_ID",
+                 T2.FILETIMESTAMP,
+                 T2.WAFER_ID
+            FROM TQD_STEP T1, TQD_INSP_INFO T2
+           WHERE     1 = 1
+                 AND T1.STEP_SEQ = T2.STEP_SEQ
+                 AND T1.WAFER_SEQ = T2.WAFER_SEQ
+                 AND T2.FACTORY = :factory
+                 AND T2.FILETIMESTAMP >= TO_DATE (:fromDate, 'yyyymmddhh24miss')
+                 AND T2.FILETIMESTAMP < TO_DATE (:toDate, 'yyyymmddhh24miss')) T3
+ WHERE     1 = 1
+       AND T1.EQUIP_MODEL = T2.EQUIP_MODEL
+       AND T2.EQUIP_ID = T3.EQUIP_ID
+       AND T1.CMF_FIELD01 = :model
+ ORDER BY INSPECTION_TIME
+ ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="factory">:factory</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="fromDate">:fromDate</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="toDate">:toDate</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="model">:model</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_REVIEW_DETAIL" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-10-10 15:28:22
+SELECT t1.CMF_FIELD01 AS "MODEL",
+       t3.equip_id,
+       T3.product,
+       T3.lot_id, 
+       t3.wafer_id, 
+       t3.step_id,
+       t3.FILETIMESTAMP as "INSPECTION_TIME"
+  FROM TQC_EQUIP_MODEL t1,
+       TQC_EQUIP T2,
+       (  SELECT T2.LOT_ID,
+                 T2.PRODUCT,
+                 T2.STEP_ID,
+                 UPPER (T1.REVIEW_EQ) AS "EQUIP_ID",
+                 T2.FILETIMESTAMP,
+                 T2.WAFER_ID
+            FROM TQD_STEP T1, TQD_INSP_INFO T2
+           WHERE     1 = 1
+                 AND T1.STEP_SEQ = T2.STEP_SEQ
+                 AND T1.WAFER_SEQ = T2.WAFER_SEQ
+                 AND T2.FACTORY = :factory
+                 AND T2.FILETIMESTAMP >= TO_DATE (:fromDate, 'yyyymmddhh24miss')
+                 AND T2.FILETIMESTAMP < TO_DATE (:toDate, 'yyyymmddhh24miss')
+                 AND T1.REVIEW_EQ IS NOT NULL) T3
+ WHERE     1 = 1
+       AND T1.EQUIP_MODEL = T2.EQUIP_MODEL
+       AND T2.EQUIP_ID = T3.EQUIP_ID
+       AND T1.CMF_FIELD01 = :model
+ ORDER BY INSPECTION_TIME
+ ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="factory">:factory</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="fromDate">:fromDate</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="toDate">:toDate</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="model">:model</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_DM_DEFECT_SUMMARY" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-10-21 19:37:18
+SELECT T1.PRODUCT,
+       T3.DIE_PITCH_X,
+       T3.DIE_PITCH_Y,
+       T1.FACTORY,
+       T1.SCAN_AREA AS "INSPECTION_AREA",
+       TO_CHAR(T1.RESULTTIMESTAMP, 'YY-MM-DD HH24:MI:SS') AS "INSPECTION_TIME",
+       T1.INSPECTION_EQ AS "INSPECTOR",
+       T1.INSPECTED_DIE,
+       T1.LOT_ID,
+       T1.SLOT_ID,
+       T1.STEP_ID,
+       T1.WAFER_ID,
+       T1.WAFER_SEQ,
+       T2.X,
+       T2.Y,
+       T2.XREL,
+       T2.YREL,
+       T2.XINDEX,
+       T2.YINDEX,
+       T2.XSIZE,
+       T2.YSIZE,
+       T2.DSIZE,
+       T2.DEFECTAREA,
+       T2.CLASSNUMBER,
+       T2.CLUSTERNUMBER, 
+       T2.ADDER, 
+       T2.IMAGECOUNT
+  FROM TQD_INSP_INFO T1, TQD_DEFECT T2, TQD_SETUP T3
+ WHERE 1=1 
+   AND T1.STEP_SEQ = T2.STEP_SEQ
+   AND T1.WAFER_SEQ = T2.WAFER_SEQ
+   AND T1.SETUP_SEQ = T3.SETUP_SEQ
+   AND T1.STEP_SEQ IN (??)]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_DM_DEFECTIVE_SUMMARY" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-10-22 19:56:30
+SELECT ??
+  FROM TQD_INSP_INFO T1, TQD_SETUP T3
+ WHERE 1=1 
+   AND T1.SETUP_SEQ = T3.SETUP_SEQ
+   AND T1.STEP_SEQ IN (??)
+ ??
+ ??]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_CONDITION_PRODUCT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-10-28 20:56:38
+SELECT DISTINCT PRODUCT
+  FROM TQD_INSP_INFO
+ WHERE 1=1
+   AND RESULTTIMESTAMP BETWEEN TO_DATE(:FROMDATE, 'YYYYMMDD') AND TO_DATE(:TODATE, 'YYYYMMDD')
+ ORDER BY PRODUCT]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="FROMDATE">:FROMDATE</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="TODATE">:TODATE</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_CONDITION_STEP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-10-28 20:56:53
+SELECT DISTINCT STEP_ID
+  FROM TQD_INSP_INFO
+ WHERE 1=1
+   AND RESULTTIMESTAMP BETWEEN TO_DATE(:FROMDATE, 'YYYYMMDD') AND TO_DATE(:TODATE, 'YYYYMMDD')
+   AND PRODUCT = :PRODUCT
+ ORDER BY STEP_ID
+ ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="FROMDATE">:FROMDATE</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="TODATE">:TODATE</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="PRODUCT">:PRODUCT</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_CONDITION_STEP_MULTI" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-10-28 20:56:53
+SELECT DISTINCT STEP_ID
+  FROM TQD_INSP_INFO
+ WHERE 1=1
+   AND RESULTTIMESTAMP BETWEEN TO_DATE(:FROMDATE, 'YYYYMMDD') AND TO_DATE(:TODATE, 'YYYYMMDD')
+   AND PRODUCT in (??)
+ ORDER BY STEP_ID
+ ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="FROMDATE">:FROMDATE</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="TODATE">:TODATE</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_CONDITION_LOT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-10-28 20:56:54
+SELECT DISTINCT LOT_ID
+  FROM TQD_INSP_INFO
+ WHERE 1=1
+   AND RESULTTIMESTAMP BETWEEN TO_DATE(:FROMDATE, 'YYYYMMDD') AND TO_DATE(:TODATE, 'YYYYMMDD')
+   AND PRODUCT = :PRODUCT
+   AND STEP_ID = :STEP_ID
+ ORDER BY LOT_ID
+ ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="FROMDATE">:FROMDATE</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="TODATE">:TODATE</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="PRODUCT">:PRODUCT</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="STEP_ID">:STEP_ID</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_CONDITION_LOT_MULTI_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-10-28 20:56:54
+SELECT DISTINCT LOT_ID
+  FROM TQD_INSP_INFO
+ WHERE 1=1
+   AND RESULTTIMESTAMP BETWEEN TO_DATE(:FROMDATE, 'YYYYMMDD') AND TO_DATE(:TODATE, 'YYYYMMDD')
+   AND PRODUCT = :PRODUCT
+   AND STEP_ID IN (??)
+ ORDER BY LOT_ID
+ ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="FROMDATE">:FROMDATE</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="TODATE">:TODATE</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="PRODUCT">:PRODUCT</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_CONDITION_LOT_MULTI_02" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-10-28 20:56:54
+SELECT DISTINCT LOT_ID
+  FROM TQD_INSP_INFO
+ WHERE 1=1
+   AND RESULTTIMESTAMP BETWEEN TO_DATE(:FROMDATE, 'YYYYMMDD') AND TO_DATE(:TODATE, 'YYYYMMDD')
+   AND PRODUCT IN (??)
+   AND STEP_ID IN (??)
+ ORDER BY LOT_ID
+ ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="FROMDATE">:FROMDATE</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="TODATE">:TODATE</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_CONDITION_WAFER" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-10-28 20:56:54
+SELECT DISTINCT WAFER_SEQ, WAFER_ID
+  FROM TQD_INSP_INFO
+ WHERE 1=1
+   AND RESULTTIMESTAMP BETWEEN TO_DATE(:FROMDATE, 'YYYYMMDD') AND TO_DATE(:TODATE, 'YYYYMMDD')
+   AND PRODUCT = :PRODUCT
+   AND STEP_ID = :STEP_ID
+   AND LOT_ID IN (??)
+ ORDER BY WAFER_ID
+ ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="FROMDATE">:FROMDATE</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="TODATE">:TODATE</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="PRODUCT">:PRODUCT</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="STEP_ID">:STEP_ID</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_CONDITION_WAFER_MULTI_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-10-28 20:56:54
+SELECT DISTINCT WAFER_SEQ, WAFER_ID
+  FROM TQD_INSP_INFO
+ WHERE 1=1
+   AND RESULTTIMESTAMP BETWEEN TO_DATE(:FROMDATE, 'YYYYMMDD') AND TO_DATE(:TODATE, 'YYYYMMDD')
+   AND PRODUCT = :PRODUCT
+   AND STEP_ID IN (??)
+   AND LOT_ID IN (??)
+ ORDER BY WAFER_ID
+ ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="FROMDATE">:FROMDATE</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="TODATE">:TODATE</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="PRODUCT">:PRODUCT</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_CONDITION_WAFER_MULTI_02" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT WAFER_SEQ, WAFER_ID
+FROM TQD_INSP_INFO A
+WHERE 1=1
+    AND RESULTTIMESTAMP BETWEEN TO_DATE(:FROMDATE, 'YYYYMMDD') AND TO_DATE(:TODATE, 'YYYYMMDD')
+    AND PRODUCT IN (??)
+    AND STEP_ID IN (??)
+    AND LOT_ID IN (??)
+    ??
+ORDER BY WAFER_ID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="FROMDATE">:FROMDATE</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="TODATE">:TODATE</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_STEP_SEQS_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT STEP_SEQ, WAFER_SEQ
+FROM TQD_INSP_INFO
+WHERE 1=1
+   AND FACTORY = :factory
+   AND RESULTTIMESTAMP BETWEEN TO_TIMESTAMP ( :fromtime,'YYYY-MM-DD HH24:MI:SS')
+                           AND TO_TIMESTAMP ( :totime,'YYYY-MM-DD HH24:MI:SS')
+   AND LOT_ID = :lot_id
+   AND SLOT_ID = :slot_id
+   AND STEP_ID = :step_id]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="FAB2">:factory</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="2010-01-01 00:00:00">:fromtime</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="2010-01-01 00:00:00">:totime</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="1234">:lot_id</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="11">:slot_id</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="df">:step_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_STEP_SEQS_02" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT STEP_SEQ, WAFER_SEQ
+FROM TQD_INSP_INFO
+WHERE 1=1
+   AND FACTORY = :factory
+   AND RESULTTIMESTAMP BETWEEN TO_TIMESTAMP ( :fromtime,'YYYY-MM-DD HH24:MI:SS')
+                           AND TO_TIMESTAMP ( :totime,'YYYY-MM-DD HH24:MI:SS')
+   AND LOT_ID = :lot_id
+   AND SLOT_ID = :slot_id
+   AND STEP_ID LIKE '%' || :step_id || '%']]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="factory">:factory</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="fromtime">:fromtime</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="totime">:totime</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="lot_id">:lot_id</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="slot_id">:slot_id</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="step_id">:step_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_INSP_INFO_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT 
+    STEP_SEQ,
+    RESULTTIMESTAMP, 
+    WAFER_ID, 
+    STEP_ID 
+FROM TQD_INSP_INFO
+WHERE STEP_SEQ IN (??)
+ORDER BY RESULTTIMESTAMP]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_STEP_SEQ_BY_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT STEP_SEQ
+FROM TQD_INSP_INFO
+WHERE LOT_ID = :LOT_ID
+    AND INSPECTION_EQ = :EQUIP_ID
+    AND RESULTTIMESTAMP = TO_DATE(:RESULTTIMESTAMP, 'YYYY-MM-DD HH24:MI:SS')]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="0">:LOT_ID</param>
+            <param direction="Input" dbtype="VarChar2" size="0">:EQUIP_ID</param>
+            <param direction="Input" dbtype="VarChar2" size="0">:RESULTTIMESTAMP</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_WAFER_LIST_02" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT 
+    STEP_SEQ,
+    0 COUNT,
+    0 RATE,
+    LOT_ID,
+    WAFER_ID,
+    SLOT_ID SLOT,
+    PRODUCT,
+    STEP_ID,
+    TEST,
+    INSPECTION_EQ EQUIP,
+    TO_CHAR(RESULTTIMESTAMP,'YYYY-MM-DD HH:MM:SS') RESULTTIME,
+    DEFECTS,
+    CLASSIFIED_DEFECTS CLASSIFIED,
+    ADDER_DEFECTS NEW,
+    RANDOM_DEFECTS RANDOM,
+    DEFECT_DD DENSITY,
+    INSPECTED_DIE,
+    DEFECTIVE_DIE
+FROM TQD_INSP_INFO
+WHERE STEP_SEQ IN (??)
+ORDER BY LOT_ID, STEP_ID, WAFER_ID]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_INSP_INFO_02" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT
+    FACTORY,
+    STEP_SEQ,
+    STEP_ID,
+    DEFECTS
+FROM TQD_INSP_INFO
+WHERE STEP_SEQ IN (??)
+ORDER BY RESULTTIMESTAMP]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_LOT_INSP_INFO" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT A.STEP_SEQ, A.STEP_ID, A.WAFER_ID
+FROM TQD_INSP_INFO A, TQD_STEP B
+WHERE A.STEP_SEQ = B.STEP_SEQ
+AND LOT_ID = :LOT_ID
+??
+ORDER BY A.STEP_ID, A.WAFER_ID ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0" value="LOT_ID">:LOT_ID</param>
+        </parameters>
+    </query>
+</queryxml>

@@ -1,0 +1,357 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="TPSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Delete" queryid="DELETE_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[DELETE FROM TQC_EQUIP
+WHERE FACTORY = :FACTORY
+    AND EQUIP_ID = :EQUIP_ID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Varchar" size="40" value="FACTORY">:FACTORY</param>
+            <param direction="Input" dbtype="Varchar" size="40" value="EQUIP_ID">:EQUIP_ID</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="EXISTS_EQUIP_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT 1 FROM TQC_EQUIP
+WHERE FACTORY = :FACTORY
+    AND EQUIP_ID = :EQUIP_ID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Varchar" size="40" value="FACTORY">:FACTORY</param>
+            <param direction="Input" dbtype="Varchar" size="40" value="EQUIP_ID">:EQUIP_ID</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="INSERT_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQC_EQUIP (
+    FACTORY, EQUIP_ID, HANDLER, EQUIP_MODEL, AREA, OPER, CREATE_USER_ID, CREATE_TIME,
+    QTY_1, QTY_2, QTY_3, QTY_4, QTY_5, QTY_6, QTY_7, QTY_8, QTY_9,
+    EQUIP_GRP_1, EQUIP_GRP_2, EQUIP_GRP_3, EQUIP_GRP_4, EQUIP_GRP_5, EQUIP_GRP_6, EQUIP_GRP_7, EQUIP_GRP_8, EQUIP_GRP_9,
+    EQUIP_STS_1, EQUIP_STS_2, EQUIP_STS_3, EQUIP_STS_4, EQUIP_STS_5, EQUIP_STS_6, EQUIP_STS_7, EQUIP_STS_8, EQUIP_STS_9,
+    EQUIP_CMF_1, EQUIP_CMF_2, EQUIP_CMF_3, EQUIP_CMF_4, EQUIP_CMF_5, EQUIP_CMF_6, EQUIP_CMF_7, EQUIP_CMF_8, EQUIP_CMF_9
+) VALUES (
+    :FACTORY, :EQUIP_ID, :HANDLER, :EQUIP_MODEL, :AREA, :OPER, :CREATE_USER_ID, SYSDATE,
+    :QTY_1, :QTY_2, :QTY_3, :QTY_4, :QTY_5, , :QTY_6, :QTY_7, :QTY_8, :QTY_9,
+    :EQUIP_GRP_1, :EQUIP_GRP_2, :EQUIP_GRP_3, :EQUIP_GRP_4, :EQUIP_GRP_5, :EQUIP_GRP_6, :EQUIP_GRP_7, :EQUIP_GRP_8, :EQUIP_GRP_9,
+    :EQUIP_STS_1, :EQUIP_STS_2, :EQUIP_STS_3, :EQUIP_STS_4, :EQUIP_STS_5, :EQUIP_STS_6, :EQUIP_STS_7, :EQUIP_STS_8, :EQUIP_STS_9,
+    :EQUIP_CMF_1, :EQUIP_CMF_2, :EQUIP_CMF_3, :EQUIP_CMF_4, :EQUIP_CMF_5, :EQUIP_CMF_6, :EQUIP_CMF_7, :EQUIP_CMF_8, :EQUIP_CMF_9
+)
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Varchar" size="40">:FACTORY</param>
+            <param direction="Input" dbtype="Varchar" size="40">:EQUIP_ID</param>
+            <param direction="Input" dbtype="Varchar" size="40">:HANDLER</param>
+            <param direction="Input" dbtype="Varchar" size="40">:EQUIP_MODEL</param>
+            <param direction="Input" dbtype="Varchar" size="40">:AREA</param>
+            <param direction="Input" dbtype="Varchar" size="40">:OPER</param>
+            <param direction="Input" dbtype="Varchar" size="40">:CREATE_USER_ID</param>
+            <param direction="Input" dbtype="Decimal" size="10">:QTY_1</param>
+            <param direction="Input" dbtype="Decimal" size="10">:QTY_2</param>
+            <param direction="Input" dbtype="Decimal" size="10">:QTY_3</param>
+            <param direction="Input" dbtype="Decimal" size="10">:QTY_4</param>
+            <param direction="Input" dbtype="Decimal" size="10">:QTY_5</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="QTY_6">:QTY_6</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="QTY_7">:QTY_7</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="QTY_8">:QTY_8</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="QTY_9">:QTY_9</param>
+            <param direction="Input" dbtype="Varchar" size="50">:EQUIP_GRP_1</param>
+            <param direction="Input" dbtype="Varchar" size="50">:EQUIP_GRP_2</param>
+            <param direction="Input" dbtype="Varchar" size="50">:EQUIP_GRP_3</param>
+            <param direction="Input" dbtype="Varchar" size="50">:EQUIP_GRP_4</param>
+            <param direction="Input" dbtype="Varchar" size="50">:EQUIP_GRP_5</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="EQUIP_GRP_6">:EQUIP_GRP_6</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="EQUIP_GRP_7">:EQUIP_GRP_7</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="EQUIP_GRP_8">:EQUIP_GRP_8</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="EQUIP_GRP_9">:EQUIP_GRP_9</param>
+            <param direction="Input" dbtype="Varchar" size="50">:EQUIP_STS_1</param>
+            <param direction="Input" dbtype="Varchar" size="50">:EQUIP_STS_2</param>
+            <param direction="Input" dbtype="Varchar" size="50">:EQUIP_STS_3</param>
+            <param direction="Input" dbtype="Varchar" size="50">:EQUIP_STS_4</param>
+            <param direction="Input" dbtype="Varchar" size="50">:EQUIP_STS_5</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="EQUIP_STS_6">:EQUIP_STS_6</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="EQUIP_STS_7">:EQUIP_STS_7</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="EQUIP_STS_8">:EQUIP_STS_8</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="EQUIP_STS_9">:EQUIP_STS_9</param>
+            <param direction="Input" dbtype="Varchar" size="50">:EQUIP_CMF_1</param>
+            <param direction="Input" dbtype="Varchar" size="50">:EQUIP_CMF_2</param>
+            <param direction="Input" dbtype="Varchar" size="50">:EQUIP_CMF_3</param>
+            <param direction="Input" dbtype="Varchar" size="50">:EQUIP_CMF_4</param>
+            <param direction="Input" dbtype="Varchar" size="50">:EQUIP_CMF_5</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="EQUIP_CMF_6">:EQUIP_CMF_6</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="EQUIP_CMF_7">:EQUIP_CMF_7</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="EQUIP_CMF_8">:EQUIP_CMF_8</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="EQUIP_CMF_9">:EQUIP_CMF_9</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_EQUIP_INFO" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT *
+FROM TQC_EQUIP
+WHERE 1=1
+AND FACTORY = :factory
+AND EQUIP_ID = :equipid]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="factory">:factory</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="equipid">:equipid</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_EQUIP_LIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT
+    FACTORY,
+    EQUIP_ID,
+    AREA,
+    OPER,
+    EQUIP_MODEL,
+    HANDLER,
+    CREATE_USER_ID,
+    TO_CHAR(CREATE_TIME,'YYYY-MM-DD HH24:MI:SS') CREATE_TIME,
+    UPDATE_USER_ID,
+    TO_CHAR(UPDATE_TIME,'YYYY-MM-DD HH24:MI:SS') UPDATE_TIME,
+    QTY_1,
+    QTY_2,
+    QTY_3,
+    QTY_4,
+    QTY_5,
+    QTY_6,
+    QTY_7,
+    QTY_8,
+    QTY_9,
+    EQUIP_GRP_1,
+    EQUIP_GRP_2,
+    EQUIP_GRP_3,
+    EQUIP_GRP_4,
+    EQUIP_GRP_5,
+    EQUIP_GRP_6,
+    EQUIP_GRP_7,
+    EQUIP_GRP_8,
+    EQUIP_GRP_9,
+    EQUIP_STS_1,
+    EQUIP_STS_2,
+    EQUIP_STS_3,
+    EQUIP_STS_4,
+    EQUIP_STS_5,
+    EQUIP_STS_6,
+    EQUIP_STS_7,
+    EQUIP_STS_8,
+    EQUIP_STS_9,
+    EQUIP_CMF_1,
+    EQUIP_CMF_2,
+    EQUIP_CMF_3,
+    EQUIP_CMF_4,
+    EQUIP_CMF_5,
+    EQUIP_CMF_6,
+    EQUIP_CMF_7,
+    EQUIP_CMF_8,
+    EQUIP_CMF_9
+FROM TQC_EQUIP
+WHERE FACTORY = :FACTORY
+??]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="FACTORY">:FACTORY</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQC_EQUIP
+SET
+    HANDLER = :HANDLER,
+    EQUIP_MODEL = :EQUIP_MODEL,
+    AREA = :AREA,
+    OPER = :OPER,
+    UPDATE_USER_ID = :UPDATE_USER_ID,
+    UPDATE_TIME = SYSDATE,
+    QTY_1 = :QTY_1,
+    QTY_2 = :QTY_2,
+    QTY_3 = :QTY_3,
+    QTY_4 = :QTY_4,
+    QTY_5 = :QTY_5,
+    QTY_6 = :QTY_6,
+    QTY_7 = :QTY_7,
+    QTY_8 = :QTY_8,
+    QTY_9 = :QTY_9,
+    EQUIP_GRP_1 = :EQUIP_GRP_1,
+    EQUIP_GRP_2 = :EQUIP_GRP_2,
+    EQUIP_GRP_3 = :EQUIP_GRP_3,
+    EQUIP_GRP_4 = :EQUIP_GRP_4,
+    EQUIP_GRP_5 = :EQUIP_GRP_5,
+    EQUIP_GRP_6 = :EQUIP_GRP_6,
+    EQUIP_GRP_7 = :EQUIP_GRP_7,
+    EQUIP_GRP_8 = :EQUIP_GRP_8,
+    EQUIP_GRP_9 = :EQUIP_GRP_9,
+    EQUIP_STS_1 = :EQUIP_STS_1,
+    EQUIP_STS_2 = :EQUIP_STS_2,
+    EQUIP_STS_3 = :EQUIP_STS_3,
+    EQUIP_STS_4 = :EQUIP_STS_4,
+    EQUIP_STS_5 = :EQUIP_STS_5,
+    EQUIP_STS_6 = :EQUIP_STS_6,
+    EQUIP_STS_7 = :EQUIP_STS_7,
+    EQUIP_STS_8 = :EQUIP_STS_8,
+    EQUIP_STS_9 = :EQUIP_STS_9,
+    EQUIP_CMF_1 = :EQUIP_CMF_1,
+    EQUIP_CMF_2 = :EQUIP_CMF_2,
+    EQUIP_CMF_3 = :EQUIP_CMF_3,
+    EQUIP_CMF_4 = :EQUIP_CMF_4,
+    EQUIP_CMF_5 = :EQUIP_CMF_5,
+    EQUIP_CMF_6 = :EQUIP_CMF_6,
+    EQUIP_CMF_7 = :EQUIP_CMF_7,
+    EQUIP_CMF_8 = :EQUIP_CMF_8,
+    EQUIP_CMF_9 = :EQUIP_CMF_9
+WHERE FACTORY = :FACTORY
+    AND EQUIP_ID = :EQUIP_ID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Varchar" size="40">:FACTORY</param>
+            <param direction="Input" dbtype="Varchar" size="40">:EQUIP_ID</param>
+            <param direction="Input" dbtype="Varchar" size="40">:HANDLER</param>
+            <param direction="Input" dbtype="Varchar" size="40">:EQUIP_MODEL</param>
+            <param direction="Input" dbtype="Varchar" size="40">:AREA</param>
+            <param direction="Input" dbtype="Varchar" size="40">:OPER</param>
+            <param direction="Input" dbtype="Varchar" size="40">:UPDATE_USER_ID</param>
+            <param direction="Input" dbtype="Decimal" size="10">:QTY_1</param>
+            <param direction="Input" dbtype="Decimal" size="10">:QTY_2</param>
+            <param direction="Input" dbtype="Decimal" size="10">:QTY_3</param>
+            <param direction="Input" dbtype="Decimal" size="10">:QTY_4</param>
+            <param direction="Input" dbtype="Decimal" size="10">:QTY_5</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="QTY_6">:QTY_6</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="QTY_7">:QTY_7</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="QTY_8">:QTY_8</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="QTY_9">:QTY_9</param>
+            <param direction="Input" dbtype="Varchar" size="50">:EQUIP_GRP_1</param>
+            <param direction="Input" dbtype="Varchar" size="50">:EQUIP_GRP_2</param>
+            <param direction="Input" dbtype="Varchar" size="50">:EQUIP_GRP_3</param>
+            <param direction="Input" dbtype="Varchar" size="50">:EQUIP_GRP_4</param>
+            <param direction="Input" dbtype="Varchar" size="50">:EQUIP_GRP_5</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="EQUIP_GRP_6">:EQUIP_GRP_6</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="EQUIP_GRP_7">:EQUIP_GRP_7</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="EQUIP_GRP_8">:EQUIP_GRP_8</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="EQUIP_GRP_9">:EQUIP_GRP_9</param>
+            <param direction="Input" dbtype="Varchar" size="50">:EQUIP_STS_1</param>
+            <param direction="Input" dbtype="Varchar" size="50">:EQUIP_STS_2</param>
+            <param direction="Input" dbtype="Varchar" size="50">:EQUIP_STS_3</param>
+            <param direction="Input" dbtype="Varchar" size="50">:EQUIP_STS_4</param>
+            <param direction="Input" dbtype="Varchar" size="50">:EQUIP_STS_5</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="EQUIP_STS_6">:EQUIP_STS_6</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="EQUIP_STS_7">:EQUIP_STS_7</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="EQUIP_STS_8">:EQUIP_STS_8</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="EQUIP_STS_9">:EQUIP_STS_9</param>
+            <param direction="Input" dbtype="Varchar" size="50">:EQUIP_CMF_1</param>
+            <param direction="Input" dbtype="Varchar" size="50">:EQUIP_CMF_2</param>
+            <param direction="Input" dbtype="Varchar" size="50">:EQUIP_CMF_3</param>
+            <param direction="Input" dbtype="Varchar" size="50">:EQUIP_CMF_4</param>
+            <param direction="Input" dbtype="Varchar" size="50">:EQUIP_CMF_5</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="EQUIP_CMF_6">:EQUIP_CMF_6</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="EQUIP_CMF_7">:EQUIP_CMF_7</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="EQUIP_CMF_8">:EQUIP_CMF_8</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="EQUIP_CMF_9">:EQUIP_CMF_9</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_DATA_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQC_EQUIP
+SET
+    EQUIP_STS_5 = :EQUIP_STS_5,
+    EQUIP_STS_6 = :EQUIP_STS_6
+WHERE 1= 1
+    AND FACTORY = :FACTORY
+    AND EQUIP_ID = :EQUIP_ID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="0">:FACTORY</param>
+            <param direction="Input" dbtype="VarChar2" size="0">:EQUIP_ID</param>
+            <param direction="Input" dbtype="VarChar2" size="0">:EQUIP_STS_5</param>
+            <param direction="Input" dbtype="VarChar2" size="0">:EQUIP_STS_6</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_PCM_EQUIP_STATUS" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT
+    A.EQUIP_ID "EQUIP ID",
+    C.MASK_ID AS "DEVICE",
+    A.EQUIP_STS_7 "PROGRAM",
+    A.EQUIP_STS_3 "LOT ID",
+    A.EQUIP_STS_4 "WAFER ID",
+    A.EQUIP_STS_1 "STATUS",
+    TO_CHAR(TO_DATE(A.EQUIP_STS_2, 'YYYY-MM-DD HH24:MI:SS'), 'MM-DD HH24:MI:SS') "STATUS TIME",
+    A.EQUIP_STS_6 "OPER",
+    A.EQUIP_STS_5 "P-CARD",
+    (
+        SELECT ROUND((SYSDATE - MIN(VAL1)) * 24) FROM (
+            SELECT
+                CASE WHEN PROBE_CARD = A.EQUIP_STS_5 THEN
+                    LAST_VALUE(CASE WHEN PROBE_CARD = A.EQUIP_STS_5 THEN INPUT_TIME END) IGNORE NULLS OVER (ORDER BY INPUT_TIME DESC)
+                END VAL1,
+                CASE WHEN PROBE_CARD = A.EQUIP_STS_5 THEN
+                    LAST_VALUE(CASE WHEN PROBE_CARD <> A.EQUIP_STS_5 THEN INPUT_TIME END) IGNORE NULLS OVER (ORDER BY INPUT_TIME DESC)
+                END VAL2
+            FROM TQP_PCM_INPUT_HIS
+            WHERE EQUIP_ID = A.EQUIP_ID
+        )
+        WHERE VAL2 IS NULL AND VAL1 IS NOT NULL
+    ) "CARD USAGE(H)",
+    DECODE(B.PROGRAM, NULL, NULL, B.PROGRAM) AS "END PGM",
+    DECODE(B.WAFER_ID, NULL, NULL, B.WAFER_ID) AS "END WAFER",
+    TO_CHAR(TO_DATE(EQUIP_STS_9, 'YYYY-MM-DD HH24:MI:SS'), 'MM-DD HH24:MI:SS') "END TIME",
+    DECODE(B.WAFER_ID, NULL, NULL, TO_CHAR(TRUNC(MOD((B.END_TIME - B.START_TIME),1)*24), 'FM09') || ':' || TO_CHAR(TRUNC(MOD((B.END_TIME - B.START_TIME)*24,1)*60), 'FM09') || ':' || TO_CHAR(TRUNC(ROUND(MOD((B.END_TIME - B.START_TIME)*24*60,1)*60)), 'FM09')) AS "TEST TIME", 
+    CASE WHEN EQUIP_CMF_2 < ROUND((SYSDATE - TO_DATE(EQUIP_STS_2, 'yyyy-mm-dd hh24:mi:ss')) * (24*60*60)) THEN 'Y' ELSE 'N' END FLAG
+FROM TQC_EQUIP A, (SELECT TO_CHAR(WAFER_SEQ) AS WAFER_SEQ, WAFER_ID, PROGRAM, START_TIME, END_TIME FROM TQP_WAFER_SUM WHERE 1=1 AND FACILITY = :FACTORY AND TESTAREA = 'PARAMETRIC') B, TQC_LOT_STS C
+WHERE A.EQUIP_STS_8 = B.WAFER_SEQ(+)
+AND A.EQUIP_STS_3 = C.LOT_NO(+)
+AND A.FACTORY = :FACTORY
+AND A.AREA = 'TEST'
+AND A.OPER = 'PARAMETRIC'
+AND A.EQUIP_ID NOT IN ('AMPTSVR', 'AMPTKVR')
+ORDER BY A.EQUIP_ID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="FAB2">:FACTORY</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_DATA_02" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQC_EQUIP
+SET
+    EQUIP_STS_1 = :EQUIP_STS_1,
+    EQUIP_STS_2 = TO_CHAR(SYSDATE,'YYYY-MM-DD HH24:MI:SS'),
+    EQUIP_STS_3 = :EQUIP_STS_3,
+    EQUIP_STS_4 = :EQUIP_STS_4,
+    EQUIP_STS_7 = :EQUIP_STS_7
+WHERE FACTORY = :FACTORY
+    AND EQUIP_ID = :EQUIP_ID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="0" value="FACTORY">:FACTORY</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="EQUIP_ID">:EQUIP_ID</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="EQUIP_STS_1">:EQUIP_STS_1</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="EQUIP_STS_3">:EQUIP_STS_3</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="EQUIP_STS_4">:EQUIP_STS_4</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="EQUIP_STS_7">:EQUIP_STS_7</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_DATA_03" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQC_EQUIP
+SET
+    EQUIP_STS_7 = :EQUIP_STS_7,
+    EQUIP_STS_8 = :EQUIP_STS_8,
+    EQUIP_STS_9 = :EQUIP_STS_9
+WHERE FACTORY = :FACTORY
+    AND EQUIP_ID = :EQUIP_ID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="0" value="FACTORY">:FACTORY</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="EQUIP_ID">:EQUIP_ID</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="EQUIP_STS_7">:EQUIP_STS_7</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="EQUIP_STS_8">:EQUIP_STS_8</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="EQUIP_STS_9">:EQUIP_STS_9</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_DATA_04" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-09-18 17:36:11
+UPDATE TQC_EQUIP
+SET EQUIP_STS_8 = :EQUIP_STS_8
+  , EQUIP_STS_9 = TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MI:SS')
+WHERE FACTORY = :FACTORY
+  AND EQUIP_ID = :EQUIP_ID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="FACTORY">:FACTORY</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="EQUIP_ID">:EQUIP_ID</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="EQUIP_STS_8">:EQUIP_STS_8</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_EQUIP_ID" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT EQUIP_ID
+FROM TQC_EQUIP
+WHERE FACTORY = :FACTORY
+AND OPER = :OPER
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="0">:FACTORY</param>
+            <param direction="Input" dbtype="VarChar2" size="0">:OPER</param>
+        </parameters>
+    </query>
+</queryxml>

@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Select" queryid="GET_DEFECT_GROUP_LIST" commandtype="Text" description="Defect Group" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQD_DEFECT_GROUP ORDER BY GROUP_ID]]></commandtext>
+    </query>
+    <query statement="Insert" queryid="INSERT_DEFECT_GROUP" commandtype="Text" description="defect group add" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQD_DEFECT_GROUP(GROUP_ID, GROUP_NAME, DELETE_FLAG, CREATE_TIME, CREATE_USER)
+  VALUES
+  (
+    :gid, 
+    :gname, 
+    :deleteflag,
+    SYSDATE,
+    :userid
+  )]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="gid">:gid</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="gname">:gname</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="deleteflag">:deleteflag</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="userid">:userid</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_DEFECT_GROUP" commandtype="Text" description="grup del" commandtimeout="60">
+        <commandtext><![CDATA[DELETE FROM TQD_DEFECT_GROUP 
+ WHERE GROUP_ID = :group_id]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:group_id</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_DEFECT_GROUP" commandtype="Text" description="group modify" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQD_DEFECT_GROUP
+SET GROUP_NAME = :gname
+  , DELETE_FLAG = :delflag 
+  , UPDATE_TIME = SYSDATE
+  , UPDATE_USER = :userid
+WHERE GROUP_ID = :gid]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="gid">:gid</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="gname">:gname</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="delflag">:delflag</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="userid">:userid</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_DEFECT_GROUP_INFO" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2013-11-06 19:12:39
+SELECT * FROM TQD_DEFECT_GROUP 
+WHERE GROUP_ID = :group_id
+ ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:group_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="EXIST_DEFECT_GROUP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-11-03 16:17:44
+SELECT COUNT(1)
+  FROM TQD_DEFECT_GROUP
+ WHERE GROUP_ID = :gid]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="gid">:gid</param>
+        </parameters>
+    </query>
+</queryxml>

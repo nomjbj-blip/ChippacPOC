@@ -1,0 +1,202 @@
+﻿<ANALYSIS PatternMode="Multi" TargetFileNamingRule="" Encoding="ASCII" CharCount="4" BOTTOM="" TOP="" LEFT="" RIGHT="">
+     <REGEX_ENTITY Name="bin" Parent="" Default="" Force="False" Label="" RegexString="^[\d]{3}[ ]{1}(?&lt;value&gt;[ \d]*)" RegexOption="Multiline" RegexValueGroupName="value" RegexValueSeperator="" ValueType="" StreamMode="Stream" STP_X="0" STP_Y="0" />
+     <REGEX_ENTITY Name="Wafer_ID" Parent="" Default=" " Force="False" Label="" RegexString="" RegexOption="Multiline" RegexValueGroupName="" RegexValueSeperator="" ValueType="" StreamMode="Stream" STP_X="0" STP_Y="0" />
+     <REGEX_ENTITY Name="Wafer_Num" Parent="" Default="" Force="False" Label="" RegexString="WAFER ID\s*:\s*(?&lt;value&gt;[\d]*)" RegexOption="Multiline" RegexValueGroupName="value" RegexValueSeperator="" ValueType="" StreamMode="Stream" STP_X="0" STP_Y="0" />
+     <REGEX_ENTITY Name="Product" Parent="" Default="" Force="False" Label="" RegexString="PRODUCT\s*ID\s*:\s*(?&lt;value&gt;[\w\d\)\(\.\-_]*)" RegexOption="Multiline" RegexValueGroupName="value" RegexValueSeperator="" ValueType="" StreamMode="Stream" STP_X="0" STP_Y="0" />
+     <REGEX_ENTITY Name="FlatZone" Parent="" Default="" Force="False" Label="" RegexString="SOURCE\s*NOTCH\s*:\s*(?&lt;value&gt;[\w]*)" RegexOption="Multiline" RegexValueGroupName="value" RegexValueSeperator="" ValueType="" StreamMode="Stream" STP_X="0" STP_Y="0" />
+     <REGEX_ENTITY Name="Run_ID" Parent="" Default="" Force="False" Label="" RegexString="LOT\s*ID\s*:\s*(?&lt;value&gt;[\w\d\._]*)" RegexOption="Multiline" RegexValueGroupName="value" RegexValueSeperator="" ValueType="" StreamMode="Stream" STP_X="0" STP_Y="0" />
+     <REGEX_ENTITY Name="Except" Parent="" Default="    " Force="False" Label="" RegexString="" RegexOption="Multiline, ExplicitCapture" RegexValueGroupName="" RegexValueSeperator="" ValueType="" StreamMode="Stream" STP_X="0" STP_Y="0" />
+     <REGEX_ENTITY Name="PROBE_CARD" Parent="" Default="" Force="False" Label="" RegexString="PROBE\s*CARD\s*ID\s*:\s*(?&lt;value&gt;[\w\-\d]*)" RegexOption="Multiline, ExplicitCapture" RegexValueGroupName="value" RegexValueSeperator="" ValueType="" StreamMode="Stream" STP_X="0" STP_Y="0" />
+     <REGEX_ENTITY Name="START_TIME" Parent="" Default="" Force="False" Label="" RegexString="START\s*TIME\s*:\s*(?&lt;value&gt;[\d\:\/ ]*)" RegexOption="Multiline, ExplicitCapture" RegexValueGroupName="value" RegexValueSeperator="" ValueType="" StreamMode="Stream" STP_X="0" STP_Y="0" />
+     <REGEX_ENTITY Name="STOP_TIME" Parent="" Default="" Force="False" Label="" RegexString="STOP\s*TIME\s*:\s*(?&lt;value&gt;[\d\:\/ ]*)" RegexOption="Multiline, ExplicitCapture" RegexValueGroupName="value" RegexValueSeperator="" ValueType="" StreamMode="Stream" STP_X="0" STP_Y="0" />
+     <REGEX_ENTITY Name="PROGRAM" Parent="" Default="" Force="False" Label="" RegexString="TEST\s*PROGRAM\s*:\s*(?&lt;value&gt;[\w\-\d]*)" RegexOption="Multiline, ExplicitCapture" RegexValueGroupName="value" RegexValueSeperator="" ValueType="" StreamMode="Stream" STP_X="0" STP_Y="0" />
+     <SAMPLE_FILE Name="HIDEEP_CRIMSON_HSG13.0001_20150823004322.CP2">[BOF]
+PRODUCT ID      : CRIMSON
+LOT ID          : HSG13.00
+WAFER ID        : 01
+FLOW ID         : CP2
+START TIME      : 2015/08/23 00:43:22
+STOP TIME       : 2015/08/26 02:40:06
+SUBCON          : ITEK
+TESTER NAME     : QUARTET12
+TEST PROGRAM    : crimson-q8hw2r4a
+LOAD BOARD ID   : 
+PROBE CARD ID   : CRIMSON-WQ1
+SITE NUM        : 
+DUT ID          : 
+DUT DIFF NUM    : 
+OPERATOR ID     : 1
+TESTED DIE      : 2148
+PASS DIE        : 1944
+YIELD           : 90.50%
+SOURCE NOTCH    : DOWN
+MAP ROW         : 52
+MAP COLUMN      : 53
+MAP BIN LENGTH  : 3
+SHIP            : 
+
+[SOFT BIN]
+        BINNAME, DIENUM,  YIELD, DESCRIPTION
+    BIN,      1,   1944, 90.50%, {[PASS]}
+    BIN,      2,      7,  0.33%, {[F_OS]}
+    BIN,      3,     36,  1.68%, {[F_PWR]}
+    BIN,      4,      1,  0.05%, {[F_IIL]}
+    BIN,      5,      0,  0.00%, {[F_IIH]}
+    BIN,      6,     11,  0.51%, {[F_VIH]}
+    BIN,      7,      0,  0.00%, {[F_VIL]}
+    BIN,      8,      0,  0.00%, {[F_VOH]}
+    BIN,      9,      0,  0.00%, {[F_VOL]}
+    BIN,     11,      2,  0.09%, {[VPP_MEAS_F]}
+    BIN,     12,      0,  0.00%, {[VPP_TRIM]}
+    BIN,     13,      0,  0.00%, {[VPP_PROG]}
+    BIN,     14,      0,  0.00%, {[VPP_VERI]}
+    BIN,     15,      6,  0.28%, {[VPP_POST]}
+    BIN,     16,      1,  0.05%, {[VPP_MEAS_M]}
+    BIN,     20,      0,  0.00%, {[pre_cycl]}
+    BIN,     21,      1,  0.05%, {[ver_all0]}
+    BIN,     22,      0,  0.00%, {[mas_eras]}
+    BIN,     23,      0,  0.00%, {[ver_all1]}
+    BIN,     24,      1,  0.05%, {[dstb_wri_all1]}
+    BIN,     25,      3,  0.14%, {[dstb_ver_all1_7ua]}
+    BIN,     26,      0,  0.00%, {[wri_all0]}
+    BIN,     27,      0,  0.00%, {[mas_eras_noprt]}
+    BIN,     28,      0,  0.00%, {[ver_all0]}
+    BIN,     29,      0,  0.00%, {[mas_eras]}
+    BIN,     30,      0,  0.00%, {[ver_all1]}
+    BIN,     31,      0,  0.00%, {[wri_ckb]}
+    BIN,     32,      1,  0.05%, {[ver_ckb]}
+    BIN,     33,      1,  0.05%, {[ver_ckb]}
+    BIN,     34,      0,  0.00%, {[wri_ickb]}
+    BIN,     35,      0,  0.00%, {[ver_all0]}
+    BIN,     36,      0,  0.00%, {[mas_eras]}
+    BIN,     37,      0,  0.00%, {[ver_all1]}
+    BIN,     38,      0,  0.00%, {[wri_ckb]}
+    BIN,     39,      4,  0.19%, {[ver_ckb]}
+    BIN,     40,      4,  0.19%, {[ckb_7ua]}
+    BIN,     41,      0,  0.00%, {[ver_ckb]}
+    BIN,     42,      0,  0.00%, {[ckb_2ua]}
+    BIN,     43,      0,  0.00%, {[wri_ickb]}
+    BIN,     44,      0,  0.00%, {[ver_all0]}
+    BIN,     45,      0,  0.00%, {[mas_eras]}
+    BIN,     46,      0,  0.00%, {[ver_all1]}
+    BIN,     47,      0,  0.00%, {[wri_ickb]}
+    BIN,     48,      4,  0.19%, {[ver_ickb]}
+    BIN,     49,      8,  0.37%, {[ver_ickb_7ua]}
+    BIN,     50,      0,  0.00%, {[ver_ickb]}
+    BIN,     51,      0,  0.00%, {[ver_ickb_2ua]}
+    BIN,     52,      0,  0.00%, {[wri_ckb]}
+    BIN,     53,      0,  0.00%, {[ver_all0]}
+    BIN,     54,      0,  0.00%, {[mas_eras]}
+    BIN,     55,      0,  0.00%, {[ver_all1]}
+    BIN,     56,      0,  0.00%, {[wri_all0]}
+    BIN,     57,      0,  0.00%, {[ver_all0]}
+    BIN,     58,      0,  0.00%, {[F_POR]}
+    BIN,     59,     38,  1.77%, {[F_SCAN_MIN]}
+    BIN,     60,      0,  0.00%, {[F_SCAN_MAX]}
+    BIN,     61,     24,  1.12%, {[F_BIST]}
+    BIN,     62,     38,  1.77%, {[CPP_MEAS]}
+    BIN,     63,      2,  0.09%, {[LDO_MEAS]}
+    BIN,     71,      3,  0.14%, {[ver_all0]}
+    BIN,     72,      0,  0.00%, {[vpp_veri]}
+    BIN,     73,      0,  0.00%, {[vpp_post_meas]}
+    BIN,     74,      0,  0.00%, {[mas_eras]}
+    BIN,     75,      0,  0.00%, {[ver_all1]}
+    BIN,     76,      0,  0.00%, {[str_wri_all1]}
+    BIN,     77,      1,  0.05%, {[str_ver_all1_7ua]}
+    BIN,     78,      0,  0.00%, {[wri_all0]}
+    BIN,     79,      0,  0.00%, {[ver_all0]}
+    BIN,     80,      0,  0.00%, {[mas_eras]}
+    BIN,     81,      0,  0.00%, {[ver_all1]}
+    BIN,     82,      0,  0.00%, {[wri_ickb]}
+    BIN,     83,      0,  0.00%, {[ickb_2ua]}
+    BIN,     84,      0,  0.00%, {[ickb_7ua]}
+    BIN,     85,      0,  0.00%, {[wri_ckb]}
+    BIN,     86,      0,  0.00%, {[ver_all0]}
+    BIN,     87,      0,  0.00%, {[mass_eras]}
+    BIN,     88,      0,  0.00%, {[ver_all1]}
+    BIN,     89,      0,  0.00%, {[wri_ckb]}
+    BIN,     90,      0,  0.00%, {[ver_ckb]}
+    BIN,     91,      0,  0.00%, {[ckb_2ua]}
+    BIN,     92,      1,  0.05%, {[ver_ckb]}
+    BIN,     93,      3,  0.14%, {[ver_ckb_7ua]}
+    BIN,     94,      0,  0.00%, {[wri_ickb]}
+    BIN,     95,      0,  0.00%, {[ver_all0]}
+    BIN,     96,      0,  0.00%, {[mas_eras]}
+    BIN,     97,      0,  0.00%, {[ver_all1]}
+    BIN,     98,      0,  0.00%, {[wri_ickb]}
+    BIN,     99,      0,  0.00%, {[ver_ickb]}
+    BIN,    100,      0,  0.00%, {[ver_ickb_2ua]}
+    BIN,    101,      1,  0.05%, {[ver_ickb]}
+    BIN,    102,      2,  0.09%, {[ver_ickb_7ua]}
+    BIN,    103,      0,  0.00%, {[wri_ckb]}
+    BIN,    104,      0,  0.00%, {[ver_all0]}
+    BIN,    105,      0,  0.00%, {[mas_eras]}
+    BIN,    106,      0,  0.00%, {[ver_all1]}
+    BIN,    199,      0,  0.00%, {[UNTESTED]}
+
+[SOFT BIN MAP]
+       0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+       0   0   0   0   0   0   0   0   0   1   1   1   1   1   1   1   1   1   1   2   2   2   2   2   2   2   2   2   2   3   3   3   3   3   3   3   3   3   3   4   4   4   4   4   4   4   4   4   4   5   5   5   5
+       1   2   3   4   5   6   7   8   9   0   1   2   3   4   5   6   7   8   9   0   1   2   3   4   5   6   7   8   9   0   1   2   3   4   5   6   7   8   9   0   1   2   3   4   5   6   7   8   9   0   1   2   3
+
+001                                                                                            1   1                           1   1                                                                                    
+002                                                                            1   1   1   1   1   1   1   1   1   1   1   1   1   1   1  15   1                                                                        
+003                                                                    1   6   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1                                                            
+004                                                            1   1   1   1   1  32   1   1   1   1   1   1  71   1   1   1   1   1  59   1   1   1   1   1                                                            
+005                                                    1   1   1   1   1   1   1   1   1   1   1   1   1   3   1  61   2   1   1   1   1   1   1   1   1   3   1   1   1                                                
+006                                                1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1                                        
+007                                            1   1  61   1   1   1   1   1   1  11   1   1   1   1   1   1   1   1   1   1   1   1   1  59  59   1   1   1   1  61   1   1   1   1                                    
+008                                        1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1  33   1   1   1   1   1   1   1   1   1   1   1                                
+009                                    1   1   1   1   1   1   1   1   1   1   1   1  62   1   1   1   1  59   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1                            
+010                                    1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1  61   1   1   3   1   1   1   1  49   1   1   1   1   1   1   1   1   1   1   1   1                        
+011                            1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1  40   1   1   1   1   1   1   1   1   1  93                    
+012                            1   1   1   1   1   1   1   1   1   1   1   1   1   2   1   1   1   1   1   1   1   1   1   1  48   1   1   1   1   1   1   1  63   1   1   1   1   1   1   1   1   1                    
+013                        1   1   1   1   1   1   1   1   1   1   1   1   1   1   1  63   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1  61                    
+014                        1   1   1   1   1   1   1   6   1   1   1   1   1   1   1   1   1   1  61   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1                
+015                    1   1  39   1   1   1   1   1   1   1   1   1  59   1  77   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1                
+016                    1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1  49   1   1   1   1   1   1            
+017            1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1  62   1   1   1   1   1   1   1   1  59   1   1   1  15   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1        
+018            1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1  49   1   1   1   1   1   1   1   1   1   1   1   1   1   1  71   1   1   1   1   1   1   1   1   1   1   1    
+019            1   1   1   1   1   1  49   1   3   1   1   1   1   1   1   1   1  59   1   1  59   1  59   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1  25    
+020            1   1   1   1   1   1   1   1   1  61   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   3   1   1   1   1   1   1   1   1   1  40   1   1   1   1   3   1   1   1   1  59   1   1   1   1    
+021            1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1  59   1   1   1   3   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1  25   1   1   1   1   1   1   1   1   1   1   1
+022            1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1  39   1   1   1   1   1   1   1   1 102   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1
+023        1   1   1  61   1   1   1   1   1   1   1   1   1   1   1   1   1   3   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   3   1  49   1  61   1   1  61   1   1   1   1   1   1   1
+024        1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   6   1   1   1   1   1   1   1
+025    1   1   1   1   1   1   1   1   1   1  61   1   1   1   1   1   1   1  61   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1
+026    1   1   1   1   1   1   1   1   1   1   1   1   1  24   1   1   1   1   1   1   1   1   1   1   1   1  61   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1  61   1   1   1   1   1   1   1   1
+027   48   1   1   1   1   1   1   1   1   1  61   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1 101   1   1   1  49   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1
+028    1   1   1   1  62   1   1   1   1   1   1   1   1   1   1  15   1   1   1  61   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1  16   1   1   1   1   1   1   1
+029  102   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1  59   1   1   1   1   1   1   1   1   1   1   1   1   1   1
+030        1   1  62   1   3   1   1   1   1   1   1   1   1   1   1   1   1   1  61   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1  49   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1
+031        1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1  61   1  21   1   1   1   1   1   1   1   1   1   1   1   1   1
+032       62   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1  61   1   6  49
+033        1  93  59   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1
+034        1   1   1   1   1   1   1   1   1  62   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1  62   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1    
+035            1   1   1   2   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1  59   1   1   1   1   1   1   1   1   1   1  61   1   1   1   1   1   1   1   1   1   1   1   1   1    
+036            1   1   1   1   1   1  62   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1  62   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1    
+037                1   1   1   1   1   1   1   1   1  62   1   1   1   1   1   1  15   1   1   1   1   1   1   1   1   1   1  59   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1        
+038                    1   1   1   1  39   1   1  62  62   1  62   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1  62   1   1   1   1   1   1   1   1            
+039                   93  61   1  15   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1  62   1   1   1   1   1   1  61   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1                
+040                       59   1   3   1   1  40   1   1   3   1   1   1   1   1   1   1   1   1   1   1   1   1   1   3   1  59   1   1  59  59   1   1   1   1   1  40   1   1   1   1   1   1   1   1                
+041                        1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1  62   1   1  62   3   1   1   1   1   3   3   1   1   1   1   6   1   1   1   1   1   1   1   1   1   1                    
+042                            1   1   1   2   1   1   1   1  59   1   1   1  25  48   1  62   1   1   1   1   1  62   1   4   1  59   1   1   1   6   1  59   1   1   1   1   1   1   1   1   1   1                    
+043                            1   1  59  62   1   1   1   1   1   1   1   1  62   1   1   1   1   1  62  15  62   1   6   3   3   3   2   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1                    
+044                                1   1  59   1   1  62   1  59   1   1   1   1  39   1   1   1   1   3   1   3  59  59   3   1   1   1   1   3   1   1   1   1   1   1   1   1   1  48   1   1                        
+045                                    6   1  59   1   1   1   1   1   1   1   1   1   1   1  62   6   1   3   1  62   1   1  62   1   1   1   1   1   1   1   1   1   1   1   1   3   1   1                            
+046                                        1   1   3   1   1   1   6   1   1   3   1  59   1  62   1   1   1  11  59   1   1  62   1   1   1  59   1   6   1   1   1   1   1   1   1   1                                
+047                                            1   1   1   1   1   1   1   1   1  62   1   1   1   1   1   1  59  62  62   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1                                    
+048                                                1   1   1   1  62   1   1   1  62   1   2   1   1   1   1   1   1   2   1   1   1   1   1   1   3   1   1   1   1   1   1   1                                        
+049                                                       62   1   1   1   1   1  62  62   1   1  59   1   1   1  59   1   1   1   1   1   1   1   1   1  92   1   1   1                                                
+050                                                           61   1   1   1   1   1   1   1  62  59   3   1  59   1  59   1   1   1   1   1   1   1   1   1   1   1                                                    
+051                                                                   59   1   1   1   1   3   3   1   3   3   3   1   1   1   3  61   1  71   1   1   1   1                                                            
+052                                                                                1   1   1   1   1   1   3   1   1   1   1   1   1   1   1   1                                                                        
+
+[EXTENSION]
+
+[EOF
+</SAMPLE_FILE>
+     <CONNECTION_INFORMATION Length="28">0001000000FFFFFFFF01000000000000000601000000044E554C4C0B</CONNECTION_INFORMATION>
+     <TASK Length="611">0001000000FFFFFFFF01000000000000000C0200000049536D6172745061727365722E436F6D6D6F6E2C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C050100000022536D6172745061727365722E436F6D6D6F6E2E495461736B436F6C6C656374696F6E05000000094974656D41646465640B4974656D52656D6F7665640D4C69737460312B5F6974656D730C4C69737460312B5F73697A650F4C69737460312B5F76657273696F6E04040400009101536D6172745061727365722E436F6D6D6F6E2E4974656D41646465644576656E7448616E646C657260315B5B536D6172745061727365722E436F6D6D6F6E2E495461736B2C20536D6172745061727365722E436F6D6D6F6E2C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C5D5D020000009301536D6172745061727365722E436F6D6D6F6E2E4974656D52656D6F7665644576656E7448616E646C657260315B5B536D6172745061727365722E436F6D6D6F6E2E495461736B2C20536D6172745061727365722E436F6D6D6F6E2C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C5D5D020000001A536D6172745061727365722E436F6D6D6F6E2E495461736B5B5D020000000808020000000A0A0903000000000000000000000007030000000001000000000000000418536D6172745061727365722E436F6D6D6F6E2E495461736B020000000B</TASK>
+     <SCRIPT Length="362">0001000000FFFFFFFF01000000000000000C0200000049536D6172745061727365722E436F6D6D6F6E2C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C0401000000890153797374656D2E436F6C6C656374696F6E732E47656E657269632E4C69737460315B5B536D6172745061727365722E436F6D6D6F6E2E5363726970742C20536D6172745061727365722E436F6D6D6F6E2C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C5D5D03000000065F6974656D73055F73697A65085F76657273696F6E0400001B536D6172745061727365722E436F6D6D6F6E2E5363726970745B5D0200000008080903000000000000000000000007030000000001000000000000000419536D6172745061727365722E436F6D6D6F6E2E536372697074020000000B</SCRIPT>
+</ANALYSIS>

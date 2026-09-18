@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Insert" queryid="CREATE_LOT" commandtype="Text" description="TDMS_LOT에 Data를 Insert한다" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQD_LOT(LOT_SEQ,LOT_ID,PRODUCT,"COMMENT") VALUES(LOT_SEQ.NEXTVAL,:lot_id,:product,:description) ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0" description="Lot ID">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="0" description="Product">:product</param>
+            <param direction="Input" dbtype="VarChar" size="0" description="Comments">:description</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_LOT_SEQ" commandtype="Text" description="LOT Sequence를 가져온다" commandtimeout="60">
+        <commandtext><![CDATA[SELECT LOT_SEQ FROM TQD_LOT WHERE PRODUCT = :product AND LOT_ID = :lot_id]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0" description="Product name">:product</param>
+            <param direction="Input" dbtype="VarChar" size="0" description="Lot_id">:lot_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="FIND_LOT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQD_LOT WHERE LOT_ID LIKE :likevalue]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:likevalue</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_MAINT_PRD" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-09-26 16:30:49]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_LOT_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT *
+  FROM TQD_LOT
+ WHERE 1 = 1 
+  AND LOT_ID = :lotid
+  AND PRODUCT = :product]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="lotid">:lotid</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="product">:product</param>
+        </parameters>
+    </query>
+</queryxml>

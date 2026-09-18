@@ -1,0 +1,291 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{72020EB8-BC7A-4A89-86F7-E731B808B344}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DACrux.ProjectManager.UI</RootNamespace>
+    <AssemblyName>DACrux.ProjectManager.UI</AssemblyName>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\71_CoreLib\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\71_CoreLib\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="DACrux.SPC.Visualization, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\07_CoreLib\DACrux.SPC.Visualization.dll</HintPath>
+    </Reference>
+    <Reference Include="EnvDTE, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    <Reference Include="FarPoint.Excel, Version=5.0.3522.2008, Culture=neutral, PublicKeyToken=327c3516b1b18457, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="FarPoint.Win, Version=5.0.3522.2008, Culture=neutral, PublicKeyToken=327c3516b1b18457, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="FarPoint.Win.Spread, Version=5.0.3522.2008, Culture=neutral, PublicKeyToken=327c3516b1b18457, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="Microsoft.Office.Interop.Excel, Version=11.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\ReferenceLibrary\Microsoft.Office.Interop.Excel.dll</HintPath>
+    </Reference>
+    <Reference Include="SPCHistogram">
+      <HintPath>..\..\07_CoreLib\SPCHistogram.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Design" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Drawing.Design" />
+    <Reference Include="System.Management" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Forms.DataVisualization, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Common.cs" />
+    <Compile Include="Cursor.cs" />
+    <Compile Include="Dialog\DlgDataViewTranspose.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialog\DlgDataViewTranspose.Designer.cs">
+      <DependentUpon>DlgDataViewTranspose.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GraphInformation.cs" />
+    <Compile Include="StatInformation.cs" />
+    <Compile Include="StatView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="StatView.Designer.cs">
+      <DependentUpon>StatView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GraphPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GraphPanel.Designer.cs">
+      <DependentUpon>GraphPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DataView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DataView.Designer.cs">
+      <DependentUpon>DataView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DataViewImage.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DataViewImage.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Dialog\DlgDataViewSplit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialog\DlgDataViewSplit.Designer.cs">
+      <DependentUpon>DlgDataViewSplit.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialog\DlgDataViewSort.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialog\DlgDataViewSort.Designer.cs">
+      <DependentUpon>DlgDataViewSort.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialog\DlgDataViewColumnSetting.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialog\DlgDataViewColumnSetting.Designer.cs">
+      <DependentUpon>DlgDataViewColumnSetting.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialog\DlgDataViewInsertRemove.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialog\DlgDataViewInsertRemove.Designer.cs">
+      <DependentUpon>DlgDataViewInsertRemove.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialog\DlgDataViewMoveColumn.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialog\DlgDataViewMoveColumn.Designer.cs">
+      <DependentUpon>DlgDataViewMoveColumn.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GradientPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="GradientPanel.designer.cs">
+      <DependentUpon>GradientPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GraphView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GraphView.Designer.cs">
+      <DependentUpon>GraphView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Service Include="{94E38DFF-614B-4cbd-B67C-F211BB35CE8B}" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Dialog\DlgDataViewTranspose.resx">
+      <DependentUpon>DlgDataViewTranspose.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="StatView.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>StatView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GraphPanel.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>GraphPanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataView.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>DataView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataViewImage.resx">
+      <SubType>Designer</SubType>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>DataViewImage.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialog\DlgDataViewSplit.resx">
+      <DependentUpon>DlgDataViewSplit.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialog\DlgDataViewSort.resx">
+      <DependentUpon>DlgDataViewSort.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialog\DlgDataViewColumnSetting.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>DlgDataViewColumnSetting.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialog\DlgDataViewInsertRemove.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>DlgDataViewInsertRemove.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialog\DlgDataViewMoveColumn.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>DlgDataViewMoveColumn.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GradientPanel.resx">
+      <DependentUpon>GradientPanel.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GraphView.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>GraphView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\licenses.licx" />
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <SubType>Designer</SubType>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 2.0</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\072numbertype.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\072numbertype0.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\073chartype.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\073chartype0.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\074datetype.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\074datetype0.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\06_CoreLibSource\DACrux.Base\DACrux.Base.csproj">
+      <Project>{EBEDC52F-2DE6-45EB-9E37-805FC298A0ED}</Project>
+      <Name>DACrux.Base</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,0 +1,611 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectType>Local</ProjectType>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{C9B0F7D0-E636-42EC-909A-44F0565C735A}</ProjectGuid>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ApplicationIcon>
+    </ApplicationIcon>
+    <AssemblyKeyContainerName>
+    </AssemblyKeyContainerName>
+    <AssemblyName>DACrux.SEMDMS.Control</AssemblyName>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+    <DefaultClientScript>JScript</DefaultClientScript>
+    <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
+    <DefaultTargetSchema>IE50</DefaultTargetSchema>
+    <DelaySign>false</DelaySign>
+    <OutputType>Library</OutputType>
+    <RootNamespace>DACrux.SEMDMS.Control</RootNamespace>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+    <StartupObject>
+    </StartupObject>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>..\..\100_ClientBin\</OutputPath>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <BaseAddress>285212672</BaseAddress>
+    <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
+    <ConfigurationOverrideFile>
+    </ConfigurationOverrideFile>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DocumentationFile>
+    </DocumentationFile>
+    <DebugSymbols>true</DebugSymbols>
+    <FileAlignment>4096</FileAlignment>
+    <NoStdLib>false</NoStdLib>
+    <NoWarn>
+    </NoWarn>
+    <Optimize>false</Optimize>
+    <RegisterForComInterop>false</RegisterForComInterop>
+    <RemoveIntegerChecks>false</RemoveIntegerChecks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningLevel>4</WarningLevel>
+    <DebugType>full</DebugType>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>..\..\100_ClientBin\</OutputPath>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <BaseAddress>285212672</BaseAddress>
+    <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
+    <ConfigurationOverrideFile>
+    </ConfigurationOverrideFile>
+    <DefineConstants>TRACE</DefineConstants>
+    <DocumentationFile>
+    </DocumentationFile>
+    <DebugSymbols>false</DebugSymbols>
+    <FileAlignment>4096</FileAlignment>
+    <NoStdLib>false</NoStdLib>
+    <NoWarn>
+    </NoWarn>
+    <Optimize>true</Optimize>
+    <RegisterForComInterop>false</RegisterForComInterop>
+    <RemoveIntegerChecks>false</RemoveIntegerChecks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningLevel>4</WarningLevel>
+    <DebugType>none</DebugType>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <BaseAddress>285212672</BaseAddress>
+    <FileAlignment>4096</FileAlignment>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <BaseAddress>285212672</BaseAddress>
+    <Optimize>true</Optimize>
+    <FileAlignment>4096</FileAlignment>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="DACrux.Base, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\07_CoreLib\DACrux.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="DACrux.FPDMap">
+      <HintPath>..\..\07_CoreLib\DACrux.FPDMap.dll</HintPath>
+    </Reference>
+    <Reference Include="DACrux.Framework.Base, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\07_CoreLib\DACrux.Framework.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="DACrux.Framework.Controls, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\07_CoreLib\DACrux.Framework.Controls.dll</HintPath>
+    </Reference>
+    <Reference Include="DACrux.Framework.Interface, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\07_CoreLib\DACrux.Framework.Interface.dll</HintPath>
+    </Reference>
+    <Reference Include="DACrux.Map">
+      <HintPath>..\..\07_CoreLib\DACrux.Map.dll</HintPath>
+    </Reference>
+    <Reference Include="DACrux.Utility, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\07_CoreLib\DACrux.Utility.dll</HintPath>
+    </Reference>
+    <Reference Include="FarPoint.Win, Version=5.0.3518.2008, Culture=neutral, PublicKeyToken=327c3516b1b18457, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files (x86)\GrapeCity\Spread.WinForms.5.dotNet35\v5.0.3518\Bin\FarPoint.Win.dll</HintPath>
+    </Reference>
+    <Reference Include="FarPoint.Win.Spread, Version=5.0.3518.2008, Culture=neutral, PublicKeyToken=327c3516b1b18457, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files (x86)\GrapeCity\Spread.WinForms.5.dotNet35\v5.0.3518\Bin\FarPoint.Win.Spread.dll</HintPath>
+    </Reference>
+    <Reference Include="Infragistics4.Win.UltraWinEditors.v12.1, Version=12.1.20121.2135, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL" />
+    <Reference Include="Infragistics4.Win.UltraWinGrid.v12.1, Version=12.1.20121.2135, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb" />
+    <Reference Include="Infragistics4.Win.UltraWinListView.v12.1, Version=12.1.20121.2135, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL" />
+    <Reference Include="Infragistics4.Win.UltraWinTree.v12.1, Version=12.1.20121.2135, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL" />
+    <Reference Include="Infragistics4.Win.v12.1, Version=12.1.20121.2135, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL" />
+    <Reference Include="Infragistics4.Win.UltraWinToolbars.v12.1, Version=12.1.20121.2135, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL" />
+    <Reference Include="Infragistics4.Win.UltraWinTabControl.v12.1, Version=12.1.20121.2135, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL" />
+    <Reference Include="Infragistics4.Win.UltraWinDock.v12.1, Version=12.1.20121.2135, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL" />
+    <Reference Include="Infragistics4.Win.Misc.v12.1, Version=12.1.20121.2135, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL" />
+    <Reference Include="Infragistics4.Shared.v12.1, Version=12.1.20121.2135, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Office.Interop.Excel, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Microsoft.VisualBasic">
+      <Name>Microsoft.VisualBasic</Name>
+    </Reference>
+    <Reference Include="Office, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="System">
+      <Name>System</Name>
+    </Reference>
+    <Reference Include="System.Data">
+      <Name>System.Data</Name>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Design">
+      <Name>System.Design</Name>
+    </Reference>
+    <Reference Include="System.Drawing">
+      <Name>System.Drawing</Name>
+    </Reference>
+    <Reference Include="System.Drawing.Design">
+      <Name>System.Drawing.Design</Name>
+    </Reference>
+    <Reference Include="System.Management">
+      <Name>System.Management</Name>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization.Formatters.Soap" />
+    <Reference Include="System.Windows.Forms">
+      <Name>System.Windows.Forms</Name>
+    </Reference>
+    <Reference Include="System.Windows.Forms.DataVisualization" />
+    <Reference Include="System.XML" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DmsCacheHelper.cs" />
+    <Compile Include="DmsDataGroupBy.cs" />
+    <Compile Include="DPUCChartAnalysis.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DPUCChartAnalysis.Designer.cs">
+      <DependentUpon>DPUCChartAnalysis.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DPUCDataSheetControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DPUCDataSheetControl.Designer.cs">
+      <DependentUpon>DPUCDataSheetControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DPUCDefecMap.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DPUCDefectInfo.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DPUCDefectInfo.Designer.cs">
+      <DependentUpon>DPUCDefectInfo.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DefectMapDraw.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DPUCDefectImgGallery.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DPUCDefectImgGalleryManyStep.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DPUCDefectMapGallery.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DPUCDefectMapGalleryItem.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DPUCDefectMapGalleryItem.Designer.cs">
+      <DependentUpon>DPUCDefectMapGalleryItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DPUCDefectMapGalleryOld.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DPUCDefectSourceAnalysis.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DPUCDieStackGallery.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DPUCDieStackViewer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DPUCImageGallery.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DPUCImageGalleryGrid.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DPUCImageGalleryGrid.designer.cs">
+      <DependentUpon>DPUCImageGalleryGrid.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DPUCImageListViewer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DPUCInformation.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DPUCInformation.Designer.cs">
+      <DependentUpon>DPUCInformation.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DPUCOption.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DPUCOption.Designer.cs">
+      <DependentUpon>DPUCOption.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DPUCPatternSearch.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DPUCReclassify.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DPUCReclassify.Designer.cs">
+      <DependentUpon>DPUCReclassify.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DPUCRepeatedDefect.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DPUCRDSetup.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DPUCRDSetup.Designer.cs">
+      <DependentUpon>DPUCRDSetup.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DPUCStepSelect.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DPUCTestMapOverlay.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DPUCWrapDefectMap.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DPUCZoneDefine.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DPUCZoneMap.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="frmDefectOption.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmDefectOption.Designer.cs">
+      <DependentUpon>frmDefectOption.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ImageControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ImageControl.Designer.cs">
+      <DependentUpon>ImageControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ImageGalleryControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ImageGalleryControl.designer.cs">
+      <DependentUpon>ImageGalleryControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ImagePopUp.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ImagePopUp.Designer.cs">
+      <DependentUpon>ImagePopUp.cs</DependentUpon>
+    </Compile>
+    <Compile Include="LargeImage.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MSChartController.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="MSChartController.Designer.cs">
+      <DependentUpon>MSChartController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DPUCExportToKlarf.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DPUCExportToKlarf.Designer.cs">
+      <DependentUpon>DPUCExportToKlarf.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PopUpAxisY.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PopUpAxisY.Designer.cs">
+      <DependentUpon>PopUpAxisY.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PopUpAxisYConfig.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PopUpAxisYConfig.designer.cs">
+      <DependentUpon>PopUpAxisYConfig.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="DPUCDefecMapViewer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SetupSearchItem.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SetupSearchItem.Designer.cs">
+      <DependentUpon>SetupSearchItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DPUCChartAnalysisDefectList.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DPUCChartAnalysisDefectList.Designer.cs">
+      <DependentUpon>DPUCChartAnalysisDefectList.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DPUCBareDefecMapViewer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="frmChartYOption.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmChartYOption.Designer.cs">
+      <DependentUpon>frmChartYOption.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserConfiguration.cs" />
+    <EmbeddedResource Include="DPUCChartAnalysis.resx">
+      <DependentUpon>DPUCChartAnalysis.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DPUCDataSheetControl.resx">
+      <DependentUpon>DPUCDataSheetControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DPUCDefecMap.resx">
+      <DependentUpon>DPUCDefecMap.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DPUCDefectImgGallery.resx">
+      <DependentUpon>DPUCDefectImgGallery.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DPUCDefectImgGalleryManyStep.resx">
+      <DependentUpon>DPUCDefectImgGalleryManyStep.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DPUCDefectInfo.resx">
+      <DependentUpon>DPUCDefectInfo.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DPUCDefectMapGallery.resx">
+      <DependentUpon>DPUCDefectMapGallery.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DPUCDefectMapGalleryItem.resx">
+      <DependentUpon>DPUCDefectMapGalleryItem.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DPUCDefectMapGalleryOld.resx">
+      <DependentUpon>DPUCDefectMapGalleryOld.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DPUCDefectSourceAnalysis.resx">
+      <DependentUpon>DPUCDefectSourceAnalysis.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DPUCDieStackGallery.resx">
+      <DependentUpon>DPUCDieStackGallery.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DPUCDieStackViewer.resx">
+      <DependentUpon>DPUCDieStackViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DPUCImageGallery.resx">
+      <DependentUpon>DPUCImageGallery.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DPUCImageGalleryGrid.resx">
+      <DependentUpon>DPUCImageGalleryGrid.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DPUCImageListViewer.resx">
+      <DependentUpon>DPUCImageListViewer.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DPUCInformation.resx">
+      <DependentUpon>DPUCInformation.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DPUCOption.resx">
+      <DependentUpon>DPUCOption.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DPUCPatternSearch.resx">
+      <DependentUpon>DPUCPatternSearch.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DPUCReclassify.resx">
+      <DependentUpon>DPUCReclassify.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DPUCRepeatedDefect.resx">
+      <DependentUpon>DPUCRepeatedDefect.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DPUCRDSetup.resx">
+      <DependentUpon>DPUCRDSetup.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DPUCStepSelect.resx">
+      <DependentUpon>DPUCStepSelect.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DPUCTestMapOverlay.resx">
+      <DependentUpon>DPUCTestMapOverlay.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DPUCWrapDefectMap.resx">
+      <DependentUpon>DPUCWrapDefectMap.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DPUCZoneDefine.resx">
+      <DependentUpon>DPUCZoneDefine.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DPUCZoneMap.resx">
+      <DependentUpon>DPUCZoneMap.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmDefectOption.resx">
+      <DependentUpon>frmDefectOption.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ImageControl.resx">
+      <DependentUpon>ImageControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ImageGalleryControl.resx">
+      <DependentUpon>ImageGalleryControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ImagePopUp.resx">
+      <DependentUpon>ImagePopUp.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LargeImage.resx">
+      <DependentUpon>LargeImage.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="licenses.licx" />
+    <EmbeddedResource Include="MSChartController.resx">
+      <DependentUpon>MSChartController.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DPUCExportToKlarf.resx">
+      <DependentUpon>DPUCExportToKlarf.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PopUpAxisY.resx">
+      <DependentUpon>PopUpAxisY.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PopUpAxisYConfig.resx">
+      <DependentUpon>PopUpAxisYConfig.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DPUCDefecMapViewer.resx">
+      <DependentUpon>DPUCDefecMapViewer.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SetupSearchItem.resx">
+      <DependentUpon>SetupSearchItem.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DPUCChartAnalysisDefectList.resx">
+      <DependentUpon>DPUCChartAnalysisDefectList.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DPUCBareDefecMapViewer.resx">
+      <DependentUpon>DPUCBareDefecMapViewer.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmChartYOption.resx">
+      <DependentUpon>frmChartYOption.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 2.0%28x86%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.0%28x86%29</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\06_CoreLibSource\DACrux.Common.RO\DACrux.Common.RO.csproj">
+      <Project>{46A137A3-7FE3-476D-B2C4-0ED113DB4378}</Project>
+      <Name>DACrux.Common.RO</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\06_CoreLibSource\DACrux.Data.Parser\DACrux.Data.Parser.csproj">
+      <Project>{74090ED2-64BC-45D4-9048-D561EA147A78}</Project>
+      <Name>DACrux.Data.Parser</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\09_TEST\DACrux.TEST.RO\DACrux.TEST.RO.csproj">
+      <Project>{E1AC51DC-7074-45B4-BD2B-92343BC69411}</Project>
+      <Name>DACrux.TEST.RO</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DACrux.SEMDMS.Interface\DACrux.SEMDMS.Interface.csproj">
+      <Project>{21875FB0-5B25-45E6-834D-72B4949B49F6}</Project>
+      <Name>DACrux.SEMDMS.Interface</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DACrux.SEMDMS.RO\DACrux.SEMDMS.RO.csproj">
+      <Project>{B3DE56DD-3EC4-4359-BDA2-2F3289699C8B}</Project>
+      <Name>DACrux.SEMDMS.RO</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram2.cd" />
+    <None Include="Resources\112_RefreshArrow_Blue_16x16_72.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Repeat.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+</Project>

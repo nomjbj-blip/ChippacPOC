@@ -1,0 +1,112 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="QMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Insert" queryid="StartLog" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQC_USER_HITLOG VALUES(:FunctionCode,:UserID, :IPAddress, systimestamp, null, :Parameter, null )]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="20" value="F01101">:FunctionCode</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="ysim234">:UserID</param>
+            <param direction="Input" dbtype="VarChar" size="20" value="2002:3200:4::3200:4">:IPAddress</param>
+            <param direction="Input" dbtype="VarChar" size="250">:Parameter</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="EndLog" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQC_USER_HITLOG SET END_TIME = sysdate
+ WHERE FUNC_CODE = :FunctionCode
+      AND USER_ID = :UserID
+      AND IP_ADDRESS = :IPAddress
+      AND START_TIME = (SELECT MAX(START_TIME)
+                                        FROM  TQC_USER_HITLOG 
+                                       WHERE FUNC_CODE = :FunctionCode
+                                           AND USER_ID = :UserID
+                                           AND IP_ADDRESS = :IPAddress)
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="20">:FunctionCode</param>
+            <param direction="Input" dbtype="VarChar" size="40">:UserID</param>
+            <param direction="Input" dbtype="VarChar" size="20">:IPAddress</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="HitRateByFunction" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[ SELECT B.FUNC_NAME, COUNT(*) AS CNT
+  FROM TQC_USER_HITLOG A, TQC_FUNCTION_LIST B, TQC_USER C 
+ WHERE A.FUNC_CODE = B.FUNC_CODE 
+     AND A.USER_ID = C.USER_ID 
+     AND (A.START_TIME BETWEEN TO_DATE(:StartTime, 'YYYY-MM-DD HH24:MI:SS') AND TO_DATE(:EndTime, 'YYYY-MM-DD HH24:MI:SS') ) 
+ GROUP BY B.FUNC_NAME 
+ ORDER BY 2 DESC
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="22" value="2011-07-10 00:00:00">:StartTime</param>
+            <param direction="Input" dbtype="VarChar" size="22" value="2011-08-10 23:59:59">:EndTime</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="UserCountByFunction" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[ SELECT X.FUNC_NAME, COUNT(*) AS CNT
+   FROM ( SELECT DISTINCT B.FUNC_NAME, A.USER_ID 
+           FROM TQC_USER_HITLOG A, TQC_FUNCTION_LIST B, TQC_USER C 
+         WHERE A.USER_ID = C.USER_ID 
+              AND A.FUNC_CODE = B.FUNC_CODE
+              AND (A.START_TIME BETWEEN TO_DATE(:StartTime, 'YYYY-MM-DD HH24:MI:SS') AND TO_DATE(:EndTime, 'YYYY-MM-DD HH24:MI:SS') ) 
+          ORDER BY 2 desc ) X 
+  GROUP BY X.FUNC_NAME 
+  ORDER BY 2 DESC 
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="22">:StartTime</param>
+            <param direction="Input" dbtype="VarChar" size="22">:EndTime</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="DailyTrend" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[ SELECT SUBSTR(TO_CHAR(A.START_TIME,'YYYYMMDDHH24MISS'),1,4) || '-' || SUBSTR(TO_CHAR(A.START_TIME,'YYYYMMDDHH24MISS'),5,2) || '-' || SUBSTR(TO_CHAR(A.START_TIME,'YYYYMMDDHH24MISS'),7,2) AS DT, COUNT(*) AS CNT 
+  FROM TQC_USER_HITLOG A, TQC_FUNCTION_LIST B, TQC_USER C 
+ WHERE A.USER_ID = C.USER_ID 
+   AND A.FUNC_CODE = B.FUNC_CODE
+   AND (A.START_TIME BETWEEN TO_DATE(:StartTime, 'YYYY-MM-DD HH24:MI:SS') AND TO_DATE(:EndTime, 'YYYY-MM-DD HH24:MI:SS') )
+ GROUP BY SUBSTR(TO_CHAR(A.START_TIME,'YYYYMMDDHH24MISS'),1,4) || '-' || SUBSTR(TO_CHAR(A.START_TIME,'YYYYMMDDHH24MISS'),5,2) || '-' || SUBSTR(TO_CHAR(A.START_TIME,'YYYYMMDDHH24MISS'),7,2) 
+ ORDER BY 1 asc ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="22">:StartTime</param>
+            <param direction="Input" dbtype="VarChar" size="22">:EndTime</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="MonthlyTrend" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[ SELECT SUBSTR(TO_CHAR(A.START_TIME,'YYYYMMDDHH24MISS'),1,4) || '-' || SUBSTR(TO_CHAR(A.START_TIME,'YYYYMMDDHH24MISS'),5,2) AS DT, COUNT(*) AS CNT 
+  FROM TQC_USER_HITLOG A, TQC_FUNCTION_LIST B, TQC_USER C 
+ WHERE A.USER_ID = C.USER_ID 
+   AND A.FUNC_CODE = B.FUNC_CODE
+   AND (A.START_TIME BETWEEN TO_DATE(:StartTime, 'YYYY-MM-DD HH24:MI:SS') AND TO_DATE(:EndTime, 'YYYY-MM-DD HH24:MI:SS') )
+ GROUP BY SUBSTR(TO_CHAR(A.START_TIME,'YYYYMMDDHH24MISS'),1,4) || '-' || SUBSTR(TO_CHAR(A.START_TIME,'YYYYMMDDHH24MISS'),5,2) 
+ ORDER BY 1 asc ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="22">:StartTime</param>
+            <param direction="Input" dbtype="VarChar" size="22">:EndTime</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="HitRateByDepartment" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[  SELECT NVL(B.USER_CMF_1, 'No Department') AS DEPT, COUNT(*) AS CNT 
+        FROM TQC_USER_HITLOG A, TQC_USER B 
+        WHERE A.USER_ID = B.USER_ID 
+        AND (A.START_TIME BETWEEN TO_DATE(:StartTime, 'YYYY-MM-DD HH24:MI:SS') AND TO_DATE(:EndTime, 'YYYY-MM-DD HH24:MI:SS') ) 
+        AND B.USER_CMF_1 != '정보혁신담당'
+        GROUP BY B.USER_CMF_1 
+        ORDER BY 2 desc ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="22">:StartTime</param>
+            <param direction="Input" dbtype="VarChar" size="22">:EndTime</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="HitLogDetail" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[  SELECT C.USER_NAME, B.FUNC_NAME 
+       , TO_CHAR(START_TIME, 'YYYY-MM-DD HH24:MI:SS') AS START_TIME 
+       , IP_ADDRESS 
+    FROM TQC_USER_HITLOG A, TQC_FUNCTION_LIST B, TQC_USER C 
+   WHERE A.USER_ID = C.USER_ID 
+       AND A.FUNC_CODE = B.FUNC_CODE
+       AND (A.START_TIME BETWEEN TO_DATE(:StartTime, 'YYYY-MM-DD HH24:MI:SS') AND TO_DATE(:EndTime, 'YYYY-MM-DD HH24:MI:SS') ) 
+   ORDER BY 3 DESC ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="22">:StartTime</param>
+            <param direction="Input" dbtype="VarChar" size="22">:EndTime</param>
+        </parameters>
+    </query>
+</queryxml>

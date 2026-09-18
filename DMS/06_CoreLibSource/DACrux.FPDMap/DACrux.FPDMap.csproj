@@ -1,0 +1,171 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{153EAAEC-FEF8-4330-A0F9-8BF1D8577411}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DACrux.FPDMap</RootNamespace>
+    <AssemblyName>DACrux.FPDMap</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\07_CoreLib\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <NoWarn>
+    </NoWarn>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DocumentationFile>..\..\71_CoreLib\DACrux.FPDMap.XML</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\07_CoreLib\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <NoWarn>
+    </NoWarn>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="DefectImageItem.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DefectImageItem.Designer.cs">
+      <DependentUpon>DefectImageItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DefectImageList.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DefectImageList.Designer.cs">
+      <DependentUpon>DefectImageList.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FPDCellLayout.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="FPDCellLayout.Designer.cs">
+      <DependentUpon>FPDCellLayout.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FPDLayout.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="FPDLayout.Designer.cs">
+      <DependentUpon>FPDLayout.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MMGBinMap.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="MMGBinMap.Designer.cs">
+      <DependentUpon>MMGBinMap.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MMGBinMap_Simple.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="MMGBinMap_Simple.Designer.cs">
+      <DependentUpon>MMGBinMap_Simple.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MMGDefectMap.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="MMGDefectMap.Designer.cs">
+      <DependentUpon>MMGDefectMap.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MMGDefectMap_Simple.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="MMGDefectMap_Simple.Designer.cs">
+      <DependentUpon>MMGDefectMap_Simple.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="QMSImageViwer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="QMSImageViwer.Designer.cs">
+      <DependentUpon>QMSImageViwer.cs</DependentUpon>
+    </Compile>
+    <Service Include="{94E38DFF-614B-4cbd-B67C-F211BB35CE8B}" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="DefectImageItem.resx">
+      <DependentUpon>DefectImageItem.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DefectImageList.resx">
+      <DependentUpon>DefectImageList.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FPDCellLayout.resx">
+      <DependentUpon>FPDCellLayout.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FPDLayout.resx">
+      <DependentUpon>FPDLayout.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MMGBinMap.resx">
+      <DependentUpon>MMGBinMap.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MMGBinMap_Simple.resx">
+      <DependentUpon>MMGBinMap_Simple.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MMGDefectMap.resx">
+      <DependentUpon>MMGDefectMap.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MMGDefectMap_Simple.resx">
+      <DependentUpon>MMGDefectMap_Simple.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="QMSImageViwer.resx">
+      <DependentUpon>QMSImageViwer.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DACrux.Base\DACrux.Base.csproj">
+      <Project>{EBEDC52F-2DE6-45EB-9E37-805FC298A0ED}</Project>
+      <Name>DACrux.Base</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DACrux.Framework.Base\DACrux.Framework.Base.csproj">
+      <Project>{E6E7F026-C24D-4B25-81FE-290BDA3D4AEB}</Project>
+      <Name>DACrux.Framework.Base</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DACrux.Map\DACrux.Map.csproj">
+      <Project>{7DE5B98B-E6CF-4E1D-8CC3-D88D2B0F9454}</Project>
+      <Name>DACrux.Map</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

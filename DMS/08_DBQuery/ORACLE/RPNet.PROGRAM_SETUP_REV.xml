@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="TPSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Select" queryid="GET_PGM_SETUP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT
+    :program PROGRAM,
+    NULL PS_SEQ,
+    INSERT_TIME SETUP_TIMESIZE,
+    INSERT_TIME LOAD_DATE,
+    0 SETUP_CNT,
+    0 BARS,
+    'ff6142' BIN_COLOR_DEFAULT,
+    NULL CHIPOPTFILE, 
+    0 CHUCKTEMP,
+    NULL CODENAME,
+    DIE_INDEX_MAX_X COLMAX,
+    NULL CUSTOMER,
+    0 DEF_SUCCESS,
+    MAPID DEVICE,
+    0 DIE_SUCCESS,
+    TRUNC(ORIGIN_MICRO_X/1000,4) DIEOFFSET_X,
+    TRUNC(ORIGIN_MICRO_Y/1000,4) DIEOFFSET_Y, 
+    TRUNC(CHIP_SIZE_X/1000,4) AS CHIP_SIZE_X,
+    TRUNC(CHIP_SIZE_Y/1000,4) AS CHIP_SIZE_Y,
+    TRUNC(EDGE_SIZE,4) AS EDGE_SIZE,
+    'ss' ESDA_MAP_DIRECTION,
+    NULL ESDA_MAP_DIRECTORY,
+    1 ESDA_MAP_FILE, 
+    'll' ESDA_MAP_ORIGIN,
+    NULL ESDA_REMOTE_USER,
+    NULL ESDA_MAP_SERVER,
+    FACTORY FACILITY,
+    1 FULL_MAP_ON_ERROR, 
+    'ff6142' INSP_COLOR_DEFAULT,
+    'FALSE' LASER_ALL_DIE,
+    NULL LBE,
+    NULL NBR,
+    EDGE_SIZE NOTCHSIZE,
+    1 NUMRETICLES,
+    1 NUMSITES,
+    1 OVERWRITE_MAPFILE,
+    NULL PERCENT_DCHK_INTERVAL,
+    NULL PERCENT_DCHK_START,
+    0 PIN_ONE,
+    NULL POSTPROCESS,
+    NULL PROBER_MAP,
+    0 RCNUM,
+    NULL RESET_SHIFTCHECK,
+    DIE_INDEX_MAX_Y ROWMAX,
+    TRUNC(CHIP_SIZE_X/1000,4) STEPSIZE_X,
+    TRUNC(CHIP_SIZE_Y/1000,4) STEPSIZE_Y,
+    'FALSE' TOTAL_DCHK_RESET,
+    NULL USER_ID,
+    CASE ANGLE WHEN 0 THEN 'Bottom' WHEN 90 THEN 'Left' WHEN 180 THEN 'Top' WHEN 270 THEN 'Right' END WAFERMAPROTATION,
+    0 X_REF_TOLERANCE,
+    NVL(USER_REF_X,
+        -((ORIGIN_INDEX_X - 1) * CHIP_SIZE_X + ORIGIN_MICRO_X - EDGE_SIZE*1000)/1000
+    ) AS X_REF_VECTOR ,
+    0 Y_REF_TOLERANCE,
+    NVL(USER_REF_Y,
+        -((ORIGIN_INDEX_Y - 1) * CHIP_SIZE_Y + ORIGIN_MICRO_Y - 2*EDGE_SIZE*1000)/1000
+    ) AS Y_REF_VECTOR, 
+    'INRULE' PROBE_SHIFT_DIE,
+    'FULL' BIN_SAMPLE_PLAN,
+    'FULL' PDL_SAMPLE_PLAN,
+    NULL SHIP_GECBINS,
+    WAFER_SIZE/1000 WAFER_SIZE 
+FROM  TQP_MAPDEF
+WHERE MAPID IN (
+    SELECT DEVICE_ALIAS
+    FROM TQP_LOT
+    WHERE LOT_SEQ = :lot_seq
+    AND DEVICE_ALIAS <> 'NONE'
+)
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Varchar2" size="0" value="program">:program</param>
+            <param direction="Input" dbtype="Varchar2" size="0" value="lot_seq">:lot_seq</param>
+        </parameters>
+    </query>
+</queryxml>

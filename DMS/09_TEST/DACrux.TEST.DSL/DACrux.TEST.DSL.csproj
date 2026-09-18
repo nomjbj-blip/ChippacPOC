@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{E3DE4096-AB0A-4E08-A95A-0E363F990F65}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DACrux.TEST.DSL</RootNamespace>
+    <AssemblyName>DACrux.TEST.DSL</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath />
+    <SccProvider>
+    </SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\101_ServerBin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\101_ServerBin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(Configuration)' == 'Debug'">
+    <Reference Include="Miracom.Middleware">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\07_CoreLib\Miracom.Middleware\x86\Miracom.Middleware.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup Condition="'$(Configuration)' == 'Release'">
+    <Reference Include="Miracom.Middleware">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\07_CoreLib\Miracom.Middleware\x64\Miracom.Middleware.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="TB_COMMON.cs" />
+    <Compile Include="TD_TABLE.cs" />
+    <Compile Include="TQD_DEFECT_DIE.cs" />
+    <Compile Include="TQP_CHANGE_HIS.cs" />
+    <Compile Include="TQP_LOT.cs" />
+    <Compile Include="TQP_LOT_SUM.cs" />
+    <Compile Include="TQP_PCM_INPUT_HIS.cs" />
+    <Compile Include="TQP_RAW.cs" />
+    <Compile Include="TQP_BINDESC.cs" />
+    <Compile Include="TQP_CUSTOMER.cs" />
+    <Compile Include="TQP_INLINE.cs" />
+    <Compile Include="TQP_MAPDEF.cs" />
+    <Compile Include="TQP_PRODUCT.cs" />
+    <Compile Include="TQP_PROGRAM.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TQP_USEMAP.cs" />
+    <Compile Include="TQP_VISUALINSPSPEC.cs" />
+    <Compile Include="TQP_WAFER.cs" />
+    <Compile Include="TQP_WAFER_SUM.cs" />
+    <Compile Include="TQP_PARASPEC.cs" />
+    <Compile Include="T_AVI_TABLE.cs" />
+    <Compile Include="T_PCM.cs" />
+    <Compile Include="T_PRB.cs" />
+    <Compile Include="utilColor.cs" />
+    <Compile Include="T_PRB_TABLE.cs" />
+    <Compile Include="TQP_DATA_TABLES.cs" />
+    <Compile Include="TQP_MAPCFG.cs" />
+    <Compile Include="TQP_FOI_DIE.cs" />
+    <Compile Include="TQP_FOI_IMAGES.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,0 +1,120 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Update" queryid="UPDATE_NOTICE_BOARD" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQC_NOTICE_BOARD
+SET
+    TITLE_KOR = :TITLE_KOR,
+    TITLE_CHN = :TITLE_CHN,
+    TITLE_ENG = :TITLE_ENG,
+    BODY_KOR = :BODY_KOR,
+    BODY_CHN = :BODY_CHN,
+    BODY_ENG = :BODY_ENG,
+    NOTICE_START = TO_DATE(:NOTICE_START, 'YYYY-MM-DD HH24:MI:SS'),
+    NOTICE_END = TO_DATE(:NOTICE_END, 'YYYY-MM-DD HH24:MI:SS'),
+    USE_FLAG = :USE_FLAG,
+    UPDATE_USER_ID = :USER_ID,
+    UPDATE_TIME = SYSDATE
+WHERE NOTICE_SEQ = :NOTICE_SEQ
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="NOTICE_SEQ">:NOTICE_SEQ</param>
+            <param direction="Input" dbtype="VarChar2" size="500" value="TITLE_KOR">:TITLE_KOR</param>
+            <param direction="Input" dbtype="VarChar2" size="500" value="TITLE_CHN">:TITLE_CHN</param>
+            <param direction="Input" dbtype="VarChar2" size="500" value="TITLE_ENG">:TITLE_ENG</param>
+            <param direction="Input" dbtype="VarChar2" size="2000" value="BODY_KOR">:BODY_KOR</param>
+            <param direction="Input" dbtype="VarChar2" size="2000" value="BODY_CHN">:BODY_CHN</param>
+            <param direction="Input" dbtype="VarChar2" size="2000" value="BODY_ENG">:BODY_ENG</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="NOTICE_START">:NOTICE_START</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="NOTICE_END">:NOTICE_END</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="USE_FLAG">:USE_FLAG</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="USER_ID">:USER_ID</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_TODAY_NOTICE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT
+    NOTICE_SEQ, 
+    CASE :LANG 
+        WHEN '0' THEN NVL(TITLE_ENG, NVL(TITLE_KOR, TITLE_CHN))
+        WHEN '1' THEN NVL(TITLE_KOR, NVL(TITLE_ENG, TITLE_CHN)) 
+        WHEN '2' THEN NVL(TITLE_CHN, NVL(TITLE_KOR, TITLE_ENG))
+    END TITLE,
+    CASE :LANG 
+        WHEN '0' THEN NVL(BODY_ENG, NVL(BODY_KOR, BODY_ENG))
+        WHEN '1' THEN NVL(BODY_KOR, NVL(BODY_ENG, BODY_CHN)) 
+        WHEN '2' THEN NVL(BODY_CHN, NVL(BODY_KOR, BODY_CHN))
+    END "BODY",
+    TO_CHAR(NOTICE_START, 'YYYY-MM-DD') || ' ~ ' || TO_CHAR(NOTICE_END, 'YYYY-MM-DD') "DATE"
+FROM (
+    SELECT *
+    FROM TQC_NOTICE_BOARD
+    WHERE SYSDATE BETWEEN NOTICE_START AND NOTICE_END
+        AND USE_FLAG = 'Y'
+    ORDER BY NOTICE_SEQ DESC
+)
+WHERE ROWNUM = 1
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" description="2" value="LANG">:LANG</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="INSERT_NOTICE_BOARD" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQC_NOTICE_BOARD
+(
+    NOTICE_SEQ, TITLE_KOR, TITLE_CHN, TITLE_ENG, BODY_KOR, BODY_CHN, BODY_ENG,
+    NOTICE_START, NOTICE_END, USE_FLAG, CREATE_USER_ID, CREATE_TIME
+)
+VALUES
+(
+    NOTICE_SEQ.NEXTVAL, :TITLE_KOR, :TITLE_CHN, :TITLE_ENG, :BODY_KOR, :BODY_CHN, :BODY_ENG,
+    TO_DATE(:NOTICE_START, 'YYYY-MM-DD HH24:MI:SS'),
+    TO_DATE(:NOTICE_END, 'YYYY-MM-DD HH24:MI:SS'),
+    :USE_FLAG, :CREATE_USER_ID, SYSDATE
+)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="500" value="TITLE_KOR">:TITLE_KOR</param>
+            <param direction="Input" dbtype="VarChar2" size="500" value="TITLE_CHN">:TITLE_CHN</param>
+            <param direction="Input" dbtype="VarChar2" size="500" value="TITLE_ENG">:TITLE_ENG</param>
+            <param direction="Input" dbtype="VarChar2" size="2000" value="BODY_KOR">:BODY_KOR</param>
+            <param direction="Input" dbtype="VarChar2" size="2000" value="BODY_CHN">:BODY_CHN</param>
+            <param direction="Input" dbtype="VarChar2" size="2000" value="BODY_ENG">:BODY_ENG</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="NOTICE_START">:NOTICE_START</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="NOTICE_END">:NOTICE_END</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="USE_FLAG">:USE_FLAG</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="CREATE_USER_ID">:CREATE_USER_ID</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_NOTICE_BOARD" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[DELETE FROM TQC_NOTICE_BOARD
+WHERE NOTICE_SEQ = :NOTICE_SEQ
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="NOTICE_SEQ">:NOTICE_SEQ</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_NOTICE_BOARD_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT
+    NOTICE_SEQ,
+    TO_CHAR(NOTICE_START, 'YYYY-MM-DD HH24:MI:SS') NOTICE_START,
+    TO_CHAR(NOTICE_END, 'YYYY-MM-DD HH24:MI:SS') NOTICE_END,
+    USE_FLAG,
+    TITLE_KOR,
+    TITLE_CHN,
+    TITLE_ENG,
+    BODY_KOR,
+    BODY_CHN,
+    BODY_ENG,
+    CREATE_USER_ID,
+    CREATE_TIME,
+    UPDATE_USER_ID,
+    UPDATE_TIME
+FROM TQC_NOTICE_BOARD
+WHERE (NOTICE_START BETWEEN TO_DATE(:FROM_DATE, 'YYYY-MM-DD HH24:MI:SS') 
+    AND TO_DATE(:TO_DATE, 'YYYY-MM-DD HH24:MI:SS'))
+    OR (NOTICE_END BETWEEN TO_DATE(:FROM_DATE, 'YYYY-MM-DD HH24:MI:SS') 
+    AND TO_DATE(:TO_DATE, 'YYYY-MM-DD HH24:MI:SS'))]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="2016-10-09 00:00:00">:FROM_DATE</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="2016-10-10 23:59:59">:TO_DATE</param>
+        </parameters>
+    </query>
+</queryxml>

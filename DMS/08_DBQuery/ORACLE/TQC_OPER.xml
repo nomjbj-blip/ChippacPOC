@@ -1,0 +1,127 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="TPSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Select" queryid="SELECT_AREA_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT AREA FROM TQC_OPER
+WHERE FACTORY = :FACTORY
+ORDER BY CASE AREA WHEN 'DM' THEN 1 WHEN 'TEST' THEN 2 ELSE 99 END]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Varchar" size="40">:FACTORY</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_OPER_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT OPER FROM TQC_OPER
+WHERE FACTORY = :FACTORY
+   ??
+ORDER BY 1]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Varchar" size="40">:FACTORY</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_OPER_02" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-07-08 16:53:11
+SELECT FACTORY, AREA, OPER, OPER_DESC, 
+       CMF_FIELD01,CMF_FIELD02,CMF_FIELD03,CMF_FIELD04,CMF_FIELD05,
+       CMF_FIELD06,CMF_FIELD07,CMF_FIELD08,CMF_FIELD09,CMF_FIELD10,
+       CREATE_USER_ID, CREATE_TIME, UPDATE_USER_ID, UPDATE_TIME
+  FROM TQC_OPER
+ WHERE 1=1 
+   AND FACTORY = :FACTORY
+   ??]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="FACTORY">:FACTORY</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="EXISTS_OPER_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-07-08 16:54:32
+SELECT 1 
+  FROM TQC_OPER
+ WHERE 1=1 
+   AND FACTORY = :FACTORY
+   AND AREA = :AREA
+   AND OPER = :OPER]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="FACTORY">:FACTORY</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="AREA">:AREA</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="OPER">:OPER</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="INSER_OPER_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-07-08 16:55:25
+INSERT INTO TQC_OPER(FACTORY, AREA, OPER, OPER_DESC, 
+       CMF_FIELD01,CMF_FIELD02,CMF_FIELD03,CMF_FIELD04,CMF_FIELD05,
+       CMF_FIELD06,CMF_FIELD07,CMF_FIELD08,CMF_FIELD09,CMF_FIELD10,
+       CREATE_USER_ID, CREATE_TIME, UPDATE_USER_ID, UPDATE_TIME)
+VALUES (:FACTORY, :AREA, :OPER, :ODESC, 
+       :CMF_FIELD01,:CMF_FIELD02,:CMF_FIELD03,:CMF_FIELD04,:CMF_FIELD05,
+       :CMF_FIELD06,:CMF_FIELD07,:CMF_FIELD08,:CMF_FIELD09,:CMF_FIELD10,
+       :USERID, sysdate, :USERID, sysdate)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="FACTORY">:FACTORY</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="AREA">:AREA</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="OPER">:OPER</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="OPER_DESC">:ODESC</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="CMF_FIELD01">:CMF_FIELD01</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="CMF_FIELD02">:CMF_FIELD02</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="CMF_FIELD03">:CMF_FIELD03</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="CMF_FIELD04">:CMF_FIELD04</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="CMF_FIELD05">:CMF_FIELD05</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="CMF_FIELD06">:CMF_FIELD06</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="CMF_FIELD07">:CMF_FIELD07</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="CMF_FIELD08">:CMF_FIELD08</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="CMF_FIELD09">:CMF_FIELD09</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="CMF_FIELD10">:CMF_FIELD10</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="CREATE_USER_ID">:USERID</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_OPER_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-07-08 16:56:36
+UPDATE TQC_OPER
+   SET OPER_DESC = :ODESC,
+       CMF_FIELD01 = :CMF_FIELD01,
+       CMF_FIELD02 = :CMF_FIELD02,
+       CMF_FIELD03 = :CMF_FIELD03,
+       CMF_FIELD04 = :CMF_FIELD04,
+       CMF_FIELD05 = :CMF_FIELD05,
+       CMF_FIELD06 = :CMF_FIELD06,
+       CMF_FIELD07 = :CMF_FIELD07,
+       CMF_FIELD08 = :CMF_FIELD08,
+       CMF_FIELD09 = :CMF_FIELD09,
+       CMF_FIELD10 = :CMF_FIELD10,
+       UPDATE_USER_ID = :USERID,
+       UPDATE_TIME = SYSDATE
+ WHERE 1=1
+   AND FACTORY = :FACTORY
+   AND AREA = :AREA
+   AND OPER = :OPER]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="FACTORY">:FACTORY</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="AREA">:AREA</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="OPER">:OPER</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="OPER_DESC">:ODESC</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="CMF_FIELD01">:CMF_FIELD01</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="CMF_FIELD02">:CMF_FIELD02</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="CMF_FIELD03">:CMF_FIELD03</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="CMF_FIELD04">:CMF_FIELD04</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="CMF_FIELD05">:CMF_FIELD05</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="CMF_FIELD06">:CMF_FIELD06</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="CMF_FIELD07">:CMF_FIELD07</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="CMF_FIELD08">:CMF_FIELD08</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="CMF_FIELD09">:CMF_FIELD09</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="CMF_FIELD10">:CMF_FIELD10</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="USERID">:USERID</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_OPER_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-07-08 16:58:12
+DELETE FROM TQC_OPER
+ WHERE 1=1
+   AND FACTORY = :FACTORY
+   AND AREA = :AREA
+   AND OPER = :OPER]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="FACTORY">:FACTORY</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="AREA">:AREA</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="OPER">:OPER</param>
+        </parameters>
+    </query>
+</queryxml>

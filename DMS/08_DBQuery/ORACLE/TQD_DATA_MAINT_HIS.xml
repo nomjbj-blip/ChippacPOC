@@ -1,0 +1,90 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Insert" queryid="INSERT_TQD_DATA_MAINT_HIS" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQD_DATA_MAINT_HIS (TRAN_KEY,
+                                LOT_ID,
+                                PRODUCT,
+                                STEP_ID,
+                                SLOT_ID,
+                                WAFER_ID,
+                                TRAN_USER,
+                                TRAN_USER_IP,
+                                PREV_VALUE,
+                                CURR_VALUE,
+                                PREV_STEP_SEQ,
+                                CURR_STEP_SEQ,
+                                USER_COMMENT)
+     VALUES ( TO_CHAR(SYSTIMESTAMP, 'YYYYMMDDHH24MISSFF'),
+             :lot_id,
+             :product,
+             :step_id,
+             :slot_id,
+             :wafer_id,
+             :tran_user,
+             :tran_user_ip,
+             :prev_value,
+             :curr_value,
+             :prev_step_seq,
+             :curr_step_seq,
+             :user_comment)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="0" value="lot_id">:lot_id</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="product">:product</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="step_id">:step_id</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="slot_id">:slot_id</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="wafer_id">:wafer_id</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="tran_user">:tran_user</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="tran_user_ip">:tran_user_ip</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="prev_value">:prev_value</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="curr_value">:curr_value</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="prev_step_seq">:prev_step_seq</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="curr_step_seq">:curr_step_seq</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="user_comment">:user_comment</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_TQD_DATA_MAINT_HIS_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT TO_CHAR(TO_DATE(SUBSTR(TRAN_KEY,1,14),'YYYYMMDDHH24MISS'),'YYYY-MM-DD HH24:MI:SS') AS TRAN_TIME,
+       LOT_ID,
+       PRODUCT,
+       STEP_ID,
+       SLOT_ID,
+       WAFER_ID,
+       TRAN_USER,
+       TRAN_USER_IP,
+       PREV_VALUE,
+       CURR_VALUE,
+       PREV_STEP_SEQ,
+       CURR_STEP_SEQ,
+       USER_COMMENT
+  FROM TQD_DATA_MAINT_HIS
+ WHERE 1 = 1 
+   AND TRAN_KEY BETWEEN :sttime AND :endtime
+   ORDER BY TRAN_KEY DESC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="sttime">:sttime</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="endtime">:endtime</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_TQD_DATA_MAINT_HIS_02" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT TO_CHAR(TO_DATE(SUBSTR(TRAN_KEY,1,14),'YYYYMMDDHH24MISS'),'YYYY-MM-DD HH24:MI:SS') AS TRAN_TIME,
+       LOT_ID,
+       PRODUCT,
+       STEP_ID,
+       SLOT_ID,
+       WAFER_ID,
+       TRAN_USER,
+       TRAN_USER_IP,
+       PREV_VALUE,
+       CURR_VALUE,
+       PREV_STEP_SEQ,
+       CURR_STEP_SEQ,
+       USER_COMMENT
+  FROM TQD_DATA_MAINT_HIS
+ WHERE 1 = 1 
+ AND LOT_ID LIKE :lotid
+ ORDER BY TRAN_KEY DESC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="0" value="lotid">:lotid</param>
+        </parameters>
+    </query>
+</queryxml>

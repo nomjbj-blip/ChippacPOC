@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{74090ED2-64BC-45D4-9048-D561EA147A78}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DACrux.Data.Parser</RootNamespace>
+    <AssemblyName>DACrux.Data.Parser</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\101_ServerBin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\101_ServerBin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="DACrux.Base, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\07_CoreLib\DACrux.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="DACrux.Utility, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\07_CoreLib\DACrux.Utility.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="DefectHelper.cs" />
+    <Compile Include="Klarf\DefectDataHelper.cs" />
+    <Compile Include="Klarf\InspectionTestList.cs" />
+    <Compile Include="Klarf\ParserKlarf_18.cs" />
+    <Compile Include="Klarf\ParserKlarf_Trf.cs" />
+    <Compile Include="Klarf\SummaryList.cs" />
+    <Compile Include="Klarf\TestParameterSpecList.cs" />
+    <Compile Include="Klarf\WaferList.cs" />
+    <Compile Include="ParserAviMapFile.cs" />
+    <Compile Include="ParserBase.cs" />
+    <Compile Include="ParserCp.cs" />
+    <Compile Include="Klarf\ParserKlarf.cs" />
+    <Compile Include="Klarf\ImageMapper.cs" />
+    <Compile Include="ParserPcm.cs" />
+    <Compile Include="ParserPcm_Fab1.cs" />
+    <Compile Include="ParserPcm_Fab2_MEMS.cs" />
+    <Compile Include="ParserPcm_Fab2.cs" />
+    <Compile Include="ParserPcm_TffData.cs" />
+    <Compile Include="ParserPst.cs" />
+    <Compile Include="ParserReviewInf.cs" />
+    <Compile Include="ParserTest.cs" />
+    <Compile Include="ParsingUtil.cs" />
+    <Compile Include="PopupExportToKlarf.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PopupExportToKlarf.Designer.cs">
+      <DependentUpon>PopupExportToKlarf.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PopupExportToKlarf_Sampling.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="PopupExportToKlarf_Sampling.Designer.cs">
+      <DependentUpon>PopupExportToKlarf_Sampling.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Klarf\FileAnalyzer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="doc\parser_info.xlsx" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="PopupExportToKlarf.resx">
+      <DependentUpon>PopupExportToKlarf.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PopupExportToKlarf_Sampling.resx">
+      <DependentUpon>PopupExportToKlarf_Sampling.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

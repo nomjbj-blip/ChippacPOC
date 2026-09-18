@@ -1,0 +1,414 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Select" queryid="SELECT_LOT_HIS_TIME" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT *
+  FROM TQC_LOT_HIS
+  WHERE 1 = 1 
+  AND TRAN_TIME BETWEEN :sttime AND :endtime]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="sttime">:sttime</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="endtime">:endtime</param>
+        </parameters>
+    </query>    
+    <query statement="Select" queryid="SELECT_WAFER_LIST_BY_LOTIDS" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT WAFER_ID
+  FROM TQC_LOT_HIS_WAFER
+  WHERE 1 = 1 
+  AND LOT_ID IN (??)
+  ORDER BY WAFER_ID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="sttime">:sttime</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="endtime">:endtime</param>
+        </parameters>
+    </query>    
+    <query statement="Select" queryid="SELECT_LOT_HIS_GROUP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT ??
+  FROM TQC_LOT_HIS
+  WHERE 1 = 1 
+  AND TRAN_TIME BETWEEN :sttime AND :endtime
+  AND TRIM(??) IS NOT NULL
+  ORDER BY 1]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="sttime">:sttime</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="endtime">:endtime</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_LOT_HIS_LOT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT 'GOOD' AS SECTION,
+       FACTORY,
+       LOT_ID,
+       LOT_TYPE,
+       TO_CHAR(TO_DATE(TRAN_TIME, 'YYYYMMDD HH24MISS'), 'YY/MM/DD HH24:MI:SS') AS TRAN_TIME,
+       RECIPE,
+       FLOW,
+       FLOW_DESC,
+       FLOW_NO,
+       OPER,
+       OPER_DESC,
+       OPER_LONG_DESC,
+       FLOW_OPER_SEQ,
+       FLOW_AREA,
+       RES_ID,
+       RES_MODEL,
+       RES_AREA
+  FROM TQC_LOT_HIS
+ WHERE 1 = 1 
+  AND LOT_ID IN (??)
+  ??
+    UNION
+  SELECT 'BAD' AS SECTION,
+       FACTORY,
+       LOT_ID,
+       LOT_TYPE,
+       TO_CHAR(TO_DATE(TRAN_TIME, 'YYYYMMDD HH24MISS'), 'YY/MM/DD HH24:MI:SS') AS TRAN_TIME,
+       RECIPE,
+       FLOW,
+       FLOW_DESC,
+       FLOW_NO,
+       OPER,
+       OPER_DESC,
+       OPER_LONG_DESC,
+       FLOW_OPER_SEQ,
+       FLOW_AREA,
+       RES_ID,
+       RES_MODEL,
+       RES_AREA
+  FROM TQC_LOT_HIS
+ WHERE 1 = 1 
+     AND LOT_ID IN (??)
+     ??]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_LOT_HIS_LOT_GRP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT ??
+       , COUNT(*) AS TOTAL
+  FROM (SELECT 'GOOD' AS SECTION,
+               FACTORY,
+               LOT_ID,
+               LOT_TYPE,
+               TRAN_TIME,
+               RECIPE,
+               FLOW,
+               FLOW_DESC,
+               FLOW_NO,
+               OPER,
+               OPER_DESC,
+               OPER_LONG_DESC,
+               FLOW_OPER_SEQ,
+               FLOW_AREA,
+               RES_ID,
+               RES_MODEL,
+               RES_AREA
+          FROM TQC_LOT_HIS
+         WHERE 1 = 1 
+           AND LOT_ID IN (??)
+           ??
+        UNION
+        SELECT 'BAD' AS SECTION,
+               FACTORY,
+               LOT_ID,
+               LOT_TYPE,
+               TRAN_TIME,
+               RECIPE,
+               FLOW,
+               FLOW_DESC,
+               FLOW_NO,
+               OPER,
+               OPER_DESC,
+               OPER_LONG_DESC,
+               FLOW_OPER_SEQ,
+               FLOW_AREA,
+               RES_ID,
+               RES_MODEL,
+               RES_AREA
+          FROM TQC_LOT_HIS
+         WHERE 1 = 1 
+            AND LOT_ID IN (??)
+            ??)
+            
+  WHERE 1 = 1 
+  GROUP BY ??
+  ORDER BY ??]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_LOT_HIS_WAFER" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT 'GOOD' AS SECTION,
+       TO_CHAR (a.tran_time, 'yy-mm-dd hh24:mi:ss') AS tran_time,
+       a.start_time,
+       a.lot_id,
+       a.slot_no,
+       a.wafer_id,
+       a.lpt,
+       a.opn,
+       a.recipe,
+       a.description,
+       a.equip,
+       a.para_1,
+       a.para_2,
+       a.para_3,
+       a.para_4,
+       a.para_5,
+       a.para_6,
+       a.para_7,
+       a.para_8,
+       a.para_9,
+       a.para_10,
+       a.para_11,
+       a.para_12,
+       a.para_13,
+       a.para_14,
+       a.para_15,
+       a.lpt_no
+  FROM TQC_LOT_HIS_WAFER A
+ WHERE 1 = 1 
+   and lot_id in (??)
+   and wafer_id in (??)
+   ??
+ UNION
+  SELECT 'BAD' AS SECTION,
+       TO_CHAR (a.tran_time, 'yy-mm-dd hh24:mi:ss') AS tran_time,
+       a.start_time,
+       a.lot_id,
+       a.slot_no,
+       a.wafer_id,
+       a.lpt,
+       a.opn,
+       a.recipe,
+       a.description,
+       a.equip,
+       a.para_1,
+       a.para_2,
+       a.para_3,
+       a.para_4,
+       a.para_5,
+       a.para_6,
+       a.para_7,
+       a.para_8,
+       a.para_9,
+       a.para_10,
+       a.para_11,
+       a.para_12,
+       a.para_13,
+       a.para_14,
+       a.para_15,
+       a.lpt_no
+  FROM TQC_LOT_HIS_WAFER A
+ WHERE 1 = 1 
+   and lot_id in (??)
+   and wafer_id in (??)
+  ??]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_LOT_HIS_WAFER_GRP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT ??
+  , COUNT(*) AS TOTAL
+  FROM 
+  (SELECT *
+          FROM TQC_LOT_HIS_WAFER
+         WHERE 1 = 1 
+           and lot_id in (??)
+           and wafer_id in (??)
+           ??
+        UNION
+  SELECT *
+          FROM TQC_LOT_HIS_WAFER
+         WHERE 1 = 1 
+            and lot_id in (??)
+            and wafer_id in (??)
+         ??)
+ WHERE     1 = 1
+       GROUP BY ??
+       ORDER BY ??]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_TREND_ITEM" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT ??
+  FROM TQC_TREND_VIEW
+ WHERE     1 = 1
+       AND TRAN_TIME BETWEEN TO_DATE (:sttime, 'YYYYMMDD HH24MISS')
+                         AND TO_DATE (:endtime, 'YYYYMMDD HH24MISS')
+                         ??
+     GROUP BY ??
+     ORDER BY ??]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="sttime">:sttime</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="endtime">:endtime</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_TREND_ITEM_STEP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT STEP_ID
+  FROM TQC_TREND_VIEW
+ WHERE     1 = 1
+       AND TRAN_TIME BETWEEN TO_DATE (:sttime, 'YYYYMMDD HH24MISS')
+                           AND TO_DATE (:endtime, 'YYYYMMDD HH24MISS')
+       ??
+       GROUP BY STEP_ID
+       ORDER BY STEP_ID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="sttime">:sttime</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="endtime">:endtime</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_TREND_REVIEW_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[ -- CREATE TIME: 2019-12-10 19:26:00
+SELECT EQUIP,
+       ?? ,
+       SUM(DEFECTS) AS DEFECTS,
+       SUM(REVIEW_SUM) AS REVIEW_SUM
+  FROM (  SELECT PRODUCT, LOT_ID, WAFER_ID, STEP_ID, SLOT_ID, LPT, OPN, TRAN_TIME, RECIPE, DESCRIPTION, EQUIP, PARA_1, PARA_2, PARA_3, PARA_4, PARA_5, PARA_6, PARA_7, PARA_8, PARA_9, PARA_10, PARA_11, PARA_12, PARA_13, PARA_14, PARA_15, STEP_SEQ, DEFECTS, DECODE (GROUPING_ID (CLASSNUMBER), 0, CLASSNUMBER, -1) AS CLASSNUMBER, SUM (CNT) AS CNT
+            FROM (  SELECT T2.PRODUCT, T2.LOT_ID, T2.WAFER_ID, T2.STEP_ID, T2.SLOT_ID, T1.LPT, T1.OPN,  T1.TRAN_TIME, T1.RECIPE, T1.DESCRIPTION, T1.EQUIP, T1.PARA_1, T1.PARA_2, T1.PARA_3, T1.PARA_4, T1.PARA_5, T1.PARA_6, T1.PARA_7, T1.PARA_8, T1.PARA_9, T1.PARA_10, T1.PARA_11, T1.PARA_12, T1.PARA_13, T1.PARA_14, T1.PARA_15, T2.STEP_SEQ, T2.DEFECTS, T3.CLASSNUMBER, T3.CLUSTERNUMBER, DECODE (T3.CLUSTERNUMBER, 0, COUNT (*), 1) AS CNT
+                      FROM TQC_LOT_HIS_WAFER T1, TQD_INSP_INFO T2, TQD_DEFECT T3
+                     WHERE     1 = 1
+                           AND T1.LOT_ID = T2.LOT_ID
+                           AND T1.WAFER_ID = T2.WAFER_ID
+                           AND T2.STEP_SEQ = T3.STEP_SEQ
+                           AND T2.WAFER_SEQ = T3.WAFER_SEQ
+                           AND T1.TRAN_TIME BETWEEN TO_DATE (:sttime, 'YYYYMMDD HH24MISS')
+                                                          AND TO_DATE (:endtime, 'YYYYMMDD HH24MISS')
+                           AND T1.EQUIP = :equipment
+                           ??
+                           AND T3.CLASSNUMBER NOT IN (0) -- UNCATEGORIZED 제외
+                  GROUP BY T2.PRODUCT, T2.LOT_ID, T2.WAFER_ID, T2.STEP_ID, T2.SLOT_ID, T1.LPT, T1.OPN,  T1.TRAN_TIME, T1.RECIPE, T1.DESCRIPTION, T1.EQUIP, T1.PARA_1, T1.PARA_2, T1.PARA_3, T1.PARA_4, T1.PARA_5, T1.PARA_6, T1.PARA_7, T1.PARA_8, T1.PARA_9, T1.PARA_10, T1.PARA_11, T1.PARA_12, T1.PARA_13, T1.PARA_14, T1.PARA_15, T2.STEP_SEQ, T2.DEFECTS, T3.CLASSNUMBER, T3.CLUSTERNUMBER)
+        GROUP BY PRODUCT, LOT_ID, WAFER_ID, STEP_ID, SLOT_ID, LPT, OPN, TRAN_TIME, RECIPE, DESCRIPTION, EQUIP, PARA_1, PARA_2, PARA_3, PARA_4, PARA_5, PARA_6, PARA_7, PARA_8, PARA_9, PARA_10, PARA_11, PARA_12, PARA_13, PARA_14, PARA_15, STEP_SEQ, DEFECTS, ROLLUP (CLASSNUMBER)) PIVOT (SUM (CNT)
+                                       FOR (CLASSNUMBER)
+                                       IN  (-1 AS REVIEW_SUM, ??))
+ GROUP BY EQUIP, ??
+ ORDER BY EQUIP, ??]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="sttime">:sttime</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="endtime">:endtime</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="equipment">:equipment</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_TREND_REVIEW_RAW_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[ -- CREATE TIME: 2019-12-10 19:26:00
+SELECT *
+  FROM (  SELECT PRODUCT, LOT_ID, WAFER_ID, STEP_ID, SLOT_ID, LPT, OPN, TRAN_TIME, RECIPE, DESCRIPTION, EQUIP, PARA_1, PARA_2, PARA_3, PARA_4, PARA_5, PARA_6, PARA_7, PARA_8, PARA_9, PARA_10, PARA_11, PARA_12, PARA_13, PARA_14, PARA_15, STEP_SEQ, DEFECTS, DECODE (GROUPING_ID (CLASSNUMBER), 0, CLASSNUMBER, -1) AS CLASSNUMBER, SUM (CNT) AS CNT
+            FROM (  SELECT T2.PRODUCT, T2.LOT_ID, T2.WAFER_ID, T2.STEP_ID, T2.SLOT_ID, T1.LPT, T1.OPN,  T1.TRAN_TIME, T1.RECIPE, T1.DESCRIPTION, T1.EQUIP, T1.PARA_1, T1.PARA_2, T1.PARA_3, T1.PARA_4, T1.PARA_5, T1.PARA_6, T1.PARA_7, T1.PARA_8, T1.PARA_9, T1.PARA_10, T1.PARA_11, T1.PARA_12, T1.PARA_13, T1.PARA_14, T1.PARA_15, T2.STEP_SEQ, T2.DEFECTS, T3.CLASSNUMBER, T3.CLUSTERNUMBER, DECODE (T3.CLUSTERNUMBER, 0, COUNT (*), 1) AS CNT
+                      FROM TQC_LOT_HIS_WAFER T1, TQD_INSP_INFO T2, TQD_DEFECT T3
+                     WHERE     1 = 1
+                           AND T1.LOT_ID = T2.LOT_ID
+                           AND T1.WAFER_ID = T2.WAFER_ID
+                           AND T2.STEP_SEQ = T3.STEP_SEQ
+                           AND T2.WAFER_SEQ = T3.WAFER_SEQ
+                           AND T1.TRAN_TIME BETWEEN TO_DATE (:sttime, 'YYYYMMDD HH24MISS')
+                                                          AND TO_DATE (:endtime, 'YYYYMMDD HH24MISS')
+                           AND T1.EQUIP = :equipment
+                           ??
+                           AND T3.CLASSNUMBER NOT IN (0) -- UNCATEGORIZED 제외
+                  GROUP BY T2.PRODUCT, T2.LOT_ID, T2.WAFER_ID, T2.STEP_ID, T2.SLOT_ID, T1.LPT, T1.OPN,  T1.TRAN_TIME, T1.RECIPE, T1.DESCRIPTION, T1.EQUIP, T1.PARA_1, T1.PARA_2, T1.PARA_3, T1.PARA_4, T1.PARA_5, T1.PARA_6, T1.PARA_7, T1.PARA_8, T1.PARA_9, T1.PARA_10, T1.PARA_11, T1.PARA_12, T1.PARA_13, T1.PARA_14, T1.PARA_15, T2.STEP_SEQ, T2.DEFECTS, T3.CLASSNUMBER, T3.CLUSTERNUMBER)
+        GROUP BY PRODUCT, LOT_ID, WAFER_ID, STEP_ID, SLOT_ID, LPT, OPN, TRAN_TIME, RECIPE, DESCRIPTION, EQUIP, PARA_1, PARA_2, PARA_3, PARA_4, PARA_5, PARA_6, PARA_7, PARA_8, PARA_9, PARA_10, PARA_11, PARA_12, PARA_13, PARA_14, PARA_15, STEP_SEQ, DEFECTS, ROLLUP (CLASSNUMBER)) PIVOT (SUM (CNT)
+                                       FOR (CLASSNUMBER)
+                                       IN  (-1 AS REVIEW_SUM, ??))
+ ORDER BY 1,2,3,4,5,6,7]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="sttime">:sttime</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="endtime">:endtime</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="equipment">:equipment</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_TREND_REVIEW_02" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[
+SELECT EQUIP,
+       ??
+  FROM (SELECT t2.PRODUCT, t2.LOT_ID, t2.WAFER_ID, t2.STEP_ID, t2.SLOT_ID, t1.LPT, t1.OPN, t1.TRAN_TIME, t1.RECIPE, t1.DESCRIPTION, t1.EQUIP, t1.PARA_1, t1.PARA_2, t1.PARA_3, t1.PARA_4, t1.PARA_5, t1.PARA_6, t1.PARA_7, t1.PARA_8, t1.PARA_9, t1.PARA_10, t1.PARA_11, t1.PARA_12, t1.PARA_13, t1.PARA_14, t1.PARA_15, 
+            t3.*
+            FROM TQC_LOT_HIS_WAFER t1, tqd_insp_info t2, tqd_insp_sum t3
+            WHERE 1=1
+            and t1.lot_id = t2.lot_id
+            and t1.wafer_id = t2.wafer_id
+            and t2.step_seq = t3.step_seq
+            AND T1.TRAN_TIME BETWEEN TO_DATE (:sttime, 'YYYYMMDD HH24MISS')
+                                AND TO_DATE (:endtime, 'YYYYMMDD HH24MISS')
+            AND T1.EQUIP = :equipment
+            ??
+            )
+   GROUP BY EQUIP, ??
+   ORDER BY EQUIP, ??]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="sttime">:sttime</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="endtime">:endtime</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="equipment">:equipment</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_TREND_REVIEW_RAW_02" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[
+SELECT * FROM 
+(SELECT t2.PRODUCT, t2.LOT_ID, t2.WAFER_ID, t2.STEP_ID, t2.SLOT_ID, t1.LPT, t1.OPN, t1.TRAN_TIME, t1.RECIPE, t1.DESCRIPTION, t1.EQUIP, t1.PARA_1, t1.PARA_2, t1.PARA_3, t1.PARA_4, t1.PARA_5, t1.PARA_6, t1.PARA_7, t1.PARA_8, t1.PARA_9, t1.PARA_10, t1.PARA_11, t1.PARA_12, t1.PARA_13, t1.PARA_14, t1.PARA_15, 
+        t3.*
+    FROM TQC_LOT_HIS_WAFER t1, tqd_insp_info t2, tqd_insp_sum t3
+    WHERE 1=1
+        and t1.lot_id = t2.lot_id
+        and t1.wafer_id = t2.wafer_id
+        and t2.step_seq = t3.step_seq
+        AND T1.TRAN_TIME BETWEEN TO_DATE (:sttime, 'YYYYMMDD HH24MISS')
+                            AND TO_DATE (:endtime, 'YYYYMMDD HH24MISS')
+        AND T1.EQUIP = :equipment
+        ??
+        )
+ORDER BY 1,2,3,4,5,6,7]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="sttime">:sttime</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="endtime">:endtime</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="equipment">:equipment</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_TREND_REVIEW_03" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[ -- CREATE TIME: 2019-12-10 19:26:00
+SELECT EQUIP,
+       ?? ,
+       SUM(DEFECTIVE_DIE) AS DEFECTIVE_DIE,
+       SUM(REVIEW_SUM) AS REVIEW_SUM
+  FROM (  SELECT PRODUCT, LOT_ID, WAFER_ID, STEP_ID, SLOT_ID, LPT, OPN, TRAN_TIME, RECIPE, DESCRIPTION, EQUIP, PARA_1, PARA_2, PARA_3, PARA_4, PARA_5, PARA_6, PARA_7, PARA_8, PARA_9, PARA_10, PARA_11, PARA_12, PARA_13, PARA_14, PARA_15, STEP_SEQ, DEFECTIVE_DIE, DECODE (GROUPING_ID (CLASSNUMBER), 0, CLASSNUMBER, -1) AS CLASSNUMBER, SUM (CNT) AS CNT
+            FROM (  SELECT PRODUCT, LOT_ID, WAFER_ID, STEP_ID, SLOT_ID, LPT, OPN,  TRAN_TIME, RECIPE, DESCRIPTION, EQUIP, PARA_1, PARA_2, PARA_3, PARA_4, PARA_5, PARA_6, PARA_7, PARA_8, PARA_9, PARA_10, PARA_11, PARA_12, PARA_13, PARA_14, PARA_15, STEP_SEQ, DEFECTIVE_DIE, CLASSNUMBER, CLUSTERNUMBER, DECODE (CLUSTERNUMBER, 0, COUNT (*), 1) AS CNT
+                      FROM (SELECT DISTINCT T2.PRODUCT, T2.LOT_ID, T2.WAFER_ID, T2.STEP_ID, T2.SLOT_ID, T1.LPT, T1.OPN,  T1.TRAN_TIME, T1.RECIPE, T1.DESCRIPTION, T1.EQUIP, T1.PARA_1, T1.PARA_2, T1.PARA_3, T1.PARA_4, T1.PARA_5, T1.PARA_6, T1.PARA_7, T1.PARA_8, T1.PARA_9, T1.PARA_10, T1.PARA_11, T1.PARA_12, T1.PARA_13, T1.PARA_14, T1.PARA_15, T2.DEFECTIVE_DIE, T2.STEP_SEQ, T3.XINDEX * 65536 + T3.YINDEX, T3.CLASSNUMBER, T3.CLUSTERNUMBER
+                              FROM TQC_LOT_HIS_WAFER T1, TQD_INSP_INFO T2, TQD_DEFECT T3
+                             WHERE     1 = 1
+                                   AND T1.LOT_ID = T2.LOT_ID
+                                   AND T1.WAFER_ID = T2.WAFER_ID
+                                   AND T2.STEP_SEQ = T3.STEP_SEQ
+                                   AND T2.WAFER_SEQ = T3.WAFER_SEQ
+                                   AND T1.TRAN_TIME BETWEEN TO_DATE (:sttime, 'YYYYMMDD HH24MISS')
+                                                        AND TO_DATE (:endtime, 'YYYYMMDD HH24MISS')
+                                   AND T1.EQUIP = :equipment
+                                   ??
+                                   AND T3.CLASSNUMBER NOT IN (0) -- UNCATEGORIZED 제외
+                                   )
+                     GROUP BY PRODUCT, LOT_ID, WAFER_ID, STEP_ID, SLOT_ID, LPT, OPN,  TRAN_TIME, RECIPE, DESCRIPTION, EQUIP, PARA_1, PARA_2, PARA_3, PARA_4, PARA_5, PARA_6, PARA_7, PARA_8, PARA_9, PARA_10, PARA_11, PARA_12, PARA_13, PARA_14, PARA_15, STEP_SEQ, DEFECTIVE_DIE, CLASSNUMBER, CLUSTERNUMBER)
+           GROUP BY PRODUCT, LOT_ID, WAFER_ID, STEP_ID, SLOT_ID, LPT, OPN, TRAN_TIME, RECIPE, DESCRIPTION, EQUIP, PARA_1, PARA_2, PARA_3, PARA_4, PARA_5, PARA_6, PARA_7, PARA_8, PARA_9, PARA_10, PARA_11, PARA_12, PARA_13, PARA_14, PARA_15, DEFECTIVE_DIE, STEP_SEQ, ROLLUP (CLASSNUMBER)) PIVOT (SUM (CNT)
+                                       FOR (CLASSNUMBER)
+                                       IN  (-1 AS REVIEW_SUM, ??))
+ GROUP BY EQUIP, ??
+ ORDER BY EQUIP, ??]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="sttime">:sttime</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="endtime">:endtime</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="equipment">:equipment</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_TREND_REVIEW_RAW_03" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[ -- CREATE TIME: 2019-12-10 19:26:00
+SELECT *
+  FROM (  SELECT PRODUCT, LOT_ID, WAFER_ID, STEP_ID, SLOT_ID, LPT, OPN, TRAN_TIME, RECIPE, DESCRIPTION, EQUIP, PARA_1, PARA_2, PARA_3, PARA_4, PARA_5, PARA_6, PARA_7, PARA_8, PARA_9, PARA_10, PARA_11, PARA_12, PARA_13, PARA_14, PARA_15, STEP_SEQ, DEFECTIVE_DIE, DECODE (GROUPING_ID (CLASSNUMBER), 0, CLASSNUMBER, -1) AS CLASSNUMBER, SUM (CNT) AS CNT
+            FROM (  SELECT PRODUCT, LOT_ID, WAFER_ID, STEP_ID, SLOT_ID, LPT, OPN,  TRAN_TIME, RECIPE, DESCRIPTION, EQUIP, PARA_1, PARA_2, PARA_3, PARA_4, PARA_5, PARA_6, PARA_7, PARA_8, PARA_9, PARA_10, PARA_11, PARA_12, PARA_13, PARA_14, PARA_15, STEP_SEQ, DEFECTIVE_DIE, CLASSNUMBER, CLUSTERNUMBER, DECODE (CLUSTERNUMBER, 0, COUNT (*), 1) AS CNT
+                      FROM (SELECT DISTINCT T2.PRODUCT, T2.LOT_ID, T2.WAFER_ID, T2.STEP_ID, T2.SLOT_ID, T1.LPT, T1.OPN,  T1.TRAN_TIME, T1.RECIPE, T1.DESCRIPTION, T1.EQUIP, T1.PARA_1, T1.PARA_2, T1.PARA_3, T1.PARA_4, T1.PARA_5, T1.PARA_6, T1.PARA_7, T1.PARA_8, T1.PARA_9, T1.PARA_10, T1.PARA_11, T1.PARA_12, T1.PARA_13, T1.PARA_14, T1.PARA_15, T2.DEFECTIVE_DIE, T2.STEP_SEQ, T3.XINDEX * 65536 + T3.YINDEX, T3.CLASSNUMBER, T3.CLUSTERNUMBER
+                              FROM TQC_LOT_HIS_WAFER T1, TQD_INSP_INFO T2, TQD_DEFECT T3
+                             WHERE     1 = 1
+                                   AND T1.LOT_ID = T2.LOT_ID
+                                   AND T1.WAFER_ID = T2.WAFER_ID
+                                   AND T2.STEP_SEQ = T3.STEP_SEQ
+                                   AND T2.WAFER_SEQ = T3.WAFER_SEQ
+                                   AND T1.TRAN_TIME BETWEEN TO_DATE (:sttime, 'YYYYMMDD HH24MISS')
+                                                        AND TO_DATE (:endtime, 'YYYYMMDD HH24MISS')
+                                   AND T1.EQUIP = :equipment
+                                   ??
+                                   AND T3.CLASSNUMBER NOT IN (0) -- UNCATEGORIZED 제외
+                                   )
+                     GROUP BY PRODUCT, LOT_ID, WAFER_ID, STEP_ID, SLOT_ID, LPT, OPN,  TRAN_TIME, RECIPE, DESCRIPTION, EQUIP, PARA_1, PARA_2, PARA_3, PARA_4, PARA_5, PARA_6, PARA_7, PARA_8, PARA_9, PARA_10, PARA_11, PARA_12, PARA_13, PARA_14, PARA_15, STEP_SEQ, DEFECTIVE_DIE, CLASSNUMBER, CLUSTERNUMBER)
+           GROUP BY PRODUCT, LOT_ID, WAFER_ID, STEP_ID, SLOT_ID, LPT, OPN, TRAN_TIME, RECIPE, DESCRIPTION, EQUIP, PARA_1, PARA_2, PARA_3, PARA_4, PARA_5, PARA_6, PARA_7, PARA_8, PARA_9, PARA_10, PARA_11, PARA_12, PARA_13, PARA_14, PARA_15, DEFECTIVE_DIE, STEP_SEQ, ROLLUP (CLASSNUMBER)) PIVOT (SUM (CNT)
+                                       FOR (CLASSNUMBER)
+                                       IN  (-1 AS REVIEW_SUM, ??))
+ ORDER BY 1,2,3,4,5,6,7]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="sttime">:sttime</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="endtime">:endtime</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="equipment">:equipment</param>
+        </parameters>
+    </query>
+</queryxml>

@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Select" queryid="SELECT_TQC_LOT_STS" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQC_LOT_STS
+WHERE 1 = 1
+ AND LOT_NO = :lot_no]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="lot_no">:lot_no</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_TQC_LOT_STS_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQC_LOT_STS
+WHERE 1 = 1
+ AND LOT_NO LIKE :lotno]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="lotno">:lotno</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_TQC_LOT_STS_ALL" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[ SELECT * FROM TQC_LOT_STS
+WHERE 1 = 1]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_SYS_DATE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT TO_CHAR(SYSDATE,'YYYYMMDDHH24MISS') AS SYSTIME FROM DUAL]]></commandtext>
+    </query>
+</queryxml>

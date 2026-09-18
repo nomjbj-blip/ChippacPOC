@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Select" queryid="SELECT_COLOR_BY_TYPE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT CLASSNUMBER,
+  COLOR
+FROM TQD_COLORBYTYPE
+WHERE USER_ID = :user_id
+ORDER BY CLASSNUMBER ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:user_id</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_COLOR_BY_TYPE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[DELETE FROM TQD_COLORBYTYPE 
+WHERE USER_ID = :user_id]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:user_id</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="INSERT_COLOR_BY_TYPE" commandtype="Text" description="inset" commandtimeout="60">
+        <commandtext><![CDATA[INSERT
+INTO TQD_COLORBYTYPE VALUES
+  (
+    :user_id,
+    :classnumber,
+    :color,
+    :shape
+  )]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:user_id</param>
+            <param direction="Input" dbtype="Number" size="10">:classnumber</param>
+            <param direction="Input" dbtype="VarChar" size="9">:color</param>
+            <param direction="Input" dbtype="Number" size="10">:shape</param>
+        </parameters>
+    </query>
+</queryxml>

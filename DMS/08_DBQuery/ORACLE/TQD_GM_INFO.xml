@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="EMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Select" queryid="SELECT_WLP_LOT_LIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2014-02-18 18:40:10
+SELECT LOT_ID FROM (SELECT LOT_ID FROM TQD_LOT LOT1
+UNION
+SELECT LOT_ID FROM TQP_LOT LOT2) LOT
+WHERE LOT_ID LIKE :LOT_ID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:LOT_ID</param>
+        </parameters>
+    </query>
+</queryxml>

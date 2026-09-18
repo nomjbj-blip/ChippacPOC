@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="BUMPFA" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Select" queryid="SELECT_RULE_TYPE_LIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT *
+FROM T_TPS_MERGERULE_TYPE
+ORDER BY RULE_NAME ]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_RULE_TYPE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT *
+FROM T_TPS_MERGERULE_TYPE
+WHERE RULE_NAME = :rule_name ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">rule_name</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="INSERT_RULE_TYPE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO T_TPS_MERGERULE_TYPE VALUES(:rule_name, :rule_desc, :save_data)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">rule_name</param>
+            <param direction="Input" dbtype="VarChar" size="30">rule_desc</param>
+            <param direction="Input" dbtype="VarChar" size="100">:save_data</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_RULE_TYPE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[DELETE FROM T_TPS_MERGERULE_TYPE WHERE RULE_NAME = :rule_name]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">rule_name</param>
+        </parameters>
+    </query>
+</queryxml>

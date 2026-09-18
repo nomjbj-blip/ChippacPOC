@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="TPSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Insert" queryid="INSERT_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-09-07 16:05:24
+INSERT INTO TQP_PCM_INPUT_HIS (
+    FACTORY,
+    EQUIP_ID,
+    INPUT_TIME,
+    PROBE_CARD,
+    OPERATOR,
+    INPUT_USER_ID
+) VALUES (
+    :FACTORY,
+    :EQUIP_ID,
+    SYSDATE,
+    :PROBE_CARD,
+    :OPERATOR,
+    :INPUT_USER_ID
+)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="50" value="FACTORY">:FACTORY</param>
+            <param direction="Input" dbtype="VarChar2" size="50" value="EQUIP_ID">:EQUIP_ID</param>
+            <param direction="Input" dbtype="VarChar2" size="50" value="PROBE_CARD">:PROBE_CARD</param>
+            <param direction="Input" dbtype="VarChar2" size="50" value="OPERATOR">:OPERATOR</param>
+            <param direction="Input" dbtype="VarChar2" size="50" value="INPUT_USER_ID">:INPUT_USER_ID</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-09-07 16:08:54
+SELECT 
+    EQUIP_ID "EQUIP ID",
+    TO_CHAR(INPUT_TIME,'YYYY-MM-DD HH24:MI:SS') "INPUT TIME",
+    PROBE_CARD "PROBE CARD",
+    OPERATOR "OPERATOR"
+FROM TQP_PCM_INPUT_HIS
+WHERE FACTORY = :FACTORY
+AND INPUT_TIME >= to_date(:fromdate, 'YYYYMMDD')
+AND INPUT_TIME < to_date(:todate, 'YYYYMMDD')
+??
+ORDER BY INPUT_TIME DESC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="FAB1">:FACTORY</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="fromdate">:fromdate</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="todate">:todate</param>
+        </parameters>
+    </query>
+</queryxml>

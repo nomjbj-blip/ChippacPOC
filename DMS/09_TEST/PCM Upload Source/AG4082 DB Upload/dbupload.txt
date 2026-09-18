@@ -1,0 +1,180 @@
+#!/bin/sh
+nfsNTI=/home/testware/nffs/testware/data/ANAMNTFAB/PARAMETRIC
+nfsTI=/home/testware/nffs/testware/data/ANAMNTFAB/PARAMETRIC
+nfsHOME=/home/testware/nffs/testware
+# add 2019.07.03 dacrux dbupload
+nfsEquipHome=/home/testware/nffs/EQUIP/TEST/PCM/AMPT17
+TPL=/home/testware/data/recipe
+rshHOME=/export/home/testware
+localDB=/home/testware/data/
+while [ $# -gt 0 ]
+do
+      case "$1" in
+            -p) PROGRAM="$2";;
+            -l) LOT="$2";; 
+            -w) WAFER="$2"
+                  WAFER=`echo $WAFER | cut -c1-12` 
+                  echo $WAFER
+                  ;;
+            -h) echo "dbupload -p KM2403CN -l 1234567 -w AK1234567-01";;
+            *)  echo "db manual upload mode enable"
+            #  echo " input lot id (ex 1234567 )"
+            #     read LOT
+            #  echo " input program name (ex KMT813CN )" 
+            #     read PROGRAM
+            #  echo " input wafer name (ex AK1299010-06 )"           
+            #     read WAFER
+            #  echo " $PROGRAM/$LOT/$WAFER " 
+            ;;
+      esac
+      shift
+done
+
+echo "$LOT,$WAFER,$PROGRAM" >> aaaa
+
+
+if [ -f $TPL/$PROGRAM/develop.flag ]; then
+      exit0
+else
+      echo " " 
+fi
+
+if [ -f $TPL/$PROGRAM/$PROGRAM.db ]; then   
+      localDB=`awk -F, '/ANAM/{print $4}' $TPL/$PROGRAM/$PROGRAM.db`
+      echo "$TPL/$PROGRAM/$PROGRAM.db == $LocalDB"
+
+else 
+      echo ""
+      echo "$TPL/$PROGRAM/$PROGRAM.db file empty"
+      echo ""
+      exit 0
+fi
+
+
+
+if [ "$localDB" = "ANAMNTFAB" ]; then   
+      nfsHOME=$nfsNTI
+      dbrealfile=$nfsNTI/$PROGRAM/$LOT/$WAFER
+      nfsLOT=$nfsNTI/$PROGRAM/$LOT
+      nfsPROG=$nfsNTI/$PROGRAM
+      DBUPLOAD="-FS -ranamntdb"
+      echo " ********* non-ti fab"
+      localHOME=/home/testware/data/ANAMNTFAB/
+
+else
+      nfsHOME=$nfsTI
+      dbrealfile=$nfsTI/$PROGRAM/$LOT/$WAFER
+      nfsLOT=$nfsTI/$PROGRAM/$LOT	
+      nfsPROG=$nfsTI/$PROGRAM
+      DBUPLOAD="-FS -ranamtwdb"
+      localHOME=/home/testware/data/ANAMFAB/
+      echo " *********  ti fab"
+fi
+
+localLOT=/home/testware/data/$localDB/$PROGRAM/$LOT
+
+
+if [ -d $nfsPROG -a -w $nfsPROG ]; then
+      echo "exist nffs directory $NHOME" 
+	cd $nfsPROG	
+	pwd
+else 
+      cd $nfsHOME
+      pwd 
+      if [ -d $nfsHOME/$PROGRAM ]; then
+            if [ -d $nfsLOT ]; then
+                  echo " ** exist nffs directory $$nfsLOT"
+            else
+                  cd $nfsPROG
+                  echo " ** make a lot $LOT"
+                  mkdir $LOT 
+            fi  
+      else 
+                  mkdir $PROGRAM
+                  cd $PROGRAM
+                  mkdir $LOT
+                  echo " empty nffs lot directory --> create $nfsLOT"
+      fi
+fi
+
+echo "local home $localHOME"
+echo "local home program $localHOME/$PROGRAM"
+
+
+if [ -d $localHOME/$PROGRAM/$LOT ]; then
+
+      if [ -d $nfsHOME/$PROGRAM/$LOT ]; then
+
+            echo "exist directory $nfsHOME/$PROGRAM/$LOT "  
+
+      else  
+            if [ -d $nfsHOME/$PROGRAM/ ]; then 
+                  cd $nfsHOME/$PROGRAM/
+                  echo "aaaa"
+                  ls -ltr  
+                  mkdir $LOT
+                  chmod 777 $LOT
+                  echo "create nfs $nfsHOME/$PROGRAM/$LOT"
+            else 
+                  cd  $nfsHOME 
+                  mkdir $PROGRAM
+                  chmod 777 $LOT 
+                  cd $nfsHOME/$PROGRAM/
+                  mkdir $LOT
+                  chmod 777 $LOT
+            fi 
+      fi
+
+      if [ -f $localHOME/$PROGRAM/$LOT/$WAFER ]; then
+
+            echo "xxxxx     $WAFER"
+            cd $localHOME/$PROGRAM/$LOT
+            pwd
+            ls -ltr 
+            cp $WAFER $nfsHOME/$PROGRAM/$LOT/
+
+      else
+
+            echo "$LOT,$WAFER"
+            echo "local file not create"
+            exit 1
+
+      fi
+
+else
+
+            echo "not exist local foler"
+            exit 1
+            
+fi
+
+
+
+if [ -f $nfsHOME/$PROGRAM/$LOT/$WAFER ]; then
+      
+      cd $nfsHOME/$PROGRAM/$LOT
+      pwd
+      mv $WAFER $WAFER"_tf_ascii"
+      /home/testware/nffs/testware/3.0/linux/bin/ascii2tf  -v -P 1 -v -i "$WAFER"_tf_ascii -o "$WAFER"_tf_new
+
+      if [ -f $WAFER"_tf_new" ]; then
+            # nfsEquipHome 에 파일 복사하는 로직 추가
+            cp $WAFER"_tf_new" "$nfsEquipHome/$WAFER"
+
+            cp $WAFER"_tf_new" "$WAFER"
+            #echo $WAFER | $NFSHOME/3.0/solaris/bin/loadtf $DBUPLOAD
+            aaa=$WAFER"_tf_new" 
+            rsh anamapps "echo $rshHOME/data/$localDB/PARAMETRIC/$PROGRAM/$LOT/$aaa | $rshHOME/3.0/solaris/bin/loadtf $DBUPLOAD"
+
+      else
+
+                  echo "not create file "
+
+      fi
+      
+else
+
+      echo " $WAFER  not Found\n"
+
+fi
+

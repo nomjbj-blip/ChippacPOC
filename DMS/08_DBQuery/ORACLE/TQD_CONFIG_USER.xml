@@ -1,0 +1,96 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Select" queryid="SELECT_CONFIG_USER_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-06-05 10:45:40
+SELECT DECODE(T2."CATEGORY", NULL, T1."CATEGORY", T2."CATEGORY") AS "CATEGORY",
+       DECODE(T2."NAME", NULL, T1."NAME", T2."NAME") AS "NAME",
+       DECODE(T2."VALUE", NULL, T1."VALUE", T2."VALUE") AS "VALUE",
+       DECODE(T2."TYPE", NULL, T1."TYPE", T2."TYPE") AS "TYPE",
+       T2.USERID AS "USER_ID",
+       T2.ORDERED,
+       DECODE(T2."COMMENT", NULL, T1."COMMENT", T2."COMMENT") AS "COMMENT"
+  FROM DMSMGR.TQD_CONFIG T1, DMSMGR.TQD_CONFIG_USER T2
+ WHERE 1=1 
+   AND T1.CATEGORY = T2.CATEGORY(+)
+   AND T1.NAME = T2.NAME(+)
+   AND T2.FACTORY(+) = :factory
+   AND T1.CATEGORY = :category
+   AND T2.USERID(+) = :userid
+ ORDER BY T1.CATEGORY, T2."ORDERED"]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="factory">:factory</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="category">:category</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="userid">:userid</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="INSERT_CONFIG_USER_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-06-05 10:47:43
+INSERT INTO TQD_CONFIG_USER 
+            (FACTORY, "CATEGORY", "NAME", "VALUE", "TYPE", USERID, "ORDERED", CREATE_TIME, CREATE_USER, "COMMENT")
+VALUES (:factory, :category, :name, :value, :type, :userid, :ordered, SYSDATE, :create_user, :cmt)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="factory">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="category">:category</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="name">:name</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="value">:value</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="type">:type</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="userid">:userid</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="ordered">:ordered</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="create_user">:create_user</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="cmt">:cmt</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_CONFIG_USER_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-06-05 10:48:06
+DELETE FROM TQD_CONFIG_USER
+ WHERE 1=1 
+   AND FACTORY = :factory
+   AND CATEGORY IN (??)
+   AND USERID = :userid]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="factory">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="userid">:userid</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_CONFIG_USER_02" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-06-06 11:16:44
+SELECT ORDERED, NAME, VALUE
+  FROM DMSMGR.TQD_CONFIG_USER 
+ WHERE 1=1 
+       AND FACTORY = :factory 
+       AND CATEGORY = :category 
+       AND USERID = :userid]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="factory">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="category">:category</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="userid">:userid</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_CONFIG_USER_03" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT *
+  FROM DMSMGR.TQD_CONFIG_USER
+ WHERE 1 = 1
+ AND USERID = :userid
+ AND CATEGORY = NVL(:cat, CATEGORY)
+  ORDER BY ORDERED]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:userid</param>
+            <param direction="Input" dbtype="VarChar" size="40">:cat</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_CONFIG_USER_04" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT VALUE
+  FROM DMSMGR.TQD_CONFIG_USER 
+ WHERE 1=1 
+       AND FACTORY = :factory 
+       AND CATEGORY = :category
+       AND NAME = :name 
+       AND USERID = :userid]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="factory">:factory</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="category">:category</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="name">:name</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="userid">:userid</param>
+        </parameters>
+    </query>
+</queryxml>

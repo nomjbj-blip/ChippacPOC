@@ -1,0 +1,122 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="TAMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Insert" queryid="CREATE_USEMAP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_USEMAP(MAPID,X,Y,USECODE) VALUES(:mapid,:x,:y,:usecode) ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30" value="ysim">:mapid</param>
+            <param direction="Input" dbtype="Number" size="0" value="1">:x</param>
+            <param direction="Input" dbtype="Number" size="0" value="1">:y</param>
+            <param direction="Input" dbtype="Number" size="0" value="10">:usecode</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_USEMAP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[DELETE FROM TQP_USEMAP WHERE MAPID = :mapid]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30" value="YSTEST">:mapid</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="__ALLSELECT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQP_USEMAP]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_USEMAP_ALLDIE" commandtype="Text" description="해당 MAPID의 전체 DIE를 가져온다." commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQP_USEMAP WHERE MAPID=:mapid]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30" value="RRR">:mapid</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_USEMAP_USEDIE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQP_USEMAP WHERE MAPID = :mapid AND USECODE >0]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30" value="TEST">:mapid</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_USEMAP_INDIE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQP_USEMAP WHERE MAPID = :mapid AND USECODE IN (1,3)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:mapid</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_SHOT" commandtype="Text" description="Update Shot" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_USEMAP 
+SET 
+	SHOT_ID = :shot_id,
+	SHOT_X = :shot_x,
+	SHOT_Y=:shot_y,
+	DIE_SHOT_X=:die_shot_x,
+	DIE_SHOT_Y=:die_shot_y
+WHERE
+	MAPID = :mapid
+	AND X=:xindex
+	AND Y=:yindex]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:shot_id</param>
+            <param direction="Input" dbtype="Number" size="0">:shot_x</param>
+            <param direction="Input" dbtype="Number" size="0">:shot_y</param>
+            <param direction="Input" dbtype="Number" size="0">:die_shot_x</param>
+            <param direction="Input" dbtype="Number" size="0">:die_shot_y</param>
+            <param direction="Input" dbtype="VarChar" size="30">:mapid</param>
+            <param direction="Input" dbtype="Number" size="0">:xindex</param>
+            <param direction="Input" dbtype="Number" size="0">:yIndex</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_SHOT_ORIGIN" commandtype="Text" description="기준 Shot정보를 가져온다." commandtimeout="60">
+        <commandtext><![CDATA[SELECT SHOT_X, SHOT_Y , MIN(X) AS MINX,MIN(Y) AS MINY,MAX(X) AS MAXX,MAX(Y) AS MAXY,(MAX(X)-MIN(X) + 1) AS COUNTX,(MAX(Y)-MIN(Y)+1) AS COUNTY  FROM TQP_USEMAP
+WHERE MAPID= :mapid
+AND USECODE > 0
+AND SHOT_X IS NOT NULL
+AND SHOT_Y IS NOT NULL
+GROUP BY SHOT_X, SHOT_Y
+ORDER BY COUNTX DESC,COUNTY DESC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30" value="AAA">:mapid</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_MINMAX" commandtype="Text" description="x, y 의 Min Max 값을 가져 온다." commandtimeout="60">
+        <commandtext><![CDATA[SELECT MIN(X) MINX, MIN(Y) MINY, MAX(X) MAXX, MAX(Y) MAXY FROM TQP_USEMAP
+WHERE MAPID = :mapid
+AND USECODE <> 0]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">mapid</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_TARGETX" commandtype="Text" description="Target X 값을 가져온다." commandtimeout="60">
+        <commandtext><![CDATA[select min(x) from TQP_USEMAP
+where usecode = 1
+and y = :y
+and mapid = :mapid]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Int32" size="0">y</param>
+            <param direction="Input" dbtype="VarChar" size="30">mapid</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_MINMAXTEST" commandtype="Text" description="Test된 x, y 의 Min Max 값을 가져 온다." commandtimeout="60">
+        <commandtext><![CDATA[SELECT MIN(X) MINX, MIN(Y) MINY, MAX(X) MAXX, MAX(Y) MAXY FROM TQP_USEMAP
+WHERE MAPID = :mapid
+AND USECODE = 1]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">mapid</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="CREATE_TEMPTABLE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[CREATE TABLE ??
+AS SELECT *
+FROM TQP_USEMAP
+WHERE 1=0]]></commandtext>
+    </query>
+    <query statement="Insert" queryid="COPY_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_USEMAP
+SELECT * 
+FROM ??]]></commandtext>
+    </query>
+    <query statement="Insert" queryid="CREATE_USEMAP_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_USEMAP(FACTORY,MAPID,PROGRAM_REV,X,Y,USECODE,DIE_NUM) VALUES(:factory,:mapid,0,:x,:y,:usecode, :dienum) ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="factory">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="mapid">:mapid</param>
+            <param direction="Input" dbtype="VarChar" size="40">:x</param>
+            <param direction="Input" dbtype="VarChar" size="40">:y</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="usecode">:usecode</param>
+            <param direction="Input" dbtype="VarChar" size="40">:dienum</param>
+        </parameters>
+    </query>
+</queryxml>

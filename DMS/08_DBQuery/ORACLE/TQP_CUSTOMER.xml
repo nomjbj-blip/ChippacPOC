@@ -1,0 +1,217 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="BUMPFA" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Insert" queryid="CREATE_CUSTOMER" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_CUSTOMER
+VALUES( :customer_id
+,:customer_name
+,:customer_desc
+,:data_service
+,:user_count
+,TO_DATE(:expire_date,'YYYY-MM-DD')
+,:ftpsite
+,:ftpuser
+,:ftppassword
+,:ftppath
+,:sendtime
+,:aviformat
+,:edsformat
+,:inklessformat
+,:rawdata
+,:cust_code
+,:spr_name
+,:map_rcvdir
+,:backup_dir
+,:error_dir
+,:log_dir
+)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="25">:customer_id</param>
+            <param direction="Input" dbtype="VarChar" size="25">:customer_name</param>
+            <param direction="Input" dbtype="VarChar" size="100">:customer_desc</param>
+            <param direction="Input" dbtype="Number" size="1">:data_service</param>
+            <param direction="Input" dbtype="Number" size="2">:user_count</param>
+            <param direction="Input" dbtype="VarChar" size="10">:expire_date</param>
+            <param direction="Input" dbtype="VarChar" size="30">:ftpsite</param>
+            <param direction="Input" dbtype="VarChar" size="30">:ftpuser</param>
+            <param direction="Input" dbtype="VarChar" size="30">:ftppassword</param>
+            <param direction="Input" dbtype="VarChar" size="100">:ftppath</param>
+            <param direction="Input" dbtype="VarChar" size="100">:sendtime</param>
+            <param direction="Input" dbtype="VarChar" size="100">:aviformat</param>
+            <param direction="Input" dbtype="VarChar" size="100">:edsformat</param>
+            <param direction="Input" dbtype="VarChar" size="100">:inklessformat</param>
+            <param direction="Input" dbtype="VarChar" size="100">:rawdata</param>
+            <param direction="Input" dbtype="VarChar" size="40">:cust_code</param>
+            <param direction="Input" dbtype="VarChar" size="40">:spr_name</param>
+            <param direction="Input" dbtype="VarChar" size="256">:map_rcvdir</param>
+            <param direction="Input" dbtype="VarChar" size="256">:backup_dir</param>
+            <param direction="Input" dbtype="VarChar" size="256">:error_dir</param>
+            <param direction="Input" dbtype="VarChar" size="256">:log_dir</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_CUSTOMER" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[DELETE FROM TQP_CUSTOMER WHERE CUSTOMER_ID = :customer_id]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="25">:customer_id</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_CUSTOMER" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_CUSTOMER SET  
+CUSTOMER_NAME = :customer_name
+,CUSTOMER_DESC = :customer_desc
+,DATA_SERVICE = :data_service
+,USER_COUNT = :user_count
+,EXPIRE_DATE = TO_DATE(:expire_date,'YYYY-MM-DD')
+,FTPSITE = :ftpsite
+, FTPUSER = :ftpuser
+, FTPPASSWORD = :ftppassword
+, FTPPATH = :ftppath
+, SENDTIME = :sendtime
+, AVIFORMAT = :aviformat
+, EDSFORMAT = :edsformat
+, INKLESSFORMAT = :inklessformat
+, RAWDATA = :rawdata
+, CUSTCODE = :cust_code
+, SPR_NAME = :spr_name
+, MAP_RCVDIR = :map_rcvdir
+, BAKDIR = :backup_dir
+, ERRDIR = :error_dir
+, LOGDIR = :log_dir
+WHERE CUSTOMER_ID = :customer_id]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="25">:customer_name</param>
+            <param direction="Input" dbtype="VarChar" size="100">:customer_desc</param>
+            <param direction="Input" dbtype="Number" size="1">:data_service</param>
+            <param direction="Input" dbtype="Number" size="2">:user_count</param>
+            <param direction="Input" dbtype="VarChar" size="10">:expire_date</param>
+            <param direction="Input" dbtype="VarChar" size="30">:ftpsite</param>
+            <param direction="Input" dbtype="VarChar" size="30">:ftpuser</param>
+            <param direction="Input" dbtype="VarChar" size="30">:ftppassword</param>
+            <param direction="Input" dbtype="VarChar" size="100">:ftppath</param>
+            <param direction="Input" dbtype="VarChar" size="100">:sendtime</param>
+            <param direction="Input" dbtype="VarChar" size="100">:aviformat</param>
+            <param direction="Input" dbtype="VarChar" size="100">:edsformat</param>
+            <param direction="Input" dbtype="VarChar" size="100">:inklessformat</param>
+            <param direction="Input" dbtype="VarChar" size="100">:rawdata</param>
+            <param direction="Input" dbtype="VarChar" size="40">:cust_code</param>
+            <param direction="Input" dbtype="VarChar" size="40">:spr_name</param>
+            <param direction="Input" dbtype="VarChar" size="256">:map_rcvdir</param>
+            <param direction="Input" dbtype="VarChar" size="256">:backup_dir</param>
+            <param direction="Input" dbtype="VarChar" size="256">:error_dir</param>
+            <param direction="Input" dbtype="VarChar" size="256">:log_dir</param>
+            <param direction="Input" dbtype="VarChar" size="40">:customer_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_CUSTLIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQP_CUSTOMER 
+ORDER BY CUSTOMER_ID]]></commandtext>
+    </query>
+    <query statement="Select" queryid="GET_CUSTINFO" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQP_CUSTOMER WHERE CUSTOMER_ID = :customer_id]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="25">:customer_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_CUSTOMERINFO" commandtype="Text" description="Customer 정보를 가져온다." commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQP_CUSTOMER
+WHERE CUSTOMER_ID = :customer_id]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">customer_id</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="CREATE_CUSTOMER2" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_CUSTOMER
+VALUES( :customer_id
+,:customer_name
+,:customer_desc
+,:incust_ip
+,:incust_port
+,:incust_user
+,:incust_pw
+,:incust_path
+,:download_ip
+,:download_port
+,:download_user
+,:download_pw
+,:download_path
+,:output_ip
+,:output_port
+,:output_user
+,:output_pw
+,:output_path
+)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:customer_id</param>
+            <param direction="Input" dbtype="VarChar" size="30">:customer_name</param>
+            <param direction="Input" dbtype="VarChar" size="100">:customer_desc</param>
+            <param direction="Input" dbtype="VarChar" size="100">:incust_ip</param>
+            <param direction="Input" dbtype="VarChar" size="100">:incust_port</param>
+            <param direction="Input" dbtype="VarChar" size="100">:incust_user</param>
+            <param direction="Input" dbtype="VarChar" size="100">:incust_pw</param>
+            <param direction="Input" dbtype="VarChar" size="100">:incust_path</param>
+            <param direction="Input" dbtype="VarChar" size="100">:download_ip</param>
+            <param direction="Input" dbtype="VarChar" size="100">:download_port</param>
+            <param direction="Input" dbtype="VarChar" size="100">:download_user</param>
+            <param direction="Input" dbtype="VarChar" size="100">:download_pw</param>
+            <param direction="Input" dbtype="VarChar" size="100">:download_path</param>
+            <param direction="Input" dbtype="VarChar" size="100">:output_ip</param>
+            <param direction="Input" dbtype="VarChar" size="100">:output_port</param>
+            <param direction="Input" dbtype="VarChar" size="100">:output_user</param>
+            <param direction="Input" dbtype="VarChar" size="100">:output_pw</param>
+            <param direction="Input" dbtype="VarChar" size="100">:output_path</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_CUSTOMER2" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_CUSTOMER SET  
+CUSTOMER_NAME = :cus_name
+,CUSTOMER_DESC = :cus_desc
+,INCUST_IP = :in_ip
+,INCUST_PORT = :in_port
+,INCUST_USER = :in_user
+,INCUST_PW = :in_pw
+,INCUST_PATH = :in_path
+,DOWNLOAD_IP = :down_ip
+,DOWNLOAD_PORT = :down_port
+,DOWNLOAD_USER = :down_user
+,DOWNLOAD_PW = :down_pw
+,DOWNLOAD_PATH = :down_path
+,OUTPUT_IP = :out_ip
+,OUTPUT_PORT = :out_port
+,OUTPUT_USER = :out_user
+,OUTPUT_PW = :out_pw
+,OUTPUT_PATH = :out_path
+WHERE CUSTOMER_ID = :cus_id ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:cus_name</param>
+            <param direction="Input" dbtype="VarChar" size="100">:cus_desc</param>
+            <param direction="Input" dbtype="VarChar" size="100">:in_ip</param>
+            <param direction="Input" dbtype="VarChar" size="100">:in_port</param>
+            <param direction="Input" dbtype="VarChar" size="100">:in_user</param>
+            <param direction="Input" dbtype="VarChar" size="100">:in_pw</param>
+            <param direction="Input" dbtype="VarChar" size="100">:in_path</param>
+            <param direction="Input" dbtype="VarChar" size="100">:down_ip</param>
+            <param direction="Input" dbtype="VarChar" size="100">:down_port</param>
+            <param direction="Input" dbtype="VarChar" size="100">:down_user</param>
+            <param direction="Input" dbtype="VarChar" size="100">:down_pw</param>
+            <param direction="Input" dbtype="VarChar" size="100">:down_path</param>
+            <param direction="Input" dbtype="VarChar" size="100">:out_ip</param>
+            <param direction="Input" dbtype="VarChar" size="100">:out_port</param>
+            <param direction="Input" dbtype="VarChar" size="100">:out_user</param>
+            <param direction="Input" dbtype="VarChar" size="100">:out_pw</param>
+            <param direction="Input" dbtype="VarChar" size="100">:out_path</param>
+            <param direction="Input" dbtype="VarChar" size="30">:cus_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_CUSTOMER_TEST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT *
+FROM TQP_CUSTOMER]]></commandtext>
+    </query>
+    <query statement="Select" queryid="GET_CUSTLIST_BYMAPDIR" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2015-03-24 16:24:02
+SELECT * FROM TQP_CUSTOMER
+WHERE MAP_RCVDIR = :map_dir
+ORDER BY CUSTOMER_ID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="256">:map_dir</param>
+        </parameters>
+    </query>
+</queryxml>

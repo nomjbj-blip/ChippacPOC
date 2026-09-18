@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Select" queryid="SELECT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT ZONE_NAME, INDEX_X, INDEX_Y, ZONE_ID COLOR FROM TQD_ZONE
+WHERE USER_ID=:userId
+AND PRODUCT=:product]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:userId</param>
+            <param direction="Input" dbtype="VarChar" size="40">:product</param>
+        </parameters>
+    </query>
+</queryxml>

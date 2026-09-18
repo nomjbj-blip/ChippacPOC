@@ -1,0 +1,85 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="BUMPFA" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Select" queryid="GET_INLINE_CONDITION" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[??]]></commandtext>
+    </query>
+    <query statement="Select" queryid="GET_INLINE_LOT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[Select Lot_no, max(to_char(dttm, 'yyyy-MM-dd')) as dttm
+From mfd_edc0
+Where prod = :PROD
+and lpt = :LPT and opn = :OPN
+Group by Lot_no
+order by dttm]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="25" description="Product" value="A445409C03">:PROD</param>
+            <param direction="Input" dbtype="VarChar" size="10" description="Loute" value="LAU1500">:LPT</param>
+            <param direction="Input" dbtype="VarChar" size="10" description="Operation" value="5802">:OPN</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_INLINE_PARA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[Select distinct Para
+From mfd_edc0
+Where prod = :PROD
+and lpt = :LPT and opn = :OPN]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="25" description="Production" value="A445409C03">:PROD</param>
+            <param direction="Input" dbtype="VarChar" size="10" description="Loute" value="LAU1500">:LPT</param>
+            <param direction="Input" dbtype="VarChar" size="10" description="Operation" value="5802">:OPN</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_INLINE_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[Select Lot_no, dttm, para, 
+decode(no_val1, null, 0, no_val1) + decode(no_val2, null, 0, no_val2) + decode(no_val3, null, 0, no_val3) + decode(no_val4, null, 0, no_val4) + decode(no_val5, null, 0, no_val5) +
+decode(no_val6, null, 0, no_val6) + decode(no_val7, null, 0, no_val7) + decode(no_val8, null, 0, no_val8) + decode(no_val9, null, 0, no_val9) + decode(no_val10, null, 0, no_val10) +
+decode(no_val11, null, 0, no_val11) + decode(no_val12, null, 0, no_val12) + decode(no_val13, null, 0, no_val13) + decode(no_val14, null, 0, no_val14) + decode(no_val15, null, 0, no_val15) +
+decode(no_val16, null, 0, no_val16) + decode(no_val17, null, 0, no_val17) + decode(no_val18, null, 0, no_val18) + decode(no_val19, null, 0, no_val19) + decode(no_val20, null, 0, no_val20) +
+decode(no_val21, null, 0, no_val21) + decode(no_val22, null, 0, no_val22) + decode(no_val23, null, 0, no_val23) + decode(no_val24, null, 0, no_val24) + decode(no_val25, null, 0, no_val25) +
+decode(no_val26, null, 0, no_val26) + decode(no_val27, null, 0, no_val27) + decode(no_val28, null, 0, no_val28) + decode(no_val29, null, 0, no_val29) + decode(no_val30, null, 0, no_val30) +
+decode(no_val31, null, 0, no_val31) + decode(no_val32, null, 0, no_val32) + decode(no_val33, null, 0, no_val33) + decode(no_val34, null, 0, no_val34) + decode(no_val35, null, 0, no_val35) +
+decode(no_val36, null, 0, no_val36) + decode(no_val37, null, 0, no_val37) + decode(no_val38, null, 0, no_val38) + decode(no_val39, null, 0, no_val39) + decode(no_val40, null, 0, no_val40) +
+decode(no_val41, null, 0, no_val41) + decode(no_val42, null, 0, no_val42) + decode(no_val43, null, 0, no_val43) + decode(no_val44, null, 0, no_val44) + decode(no_val45, null, 0, no_val45) +
+decode(no_val46, null, 0, no_val46) + decode(no_val47, null, 0, no_val47) + decode(no_val48, null, 0, no_val48) + decode(no_val49, null, 0, no_val49) + decode(no_val50, null, 0, no_val50)
+as sum,  no_val as count  
+From mfd_edc0
+Where prod = :PROD
+and lpt = :LPT and opn = :OPN]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="25" description="Product" value="A445409C03">:PROD</param>
+            <param direction="Input" dbtype="VarChar" size="10" description="Route" value="LAU1500">:LPT</param>
+            <param direction="Input" dbtype="VarChar" size="10" description="Operation" value="5802">:OPN</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_INLINE_SPEC" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[Select LSL, USL
+From mfd_edcspec
+Where Prod = :PROD
+and LPT = :LPT
+and OPN = :OPN
+and PARA = :PARA]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="25" description="Production" value="D353TI17001">:PROD</param>
+            <param direction="Input" dbtype="VarChar" size="10" description="Loute" value="LAG3500">:LPT</param>
+            <param direction="Input" dbtype="VarChar" size="10" description="Operation" value="3750">:OPN</param>
+            <param direction="Input" dbtype="VarChar" size="12" description="Parameter" value="R/R">:PARA</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_INLINE_SITEDATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[select lot_no, no_val, no_val1, no_val2, no_val3, no_val4, no_val5, no_val6, no_val7, no_val8, no_val9, no_val10
+, no_val11, no_val12, no_val13, no_val14, no_val15, no_val16, no_val17, no_val18, no_val19, no_val20
+, no_val21, no_val22, no_val23, no_val24, no_val25, no_val26, no_val27, no_val28, no_val29, no_val30
+, no_val31, no_val32, no_val33, no_val34, no_val35, no_val36, no_val37, no_val38, no_val39, no_val40
+, no_val41, no_val42, no_val43, no_val44, no_val45, no_val46, no_val47, no_val48, no_val49, no_val50 
+from mfd_edc0
+where prod = :PROD
+and lot_no in (??)
+and lpt = :LPT
+and opn = :OPN
+and para = :PARA]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="25" description="Production" value="D353TI01E01">:PROD</param>
+            <param direction="Input" dbtype="VarChar" size="10" description="Loute" value="LAC5980">:LPT</param>
+            <param direction="Input" dbtype="VarChar" size="10" description="Operation" value="6800">:OPN</param>
+            <param direction="Input" dbtype="VarChar" size="12" description="Parameter" value="RS145A">:PARA</param>
+        </parameters>
+    </query>
+</queryxml>

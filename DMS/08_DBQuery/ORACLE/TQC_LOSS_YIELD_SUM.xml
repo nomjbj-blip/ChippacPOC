@@ -1,0 +1,251 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Insert" queryid="INSERT_TQC_LOSS_YIELD_SUM" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQC_LOSS_YIELD_SUM
+  SELECT YEAR,
+         MONTH,
+         DAY,
+         WEEK,
+         TRAN_DAY,
+         CUSTOMER,
+         DEVICE_ALIAS,
+         PRODUCT,
+         TESTAREA,
+         PROGRAM,
+         TESTER,
+         PROBE_CARD,
+         STEP_ID,
+         INSPECTION_EQ,
+         SUM (TESTED_DIE) AS TESTED_DIE,
+         SUM (DEFECTIVE_DIE) AS DEFECTIVE_DIE,
+         SUM (BAD_DIE_CNT) AS BAD_DIE_CNT,
+         ROUND(SUM (BAD_DIE_CNT) / SUM (DEFECTIVE_DIE) * 100, 2) AS KILL_RATIO,
+         SUM (NETDIE) AS NETDIE,
+         SUM (GOOD_CNT) AS GOOD_CNT,
+         SUM (BAD_CNT) AS BAD_CNT,
+         ROUND(SUM (BAD_CNT) / SUM (NETDIE) * 100, 2) AS LOSS_YIELD
+    FROM TQC_MATCH_SUM
+   WHERE     1 = 1
+         AND TEST_TRAN_TIME BETWEEN TO_DATE (
+                                TO_CHAR (SYSDATE - 1, 'YYYYMMDD')
+                                       || '060000',
+                                       'YYYYMMDD HH24MISS')
+                                AND TO_DATE (
+                                TO_CHAR (SYSDATE, 'YYYYMMDD')
+                                       || '055959',
+                                       'YYYYMMDD HH24MISS')
+GROUP BY YEAR,
+         MONTH,
+         DAY,
+         WEEK,
+         TRAN_DAY,
+         CUSTOMER,
+         DEVICE_ALIAS,
+         PRODUCT,
+         TESTAREA,
+         PROGRAM,
+         TESTER,
+         PROBE_CARD,
+         STEP_ID,
+         INSPECTION_EQ]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_FILTER_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT LOT_ID, WAFER_ID, PRODUCT, STEP_ID
+    FROM TQC_MATCH_SUM
+   WHERE     1 = 1
+    AND DEVICE_ALIAS = :device
+    AND TESTAREA = :testarea
+    AND TEST_TRAN_TIME BETWEEN TO_DATE(:sttime,'YYYY/MM/DD HH24:MI:SS') AND TO_DATE(:endtime,'YYYY/MM/DD HH24:MI:SS')
+ GROUP BY LOT_ID, WAFER_ID, PRODUCT, STEP_ID
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="sttime">:sttime</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="endtime">:endtime</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="testarea">:testarea</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="device">:device</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_FILTER_DATA_DEVICE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DEVICE_ALIAS, TESTAREA
+    FROM TQC_MATCH_SUM
+   WHERE     1 = 1
+    AND TEST_TRAN_TIME BETWEEN TO_DATE(:sttime,'YYYY/MM/DD HH24:MI:SS') AND TO_DATE(:endtime,'YYYY/MM/DD HH24:MI:SS')
+GROUP BY DEVICE_ALIAS, TESTAREA
+
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="sttime">:sttime</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="endtime">:endtime</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_LOSS_MAIN_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[  SELECT LOT_ID,
+         WAFER_ID,
+         TESTAREA,
+         DEVICE_ALIAS,
+         PRODUCT,
+         PROGRAM,
+         CUSTOMER,
+         DECODE (REGEXP_INSTR (SUBSTR (PRODUCT, 2, 2), '[^0-9]'),
+                 0, ROUND (TO_NUMBER (SUBSTR (PRODUCT, 2, 2)) / 100, 2),
+                 0)
+            AS TECH,
+         0 AS PROSPECT_YIELD,
+         0 AS PROSPECT_INCLUDE_AVG_YIELD,
+         ROUND (GOOD_CNT / TESTED_DIE * 100, 2) AS ACTUAL_YIELD,
+         STEP_ID,
+         ROUND (BAD_DIE_CNT / NETDIE * 100, 2) AS LOSS_YIELD
+    FROM TQC_MATCH_SUM
+   WHERE     1 = 1
+       AND DEVICE_ALIAS = :device
+       AND TESTAREA = :teatarea
+       AND TEST_TRAN_TIME BETWEEN TO_DATE(:sttime,'YYYY/MM/DD HH24:MI:SS') AND TO_DATE(:endtime,'YYYY/MM/DD HH24:MI:SS')
+       ??
+ORDER BY LOT_ID,
+         WAFER_ID,
+         TESTAREA,
+         DEVICE_ALIAS,
+         PRODUCT,
+         PROGRAM,
+         CUSTOMER]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="device">:device</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="teatarea">:teatarea</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="sttime">:sttime</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="endtime">:endtime</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_LOSS_SUB_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DEVICE_ALIAS,
+         TESTAREA,
+         STEP_ID,
+         ROUND (SUM (BAD_DIE_CNT) / SUM (NETDIE) * 100, 2) AS LOSS_YIELD
+    FROM TQC_LOSS_YIELD_SUM
+   WHERE     1 = 1
+       AND DEVICE_ALIAS = :device
+       AND TESTAREA = :teatarea
+       AND TRAN_DAY BETWEEN TO_CHAR (SYSDATE - 30, 'YYYYMMDD')
+                        AND TO_CHAR (SYSDATE - 1, 'YYYYMMDD')
+GROUP BY DEVICE_ALIAS,
+         TESTAREA,
+         STEP_ID
+ORDER BY DEVICE_ALIAS,
+         TESTAREA,
+         STEP_ID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="device">:device</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="teatarea">:teatarea</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="INSERT_TQC_MATCH_SUM" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQC_MATCH_SUM
+WITH WT
+     AS (  SELECT TS.WAFER_SEQ,
+                  DM.STEP_SEQ,
+                  TS.END_TIME AS TEST_TRAN_TIME,
+                  TS.CUSTOMER,
+                  TS.DEVICE_ALIAS,
+                  TS.PRODUCT,
+                  TS.TESTAREA,
+                  TS.PROGRAM,
+                  TS.TESTER,
+                  TS.PROBE_CARD,
+                  DM.STEP_ID,
+                  DM.INSPECTION_EQ,
+                  TS.LOT_ID,
+                  TS.WAFER_ID,
+                  SM.X,
+                  SM.Y,
+                  DECODE(MAX (BN.HIGH_GEC), NULL , DECODE(MAX(SM.BIN), 1, 0, 1), 'N', 1, 0) AS BAD_DIE
+             FROM TQP_WAFER_SUM TS,
+                  TQD_INSP_INFO DM,
+                  TQD_DEFECT_DIE SM,
+                  TQP_BINDESC BN
+            WHERE     1 = 1
+                  AND TS.WAFER_SEQ = SM.TEST_WAFER_SEQ
+                  AND DM.STEP_SEQ = SM.DM_STEP_SEQ
+                  AND TS.TESTED_DIE > 0
+                  AND TS.PROBE_CNT = 0
+                  AND DM.TEST = 1
+                  AND TS.PROGRAM = BN.PROGRAM(+)
+                  AND SM.BIN = BN.BIN(+)
+         GROUP BY TS.WAFER_SEQ,
+                  DM.STEP_SEQ,
+                  TS.END_TIME,
+                  TS.CUSTOMER,
+                  TS.DEVICE_ALIAS,
+                  TS.PRODUCT,
+                  TS.TESTAREA,
+                  TS.PROGRAM,
+                  TS.TESTER,
+                  TS.PROBE_CARD,
+                  DM.STEP_ID,
+                  DM.INSPECTION_EQ,
+                  TS.LOT_ID,
+                  TS.WAFER_ID,
+                  SM.X,
+                  SM.Y)
+  SELECT DBH_DATE (A.TEST_TRAN_TIME, 'YYYY') AS YEAR,
+         DBH_DATE (A.TEST_TRAN_TIME, 'MM') AS MONTH,
+         DBH_DATE (A.TEST_TRAN_TIME, 'DD') AS DAY,
+         DBH_DATE (A.TEST_TRAN_TIME, 'WW') AS WEEK,
+         DBH_DATE (A.TEST_TRAN_TIME, 'YYYYMMDD') AS TRAN_DAY,
+         A.WAFER_SEQ,
+         A.STEP_SEQ,
+         A.LOT_ID,
+         A.WAFER_ID,
+         A.TEST_TRAN_TIME,
+         A.CUSTOMER,
+         A.DEVICE_ALIAS,
+         A.PRODUCT,
+         A.TESTAREA,
+         A.PROGRAM,
+         A.TESTER,
+         A.PROBE_CARD,
+         A.STEP_ID,
+         A.INSPECTION_EQ,
+         MAX (B.TESTED_DIE) AS TESTED_DIE,
+         COUNT (*) AS DEFECTIVE_DIE,
+         SUM (A.BAD_DIE) AS BAD_DIE_CNT,
+         ROUND (SUM (A.BAD_DIE) / COUNT (*) * 100, 2) AS KILL_RATIO,
+         MAX (C.NETDIE) AS NETDIE,
+         ROUND (MAX (B.TESTED_DIE) * (MAX (B.YIELD) / 100)) AS GOOD_CNT,
+           MAX (B.TESTED_DIE)
+         - ROUND (MAX (B.TESTED_DIE) * (MAX (B.YIELD) / 100))
+            AS BAD_CNT,
+         ROUND (
+              (  (  MAX (B.TESTED_DIE)
+                  - ROUND (MAX (B.TESTED_DIE) * (MAX (B.YIELD) / 100)))
+               / MAX (C.NETDIE))
+            * 100,
+            2)
+            AS LOSS_YIELD
+    FROM WT A, TQP_WAFER_SUM B, TQP_MAPDEF C
+    WHERE 1 = 1 AND A.WAFER_SEQ = B.WAFER_SEQ AND A.DEVICE_ALIAS = C.MAPID AND A.WAFER_SEQ = :wafer_seq
+GROUP BY A.WAFER_SEQ,
+         A.STEP_SEQ,
+         A.LOT_ID,
+         A.WAFER_ID,
+         A.TEST_TRAN_TIME,
+         A.CUSTOMER,
+         A.DEVICE_ALIAS,
+         A.PRODUCT,
+         A.TESTAREA,
+         A.PROGRAM,
+         A.TESTER,
+         A.PROBE_CARD,
+         A.STEP_ID,
+         A.INSPECTION_EQ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="wafer_seq">:wafer_seq</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_TQC_MATCH_SUM" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[DELETE FROM TQC_MATCH_SUM
+WHERE 1 = 1 
+AND WAFER_SEQ = :wafer_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="wafer_seq">:wafer_seq</param>
+        </parameters>
+    </query>
+</queryxml>

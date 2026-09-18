@@ -1,0 +1,81 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="BUMPFA" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Insert" queryid="CREATE_MERGE_RESULT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO T_TPS_MERGE_RESULT
+VALUES(
+:merge_seq
+, :lot_id
+, :wafer_list
+, ''
+, :testarea
+, 0
+, TO_DATE(:start_time,'YYYY-MM-DD HH24:MI:SS')
+, TO_DATE(:end_time,'YYYY-MM-DD HH24:MI:SS')
+, :success
+, ''
+, '')]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:merge_seq</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="1">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="2">:wafer_list</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="4">:testarea</param>
+            <param direction="Input" dbtype="VarChar" size="19" value="201312301231">:start_time</param>
+            <param direction="Input" dbtype="VarChar" size="19" value="201312301231">:end_time</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="RUN">:success</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_MERGE_RESULT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM T_TPS_MERGE_RESULT
+WHERE LOT_ID = :lot_id
+AND WAFER_LIST = :wafer_list
+AND TESTAREA = :testarea
+AND MERGE_CNT = 0]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="0">:wafer_list</param>
+            <param direction="Input" dbtype="VarChar" size="40">:testarea</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_MERGE_CNT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE T_TPS_MERGE_RESULT 
+SET MERGE_CNT = MERGE_CNT + 1 
+WHERE LOT_ID = :lot_id
+AND  WAFER_LIST = :wafer_list
+AND TESTAREA = :testarea
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="0">:wafer_list</param>
+            <param direction="Input" dbtype="VarChar" size="0">:testarea</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_MERGE_RESULT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE T_TPS_MERGE_RESULT 
+SET END_TIME = TO_DATE(:end_time,'YYYY-MM-DD HH24:MI:SS')
+, SUCCESS = :success
+, FAIL_WAFER = :fail_wafer
+, FAIL_MESSAGE = :fail_message
+WHERE MERGE_SEQ = :merge_seq 
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="14">:end_time</param>
+            <param direction="Input" dbtype="VarChar" size="40">:success</param>
+            <param direction="Input" dbtype="VarChar" size="40">:fail_wafer</param>
+            <param direction="Input" dbtype="VarChar" size="400">:fail_message</param>
+            <param direction="Input" dbtype="Number" size="9">:merge_seq</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_MERGE_PRODUCT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE T_TPS_MERGE_RESULT 
+SET PRODUCT = :product
+WHERE MERGE_SEQ = :merge_seq 
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:product</param>
+            <param direction="Input" dbtype="Number" size="9">:merge_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_NEXT_MERGE_SEQ" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT MERGE_SEQ.NEXTVAL MERGE_SEQ FROM DUAL ]]></commandtext>
+    </query>
+</queryxml>

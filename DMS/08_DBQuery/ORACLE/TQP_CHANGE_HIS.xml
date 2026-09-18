@@ -1,0 +1,73 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="TPSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Insert" queryid="INSERT_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-09-07 16:05:24
+INSERT INTO TQP_CHANGE_HIS (
+    TRAN_KEY,
+    FACTORY,
+    TESTAREA,
+    PRODUCT,
+    PROGRAM,
+    LOT_ID,
+    WAFER_ID,
+    TRAN_USER,
+    TRAN_USER_IP,
+    TRAN_CATEGORY,
+    TRAN_TYPE,
+    TRAN_COUNT,
+    PREV_VALUE,
+    CURR_VALUE,
+    USER_COMMENT
+) VALUES (
+    TO_CHAR(SYSTIMESTAMP, 'YYYYMMDDHH24MISSFF'),
+    :FACTORY,
+    :TESTAREA,
+    :PRODUCT,
+    :PROGRAM,
+    :LOT_ID,
+    :WAFER_ID,
+    :TRAN_USER,
+    :TRAN_USER_IP,
+    :TRAN_CATEGORY,
+    :TRAN_TYPE,
+    :TRAN_COUNT,
+    :PREV_VALUE,
+    :CURR_VALUE,
+    :USER_COMMENT
+)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="0" value="FAB1">:FACTORY</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="PARAMETRIC">:TESTAREA</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="PR01">:PRODUCT</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="PROG001">:PROGRAM</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="LOT001">:LOT_ID</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="LOT001-02">:WAFER_ID</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="ADMIN">:TRAN_USER</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="10.10.10.1">:TRAN_USER_IP</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="RAWDATA">:TRAN_CATEGORY</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="UPDATE">:TRAN_TYPE</param>
+            <param direction="Input" dbtype="Decimal" size="0" value="5">:TRAN_COUNT</param>
+            <param direction="Input" dbtype="VarChar2" size="0">:PREV_VALUE</param>
+            <param direction="Input" dbtype="VarChar2" size="0">:CURR_VALUE</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="설비 오류로 데이터 잘못됨">:USER_COMMENT</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-09-07 16:08:54
+SELECT
+    TO_CHAR(TO_DATE(SUBSTR(TRAN_KEY,1,14),'YYYYMMDDHH24MISS'),'YYYY-MM-DD HH24:MI:SS') TRAN_TIME,
+    FACTORY, TESTAREA, PRODUCT, PROGRAM, LOT_ID, WAFER_ID,
+    TRAN_USER "USER ID", TRAN_USER_IP "IP ADDRESS", TRAN_CATEGORY "CATEOGRY",
+    TRAN_TYPE "TYPE", TRAN_COUNT "COUNT", PREV_VALUE "PREV", CURR_VALUE "CURR", USER_COMMENT "COMMENT"
+FROM TQP_CHANGE_HIS
+WHERE FACTORY = :FACTORY AND TESTAREA = :TESTAREA
+AND TRAN_KEY >= :FROM_DATE AND TRAN_KEY <= :TO_DATE
+ORDER BY TRAN_KEY DESC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="FAB1">:FACTORY</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="PARAMETRIC">:TESTAREA</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="20190901">:FROM_DATE</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="20190910">:TO_DATE</param>
+        </parameters>
+    </query>
+</queryxml>

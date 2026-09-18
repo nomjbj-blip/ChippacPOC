@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="QMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Insert" queryid="INSERT_SEC_GROUP_HIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2014-01-28 13:48:49
+INSERT INTO TQC_SECURITY_GROUP_HISTORY(SEC_GRP_SEQ, SEC_GRP_ID, SEC_GRP_DESC, REMARK, TRAN_TIME, USER_CMF_1, USER_CMF_2, USER_CMF_3, USER_CMF_4, USER_CMF_5) VALUES(SEC_GRP_SEQ.NEXTVAL, :strSecGrpId, :strSecGrpDesc, :strRemark, :strTrantime,:strUserCmf1, :strUserCmf2, :strUserCmf3, :strUserCmf4, :strUserCmf5)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:strSecGrpId</param>
+            <param direction="Input" dbtype="VarChar" size="40">:strSecGrpDesc</param>
+            <param direction="Input" dbtype="VarChar" size="40">:strRemark</param>
+            <param direction="Input" dbtype="VarChar" size="40">:strTrantime</param>
+            <param direction="Input" dbtype="VarChar" size="40">:strUserCmf1</param>
+            <param direction="Input" dbtype="VarChar" size="40">:strUserCmf2</param>
+            <param direction="Input" dbtype="VarChar" size="40">:strUserCmf3</param>
+            <param direction="Input" dbtype="VarChar" size="40">:strUserCmf4</param>
+            <param direction="Input" dbtype="VarChar" size="40">:strUserCmf5</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_SEC_GROUP_HIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2014-01-28 13:53:44
+SELECT USER_CMF_1 AS STATUS ,SEC_GRP_SEQ, SEC_GRP_ID, SEC_GRP_DESC, REMARK, TRAN_TIME FROM TQC_SECURITY_GROUP_HISTORY
+WHERE 1=1
+AND TRAN_TIME BETWEEN TO_TIMESTAMP(:st_time,'YYYY-MM-DD HH24:MI:SS.FF')
+                    AND TO_TIMESTAMP(:end_time,'YYYY-MM-DD HH24:MI:SS.FF')
+ORDER BY TRAN_TIME DESC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:st_time</param>
+            <param direction="Input" dbtype="VarChar" size="40">:end_time</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_SEC_GROUP_HIST_BYUSER" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2014-01-28 13:58:19
+SELECT USER_CMF_1 AS STATUS ,SEC_GRP_SEQ, SEC_GRP_ID, SEC_GRP_DESC, REMARK, TRAN_TIME FROM TQC_SECURITY_GROUP_HISTORY
+WHERE 1=1
+AND TRAN_TIME BETWEEN TO_TIMESTAMP(:st_time,'YYYY-MM-DD HH24:MI:SS.FF')
+                    AND TO_TIMESTAMP(:end_time,'YYYY-MM-DD HH24:MI:SS.FF')
+AND SEC_GRP_DESC = :strSecGrpName                  
+ORDER BY TRAN_TIME DESC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:st_time</param>
+            <param direction="Input" dbtype="VarChar" size="40">:end_time</param>
+            <param direction="Input" dbtype="VarChar" size="40">:strSecGrpName</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_DELTE_GROUP_LIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2014-01-28 13:58:47
+SELECT USER_CMF_1 AS STATUS ,SEC_GRP_SEQ, SEC_GRP_ID, SEC_GRP_DESC, REMARK, TRAN_TIME FROM TQC_SECURITY_GROUP_HISTORY
+WHERE 1=1
+AND TRAN_TIME BETWEEN TO_TIMESTAMP(:st_time,'YYYY-MM-DD HH24:MI:SS.FF')
+                    AND TO_TIMESTAMP(:end_time,'YYYY-MM-DD HH24:MI:SS.FF')
+AND USER_CMF_1 = 'Delete'                    
+ORDER BY TRAN_TIME DESC, SEC_GRP_ID ASC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:st_time</param>
+            <param direction="Input" dbtype="VarChar" size="40">:end_time</param>
+        </parameters>
+    </query>
+</queryxml>

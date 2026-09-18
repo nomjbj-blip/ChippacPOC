@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="DACrux.Data.Parser.ParserBase" Collapsed="true">
+    <Position X="1.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>UAAAgAAgAAAAAQAAhAIAjAAQEAEGAAQAAgAAAADAABA=</HashCode>
+      <FileName>ParserBase.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DACrux.Data.Parser.Klarf.ParserKlarf" Collapsed="true">
+    <Position X="1.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>oIJAAAAAMAADiAAAAIACCAAA0QSkKCB2JQyAWAAAAAA=</HashCode>
+      <FileName>ParserKlarf.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="DACrux.Data.Parser.Klarf.WaferList" Collapsed="true">
+    <Position X="5.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ParserKlarf.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DACrux.Data.Parser.Klarf.Wafer" Collapsed="true">
+    <Position X="5.5" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAgAAAAAEEAAAQAGAACAAAAAAAABAAAAkAAABAAAgA=</HashCode>
+      <FileName>ParserKlarf.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DACrux.Data.Parser.Klarf.SummaryList" Collapsed="true">
+    <Position X="7.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ParserKlarf.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DACrux.Data.Parser.Klarf.Summary" Collapsed="true">
+    <Position X="7.5" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgAAIgCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIABA=</HashCode>
+      <FileName>ParserKlarf.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="DACrux.Data.Parser.Klarf.TestParameterSpecList" Collapsed="true">
+    <Position X="9.75" Y="0.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>ParserKlarf.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DACrux.Data.Parser.Klarf.TestParameterSpec" Collapsed="true">
+    <Position X="9.75" Y="1.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAIAAAAAAABA=</HashCode>
+      <FileName>ParserKlarf.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="DACrux.Data.Parser.Klarf.InspectionTestList" Collapsed="true">
+    <Position X="7.75" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAABA=</HashCode>
+      <FileName>ParserKlarf.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="DACrux.Data.Parser.Klarf.InspectionTest" Collapsed="true">
+    <Position X="7.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gACABAAAAAAAAAAAAAAAAABAIAQAAAAAAAAAAAAAABA=</HashCode>
+      <FileName>ParserKlarf.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Enum Name="DACrux.Data.Parser.Klarf.InspectionStationValueOrder" Collapsed="true">
+    <Position X="1.75" Y="4.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAgAAAAAAAAAAAAAAAAgAAAAAAAAAAAAA=</HashCode>
+      <FileName>ParserKlarf.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="DACrux.Data.Parser.Klarf.DataType" Collapsed="true">
+    <Position X="1.75" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAEAAAACAAAQBAAAAAAgAICgAQBAQAAAAAAACA=</HashCode>
+      <FileName>ParserKlarf.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="맑은 고딕" Size="9" />
+</ClassDiagram>

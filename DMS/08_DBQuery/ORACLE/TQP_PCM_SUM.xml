@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="BUMPFA" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Select" queryid="GET_RAW_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM T_PCM_?? WHERE WAFER_SEQ IN (??)
+ORDER BY WAFER_SEQ,DIEID]]></commandtext>
+    </query>
+</queryxml>

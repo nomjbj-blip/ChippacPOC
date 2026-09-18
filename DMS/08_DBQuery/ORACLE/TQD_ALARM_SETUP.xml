@@ -1,0 +1,157 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Select" queryid="SELECT_CONFIG_CODE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT NAME CODE, NAME VALUE
+FROM TQC_CONFIG
+WHERE CATEGORY = :CATEGORY]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0" value="CATEGORY">:CATEGORY</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="EXISTS_CONFIG_CODE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT COUNT(*)
+FROM TQC_CONFIG
+WHERE CATEGORY = :CATEGORY
+AND NAME = :NAME]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0" value="CATEGORY">:CATEGORY</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="NAME">:NAME</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="INSERT_CONFIG_CODE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQC_CONFIG
+VALUES (
+    :CATEGORY,
+    :NAME,
+    :NAME,
+    'STRING',
+    NULL
+)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0" value="CATEGORY">:CATEGORY</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="NAME">:NAME</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_CONFIG_CODE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[DELETE FROM TQC_CONFIG
+WHERE CATEGORY = :CATEGORY
+AND NAME = :NAME]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0" value="CATEGORY">:CATEGORY</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="NAME">:NAME</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="INSERT_ALARM_SETUP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO
+    TQD_ALARM_SETUP
+VALUES (
+    :FACTORY,
+    :DEFECT_TYPE,
+    :PRODUCT,
+    :STEP_ID,
+    :EQUIP_ID,
+    :LOWER,
+    :TARGET,
+    :UPPER,
+    :USE_FLAG,
+    :CREATE_USER,
+    SYSDATE
+)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0" value="FACTORY">:FACTORY</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="DEFECT_TYPE">:DEFECT_TYPE</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="PRODUCT">:PRODUCT</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="STEP_ID">:STEP_ID</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="EQUIP_ID">:EQUIP_ID</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="LOWER">:LOWER</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="TARGET">:TARGET</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="UPPER">:UPPER</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="USE_FLAG">:USE_FLAG</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="CREATE_USER">:CREATE_USER</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ALARM_SETUP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT 
+    :FACTORY FACTORY,
+    :DEFECT_TYPE DEFECT_TYPE,
+    :PRODUCT PRODUCT,
+    :STEP_ID STEP_ID,
+    A.EQUIP_ID,
+    LOWER,
+    TARGET,
+    UPPER,
+    CASE WHEN USE_FLAG IS NULL THEN 1 WHEN USE_FLAG = 'Y' THEN 1 ELSE 0 END USE_FLAG,
+    (SELECT USER_NAME FROM TQC_USER WHERE USER_ID = CREATE_USER) CREATE_USER,
+    TO_CHAR(B.CREATE_TIME,'YYYY-MM-DD HH24:MI:SS') CREATE_TIME
+FROM TQC_EQUIP A, (
+    SELECT *
+    FROM TQD_ALARM_SETUP
+    WHERE FACTORY = :FACTORY
+    AND DEFECT_TYPE = :DEFECT_TYPE
+    AND PRODUCT = :PRODUCT
+    AND STEP_ID = :STEP_ID
+) B
+WHERE A.FACTORY = B.FACTORY(+)
+    AND A.EQUIP_ID = B.EQUIP_ID(+)
+    AND A.OPER = 'Inspection'
+ORDER BY A.EQUIP_ID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0" value="FACTORY">:FACTORY</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="DEFECT_TYPE">:DEFECT_TYPE</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="PRODUCT">:PRODUCT</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="STEP_ID">:STEP_ID</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_ALARM_SETUP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[DELETE FROM TQD_ALARM_SETUP
+WHERE FACTORY = :FACTORY
+AND DEFECT_TYPE = :DEFECT_TYPE
+AND PRODUCT = :PRODUCT
+AND STEP_ID = :STEP_ID
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0" value="FACTORY">:FACTORY</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="DEFECT_TYPE">:DEFECT_TYPE</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="PRODUCT">:PRODUCT</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="STEP_ID">:STEP_ID</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_LIMIT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT
+FROM TQD_ALARM_SETUP
+WHERE FACTORY = :FACTORY
+AND PRODUCT = :PRODUCT
+AND STEP_ID = :STEP_ID
+AND EQUIP_ID = :EQUIP_ID
+AND USE_FLAG = 'Y'
+AND (LOWER IS NOT NULL OR UPPER IS NOT NULL)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="FACTORY">:FACTORY</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="PRODUCT">:PRODUCT</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="STEP_ID">:STEP_ID</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="EQUIP_ID">:EQUIP_ID</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ALARM_SETUP_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT LOWER, TARGET, UPPER
+FROM TQD_ALARM_SETUP
+WHERE FACTORY = :FACTORY
+AND DEFECT_TYPE = :DEFECT_TYPE
+AND PRODUCT = :PRODUCT
+AND STEP_ID = :STEP_ID
+AND EQUIP_ID = :EQUIP_ID
+AND USE_FLAG = 'Y']]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0" value="FACTORY">:FACTORY</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="DEFECT_TYPE">:DEFECT_TYPE</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="PRODUCT">:PRODUCT</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="STEP_ID">:STEP_ID</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="EQUIP_ID">:EQUIP_ID</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_EQUIP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT EQUIP_ID CODE, EQUIP_ID VALUE
+FROM TQC_EQUIP
+WHERE OPER = 'Inspection']]></commandtext>
+    </query>
+</queryxml>

@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Select" queryid="GET_INTERLOCK_SPEC" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQD_INTERLOCK_SPEC
+WHERE PRODUCT = :product
+AND STEP_ID = :step_id
+AND MAIN_EQ =:main_eq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:product</param>
+            <param direction="Input" dbtype="VarChar" size="0">:stepid</param>
+            <param direction="Input" dbtype="VarChar" size="0">:main_eq</param>
+        </parameters>
+    </query>
+</queryxml>

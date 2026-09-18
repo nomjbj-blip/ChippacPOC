@@ -1,0 +1,333 @@
+﻿<!DOCTYPE html>
+<!-- saved from url=(0014)about:internet -->
+ <html xmlns:msxsl="urn:schemas-microsoft-com:xslt"><head><meta content="en-us" http-equiv="Content-Language" /><meta content="text/html; charset=utf-16" http-equiv="Content-Type" /><title _locID="ConversionReport0">
+          마이그레이션 보고서
+        </title><style> 
+                    /* Body style, for the entire document */
+                    body
+                    {
+                        background: #F3F3F4;
+                        color: #1E1E1F;
+                        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+                        padding: 0;
+                        margin: 0;
+                    }
+
+                    /* Header1 style, used for the main title */
+                    h1
+                    {
+                        padding: 10px 0px 10px 10px;
+                        font-size: 21pt;
+                        background-color: #E2E2E2;
+                        border-bottom: 1px #C1C1C2 solid; 
+                        color: #201F20;
+                        margin: 0;
+                        font-weight: normal;
+                    }
+
+                    /* Header2 style, used for "Overview" and other sections */
+                    h2
+                    {
+                        font-size: 18pt;
+                        font-weight: normal;
+                        padding: 15px 0 5px 0;
+                        margin: 0;
+                    }
+
+                    /* Header3 style, used for sub-sections, such as project name */
+                    h3
+                    {
+                        font-weight: normal;
+                        font-size: 15pt;
+                        margin: 0;
+                        padding: 15px 0 5px 0;
+                        background-color: transparent;
+                    }
+
+                    /* Color all hyperlinks one color */
+                    a
+                    {
+                        color: #1382CE;
+                    }
+
+                    /* Table styles */ 
+                    table
+                    {
+                        border-spacing: 0 0;
+                        border-collapse: collapse;
+                        font-size: 10pt;
+                    }
+
+                    table th
+                    {
+                        background: #E7E7E8;
+                        text-align: left;
+                        text-decoration: none;
+                        font-weight: normal;
+                        padding: 3px 6px 3px 6px;
+                    }
+
+                    table td
+                    {
+                        vertical-align: top;
+                        padding: 3px 6px 5px 5px;
+                        margin: 0px;
+                        border: 1px solid #E7E7E8;
+                        background: #F7F7F8;
+                    }
+
+                    /* Local link is a style for hyperlinks that link to file:/// content, there are lots so color them as 'normal' text until the user mouse overs */
+                    .localLink
+                    {
+                        color: #1E1E1F;
+                        background: #EEEEED;
+                        text-decoration: none;
+                    }
+
+                    .localLink:hover
+                    {
+                        color: #1382CE;
+                        background: #FFFF99;
+                        text-decoration: none;
+                    }
+
+                    /* Center text, used in the over views cells that contain message level counts */ 
+                    .textCentered
+                    {
+                        text-align: center;
+                    }
+
+                    /* The message cells in message tables should take up all avaliable space */
+                    .messageCell
+                    {
+                        width: 100%;
+                    }
+
+                    /* Padding around the content after the h1 */ 
+                    #content 
+                    {
+	                    padding: 0px 12px 12px 12px; 
+                    }
+
+                    /* The overview table expands to width, with a max width of 97% */ 
+                    #overview table
+                    {
+                        width: auto;
+                        max-width: 75%; 
+                    }
+
+                    /* The messages tables are always 97% width */
+                    #messages table
+                    {
+                        width: 97%;
+                    }
+
+                    /* All Icons */
+                    .IconSuccessEncoded, .IconInfoEncoded, .IconWarningEncoded, .IconErrorEncoded
+                    {
+                        min-width:18px;
+                        min-height:18px; 
+                        background-repeat:no-repeat;
+                        background-position:center;
+                    }
+
+                    /* Success icon encoded */
+                    .IconSuccessEncoded
+                    {
+                        /* Note: Do not delete the comment below. It is used to verify the correctness of the encoded image resource below before the product is released */
+                        /* [---XsltValidateInternal-Base64EncodedImage:IconSuccess#Begin#background-image: url(data:image/png;base64,#Separator#);#End#] */
+                        background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAA7EAAAOxAGVKw4bAAABcElEQVR4Xq2TsUsCURzHv15g8ZJcBWlyiYYgCIWcb9DFRRwMW5TA2c0/QEFwFkxxUQdxVlBwCYWOi6IhWgQhBLHJUCkhLr/BW8S7gvrAg+N+v8/v+x68Z8MGy+XSCyABQAXgBgHGALoASkIIDWSLeLBetdHryMjd5IxQPWT4rn1c/P7+xxp72Cs9m5SZ0Bq2vPnbPFafK2zDvmNHypdC0BPkLlQhxJsCAhQoZwdZU5mwxh720qGo8MzTxTTKZDPCx2HoVzp6lz0Q9tKhyx0kGs8Ny+TkWRKk8lCROwEduhyg9l/6lunOPSfmH3NUH6uQ0KHLAe7JYvJjevm+DAMGJHToKtigE+vwvIidxLamb8IBY9e+C5LiXREkfho3TSd06HJA13/oh6T51MTsfQbHrsMynQ5dDihFjiK8JJAU9AKIWTp76dCVN7HWHrajmUEGvyF9nkbAE6gLIS7kTUyuf2gscLoJrElZo/Mvj+nPz/kLTmfnEwP3tB0AAAAASUVORK5CYII=);
+                    }
+
+                    /* Information icon encoded */
+                    .IconInfoEncoded
+                    {
+                        /* Note: Do not delete the comment below. It is used to verify the correctness of the encoded image resource below before the product is released */
+                        /* [---XsltValidateInternal-Base64EncodedImage:IconInformation#Begin#background-image: url(data:image/png;base64,#Separator#);#End#] */
+                        background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABHElEQVR4Xs2TsUoDQRRF7wwoziokjZUKadInhdhukR9YP8DMX1hYW+QvdsXa/QHBbcXC7W0CamWTQnclFutceIQJwwaWNLlwm5k5d94M76mmaeCrrmsLYOocY12FcxZFUeozCqKqqgYA8uevv1H6VuPxcwlfk5N92KHBxfFeCSAxxswlYAW/Xr989x/mv9gkhtyMDhcAxgzRsp7flj8B/HF1RsMXq+NZMkopaHe7lbKxQUEIGbKsYNoGn969060hZBkQex/W8oRQwsQaW2o3Ago2SVcJUzAgY3N0lTCZZm+zPS8HB51gMmS1DEYyOz9acKO1D8JWTlafKIMxdhvlfdyT94Vv5h7P8Ky7nQzACmhvKq3zk3PjW9asz9D/1oigecsioooAAAAASUVORK5CYII=);
+                    }
+
+                    /* Warning icon encoded */
+                    .IconWarningEncoded
+                    {
+                        /* Note: Do not delete the comment below. It is used to verify the correctness of the encoded image resource below before the product is released */
+                        /* [---XsltValidateInternal-Base64EncodedImage:IconWarning#Begin#background-image: url(data:image/png;base64,#Separator#);#End#] */
+                        background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAx0lEQVR4XpWSMQ7CMAxFf4xAyBMLCxMrO8dhaBcuwdCJS3RJBw7SA/QGTCxdWJgiQYWKXJWKIXHIlyw5lqr34tQgEOdcBsCOx5yZK3hCCKdYXneQkh4pEfqzLfu+wVDSyyzFoJjfz9NB+pAF+eizx2Vruts0k15mPgvS6GYvpVtQhB61IB/dk6AF6fS4Ben0uIX5odtFe8Q/eW1KvFeH4e8khT6+gm5B+t3juyDt7n0jpe+CANTd+oTUjN/U3yVaABnSUjFz/gFq44JaVSCXeQAAAABJRU5ErkJggg==);
+                    }
+
+                    /* Error icon encoded */
+                    .IconErrorEncoded
+                    {
+                        /* Note: Do not delete the comment below. It is used to verify the correctness of the encoded image resource below before the product is released */
+                        /* [---XsltValidateInternal-Base64EncodedImage:IconError#Begin#background-image: url(data:image/png;base64,#Separator#);#End#] */
+                        background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABQElEQVR4XqWTvUoEQRCE6wYPZUA80AfwAQz23uCMjA7MDRQEIzPBVEyNTQUFIw00vcQTTMzuAh/AxEQQT8HF/3G/oGGnEUGuoNnd6qoZuqltyKEsyzVJq5I6rnUp6SjGeGhESikzzlc1eL7opfuVbrqbU1Zw9NCgtQMaZpY0eNnaaL2fHusvTK5vKu7sjSS1Y4y3QUA6K3e3Mau5UFDyMP7tYF9o8cAHZv68vipoIJg971PZIZ5HiwdvYGGvFVFHmGmZ2MxwmQYPXubPl9Up0tfoMQGetXd6mRbvhBw+boZ6WF7Mbv1+GsHRk0fQmPAH1GfmZirbCfDJ61tw3Px8/8pZsPAG4jlVhcPgZ7adwNWBB68lkRQWFiTgFlbnLY3DGGM7izIJIyT/jjIvEJw6fdJTc6krDzh6aMwMP9bvDH4ADSsa9uSWVJkAAAAASUVORK5CYII=);
+                    }
+                 </style><script type="text/javascript" language="javascript"> 
+          
+            // Startup 
+            // Hook up the the loaded event for the document/window, to linkify the document content
+            var startupFunction = function() { linkifyElement("messages"); };
+            
+            if(window.attachEvent)
+            {
+              window.attachEvent('onload', startupFunction);
+            }
+            else if (window.addEventListener) 
+            {
+              window.addEventListener('load', startupFunction, false);
+            }
+            else 
+            {
+              document.addEventListener('load', startupFunction, false);
+            } 
+            
+            // Toggles the visibility of table rows with the specified name 
+            function toggleTableRowsByName(name)
+            {
+               var allRows = document.getElementsByTagName('tr');
+               for (i=0; i < allRows.length; i++)
+               {
+                  var currentName = allRows[i].getAttribute('name');
+                  if(!!currentName && currentName.indexOf(name) == 0)
+                  {
+                      var isVisible = allRows[i].style.display == ''; 
+                      isVisible ? allRows[i].style.display = 'none' : allRows[i].style.display = '';
+                  }
+               }
+            }
+            
+            function scrollToFirstVisibleRow(name) 
+            {
+               var allRows = document.getElementsByTagName('tr');
+               for (i=0; i < allRows.length; i++)
+               {
+                  var currentName = allRows[i].getAttribute('name');
+                  var isVisible = allRows[i].style.display == ''; 
+                  if(!!currentName && currentName.indexOf(name) == 0 && isVisible)
+                  {
+                     allRows[i].scrollIntoView(true); 
+                     return true; 
+                  }
+               }
+               
+               return false;
+            }
+            
+            // Linkifies the specified text content, replaces candidate links with html links 
+            function linkify(text)
+            {
+                 if(!text || 0 === text.length)
+                 {
+                     return text; 
+                 }
+
+                 // Find http, https and ftp links and replace them with hyper links 
+                 var urlLink = /(http|https|ftp)\:\/\/[a-zA-Z0-9\-\.]+(:[a-zA-Z0-9]*)?\/?([a-zA-Z0-9\-\._\?\,\/\\\+&%\$#\=~;\{\}])*/gi;
+                 
+                 return text.replace(urlLink, '<a href="$&">$&</a>') ;
+            }
+            
+            // Linkifies the specified element by ID
+            function linkifyElement(id)
+            {
+                var element = document.getElementById(id);
+                if(!!element)
+                {
+                  element.innerHTML = linkify(element.innerHTML); 
+                }
+            }
+            
+            function ToggleMessageVisibility(projectName)
+            {
+              if(!projectName || 0 === projectName.length)
+              {
+                return; 
+              }
+              
+              toggleTableRowsByName("MessageRowClass" + projectName);
+              toggleTableRowsByName('MessageRowHeaderShow' + projectName);
+              toggleTableRowsByName('MessageRowHeaderHide' + projectName); 
+            }
+            
+            function ScrollToFirstVisibleMessage(projectName)
+            {
+              if(!projectName || 0 === projectName.length)
+              {
+                return; 
+              }
+              
+              // First try the 'Show messages' row
+              if(!scrollToFirstVisibleRow('MessageRowHeaderShow' + projectName))
+              {
+                // Failed to find a visible row for 'Show messages', try an actual message row 
+                scrollToFirstVisibleRow('MessageRowClass' + projectName); 
+              }
+            }
+           </script></head><body><h1 _locID="ConversionReport">
+          마이그레이션 보고서 - </h1><div id="content"><h2 _locID="OverviewTitle">개요</h2><div id="overview"><table><tr><th></th><th _locID="ProjectTableHeader">프로젝트</th><th _locID="PathTableHeader">경로</th><th _locID="ErrorsTableHeader">오류</th><th _locID="WarningsTableHeader">경고</th><th _locID="MessagesTableHeader">메시지</th></tr><tr><td class="IconErrorEncoded" /><td><strong><a href="#DACrux">DACrux</a></strong></td><td>DACrux\DACrux.vdproj</td><td class="textCentered"><a href="#DACruxError">1</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#00_Framework">00_Framework</a></strong></td><td>00_Framework</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#01_WinApp">01_WinApp</a></strong></td><td>01_WinApp</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#02_DMS">02_DMS</a></strong></td><td>02_DMS</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#03_Core">03_Core</a></strong></td><td>03_Core</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#03_STAT">03_STAT</a></strong></td><td>03_STAT</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#04_TEST">04_TEST</a></strong></td><td>04_TEST</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#05_RPNet">05_RPNet</a></strong></td><td>05_RPNet</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#DACrux.Base">DACrux.Base</a></strong></td><td>..\..\06_CoreLibSource\DACrux.Base\DACrux.Base.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#DACrux.Common.BSL">DACrux.Common.BSL</a></strong></td><td>..\..\06_CoreLibSource\DACrux.Common.BSL\DACrux.Common.BSL.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#DACrux.Common.DSL">DACrux.Common.DSL</a></strong></td><td>..\..\06_CoreLibSource\DACrux.Common.DSL\DACrux.Common.DSL.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#DACrux.Common.Interface">DACrux.Common.Interface</a></strong></td><td>..\..\06_CoreLibSource\DACrux.Common.Interface\DACrux.Common.Interface.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#DACrux.Common.RO">DACrux.Common.RO</a></strong></td><td>..\..\06_CoreLibSource\DACrux.Common.RO\DACrux.Common.RO.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#DACrux.Common.Setup">DACrux.Common.Setup</a></strong></td><td>..\..\06_CoreLibSource\DACrux.Common.Setup\DACrux.Common.Setup.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#DACrux.Common.VideoCapture">DACrux.Common.VideoCapture</a></strong></td><td>..\..\06_CoreLibSource\DACrux.Common.VideoCapture\DACrux.Common.VideoCapture.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#DACrux.Data.Handler">DACrux.Data.Handler</a></strong></td><td>..\..\06_CoreLibSource\DACrux.Data.Handler\DACrux.Data.Handler.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#DACrux.Data.Parser">DACrux.Data.Parser</a></strong></td><td>..\..\06_CoreLibSource\DACrux.Data.Parser\DACrux.Data.Parser.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#DACrux.FPDMap">DACrux.FPDMap</a></strong></td><td>..\..\06_CoreLibSource\DACrux.FPDMap\DACrux.FPDMap.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#DACrux.Framework">DACrux.Framework</a></strong></td><td>..\..\06_CoreLibSource\DACrux.Framework\DACrux.Framework.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#DACrux.Framework.Base">DACrux.Framework.Base</a></strong></td><td>..\..\06_CoreLibSource\DACrux.Framework.Base\DACrux.Framework.Base.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#DACrux.Framework.BSL">DACrux.Framework.BSL</a></strong></td><td>..\..\06_CoreLibSource\DACrux.Framework.BSL\DACrux.Framework.BSL.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#DACrux.Framework.Controls">DACrux.Framework.Controls</a></strong></td><td>..\..\06_CoreLibSource\DACrux.Framework.Controls\DACrux.Framework.Controls.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#DACrux.Framework.DSL">DACrux.Framework.DSL</a></strong></td><td>..\..\06_CoreLibSource\DACrux.Framework.DSL\DACrux.Framework.DSL.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#DACrux.Framework.Interface">DACrux.Framework.Interface</a></strong></td><td>..\..\06_CoreLibSource\DACrux.Framework.Interface\DACrux.Framework.Interface.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#DACrux.Framework.RO">DACrux.Framework.RO</a></strong></td><td>..\..\06_CoreLibSource\DACrux.Framework.RO\DACrux.Framework.RO.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#DACrux.Framework.Server">DACrux.Framework.Server</a></strong></td><td>..\..\06_CoreLibSource\DACrux.Framework.Server\DACrux.Framework.Server.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#DACrux.Framework.Service">DACrux.Framework.Service</a></strong></td><td>..\..\06_CoreLibSource\DACrux.Framework.Service\DACrux.Framework.Service.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#DACrux.Map">DACrux.Map</a></strong></td><td>..\..\06_CoreLibSource\DACrux.Map\DACrux.Map.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#DACrux.Map.WaferChart">DACrux.Map.WaferChart</a></strong></td><td>..\..\06_CoreLibSource\DACrux.Map.WaferChart\DACrux.Map.WaferChart.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#DACrux.ProjectManager">DACrux.ProjectManager</a></strong></td><td>..\..\03_STAT\DACrux.ProjectManager\DACrux.ProjectManager.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#DACrux.ProjectManager.UI">DACrux.ProjectManager.UI</a></strong></td><td>..\..\03_STAT\DACrux.ProjectManager.UI\DACrux.ProjectManager.UI.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#DACrux.RPNet.BSL">DACrux.RPNet.BSL</a></strong></td><td>..\..\09_TEST\DACrux.RPNet.BSL\DACrux.RPNet.BSL.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#DACrux.RPNet.DSL">DACrux.RPNet.DSL</a></strong></td><td>..\..\09_TEST\DACrux.RPNet.DSL\DACrux.RPNet.DSL.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#DACrux.RPNet.Service">DACrux.RPNet.Service</a></strong></td><td>..\..\09_TEST\DACrux.RPNet.Service\DACrux.RPNet.Service.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#DACrux.SEMDMS.BSL">DACrux.SEMDMS.BSL</a></strong></td><td>..\..\02_DMS\DACrux.SEMDMS.BSL\DACrux.SEMDMS.BSL.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#DACrux.SEMDMS.Control">DACrux.SEMDMS.Control</a></strong></td><td>..\..\02_DMS\DACrux.SEMDMS.Control\DACrux.SEMDMS.Control.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#DACrux.SEMDMS.DSL">DACrux.SEMDMS.DSL</a></strong></td><td>..\..\02_DMS\DACrux.SEMDMS.DSL\DACrux.SEMDMS.DSL.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#DACrux.SEMDMS.ENGUI">DACrux.SEMDMS.ENGUI</a></strong></td><td>..\..\02_DMS\DACrux.SEMDMS.ENGUI\DACrux.SEMDMS.ENGUI.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#DACrux.SEMDMS.Inspection.DataService">DACrux.SEMDMS.Inspection.DataService</a></strong></td><td>..\..\02_DMS\DACrux.SEMDMS.Inspection.DataService\DACrux.SEMDMS.Inspection.DataService.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#DACrux.SEMDMS.Inspection.PreConvertingService">DACrux.SEMDMS.Inspection.PreConvertingService</a></strong></td><td>..\..\02_DMS\DACrux.SEMDMS.Inspection.PreConvertingService\DACrux.SEMDMS.Inspection.PreConvertingService.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#DACrux.SEMDMS.Interface">DACrux.SEMDMS.Interface</a></strong></td><td>..\..\02_DMS\DACrux.SEMDMS.Interface\DACrux.SEMDMS.Interface.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#DACrux.SEMDMS.Review.DataService">DACrux.SEMDMS.Review.DataService</a></strong></td><td>..\..\02_DMS\DACrux.SEMDMS.Review.DataService\DACrux.SEMDMS.Review.DataService.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#DACrux.SEMDMS.RO">DACrux.SEMDMS.RO</a></strong></td><td>..\..\02_DMS\DACrux.SEMDMS.RO\DACrux.SEMDMS.RO.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#DACrux.SEMDMS.Service">DACrux.SEMDMS.Service</a></strong></td><td>..\..\02_DMS\DACrux.SEMDMS.Service\DACrux.SEMDMS.Service.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#DACrux.SEMDMS.TFF2KLA">DACrux.SEMDMS.TFF2KLA</a></strong></td><td>..\..\02_DMS\DACrux.SEMDMS.TFF2KLA\DACrux.SEMDMS.TFF2KLA.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#DACrux.SP.Common">DACrux.SP.Common</a></strong></td><td>..\..\06_CoreLibSource\DACrux.SP.Common\DACrux.SP.Common.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#DACrux.TEST.AVI.DataService">DACrux.TEST.AVI.DataService</a></strong></td><td>..\..\09_TEST\DACrux.TEST.AVI.DataService\DACrux.TEST.AVI.DataService.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#DACrux.TEST.BSL">DACrux.TEST.BSL</a></strong></td><td>..\..\09_TEST\DACrux.TEST.BSL\DACrux.TEST.BSL.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#DACrux.TEST.Control">DACrux.TEST.Control</a></strong></td><td>..\..\09_TEST\DACrux.TEST.Control\DACrux.TEST.Control.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#DACrux.TEST.CP.DataService">DACrux.TEST.CP.DataService</a></strong></td><td>..\..\09_TEST\DACrux.TEST.CP.DataService\DACrux.TEST.CP.DataService.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#DACrux.TEST.DSL">DACrux.TEST.DSL</a></strong></td><td>..\..\09_TEST\DACrux.TEST.DSL\DACrux.TEST.DSL.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#DACrux.TEST.ENGUI">DACrux.TEST.ENGUI</a></strong></td><td>..\..\09_TEST\DACrux.TEST.ENGUI\DACrux.TEST.ENGUI.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#DACrux.TEST.Interface">DACrux.TEST.Interface</a></strong></td><td>..\..\09_TEST\DACrux.TEST.Interface\DACrux.TEST.Interface.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#DACrux.TEST.PCM.DataService">DACrux.TEST.PCM.DataService</a></strong></td><td>..\..\09_TEST\DACrux.TEST.PCM.DataService\DACrux.TEST.PCM.DataService.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#DACrux.TEST.PCM.StatusService">DACrux.TEST.PCM.StatusService</a></strong></td><td>..\..\09_TEST\DACrux.TEST.PCM.StatusService\DACrux.TEST.PCM.StatusService.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#DACrux.TEST.RO">DACrux.TEST.RO</a></strong></td><td>..\..\09_TEST\DACrux.TEST.RO\DACrux.TEST.RO.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#DACrux.TEST.Service">DACrux.TEST.Service</a></strong></td><td>..\..\09_TEST\DACrux.TEST.Service\DACrux.TEST.Service.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#DACrux.Utility">DACrux.Utility</a></strong></td><td>..\..\06_CoreLibSource\DACrux.Utility\DACrux.Utility.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#DACruxV5">DACruxV5</a></strong></td><td>..\..\01_WinApp\DACruxV5\DACruxV5.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#DACruxV5_FAB2">DACruxV5_FAB2</a></strong></td><td>..\..\01_WinApp\DACruxV5_FAB2\DACruxV5_FAB2.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#VideoCaptureTest">VideoCaptureTest</a></strong></td><td>VideoCaptureTest\VideoCaptureTest.csproj</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#">0</a></td></tr><tr><td class="IconSuccessEncoded" /><td><strong><a href="#Solution"><span _locID="OverviewSolutionSpan">솔루션</span></a></strong></td><td>DACrux2015wc.sln</td><td class="textCentered"><a>0</a></td><td class="textCentered"><a>0</a></td><td class="textCentered"><a href="#" onclick="ScrollToFirstVisibleMessage('Solution'); return false;">1</a></td></tr></table></div><h2 _locID="SolutionAndProjectsTitle">솔루션 및 프로젝트</h2><div id="messages"><a name="DACrux" /><h3>DACrux</h3><table><tr id="DACruxHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr name="ErrorRowClassDACrux"><td class="IconErrorEncoded"><a name="DACruxError" /></td><td class="messageCell"><strong>DACrux\DACrux.vdproj:
+        </strong><span>이 프로젝트 형식을 기반으로 하는 애플리케이션을 찾지 못했습니다. 추가 정보를 보려면 이 링크를 확인하십시오. 54435603-dbb4-11d2-8724-00a0c9a8b90c</span></td></tr></table><a name="00_Framework" /><h3>00_Framework</h3><table><tr id="00_FrameworkHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">00_Framework 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="01_WinApp" /><h3>01_WinApp</h3><table><tr id="01_WinAppHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">01_WinApp 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="02_DMS" /><h3>02_DMS</h3><table><tr id="02_DMSHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">02_DMS 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="03_Core" /><h3>03_Core</h3><table><tr id="03_CoreHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">03_Core 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="03_STAT" /><h3>03_STAT</h3><table><tr id="03_STATHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">03_STAT 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="04_TEST" /><h3>04_TEST</h3><table><tr id="04_TESTHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">04_TEST 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="05_RPNet" /><h3>05_RPNet</h3><table><tr id="05_RPNetHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">05_RPNet 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="DACrux.Base" /><h3>DACrux.Base</h3><table><tr id="DACrux.BaseHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">DACrux.Base 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="DACrux.Common.BSL" /><h3>DACrux.Common.BSL</h3><table><tr id="DACrux.Common.BSLHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">DACrux.Common.BSL 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="DACrux.Common.DSL" /><h3>DACrux.Common.DSL</h3><table><tr id="DACrux.Common.DSLHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">DACrux.Common.DSL 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="DACrux.Common.Interface" /><h3>DACrux.Common.Interface</h3><table><tr id="DACrux.Common.InterfaceHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">DACrux.Common.Interface 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="DACrux.Common.RO" /><h3>DACrux.Common.RO</h3><table><tr id="DACrux.Common.ROHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">DACrux.Common.RO 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="DACrux.Common.Setup" /><h3>DACrux.Common.Setup</h3><table><tr id="DACrux.Common.SetupHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">DACrux.Common.Setup 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="DACrux.Common.VideoCapture" /><h3>DACrux.Common.VideoCapture</h3><table><tr id="DACrux.Common.VideoCaptureHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">DACrux.Common.VideoCapture 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="DACrux.Data.Handler" /><h3>DACrux.Data.Handler</h3><table><tr id="DACrux.Data.HandlerHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">DACrux.Data.Handler 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="DACrux.Data.Parser" /><h3>DACrux.Data.Parser</h3><table><tr id="DACrux.Data.ParserHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">DACrux.Data.Parser 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="DACrux.FPDMap" /><h3>DACrux.FPDMap</h3><table><tr id="DACrux.FPDMapHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">DACrux.FPDMap 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="DACrux.Framework" /><h3>DACrux.Framework</h3><table><tr id="DACrux.FrameworkHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">DACrux.Framework 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="DACrux.Framework.Base" /><h3>DACrux.Framework.Base</h3><table><tr id="DACrux.Framework.BaseHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">DACrux.Framework.Base 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="DACrux.Framework.BSL" /><h3>DACrux.Framework.BSL</h3><table><tr id="DACrux.Framework.BSLHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">DACrux.Framework.BSL 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="DACrux.Framework.Controls" /><h3>DACrux.Framework.Controls</h3><table><tr id="DACrux.Framework.ControlsHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">DACrux.Framework.Controls 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="DACrux.Framework.DSL" /><h3>DACrux.Framework.DSL</h3><table><tr id="DACrux.Framework.DSLHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">DACrux.Framework.DSL 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="DACrux.Framework.Interface" /><h3>DACrux.Framework.Interface</h3><table><tr id="DACrux.Framework.InterfaceHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">DACrux.Framework.Interface 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="DACrux.Framework.RO" /><h3>DACrux.Framework.RO</h3><table><tr id="DACrux.Framework.ROHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">DACrux.Framework.RO 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="DACrux.Framework.Server" /><h3>DACrux.Framework.Server</h3><table><tr id="DACrux.Framework.ServerHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">DACrux.Framework.Server 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="DACrux.Framework.Service" /><h3>DACrux.Framework.Service</h3><table><tr id="DACrux.Framework.ServiceHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">DACrux.Framework.Service 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="DACrux.Map" /><h3>DACrux.Map</h3><table><tr id="DACrux.MapHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">DACrux.Map 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="DACrux.Map.WaferChart" /><h3>DACrux.Map.WaferChart</h3><table><tr id="DACrux.Map.WaferChartHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">DACrux.Map.WaferChart 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="DACrux.ProjectManager" /><h3>DACrux.ProjectManager</h3><table><tr id="DACrux.ProjectManagerHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">DACrux.ProjectManager 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="DACrux.ProjectManager.UI" /><h3>DACrux.ProjectManager.UI</h3><table><tr id="DACrux.ProjectManager.UIHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">DACrux.ProjectManager.UI 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="DACrux.RPNet.BSL" /><h3>DACrux.RPNet.BSL</h3><table><tr id="DACrux.RPNet.BSLHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">DACrux.RPNet.BSL 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="DACrux.RPNet.DSL" /><h3>DACrux.RPNet.DSL</h3><table><tr id="DACrux.RPNet.DSLHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">DACrux.RPNet.DSL 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="DACrux.RPNet.Service" /><h3>DACrux.RPNet.Service</h3><table><tr id="DACrux.RPNet.ServiceHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">DACrux.RPNet.Service 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="DACrux.SEMDMS.BSL" /><h3>DACrux.SEMDMS.BSL</h3><table><tr id="DACrux.SEMDMS.BSLHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">DACrux.SEMDMS.BSL 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="DACrux.SEMDMS.Control" /><h3>DACrux.SEMDMS.Control</h3><table><tr id="DACrux.SEMDMS.ControlHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">DACrux.SEMDMS.Control 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="DACrux.SEMDMS.DSL" /><h3>DACrux.SEMDMS.DSL</h3><table><tr id="DACrux.SEMDMS.DSLHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">DACrux.SEMDMS.DSL 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="DACrux.SEMDMS.ENGUI" /><h3>DACrux.SEMDMS.ENGUI</h3><table><tr id="DACrux.SEMDMS.ENGUIHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">DACrux.SEMDMS.ENGUI 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="DACrux.SEMDMS.Inspection.DataService" /><h3>DACrux.SEMDMS.Inspection.DataService</h3><table><tr id="DACrux.SEMDMS.Inspection.DataServiceHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">DACrux.SEMDMS.Inspection.DataService 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="DACrux.SEMDMS.Inspection.PreConvertingService" /><h3>DACrux.SEMDMS.Inspection.PreConvertingService</h3><table><tr id="DACrux.SEMDMS.Inspection.PreConvertingServiceHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">DACrux.SEMDMS.Inspection.PreConvertingService 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="DACrux.SEMDMS.Interface" /><h3>DACrux.SEMDMS.Interface</h3><table><tr id="DACrux.SEMDMS.InterfaceHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">DACrux.SEMDMS.Interface 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="DACrux.SEMDMS.Review.DataService" /><h3>DACrux.SEMDMS.Review.DataService</h3><table><tr id="DACrux.SEMDMS.Review.DataServiceHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">DACrux.SEMDMS.Review.DataService 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="DACrux.SEMDMS.RO" /><h3>DACrux.SEMDMS.RO</h3><table><tr id="DACrux.SEMDMS.ROHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">DACrux.SEMDMS.RO 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="DACrux.SEMDMS.Service" /><h3>DACrux.SEMDMS.Service</h3><table><tr id="DACrux.SEMDMS.ServiceHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">DACrux.SEMDMS.Service 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="DACrux.SEMDMS.TFF2KLA" /><h3>DACrux.SEMDMS.TFF2KLA</h3><table><tr id="DACrux.SEMDMS.TFF2KLAHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">DACrux.SEMDMS.TFF2KLA 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="DACrux.SP.Common" /><h3>DACrux.SP.Common</h3><table><tr id="DACrux.SP.CommonHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">DACrux.SP.Common 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="DACrux.TEST.AVI.DataService" /><h3>DACrux.TEST.AVI.DataService</h3><table><tr id="DACrux.TEST.AVI.DataServiceHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">DACrux.TEST.AVI.DataService 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="DACrux.TEST.BSL" /><h3>DACrux.TEST.BSL</h3><table><tr id="DACrux.TEST.BSLHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">DACrux.TEST.BSL 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="DACrux.TEST.Control" /><h3>DACrux.TEST.Control</h3><table><tr id="DACrux.TEST.ControlHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">DACrux.TEST.Control 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="DACrux.TEST.CP.DataService" /><h3>DACrux.TEST.CP.DataService</h3><table><tr id="DACrux.TEST.CP.DataServiceHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">DACrux.TEST.CP.DataService 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="DACrux.TEST.DSL" /><h3>DACrux.TEST.DSL</h3><table><tr id="DACrux.TEST.DSLHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">DACrux.TEST.DSL 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="DACrux.TEST.ENGUI" /><h3>DACrux.TEST.ENGUI</h3><table><tr id="DACrux.TEST.ENGUIHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">DACrux.TEST.ENGUI 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="DACrux.TEST.Interface" /><h3>DACrux.TEST.Interface</h3><table><tr id="DACrux.TEST.InterfaceHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">DACrux.TEST.Interface 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="DACrux.TEST.PCM.DataService" /><h3>DACrux.TEST.PCM.DataService</h3><table><tr id="DACrux.TEST.PCM.DataServiceHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">DACrux.TEST.PCM.DataService 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="DACrux.TEST.PCM.StatusService" /><h3>DACrux.TEST.PCM.StatusService</h3><table><tr id="DACrux.TEST.PCM.StatusServiceHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">DACrux.TEST.PCM.StatusService 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="DACrux.TEST.RO" /><h3>DACrux.TEST.RO</h3><table><tr id="DACrux.TEST.ROHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">DACrux.TEST.RO 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="DACrux.TEST.Service" /><h3>DACrux.TEST.Service</h3><table><tr id="DACrux.TEST.ServiceHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">DACrux.TEST.Service 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="DACrux.Utility" /><h3>DACrux.Utility</h3><table><tr id="DACrux.UtilityHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">DACrux.Utility 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="DACruxV5" /><h3>DACruxV5</h3><table><tr id="DACruxV5HeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">DACruxV5 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="DACruxV5_FAB2" /><h3>DACruxV5_FAB2</h3><table><tr id="DACruxV5_FAB2HeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">DACruxV5_FAB2 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="VideoCaptureTest" /><h3>VideoCaptureTest</h3><table><tr id="VideoCaptureTestHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr><td class="IconInfoEncoded" /><td class="messageCell" _locID="NoMessagesRow">VideoCaptureTest 메시지가 기록되지 않았습니다.
+                  </td></tr></table><a name="Solution" /><h3 _locID="ProjectDisplayNameHeader">솔루션</h3><table><tr id="SolutionHeaderRow"><th></th><th class="messageCell" _locID="MessageTableHeader">메시지</th></tr><tr name="MessageRowHeaderShowSolution"><td class="IconInfoEncoded" /><td class="messageCell"><a _locID="ShowAdditionalMessages" href="#" name="SolutionMessage" onclick="ToggleMessageVisibility('Solution'); return false;">
+          표시 1 추가 메시지
+        </a></td></tr><tr name="MessageRowClassSolution" style="display: none"><td class="IconInfoEncoded"><a name="SolutionMessage" /></td><td class="messageCell"><strong>DACrux2015wc.sln:
+        </strong><span>솔루션 파일은 마이그레이션하지 않아도 됩니다.</span></td></tr><tr style="display: none" name="MessageRowHeaderHideSolution"><td class="IconInfoEncoded" /><td class="messageCell"><a _locID="HideAdditionalMessages" href="#" name="SolutionMessage" onclick="ToggleMessageVisibility('Solution'); return false;">
+          숨기기 1 추가 메시지
+        </a></td></tr></table></div></div></body></html>

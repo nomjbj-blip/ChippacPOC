@@ -1,0 +1,187 @@
+<?xml version="1.0" standalone="yes"?>
+<NewDataSet>
+  <xs:schema id="NewDataSet" xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xs:element name="NewDataSet" msdata:IsDataSet="true" msdata:UseCurrentLocale="true">
+      <xs:complexType>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="LANG_LIST">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="NUMBER" type="xs:int" minOccurs="0" />
+                <xs:element name="COUNTRY" type="xs:string" minOccurs="0" />
+                <xs:element name="LANGUAGE" type="xs:string" minOccurs="0" />
+                <xs:element name="DESCRIPTION" type="xs:string" minOccurs="0" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="GLOBAL">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="CAPTIONKEY" type="xs:string" minOccurs="0" />
+                <xs:element name="CAPTION001" type="xs:string" minOccurs="0" />
+                <xs:element name="CAPTION002" type="xs:string" minOccurs="0" />
+                <xs:element name="CAPTION003" type="xs:string" minOccurs="0" />
+                <xs:element name="CAPTION004" type="xs:string" minOccurs="0" />
+                <xs:element name="CAPTION005" type="xs:string" minOccurs="0" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <LANG_LIST>
+    <NUMBER>1</NUMBER>
+    <COUNTRY>Global</COUNTRY>
+    <LANGUAGE>English</LANGUAGE>
+    <DESCRIPTION />
+  </LANG_LIST>
+  <LANG_LIST>
+    <NUMBER>2</NUMBER>
+    <COUNTRY>대한민국</COUNTRY>
+    <LANGUAGE>한글</LANGUAGE>
+    <DESCRIPTION />
+  </LANG_LIST>
+  <LANG_LIST>
+    <NUMBER>3</NUMBER>
+    <COUNTRY>中國</COUNTRY>
+    <LANGUAGE>中國語</LANGUAGE>
+    <DESCRIPTION />
+  </LANG_LIST>
+  <GLOBAL>
+    <CAPTIONKEY>System Option</CAPTIONKEY>
+    <CAPTION001>System Option</CAPTION001>
+    <CAPTION002>시스템 설정</CAPTION002>
+    <CAPTION003>系统设置</CAPTION003>
+    <CAPTION004 />
+    <CAPTION005 />
+  </GLOBAL>
+  <GLOBAL>
+    <CAPTIONKEY>Language</CAPTIONKEY>
+    <CAPTION001>Language</CAPTION001>
+    <CAPTION002>언어</CAPTION002>
+    <CAPTION003>语言</CAPTION003>
+    <CAPTION004 />
+    <CAPTION005 />
+  </GLOBAL>
+  <GLOBAL>
+    <CAPTIONKEY>Application Server</CAPTIONKEY>
+    <CAPTION001>Application Server</CAPTION001>
+    <CAPTION002>어플리케이션 서버</CAPTION002>
+    <CAPTION003>应用服务器</CAPTION003>
+    <CAPTION004 />
+    <CAPTION005 />
+  </GLOBAL>
+  <GLOBAL>
+    <CAPTIONKEY>Server IP</CAPTIONKEY>
+    <CAPTION001>Server IP</CAPTION001>
+    <CAPTION002>서버주소</CAPTION002>
+    <CAPTION003>服务器地址</CAPTION003>
+    <CAPTION004 />
+    <CAPTION005 />
+  </GLOBAL>
+  <GLOBAL>
+    <CAPTIONKEY>H101</CAPTIONKEY>
+    <CAPTION001>H101</CAPTION001>
+    <CAPTION002>H101</CAPTION002>
+    <CAPTION003>H101</CAPTION003>
+    <CAPTION004 />
+    <CAPTION005 />
+  </GLOBAL>
+  <GLOBAL>
+    <CAPTIONKEY>Server Port</CAPTIONKEY>
+    <CAPTION001>Server Port</CAPTION001>
+    <CAPTION002>서버포트</CAPTION002>
+    <CAPTION003>服务器端口</CAPTION003>
+    <CAPTION004 />
+    <CAPTION005 />
+  </GLOBAL>
+  <GLOBAL>
+    <CAPTIONKEY>Channel</CAPTIONKEY>
+    <CAPTION001>Channel</CAPTION001>
+    <CAPTION002>채널</CAPTION002>
+    <CAPTION003>频道</CAPTION003>
+    <CAPTION004 />
+    <CAPTION005 />
+  </GLOBAL>
+  <GLOBAL>
+    <CAPTIONKEY>Factory</CAPTIONKEY>
+    <CAPTION001>Factory</CAPTION001>
+    <CAPTION002>공장</CAPTION002>
+    <CAPTION003>工厂</CAPTION003>
+    <CAPTION004 />
+    <CAPTION005 />
+  </GLOBAL>
+  <GLOBAL>
+    <CAPTIONKEY>User ID</CAPTIONKEY>
+    <CAPTION001>User ID</CAPTION001>
+    <CAPTION002>사용자아이디</CAPTION002>
+    <CAPTION003>用户名</CAPTION003>
+    <CAPTION004 />
+    <CAPTION005 />
+  </GLOBAL>
+  <GLOBAL>
+    <CAPTIONKEY>Password</CAPTIONKEY>
+    <CAPTION001>Password</CAPTION001>
+    <CAPTION002>비밀번호</CAPTION002>
+    <CAPTION003>密码</CAPTION003>
+    <CAPTION004 />
+    <CAPTION005 />
+  </GLOBAL>
+  <GLOBAL>
+    <CAPTIONKEY>Option</CAPTIONKEY>
+    <CAPTION001>Option</CAPTION001>
+    <CAPTION002>옵션</CAPTION002>
+    <CAPTION003>选项</CAPTION003>
+    <CAPTION004 />
+    <CAPTION005 />
+  </GLOBAL>
+  <GLOBAL>
+    <CAPTIONKEY>Cancel</CAPTIONKEY>
+    <CAPTION001>Cancel</CAPTION001>
+    <CAPTION002>취소</CAPTION002>
+    <CAPTION003>取消</CAPTION003>
+    <CAPTION004 />
+    <CAPTION005 />
+  </GLOBAL>
+  <GLOBAL>
+    <CAPTIONKEY>OK</CAPTIONKEY>
+    <CAPTION001>OK</CAPTION001>
+    <CAPTION002>승인</CAPTION002>
+    <CAPTION003>确认</CAPTION003>
+    <CAPTION004 />
+    <CAPTION005 />
+  </GLOBAL>
+  <GLOBAL>
+    <CAPTIONKEY>Recalculate</CAPTIONKEY>
+    <CAPTION001>Recalculate</CAPTION001>
+    <CAPTION002>다시계산</CAPTION002>
+    <CAPTION003>重新计算</CAPTION003>
+    <CAPTION004 />
+    <CAPTION005 />
+  </GLOBAL>
+  <GLOBAL>
+    <CAPTIONKEY>Product</CAPTIONKEY>
+    <CAPTION001>Product</CAPTION001>
+    <CAPTION002>제품</CAPTION002>
+    <CAPTION003>产品</CAPTION003>
+    <CAPTION004 />
+    <CAPTION005 />
+  </GLOBAL>
+  <GLOBAL>
+    <CAPTIONKEY>Device</CAPTIONKEY>
+    <CAPTION001>Device</CAPTION001>
+    <CAPTION002>제품</CAPTION002>
+    <CAPTION003>产品</CAPTION003>
+    <CAPTION004 />
+    <CAPTION005 />
+  </GLOBAL>
+  <GLOBAL>
+    <CAPTIONKEY>Customer</CAPTIONKEY>
+    <CAPTION001>Customer</CAPTION001>
+    <CAPTION002>고객</CAPTION002>
+    <CAPTION003>顾客</CAPTION003>
+    <CAPTION004 />
+    <CAPTION005 />
+  </GLOBAL>
+</NewDataSet>

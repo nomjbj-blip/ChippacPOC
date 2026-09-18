@@ -1,0 +1,148 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Insert" queryid="INSERT_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQC_SERVICE_LOG (
+    FACTORY,
+    SERVICE_NAME, 
+    TRAN_KEY,
+    SERVER_NAME,
+    ACTION,
+    EQUIP_ID,
+    LOT_ID,
+    WAFER_ID,
+    HANDLER,
+    EXECUTE_TIME,
+    MESSAGE,
+    DETAIL_MSG
+) VALUES (
+    :FACTORY,
+    :SERVICE_NAME,
+    :TRAN_KEY,
+    :SERVER_NAME,
+    :ACTION,
+    :EQUIP_ID,
+    :LOT_ID,
+    :WAFER_ID,
+    :HANDLER,
+    :EXECUTE_TIME,
+    :MESSAGE,
+    :DETAIL_MSG
+)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="0">:FACTORY</param>
+            <param direction="Input" dbtype="VarChar2" size="0">:SERVICE_NAME</param>
+            <param direction="Input" dbtype="Varchar2" size="20">:TRAN_KEY</param>
+            <param direction="Input" dbtype="VarChar2" size="0">:SERVER_NAME</param>
+            <param direction="Input" dbtype="VarChar2" size="0">:ACTION</param>
+            <param direction="Input" dbtype="VarChar2" size="0">:EQUIP_ID</param>
+            <param direction="Input" dbtype="VarChar2" size="0">:LOT_ID</param>
+            <param direction="Input" dbtype="VarChar2" size="0">:WAFER_ID</param>
+            <param direction="Input" dbtype="VarChar2" size="0">:HANDLER</param>
+            <param direction="Input" dbtype="Int32" size="0">:EXECUTE_TIME</param>
+            <param direction="Input" dbtype="VarChar2" size="200">:MESSAGE</param>
+            <param direction="Input" dbtype="VarChar2" size="2000">:DETAIL_MSG</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="INSERT_DATA_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQC_SERVICE_LOG (
+    FACTORY,
+    SERVICE_NAME, 
+    TRAN_KEY,
+    SERVER_NAME,
+    ACTION,
+    FILE_NAME,
+    EQUIP_ID,
+    LOT_ID,
+    WAFER_ID,
+    HANDLER,
+    EXECUTE_TIME,
+    MESSAGE,
+    DETAIL_MSG
+) VALUES (
+    :FACTORY,
+    :SERVICE_NAME,
+    :TRAN_KEY,
+    :SERVER_NAME,
+    :ACTION,
+    :FILE_NAME,
+    :EQUIP_ID,
+    :LOT_ID,
+    :WAFER_ID,
+    :HANDLER,
+    :EXECUTE_TIME,
+    :MESSAGE,
+    :DETAIL_MSG
+)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="20">:FACTORY</param>
+            <param direction="Input" dbtype="VarChar2" size="50">:SERVICE_NAME</param>
+            <param direction="Input" dbtype="VarChar2" size="20">:TRAN_KEY</param>
+            <param direction="Input" dbtype="VarChar2" size="50">:SERVER_NAME</param>
+            <param direction="Input" dbtype="VarChar2" size="50">:ACTION</param>
+            <param direction="Input" dbtype="VarChar2" size="500">:FILE_NAME</param>
+            <param direction="Input" dbtype="VarChar2" size="50">:EQUIP_ID</param>
+            <param direction="Input" dbtype="VarChar2" size="50">:LOT_ID</param>
+            <param direction="Input" dbtype="VarChar2" size="500">:WAFER_ID</param>
+            <param direction="Input" dbtype="VarChar2" size="50">:HANDLER</param>
+            <param direction="Input" dbtype="Int32" size="0">:EXECUTE_TIME</param>
+            <param direction="Input" dbtype="VarChar2" size="500">:MESSAGE</param>
+            <param direction="Input" dbtype="VarChar2" size="3000">:DETAIL_MSG</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_SERVICE_NAME" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-09-23 17:40:54
+SELECT 'AVI.DataService' AS SERVICE_NAME FROM DUAL
+ UNION ALL 
+SELECT 'CP.DataService' AS SERVICE_NAME FROM DUAL
+ UNION ALL 
+SELECT 'Inspection.DataService' AS SERVICE_NAME FROM DUAL
+ UNION ALL 
+SELECT 'Inspection.PreConvertingService' AS SERVICE_NAME FROM DUAL
+ UNION ALL 
+SELECT 'PCM.DataService' AS SERVICE_NAME FROM DUAL
+ UNION ALL 
+SELECT 'PCM.StatusService' AS SERVICE_NAME FROM DUAL
+ UNION ALL 
+SELECT 'Review.DataService' AS SERVICE_NAME FROM DUAL
+ ]]></commandtext>
+    </query>
+    <query statement="Select" queryid="GET_SERVICE_ACTION" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-09-23 17:42:37
+SELECT 'ERROR' AS ACTION FROM DUAL
+ UNION ALL 
+ SELECT 'WARNING' AS ACTION FROM DUAL
+ UNION ALL 
+SELECT 'SERVICE_START' AS ACTION FROM DUAL
+ UNION ALL 
+SELECT 'SERVICE_STOP' AS ACTION FROM DUAL
+ UNION ALL 
+SELECT 'SUCCESS' AS ACTION FROM DUAL]]></commandtext>
+    </query>
+    <query statement="Select" queryid="GET_SERVICE_LIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-09-23 18:08:00
+SELECT factory,
+       service_name,
+       to_char(cast(to_timestamp (tran_key, 'yyyymmddhh24missff') as date), 'YYYY-MM-DD HH24:MI:SS') tran_date,
+       server_name,
+       action,
+       file_name,
+       equip_id,
+       lot_id,
+       wafer_id,
+       handler, 
+       execute_time / 1000 as "EXECUTE TIME(SEC)",
+       message,
+       detail_msg
+  FROM TQC_SERVICE_LOG 
+ WHERE 1=1 
+   AND TRAN_KEY BETWEEN :startdate AND :enddate
+   AND FACTORY = :factory
+   ??
+ ORDER BY TRAN_KEY DESC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="startdate">:startdate</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="enddate">:enddate</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="factory">:factory</param>
+        </parameters>
+    </query>
+</queryxml>

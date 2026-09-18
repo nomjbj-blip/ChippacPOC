@@ -1,0 +1,404 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{0CDDB391-0A29-4850-9198-C529509DA64F}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DACrux.Framework.Controls</RootNamespace>
+    <AssemblyName>DACrux.Framework.Controls</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\07_CoreLib\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\07_CoreLib\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Accessibility">
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="DACrux.Base">
+      <HintPath>..\..\07_CoreLib\DACrux.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="FarPoint.CalcEngine, Version=5.0.3522.2008, Culture=neutral, PublicKeyToken=327c3516b1b18457, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="FarPoint.PDF, Version=5.0.3522.2008, Culture=neutral, PublicKeyToken=327c3516b1b18457, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="FarPoint.PluginCalendar.WinForms, Version=5.0.3522.2008, Culture=neutral, PublicKeyToken=327c3516b1b18457, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="FarPoint.Win, Version=5.0.3522.2008, Culture=neutral, PublicKeyToken=327c3516b1b18457, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="FarPoint.Win.Chart, Version=5.0.3522.2008, Culture=neutral, PublicKeyToken=327c3516b1b18457, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="FarPoint.Win.Chart.Design, Version=5.0.3522.2008, Culture=neutral, PublicKeyToken=327c3516b1b18457, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="FarPoint.Win.Design, Version=5.0.3522.2008, Culture=neutral, PublicKeyToken=327c3516b1b18457, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="FarPoint.Win.Ink, Version=5.0.3522.2008, Culture=neutral, PublicKeyToken=327c3516b1b18457, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="FarPoint.Win.Spread, Version=5.0.3518.2008, Culture=neutral, PublicKeyToken=327c3516b1b18457, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files (x86)\GrapeCity\Spread.WinForms.5.dotNet35\v5.0.3518\Bin\FarPoint.Win.Spread.dll</HintPath>
+    </Reference>
+    <Reference Include="FarPoint.Win.TextRenderer, Version=5.0.3522.2008, Culture=neutral, PublicKeyToken=327c3516b1b18457, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="policy.5.0.FarPoint.Win, Version=5.0.3522.2008, Culture=neutral, PublicKeyToken=327c3516b1b18457, processorArchitecture=MSIL" />
+    <Reference Include="policy.5.0.FarPoint.Win.Spread, Version=5.0.3522.2008, Culture=neutral, PublicKeyToken=327c3516b1b18457, processorArchitecture=MSIL" />
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Design">
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization.Formatters.Soap" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms">
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="System.Windows.Forms.DataVisualization" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Base.cs" />
+    <Compile Include="ChartEx.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="DUCAlarmStatusView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DUCAlarmStatusView.Designer.cs">
+      <DependentUpon>DUCAlarmStatusView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DUCComboBox.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DUCComboBox.Designer.cs">
+      <DependentUpon>DUCComboBox.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DUCControlSpread.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DUCControlSpread.Designer.cs">
+      <DependentUpon>DUCControlSpread.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DUCEngStatusView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DUCEngStatusView.designer.cs">
+      <DependentUpon>DUCEngStatusView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DUCNumericUpDown.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DUCNumericUpDown.Designer.cs">
+      <DependentUpon>DUCNumericUpDown.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DUCPeriodPicker.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DUCPeriodPicker.Designer.cs">
+      <DependentUpon>DUCPeriodPicker.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DUCTitlePanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DUCTitlePanel.Designer.cs">
+      <DependentUpon>DUCTitlePanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DUCTextBox.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DUCTextBox.Designer.cs">
+      <DependentUpon>DUCTextBox.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DUCUpDownListView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DUCUpDownListView.Designer.cs">
+      <DependentUpon>DUCUpDownListView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DUCItemSelector.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DUCItemSelector.Designer.cs">
+      <DependentUpon>DUCItemSelector.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DUCUserIDValidator.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DUCUserIDValidator.Designer.cs">
+      <DependentUpon>DUCUserIDValidator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmAddLot.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmAddLot.Designer.cs">
+      <DependentUpon>frmAddLot.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmRetestMsgBoxControl.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmRetestMsgBoxControl.designer.cs">
+      <DependentUpon>frmRetestMsgBoxControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="frmDUCListBox.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmDUCListBox.designer.cs">
+      <DependentUpon>frmDUCListBox.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="DUCStatusView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DUCStatusView.Designer.cs">
+      <DependentUpon>DUCStatusView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DUCLotGroup.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DUCLotGroup.Designer.cs">
+      <DependentUpon>DUCLotGroup.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DUCListBox.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DUCListBox.Designer.cs">
+      <DependentUpon>DUCListBox.cs</DependentUpon>
+    </Compile>
+    <Compile Include="WithThread.cs" />
+    <Service Include="{94E38DFF-614B-4cbd-B67C-F211BB35CE8B}" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="DUCAlarmStatusView.resx">
+      <DependentUpon>DUCAlarmStatusView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DUCComboBox.resx">
+      <DependentUpon>DUCComboBox.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DUCControlSpread.resx">
+      <DependentUpon>DUCControlSpread.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DUCEngStatusView.resx">
+      <DependentUpon>DUCEngStatusView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DUCListBox.resx">
+      <DependentUpon>DUCListBox.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DUCNumericUpDown.resx">
+      <DependentUpon>DUCNumericUpDown.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DUCPeriodPicker.resx">
+      <DependentUpon>DUCPeriodPicker.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DUCTitlePanel.resx">
+      <DependentUpon>DUCTitlePanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DUCTextBox.resx">
+      <DependentUpon>DUCTextBox.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DUCUpDownListView.resx">
+      <DependentUpon>DUCUpDownListView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DUCItemSelector.resx">
+      <DependentUpon>DUCItemSelector.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DUCUserIDValidator.resx">
+      <DependentUpon>DUCUserIDValidator.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmAddLot.resx">
+      <DependentUpon>frmAddLot.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmDUCListBox.resx">
+      <DependentUpon>frmDUCListBox.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmRetestMsgBoxControl.resx">
+      <DependentUpon>frmRetestMsgBoxControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\licenses.licx" />
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DUCStatusView.resx">
+      <DependentUpon>DUCStatusView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DUCLotGroup.resx">
+      <DependentUpon>DUCLotGroup.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Collapse_large.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Expand_large.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\1.1.13_Upgrade_Client_16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\2.6.7_Resource_Labor_Setup_16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\2.6.10_PM_Schedule_Setup_16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\097_BPCSAlarmTrend_16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\112_RefreshArrow_Blue_16x16_72.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\112_RightArrowLong_Green_16x16_72.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\112_RightArrowShort_Blue_16x16_72.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\112_RightArrowShort_Grey_16x16_72.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\112_RightArrowShort_Orange_16x16_72.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Attachment.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Audio.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Cancel.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Change_Password.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\CheckBoxHS.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\CheckGrammar.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Close.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Collapse_large1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\DeleteHS.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Erase.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Expand_large1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Filter.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\FindHS.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\GoLtr.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\GoRtl.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\OK.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\RecordHS.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Repeat.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\RightArrow2HS.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\RightArrowHS.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\save.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Search.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\StopHS.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Zoom.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Information.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\2.6.13_Check_Type_DefinitionGroup1_16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="DUCLotGroup.bmp" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

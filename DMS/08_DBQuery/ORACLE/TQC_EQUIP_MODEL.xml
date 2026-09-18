@@ -1,0 +1,136 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="TPSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Select" queryid="SELECT_EQUIP_MODEL_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT EQUIP_MODEL
+FROM TQC_EQUIP_MODEL
+WHERE FACTORY = :FACTORY]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Varchar" size="40" value="FACTORY">:FACTORY</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_EQUIP_MODEL_02" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-07-08 15:20:53
+SELECT FACTORY,
+       EQUIP_MODEL,
+       EQUIP_MODEL_DESC,
+       CMF_FIELD01,
+       CMF_FIELD02,
+       CMF_FIELD03,
+       CMF_FIELD04,
+       CMF_FIELD05,
+       CMF_FIELD06,
+       CMF_FIELD07,
+       CMF_FIELD08,
+       CMF_FIELD09,
+       CMF_FIELD10,
+       CREATE_USER_ID,
+       CREATE_TIME,
+       UPDATE_USER_ID,
+       UPDATE_TIME
+  FROM TQC_EQUIP_MODEL
+ WHERE FACTORY = :FACTORY]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:FACTORY</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_EQUIP_MODEL_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-07-08 15:27:38
+UPDATE TQC_EQUIP_MODEL
+   SET EQUIP_MODEL_DESC = :EMDESC,
+       CMF_FIELD01 = :CMF_FIELD01,
+       CMF_FIELD02 = :CMF_FIELD02,
+       CMF_FIELD03 = :CMF_FIELD03,
+       CMF_FIELD04 = :CMF_FIELD04,
+       CMF_FIELD05 = :CMF_FIELD05,
+       CMF_FIELD06 = :CMF_FIELD06,
+       CMF_FIELD07 = :CMF_FIELD07,
+       CMF_FIELD08 = :CMF_FIELD08,
+       CMF_FIELD09 = :CMF_FIELD09,
+       CMF_FIELD10 = :CMF_FIELD10,
+       UPDATE_USER_ID = :USERID,
+       UPDATE_TIME = SYSDATE
+ WHERE 1=1
+   AND FACTORY = :FACTORY
+   AND EQUIP_MODEL = :EQUIP_MODEL]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="FACTORY">:FACTORY</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="EQUIP_MODEL">:EQUIP_MODEL</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="EMDESC">:EMDESC</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="CMF_FIELD01">:CMF_FIELD01</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="CMF_FIELD02">:CMF_FIELD02</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="CMF_FIELD03">:CMF_FIELD03</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="CMF_FIELD04">:CMF_FIELD04</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="CMF_FIELD05">:CMF_FIELD05</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="CMF_FIELD06">:CMF_FIELD06</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="CMF_FIELD07">:CMF_FIELD07</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="CMF_FIELD08">:CMF_FIELD08</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="CMF_FIELD09">:CMF_FIELD09</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="CMF_FIELD10">:CMF_FIELD10</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="USERID">:USERID</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_EQUIP_MODEL_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-07-08 15:27:40
+DELETE FROM TQC_EQUIP_MODEL
+ WHERE 1=1 
+   AND FACTORY = :FACTORY
+   AND EQUIP_MODEL = :EQUIP_MODEL]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="FACTORY">:FACTORY</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="EQUIP_MODEL">:EQUIP_MODEL</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="INSERT_EQUIP_MODEL_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-07-08 15:27:41
+INSERT INTO TQC_EQUIP_MODEL(FACTORY, EQUIP_MODEL, EQUIP_MODEL_DESC, 
+       CMF_FIELD01,CMF_FIELD02,CMF_FIELD03,CMF_FIELD04,CMF_FIELD05,
+       CMF_FIELD06,CMF_FIELD07,CMF_FIELD08,CMF_FIELD09,CMF_FIELD10,
+       CREATE_USER_ID,CREATE_TIME,UPDATE_USER_ID,UPDATE_TIME)
+VALUES(:FACTORY, :EQUIP_MODEL, :EMDESC, 
+       :CMF_FIELD01,:CMF_FIELD02,:CMF_FIELD03,:CMF_FIELD04,:CMF_FIELD05,
+       :CMF_FIELD06,:CMF_FIELD07,:CMF_FIELD08,:CMF_FIELD09,:CMF_FIELD10,
+       :USERID,SYSDATE,:USERID,SYSDATE
+       )]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="FACTORY">:FACTORY</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="EQUIP_MODEL">:EQUIP_MODEL</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="EMDESC">:EMDESC</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="CMF_FIELD01">:CMF_FIELD01</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="CMF_FIELD02">:CMF_FIELD02</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="CMF_FIELD03">:CMF_FIELD03</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="CMF_FIELD04">:CMF_FIELD04</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="CMF_FIELD05">:CMF_FIELD05</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="CMF_FIELD06">:CMF_FIELD06</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="CMF_FIELD07">:CMF_FIELD07</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="CMF_FIELD08">:CMF_FIELD08</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="CMF_FIELD09">:CMF_FIELD09</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="CMF_FIELD10">:CMF_FIELD10</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="USERID">:USERID</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="EXISTS_EQUIP_MODEL_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-07-08 15:36:32
+SELECT 1 FROM TQC_EQUIP_MODEL
+WHERE FACTORY = :FACTORY
+    AND EQUIP_MODEL = :EQUIP_MODEL]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="FACTORY">:FACTORY</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="EQUIP_MODEL">:EQUIP_MODEL</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_EQUIP_MODEL_03" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-09-04 15:57:39
+SELECT DISTINCT T1.EQUIP_MODEL
+  FROM TQC_EQUIP_MODEL T1, TQC_EQUIP T2
+ WHERE 1=1 AND T1.FACTORY = T2.FACTORY
+  AND T1.EQUIP_MODEL = T2.EQUIP_MODEL
+  AND T1.FACTORY = :factory
+  AND T2.AREA IN (??)
+  AND T2.OPER IN (??)
+ORDER BY EQUIP_MODEL
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="factory">:factory</param>
+        </parameters>
+    </query>
+</queryxml>

@@ -1,0 +1,643 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="TPSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Insert" queryid="CREATE_MAP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_MAPDEF (
+ MAPID  ,
+ WAFER_SIZE  ,
+ CHIP_SIZE_X ,
+ CHIP_SIZE_Y ,
+ ORIGIN_MICRO_X  ,
+ ORIGIN_MICRO_Y  ,
+ ORIGIN_INDEX_X  ,
+ ORIGIN_INDEX_Y  ,
+ FIRST_MICRO_X   ,
+ FIRST_MICRO_Y   ,
+ FIRST_INDEX_X   ,
+ FIRST_INDEX_Y   ,
+ EDGE_SIZE   ,
+ ANGLE   ,
+ NETDIE  ,
+ NOTCH_TYPE  ,
+ ST_START    ,
+ ST_INTYPE   ,
+ ST_XCNT ,
+ ST_YCNT ,
+ ST_START_X  ,
+ ST_START_Y  ,
+ DIE_INDEX_MIN_X ,
+ DIE_INDEX_MAX_X ,
+ DIE_INDEX_MIN_Y ,
+ DIE_INDEX_MAX_Y ,
+ XY_DIRECTION    ,
+ REFERENCEDIE_SETTING    ,
+ DELETE_FLAG 
+ ) VALUES(
+ :mapid
+,:wafer_size
+,:chip_size_x
+,:chip_size_y
+,:origin_micro_x
+,:origin_micro_y
+,:origin_index_x
+,:origin_index_y
+,:first_micro_x
+,:first_micro_y
+,:first_index_x
+,:first_index_y
+,:edge_size
+,:angle
+,:netdie
+,:notch_type
+,:st_start
+,:st_intype
+,:st_xcnt    
+,:st_ycnt    
+,:st_start_x
+,:st_start_y
+,:die_index_min_x
+,:die_index_max_x
+,:die_index_min_y
+,:die_index_max_y
+,:xy_direction
+,:referance_setting
+, 'N')]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:mapid</param>
+            <param direction="Input" dbtype="Number" size="10">:wafer_size</param>
+            <param direction="Input" dbtype="Number" size="10">:chip_size_x</param>
+            <param direction="Input" dbtype="Number" size="10">:chip_size_y</param>
+            <param direction="Input" dbtype="Number" size="10">:origin_micro_x</param>
+            <param direction="Input" dbtype="Number" size="10">:origin_micro_y</param>
+            <param direction="Input" dbtype="Int32" size="10">:origin_index_x</param>
+            <param direction="Input" dbtype="Int32" size="10">:origin_index_y</param>
+            <param direction="Input" dbtype="Number" size="10">:first_micro_x</param>
+            <param direction="Input" dbtype="Number" size="10">:first_micro_y</param>
+            <param direction="Input" dbtype="Int32" size="10">:first_index_x</param>
+            <param direction="Input" dbtype="Int32" size="10">:first_index_y</param>
+            <param direction="Input" dbtype="Number" size="10">:edge_size</param>
+            <param direction="Input" dbtype="Int32" size="10">:angle</param>
+            <param direction="Input" dbtype="Int32" size="10">:netdie</param>
+            <param direction="Input" dbtype="Int32" size="10">:notch_type</param>
+            <param direction="Input" dbtype="Number" size="10">:st_start</param>
+            <param direction="Input" dbtype="Number" size="10">:st_intype</param>
+            <param direction="Input" dbtype="Number" size="10">:st_xcnt</param>
+            <param direction="Input" dbtype="Number" size="10">:st_ycnt</param>
+            <param direction="Input" dbtype="Number" size="10">:st_start_x</param>
+            <param direction="Input" dbtype="Number" size="10">:st_start_y</param>
+            <param direction="Input" dbtype="Int32" size="10">:die_index_min_x</param>
+            <param direction="Input" dbtype="Int32" size="10">:die_index_max_x</param>
+            <param direction="Input" dbtype="Int32" size="10">:die_index_min_y</param>
+            <param direction="Input" dbtype="Int32" size="10">:die_index_max_y</param>
+            <param direction="Input" dbtype="Int32" size="0">:xy_direction</param>
+            <param direction="Input" dbtype="Int32" size="10">:referance_setting</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_MAPDEF" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT FACTORY,
+       MAPID,
+       WAFER_SIZE,
+       CHIP_SIZE_X,
+       CHIP_SIZE_Y,
+       ORIGIN_MICRO_X,
+       CHIP_SIZE_Y - ORIGIN_MICRO_Y  AS ORIGIN_MICRO_Y,
+       ORIGIN_INDEX_X,
+       ORIGIN_INDEX_Y,
+       FIRST_MICRO_X,
+       FIRST_MICRO_Y,
+       FIRST_INDEX_X,
+       FIRST_INDEX_Y,
+       EDGE_SIZE,
+       ANGLE,
+       NETDIE,
+       NETSHOT,
+       NOTCH_TYPE,
+       ST_START,
+       ST_INTYPE,
+       ST_XCNT,
+       ST_YCNT,
+       ST_START_X,
+       ST_START_Y,
+       DIE_INDEX_MIN_X,
+       DIE_INDEX_MAX_X,
+       DIE_INDEX_MIN_Y,
+       DIE_INDEX_MAX_Y,
+       XY_DIRECTION,
+       REFERENCEDIE_SETTING,
+   CASE WHEN DELETE_FLAG = 'Y' THEN 'Y' ELSE 'N' END DELETE_FLAG,
+       TO_CHAR(INSERT_TIME,'YYYY-MM-DD HH24:MI:SS') INSERT_TIME,
+       INSERT_USER,
+       TO_CHAR(UPDATE_TIME,'YYYY-MM-DD HH24:MI:SS') UPDATE_TIME,
+       UPDATE_USER
+ FROM TQP_MAPDEF 
+  WHERE 1 = 1 
+    AND MAPID = :MAPID
+    --AND NVL(DELETE_FLAG,'N') <> 'Y']]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30" value="TEST">:MAPID</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_MAPIDLIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT MAPID FROM TQP_MAPDEF
+WHERE NVL(DELETE_FLAG,'N') <> 'Y'
+ORDER BY MAPID]]></commandtext>
+    </query>
+    <query statement="Update" queryid="UPDATE_MAP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_MAPDEF SET
+        WAFER_SIZE      =:wafer_size 
+        ,CHIP_SIZE_X    =:chip_size_x    
+        ,CHIP_SIZE_Y    =:chip_size_y   
+        ,ORIGIN_MICRO_X =:origin_micro_x        
+        ,ORIGIN_MICRO_Y =:origin_micro_y
+        ,ORIGIN_INDEX_X =:origin_index_x        
+        ,ORIGIN_INDEX_Y =:origin_index_y
+        ,FIRST_MICRO_X   =:first_micro_x  
+        ,FIRST_MICRO_Y   =:first_micro_y  
+        ,FIRST_INDEX_X   =:first_index_x  
+        ,FIRST_INDEX_Y   =:first_index_y       
+        ,EDGE_SIZE       =:edge_size      
+        ,ANGLE           =:angle
+        ,NETDIE          =:netdie 
+        ,NOTCH_TYPE      =:notch_type     
+        ,ST_START        =:st_start       
+        ,ST_INTYPE       =:st_intype      
+        ,ST_XCNT         =:st_xcnt        
+        ,ST_YCNT         =:st_ycnt        
+        ,ST_START_X      =:st_start_x     
+        ,ST_START_Y      =:st_start_y     
+        ,DIE_INDEX_MIN_X =:die_index_min_x
+        ,DIE_INDEX_MAX_X =:die_index_max_x
+        ,DIE_INDEX_MIN_Y =:die_index_min_y
+        ,DIE_INDEX_MAX_Y =:die_index_max_y
+        ,XY_DIRECTION   = : xy_direction
+WHERE MAPID = :mapid]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:wafer_size</param>
+            <param direction="Input" dbtype="Number" size="0">:chip_size_x</param>
+            <param direction="Input" dbtype="Number" size="0">:chip_size_y</param>
+            <param direction="Input" dbtype="Number" size="0">:origin_micro_x</param>
+            <param direction="Input" dbtype="Number" size="0">:origin_micro_y</param>
+            <param direction="Input" dbtype="Number" size="0">:origin_index_x</param>
+            <param direction="Input" dbtype="Number" size="0">:origin_index_y</param>
+            <param direction="Input" dbtype="Number" size="0">:first_micro_x</param>
+            <param direction="Input" dbtype="Number" size="0">:first_micro_y</param>
+            <param direction="Input" dbtype="Number" size="0">:first_index_x</param>
+            <param direction="Input" dbtype="Number" size="0">:first_index_y</param>
+            <param direction="Input" dbtype="Number" size="0">:edge_size</param>
+            <param direction="Input" dbtype="Number" size="0">:angle</param>
+            <param direction="Input" dbtype="Number" size="0">:netdie</param>
+            <param direction="Input" dbtype="Number" size="0">:notch_type</param>
+            <param direction="Input" dbtype="Number" size="0">:st_start</param>
+            <param direction="Input" dbtype="Number" size="0">:st_intype</param>
+            <param direction="Input" dbtype="Number" size="0">:st_xcnt</param>
+            <param direction="Input" dbtype="Number" size="0">:st_ycnt</param>
+            <param direction="Input" dbtype="Number" size="0">:st_start_x</param>
+            <param direction="Input" dbtype="Number" size="0">:st_start_y</param>
+            <param direction="Input" dbtype="Number" size="0">:die_index_min_x</param>
+            <param direction="Input" dbtype="Number" size="0">:die_index_max_x</param>
+            <param direction="Input" dbtype="Number" size="0">:die_index_min_y</param>
+            <param direction="Input" dbtype="Number" size="0">:die_index_max_y</param>
+            <param direction="Input" dbtype="Number" size="0">:xy_direction</param>
+            <param direction="Input" dbtype="VarChar" size="30">:mapid</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_MAP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_MAPDEF SET DELETE_FLAG = 'Y', UPDATE_TIME = SYSDATE, UPDATE_USER = :update_user
+WHERE MAPID=:mapid]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:mapid</param>
+            <param direction="Input" dbtype="VarChar" size="40">:update_user</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="__ALLSELECT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[??]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_NETDIE" commandtype="Text" description="NetDie를 가져온다." commandtimeout="60">
+        <commandtext><![CDATA[SELECT  NETDIE FROM TQP_MAPDEF 
+WHERE UPPER(MAPID) = UPPER(:mapid)
+AND NVL(DELETE_FLAG,'N') <> 'Y']]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30" value="MAP1">:mapid</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_MAPINFO" commandtype="Text" description="Map Define 정보를 가져온다." commandtimeout="60">
+        <commandtext><![CDATA[SELECT FACTORY,
+       MAPID,
+       WAFER_SIZE,
+       CHIP_SIZE_X,
+       CHIP_SIZE_Y,
+       ORIGIN_MICRO_X,
+       CHIP_SIZE_Y - ORIGIN_MICRO_Y  AS ORIGIN_MICRO_Y,
+       ORIGIN_INDEX_X,
+       ORIGIN_INDEX_Y,
+       FIRST_MICRO_X,
+       FIRST_MICRO_Y,
+       FIRST_INDEX_X,
+       FIRST_INDEX_Y,
+       EDGE_SIZE,
+       ANGLE,
+       NETDIE,
+       NETSHOT,
+       NOTCH_TYPE,
+       ST_START,
+       ST_INTYPE,
+       ST_XCNT,
+       ST_YCNT,
+       ST_START_X,
+       ST_START_Y,
+       DIE_INDEX_MIN_X,
+       DIE_INDEX_MAX_X,
+       DIE_INDEX_MIN_Y,
+       DIE_INDEX_MAX_Y,
+       XY_DIRECTION,
+       REFERENCEDIE_SETTING,
+       DELETE_FLAG,
+       INSERT_TIME,
+       INSERT_USER,
+       UPDATE_TIME,
+       UPDATE_USER FROM TQP_MAPDEF 
+       WHERE 1 = 1
+        AND UPPER(MAPID) = UPPER(:mapid)
+        AND NVL(DELETE_FLAG,'N') <> 'Y']]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:mapid</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_MAPDEF_BY_LOTID" commandtype="Text" description="Map Define 정보를 가져온다." commandtimeout="60">
+        <commandtext><![CDATA[SELECT 
+    A.FACTORY,
+    A.MAPID,
+    A.WAFER_SIZE,
+    A.CHIP_SIZE_X,
+    A.CHIP_SIZE_Y,
+    A.ORIGIN_MICRO_X,
+    A.CHIP_SIZE_Y - ORIGIN_MICRO_Y  AS ORIGIN_MICRO_Y,
+    A.ORIGIN_INDEX_X,
+    A.ORIGIN_INDEX_Y,
+    A.FIRST_MICRO_X,
+    A.FIRST_MICRO_Y,
+    A.FIRST_INDEX_X,
+    A.FIRST_INDEX_Y,
+    A.EDGE_SIZE,
+    A.ANGLE,
+    A.NETDIE,
+    A.NETSHOT,
+    A.NOTCH_TYPE,
+    A.ST_START,
+    A.ST_INTYPE,
+    A.ST_XCNT,
+    A.ST_YCNT,
+    A.ST_START_X,
+    A.ST_START_Y,
+    A.DIE_INDEX_MIN_X,
+    A.DIE_INDEX_MAX_X,
+    A.DIE_INDEX_MIN_Y,
+    A.DIE_INDEX_MAX_Y,
+    A.XY_DIRECTION,
+    A.REFERENCEDIE_SETTING,
+    A.DELETE_FLAG,
+    A.INSERT_TIME,
+    A.INSERT_USER,
+    A.UPDATE_TIME,
+    A.UPDATE_USER
+ FROM TQP_MAPDEF A, TQP_PRODUCT B 
+WHERE 1=1
+AND A.MAPID = B.MAPID
+AND B.PRODUCT = :LotId
+AND NVL(A.DELETE_FLAG,'N') <> 'Y'
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:LotId</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="CREATE_MAP1" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_MAPDEF VALUES(:mapid
+,:wafer_size
+,:chip_size_x
+,:chip_size_y
+,:origin_micro_x
+,:origin_micro_y
+,:origin_index_x
+,:origin_index_y
+,:first_micro_x
+,:first_micro_y
+,:first_index_x
+,:first_index_y
+,:edge_size
+,:angle
+,:netdie
+,:notch_type
+,:st_start
+,:st_intype
+,:st_xcnt    
+,:st_ycnt    
+,:st_start_x
+,:st_start_y
+,:die_index_min_x
+,:die_index_max_x
+,:die_index_min_y
+,:die_index_max_y
+,:xy_direction
+,:referance_setting)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:mapid</param>
+            <param direction="Input" dbtype="Number" size="10">:wafer_size</param>
+            <param direction="Input" dbtype="Number" size="10">:chip_size_x</param>
+            <param direction="Input" dbtype="Number" size="10">:chip_size_y</param>
+            <param direction="Input" dbtype="Number" size="10">:origin_micro_x</param>
+            <param direction="Input" dbtype="Number" size="10">:origin_micro_y</param>
+            <param direction="Input" dbtype="Int32" size="10">:origin_index_x</param>
+            <param direction="Input" dbtype="Int32" size="10">:origin_index_y</param>
+            <param direction="Input" dbtype="Number" size="10">:first_micro_x</param>
+            <param direction="Input" dbtype="Number" size="10">:first_micro_y</param>
+            <param direction="Input" dbtype="Int32" size="10">:first_index_x</param>
+            <param direction="Input" dbtype="Int32" size="10">:first_index_y</param>
+            <param direction="Input" dbtype="Number" size="10">:edge_size</param>
+            <param direction="Input" dbtype="Int32" size="10">:angle</param>
+            <param direction="Input" dbtype="Int32" size="10">:netdie</param>
+            <param direction="Input" dbtype="Int32" size="10">:notch_type</param>
+            <param direction="Input" dbtype="Number" size="10">:st_start</param>
+            <param direction="Input" dbtype="Number" size="10">:st_intype</param>
+            <param direction="Input" dbtype="Number" size="10">:st_xcnt</param>
+            <param direction="Input" dbtype="Number" size="10">:st_ycnt</param>
+            <param direction="Input" dbtype="Number" size="10">:st_start_x</param>
+            <param direction="Input" dbtype="Number" size="10">:st_start_y</param>
+            <param direction="Input" dbtype="Int32" size="10">:die_index_min_x</param>
+            <param direction="Input" dbtype="Int32" size="10">:die_index_max_x</param>
+            <param direction="Input" dbtype="Int32" size="10">:die_index_min_y</param>
+            <param direction="Input" dbtype="Int32" size="10">:die_index_max_y</param>
+            <param direction="Input" dbtype="Int32" size="0">:xy_direction</param>
+            <param direction="Input" dbtype="Int32" size="10">:referance_setting</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_MAPDEF_DIE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT FACTORY, MAPID, DIE_TYPE, TO_NUMBER(DIE_NO) DIE_NO, INDEX_X, INDEX_Y
+  FROM TQP_MAPDEF_DIE 
+ WHERE MAPID = :MAPID
+  AND DIE_TYPE = 'DIE']]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:MAPID</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_MAPDEF_DIE_DM" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT INDEX_X, INDEX_Y, 1 AS TEST
+  FROM TQP_MAPDEF_DIE 
+ WHERE MAPID = :MAPID
+  AND DIE_TYPE = 'DIE']]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="MTDN">:MAPID</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_MAPDEF_DIE_INFO" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT MAPID AS SETUP_ID,
+       ANGLE,
+       WAFER_SIZE,
+       NOTCH_TYPE,
+       CHIP_SIZE_X AS DIE_PITCH_X,
+       CHIP_SIZE_Y AS DIE_PITCH_Y,
+       ORIGIN_INDEX_X AS DIE_ORIGIN_X,
+       ORIGIN_INDEX_Y AS DIE_ORIGIN_Y,
+       ORIGIN_MICRO_X AS ORIGIN_X,
+       CHIP_SIZE_Y - ORIGIN_MICRO_Y  AS ORIGIN_Y
+  FROM TQP_MAPDEF
+ WHERE 1 = 1 
+   AND MAPID = :MAPID
+   AND NVL(DELETE_FLAG,'N') <> 'Y']]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="MAPID">:MAPID</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_MAPDEF_ALL" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT FACTORY,
+       MAPID,
+       WAFER_SIZE,
+       CHIP_SIZE_X,
+       CHIP_SIZE_Y,
+       ORIGIN_MICRO_X,
+       CHIP_SIZE_Y - ORIGIN_MICRO_Y  AS ORIGIN_MICRO_Y,
+       ORIGIN_INDEX_X,
+       ORIGIN_INDEX_Y,
+       FIRST_MICRO_X,
+       FIRST_MICRO_Y,
+       FIRST_INDEX_X,
+       FIRST_INDEX_Y,
+       EDGE_SIZE,
+       ANGLE,
+       NETDIE,
+       NETSHOT,
+       NOTCH_TYPE,
+       ST_START,
+       ST_INTYPE,
+       ST_XCNT,
+       ST_YCNT,
+       ST_START_X,
+       ST_START_Y,
+       DIE_INDEX_MIN_X,
+       DIE_INDEX_MAX_X,
+       DIE_INDEX_MIN_Y,
+       DIE_INDEX_MAX_Y,
+       XY_DIRECTION,
+       REFERENCEDIE_SETTING,
+       DELETE_FLAG,
+       TO_CHAR(INSERT_TIME, 'YYYY/MM/DD HH24:MI:SS') AS INSERT_TIME,
+       INSERT_USER,
+       TO_CHAR(UPDATE_TIME, 'YYYY/MM/DD HH24:MI:SS') AS UPDATE_TIME,
+       UPDATE_USER
+ FROM TQP_MAPDEF 
+  WHERE 1 = 1 
+    AND NVL(DELETE_FLAG,'N') <> 'Y'
+   ORDER BY MAPID]]></commandtext>
+    </query>
+    <query statement="Select" queryid="GET_MAPIDLIST_ALL" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT MAPID, CASE WHEN DELETE_FLAG = 'Y' THEN MAPID || ' (USER)' ELSE MAPID END DISP_MAPID
+FROM TQP_MAPDEF
+ORDER BY 1
+]]></commandtext>
+    </query>
+    <query statement="Select" queryid="EXISTS_MAPID" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT 1 FROM TQP_MAPDEF
+WHERE FACTORY = :FACTORY
+AND MAPID = :MAPID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="FACTORY">:FACTORY</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="MAPID">:MAPID</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="INSERT_USER_MAP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_MAPDEF (
+    FACTORY,
+    MAPID  ,
+    WAFER_SIZE  ,
+    CHIP_SIZE_X ,
+    CHIP_SIZE_Y ,
+    ORIGIN_MICRO_X  ,
+    ORIGIN_MICRO_Y  ,
+    ORIGIN_INDEX_X  ,
+    ORIGIN_INDEX_Y  ,
+    EDGE_SIZE   ,
+    ANGLE   ,
+    NOTCH_TYPE  ,
+    DIE_INDEX_MIN_X ,
+    DIE_INDEX_MAX_X ,
+    DIE_INDEX_MIN_Y ,
+    DIE_INDEX_MAX_Y ,
+    XY_DIRECTION,
+    INSERT_TIME,
+    INSERT_USER,
+    DELETE_FLAG
+ ) VALUES(
+     :factory
+    ,:mapid
+    ,:wafer_size
+    ,:chip_size_x
+    ,:chip_size_y
+    ,:origin_micro_x
+    ,:chip_size_y - :origin_micro_y
+    ,:origin_index_x
+    ,:origin_index_y
+    ,:edge_size
+    ,0
+    ,0
+    ,:die_index_min_x
+    ,:die_index_max_x
+    ,:die_index_min_y
+    ,:die_index_max_y
+    ,0
+    ,SYSDATE
+    ,:create_user
+    ,'Y'
+)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="factory">:factory</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="mapid">:mapid</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="wafer_size">:wafer_size</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="chip_size_x">:chip_size_x</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="chip_size_y">:chip_size_y</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="origin_micro_x">:origin_micro_x</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="origin_micro_y">:origin_micro_y</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="origin_index_x">:origin_index_x</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="origin_index_y">:origin_index_y</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="edge_size">:edge_size</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="die_index_min_x">:die_index_min_x</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="die_index_max_x">:die_index_max_x</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="die_index_min_y">:die_index_min_y</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="die_index_max_y">:die_index_max_y</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="create_user">:create_user</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_USER_MAP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_MAPDEF
+SET
+    WAFER_SIZE = :wafer_size,
+    CHIP_SIZE_X = :chip_size_x,
+    CHIP_SIZE_Y = :chip_size_y,
+    ORIGIN_MICRO_X = :origin_micro_x,
+    ORIGIN_MICRO_Y = :chip_size_y - :origin_micro_y,
+    ORIGIN_INDEX_X = :origin_index_x,
+    ORIGIN_INDEX_Y = :origin_index_y,
+    EDGE_SIZE = :edge_size,
+    DIE_INDEX_MIN_X = :die_index_min_x,
+    DIE_INDEX_MAX_X = :die_index_max_x,
+    DIE_INDEX_MIN_Y = :die_index_min_y,
+    DIE_INDEX_MAX_Y = :die_index_max_y
+WHERE FACTORY = :factory
+AND MAPID = :mapid]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="factory">:factory</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="mapid">:mapid</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="wafer_size">:wafer_size</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="chip_size_x">:chip_size_x</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="chip_size_y">:chip_size_y</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="origin_micro_x">:origin_micro_x</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="origin_micro_y">:origin_micro_y</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="origin_index_x">:origin_index_x</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="origin_index_y">:origin_index_y</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="edge_size">:edge_size</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="die_index_min_x">:die_index_min_x</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="die_index_max_x">:die_index_max_x</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="die_index_min_y">:die_index_min_y</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="die_index_max_y">:die_index_max_y</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_USER_MAP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[DELETE FROM TQP_MAPDEF
+WHERE FACTORY = :factory
+AND MAPID = :mapid]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="factory">:factory</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="mapid">:mapid</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_MAPDEF_MAP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT FACTORY,
+       MAPID,
+       WAFER_SIZE,
+       CHIP_SIZE_X,
+       CHIP_SIZE_Y,
+       ORIGIN_MICRO_X,
+       CHIP_SIZE_Y - ORIGIN_MICRO_Y  AS ORIGIN_MICRO_Y,
+       ORIGIN_INDEX_X,
+       ORIGIN_INDEX_Y,
+       FIRST_MICRO_X,
+       FIRST_MICRO_Y,
+       FIRST_INDEX_X,
+       FIRST_INDEX_Y,
+       EDGE_SIZE,
+       ANGLE,
+       NETDIE,
+       NETSHOT,
+       NOTCH_TYPE,
+       ST_START,
+       ST_INTYPE,
+       ST_XCNT,
+       ST_YCNT,
+       ST_START_X,
+       ST_START_Y,
+       DIE_INDEX_MIN_X,
+       DIE_INDEX_MAX_X,
+       DIE_INDEX_MIN_Y,
+       DIE_INDEX_MAX_Y,
+       XY_DIRECTION,
+       REFERENCEDIE_SETTING,
+   CASE WHEN DELETE_FLAG = 'Y' THEN 'Y' ELSE 'N' END DELETE_FLAG,
+       TO_CHAR(INSERT_TIME,'YYYY-MM-DD HH24:MI:SS') INSERT_TIME,
+       INSERT_USER,
+       TO_CHAR(UPDATE_TIME,'YYYY-MM-DD HH24:MI:SS') UPDATE_TIME,
+       UPDATE_USER
+ FROM TQP_MAPDEF 
+  WHERE 1 = 1 
+    AND MAPID = :MAPID
+    AND NVL(DELETE_FLAG,'N') <> 'Y']]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="MAPID">:MAPID</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_MAP_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT -1 AS WAFER_SEQ,
+       DIE_NO AS DIE_NUM,
+       'AVI' AS TEST_AREA,
+       0 AS DIEPROBE_CNT,
+       INDEX_X AS X,
+       INDEX_Y AS Y,
+       0 AS BIN,
+       '0' AS BIN_CHAR,
+       '' AS IMAGE_PATH,
+       '' AS THUMB_PATH,
+       '' AS IMAGE_FILE_NAME,
+       '' AS THUMB_FILENAME
+  FROM TQP_MAPDEF_DIE
+ WHERE 1 = 1 
+    AND MAPID = :mapid
+    AND DIE_TYPE = 'DIE']]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="mapid">:mapid</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_MAPIDLIST_USE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT MAPID, CASE WHEN DELETE_FLAG = 'Y' THEN MAPID || ' (USER)' ELSE MAPID END DISP_MAPID
+FROM TQP_MAPDEF
+WHERE 1 = 1 
+AND NVL(DELETE_FLAG,'N') <> 'Y'
+ORDER BY 1
+]]></commandtext>
+    </query>
+</queryxml>

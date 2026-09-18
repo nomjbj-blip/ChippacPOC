@@ -1,0 +1,103 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Select" queryid="SELECT_TODAY_LOG_GROUP_BY_BYEQUIP" commandtype="Text" description="장비별 그날의 LOG를 가져오기" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQD_UPDATELOG 
+WHERE FACILITY = :facility
+AND START_TIME = :start_time]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0" description="FAB ID">:facility</param>
+            <param direction="Input" dbtype="VarChar" size="10" description="FAB ID">:start_time</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="CREATE_UPDATELOG" commandtype="Text" description="Log저장" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQD_UPDATELOG
+(FACILITY  ,   
+EQUIP_ID  ,   
+START_TIME) VALUES(:facility,:equip_id,TO_DATE(:start_time,'YYYY-MM-DD HH24:MI:SS'))]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0" description="FAB ID">:facility</param>
+            <param direction="Input" dbtype="VarChar" size="0" description="EQUIP_ID">:equip_id</param>
+            <param direction="Input" dbtype="VarChar" size="19">:start_time</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_UPDATELOG" commandtype="Text" description="Update Log" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQD_UPDATELOG 
+SET 
+END_TIME = TO_DATE(:end_time,'YYYY-MM-DD HH24:MI:SS')
+,SVC_TIME = TO_DATE(:svc_time,'YYYY-MM-DD HH24:MI:SS')
+,TR_TYPE = :tr_type
+,SUCCESS_FLAG =:success_flag
+,STEP_SEQ = :step_seq
+,RESULT_FILE = :result_file
+,ERROR_FILE =:error_file
+,BACKUP_FILE =:backup_file
+,DEFECTS = :defects
+,IMAGES =:images
+WHERE 
+EQUIP_ID = :equip_id
+AND START_TIME = TO_DATE(:start_time,'YYYY-MM-DD HH24:MI:SS')]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="19">:end_time</param>
+            <param direction="Input" dbtype="VarChar" size="19">:svc_time</param>
+            <param direction="Input" dbtype="VarChar" size="0">:tr_type</param>
+            <param direction="Input" dbtype="Char" size="4">:success_flag</param>
+            <param direction="Input" dbtype="Number" size="0">:step_seq</param>
+            <param direction="Input" dbtype="VarChar" size="0">:result_file</param>
+            <param direction="Input" dbtype="VarChar" size="0">:error_file</param>
+            <param direction="Input" dbtype="VarChar" size="0">:backup_file</param>
+            <param direction="Input" dbtype="Number" size="0">:defects</param>
+            <param direction="Input" dbtype="Number" size="0">:images</param>
+            <param direction="Input" dbtype="VarChar" size="0">:equip_id</param>
+            <param direction="Input" dbtype="VarChar" size="19">:start_time</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_UPDATE_HISTORY_BY_EQUIP" commandtype="Text" description="장비와 기간을 조건으로 Update History를 가져온다" commandtimeout="60">
+        <commandtext><![CDATA[SELECT 
+FACILITY AS FAB
+,EQUIP_ID AS EQUIP
+,TO_CHAR(START_TIME,'YYYY-MM-DD HH24:MI:SS') AS START_TIME
+,TO_CHAR(END_TIME,'YYYY-MM-DD HH24:MI:SS') AS END_TIME
+,TO_CHAR(SVC_TIME,'YYYY-MM-DD HH24:MI:SS') AS SERVICE_TIME
+,TR_TYPE AS TRANS_TYPE 
+,SUCCESS_FLAG
+,STEP_SEQ
+,RESULT_FILE AS RESULT
+,ERROR_FILE AS ERROR
+,BACKUP_FILE AS BACKUP
+,DEFECTS
+,IMAGES
+FROM TQD_UPDATELOG
+WHERE 
+START_TIME BETWEEN :fromtime AND :totime
+AND EQUIP_ID = :equip_id
+ORDER BY START_TIME DESC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="19">:fromtime</param>
+            <param direction="Input" dbtype="VarChar" size="19">:totime</param>
+            <param direction="Input" dbtype="VarChar" size="0">:equip_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_FILE_DEFECT_COUNT_BYHOUR" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT SUBSTR(TO_CHAR(START_TIME,'YYYY-MM-DD HH24:MI:SS'),1,13) AS HO,COUNT(*) AS COUNT,SUM(DEFECTS)
+FROM TQD_UPDATELOG 
+WHERE
+EQUIP_ID = :equip_id
+AND START_TIME BETWEEN :fromtime AND :totime
+GROUP BY  SUBSTR(TO_CHAR(START_TIME,'YYYY-MM-DD HH24:MI:SS'),1,13)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:equip_id</param>
+            <param direction="Input" dbtype="VarChar" size="19">:fromtime</param>
+            <param direction="Input" dbtype="VarChar" size="19">:totime</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_FILE_DEFECT_COUNT_BYHOUR_ALLEQUIP" commandtype="Text" description="ALLEQUIP" commandtimeout="60">
+        <commandtext><![CDATA[SELECT SUBSTR(TO_CHAR(START_TIME,'YYYY-MM-DD HH24:MI:SS'),1,13) AS HO,COUNT(*) AS COUNT,SUM(DEFECTS)
+FROM TQD_UPDATELOG 
+WHERE START_TIME BETWEEN :fromtime AND :totime
+GROUP BY  SUBSTR(TO_CHAR(START_TIME,'YYYY-MM-DD HH24:MI:SS'),1,13)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="19">:fromtime</param>
+            <param direction="Input" dbtype="VarChar" size="19">:totime</param>
+        </parameters>
+    </query>
+</queryxml>

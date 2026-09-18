@@ -1,0 +1,306 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Insert" queryid="INSERT_PRB" commandtype="Text" description="Tset Data를 추가 한다." commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO ?? VALUES( :wafer_seq, :dieid, :x, :y, :bin, :hbin, :charbin, :site, :visualinsp, :avi)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="8">:wafer_seq</param>
+            <param direction="Input" dbtype="Int32" size="0">:dieid</param>
+            <param direction="Input" dbtype="Int32" size="0">:x</param>
+            <param direction="Input" dbtype="Int32" size="0">:y</param>
+            <param direction="Input" dbtype="Int32" size="0">:bin</param>
+            <param direction="Input" dbtype="Int32" size="0">:hbin</param>
+            <param direction="Input" dbtype="VarChar" size="4">:charbin</param>
+            <param direction="Input" dbtype="Int32" size="0">:site</param>
+            <param direction="Input" dbtype="Int32" size="0">:visualinsp</param>
+            <param direction="Input" dbtype="Int32" size="0">:avi</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_BINDATA" commandtype="Text" description="Bin정보를 가져온다." commandtimeout="60">
+        <commandtext><![CDATA[SELECT BIN, COUNT(*)  
+FROM ?? 
+WHERE WAFER_SEQ = :wafer_seq  
+GROUP BY BIN
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="8">:wafer_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_INFO" commandtype="Text" description="Bin Data를 가져온다." commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM ?? WHERE WAFER_SEQ = :wafer_seq  ORDER BY Y, X]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="8" value="14">:wafer_seq</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_AVI" commandtype="Text" description="Avi bin 항목을 Update한다" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE ?? SET AVI = :bin
+WHERE WAFER_SEQ = :wafer_seq
+and X = :x
+and Y = :y]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="8" value="353">:wafer_seq</param>
+            <param direction="Input" dbtype="Int32" size="0" value="140">:x</param>
+            <param direction="Input" dbtype="Int32" size="0" value="104">:y</param>
+            <param direction="Input" dbtype="Int32" size="0" value="40">:bin</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_LOSSDIE" commandtype="Text" description="Lossdie 개수를 가져온다." commandtimeout="60">
+        <commandtext><![CDATA[SELECT COUNT(*) LOSSDIE FROM ??
+WHERE WAFER_SEQ = :wafer_seq
+AND BIN IN
+    (SELECT BIN FROM T_TPS_BINDESC
+    WHERE PROGRAM = :program
+    AND PRODUCT = :product
+    AND HIGH_GEC = 'F')
+    AND BIN < 1
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="8" value="426">:wafer_seq</param>
+            <param direction="Input" dbtype="VarChar" size="30" value="LGDP4213A-EDS-REV1">:program</param>
+            <param direction="Input" dbtype="VarChar" size="30" value="LGDP4213A">:product</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_XY" commandtype="Text" description="X, Y 에 해당하는 Row가 있는가 " commandtimeout="60">
+        <commandtext><![CDATA[SELECT COUNT(*) FROM ??
+WHERE WAFER_SEQ = :wafer_seq
+and X = :x
+and Y = :y]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="8">:wafer_seq</param>
+            <param direction="Input" dbtype="Int32" size="0">:x</param>
+            <param direction="Input" dbtype="Int32" size="0">:y</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="COPY_PRB" commandtype="Text" description="Data를 복사 insert" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO ??
+SELECT :wafer_seq AS WAFER_SEQ, DIEID, X, Y, BIN, HBIN, CHARBIN, SITE, VISUALINSP, AVI 
+FROM ??
+WHERE WAFER_SEQ = :pwafer_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="8">:wafer_seq</param>
+            <param direction="Input" dbtype="Number" size="8">:pwafer_seq</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_PRB" commandtype="Text" description="Tset Data를 Update 한다." commandtimeout="60">
+        <commandtext><![CDATA[UPDATE ?? SET BIN = :bin, HBIN = :hbin, CHARBIN = :charbin
+WHERE WAFER_SEQ = :wafer_seq
+and X = :x
+and Y = :y]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="8">:wafer_seq</param>
+            <param direction="Input" dbtype="Int32" size="0">:x</param>
+            <param direction="Input" dbtype="Int32" size="0">:y</param>
+            <param direction="Input" dbtype="Int32" size="0">:bin</param>
+            <param direction="Input" dbtype="Int32" size="0">:hbin</param>
+            <param direction="Input" dbtype="VarChar" size="4">:charbin</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_TESTDIE" commandtype="Text" description="Test Die 수를 가져온다." commandtimeout="60">
+        <commandtext><![CDATA[SELECT COUNT(*) TESTDIE FROM ??
+WHERE WAFER_SEQ = :wafer_seq
+AND BIN <> 88]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="8">:wafer_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_TABLENAME" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT TABLE_NAME 
+FROM TABS 
+WHERE TABLE_NAME= :program]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="20" value="61901_RDL_29MIL">:program</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_FAILDIE" commandtype="Text" description="Faildie 개수를 가져온다." commandtimeout="60">
+        <commandtext><![CDATA[SELECT COUNT(*) FAILDIE FROM ??
+WHERE WAFER_SEQ = :wafer_seq
+AND BIN IN
+    (SELECT BIN FROM T_TPS_BINDESC
+    WHERE PROGRAM = :program
+    AND PRODUCT = :product
+    AND HIGH_GEC = 'F')
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="8" value="426">:wafer_seq</param>
+            <param direction="Input" dbtype="VarChar" size="30" value="LGDP4213A-EDS-REV1">:program</param>
+            <param direction="Input" dbtype="VarChar" size="30" value="LGDP4213A">:product</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="CREATE_TEMP_TABLE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2013-08-26 18:39:44
+
+CREATE TABLE ??
+AS SELECT *
+FROM ??
+WHERE 1=0]]></commandtext>
+    </query>
+    <query statement="Insert" queryid="COPY_TEMP_TABLE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2013-08-26 18:40:18
+
+INSERT INTO ??(WAFER_SEQ,DIEID,X,Y,BIN,HBIN,CHARBIN,VISUALINSP,AVI)
+SELECT WAFER_SEQ,DIEID,X,Y,BIN,HBIN,CHARBIN,VISUALINSP,AVI
+FROM ??]]></commandtext>
+    </query>
+    <query statement="Delete" queryid="DROP_TEMP_TABLE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2013-08-26 18:41:58
+
+DROP TABLE ??]]></commandtext>
+    </query>
+    <query statement="Insert" queryid="COPY_TEMP_TABLE_TO_ITEM" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2013-08-26 19:21:03
+
+INSERT INTO ??
+SELECT *
+FROM ??]]></commandtext>
+    </query>
+    <query statement="Select" queryid="DYNAMIC_QUERY" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[??]]></commandtext>
+    </query>
+    <query statement="Insert" queryid="COPY_ROW_DATA_NOT_PRB" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO ??
+SELECT :wafer_seq AS WAFER_SEQ, DIEID, X, Y, BIN, CHARBIN, VISUALINSP 
+FROM ??
+WHERE WAFER_SEQ = :pwafer_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="20">:wafer_seq</param>
+            <param direction="Input" dbtype="Number" size="20">:pwafer_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ROW_DATA_WITH_GEC" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT A.X, A.Y
+        , A.BIN, DECODE(A.BIN, 1, 'T','F')
+        , A.VISUALINSP, DECODE(A.VISUALINSP, 0, 'T','F') AS VISUAL_GEC
+FROM T_INCUST A,  T_TPS_BINDESC B
+WHERE 1=1    
+AND A.WAFER_SEQ = :wafer_seq
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="8">:wafer_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_BINDATA_MULTI" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT BIN, COUNT(*)  
+FROM ?? 
+WHERE WAFER_SEQ IN (??)
+GROUP BY BIN
+]]></commandtext>
+    </query>
+    <query statement="Insert" queryid="COPY_ROW_DATA_FOR_AOI" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO ?? (WAFER_SEQ, DIEID, X, Y, BIN, CHARBIN)
+SELECT :wafer_seq AS WAFER_SEQ, DIEID, X, Y, BIN, CHARBIN
+FROM ??
+WHERE WAFER_SEQ = :pwafer_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="20">:wafer_seq</param>
+            <param direction="Input" dbtype="Number" size="20">:pwafer_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_INFO_AVI_MERGE_VI" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT
+( B.X - C.MIN_X +1) X --X
+, (C.MAX_Y - B.Y +1 ) Y  --Y
+, CASE
+        WHEN DECODE(A.BIN, null, 1, A.BIN) != 1 THEN A.BIN
+        WHEN VISUALINSP != 0 THEN VISUALINSP
+        ELSE 1 
+  END BIN -- BIN
+FROM 
+(
+    SELECT XINDEX AS X, YINDEX AS Y, MAX(CLASSNUMBER) AS BIN 
+    FROM
+    (
+        SELECT STEP_SEQ, RANK() OVER (ORDER BY RESULTTIMESTAMP DESC) AS RANK 
+        FROM T_DMS_LOT A, T_DMS_WAFER B, T_DMS_STEP C
+        WHERE 1=1
+        AND A.LOT_ID = :lot_id
+        AND A.LOT_SEQ = B.LOT_SEQ
+        AND B.WAFER_ID = :wafer_id
+        AND B.WAFER_SEQ = C.WAFER_SEQ
+        AND C.STEP_ID = :step_id
+    ) A, T_DMS_DEFECT B
+    WHERE A.RANK = 1
+    AND A.STEP_SEQ = B.STEP_SEQ
+    GROUP BY XINDEX, YINDEX
+) A,
+(
+    SELECT INDEX_X AS X, INDEX_Y AS Y, VISUALINSP 
+    FROM
+    (
+        SELECT STEP_SEQ, RANK() OVER (ORDER BY RESULTTIMESTAMP DESC) AS RANK
+        FROM T_DMS_LOT A, T_DMS_WAFER B, T_DMS_STEP C
+        WHERE 1=1
+        AND A.LOT_ID = :lot_id
+        AND A.LOT_SEQ = B.LOT_SEQ
+        AND B.WAFER_ID = :wafer_id
+        AND B.WAFER_SEQ = C.WAFER_SEQ
+        AND C.STEP_ID = :step_id
+    ) A, T_DMS_SCAN_SAMPLE B
+    WHERE A.RANK = 1
+    AND A.STEP_SEQ = B.STEP_SEQ
+) B,
+(
+    --SELECT LOT_ID, WAFER_ID
+    SELECT
+    MAX(INDEX_X) MAX_X, MAX(INDEX_Y) MAX_Y
+    , MIN(INDEX_X) MIN_X, MIN(INDEX_Y) MIN_Y
+    FROM (
+                SELECT LOT_ID, WAFER_ID, STEP_SEQ, RANK() OVER (ORDER BY RESULTTIMESTAMP DESC) AS RANK
+                FROM T_DMS_LOT A, T_DMS_WAFER B, T_DMS_STEP C
+                WHERE 1=1
+                AND A.LOT_ID = :lot_id
+                AND A.LOT_SEQ = B.LOT_SEQ
+                AND B.WAFER_ID = :wafer_id
+                AND B.WAFER_SEQ = C.WAFER_SEQ
+                AND C.STEP_ID = :step_id
+               ) A, T_DMS_SCAN_SAMPLE B
+       WHERE A.RANK = 1
+       AND A.STEP_SEQ = B.STEP_SEQ
+       --GROUP BY LOT_ID, WAFER_ID
+) C 
+WHERE 1=1 
+AND A.X (+)= B.X
+AND A.Y (+)= B.Y
+ORDER BY Y, X]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:wafer_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:step_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_INFO_MERGE_VI" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT X,Y
+,CASE 
+    WHEN BIN != 1 THEN BIN
+    WHEN VISUALINSP != 0 THEN VISUALINSP
+    ELSE 1
+END BIN
+FROM ?? 
+WHERE WAFER_SEQ = :wafer_seq  
+ORDER BY Y, X]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="8">:wafer_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_MAX_WAFERSEQ" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2015-03-25 10:33:29
+SELECT WAFER_SEQ.NEXTVAL FROM DUAL]]></commandtext>
+    </query>
+    <query statement="Insert" queryid="CALL_PROCEDURE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2015-03-25 15:47:02
+CALL BUMPFA.proc_run_prb_summary(:testarea, :product, :program, :wafer_seq, :gec_bin)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:testarea</param>
+            <param direction="Input" dbtype="VarChar" size="40">:product</param>
+            <param direction="Input" dbtype="VarChar" size="40">:program</param>
+            <param direction="Input" dbtype="VarChar" size="40">:wafer_seq</param>
+            <param direction="Input" dbtype="VarChar" size="40">:gec_bin</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="INSERTD_BYUSEMAP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2015-04-14 09:53:03
+INSERT INTO ?? SELECT :wafer_seq, ROWNUM, X, Y, 0, 0, '0', 0, 0, 0 FROM TQP_USEMAP WHERE MAPID = :mapid AND USECODE > 0]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:wafer_seq</param>
+            <param direction="Input" dbtype="VarChar" size="40">:mapid</param>
+        </parameters>
+    </query>
+</queryxml>

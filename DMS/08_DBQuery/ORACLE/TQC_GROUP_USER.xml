@@ -1,0 +1,131 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="QMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Update" queryid="UPDATEGROUPUSER" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[Update TQC_GROUP_USER Set SEC_GRP_ID=:strNewGrp where SEC_GRP_ID=:strDelGrp]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:strNewGrp</param>
+            <param direction="Input" dbtype="VarChar" size="40">:strDelGrp</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="LOADGROUPUSER" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT SEC_GRP_ID, USER_ID 
+FROM TQC_GROUP_USER 
+WHERE SEC_GRP_ID=:strGrpCode]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="20" value="G004">:strGrpCode</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="COUNTBYGROUP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT SEC_GRP_ID, count(*) as CNT
+  FROM TQC_GROUP_USER 
+ GROUP BY SEC_GRP_ID 
+order by SEC_GRP_ID ]]></commandtext>
+    </query>
+    <query statement="Select" queryid="LOADJOINUSERNAME" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT A.SEC_GRP_ID, B.USER_NAME, A.USER_ID
+  FROM TQC_GROUP_USER A, TQC_USER B
+ WHERE A.USER_ID = B.USER_ID
+order by B.USER_NAME
+]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SEARCHGROUPUSER" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM
+ (SELECT A.SEC_GRP_ID, B.USER_NAME, A.USER_ID
+      FROM TQC_GROUP_USER A, TQC_USER B
+    WHERE A.USER_ID = B.USER_ID
+ )
+Where USER_NAME like :strSearch 
+    OR USER_ID like :strSearch]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:strSearch</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SEARCHDEPARTMENTUSER" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM  (SELECT DISTINCT   B.USER_CMF_1, B.USER_NAME,  A.USER_ID
+                                FROM TQC_GROUP_USER A, TQC_USER B
+                               WHERE A.USER_ID = B.USER_ID
+                                    and B.USER_CMF_1 is not null
+                            )
+Where USER_NAME like :strSearch 
+OR USER_ID like :strSearch
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:strSearch</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SEARCHGROUPLIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT SEC_GRP_ID, count(*) as CNT
+   FROM (SELECT * FROM (SELECT A.SEC_GRP_ID, B.USER_NAME, A.USER_ID
+                                            FROM TQC_GROUP_USER A, TQC_USER B
+                                           WHERE A.USER_ID = B.USER_ID
+                                       )
+                             Where USER_NAME like :strSearch 
+                                  OR USER_ID like :strSearch)
+               GROUP BY SEC_GRP_ID 
+order by SEC_GRP_ID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:strSearch</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SEARCHDEPARTMENTLIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT USER_CMF_1, count(*) as CNT
+   FROM (SELECT * FROM (SELECT DISTINCT B.USER_CMF_1, B.USER_NAME, A.USER_ID
+                                            FROM TQC_GROUP_USER A, TQC_USER B
+                                           WHERE A.USER_ID = B.USER_ID
+                                               AND B.USER_CMF_1 is not null
+                                         )
+               Where USER_NAME like :strSearch 
+  OR USER_ID like :strSearch)
+ GROUP BY USER_CMF_1 
+order by USER_CMF_1 ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:strSearch</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="LOADJOINALLGROUP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[Select * From TQC_GROUP_USER A, TQC_SECURITY_GROUP B
+Where A.SEC_GRP_ID=B.SEC_GRP_ID 
+]]></commandtext>
+    </query>
+    <query statement="Select" queryid="DELETEGROUPUSER" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[ DELETE FROM TQC_GROUP_USER  where USER_ID=:strUserID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:strUserID</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="INSERTGROUPUSER" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[Insert into TQC_GROUP_USER (SEC_GRP_ID, USER_ID) values(:strGrpCode,  :strUserID)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:strGrpCode</param>
+            <param direction="Input" dbtype="VarChar" size="40">:strUserID</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="CHECKFUNCTION" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT COUNT(*) FROM 
+(
+  SELECT DISTINCT FUNC_CODE
+    FROM  (SELECT SEC_GRP_ID 
+                   FROM TQC_GROUP_USER 
+                 WHERE USER_ID = :UserID) A, TQC_GROUP_FUNCTION B 
+   WHERE A.SEC_GRP_ID = B.SEC_GRP_ID
+)
+WHERE FUNC_CODE = :FuncCode
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="20">:UserID</param>
+            <param direction="Input" dbtype="VarChar" size="20">:FuncCode</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_ALL_GROUP_USER" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2014-01-22 19:27:08
+DELETE FROM TQC_GROUP_USER]]></commandtext>
+    </query>
+    <query statement="Insert" queryid="INSERT_MULTI_GROUP_USER" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2014-01-22 19:27:49
+Insert into TQC_GROUP_USER (SEC_GRP_ID, USER_ID) values(:strGrpCode,  :strUserID)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:strGrpCode</param>
+            <param direction="Input" dbtype="VarChar" size="40">:strUserID</param>
+        </parameters>
+    </query>
+</queryxml>

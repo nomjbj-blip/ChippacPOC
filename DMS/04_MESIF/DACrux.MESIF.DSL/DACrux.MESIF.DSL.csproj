@@ -1,0 +1,90 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{51F298C7-68F3-4FEB-8ACD-3A3112B8EEE7}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DACrux.MESIF.DSL</RootNamespace>
+    <AssemblyName>DACrux.MESIF.DSL</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(Configuration)' == 'Debug'">
+    <Reference Include="Miracom.Middleware">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\07_CoreLib\Miracom.Middleware\x86\Miracom.Middleware.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup Condition="'$(Configuration)' == 'Release'">
+    <Reference Include="Miracom.Middleware">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\07_CoreLib\Miracom.Middleware\x64\Miracom.Middleware.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MES_MRASTOLDEF.cs" />
+    <Compile Include="MES_MWIPCALDEF.cs" />
+    <Compile Include="MES_CMESHODREL.cs" />
+    <Compile Include="MES_CWIPCTLDEF.cs" />
+    <Compile Include="MES_CWIPRELINF.cs" />
+    <Compile Include="MES_CXDCCUMDAT.cs" />
+    <Compile Include="MES_MGCMTBLDAT.cs" />
+    <Compile Include="MES_MRASRESDEF.cs" />
+    <Compile Include="MES_MRASRESMFO.cs" />
+    <Compile Include="MES_MRASRESOPR.cs" />
+    <Compile Include="MES_MRCPRCPARS.cs" />
+    <Compile Include="MES_MSECUSRDEF.cs" />
+    <Compile Include="MES_MWIPCRRLOT.cs" />
+    <Compile Include="MES_MWIPFACDEF.cs" />
+    <Compile Include="MES_MWIPFLWDEF.cs" />
+    <Compile Include="MES_MWIPFLWOPR.cs" />
+    <Compile Include="MES_MWIPLOTSTS.cs" />
+    <Compile Include="MES_MWIPMATDEF.cs" />
+    <Compile Include="MES_MWIPOPRDEF.cs" />
+    <Compile Include="MES_MRASCRRDEF.cs" />
+    <Compile Include="MES_MWIPSLTSTS.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="MES_CQCMABNMNG.cs" />
+    <Compile Include="MES_CQCMABFAIL.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

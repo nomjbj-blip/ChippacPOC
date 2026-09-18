@@ -1,0 +1,112 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Select" queryid="SELECT_DEFECT_BY_TYPE" commandtype="Text" description="select defect type" commandtimeout="60">
+        <commandtext><![CDATA[  SELECT T1.CLASSNUMBER,
+         T1.NAME,
+         T1.DESCRIPTION,
+         T2.GROUP_NAME || '(' || T1.GROUP_ID || ')' AS "GROUP_ID",
+         T1.DELETE_FLAG,
+         T1.DEFECT_COLOR,
+         T1.CREATE_TIME,
+         T1.CREATE_USER,
+         T1.UPDATE_TIME,
+         T1.UPDATE_USER,
+         '' AS EDITMODE
+    FROM TQD_DEFECT_TYPE T1, TQD_DEFECT_GROUP T2
+   WHERE 1 = 1 AND T1.GROUP_ID = T2.GROUP_ID(+) AND T2.DELETE_FLAG(+) = 'N'
+ORDER BY CLASSNUMBER]]></commandtext>
+    </query>
+    <query statement="Update" queryid="UPDATE_DEFECT_BY_TYPE" commandtype="Text" description="defect type modify" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQD_DEFECT_TYPE
+SET NAME          = :name,
+  DESCRIPTION     = :desc
+WHERE CLASSNUMBER = :classnumber]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="1">:name</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="1">:desc</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="1">:classnumber</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_DEFECT_BY_TYPE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[DELETE FROM TQD_DEFECT_TYPE 
+WHERE CLASSNUMBER = :classnumber]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="1">:classnumber</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="INSERT_DEFECT_BY_TYPE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQD_DEFECT_TYPE(CLASSNUMBER, NAME, DESCRIPTION, GROUP_ID, DELETE_FLAG, DEFECT_COLOR, CREATE_TIME, CREATE_USER, UPDATE_TIME, UPDATE_USER)
+VALUES (:CLASSNUMBER, :NAME, :DESCRIPTION, :GROUP_ID, :DELETE_FLAG, :DEFECT_COLOR, SYSDATE, :CID, SYSDATE, :UID)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="CLASSNUMBER">:CLASSNUMBER</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="NAME">:NAME</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="DESCRIPTION">:DESCRIPTION</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="GROUP_ID">:GROUP_ID</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="DELETE_FLAG">:DELETE_FLAG</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="DEFECT_COLOR">:DEFECT_COLOR</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="CID" description="Create User ID">:CID</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="UID" description="Update User ID">:UID</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_DEFECT_BY_GROUP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQD_DEFECT_TYPE
+WHERE GROUP_ID=:group_id
+ORDER BY CLASSNUMBER ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:group_id</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_DEFECT_TYPE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2013-11-06 21:33:41
+UPDATE TQD_DEFECT_TYPE
+SET NAME          = :typename,
+    DESCRIPTION   = :typedesc,
+    GROUP_ID      = :group_id, 
+    DEFECT_COLOR  = :color, 
+    UPDATE_USER   = :userid
+WHERE CLASSNUMBER = :classnumber ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:typename</param>
+            <param direction="Input" dbtype="VarChar" size="128">:typedesc</param>
+            <param direction="Input" dbtype="VarChar" size="40">:group_id</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="color">:color</param>
+            <param direction="Input" dbtype="VarChar" size="40">:classnumber</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="userid">:userid</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_DEFECT_COLOR" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT CLASSNUMBER, NAME, DEFECT_COLOR AS COLOR
+  FROM TQD_DEFECT_TYPE
+ ORDER BY CLASSNUMBER]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_CODE_NAME" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT CLASSNUMBER, NAME, DEFECT_COLOR
+  FROM TQD_DEFECT_TYPE
+ ORDER BY CLASSNUMBER]]></commandtext>
+    </query>
+    <query statement="Select" queryid="EXISTS_DEFECT_TYPE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-08-06 17:27:26
+SELECT COUNT(1) 
+  FROM TQD_DEFECT_TYPE
+ WHERE 1=1
+       AND CLASSNUMBER = :classnumber]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="classnumber">:classnumber</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_CODE_LIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[  SELECT CLASSNUMBER, CLASSNUMBER || ':' || NAME AS NAME, DESCRIPTION
+    FROM TQD_DEFECT_TYPE
+   WHERE 1 = 1 AND NVL (DELETE_FLAG, 'N') = 'N'
+ORDER BY CLASSNUMBER, NAME, DESCRIPTION
+]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_STATS_CODE_LIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[  SELECT  COLUMN_NAME, COLUMN_NAME
+    FROM COLS
+   WHERE 1 = 1 
+     AND TABLE_NAME = 'TQD_INSP_SUM' 
+     AND COLUMN_NAME <> 'STEP_SEQ'
+ORDER BY COLUMN_ID]]></commandtext>
+    </query>
+</queryxml>

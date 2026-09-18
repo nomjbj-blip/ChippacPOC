@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Insert" queryid="CREATE_SCAN_SAMPLE" commandtype="Text" description="Scan Sample Insert" commandtimeout="60">
+        <commandtext><![CDATA[??]]></commandtext>
+    </query>
+    <query statement="Select" queryid="GET_SAMPLE_COUNT" commandtype="Text" description="주어진 Setup Seq 해당하는 Scan Sample이 있는지 조회 한다." commandtimeout="60">
+        <commandtext><![CDATA[SELECT COUNT(*) CNT FROM TQD_SCAN_SAMPLE WHERE STEP_SEQ = :step_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0" description="step seq">:step_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_SCAN_SAMPLE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT STEP_SEQ,INDEX_X,INDEX_Y,TEST FROM TQD_SCAN_SAMPLE WHERE STEP_SEQ = :step_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:step_seq</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="CREATE_SCAN_SAMPLE_MULTI" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQD_SCAN_SAMPLE(STEP_SEQ,TEST,INDEX_X,INDEX_Y) VALUES
+(:stepseq, :test, :idxx, :idxy) ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="stepseq">:stepseq</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="test">:test</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="idxx">:idxx</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="idxy">:idxy</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="RECIPE_CREATE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO DRV_RECIPE (DEVICE, MAX_ROWS, MAX_COLS, X_PERIOD, Y_PERIOD, X_OS, Y_OS, STREET_WIDTH, STREET_HEIGHT  ) VALUES
+(:device, :max_rows, :max_cols, :x_period, :y_period, :x_os, :y_os, :street_width, :street_height) ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="device">:device</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="max_rows">:max_rows</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="max_cols">:max_cols</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="x_period">:x_period</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="y_period">:y_period</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="x_os">:x_os</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="y_os">:y_os</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="street_width">:street_width</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="street_height">:street_height</param>
+        </parameters>
+    </query>
+</queryxml>

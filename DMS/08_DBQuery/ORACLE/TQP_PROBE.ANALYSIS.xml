@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="BUMPFA" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Select" queryid="GETPROBESPEC" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[select ITEM, UNIT, 
+DECODE(LOWER_LIMIT,1E37,null,-1E37,null,LOWER_LIMIT) as LOWER_LIMIT,
+DECODE(UPPER_LIMIT,1E37,null,-1E37,null,UPPER_LIMIT) as UPPER_LIMIT
+from t_tps_paraspec
+where program = :program
+order by Item_Number]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0" value="OZ964">:program</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GETPROBEDATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[Select *
+from TD_??
+Where wafer_seq = :seq
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0" value="55567">:seq</param>
+        </parameters>
+    </query>
+</queryxml>

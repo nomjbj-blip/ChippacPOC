@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="BUMPFA" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Select" queryid="GET_USERINFO" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQP_SECUSR
+WHERE USER_NAME = :user_name
+AND PASSWORD = :password]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30" value="hhmstill">:user_name</param>
+            <param direction="Input" dbtype="VarChar" size="30" value="aba101">:password</param>
+        </parameters>
+    </query>
+</queryxml>

@@ -1,0 +1,1173 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="BUMPFA" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Insert" queryid="INSERT_ALARM" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TBP_EQUIP_ALARM
+(
+	RES_ID
+	,SET_TIME
+	,CLR_TIME
+	,MONTH
+	,DAY
+	,SHIFT
+	,FACTORY
+	,OPER
+	,MAT_ID
+	,LOT_ID
+	,RECIPE_ID
+	,ALARM_ID
+	,ALARM_CAT
+	,ALARM_MSG
+	,STATE
+	,PERIOD
+) VALUES(
+	:res_id
+	,SYSTIMESTAMP
+	,SYSTIMESTAMP + 1/86400--초기 RELEASE 시간은 발생시간과 동일시간
+	,TO_CHAR(SYSTIMESTAMP,'YYYYMM')
+	,TO_CHAR(SYSTIMESTAMP,'DD')
+	,DECODE( TRUNC(TO_NUMBER(TO_CHAR(SYSTIMESTAMP  + (2/24),'HH24')) / 8)
+	 , 0 , 'N'
+	 , 1 , 'D'
+	 ,'S')
+	,:factory
+	,(SELECT RES_STS_8 AS OPER FROM MESMGR.MRASRESDEF@FATOMES
+		WHERE RES_ID = :res_id)
+	,(SELECT RES_STS_2 AS MAT_ID FROM MESMGR.MRASRESDEF@FATOMES
+		WHERE RES_ID = :res_id)
+	,:lot_id
+	,:recipe_id
+	,:alarm_id
+	,:alarm_cat
+	,:alarm_msg
+	,'S'
+	,1
+)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:res_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:factory</param>
+            <param direction="input" dbtype="VarChar" size="40">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="100">:recipe_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:alarm_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:alarm_cat</param>
+            <param direction="Input" dbtype="VarChar" size="128">:alarm_msg</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_ALARM" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TBP_EQUIP_ALARM
+SET 	CLR_TIME = SYSTIMESTAMP
+	, CLEAR_CAT = :clear_cat
+	, CLEAR_MSG= :clear_msg
+	, PERIOD = :period
+	, EFFECT = :effect
+	, STATE = 'C'
+WHERE 
+	FACTORY = :factory
+	AND RES_ID = :res_id
+	--AND ALARM_ID = :alarm_id  -- 특정 설비에서 다른 아이디로 Alarm Clear 메시지가 들어와서 변경
+	AND ALARM_MSG = :clear_msg
+	AND SET_TIME = (SELECT MAX(SET_TIME) 
+			FROM TBP_EQUIP_ALARM
+			WHERE 	
+				FACTORY = :factory
+				AND RES_ID = :res_id
+				AND SET_TIME > SYSTIMESTAMP-1
+				--AND ALARM_ID = :alarm_id  -- 특정 설비에서 다른 아이디로 Alarm Clear 메시지가 들어와서 변경
+				AND ALARM_MSG = :clear_msg
+				AND STATE = 'S')
+			 		]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:clear_cat</param>
+            <param direction="Input" dbtype="VarChar" size="128">:clear_msg</param>
+            <param direction="Input" dbtype="Number" size="20">:period</param>
+            <param direction="Input" dbtype="Number" size="20">:effect</param>
+            <param direction="Input" dbtype="VarChar" size="40">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="40">:res_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_CUMMULATED_ALARM" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT TBP_EQUIP_ALARM.* ,SYSTIMESTAMP AS CURRTIME FROM TBP_EQUIP_ALARM
+WHERE SET_TIME >= SYSTIMESTAMP - 1
+AND FACTORY = :factory
+AND RES_ID = :res_id
+--AND ALARM_ID <> :alarm_id
+AND ALARM_MSG <> :alarm_msg
+AND STATE = 'S'
+ORDER BY SET_TIME]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="HMKA1">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="SBA01">:res_id</param>
+            <param direction="Input" dbtype="VarChar" size="128">:alarm_msg</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ALARM_INFO_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT 
+RES_ID
+,SET_TIME
+,CLR_TIME
+,MONTH
+,DAY
+,SHIFT
+,FACTORY
+,OPER
+,MAT_ID
+,LOT_ID
+,RECIPE_ID
+,ALARM_ID
+,ALARM_CAT
+,ALARM_MSG
+,CLEAR_CAT
+,CLEAR_MSG
+,STATE
+,PERIOD
+,EFFECT
+,SYSTIMESTAMP AS CURRTIME FROM TBP_EQUIP_ALARM
+WHERE SET_TIME >= SYSTIMESTAMP - 1
+AND FACTORY = :factory
+AND RES_ID = :res_id
+--AND ALARM_ID = :alarm_id	-- 특정 설비에서 다른 아이디로 Alarm Clear 메시지가 들어와서 변경
+AND ALARM_MSG = :alarm_msg
+AND STATE = 'S'
+ORDER BY SET_TIME DESC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="40">:res_id</param>
+            <param direction="Input" dbtype="VarChar" size="128">:alarm_msg</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ALARM_TREND" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT ALARM_ID, ??,
+       CNT,
+       EFFECT
+FROM   (SELECT ALARM_ID, ??,
+               COUNT(*) CNT,
+               SUM(EFFECT) EFFECT,
+               RANK() OVER (
+                ORDER BY COUNT(*) DESC) AS RANK
+        FROM   TBP_EQUIP_ALARM
+        WHERE SET_TIME BETWEEN TO_DATE(:sttime,'YYYY/MM/DD HH24:MI:SS') AND TO_DATE(:endtime,'YYYY/MM/DD HH24:MI:SS')
+        ??
+        GROUP BY ALARM_ID, ??)
+WHERE  1 = 1
+AND    RANK <=  :rcnt
+ORDER BY 3 DESC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:sttime</param>
+            <param direction="Input" dbtype="VarChar" size="30">:endtime</param>
+            <param direction="Input" dbtype="Number" size="10">:rcnt</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_MTBA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT RES_ID, TO_CHAR(SET_TIME, 'YYYY-MM-DD HH24:MI:SS') AS SET_TIME, TO_CHAR(CLR_TIME, 'YYYY-MM-DD HH24:MI:SS') AS CLEAR_TIME, EFFECT, ALARM_ID, ALARM_MSG FROM TBP_EQUIP_ALARM
+WHERE 1=1
+AND MONTH = TO_CHAR(TO_DATE(:today, 'YYYY-MM-DD'), 'YYYYMM')
+AND DAY = TO_CHAR(TO_DATE(:today, 'YYYY-MM-DD'), 'DD')
+??
+ORDER BY RES_ID, SET_TIME]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:today</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ALARM_HISTORY" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT  
+	RES_ID, 
+	SET_TIME, 
+	CLR_TIME, 
+	OPER, 
+	MAT_ID, 
+	LOT_ID, 
+	RECIPE_ID, 
+	ALARM_MSG, 
+	CLEAR_MSG, 
+	PERIOD, EFFECT 
+FROM    TBP_EQUIP_ALARM 
+WHERE   1=1
+        ?? 
+        AND SET_TIME BETWEEN TO_DATE(:sttime, 'YYYY-MM-DD HH24:MI:SS') AND TO_DATE(:endtime, 'YYYY-MM-DD HH24:MI:SS')
+        AND ALARM_ID= :alarm_id
+ORDER BY SET_TIME]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:sttime</param>
+            <param direction="Input" dbtype="VarChar" size="30">:endtime</param>
+            <param direction="Input" dbtype="VarChar" size="30">:alarm_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_BLOCK_ALARM_INFO" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT
+       ALARM_ID, ALARM_MSG,
+       CNT,
+       EFFECT
+FROM   (SELECT ALARM_ID, ALARM_MSG,
+               COUNT(*) CNT,	   
+               SUM(EFFECT) EFFECT,
+               RANK() OVER (
+                ORDER BY COUNT(*) DESC) AS RANK
+        FROM   TBP_EQUIP_ALARM
+        WHERE 1=1
+	AND SET_TIME BETWEEN TO_DATE(:sttime,'YYYY/MM/DD HH24:MI:SS') AND TO_DATE(:endtime,'YYYY/MM/DD HH24:MI:SS')
+        ??
+        GROUP BY ALARM_ID, ALARM_MSG) ALM,
+        
+        (SELECT DISTINCT AREA_ID, SUB_AREA_ID FROM MESMGR.MRASRESDEF@FATOMES
+WHERE 1=1
+AND SUB_AREA_ID = :sub_area_id
+ORDER BY SUB_AREA_ID) RAS
+ORDER BY CNT DESC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:sttime</param>
+            <param direction="Input" dbtype="VarChar" size="40">:endtime</param>
+            <param direction="Input" dbtype="VarChar" size="40">:sub_area_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ALARM_HISTORY_CHECK" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT
+       ALM.RES_ID, ALARM_ID, ALARM_MSG,
+       CNT,
+       D, S, G,
+       EFFECT
+FROM   (SELECT RES_ID, ALARM_ID, ALARM_MSG,
+               	  COUNT(*) CNT,
+		  SUM(DECODE(SHIFT, 'D', 1)) AS D,
+               	  SUM(DECODE(SHIFT, 'S', 1)) AS S,
+               	  SUM(DECODE(SHIFT, 'N', 1)) AS G,
+               	  SUM(EFFECT) EFFECT,
+               	  RANK() OVER (
+             	  ORDER BY COUNT(*) DESC) AS RANK
+       	 FROM   TBP_EQUIP_ALARM
+       	 WHERE 1=1
+		AND SET_TIME BETWEEN TO_DATE(:sttime,'YYYY/MM/DD HH24:MI:SS') AND TO_DATE(:endtime,'YYYY/MM/DD HH24:MI:SS')
+		AND FACTORY = 'HMKA1'
+       		 ??
+        	 GROUP BY RES_ID, ALARM_ID, ALARM_MSG) ALM,
+        
+       	 (SELECT DISTINCT RES_ID, AREA_ID, SUB_AREA_ID FROM MESMGR.MRASRESDEF@FATOMES
+		WHERE 1=1
+			AND SUB_AREA_ID = :sub_area_id
+		ORDER BY SUB_AREA_ID) RAS
+WHERE 1=1
+AND ALM.RES_ID = RAS.RES_ID
+ORDER BY CNT DESC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:sttime</param>
+            <param direction="Input" dbtype="VarChar" size="40">:endtime</param>
+            <param direction="Input" dbtype="VarChar" size="40">:sub_area_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_MODEL_ALARM_INFO" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT
+       ALM.RES_ID, ALARM_ID, ALARM_MSG,
+       CNT,
+       EFFECT
+FROM   (SELECT RES_ID, ALARM_ID, ALARM_MSG,
+               	  COUNT(*) CNT,
+		  SUM(DECODE(SHIFT, 'D', 1)) AS D,
+              	  SUM(DECODE(SHIFT, 'S', 1)) AS S,
+              	  SUM(DECODE(SHIFT, 'N', 1)) AS G,
+               	  SUM(EFFECT) EFFECT,
+               	  RANK() OVER (
+             	  ORDER BY COUNT(*) DESC) AS RANK
+       	 FROM   TBP_EQUIP_ALARM
+       	 WHERE 1=1
+		AND SET_TIME BETWEEN TO_DATE(:sttime,'YYYY/MM/DD HH24:MI:SS') AND TO_DATE(:endtime,'YYYY/MM/DD HH24:MI:SS')
+		AND FACTORY = 'HMKA1'
+       		??
+        	 GROUP BY RES_ID, ALARM_ID, ALARM_MSG) ALM,
+        
+       	 (SELECT DISTINCT RES_GRP_6, RES_ID FROM MESMGR.MRASRESDEF@FATOMES
+		WHERE 1=1
+			AND RES_GRP_6 = :res_model
+		ORDER BY RES_ID) RAS
+WHERE 1=1
+AND ALM.RES_ID = RAS.RES_ID
+ORDER BY CNT DESC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:sttime</param>
+            <param direction="Input" dbtype="VarChar" size="40">:endtime</param>
+            <param direction="Input" dbtype="VarChar" size="40">:res_model</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_SHIFT_COUNT_INFO" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT  RES_ID, 
+        WORK_DATE,
+        COUNT(*) AS "ALL",
+        COUNT(DECODE(WORK_HOUR,'06',1,'07',1,'08',1,'09',1,'10',1,'11',1,'12',1,'13',1)) AS "DAY",
+        COUNT(DECODE(WORK_HOUR,'14',1,'15',1,'16',1,'17',1,'18',1,'19',1,'20',1,'21',1)) AS SW,
+        COUNT(DECODE(WORK_HOUR,'22',1,'23',1,'00',1,'01',1,'02',1,'03',1,'04',1,'05',1)) AS GY
+FROM    (
+        SELECT  RES.RES_ID, TO_CHAR(TO_DATE(HIS.TRAN_TIME,'YYYYMMDDHH24MISS'),'YYYY/MM/DD') AS WORK_DATE,
+                TO_CHAR(TO_DATE(HIS.TRAN_TIME,'YYYYMMDDHH24MISS'),'HH24') AS WORK_HOUR
+        FROM    MESMGR.MRASALMHIS@FATOMES HIS,
+                MESMGR.MRASRESDEF@FATOMES RES
+        WHERE   1=1
+                AND HIS.FACTORY = RES.FACTORY
+                AND HIS.RES_ID = RES.RES_ID
+                AND RES.FACTORY = 'HMKA1'
+                AND RES.DELETE_FLAG = ' '
+	    AND HIS.TRAN_TIME BETWEEN :sttime AND :endtime
+                AND RES.RES_ID IN (??)
+        )
+WHERE   1=1
+GROUP BY RES_ID,WORK_DATE
+ORDER BY "ALL" DESC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="2013-02-06 22:00:00">:sttime</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="2013-02-07 21:59:59">:endtime</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_TBP_EQUIP_ALARM" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT 
+	RES_ID, 
+	SET_TIME, CLR_TIME, 
+	TO_CHAR(MONTH) AS MONTH,
+	DAY, 
+	SHIFT, 
+	FACTORY, OPER, 
+	MAT_ID, LOT_ID, RECIPE_ID, 
+	ALARM_ID, ALARM_CAT, ALARM_MSG, 
+	CLEAR_CAT, CLEAR_MSG, 
+	STATE, PERIOD, 
+	EFFECT
+FROM TBP_EQUIP_ALARM
+WHERE 1=1
+	AND FACTORY = 'HMKA1'
+	AND RES_ID IN (??)
+	AND SET_TIME BETWEEN TO_DATE(:sttime,'YYYY-MM-DD HH24:MI:SS') AND TO_DATE(:endtime,'YYYY-MM-DD HH24:MI:SS')
+--	AND SET_TIME BETWEEN :sttime AND :endtime
+ORDER BY RES_ID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="20130206220000">:sttime</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="20130207215959">:endtime</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ALARM_MSG_COUNT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT RES_ID, ALARM_ID, DECODE(REPLACE(ALARM_MSG, ',' , ' '), '', 'NULL', REPLACE(ALARM_MSG, ',' , ' ')) AS ALARM_MSG, COUNT(*) CNT 
+FROM TBP_EQUIP_ALARM
+WHERE 1=1
+AND FACTORY = 'HMKA1'
+AND RES_ID IN (??)
+--AND SET_TIME BETWEEN :sttime AND :endtime
+AND SET_TIME BETWEEN TO_DATE(:sttime,'YYYY/MM/DD HH24:MI:SS') AND TO_DATE(:endtime, 'YYYY/MM/DD HH24:MI:SS')
+GROUP BY RES_ID, ALARM_ID, ALARM_MSG
+ORDER BY RES_ID, CNT DESC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="20120808220000">:sttime</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="20120809215959">:endtime</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ALARM_TOP_10" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT ALARM_MSG, 
+       CNT,
+       EFFECT,
+       ALARM_ID
+FROM   (SELECT ALARM_ID, RES_ID, ALARM_MSG
+               ,COUNT(*) CNT,
+               SUM(EFFECT) EFFECT,
+               RANK() OVER (
+                ORDER BY COUNT(*) DESC) AS RANK
+        FROM   TBP_EQUIP_ALARM
+        WHERE 1 = 1 AND SET_TIME BETWEEN TO_DATE(:sttime,'YYYY/MM/DD HH24:MI:SS') AND TO_DATE(:endtime,'YYYY/MM/DD HH24:MI:SS')
+        AND RES_ID = :res_id
+        GROUP BY ALARM_ID,  RES_ID, ALARM_MSG)
+WHERE  1 = 1
+AND    RANK <=  :rcnt
+ORDER BY 3 DESC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30" value="20120715000000">:sttime</param>
+            <param direction="Input" dbtype="VarChar" size="30" value="20120716000000">:endtime</param>
+            <param direction="Input" dbtype="VarChar" size="30" value="BD417">:res_id</param>
+            <param direction="Input" dbtype="Number" size="10" value="10">:rcnt</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ALARM_EVENT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT
+ALARM_ID
+, RES_ID AS "EQUIP ID"
+,TO_CHAR(SET_TIME,'YYYY-MM-DD HH24:MI:SS') AS "EVENT TIME"
+,TO_CHAR(CLR_TIME,'YYYY-MM-DD HH24:MI:SS') AS "CLEAR TIME"
+,PERIOD AS "TERM(Sec)"
+,MAT_ID
+,OPER AS "OPER ID"
+,'' AS "PART ID"
+,RECIPE_ID AS "RECIPE ID"
+,LOT_ID AS "LOT ID"
+,STATE
+,EFFECT
+,ALARM_MSG
+,CLEAR_MSG
+FROM TBP_EQUIP_ALARM
+WHERE 1=1
+AND SET_TIME BETWEEN TO_DATE(:dt_start,'YYYY-MM-DD HH24:MI:SS') - 1 AND TO_DATE(:dt_end,'YYYY-MM-DD HH24:MI:SS') + 1
+AND RES_ID = :res_id
+AND LOT_ID = :lot_id
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="22">:dt_start</param>
+            <param direction="Input" dbtype="VarChar" size="22">:dt_end</param>
+            <param direction="Input" dbtype="VarChar" size="20">:res_id</param>
+            <param direction="Input" dbtype="VarChar" size="30">:lot_id</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="INSERT_ALARM02" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TBP_EQUIP_ALARM
+(
+	RES_ID
+	,SET_TIME
+	,CLR_TIME
+	,MONTH
+	,DAY
+	,SHIFT
+	,FACTORY
+	,OPER
+	,MAT_ID
+	,LOT_ID
+	,RECIPE_ID
+	,ALARM_ID
+	,ALARM_CAT
+	,ALARM_MSG
+	,STATE
+	,PERIOD
+) VALUES(
+	:res_id
+	,SYSTIMESTAMP
+	,SYSTIMESTAMP + 1/86400--초기 RELEASE 시간은 발생시간과 동일시간
+	,TO_CHAR(SYSTIMESTAMP,'YYYYMM')
+	,TO_CHAR(SYSTIMESTAMP,'DD')
+	,DECODE( TRUNC(TO_NUMBER(TO_CHAR(SYSTIMESTAMP  + (2/24),'HH24')) / 8)
+	 , 0 , 'N'
+	 , 1 , 'D'
+	 ,'S')
+	,:factory
+	,:str_oper
+	,:mat_id
+	,:lot_id
+	,:recipe_id
+	,:alarm_id
+	,:alarm_cat
+	,:alarm_msg
+	,'S'
+	,1
+)
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:res_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:factory</param>
+            <param direction="input" dbtype="VarChar" size="20">:str_oper</param>
+            <param direction="input" dbtype="VarChar" size="40">:mat_id</param>
+            <param direction="input" dbtype="VarChar" size="40">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="100">:recipe_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:alarm_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:alarm_cat</param>
+            <param direction="Input" dbtype="VarChar" size="128">:alarm_msg</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ALARMMSG_REPORT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DAILY,
+       ALARM_ID, 
+       ALARM_MSG, 
+       CNT,
+       RANK
+    FROM 
+    (SELECT TO_CHAR(SET_TIME, 'YYYY/MM/DD') AS DAILY, ALARM_ID, ALARM_MSG, COUNT(*) AS CNT,
+        RANK() OVER (ORDER BY COUNT(*) DESC) AS RANK 
+        FROM TBP_EQUIP_ALARM
+    WHERE 1=1
+        AND FACTORY = 'HMKA1'
+        ??
+        AND SET_TIME BETWEEN TO_DATE(:sttime,'YYYY/MM/DD HH24:MI:SS') AND TO_DATE(:endtime,'YYYY/MM/DD HH24:MI:SS')
+        ??
+        GROUP BY TO_CHAR(SET_TIME, 'YYYY/MM/DD'), ALARM_MSG, ALARM_ID
+        ORDER BY TO_CHAR(SET_TIME, 'YYYY/MM/DD'), ALARM_MSG)
+        WHERE 1=1
+            AND RANK <= :rcnt]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:sttime</param>
+            <param direction="Input" dbtype="VarChar" size="30">:endtime</param>
+            <param direction="Input" dbtype="Number" size="10">:rcnt</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ALARM_MSG_HISTORY" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT  
+	RES_ID, 
+	SET_TIME, 
+	CLR_TIME, 
+	OPER, 
+	MAT_ID, 
+	LOT_ID, 
+	RECIPE_ID, 
+	ALARM_MSG, 
+	CLEAR_MSG, 
+	PERIOD, EFFECT 
+FROM    TBP_EQUIP_ALARM 
+WHERE   1=1
+        ??
+        --AND SET_TIME BETWEEN :sttime AND :endtime
+        AND SET_TIME BETWEEN TO_DATE(:sttime,'YYYY/MM/DD HH24:MI:SS') AND TO_DATE(:endtime, 'YYYY/MM/DD HH24:MI:SS')
+        ??
+ORDER BY SET_TIME, ALARM_MSG]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:sttime</param>
+            <param direction="Input" dbtype="VarChar" size="30">:endtime</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ALARM_List_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM
+(
+   SELECT ALARM_ID, ALARM_MSG, COUNT(*) CNT,
+               SUM(EFFECT) EFFECT,
+               RANK() OVER (
+               ORDER BY COUNT(*) DESC) AS RANK FROM
+               (
+               SELECT ALARM_ID, ALARM_MSG, EFFECT, MONTH || '-'|| DAY DAYS FROM 
+               TBP_EQUIP_ALARM
+   WHERE MONTH BETWEEN (:sMonth)
+           AND (:eMonth)
+           AND SET_TIME BETWEEN TO_DATE (:sTime,'YYYY-MM-DD HH24:MI:SS')
+           AND TO_DATE (:eTime,'YYYY-MM-DD HH24:MI:SS')
+           AND OPER IN (SELECT OPER FROM MWIPOPRDEF@FATOMES WHERE OPER_GRP_4 = :sOper)
+           AND DECODE(:resID, 'All', '%,' || RES_ID || ',%', ','||:resID||',') LIKE '%,' || RES_ID || ',%'
+           AND DECODE(:alarm, 'All', '%,' || ALARM_MSG || ',%', ','||:alarm||',') LIKE '%,' || ALARM_MSG || ',%'
+   )
+   WHERE DAYS BETWEEN  (:sDay) AND (:eDay) 
+   GROUP BY ALARM_ID, ALARM_MSG
+)
+WHERE  1 = 1
+       AND RANK <=:rank
+ORDER BY 3 DESC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="40">:sMonth</param>
+            <param direction="Input" dbtype="Number" size="40">:eMonth</param>
+            <param direction="Input" dbtype="VarChar" size="40">:sTime</param>
+            <param direction="Input" dbtype="VarChar" size="40">:eTime</param>
+            <param direction="Input" dbtype="VarChar" size="40">:resID</param>
+            <param direction="Input" dbtype="VarChar" size="100">:alarm</param>
+            <param direction="Input" dbtype="VarChar" size="40">:sDay</param>
+            <param direction="Input" dbtype="VarChar" size="40">:eDay</param>
+            <param direction="Input" dbtype="Number" size="20">:rank</param>
+            <param direction="Input" dbtype="VarChar" size="40">:sOper</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ALARM_DETAIL_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT 
+            ALARM_ID, 
+	RES_ID, 
+	SET_TIME, 
+	CLR_TIME, 
+	OPER, 
+	MAT_ID, 
+	LOT_ID, 
+	RECIPE_ID, 
+	ALARM_MSG, 
+	CLEAR_MSG, 
+	PERIOD, EFFECT 
+FROM    TBP_EQUIP_ALARM 
+WHERE   1=1
+        AND SET_TIME BETWEEN TO_DATE(:sTime, 'YYYY-MM-DD HH24:MI:SS') AND TO_DATE(:eTime, 'YYYY-MM-DD HH24:MI:SS')
+        AND ALARM_ID= :ID
+        AND ?? =  :value
+        AND DECODE(:resID, 'All', '%,' || RES_ID || ',%', ','||:resID||',') LIKE '%,' || RES_ID || ',%'
+ORDER BY SET_TIME]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:sTime</param>
+            <param direction="Input" dbtype="VarChar" size="40">:eTime</param>
+            <param direction="Input" dbtype="VarChar" size="40">:ID</param>
+            <param direction="Input" dbtype="VarChar" size="100">:value</param>
+            <param direction="Input" dbtype="VarChar" size="40">:resID</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ALARM_MAT_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM
+(
+   SELECT MAT_ID, COUNT(*) CNT,
+               SUM(EFFECT) EFFECT,
+               RANK() OVER (
+               ORDER BY COUNT(*) DESC) AS RANK FROM
+               (
+               SELECT MAT_ID, EFFECT, MONTH || '-'|| DAY DAYS FROM 
+               TBP_EQUIP_ALARM
+   WHERE MONTH BETWEEN (:sMonth)
+           AND (:eMonth)
+           AND SET_TIME BETWEEN TO_DATE (:sTime,'YYYY-MM-DD HH24:MI:SS')
+           AND TO_DATE (:eTime,'YYYY-MM-DD HH24:MI:SS')
+           AND OPER IN (SELECT OPER FROM MWIPOPRDEF@FATOMES WHERE OPER_GRP_4 = :sOper)
+           AND DECODE(:resID, 'All', '%,' || RES_ID || ',%', ','||:resID||',') LIKE '%,' || RES_ID || ',%'
+           AND DECODE(:matID, 'All', '%,' || MAT_ID || ',%', ','||:matID||',') LIKE '%,' || MAT_ID || ',%'
+           AND DECODE(:alarm, 'All', '%,' || ALARM_MSG || ',%', ','||:alarm||',') LIKE '%,' || ALARM_MSG || ',%'
+   )
+   WHERE DAYS BETWEEN  (:sDay) AND (:eDay) 
+   GROUP BY  MAT_ID
+)
+WHERE  1 = 1
+       AND RANK <=:rank
+ORDER BY 3 DESC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:sMonth</param>
+            <param direction="Input" dbtype="VarChar" size="40">:eMonth</param>
+            <param direction="Input" dbtype="VarChar" size="40">:sTime</param>
+            <param direction="Input" dbtype="VarChar" size="40">:eTime</param>
+            <param direction="Input" dbtype="VarChar" size="40">:resID</param>
+            <param direction="Input" dbtype="VarChar" size="100">:alarm</param>
+            <param direction="Input" dbtype="VarChar" size="40">:sDay</param>
+            <param direction="Input" dbtype="VarChar" size="40">:eDay</param>
+            <param direction="Input" dbtype="Number" size="20">:rank</param>
+            <param direction="Input" dbtype="VarChar" size="40">:sOper</param>
+            <param direction="Input" dbtype="VarChar" size="200">:matID</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ALARM_EqNo_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM
+(
+   SELECT ALARM_ID, RES_ID, COUNT(*) CNT,
+               SUM(EFFECT) EFFECT,
+               RANK() OVER (
+               ORDER BY COUNT(*) DESC) AS RANK FROM
+               (
+                  SELECT ALARM_ID, RES_ID, EFFECT, MONTH || '-'|| DAY DAYS FROM 
+                  TBP_EQUIP_ALARM
+                  WHERE MONTH BETWEEN (:sMonth)
+                         AND (:eMonth)
+                         AND SET_TIME BETWEEN TO_DATE (:sTime,'YYYY-MM-DD HH24:MI:SS')
+                         AND TO_DATE (:eTime,'YYYY-MM-DD HH24:MI:SS')
+                         AND OPER IN (SELECT OPER FROM MWIPOPRDEF@FATOMES WHERE OPER_GRP_4 = :sOper)
+                         AND DECODE(:resID, 'All', '%,' || RES_ID || ',%', ','||:resID||',') LIKE '%,' || RES_ID || ',%'
+                         AND DECODE(:alarm, 'All', '%,' || ALARM_MSG || ',%', ','||:alarm||',') LIKE '%,' || ALARM_MSG || ',%'
+   )
+   WHERE DAYS BETWEEN  (:sDay) AND (:eDay) 
+   GROUP BY ALARM_ID, RES_ID
+)
+WHERE  1 = 1
+       AND RANK <=:rank
+ORDER BY 3 DESC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:sMonth</param>
+            <param direction="Input" dbtype="VarChar" size="40">:eMonth</param>
+            <param direction="Input" dbtype="VarChar" size="40">:sTime</param>
+            <param direction="Input" dbtype="VarChar" size="40">:eTime</param>
+            <param direction="Input" dbtype="VarChar" size="40">:resID</param>
+            <param direction="Input" dbtype="VarChar" size="40">:alarm</param>
+            <param direction="Input" dbtype="VarChar" size="40">:sDay</param>
+            <param direction="Input" dbtype="VarChar" size="40">:eDay</param>
+            <param direction="Input" dbtype="VarChar" size="40">:rank</param>
+            <param direction="Input" dbtype="VarChar" size="40">:sOper</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ALARM_CODE_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM
+(
+  SELECT ALARM_CODE,
+  COUNT(*) CNT,
+  SUM(EFFECT) EFFECT,
+  RANK() OVER (ORDER BY COUNT(*) DESC) AS RANK     
+  FROM MRASALMDEF@FATOMES A LEFT OUTER JOIN TBP_EQUIP_ALARM B
+  ON A.ALARM_ID = TO_CHAR(B.ALARM_ID)
+  WHERE MONTH ||'-'|| DAY BETWEEN :sDay
+          AND :eDay
+          AND SET_TIME BETWEEN TO_DATE (:sTime,'YYYY-MM-DD HH24:MI:SS')
+          AND TO_DATE (:eTime,'YYYY-MM-DD HH24:MI:SS')
+          AND OPER IN (SELECT OPER FROM MWIPOPRDEF@FATOMES WHERE OPER_GRP_4 = :sOper)
+          AND DECODE(:resId, 'All', '%,' || RES_ID || ',%', ','||:resId||',') LIKE '%,' || RES_ID || ',%'
+          AND DECODE(:matId, 'All', '%,' || MAT_ID || ',%', ','||:matId||',') LIKE '%,' || MAT_ID || ',%'
+          AND DECODE(:alarm, 'All', '%,' || ALARM_MSG || ',%', ','||:alarm||',') LIKE '%,' || ALARM_MSG || ',%'
+  GROUP BY ALARM_CODE
+)
+WHERE  1 = 1
+       AND RANK <= :rank
+ORDER BY ALARM_CODE DESC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:sDay</param>
+            <param direction="Input" dbtype="VarChar" size="40">:eDay</param>
+            <param direction="Input" dbtype="VarChar" size="40">:sTime</param>
+            <param direction="Input" dbtype="VarChar" size="40">:eTime</param>
+            <param direction="Input" dbtype="VarChar" size="40">:sOper</param>
+            <param direction="Input" dbtype="VarChar" size="40">:resId</param>
+            <param direction="Input" dbtype="VarChar" size="100">:matId</param>
+            <param direction="Input" dbtype="VarChar" size="100">:alarm</param>
+            <param direction="Input" dbtype="Number" size="20">:rank</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ALARM_CODE_LIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT ALARM_CODE FROM 
+MRASALMDEF@FATOMES
+WHERE CREATE_TIME BETWEEN (:sTime)
+         AND (:eTime)
+         AND DECODE(:model, 'All', '%,' || MODEL  || ',%', ','||:model||',') LIKE '%,' || MODEL  || ',%'
+         --AND MODEL = DECODE(:model, 'All', MODEL, :model)
+ORDER BY ALARM_CODE
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:sTime</param>
+            <param direction="Input" dbtype="VarChar" size="40">:eTime</param>
+            <param direction="Input" dbtype="VarChar" size="60">:model</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ALARM_MSG_LIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT ALARM_MSG
+FROM TBP_EQUIP_ALARM
+WHERE MONTH BETWEEN :sMonth 
+       AND :eMonth    
+       AND SET_TIME BETWEEN TO_DATE(:sTime,'YYYY-MM-DD HH24:MI:SS') 
+       AND TO_DATE(:eTime,'YYYY-MM-DD HH24:MI:SS')
+       AND OPER IN (SELECT OPER FROM MWIPOPRDEF@FATOMES WHERE OPER_GRP_4 = :sOper)
+       AND DECODE(:resID, 'All', '%,' || RES_ID  || ',%', ','||:resID||',') LIKE '%,' || RES_ID  || ',%'
+ORDER BY ALARM_MSG]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="30">:sMonth</param>
+            <param direction="Input" dbtype="Number" size="30">:eMonth</param>
+            <param direction="Input" dbtype="VarChar" size="40">:sTime</param>
+            <param direction="Input" dbtype="VarChar" size="40">:eTime</param>
+            <param direction="Input" dbtype="VarChar" size="40">:resID</param>
+            <param direction="Input" dbtype="VarChar" size="40">:sOper</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ALRAM_TREND" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM
+(
+   SELECT TIME, ALARM_ID, ALARM_MSG, COUNT(*) CNT,
+               SUM(EFFECT) EFFECT,
+               ?? FROM
+               (
+               SELECT SET_TIME AS TIME, ALARM_ID, ALARM_MSG, EFFECT, MONTH || '-'|| DAY DAYS 
+               ,?? FROM 
+               TBP_EQUIP_ALARM
+   WHERE MONTH BETWEEN (:sMonth)
+           AND (:eMonth)
+           AND SET_TIME BETWEEN TO_DATE (:sTime,'YYYY-MM-DD HH24:MI:SS')
+           AND TO_DATE (:eTime,'YYYY-MM-DD HH24:MI:SS')
+           AND DECODE(:resID, 'All', '%,' || RES_ID || ',%', ','||:resID||',') LIKE '%,' || RES_ID || ',%'
+           AND DECODE(:alarm, 'All', '%,' || ALARM_MSG || ',%', ','||:alarm||',') LIKE '%,' || ALARM_MSG || ',%'
+   )
+   WHERE DAYS BETWEEN :sDays AND :eDays 
+   GROUP BY TIME, ALARM_ID, ALARM_MSG, ??
+)
+WHERE  1 = 1
+ORDER BY 3 DESC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="40">:sMonth</param>
+            <param direction="Input" dbtype="Number" size="40">:eMonth</param>
+            <param direction="Input" dbtype="VarChar" size="40">:sTime</param>
+            <param direction="Input" dbtype="VarChar" size="40">:eTime</param>
+            <param direction="Input" dbtype="VarChar" size="40">:resID</param>
+            <param direction="Input" dbtype="VarChar" size="100">:alarm</param>
+            <param direction="Input" dbtype="VarChar" size="40">:sDays</param>
+            <param direction="Input" dbtype="VarChar" size="40">:eDays</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ALRAM_GROUPBY" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- col1, col2, col2, sQuery, rank, sOper, sModel
+SELECT * FROM
+(
+  SELECT ??, CNT, ROW_NUMBER() OVER (ORDER BY CNT DESC) AS RANKING  FROM
+  (
+    SELECT ??, COUNT(*) AS CNT
+    FROM MRASALMDEF@FATOMES A LEFT OUTER JOIN TBP_EQUIP_ALARM B
+    ON A.ALARM_ID = TO_CHAR(B.ALARM_ID)
+    WHERE B.FACTORY = 'HMKA1'
+                AND B.OPER IN (SELECT OPER FROM MWIPOPRDEF@FATOMES WHERE FACTORY = 'HMKA1' AND OPER_GRP_4 = :sOper)
+                AND B.SET_TIME BETWEEN TO_DATE (:sTime,'YYYY-MM-DD HH24:MI:SS')
+                AND TO_DATE (:eTime,'YYYY-MM-DD HH24:MI:SS')
+                AND DECODE(:sModel, 'All', '%,' || MODEL || ',%', ','||:sModel||',') LIKE '%,' || MODEL || ',%'
+                AND DECODE(:sRes, 'All', '%,' || RES_ID || ',%', ','||:sRes||',') LIKE '%,' || RES_ID || ',%'
+                AND DECODE(:sMat, 'All', '%,' || MAT_ID || ',%', ','||:sMat||',') LIKE '%,' || MAT_ID || ',%'
+                AND DECODE(:sAlarm, 'All', '%,' || ALARM_MSG || ',%', ','||:sAlarm||',') LIKE '%,' || ALARM_MSG || ',%'
+                ??
+    GROUP BY ??
+  )
+)
+WHERE 1=1
+AND RANKING ??]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:sOper</param>
+            <param direction="Input" dbtype="VarChar" size="40">:sTime</param>
+            <param direction="Input" dbtype="VarChar" size="40">:eTime</param>
+            <param direction="Input" dbtype="VarChar" size="40">:sModel</param>
+            <param direction="Input" dbtype="VarChar" size="40">:sRes</param>
+            <param direction="Input" dbtype="VarChar" size="40">:sMat</param>
+            <param direction="Input" dbtype="VarChar" size="40">:sAlarm</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ALARM_HIS" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM
+(
+   SELECT ??, COUNT(*) CNT,
+               SUM(EFFECT) EFFECT,
+               RANK() OVER (
+               ORDER BY COUNT(*) DESC) AS RANK    
+               FROM
+               TBP_EQUIP_ALARM
+                       WHERE MONTH ||'-'|| DAY BETWEEN :sDay
+                       AND :eDay
+         AND SET_TIME BETWEEN TO_DATE (:sTime,'YYYY-MM-DD HH24:MI:SS')
+         AND TO_DATE (:eTime,'YYYY-MM-DD HH24:MI:SS')
+                       AND OPER IN (SELECT OPER FROM MWIPOPRDEF@FATOMES WHERE OPER_GRP_4 = :sOper)
+                       AND RES_ID = DECODE(:resId, 'All', RES_ID, :resId)
+                       AND MAT_ID = DECODE(:matId, 'All', MAT_ID, :matId)
+                       AND ALARM_MSG = DECODE(:alarm, 'All', ALARM_MSG, :alarm) 
+                       --AND DECODE(:resId, 'All', '%,' || RES_ID || ',%', ','||:resId||',') LIKE '%,' || RES_ID || ',%'
+                       --AND DECODE(:matId, 'All', '%,' || MAT_ID || ',%', ','||:matId||',') LIKE '%,' || MAT_ID || ',%'
+                       --AND DECODE(:alarm, 'All', '%,' || ALARM_MSG || ',%', ','||:alarm||',') LIKE '%,' || ALARM_MSG || ',%'
+               GROUP BY ??
+) 
+WHERE  1 = 1
+       AND RANK <= :rank
+ORDER BY 4 ASC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:sDay</param>
+            <param direction="Input" dbtype="VarChar" size="40">:eDay</param>
+            <param direction="Input" dbtype="VarChar" size="40">:sTime</param>
+            <param direction="Input" dbtype="VarChar" size="40">:eTime</param>
+            <param direction="Input" dbtype="VarChar" size="40">:sOper</param>
+            <param direction="Input" dbtype="VarChar" size="40">:resId</param>
+            <param direction="Input" dbtype="VarChar" size="100">:matId</param>
+            <param direction="Input" dbtype="VarChar" size="100">:alarm</param>
+            <param direction="Input" dbtype="Number" size="20">:rank</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ALARM_CODE_TREND" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT OPER, ALARM_CODE, COUNT(*) CNT, ?? 
+FROM MRASALMDEF@FATOMES A LEFT OUTER JOIN TBP_EQUIP_ALARM B
+ON A.ALARM_ID = TO_CHAR(B.ALARM_ID)
+WHERE 1=1
+         AND MONTH ||'-'|| DAY BETWEEN :sDay
+         AND :eDay
+         AND SET_TIME BETWEEN TO_DATE (:sTime,'YYYY-MM-DD HH24:MI:SS')
+        AND TO_DATE (:eTime,'YYYY-MM-DD HH24:MI:SS')
+         AND OPER IN (SELECT OPER FROM MWIPOPRDEF@FATOMES WHERE OPER_GRP_4 = :sOper)
+         AND DECODE(:resId, 'All', '%,' || RES_ID || ',%', ','||:resId||',') LIKE '%,' || RES_ID || ',%'
+         AND DECODE(:matId, 'All', '%,' || MAT_ID || ',%', ','||:matId||',') LIKE '%,' || MAT_ID || ',%'
+AND DECODE(:alarm, 'All', '%,' || ALARM_MSG || ',%', ','||:alarm||',') LIKE '%,' || ALARM_MSG || ',%'
+GROUP BY OPER, ALARM_CODE, ??
+ORDER BY 4 ASC
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:sDay</param>
+            <param direction="Input" dbtype="VarChar" size="40">:eDay</param>
+            <param direction="Input" dbtype="VarChar" size="40">:sTime</param>
+            <param direction="Input" dbtype="VarChar" size="40">:eTime</param>
+            <param direction="Input" dbtype="VarChar" size="40">:sOper</param>
+            <param direction="Input" dbtype="VarChar" size="40">:resId</param>
+            <param direction="Input" dbtype="VarChar" size="40">:matId</param>
+            <param direction="Input" dbtype="VarChar" size="40">:alarm</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ALARM_TREND_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- col1, col2, col2, sQuery, rank, sOper, sModel
+SELECT * FROM
+(
+  SELECT ??, CNT, ROW_NUMBER() OVER (ORDER BY CNT DESC) AS RANKING  FROM
+  (
+    SELECT ??, COUNT(*) AS CNT
+    FROM MRASALMDEF@FATOMES A LEFT OUTER JOIN TBP_EQUIP_ALARM B
+    ON A.ALARM_ID = TO_CHAR(B.ALARM_ID)
+    WHERE B.FACTORY = 'HMKA1'
+                AND B.OPER IN (SELECT OPER FROM MWIPOPRDEF@FATOMES WHERE FACTORY = 'HMKA1' AND OPER_GRP_4 = :sOper)
+                AND B.SET_TIME BETWEEN TO_DATE (:sTime,'YYYY-MM-DD HH24:MI:SS')
+                AND TO_DATE (:eTime,'YYYY-MM-DD HH24:MI:SS')
+                AND A.MODEL = :sModel
+                ??
+                ??
+    GROUP BY ??
+  )
+)
+WHERE 1=1
+AND RANKING ??]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:sOper</param>
+            <param direction="Input" dbtype="VarChar" size="40">:sTime</param>
+            <param direction="Input" dbtype="VarChar" size="40">:eTime</param>
+            <param direction="Input" dbtype="VarChar" size="40">:sModel</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ALARM_CODE_TREND_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT TO_DATE(DAY, 'YYYY-MM-DD') AS DAY , ALARM_ID  AS VALUE, ALARM_DESC , CNT, SUM(CNT) OVER (PARTITION BY  DAY) AS SUM FROM
+(
+  SELECT DAY, ALARM_ID, ALARM_DESC, COUNT(*) CNT FROM
+  (
+    SELECT TO_CHAR(B.SET_TIME, 'YYYY-MM-DD') AS DAY, A.ALARM_ID, A.ALARM_DESC
+    FROM MRASALMDEF@FATOMES A LEFT OUTER JOIN TBP_EQUIP_ALARM B
+    ON A.ALARM_ID = TO_CHAR(B.ALARM_ID)
+    WHERE B.FACTORY = 'HMKA1'
+                AND B.OPER IN (SELECT OPER FROM MWIPOPRDEF@FATOMES WHERE FACTORY = 'HMKA1' AND OPER_GRP_4 = :sOper)
+                AND B.SET_TIME BETWEEN TO_DATE (:sTime,'YYYY-MM-DD HH24:MI:SS')
+                AND TO_DATE (:eTime,'YYYY-MM-DD HH24:MI:SS')
+                AND A.MODEL = :sModel
+                ??
+                AND A.ALARM_ID IN (??)
+    GROUP BY B.SET_TIME, A.ALARM_ID, A.ALARM_DESC
+  )
+  GROUP BY DAY, ALARM_ID, ALARM_DESC
+)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:sOper</param>
+            <param direction="Input" dbtype="VarChar" size="40">:sTime</param>
+            <param direction="Input" dbtype="VarChar" size="40">:eTime</param>
+            <param direction="Input" dbtype="VarChar" size="40">:sModel</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ALARM_RES_TREND_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT TO_DATE(DAY, 'YYYY-MM-DD') AS DAY , RES_ID AS VALUE , CNT, SUM(CNT) OVER (PARTITION BY  DAY) AS SUM FROM
+(
+  SELECT DAY, RES_ID, COUNT(*) CNT FROM
+  (
+    SELECT TO_CHAR(B.SET_TIME, 'YYYY-MM-DD') AS DAY, B.RES_ID
+    FROM MRASALMDEF@FATOMES A LEFT OUTER JOIN TBP_EQUIP_ALARM B
+    ON A.ALARM_ID = TO_CHAR(B.ALARM_ID)
+    WHERE B.FACTORY = 'HMKA1'
+                AND B.OPER IN (SELECT OPER FROM MWIPOPRDEF@FATOMES WHERE FACTORY = 'HMKA1' AND OPER_GRP_4 = :sOper)
+                AND B.SET_TIME BETWEEN TO_DATE (:sTime,'YYYY-MM-DD HH24:MI:SS')
+                AND TO_DATE (:eTime,'YYYY-MM-DD HH24:MI:SS')
+                AND A.MODEL = :sModel
+                ??
+                AND B.RES_ID IN (??)
+    GROUP BY B.SET_TIME, B.RES_ID
+  )
+  GROUP BY DAY, RES_ID
+)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:sOper</param>
+            <param direction="Input" dbtype="VarChar" size="40">:sTime</param>
+            <param direction="Input" dbtype="VarChar" size="40">:eTime</param>
+            <param direction="Input" dbtype="VarChar" size="40">:sModel</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ALARM_MAT_TREND_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT TO_DATE(DAY, 'YYYY-MM-DD') AS DAY , MAT_ID AS VALUE , CNT, SUM(CNT) OVER (PARTITION BY  DAY) AS SUM FROM
+(
+  SELECT DAY, MAT_ID, COUNT(*) CNT FROM
+  (
+    SELECT TO_CHAR(B.SET_TIME, 'YYYY-MM-DD') AS DAY, B.MAT_ID
+    FROM MRASALMDEF@FATOMES A LEFT OUTER JOIN TBP_EQUIP_ALARM B
+    ON A.ALARM_ID = TO_CHAR(B.ALARM_ID)
+    WHERE B.FACTORY = 'HMKA1'
+                AND B.OPER IN (SELECT OPER FROM MWIPOPRDEF@FATOMES WHERE FACTORY = 'HMKA1' AND OPER_GRP_4 = :sOper)
+                AND B.SET_TIME BETWEEN TO_DATE (:sTime,'YYYY-MM-DD HH24:MI:SS')
+                AND TO_DATE (:eTime,'YYYY-MM-DD HH24:MI:SS')
+                AND A.MODEL = :sModel
+                ??
+                AND B.MAT_ID IN (??)
+    GROUP BY B.SET_TIME, B.MAT_ID
+  )
+  GROUP BY DAY, MAT_ID
+)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:sOper</param>
+            <param direction="Input" dbtype="VarChar" size="40">:sTime</param>
+            <param direction="Input" dbtype="VarChar" size="40">:eTime</param>
+            <param direction="Input" dbtype="VarChar" size="40">:sModel</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ALARM_WEEK_TREND_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[--sCol, sQuery, sRank
+SELECT * FROM
+(
+  SELECT WEEK , ??  AS VALUE, CNT, ROW_NUMBER() OVER (ORDER BY CNT DESC) AS RANKING FROM
+  (
+    SELECT WEEK, ??, COUNT(*) CNT FROM 
+    (
+      SELECT TO_CHAR(SET_TIME, 'YYYYIW') AS WEEK, ??
+      FROM MRASALMDEF@FATOMES A LEFT OUTER JOIN TBP_EQUIP_ALARM B
+      ON A.ALARM_ID = TO_CHAR(B.ALARM_ID)
+      WHERE 1=1
+              AND SET_TIME BETWEEN TO_DATE (:sTime,'YYYY-MM-DD HH24:MI:SS')
+              AND TO_DATE (:eTime,'YYYY-MM-DD HH24:MI:SS')
+              AND OPER IN (SELECT OPER FROM MWIPOPRDEF@FATOMES WHERE OPER_GRP_4 = :sOper)
+              AND DECODE(:sModel, 'All', '%,' || MODEL || ',%', ','||:sModel||',') LIKE '%,' || MODEL || ',%'
+              AND DECODE(:sRes, 'All', '%,' || RES_ID || ',%', ','||:sRes||',') LIKE '%,' || RES_ID || ',%'
+              AND DECODE(:sMat, 'All', '%,' || MAT_ID || ',%', ','||:sMat||',') LIKE '%,' || MAT_ID || ',%'
+              AND DECODE(:sAlarm, 'All', '%,' || ALARM_MSG || ',%', ','||:sAlarm||',') LIKE '%,' || ALARM_MSG || ',%'
+              ??
+      GROUP BY MAT_ID, SET_TIME
+    )
+    GROUP BY WEEK, ??
+  )
+)
+WHERE 1=1
+        AND RANKING ??]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:sTime</param>
+            <param direction="Input" dbtype="VarChar" size="40">:eTime</param>
+            <param direction="Input" dbtype="VarChar" size="40">:sOper</param>
+            <param direction="Input" dbtype="VarChar" size="40">:sModel</param>
+            <param direction="Input" dbtype="VarChar" size="40">:sRes</param>
+            <param direction="Input" dbtype="VarChar" size="40">:sMat</param>
+            <param direction="Input" dbtype="VarChar" size="40">:sAlarm</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ALARM_MONTH_TREND_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM
+(
+  SELECT MONTH , ??  AS VALUE, CNT, ROW_NUMBER() OVER (ORDER BY CNT DESC) AS RANKING FROM
+  (
+    SELECT MONTH, ??, COUNT(*) CNT FROM 
+    (
+      SELECT MONTH, ??
+      FROM MRASALMDEF@FATOMES A LEFT OUTER JOIN TBP_EQUIP_ALARM B
+      ON A.ALARM_ID = TO_CHAR(B.ALARM_ID)
+      WHERE 1=1
+              AND SET_TIME BETWEEN TO_DATE (:sTime,'YYYY-MM-DD HH24:MI:SS')
+              AND TO_DATE (:eTime,'YYYY-MM-DD HH24:MI:SS')
+              AND OPER IN (SELECT OPER FROM MWIPOPRDEF@FATOMES WHERE OPER_GRP_4 = :sOper)
+              AND DECODE(:sModel, 'All', '%,' || MODEL || ',%', ','||:sModel||',') LIKE '%,' || MODEL || ',%'
+              AND DECODE(:sRes, 'All', '%,' || RES_ID || ',%', ','||:sRes||',') LIKE '%,' || RES_ID || ',%'
+              AND DECODE(:sMat, 'All', '%,' || MAT_ID || ',%', ','||:sMat||',') LIKE '%,' || MAT_ID || ',%'
+              AND DECODE(:sAlarm, 'All', '%,' || ALARM_MSG || ',%', ','||:sAlarm||',') LIKE '%,' || ALARM_MSG || ',%'
+              ??
+      GROUP BY ??, MONTH
+    )
+    GROUP BY MONTH, ??
+  )
+)
+WHERE 1=1
+        AND RANKING ??]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:sTime</param>
+            <param direction="Input" dbtype="VarChar" size="40">:eTime</param>
+            <param direction="Input" dbtype="VarChar" size="40">:sOper</param>
+            <param direction="Input" dbtype="VarChar" size="40">:sModel</param>
+            <param direction="Input" dbtype="VarChar" size="40">:sRes</param>
+            <param direction="Input" dbtype="VarChar" size="40">:sMat</param>
+            <param direction="Input" dbtype="VarChar" size="40">:sAlarm</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ALARM_DAY_TREND_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM
+(
+  SELECT TO_DATE(DAY, 'YYYY-MM-DD' ) AS DAY , ??  AS VALUE, CNT, ROW_NUMBER() OVER (ORDER BY CNT DESC) AS RANKING FROM
+  (
+    SELECT DAY, ??, COUNT(*) CNT FROM 
+    (
+      SELECT TO_CHAR(SET_TIME, 'YYYY-MM-DD') AS DAY, ??
+      FROM MRASALMDEF@FATOMES A LEFT OUTER JOIN TBP_EQUIP_ALARM B
+      ON A.ALARM_ID = TO_CHAR(B.ALARM_ID)
+      WHERE 1=1
+              AND SET_TIME BETWEEN TO_DATE (:sTime,'YYYY-MM-DD HH24:MI:SS')
+              AND TO_DATE (:eTime,'YYYY-MM-DD HH24:MI:SS')
+              AND OPER IN (SELECT OPER FROM MWIPOPRDEF@FATOMES WHERE OPER_GRP_4 = :sOper)
+              AND DECODE(:sModel, 'All', '%,' || MODEL || ',%', ','||:sModel||',') LIKE '%,' || MODEL || ',%'
+              AND DECODE(:sRes, 'All', '%,' || RES_ID || ',%', ','||:sRes||',') LIKE '%,' || RES_ID || ',%'
+              AND DECODE(_sMat, 'All', '%,' || MAT_ID || ',%', ','||:sMat||',') LIKE '%,' || MAT_ID || ',%'
+              AND DECODE(:sAlarm, 'All', '%,' || ALARM_MSG || ',%', ','||:sAlarm||',') LIKE '%,' || ALARM_MSG || ',%'
+              ??
+      GROUP BY ??, SET_TIME
+    )
+    GROUP BY DAY, ??
+  )
+)
+WHERE 1=1
+        AND RANKING ??]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:sTime</param>
+            <param direction="Input" dbtype="VarChar" size="40">:eTime</param>
+            <param direction="Input" dbtype="VarChar" size="40">:sOper</param>
+            <param direction="Input" dbtype="VarChar" size="40">:sModel</param>
+            <param direction="Input" dbtype="VarChar" size="40">:sRes</param>
+            <param direction="Input" dbtype="VarChar" size="40">:sMat</param>
+            <param direction="Input" dbtype="VarChar" size="40">:sAlarm</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ALM_ANALYSIS_CHART_BY_ERROR" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT MES.RES_OPER             AS RES_OPER
+     , NVL(MES.RES_MODEL, ' ')  AS RES_MODEL
+     , ' '     AS RES_ID
+     , ' ' MAT_ID
+      , ' ' OPER
+     , NVL(ALARM_DESC, ' ')     AS ALARM_DESC
+     , SUM(MES.ALARM_CNT) ALARM_CNT
+     , ROUND(SUM(DISTINCT MES.MES_RUN_TIME) / DECODE(SUM(MES.ALARM_CNT),0,1,SUM(MES.ALARM_CNT)),2) AS MES_MTBA
+     , ROUND(SUM(DISTINCT FA.FA_RUN_TIME) / DECODE(SUM(MES.ALARM_CNT),0,1,SUM(MES.ALARM_CNT)),2) AS FA_MTBA
+     , ROUND(SUM(DISTINCT MES.MES_RUN_TIME),2) AS MES_RUN_TIME
+     , ROUND(SUM(DISTINCT FA.FA_RUN_TIME),2) AS FA_RUN_TIME
+     , ROUND(100 * SUM(EFFECT_TIME) / (COUNT(DISTINCT MAX(RES_USE.RES_ID)) OVER (PARTITION BY MES.RES_MODEL) * (( (TO_DATE(:end_day,'YYYYMMDD') - TO_DATE(:start_day,'YYYYMMDD')) + 1 ) * 1440 )),2)  AS "시간율"
+     , ROUND(SUM(EFFECT_TIME),2) AS EFFECT_TIME -- 2013. 12. 26 add fa-effect time
+     , COUNT(DISTINCT MAX(RES_USE.RES_ID)) OVER (PARTITION BY MES.RES_MODEL) * (( (TO_DATE(:end_day,'YYYYMMDD') - TO_DATE(:start_day,'YYYYMMDD')) + 1 ) * 1440 ) AS WORK_TIME
+  FROM (
+          SELECT TO_CHAR(SET_TIME + 2/24, 'YYYYMMDD') AS WORK_DAY
+             , DEF.RES_GRP_3 AS RES_OPER
+             , DEF.RES_GRP_6 AS RES_MODEL
+             , DEF.RES_ID AS RES_ID
+             , MAX(RUN_TIME) AS MES_RUN_TIME
+             , ALM.ALARM_MSG AS ALARM_DESC 
+             , COUNT(1) AS ALARM_CNT
+             , SUM(ALM.EFFECT)/60 EFFECT_TIME
+          FROM TBP_EQUIP_ALARM ALM
+             , MRASRESDEF@FATOMES DEF
+             , (
+                SELECT WORK_DAY, ALM.FACTORY, DEF.RES_GRP_6, ALM.RES_ID  
+                     , SUM(MAX(RUN_TIME)) OVER (PARTITION BY  RES_GRP_6) AS RUN_TIME
+                     , SUM(ALARM_CNT) AS CNT 
+                  FROM CSUMALMRES@FATOMES ALM, MRASRESDEF@FATOMES DEF
+                 WHERE WORK_DAY BETWEEN :start_day AND :end_day 
+                   AND ALM.RES_ID = DEF.RES_ID
+                GROUP BY WORK_DAY, ALM.FACTORY, RES_GRP_6, ALM.RES_ID 
+               ) RES_SUM 
+         WHERE SET_TIME BETWEEN TO_DATE(:start_day||'220000', 'YYYYMMDDHH24MISS') - 1 AND  TO_DATE(:end_day || '215959', 'YYYYMMDDHH24MISS')
+           AND DEF.RES_ID = ALM.RES_ID
+           AND DEF.RES_ID = RES_SUM.RES_ID
+           ??
+           ??
+           ??
+           AND ALM.FACTORY = 'HMKA1'
+         GROUP BY TO_CHAR(SET_TIME + 2/24, 'YYYYMMDD'), DEF.RES_GRP_3, DEF.RES_GRP_6 ,  DEF.RES_ID, ALM.ALARM_MSG
+       ) MES
+     , (SELECT WORK_DAY, RES_OPER, RES_MODEL, RES_ID, SUM(FA_RUN_TIME + FA_INDEX_TIME) / 60 AS FA_RUN_TIME
+          FROM TSM_EQUIP_PROC_RESULT
+         WHERE WORK_MONTH BETWEEN SUBSTR(:start_day,1,6) AND SUBSTR(:end_day,1,6)
+           AND WORK_DAY BETWEEN :start_day AND :end_day
+         GROUP BY WORK_DAY,RES_OPER, RES_MODEL, RES_ID
+       ) FA
+     , (
+                    SELECT SUBSTR(CUTOFF_DT, 1, 8) AS WORK_DAY
+                         , RES_GRP_3    AS RES_OPER
+                         , RES_GRP_5    AS RES_MAKER
+                         , RES_GRP_6    AS RES_MODEL
+                         , RES_ID       AS RES_ID
+                         , RES_CMF_9    AS USE_STATE
+                      FROM MRASRESDEF_BOH@FATOMES RES
+                         , (
+                             SELECT TO_CHAR(TO_DATE (:start_day, 'YYYYMMDD')+(LEVEL - 1), 'YYYYMMDD') DAY
+                               FROM DUAL
+                            CONNECT BY TO_DATE (:start_day, 'YYYYMMDD')+(LEVEL-1) <=TO_DATE (:end_day, 'YYYYMMDD')
+                           ) YMD
+                     WHERE RES.FACTORY = 'HMKA1'
+                       AND RES.CUTOFF_DT = YMD.DAY || '22'
+                       AND RES.DELETE_FLAG = ' '
+     ) RES_USE        
+ WHERE MES.RES_OPER = FA.RES_OPER
+   AND MES.RES_MODEL = FA.RES_MODEL
+   AND MES.RES_ID = FA.RES_ID      
+   AND MES.RES_ID = RES_USE.RES_ID
+           AND MES.WORK_DAY = RES_USE.WORK_DAY
+   AND MES.WORK_DAY = FA.WORK_DAY
+   AND RES_USE.USE_STATE = 'Y'
+ GROUP BY GROUPING SETS (
+                           (MES.RES_OPER, MES.RES_MODEL, ALARM_DESC) -- 6th
+                        )
+  HAVING SUM(MES.ALARM_CNT) <> 0   ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:start_day</param>
+            <param direction="Input" dbtype="VarChar" size="40">:end_day</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_ALARM" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[DELETE
+FROM    TBP_EQUIP_ALARM
+WHERE   1=1
+        AND SET_TIME  < SYSDATE - :delete_day]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="10">:delete_day</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ALARM_BLADE_DETECTION" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT  /*+INDEX_DESC(ALM TBP_EQUIP_ALARM_PK)*/TO_CHAR(SET_TIME,'YYYYMMDDHH24MISS') AS TRAN_TIME FROM   
+        (SELECT * FROM TBP_EQUIP_ALARM
+                WHERE   1=1
+            and OPER = :oper
+            and FACTORY = 'HMKA1'
+            AND MONTH IN (TO_CHAR(SYSDATE,'YYYYMM'), TO_CHAR(ADD_MONTHS(SYSDATE,-1),'YYYYMM'))
+            and ALARM_ID IN ('2184', '2185', '2500', '2501', '2660', '2661', '2662', '2663')
+            and RES_ID = :res_id order by SET_TIME DESC) ALM
+            where 1=1
+                and ROWNUM = 1]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="10" value="A0200">:oper</param>
+            <param direction="Input" dbtype="VarChar" size="10" value="BS016">:res_id</param>
+        </parameters>
+    </query>
+</queryxml>

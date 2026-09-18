@@ -1,0 +1,179 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{7EBEB130-619F-4615-B335-A26B41CC9963}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Dacrux.Mining</RootNamespace>
+    <AssemblyName>Dacrux.Mining</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>"%24/DACruxV4/02_ClsLib/Dacrux.Mining", VSAAAAAA</SccProjectName>
+    <SccLocalPath>.</SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>MSSCCI:Microsoft Visual SourceSafe</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\100_ClientBin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\100_ClientBin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="DACrux.Base, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\07_CoreLib\DACrux.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="DACrux.BStats">
+      <HintPath>..\..\07_CoreLib\DACrux.BStats.dll</HintPath>
+    </Reference>
+    <Reference Include="DACrux.BStats.Core">
+      <HintPath>..\..\07_CoreLib\DACrux.BStats.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="DACrux.Common, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\07_CoreLib\DACrux.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="DACrux.Common.RO, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\07_CoreLib\DACrux.Common.RO.dll</HintPath>
+    </Reference>
+    <Reference Include="DACrux.DataVisualization">
+      <HintPath>..\..\07_CoreLib\DACrux.DataVisualization.dll</HintPath>
+    </Reference>
+    <Reference Include="DACrux.Interface, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\07_CoreLib\DACrux.Interface.dll</HintPath>
+    </Reference>
+    <Reference Include="DACrux.SP.Controls">
+      <HintPath>..\..\07_CoreLib\DACrux.SP.Controls.dll</HintPath>
+    </Reference>
+    <Reference Include="DACrux.StatBase">
+      <HintPath>..\..\07_CoreLib\DACrux.StatBase.dll</HintPath>
+    </Reference>
+    <Reference Include="DACrux.Statistics, Version=1.0.0.0, Culture=neutral, PublicKeyToken=d3d3167e709f0915, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\07_CoreLib\DACrux.Statistics.dll</HintPath>
+    </Reference>
+    <Reference Include="DACrux.Utility">
+      <HintPath>..\..\07_CoreLib\DACrux.Utility.dll</HintPath>
+    </Reference>
+    <Reference Include="FarPoint.Excel, Version=5.0.3518.2008, Culture=neutral, PublicKeyToken=327c3516b1b18457, processorArchitecture=MSIL" />
+    <Reference Include="FarPoint.Win, Version=5.0.3518.2008, Culture=neutral, PublicKeyToken=327c3516b1b18457, processorArchitecture=MSIL" />
+    <Reference Include="FarPoint.Win.Spread, Version=5.0.3518.2008, Culture=neutral, PublicKeyToken=327c3516b1b18457, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files (x86)\GrapeCity\Spread.WinForms.5.dotNet35\v5.0.3518\Bin\FarPoint.Win.Spread.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Forms.DataVisualization" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="frmAddLot.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmAddLot.designer.cs">
+      <DependentUpon>frmAddLot.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmClassAnalysis.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmClassAnalysis.designer.cs">
+      <DependentUpon>frmClassAnalysis.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmCommonality.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmCommonality.designer.cs">
+      <DependentUpon>frmCommonality.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmTimeSeriesAnalysis.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmTimeSeriesAnalysis.designer.cs">
+      <DependentUpon>frmTimeSeriesAnalysis.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmYieldSummaryByLot.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmYieldSummaryByLot.designer.cs">
+      <DependentUpon>frmYieldSummaryByLot.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="uclLotGroup.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="uclLotGroup.designer.cs">
+      <DependentUpon>uclLotGroup.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="frmAddLot.resx">
+      <DependentUpon>frmAddLot.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmClassAnalysis.resx">
+      <DependentUpon>frmClassAnalysis.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmCommonality.resx">
+      <DependentUpon>frmCommonality.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmTimeSeriesAnalysis.resx">
+      <DependentUpon>frmTimeSeriesAnalysis.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmYieldSummaryByLot.resx">
+      <DependentUpon>frmYieldSummaryByLot.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\licenses.licx" />
+    <EmbeddedResource Include="uclLotGroup.resx">
+      <DependentUpon>uclLotGroup.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\03_CtlLib\DACrux.Control\DACrux.Controls.csproj">
+      <Project>{0CDDB391-0A29-4850-9198-C529509DA64F}</Project>
+      <Name>DACrux.Controls</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DACrux.ENG.Interface\DACrux.ENG.Interface.csproj">
+      <Project>{474B0701-B968-4B5C-867A-8C6DFA10402D}</Project>
+      <Name>DACrux.ENG.Interface</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DACrux.ENG.RO\DACrux.ENG.RO.csproj">
+      <Project>{A35A3D49-E1CB-4E98-961D-A8C6DB38D1D5}</Project>
+      <Name>DACrux.ENG.RO</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DACrux.SPC.RO\DACrux.SPC.RO.csproj">
+      <Project>{DD18C9C8-0F8A-45EA-B946-CF9A1095FE27}</Project>
+      <Name>DACrux.SPC.RO</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

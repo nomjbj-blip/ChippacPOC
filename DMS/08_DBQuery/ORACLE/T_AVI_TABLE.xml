@@ -1,0 +1,437 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="TPSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Insert" queryid="INSERT_RAWDATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO ?? VALUES(
+:wafer_seq,
+:dieid,
+:x,
+:y,
+:cat,
+:qc
+)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0" value="1">:wafer_seq</param>
+            <param direction="Input" dbtype="Number" size="0" value="1">:dieid</param>
+            <param direction="Input" dbtype="Number" size="0" value="1">:x</param>
+            <param direction="Input" dbtype="Number" size="0" value="1">:y</param>
+            <param direction="Input" dbtype="Number" size="0" value="1">:cat</param>
+            <param direction="Input" dbtype="Number" size="0" value="1">:qc</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_LOT_SEQ" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT LOT_SEQ FROM TQP_LOT
+WHERE TESTAREA = :testarea
+AND PRODUCT = :product
+AND PROGRAM = :program
+AND LOT_ID = :lot_id]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:testarea</param>
+            <param direction="Input" dbtype="VarChar" size="30">:product</param>
+            <param direction="Input" dbtype="VarChar" size="30">:program</param>
+            <param direction="Input" dbtype="VarChar" size="30">:lot_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_WAFER_SEQ" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT LOT_SEQ,WAFER_SEQ,PROBE_CNT FROM TQP_WAFER
+WHERE LOT_SEQ = :lot_seq
+AND WAFER_ID = :wafer_id]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:lot_seq</param>
+            <param direction="Input" dbtype="VarChar" size="30">:wafer_id</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_PROBE_CNT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_WAFER SET PROBE_CNT = PROBE_CNT+1
+WHERE LOT_SEQ = :lot_seq
+AND WAFER_SEQ = :wafer_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:lot_seq</param>
+            <param direction="Input" dbtype="Number" size="0">:wafer_seq</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="INSERT_WAFER_INFO" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_WAFER(WAFER_SEQ,LOT_SEQ, WAFER_ID, TESTER, PROBE_CARD, OPERATOR, TESTED_DIE, START_TIME, END_TIME, LOSS_DIE)
+VALUES(
+WAFER_SEQ.NEXTVAL, :lot_seq, :wafer_id, :tester, :probe_card, :operator,:tested_die, TO_DATE(:start_time,'YYYY/MM/DD HH24:MI:SS'), sysdate, :loss_die
+)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:lot_seq</param>
+            <param direction="Input" dbtype="VarChar" size="30">:wafer_id</param>
+            <param direction="Input" dbtype="VarChar" size="30">:tester</param>
+            <param direction="Input" dbtype="VarChar" size="30">:probe_card</param>
+            <param direction="Input" dbtype="VarChar" size="30">:operator</param>
+            <param direction="Input" dbtype="Number" size="0">:tested_die</param>
+            <param direction="Input" dbtype="VarChar" size="19">:start_time</param>
+            <param direction="Input" dbtype="Number" size="0">:loss_die</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="INSERT_LOT_INFO" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_LOT(LOT_SEQ, PRODUCT, TESTAREA, PROGRAM, LOT_ID, MOTHER_LOT_ID, LOT_TYPE, FABLOT, FAMILY, FACILITY, DEVICE_ALIAS, START_TIME, END_TIME, WIP_STATUS, WAFERS)
+VALUES(LOT_SEQ.NEXTVAL,
+:product, 
+:testarea, 
+:program,
+:lot_id, 
+:mother_lot_id, 
+:lot_type, 
+:fablot, 
+:family, 
+:facility, 
+:device_alias,
+ TO_DATE(:start_time,'YYYY/MM/DD HH24:MI:SS'), 
+TO_DATE(:end_time,'YYYY/MM/DD HH24:MI:SS'),
+:wip_status, 
+:wafers)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:product</param>
+            <param direction="Input" dbtype="VarChar" size="30">:testarea</param>
+            <param direction="Input" dbtype="VarChar" size="30">:program</param>
+            <param direction="Input" dbtype="VarChar" size="30">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="30">:mother_lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="30">:lot_type</param>
+            <param direction="Input" dbtype="VarChar" size="30">:fablot</param>
+            <param direction="Input" dbtype="VarChar" size="30">:family</param>
+            <param direction="Input" dbtype="VarChar" size="30">:facility</param>
+            <param direction="Input" dbtype="VarChar" size="30">:device_alias</param>
+            <param direction="Input" dbtype="VarChar" size="19">:start_time</param>
+            <param direction="Input" dbtype="VarChar" size="19">:end_time</param>
+            <param direction="Input" dbtype="VarChar" size="10">:wip_status</param>
+            <param direction="Input" dbtype="Number" size="0">:wafers</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_MAPDATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT USEMAP.X,USEMAP.Y
+,DECODE(REALMAP.KILLER,NULL,0,'MACHINE',REALMAP.CAT,0) AS BIN
+,DECODE(REALMAP.CAT,NULL,0,REALMAP.CAT) AS VI,USECODE 
+FROM 
+    (
+        SELECT X, Y, A.CAT, A.QC AS KILLER 
+        FROM T_AVI_?? A,TQP_WAFER W,TQP_LOT L
+        WHERE L.TESTAREA = :testarea
+        AND L.PRODUCT = :product
+        AND L.PROGRAM = :program
+        AND L.LOT_ID = :lot_id
+        AND W.WAFER_ID = :wafer_id
+        AND W.PROBE_CNT = 0
+        AND L.LOT_SEQ = W.LOT_SEQ
+        AND W.WAFER_SEQ = A.WAFER_SEQ
+    ) REALMAP,
+    (SELECT X,Y,USECODE FROM TQP_USEMAP U, TQP_PRODUCT P
+    WHERE P.PRODUCT = :product
+    AND U.USECODE >0
+    AND P.MAPID = U.MAPID) USEMAP
+WHERE USEMAP.X = REALMAP.X(+)
+AND USEMAP.Y = REALMAP.Y(+) ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:testarea</param>
+            <param direction="Input" dbtype="VarChar" size="30">:product</param>
+            <param direction="Input" dbtype="VarChar" size="30">:program</param>
+            <param direction="Input" dbtype="VarChar" size="30">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="30">:wafer_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_WAFER_LIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT L.TESTAREA,PRODUCT,PROGRAM,LOT_ID,L.LOT_SEQ,FABLOT,WAFER_ID,W.WAFER_SEQ,W.START_TIME,W.END_TIME,W.OPERATOR FROM TQP_LOT L,TQP_WAFER W
+WHERE L.LOT_SEQ = W.LOT_SEQ
+AND L.TESTAREA = :testarea
+AND L.END_TIME BETWEEN TO_DATE(:stime,'YYYY-MM-DD HH24:MI:SS') AND TO_DATE(:etime,'YYYY-MM-DD HH24:MI:SS')
+AND W.PROBE_CNT = 0
+??]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:testarea</param>
+            <param direction="Input" dbtype="VarChar" size="19">:stime</param>
+            <param direction="Input" dbtype="VarChar" size="19">:etime</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_TESTAREA_LIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT TESTAREA FROM TQP_LOT]]></commandtext>
+    </query>
+    <query statement="Update" queryid="UPDATE_RAWDATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE ?? SET
+QC = :qc
+WHERE 
+WAFER_SEQ = :wafer_seq
+AND X = :x
+AND Y = :y]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:qc</param>
+            <param direction="Input" dbtype="Number" size="0">:wafer_seq</param>
+            <param direction="Input" dbtype="Number" size="0">:x</param>
+            <param direction="Input" dbtype="Number" size="0">:y</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_AVI_MAPDATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT USEMAP.X,USEMAP.Y,DECODE(REALMAP.VIFAIL,NULL,0,REALMAP.VIFAIL) AS BIN,QC,USEMAP.USECODE FROM 
+    (SELECT X, Y, A.CAT AS VIFAIL,QC FROM T_AVI_?? A,TQP_WAFER W,TQP_LOT L
+    WHERE L.TESTAREA = :testarea
+    AND L.PRODUCT = :product
+    AND L.LOT_ID = :lot_id
+    AND W.WAFER_ID = :wafer_id
+    AND L.LOT_SEQ = W.LOT_SEQ
+    AND W.WAFER_SEQ = A.WAFER_SEQ) REALMAP,
+    (SELECT X,Y,USECODE FROM TQP_LOT L, TQP_USEMAP U, TQP_PRODUCT P
+    WHERE L.TESTAREA = :testarea
+    AND L.PRODUCT = :product
+    AND L.LOT_ID = :lot_id
+    AND U.USECODE >0
+    AND L.PRODUCT = P.PRODUCT
+    AND P.MAPID = U.MAPID) USEMAP
+WHERE REALMAP.X(+) = USEMAP.X
+AND REALMAP.Y(+) = USEMAP.Y
+ORDER BY USEMAP.Y,USEMAP.X]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30" description="PROBETEST">:testarea</param>
+            <param direction="Input" dbtype="VarChar" size="30" description="BL6212-2DUT">:product</param>
+            <param direction="Input" dbtype="VarChar" size="30" description="E461431AP">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="30" description="E461431AP_02">:wafer_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GETD_MAPDATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT USEMAP.X,USEMAP.Y,DECODE(REALMAP.VISUALINSP,NULL,0,REALMAP.VISUALINSP) AS VI ,DECODE( REALMAP.BIN ,NULL,0,REALMAP.BIN ) AS BIN,USEMAP.USECODE FROM 
+    (SELECT X, Y, 
+    BIN, VISUALINSP FROM TD_?? A,TQP_WAFER W,TQP_LOT L
+    WHERE L.TESTAREA = :testarea
+    AND L.PRODUCT = :product
+    AND L.PROGRAM = :program
+    AND L.LOT_ID = :lot_id
+    AND W.WAFER_ID = :wafer_id
+    AND W.PROBE_CNT = 0
+    AND L.LOT_SEQ = W.LOT_SEQ
+    AND W.WAFER_SEQ = A.WAFER_SEQ) REALMAP,
+    (SELECT X,Y,USECODE FROM TQP_LOT L, TQP_USEMAP U, TQP_PRODUCT P
+    WHERE L.TESTAREA = :testarea
+    AND L.PRODUCT = :product
+    AND L.PROGRAM = :program
+    AND L.LOT_ID = :lot_id
+    AND U.USECODE =1 
+    AND L.PRODUCT = P.PRODUCT
+    AND P.MAPID = U.MAPID) USEMAP
+WHERE REALMAP.X(+) = USEMAP.X
+AND REALMAP.Y(+) = USEMAP.Y
+ORDER BY USEMAP.Y,USEMAP.X]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:testarea</param>
+            <param direction="Input" dbtype="VarChar" size="30">:product</param>
+            <param direction="Input" dbtype="VarChar" size="30">:program</param>
+            <param direction="Input" dbtype="VarChar" size="30">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="30">:wafer_id</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_ZERO" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[DELETE FROM T_AVI_?? WHERE WAFER_SEQ=:wafer_seq
+AND QC=0 AND CAT=0]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:wafer_seq</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="PROC_RUN_AVI_SUMMAY" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[CALL PROC_RUN_AVI_SUMMARY(:product,:wafer_seq)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30" value="LG">:product</param>
+            <param direction="Input" dbtype="VarChar" size="30" value="11">:wafer_seq</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_PROBE_CNT_SUM" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_WAFER_SUM SET PROBE_CNT = PROBE_CNT+1
+WHERE LOT_SEQ = :lot_seq
+AND WAFER_SEQ = :wafer_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="10">:lot_seq</param>
+            <param direction="Input" dbtype="Number" size="10">:wafer_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_AVI_SUM" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT A.WAFER_ID AS WID,NETDIE AS TOTAL
+,ROUND( ((NETDIE - AVI_FAIL) / NETDIE) * 100,2) AS YIELD
+,(NETDIE - AVI_FAIL) AS PASS
+,AVI_FAIL AS FAIL,(TOT_FAIL - AVI_FAIL) AS KILL
+FROM 
+(
+SELECT L.PRODUCT,L.LOT_ID,W.WAFER_ID,L.LOT_SEQ,W.WAFER_SEQ,COUNT(*) AS TOT_FAIL FROM TQP_LOT L,TQP_WAFER W, T_AVI_LG A
+WHERE L.TESTAREA = 'AVI'
+AND L.PRODUCT = :product
+AND L.LOT_ID = :lot_id
+AND CAT > 0
+AND PROBE_CNT = 0
+AND L.LOT_SEQ = W.LOT_SEQ 
+AND W.WAFER_SEQ = A.WAFER_SEQ
+GROUP BY L.PRODUCT,L.LOT_ID,W.WAFER_ID,L.LOT_SEQ,W.WAFER_SEQ
+) A,
+(
+SELECT L.PRODUCT,L.LOT_ID,W.WAFER_ID,L.LOT_SEQ,W.WAFER_SEQ,COUNT(*) AS AVI_FAIL 
+FROM TQP_LOT L,TQP_WAFER W, T_AVI_LG A
+WHERE L.TESTAREA = 'AVI'
+AND L.PRODUCT = :product
+AND L.LOT_ID = :lot_id
+AND KILLER = 'MACHINE'
+AND CAT > 0
+AND PROBE_CNT = 0
+AND L.LOT_SEQ = W.LOT_SEQ 
+AND W.WAFER_SEQ = A.WAFER_SEQ
+GROUP BY L.PRODUCT,L.LOT_ID,W.WAFER_ID,L.LOT_SEQ,W.WAFER_SEQ
+) B,
+(
+SELECT PRODUCT,NETDIE FROM TQP_MAPDEF M,TQP_PRODUCT P
+WHERE P.PRODUCT = :product
+AND M.MAPID = P.MAPID
+) C
+WHERE A.PRODUCT = B.PRODUCT
+AND A.LOT_ID = B.LOT_ID
+AND A.WAFER_ID = B.WAFER_ID
+AND A.PRODUCT = C.PRODUCT]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:product</param>
+            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_IQC_MAPDATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2015-04-13 14:42:32
+SELECT ROUND(USEMAP.XY / 65536) AS X, MOD(USEMAP.XY, 65536) AS Y, QC AS VI, CAT AS BIN, USEMAP.USECODE 
+FROM 
+    (SELECT (X * 65536) + Y AS XY,QC,CAT FROM T_AVI_?? A,TQP_WAFER W,TQP_LOT L
+    WHERE L.TESTAREA = :testarea
+    AND L.PRODUCT = :product
+    AND L.LOT_ID = :lot_id
+    AND W.WAFER_ID = :wafer_id
+    AND L.LOT_SEQ = W.LOT_SEQ
+    AND W.PROBE_CNT = 0
+    AND W.WAFER_SEQ = A.WAFER_SEQ) REALMAP,
+    (SELECT (X * 65536) + Y AS XY,USECODE FROM TQP_USEMAP U, TQP_PRODUCT P
+    WHERE P.PRODUCT = :product
+    AND P.MAPID = U.MAPID
+    AND U.USECODE >0) USEMAP
+WHERE REALMAP.XY(+) = USEMAP.XY
+ORDER BY USEMAP.XY]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:testarea</param>
+            <param direction="Input" dbtype="VarChar" size="40">:product</param>
+            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:wafer_id</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="INSERT_CLEAN_MAP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2015-04-16 09:51:37
+INSERT INTO TD_??
+(SELECT :wafer_seq AS WAFER_SEQ, ROWNUM AS DIEID, X , Y , 0, 0, NULL 
+FROM TQP_USEMAP
+WHERE MAPID = (SELECT MAPID FROM TQP_PRODUCT
+               WHERE PRODUCT = :product)
+AND USECODE = 1
+)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:wafer_seq</param>
+            <param direction="Input" dbtype="VarChar" size="40">:product</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_BIN_DISTRIBUTION_IQC" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2015-04-21 17:02:21
+SELECT DECODE(A.BIN,NULL,B.BIN,A.BIN) AS BIN
+,DECODE(A.BIN_NAME,NULL,'BIN' || B.BIN,A.BIN_NAME) AS BIN_NAME,CNT
+,NVL(COLOR, '#FFFFFF') AS COLOR 
+FROM
+    (SELECT * 
+     FROM TQP_VISUALINSPSPEC
+     WHERE INSPTYPE = :testarea) A,
+    (SELECT QC AS BIN,COUNT(*) AS CNT 
+    FROM T_AVI_??
+    WHERE WAFER_SEQ = :wafer_seq
+     GROUP BY QC) B
+WHERE A.BIN(+) = B.BIN
+ORDER BY BIN]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:testarea</param>
+            <param direction="Input" dbtype="VarChar" size="40">:wafer_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_BIN_DISTRIBUTION_AVI" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2015-04-21 17:06:42
+SELECT DECODE(A.BIN,NULL,B.BIN,A.BIN) AS BIN
+,DECODE(A.BIN_NAME,NULL,'BIN' || B.BIN,A.BIN_NAME) AS BIN_NAME,CNT
+,NVL(COLOR, '#FFFFFF') AS COLOR 
+FROM
+    (SELECT * 
+     FROM TQP_VISUALINSPSPEC
+     WHERE INSPTYPE = :testarea) A,
+     (SELECT CAT AS BIN,COUNT(*) AS CNT 
+    FROM T_AVI_??
+    WHERE WAFER_SEQ = :wafer_seq
+    GROUP BY CAT) B
+WHERE A.BIN(+) = B.BIN
+ORDER BY BIN]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:testarea</param>
+            <param direction="Input" dbtype="VarChar" size="40">:wafer_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_AVI_MAPDATA(BY_WAFER_SEQ)" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2015-04-21 17:16:04
+SELECT WAFER_SEQ,USEMAP.X,USEMAP.Y
+,DECODE(REALMAP.KILLER,NULL,0,'MACHINE',REALMAP.BIN,0) AS BIN
+,DECODE(REALMAP.BIN,NULL,0,REALMAP.BIN) AS VI,USECODE 
+FROM 
+    (
+        SELECT A.WAFER_SEQ,X, Y, A.BIN, NULL AS KILLER 
+        FROM T_AVI_?? A,TQP_WAFER W,TQP_LOT L
+        WHERE 1 = 1 
+        AND L.DEVICE = :product
+        AND W.WAFER_SEQ = :wafer_seq
+        AND L.LOT_SEQ = W.LOT_SEQ
+        AND W.WAFER_SEQ = A.WAFER_SEQ
+    ) REALMAP,
+    (SELECT X,Y,USECODE FROM TQP_USEMAP U, TQP_PRODUCT P
+    WHERE P.PRODUCT = :product
+    AND U.USECODE >0
+    AND P.MAPID = U.MAPID) USEMAP
+WHERE USEMAP.X = REALMAP.X(+)
+AND USEMAP.Y = REALMAP.Y(+) ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:product</param>
+            <param direction="Input" dbtype="VarChar" size="40">:wafer_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_IQC_MAPDATA(BY_WAFER_SEQ)" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2015-04-21 17:20:36
+SELECT WAFER_SEQ,ROUND(USEMAP.XY / 65536) AS X, MOD(USEMAP.XY, 65536) AS Y, QC AS VI, CAT AS BIN, USEMAP.USECODE 
+FROM 
+    (SELECT A.WAFER_SEQ,(X * 65536) + Y AS XY,QC,CAT FROM T_AVI_?? A,TQP_WAFER W,TQP_LOT L
+    WHERE L.TESTAREA = :testarea
+    AND L.PRODUCT = :product
+    AND W.WAFER_SEQ = :wafer_seq
+    AND L.LOT_SEQ = W.LOT_SEQ
+    AND W.WAFER_SEQ = A.WAFER_SEQ) REALMAP,
+    (SELECT (X * 65536) + Y AS XY,USECODE FROM TQP_USEMAP U, TQP_PRODUCT P
+    WHERE P.PRODUCT = :product
+    AND P.MAPID = U.MAPID
+    AND U.USECODE >0) USEMAP
+WHERE REALMAP.XY(+) = USEMAP.XY
+ORDER BY USEMAP.XY]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:product</param>
+            <param direction="Input" dbtype="VarChar" size="40">:wafer_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_IQC_MAPDATA_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2015-04-13 14:42:32
+SELECT ROUND(USEMAP.XY / 65536) AS X, MOD(USEMAP.XY, 65536) AS Y, 0 AS VI, BIN, NVL(USEMAP.USECODE, 0) AS USECODE
+FROM 
+    (SELECT (X * 65536) + Y AS XY,BIN FROM TD_?? A,TQP_WAFER W,TQP_LOT L
+    WHERE L.TEST_AREA = :testarea
+    AND L.DEVICE = :product
+    AND L.LOT_ID = :lot_id
+    AND W.WAFER_ID = :wafer_id
+    AND L.LOT_SEQ = W.LOT_SEQ
+    AND W.PROBE_CNT = 0
+    AND W.WAFER_SEQ = A.WAFER_SEQ) REALMAP,
+    (SELECT (X * 65536) + Y AS XY,USECODE FROM TQP_USEMAP U, TQP_PRODUCT P
+    WHERE P.PRODUCT = :product
+    AND P.MAPID = U.MAPID) USEMAP
+WHERE REALMAP.XY(+) = USEMAP.XY
+ORDER BY USEMAP.XY]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:testarea</param>
+            <param direction="Input" dbtype="VarChar" size="40">:product</param>
+            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:wafer_id</param>
+        </parameters>
+    </query>
+</queryxml>

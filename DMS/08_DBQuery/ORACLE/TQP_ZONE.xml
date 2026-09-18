@@ -1,0 +1,73 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="BUMPFA" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Select" queryid="SELECT_ZONE_MAP" commandtype="Text" description="해당 USER별로 해당 DEVICE의 ZONE MAP 을 가져온다." commandtimeout="60">
+        <commandtext><![CDATA[SELECT X,Y,ZONEID,COLOR FROM TQP_ZONE
+WHERE USER_NAME = :user_name
+AND PRODUCT = :product
+ORDER BY X,Y]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30" value="admin">:user_name</param>
+            <param direction="Input" dbtype="VarChar" size="30" value="S7SP800X01-51M">:product</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="CREATE_ZONE_MAP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_ZONE(USER_NAME, PRODUCT, MAPID, ZONEID, X, Y, COLOR)
+VALUES(:user_name,:product,:mapid,:zoneid,:x,:y,:color)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:user_name</param>
+            <param direction="Input" dbtype="VarChar" size="30">:product</param>
+            <param direction="Input" dbtype="VarChar" size="30">:mapid</param>
+            <param direction="Input" dbtype="VarChar" size="30">:zoneid</param>
+            <param direction="Input" dbtype="Number" size="0">:x</param>
+            <param direction="Input" dbtype="Number" size="0">:y</param>
+            <param direction="Input" dbtype="VarChar" size="9">:color</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_ZONE_MAP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[DELETE FROM TQP_ZONE
+WHERE USER_NAME = :user_name
+AND PRODUCT = :product]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:user_name</param>
+            <param direction="Input" dbtype="VarChar" size="30">:product</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_ZONE_LIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT ZONEID,COLOR FROM  TQP_ZONE
+WHERE USER_NAME= :user_name
+AND PRODUCT = :product]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:user_name</param>
+            <param direction="Input" dbtype="VarChar" size="30">:product</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_MAP_ID" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQP_PRODUCT WHERE PRODUCT=:product]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:product</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_USE_MAP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQP_USEMAP WHERE MAPID=:mapId AND USECODE=1]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:mapId</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_MAP_DEF" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQP_MAPDEF WHERE MAPID=:mapId]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:mapId</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DEL_ZONE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[DELETE TQP_ZONE WHERE USER_NAME=:userName AND PRODUCT=:product AND MAPID=:mapId]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:userName</param>
+            <param direction="Input" dbtype="VarChar" size="0">:product</param>
+            <param direction="Input" dbtype="VarChar" size="0">:mapId</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="INS_ZONE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_ZONE VALUES(??)]]></commandtext>
+    </query>
+</queryxml>

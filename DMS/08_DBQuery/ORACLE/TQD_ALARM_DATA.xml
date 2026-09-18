@@ -1,0 +1,122 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="TPSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Select" queryid="SELECT_ALARM_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT 
+    A.FACTORY,
+    :DEFECT_TYPE DEFECT_TYPE,
+    A.EQUIP_ID,
+    :PRODUCT PRODUCT,
+    :STEP_ID STEP_ID,
+    LOWER,
+    TARGET,
+    UPPER,
+    CASE USE_FLAG WHEN NULL THEN 1 WHEN 'Y' THEN 1 ELSE 0 END USE_FLAG,
+    CREATE_USER,
+    TO_CHAR(B.CREATE_TIME,'YYYY-MM-DD HH24:MI:SS') CREATE_TIME,
+    UPDATE_USER,
+    TO_CHAR(B.UPDATE_TIME,'YYYY-MM-DD HH24:MI:SS') UPDATE_TIME
+FROM TQC_EQUIP A, (
+SELECT *
+FROM TQD_ALARM_SETUP
+WHERE 1=1
+AND DEFECT_TYPE = :DEFECT_TYPE
+AND PRODUCT = :PRODUCT
+AND STEP_ID = :STEP_ID
+) B
+WHERE A.FACTORY = B.FACTORY(+)
+AND A.EQUIP_ID = B.EQUIP_ID(+)
+AND A.OPER = 'Inspection'
+ORDER BY A.EQUIP_ID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0" value="DEFECT_TYPE">:DEFECT_TYPE</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="PRODUCT">:PRODUCT</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="STEP_ID">:STEP_ID</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="INSERT_ALARM_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQD_ALARM_DATA (
+    FACTORY, 
+    DEFECT_TYPE, 
+    PRODUCT, 
+    STEP_ID,
+    EQUIP_ID, 
+    TRAN_TIME, 
+    STEP_SEQ, 
+    LOWER, 
+    TARGET, 
+    UPPER,
+    ALARM_YN,
+    ALARM_TYPE, 
+    DEFECT_COUNT,
+    NOTI_USER
+) VALUES (
+    :FACTORY, 
+    :DEFECT_TYPE, 
+    :PRODUCT, 
+    :STEP_ID,
+    :EQUIP_ID,
+    SYSDATE, 
+    :STEP_SEQ, 
+    :LOWER, 
+    :TARGET, 
+    :UPPER,
+    :ALARM_YN,
+    :ALARM_TYPE, 
+    :DEFECT_COUNT,
+    :NOTI_USER
+)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0" value="FACTORY">:FACTORY</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="DEFECT_TYPE">:DEFECT_TYPE</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="PRODUCT">:PRODUCT</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="STEP_ID">:STEP_ID</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="EQUIP_ID">:EQUIP_ID</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="STEP_SEQ">:STEP_SEQ</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="LOWER">:LOWER</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="TARGET">:TARGET</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="UPPER">:UPPER</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="ALARM_YN">:ALARM_YN</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="ALARM_TYPE">:ALARM_TYPE</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="DEFECT_COUNT">:DEFECT_COUNT</param>
+            <param direction="Input" dbtype="VarChar" size="500" value="NOTI_USER">:NOTI_USER</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ALARM_DATA_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT
+    FACTORY,
+    DEFECT_TYPE,
+    PRODUCT,
+    STEP_ID,
+    EQUIP_ID,
+    TO_CHAR(TRAN_TIME,'YYYY-MM-DD HH24:MI:SS') TRAN_TIME,
+    WAFER_ID,
+    LOWER,
+    TARGET,
+    UPPER,
+    DEFECT_COUNT,
+    ALARM_YN,
+    ALARM_TYPE,
+    NOTI_USER
+FROM (
+SELECT A.*,
+    (SELECT WAFER_ID FROM TQD_INSP_INFO WHERE STEP_SEQ = A.STEP_SEQ) WAFER_ID
+FROM TQD_ALARM_DATA A
+WHERE FACTORY = :FACTORY
+AND DEFECT_TYPE = :DEFECT_TYPE
+AND EQUIP_ID = :EQUIP_ID
+AND PRODUCT = :PRODUCT
+AND STEP_ID = :STEP_ID
+ORDER BY TRAN_TIME DESC
+)
+WHERE ROWNUM < :NUM
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0" value="FACTORY">:FACTORY</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="DEFECT_TYPE">:DEFECT_TYPE</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="PRODUCT">:PRODUCT</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="STEP_ID">:STEP_ID</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="EQUIP_ID">:EQUIP_ID</param>
+            <param direction="Input" dbtype="Int32" size="0" value="NUM">:NUM</param>
+        </parameters>
+    </query>
+</queryxml>

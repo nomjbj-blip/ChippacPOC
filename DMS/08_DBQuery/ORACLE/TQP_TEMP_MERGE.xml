@@ -1,0 +1,494 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="BUMPFA" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Insert" queryid="INSERT_DATA_NOT_AVI" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO ?? 
+(ID
+, X
+, Y
+, ??
+, ??
+, ??
+, ??) 
+SELECT  
+    B.WAFER_ID 
+    , A.X
+    , A.Y
+    , A.BIN
+    , DECODE(A.BIN, 1, 'T','F')
+    , A.VISUALINSP
+    , DECODE(A.VISUALINSP, 0, 'T','F')
+FROM ?? A, TQP_WAFER_SUM B
+WHERE 1=1    
+AND A.WAFER_SEQ = :wafer_seq
+AND A.WAFER_SEQ = B.WAFER_SEQ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:wafer_seq</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_DATA_NOT_AVI" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[MERGE 
+INTO ?? A
+USING  (
+        SELECT  
+            B.LOT_ID
+            , B.WAFER_ID 
+            , A.X
+            , A.Y
+            , A.BIN
+            , DECODE(A.BIN, 1, 'T','F') AS HIGH_GEC
+            , A.VISUALINSP
+            , DECODE(A.VISUALINSP, 0, 'T','F') AS VISUAL_GEC
+            FROM ?? A, TQP_WAFER_SUM B
+        WHERE 1=1    
+        AND A.WAFER_SEQ = :wafer_seq
+        AND A.WAFER_SEQ = B.WAFER_SEQ
+        ) B
+        ON (A.ID = B.WAFER_ID AND A.X = B.X AND A.Y = B.Y)
+WHEN MATCHED THEN
+UPDATE SET 
+A.?? = B.BIN
+, A.?? = B.HIGH_GEC
+, A.?? = B.VISUALINSP
+, A.?? = B.VISUAL_GEC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="10">:wafer_seq</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="INSERT_DATA_AVI" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO ?? 
+(ID
+, X
+, Y
+, ??
+, ??
+, ??
+, ??) 
+SELECT
+C.LOT_ID || '.' || C.WAFER_ID --ID
+, ( B.X - C.MIN_X +1) X --X
+, (C.MAX_Y - B.Y +1 ) Y  --Y
+, DECODE(A.BIN, null, 1, A.BIN) AS BIN --BIN
+, DECODE(A.BIN, null, 'T','F') HIGH_GEC --BIN_GEC
+, B.VISUALINSP AS VI    --VI 
+, DECODE(B.VISUALINSP, 0, 'T', 'F') AS VI_GEC --VI_GEC
+FROM 
+(
+    SELECT XINDEX AS X, YINDEX AS Y, MAX(CLASSNUMBER) AS BIN 
+    FROM 
+    (
+        SELECT STEP_SEQ, RESULTTIMESTAMP, RANK() OVER (ORDER BY RESULTTIMESTAMP DESC) AS RANK
+        FROM TQD_LOT A, TQD_WAFER B, TQD_STEP C
+        WHERE 1=1
+        AND A.LOT_ID = :lot_id
+        AND A.PRODUCT = :product
+        AND A.LOT_SEQ = B.LOT_SEQ
+        AND B.WAFER_ID = :wafer_id
+        AND B.WAFER_SEQ = C.WAFER_SEQ
+        AND C.STEP_ID = :step_id
+        ) A, TQD_DEFECT B
+    WHERE A.RANK = 1
+    AND A.STEP_SEQ = B.STEP_SEQ
+    GROUP BY XINDEX, YINDEX
+) A,
+(
+    SELECT INDEX_X AS X, INDEX_Y AS Y, VISUALINSP 
+    FROM 
+    (
+        SELECT STEP_SEQ, RESULTTIMESTAMP, RANK() OVER (ORDER BY RESULTTIMESTAMP DESC) AS RANK
+        FROM TQD_LOT A, TQD_WAFER B, TQD_STEP C
+        WHERE 1=1
+        AND A.LOT_ID = :lot_id
+        AND A.PRODUCT = :product
+        AND A.LOT_SEQ = B.LOT_SEQ
+        AND B.WAFER_ID = :wafer_id
+        AND B.WAFER_SEQ = C.WAFER_SEQ
+        AND C.STEP_ID = :step_id
+        ) A, TQD_SCAN_SAMPLE B
+    WHERE A.RANK = 1
+    AND A.STEP_SEQ = B.STEP_SEQ
+) B,
+(
+    SELECT LOT_ID, WAFER_ID
+    , MAX(INDEX_X) MAX_X, MAX(INDEX_Y) MAX_Y
+    , MIN(INDEX_X) MIN_X, MIN(INDEX_Y) MIN_Y
+    FROM 
+    (
+        SELECT A.LOT_ID
+        , B.WAFER_ID
+        , STEP_SEQ
+        , RESULTTIMESTAMP
+        , RANK() OVER (ORDER BY RESULTTIMESTAMP DESC) AS RANK
+        FROM TQD_LOT A, TQD_WAFER B, TQD_STEP C
+        WHERE 1=1
+        AND A.LOT_ID = :lot_id
+        AND A.PRODUCT = :product
+        AND A.LOT_SEQ = B.LOT_SEQ
+        AND B.WAFER_ID = :wafer_id
+        AND B.WAFER_SEQ = C.WAFER_SEQ
+        AND C.STEP_ID = :step_id
+        ) A, TQD_SCAN_SAMPLE B
+    WHERE A.RANK = 1
+    AND A.STEP_SEQ = B.STEP_SEQ
+    GROUP BY A.LOT_ID, A.WAFER_ID
+) C 
+WHERE 1=1 
+AND A.X (+)= B.X
+AND A.Y (+)= B.Y]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:wafer_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:step_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:product</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_DATA_AVI" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[MERGE 
+INTO ?? A
+USING  (SELECT
+            C.LOT_ID -- LOT_ID
+            , C.WAFER_ID --WAFER_ID
+            , ( B.X - C.MIN_X +1) X --X
+            , (C.MAX_Y - B.Y +1 ) Y  --Y
+            , DECODE(A.BIN, null, 1, A.BIN) AS BIN -- BIN
+            , DECODE(A.BIN, null, 'T','F') HIGH_GEC -- BIN_GEC
+            , B.VISUALINSP AS VISUALINSP    -- VI
+            , DECODE(B.VISUALINSP, 0, 'T', 'F') AS VISUAL_GEC -- VI_GEC
+            FROM 
+            (
+                SELECT XINDEX AS X, YINDEX AS Y, MAX(CLASSNUMBER) AS BIN 
+                FROM 
+                (
+                    SELECT STEP_SEQ, RESULTTIMESTAMP
+                    , RANK() OVER (ORDER BY RESULTTIMESTAMP DESC) AS RANK
+                    FROM TQD_LOT A, TQD_WAFER B, TQD_STEP C
+                    WHERE 1=1
+                    AND A.LOT_ID = :lot_id
+                    AND A.PRODUCT = :product
+                    AND A.LOT_SEQ = B.LOT_SEQ
+                    AND B.WAFER_ID = :wafer_id
+                    AND B.WAFER_SEQ = C.WAFER_SEQ
+                    AND C.STEP_ID = :step_id
+                    ) A, TQD_DEFECT B
+                WHERE A.RANK = 1
+                AND A.STEP_SEQ = B.STEP_SEQ
+                GROUP BY XINDEX, YINDEX
+            ) A,
+            (
+                SELECT INDEX_X AS X, INDEX_Y AS Y, VISUALINSP 
+                FROM 
+                (
+                    SELECT STEP_SEQ, RESULTTIMESTAMP
+                    , RANK() OVER (ORDER BY RESULTTIMESTAMP DESC) AS RANK
+                    FROM TQD_LOT A, TQD_WAFER B, TQD_STEP C
+                    WHERE 1=1
+                    AND A.LOT_ID = :lot_id
+                    AND A.PRODUCT = :product
+                    AND A.LOT_SEQ = B.LOT_SEQ
+                    AND B.WAFER_ID = :wafer_id
+                    AND B.WAFER_SEQ = C.WAFER_SEQ
+                    AND C.STEP_ID = :step_id
+                    ) A, TQD_SCAN_SAMPLE B
+                WHERE A.RANK = 1
+                AND A.STEP_SEQ = B.STEP_SEQ
+            ) B,
+            (
+                SELECT LOT_ID, WAFER_ID
+                , MAX(INDEX_X) MAX_X, MAX(INDEX_Y) MAX_Y
+                , MIN(INDEX_X) MIN_X, MIN(INDEX_Y) MIN_Y
+                FROM 
+                (
+                    SELECT A.LOT_ID
+                    , B.WAFER_ID
+                    , STEP_SEQ
+                    , RESULTTIMESTAMP
+                    , RANK() OVER (ORDER BY RESULTTIMESTAMP DESC) AS RANK
+                    FROM TQD_LOT A, TQD_WAFER B, TQD_STEP C
+                    WHERE 1=1
+                    AND A.LOT_ID = :lot_id
+                    AND A.PRODUCT = :product
+                    AND A.LOT_SEQ = B.LOT_SEQ
+                    AND B.WAFER_ID = :wafer_id
+                    AND B.WAFER_SEQ = C.WAFER_SEQ
+                    AND C.STEP_ID = :step_id
+                    ) A, TQD_SCAN_SAMPLE B
+                WHERE A.RANK = 1
+                AND A.STEP_SEQ = B.STEP_SEQ
+                GROUP BY A.LOT_ID, A.WAFER_ID
+            ) C 
+            WHERE 1=1 
+            AND A.X (+)= B.X
+            AND A.Y (+)= B.Y
+            ) B
+            ON (A.ID = B.LOT_ID || '.' ||B.WAFER_ID AND A.X = B.X AND A.Y = B.Y)
+WHEN MATCHED THEN
+UPDATE SET A.?? = B.BIN, A.?? = B.HIGH_GEC, A.?? = B.VISUALINSP, A.?? = B.VISUAL_GEC
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:wafer_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:step_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:product</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_MERGE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT 
+X
+,Y
+, CASE
+        ??
+    END AS BIN
+, CASE
+        ??
+    END AS GEC
+, CASE
+        ??
+   END AS VISUALINSP
+, CASE
+        ??
+   END AS VISUALAINSP_GEC
+, 1 AS USECODE
+FROM ??
+WHERE ID = :id
+ORDER BY Y,X]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="80">:id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_IS" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT *
+FROM ??
+WHERE ID = :id]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="80">:id</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[DELETE
+FROM T_TPS_TEMP_MERGE
+WHERE ID = :id ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_SUM" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * 
+FROM(
+SELECT * 
+FROM
+   (SELECT BIN 
+    FROM
+        (SELECT 
+        X
+        ,Y
+        , CASE
+                ??
+            END AS BIN
+        , CASE
+                ??
+            END AS GEC
+        , CASE
+                ??
+           END AS VISUALINSP
+        , CASE
+                ??
+           END AS VISUALAINSP_GEC
+            FROM ??
+        WHERE ID = :id
+        ORDER BY Y,X
+        )
+    )
+    PIVOT (COUNT(BIN) FOR BIN IN (1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+    , 11, 12, 13, 14, 15, 16, 17, 18, 19, 20
+    , 21, 22, 23, 24, 25, 26, 27, 28, 29, 30
+    , 31, 32, 33, 34, 35, 36, 37, 38, 39, 40
+    , 41, 42, 43, 44, 45, 46, 47, 48, 49, 50
+    , 51, 52, 53, 54, 55, 56, 57, 58, 59, 60
+    , 61, 62, 63, 64, 65, 66, 67, 68, 69, 70
+    , 71, 72, 73, 74, 75, 76, 77, 78, 79, 80
+    , 81, 82, 83, 84, 85, 86, 87, 88, 89, 90
+    , 91, 92, 93, 94, 95, 96, 97, 98, 99, 100
+    , 101, 102, 103, 104, 105, 106, 107, 108, 109, 110
+    , 111, 112, 113, 114, 115, 116, 117, 118, 119, 120
+    , 121, 122, 123, 124, 125, 126, 127, 128, 129, 130
+    , 131, 132, 133, 134, 135, 136, 137, 138, 139, 140
+    , 141, 142, 143, 144, 145, 146, 147, 148, 149, 150
+    , 151, 152, 153, 154, 155, 156, 157, 158, 159, 160
+    , 161, 162, 163, 164, 165, 166, 167, 168, 169, 170
+    , 171, 172, 173, 174, 175, 176, 177, 178, 179, 180
+    , 181, 182, 183, 184, 185, 186, 187, 188, 189, 190
+    , 191, 192, 193, 194, 195, 196, 197, 198, 199, 200
+    , 201, 202, 203, 204, 205, 206, 207, 208, 209, 210
+    , 211, 212, 213, 214, 215, 216, 217, 218, 219, 220
+    , 221, 222, 223, 224, 225, 226, 227, 228, 229, 230
+    , 231, 232, 233, 234, 235, 236, 237, 238, 239, 240
+    , 241, 242, 243, 244, 245, 246, 247, 248, 249, 250
+    , 251, 252, 253, 254, 255)
+    )
+) A
+,(
+    SELECT COUNT(DECODE(GEC, 'T',1,NULL)) AS GEC
+    , COUNT(DECODE(GEC, 'F', 1, NULL)) AS LOSS_DIE
+    , COUNT(*) AS TESTED_DIE
+    FROM
+    (
+        SELECT 
+        X
+        ,Y
+        , CASE
+                ??
+            END AS BIN
+        , CASE
+                ??
+            END AS GEC
+        , CASE
+                ??
+           END AS VISUALINSP
+        , CASE
+                ??
+           END AS VISUALAINSP_GEC
+        FROM T_TPS_TEMP_MERGE
+        WHERE ID = :id
+        ORDER BY Y,X
+    )
+) B]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="80">:id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_DATA_AVI" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT
+(C.MAX_X - B.X +1 ) X --X
+, (C.MAX_Y - B.Y +1) Y  --Y
+, DECODE(A.BIN, null, 1, A.BIN) AS BIN --BIN
+, DECODE(A.BIN, null, 'T','F') HIGH_GEC --BIN_GEC
+, B.VISUALINSP AS VI    --VI 
+, '1' AS USECODE
+FROM 
+(
+    SELECT XINDEX AS X, YINDEX AS Y, MAX(CLASSNUMBER) AS BIN 
+    FROM 
+    (
+        SELECT STEP_SEQ, RESULTTIMESTAMP, RANK() OVER (ORDER BY RESULTTIMESTAMP DESC) AS RANK
+        FROM TQD_LOT A, TQD_WAFER B, TQD_STEP C
+        WHERE 1=1
+        AND A.LOT_ID = :lot_id
+        AND A.PRODUCT = :product
+        AND A.LOT_SEQ = B.LOT_SEQ
+        AND B.WAFER_ID = :wafer_id
+        AND B.WAFER_SEQ = C.WAFER_SEQ
+        AND C.STEP_ID = :step_id
+        ) A, TQD_DEFECT B
+    WHERE A.RANK = 1
+    AND A.STEP_SEQ = B.STEP_SEQ
+    GROUP BY XINDEX, YINDEX
+) A,
+(
+    SELECT INDEX_X AS X, INDEX_Y AS Y, VISUALINSP 
+    FROM 
+    (
+        SELECT STEP_SEQ, RESULTTIMESTAMP, RANK() OVER (ORDER BY RESULTTIMESTAMP DESC) AS RANK
+        FROM T_DMS_LOT A, T_DMS_WAFER B, T_DMS_STEP C
+        WHERE 1=1
+        AND A.LOT_ID = :lot_id
+        AND A.PRODUCT = :product
+        AND A.LOT_SEQ = B.LOT_SEQ
+        AND B.WAFER_ID = :wafer_id
+        AND B.WAFER_SEQ = C.WAFER_SEQ
+        AND C.STEP_ID = :step_id
+    ) A, T_DMS_SCAN_SAMPLE B
+    WHERE A.RANK = 1
+    AND A.STEP_SEQ = B.STEP_SEQ
+) B,
+(
+    SELECT LOT_ID, WAFER_ID
+    , MAX(INDEX_X) MAX_X, MAX(INDEX_Y) MAX_Y
+    , MIN(INDEX_X) MIN_X, MIN(INDEX_Y) MIN_Y
+    FROM 
+    (
+        SELECT A.LOT_ID
+        , B.WAFER_ID
+        , STEP_SEQ
+        , RESULTTIMESTAMP
+        , RANK() OVER (ORDER BY RESULTTIMESTAMP DESC) AS RANK
+        FROM T_DMS_LOT A, T_DMS_WAFER B, T_DMS_STEP C
+        WHERE 1=1
+        AND A.LOT_ID = :lot_id
+        AND A.PRODUCT = :product
+        AND A.LOT_SEQ = B.LOT_SEQ
+        AND B.WAFER_ID = :wafer_id
+        AND B.WAFER_SEQ = C.WAFER_SEQ
+        AND C.STEP_ID = :step_id
+    ) A, T_DMS_SCAN_SAMPLE B
+    WHERE A.RANK = 1
+    AND A.STEP_SEQ = B.STEP_SEQ
+    GROUP BY A.LOT_ID, A.WAFER_ID
+) C 
+WHERE 1=1 
+AND A.X (+)= B.X
+AND A.Y (+)= B.Y]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:product</param>
+            <param direction="Input" dbtype="VarChar" size="40">:wafer_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:step_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_DMS_STEP_SEQ" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT STEP_SEQ 
+FROM 
+(
+    SELECT STEP_SEQ, RESULTTIMESTAMP, RANK() OVER (ORDER BY RESULTTIMESTAMP DESC) AS RANK
+    FROM TQD_LOT A, TQD_WAFER B, TQD_STEP C
+    WHERE 1=1
+    AND A.LOT_ID = :lot_id
+    AND A.PRODUCT = :product
+    AND A.LOT_SEQ = B.LOT_SEQ
+    AND B.WAFER_ID = :wafer_id
+    AND B.WAFER_SEQ = C.WAFER_SEQ
+    AND C.STEP_ID = :step_id
+) 
+WHERE RANK = 1]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:product</param>
+            <param direction="Input" dbtype="VarChar" size="40">:wafer_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:step_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_MERGE_FOR_VIEW" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT 
+A.X
+,A.Y
+, CASE
+    ??
+   WHEN VISUALINSP != '0' THEN VISUALINSP
+   ELSE 0
+   END AS VI
+, CASE
+    ??
+    END AS BIN
+, 1 AS USECODE
+FROM ?? A, ?? B
+WHERE ID = :id
+AND B.WAFER_SEQ = :wafer_seq
+AND A.X = B.X
+AND A.Y = B.Y
+ORDER BY Y,X]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="80">:id</param>
+            <param direction="Input" dbtype="Number" size="20">:wafer_seq</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="CREATE_TEMP_TABLE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[CREATE TABLE ??
+(
+    ID  VarChar(100 BYTE)   NOT NULL,
+    X   NUMBER(3)   NOT NULL,
+    Y   NUMBER(3)   NOT NULL,
+    ??
+)]]></commandtext>
+    </query>
+    <query statement="Delete" queryid="DROP_TEMP_TABLE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[drop table ??]]></commandtext>
+    </query>
+</queryxml>

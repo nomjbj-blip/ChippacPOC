@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Insert" queryid="CALL_UPDATE_DCOUNT" commandtype="StoredProcedure" description="DCOUNT Summary" commandtimeout="60">
+        <commandtext><![CDATA[CALL UPDATE_DCOUNT]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="15">:step_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_DCOUNT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQD_DCOUNT WHERE STEP_SEQ = :step_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="15">:step_seq</param>
+        </parameters>
+    </query>
+</queryxml>

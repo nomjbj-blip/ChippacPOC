@@ -1,0 +1,390 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="TPSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Select" queryid="GET_PARA_SPEC" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT PROGRAM,  
+--PRODUCT, 
+PARAM_INDEX AS ITEM_NUMBER, PARAM_NAME, PARAM_DESC, 
+DECODE(LSL,1E37,1E18,-1E37,-1E18,LSL) as LOWER_LIMIT,
+DECODE(USL,1E37,1E18,-1E37,-1E18,USL) as UPPER_LIMIT,
+DECODE(LCL,1E37,1E18,-1E37,-1E18,LCL) as DIS_LOWER,
+DECODE(UCL,1E37,1E18,-1E37,-1E18,UCL) as DIS_UPPER,
+ UOM AS UNIT--, DIRECTION, COMMENTS
+FROM TQP_PARASPEC
+WHERE TESTAREA = 'PARAMETRIC'
+AND PROGRAM= :program]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30" value="AV005">:program</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_ITEM" commandtype="Text" description="PCM Test Parameter를 가져온다" commandtimeout="60">
+        <commandtext><![CDATA[/*****************************************************************
+SELECT DISTINCT PARAM_NAME AS ITEM FROM TQP_PARASPEC
+WHERE PROGRAM=:program
+AND TESTAREA=:testArea
+AND PRODUCT=:product
+******************************************************************/
+
+SELECT DISTINCT PARAM_NAME, 
+       DECODE(PARAM_DESC, NULL, PARAM_NAME, PARAM_DESC) AS PARAM_DESC 
+  FROM TQP_PARASPEC
+ WHERE 1=1
+   AND FACTORY = :factory
+   AND PROGRAM = :program
+ ORDER BY PARAM_NAME ASC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="factory">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="30">:program</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="CREATE_PARASPEC" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_PARASPEC(FACTORY, PROGRAM, PROGRAM_REV, PARAM_INDEX, PARAM_NAME, PARAM_TYPE, PARAM_DESC, CREATE_TIME, CREATE_USER, TABLE_NAME, DECIMAL_PLACES, RUNTIME_DEFINED, UOM, USE_FLAG)
+VALUES (:factory, :program, :progrev, :param_index, :param_name, :param_type, :param_desc, SYSDATE, :create_user, :table_name, :decimal_places, :runtime_defined, :uom, :use_flag)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0" value="factory">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="program">:program</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="program_rev">:progrev</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="param_index">:param_index</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="param_name">:param_name</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="param_type">:param_type</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="param_desc">:param_desc</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="create_user">:create_user</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="table_name">:table_name</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="decimal_places">:decimal_places</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="runtime_defined">:runtime_defined</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="uom">:uom</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="use_flag">:use_flag</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_PROGRAM_PARASPEC" commandtype="Text" description="해당 Program에 대한 Paraspec을 삭제한다." commandtimeout="60">
+        <commandtext><![CDATA[DELETE FROM TQP_PARASPEC WHERE PROGRAM = :program
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:program</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_PARASPEC_TEMP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_PARASPEC SET PROGRAM = 'UPDATE_TEMP'   WHERE PROGRAM = :program]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:program</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_PARASPEC_EDITABLE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[/*****************************************************************
+SELECT PARAM_NAME as "Item", PARAM_DESC as "Description"
+, DECODE(LSL,1E37,1E18,-1E37,-1E18,LSL) as "Lower Limit"
+, DECODE(USL,1E37,1E18,-1E37,-1E18,USL) as "Upper Limit"
+, DECODE(LCL,1E37,1E18,-1E37,-1E18,LCL) as "Lower Ctl Limit"
+, DECODE(UCL,1E37,1E18,-1E37,-1E18,UCL) as "Upper Ctl Limit"
+, UOM as "Unit"--, DIRECTION as "Direction", COMMENTS
+FROM TQP_PARASPEC
+WHERE PROGRAM = :program
+*******************************************************************/
+
+SELECT FACTORY, 
+       PROGRAM,
+       PROGRAM_REV,
+       PARAM_INDEX,
+       PARAM_NAME,
+       USER_PROGRAM_NAME,
+       PARAM_TYPE,
+       PARAM_DESC,
+       TO_CHAR(CREATE_TIME, 'YY-MM-DD HH24:MI:SS') AS CREATE_TIME,
+       CREATE_USER,
+       TO_CHAR(UPDATE_TIME, 'YY-MM-DD HH24:MI:SS') AS UPDATE_TIME,
+       UPDATE_USER,
+       TABLE_NAME,
+       DECIMAL_PLACES,
+       RUNTIME_DEFINED,
+       DECODE(USE_FLAG, 'Y', 'True', 'False') AS USE_FLAG,
+       UOM,
+       LSL,
+       TARGET,
+       USL,
+       LCL,
+       UCL,
+       LOL,
+       UOL,
+       LTL,
+       UTL,
+       TEST_LOW,
+       TEST_HIGH
+  FROM TQP_PARASPEC
+ WHERE 1=1
+       AND FACTORY = :factory
+       AND PROGRAM = :program
+       AND program_rev = (SELECT MAX (PROGRAM_REV)
+                            FROM TQP_PARASPEC
+                           WHERE 1=1
+                                 AND FACTORY = :factory
+                                 AND PROGRAM = :program)
+ ORDER BY PARAM_INDEX]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="factory">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="30" value="XXX">:program</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_TEMP_PROGRAM" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[DELETE FROM TQP_PARASPEC WHERE PROGRAM='UPDATE_TEMP']]></commandtext>
+    </query>
+    <query statement="Update" queryid="ROLLBACK_PARASPEC_TEMP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_PARASPEC SET PROGRAM = :program WHERE PROGRAM = 'UPDATE_TEMP' ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:program</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_PROGRAM_REV_MAX" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-05-24 09:57:11
+SELECT MAX (program_rev) AS "MAX_VALUE"
+  FROM tqp_paraspec
+ WHERE 1 = 1 AND factory = :factory AND program = :program]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="factory">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="program">:program</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_PARA_DATA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[  SELECT *
+    FROM TQP_PARASPEC
+   WHERE 1 = 1 
+     AND FACTORY = :factory
+     AND PROGRAM = :pgm
+     AND PROGRAM_REV IN (??)
+     AND PARAM_INDEX > 1
+     AND TABLE_NAME IS NOT NULL
+   ORDER BY PARAM_NAME]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="factory">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="40">:pgm</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_PARA_ITEM" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[WITH WT AS ( SELECT A.*
+    FROM TQP_PARASPEC A, TQP_WAFER B
+   WHERE     1 = 1
+       AND A.PROGRAM = :pgm
+       AND B.WAFER_SEQ = :wafer_seq
+       AND A.PARAM_TYPE IN ('FLOAT', 'INT' )
+       AND A.PROGRAM_REV = B.PROGRAM_REV
+       AND A.TABLE_NAME IS NOT NULL)
+ SELECT A.*
+    FROM WT A, ALL_TAB_COLUMNS B
+   WHERE 1 = 1 
+      AND A.TABLE_NAME = B.TABLE_NAME 
+      AND A.PARAM_NAME = B.COLUMN_NAME
+ ORDER BY DECODE(A.PARAM_NAME, 'X', 1, 'Y', 2, 'BIN', 3), A.PARAM_NAME]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:pgm</param>
+            <param direction="Input" dbtype="VarChar" size="40">:wafer_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_PARA_NOT_EMPTY" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT ITEM AS PARAM_NAME,
+        ROUND(MIN (RAW_VALUE) OVER (PARTITION BY ITEM), 5) AS MIN,
+        ROUND(MAX (RAW_VALUE) OVER (PARTITION BY ITEM), 5) AS MAX,
+        ROUND(AVG (RAW_VALUE) OVER (PARTITION BY ITEM), 5) AS AVG
+  FROM (WITH RAWDATA
+             AS (SELECT ??
+                   FROM (SELECT WAFER_SEQ, WAFER_ID FROM TQP_WAFER) T1, ??)
+        SELECT *
+          FROM RAWDATA UNPIVOT (RAW_VALUE
+                       FOR ITEM
+                       IN  (??)))
+ ORDER BY DECODE(PARAM_NAME, 'X', 1, 'Y', 2, 'BIN', 3), PARAM_NAME]]></commandtext>
+    </query>
+    <query statement="Select" queryid="GET_ITEM_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-06-13 19:06:39
+SELECT DISTINCT TABLE_NAME, 
+       PARAM_NAME, 
+       DECODE(PARAM_DESC, NULL, PARAM_NAME, PARAM_DESC) AS PARAM_DESC 
+  FROM TQP_PARASPEC
+ WHERE 1=1
+   AND FACTORY = :factory
+   AND PROGRAM = :program
+   AND PROGRAM_REV = :rev
+ ORDER BY PARAM_NAME ASC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="factory">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="program">:program</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="rev">:rev</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_PARAM_NAME" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT PARAM_NAME 
+FROM (
+    SELECT
+        PROGRAM_REV,
+        MAX(PROGRAM_REV) OVER (PARTITION BY FACTORY, PROGRAM) MAX_REV,
+        PARAM_INDEX,
+        PARAM_NAME
+    FROM TQP_PARASPEC
+    WHERE 1 = 1
+    AND FACTORY = :FACTORY
+    AND PROGRAM = :PROGRAM
+    AND TABLE_NAME = :TABLE_NAME
+)
+ WHERE PROGRAM_REV = MAX_REV
+ UNION 
+SELECT COLUMN_NAME
+  FROM USER_TAB_COLUMNS
+ WHERE 1 = 1 
+   AND TABLE_NAME = :TABLE_NAME
+ ORDER BY PARAM_NAME]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="FACTORY">:FACTORY</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="PROGRAM">:PROGRAM</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="TABLE_NAME">:TABLE_NAME</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_MAX_PARAM_INDEX" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT NVL(MAX(PARAM_INDEX), 0) PARAM_INDEX
+FROM (
+    SELECT
+        PROGRAM_REV,
+        MAX(PROGRAM_REV) OVER (PARTITION BY FACTORY, PROGRAM) MAX_REV,
+        PARAM_INDEX
+    FROM TQP_PARASPEC
+    WHERE 1 = 1
+    AND FACTORY = :FACTORY
+    AND PROGRAM = :PROGRAM
+    AND TABLE_NAME = :TABLE_NAME
+)
+WHERE PROGRAM_REV = MAX_REV]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="FACTORY">:FACTORY</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="PROGRAM">:PROGRAM</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="TABLE_NAME">:TABLE_NAME</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_MAX_PROGRAM_REV" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-07-11 15:52:36
+SELECT
+    NVL(MAX(PROGRAM_REV), 0) PROGRAM_REV
+FROM TQP_PARASPEC
+WHERE 1 = 1
+AND FACTORY = :FACTORY
+AND PROGRAM = :PROGRAM
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="FACTORY">:FACTORY</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="PROGRAM">:PROGRAM</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_BIN_TTABLE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-07-22 16:13:15
+SELECT TABLE_NAME 
+FROM TQP_PARASPEC
+WHERE (FACTORY, PROGRAM, PROGRAM_REV)
+IN (
+    SELECT FACTORY, PROGRAM, PROGRAM_REV
+    FROM TQP_WAFER
+    WHERE WAFER_SEQ = :waferseq
+)
+AND PARAM_NAME = 'BIN']]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="waferseq">:waferseq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_DATA_TABLE_LIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT PROGRAM FROM TQP_PARASPEC
+WHERE 1 = 1 
+AND TABLE_NAME != 'TD_'
+ORDER BY PROGRAM]]></commandtext>
+    </query>
+    <query statement="Select" queryid="GET_DATA_TABLE_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT A.*
+  FROM TQP_PARASPEC A, ALL_TAB_COLUMNS B
+ WHERE     1 = 1
+       AND A.PROGRAM = :pgm
+       AND A.TABLE_NAME = B.TABLE_NAME
+       AND A.PARAM_NAME = B.COLUMN_NAME
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="pgm">:pgm</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_DATA_TABLE_02" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT ?? FROM ??
+WHERE 1 = 1 
+  AND ROWNUM = 1]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_PARA_SPEC_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT TABLE_NAME,
+       MAX (FACTORY) AS FACTORY,
+       MAX (PROGRAM) AS PROGRAM,
+       MAX (PROGRAM_REV) AS PROGRAM_REV,
+       MAX (PARAM_INDEX) AS PARAM_INDEX
+  FROM TQP_PARASPEC
+ WHERE     1 = 1
+ and TABLE_NAME IS NOT NULL
+ group by TABLE_NAME]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_PARA_SPEC_02" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-09-03 14:32:55
+SELECT TABLE_NAME, PARAM_NAME
+FROM TQP_PARASPEC
+WHERE (PROGRAM, TABLE_NAME) IN (
+    SELECT PROGRAM, TABLE_NAME
+    FROM TQP_DATA_TABLES
+    WHERE PROGRAM = :PROGRAM
+)
+AND PARAM_INDEX > 0
+ORDER BY TABLE_NAME, PARAM_NAME]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="PROGRAM">:PROGRAM</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_PARA_SPEC_03" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-09-05 13:23:07
+SELECT PARAM_NAME
+FROM TQP_PARASPEC
+WHERE FACTORY = :FACTORY
+AND PROGRAM = :PROGRAM
+AND TABLE_NAME = :TABLE_NAME
+ORDER BY PARAM_INDEX]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="PROGRAM">:PROGRAM</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="TABLE_NAME">:TABLE_NAME</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_PARA_SPEC_04" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-09-09 09:46:38
+SELECT *
+  FROM TQP_PARASPEC
+ WHERE 1=1
+   AND FACTORY = :factory
+   AND PROGRAM = :program
+   AND PROGRAM_REV = :rev
+ ORDER BY PARAM_INDEX ASC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="factory">:factory</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="program">:program</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="rev">:rev</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_PARA_ITEM_MULTI" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[WITH WT AS ( SELECT A.*
+    FROM TQP_PARASPEC A, TQP_WAFER B
+   WHERE     1 = 1
+       AND A.PROGRAM = :pgm
+       AND B.WAFER_SEQ IN( ?? )
+       AND A.PARAM_TYPE IN ('FLOAT', 'INT' )
+       AND A.PROGRAM_REV = B.PROGRAM_REV
+       AND A.TABLE_NAME IS NOT NULL)
+  SELECT DISTINCT A.*
+    FROM WT A, ALL_TAB_COLUMNS B
+   WHERE 1 = 1 
+      AND A.TABLE_NAME = B.TABLE_NAME 
+      AND A.PARAM_NAME = B.COLUMN_NAME
+   ORDER BY A.PARAM_NAME]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="0" value="pgm">:pgm</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_BY_TABLE_NAME" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[DELETE FROM TQP_PARASPEC
+WHERE TABLE_NAME = :TABLE_NAME]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="TABLE_NAME">:TABLE_NAME</param>
+        </parameters>
+    </query>
+</queryxml>

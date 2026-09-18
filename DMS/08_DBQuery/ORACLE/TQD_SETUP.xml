@@ -1,0 +1,187 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Insert" queryid="CREATE_SETUP" commandtype="Text" description="Setup Info Insert" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQD_SETUP(SETUP_SEQ ,SETUP_ID,STEP_ID,SETUP_TIME,ANGLE,WAFER_SIZE,NOTCH_TYPE,DIE_PITCH_X,
+DIE_PITCH_Y,DIE_ORIGIN_X,DIE_ORIGIN_Y,ORIGIN_X,ORIGIN_Y, STREET_X, STREET_Y)
+VALUES(
+SETUP_SEQ.NEXTVAL
+,:setup_id
+,:step_id
+,TO_TIMESTAMP(:setup_time,'MM-DD-YY HH24:MI:SS')
+,:angle
+,:wafer_size
+,:notch_type
+,:die_pitch_x
+,:die_pitch_y
+,:die_origin_x
+,:die_origin_y
+,:origin_x
+,:origin_y
+,:st_x
+,:st_y)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0" description="setup id">:setup_id</param>
+            <param direction="Input" dbtype="VarChar" size="0" description="step_id">:step_id</param>
+            <param direction="Input" dbtype="VarChar" size="0" description="setup_time">:setup_time</param>
+            <param direction="Input" dbtype="Number" size="0" description="angle">:angle</param>
+            <param direction="Input" dbtype="Number" size="0" description="wafer size">:wafer_size</param>
+            <param direction="Input" dbtype="Char" size="1" description="notch_type 'F' 'N'">:notch_type</param>
+            <param direction="Input" dbtype="Number" size="0" description="die pitch x">:die_pitch_x</param>
+            <param direction="Input" dbtype="Number" size="0" description="die pitch y">:die_pitch_y</param>
+            <param direction="Input" dbtype="Number" size="0" description="die origin x">:die_origin_x</param>
+            <param direction="Input" dbtype="Number" size="0" description="die origin y">:die_origin_y</param>
+            <param direction="Input" dbtype="Number" size="0" description="real origin x">:origin_x</param>
+            <param direction="Input" dbtype="Number" size="0" description="real origin y">:origin_y</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="st_x">:st_x</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="st_y">:st_y</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_SETUP_SEQ" commandtype="Text" description="Setup Seq 조회" commandtimeout="60">
+        <commandtext><![CDATA[SELECT SETUP_SEQ FROM TQD_SETUP 
+WHERE SETUP_ID = :setup_id
+AND STEP_ID = :step_id
+AND SETUP_TIME = TO_TIMESTAMP(:setup_time,'YYYYMMDD HH24:MI:SS')
+ORDER BY SETUP_SEQ DESC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="100" description="setup id">:setup_id</param>
+            <param direction="Input" dbtype="VarChar2" size="100">:step_id</param>
+            <param direction="Input" dbtype="VarChar" size="100" description="setup time">:setup_time</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_SETUP_SEQ_2" commandtype="Text" description="Setup Seq 조회" commandtimeout="60">
+        <commandtext><![CDATA[SELECT SETUP_SEQ FROM TQD_SETUP WHERE SETUP_ID = :setup_id]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0" description="setup id">:setup_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_RECIPE" commandtype="Text" description="TDMS_STEP 과 JOIN" commandtimeout="60">
+        <commandtext><![CDATA[SELECT SETUP_SEQ
+,SETUP_ID    
+,STEP_ID     
+,SETUP_TIME  
+,ANGLE       
+,WAFER_SIZE  
+,NOTCH_TYPE  
+,DIE_PITCH_X 
+,DIE_PITCH_Y 
+,DIE_ORIGIN_X
+,DIE_ORIGIN_Y
+,ORIGIN_X    
+,ORIGIN_Y
+,STREET_X    
+,STREET_Y  
+FROM TQD_SETUP
+WHERE SETUP_SEQ = (SELECT SETUP_SEQ FROM TDMS_STEP WHERE STEP_SEQ = :step_seq)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:step_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_SETUP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT SETUP_SEQ
+,SETUP_ID    
+,STEP_ID     
+,SETUP_TIME  
+,ANGLE       
+,WAFER_SIZE  
+,NOTCH_TYPE  
+,DIE_PITCH_X 
+,DIE_PITCH_Y 
+,DIE_ORIGIN_X
+,DIE_ORIGIN_Y
+,ORIGIN_X    
+,ORIGIN_Y
+,STREET_X    
+,STREET_Y    
+FROM TQD_SETUP
+WHERE SETUP_SEQ = :setup_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:setup_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_SETUP_DUPLE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT 
+ trunc(DIE_PITCH_X / 1000) AS DIE_PITCH_X
+ ,trunc(DIE_PITCH_Y / 1000) AS DIE_PITCH_Y
+FROM TQD_SETUP
+WHERE SETUP_SEQ IN (
+SELECT SETUP_SEQ FROM TQD_INSP_INFO A
+         WHERE STEP_SEQ IN (??))
+         GROUP BY trunc(DIE_PITCH_X / 1000), trunc(DIE_PITCH_Y / 1000)]]></commandtext>
+    </query>
+    <query statement="Insert" queryid="CREATE_SETUP_INFO" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQD_SETUP(SETUP_SEQ ,SETUP_ID,STEP_ID,SETUP_TIME,ANGLE,WAFER_SIZE,NOTCH_TYPE,DIE_PITCH_X,
+DIE_PITCH_Y,DIE_ORIGIN_X,DIE_ORIGIN_Y,ORIGIN_X,ORIGIN_Y)
+VALUES(
+SETUP_SEQ.NEXTVAL
+,:setup_id
+,:step_id
+,TO_TIMESTAMP(:setup_time,'YYYYMMDD HH24:MI:SS')
+,:angle
+,:wafer_size
+,:notch_type
+,:die_pitch_x
+,:die_pitch_y
+,:die_origin_x
+,:die_origin_y
+,:origin_x
+,:origin_y)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:setup_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:step_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:setup_time</param>
+            <param direction="Input" dbtype="VarChar" size="40">:angle</param>
+            <param direction="Input" dbtype="VarChar" size="40">:wafer_size</param>
+            <param direction="Input" dbtype="VarChar" size="40">:notch_type</param>
+            <param direction="Input" dbtype="VarChar" size="40">:die_pitch_x</param>
+            <param direction="Input" dbtype="VarChar" size="40">:die_pitch_y</param>
+            <param direction="Input" dbtype="VarChar" size="40">:die_origin_x</param>
+            <param direction="Input" dbtype="VarChar" size="40">:die_origin_y</param>
+            <param direction="Input" dbtype="VarChar" size="40">:origin_x</param>
+            <param direction="Input" dbtype="VarChar" size="40">:origin_y</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_SETUP_DUPLE_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT 
+ trunc(DIE_PITCH_X / 1000) AS DIE_PITCH_X
+ ,trunc(DIE_PITCH_Y / 1000) AS DIE_PITCH_Y
+FROM TQD_SETUP
+WHERE SETUP_SEQ IN (
+SELECT SETUP_SEQ FROM TQD_INSP_INFO A
+         WHERE 1 = 1
+          AND (STEP_SEQ, TEST) IN (??))
+         GROUP BY trunc(DIE_PITCH_X / 1000), trunc(DIE_PITCH_Y / 1000)]]></commandtext>
+    </query>
+    <query statement="Update" queryid="UPDATE_SETUP_STREET" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQD_SETUP SET STREET_X = :st_x, STREET_Y = :st_y
+WHERE SETUP_SEQ = :setup_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="st_x">:st_x</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="st_y">:st_y</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="setup_seq">:setup_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="FAB1_SETUP_SUPLE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT SETUP_SEQ FROM TQD_SETUP 
+ WHERE 1 = 1 
+  AND SETUP_ID = :setup_id
+  AND DIE_ORIGIN_X = :orx
+  AND DIE_ORIGIN_Y = :ory]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="setup_id">:setup_id</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="orx">:orx</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="ory">:ory</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ORIGIN_INDEX" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DIE_ORIGIN_X, DIE_ORIGIN_Y
+FROM TQD_SETUP
+WHERE SETUP_ID = :SETUP_ID
+AND STEP_ID = :STEP_ID
+AND SETUP_TIME = TO_DATE(:SETUP_TIME,'YYYY-MM-DD HH24:MI:SS')]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="SETUP_ID">:SETUP_ID</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="STEP_ID">:STEP_ID</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="SETUP_TIME">:SETUP_TIME</param>
+        </parameters>
+    </query>
+</queryxml>

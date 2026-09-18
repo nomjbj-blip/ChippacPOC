@@ -1,0 +1,237 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Select" queryid="GET_PCM_DATA" commandtype="Text" description="PCM TEST Data를 가져온다" commandtimeout="60">
+        <commandtext><![CDATA[SELECT *
+  FROM ??
+ WHERE     1 = 1
+       AND WAFER_SEQ IN (??)]]></commandtext>
+    </query>
+    <query statement="Select" queryid="PCM_REPORT" commandtype="Text" description="report를 위한 Data" commandtimeout="60">
+        <commandtext><![CDATA[SELECT B.LOT_ID || '-' || B.WAFER_ID || '-' || DIEID || '-' || X || '-' || Y "LOT-WAFER-DIE-X-Y", ??
+FROM
+(
+SELECT WAFER_SEQ, DIEID, X, Y, ?? FROM T_PCM_??
+WHERE WAFER_SEQ IN (??)
+) A, T_TPS_WAFER_SUM B
+WHERE A.WAFER_SEQ = B.WAFER_SEQ
+]]></commandtext>
+    </query>
+    <query statement="Select" queryid="YIELD_PCM_DATA" commandtype="Text" description="pcm data를 yield와 같이 가져온다" commandtimeout="60">
+        <commandtext><![CDATA[-- (agv, min, max, ...), zone을 선택하지 않았을때(total yield)
+SELECT B.LOT_ID, B.WAFER_ID, B.YIELD, ??
+FROM
+(
+    SELECT L.LOT_ID,W.WAFER_ID,P.WAFER_SEQ, ??
+    FROM T_PCM_?? P,T_TPS_LOT L,T_TPS_WAFER W
+    WHERE L.LOT_ID IN (??)
+    AND L.LOT_SEQ = W.LOT_SEQ
+    AND W.WAFER_SEQ = P.WAFER_SEQ
+    GROUP BY L.LOT_ID,W.WAFER_ID,P.WAFER_SEQ
+) A, (
+    SELECT LOT_ID, WAFER_ID, YIELD FROM T_TPS_WAFER_SUM WHERE LOT_ID IN (??)
+) B
+WHERE A.LOT_ID = B.LOT_ID
+AND A.WAFER_ID = B.WAFER_ID
+ORDER BY B.LOT_ID, B.WAFER_ID
+]]></commandtext>
+    </query>
+    <query statement="Select" queryid="PCM_BOX_PLOT" commandtype="Text" description="wafer 별 pcm test data를 가져온다" commandtimeout="60">
+        <commandtext><![CDATA[SELECT LOT_ID, WAFER_ID, A.WAFER_SEQ, DIEID, ??
+FROM T_PCM_?? A,
+(
+SELECT LOT_ID, WAFER_ID, WAFER_SEQ FROM T_TPS_WAFER A, T_TPS_LOT B
+WHERE WAFER_SEQ IN (??)
+AND A.LOT_SEQ=B.LOT_SEQ
+) B
+WHERE A.WAFER_SEQ=B.WAFER_SEQ
+ORDER BY DIEID]]></commandtext>
+    </query>
+    <query statement="Select" queryid="PCM_SCATTER" commandtype="Text" description="wafer 별 pcm test data를 가져온다" commandtimeout="60">
+        <commandtext><![CDATA[SELECT LOT_ID, WAFER_ID,A.WAFER_SEQ, DIEID, ??
+FROM T_PCM_?? A,
+(
+SELECT LOT_ID, WAFER_ID, WAFER_SEQ FROM T_TPS_WAFER A, T_TPS_LOT B
+WHERE WAFER_SEQ IN (??)
+AND A.LOT_SEQ=B.LOT_SEQ
+) B
+WHERE A.WAFER_SEQ=B.WAFER_SEQ
+ORDER BY LOT_ID, WAFER_ID, DIEID]]></commandtext>
+    </query>
+    <query statement="Select" queryid="PCM_SITE_CNT" commandtype="Text" description="PCM Test를 한 die id 갯수를 가져온다" commandtimeout="60">
+        <commandtext><![CDATA[SELECT COUNT(DISTINCT DIEID) CNT
+FROM T_PCM_??
+WHERE WAFER_SEQ IN (??)]]></commandtext>
+    </query>
+    <query statement="Select" queryid="PCM_DATA_DAY" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT LOT_ID, WAFER_ID, A.WAFER_SEQ, DIEID, DAY, ??
+FROM T_PCM_?? A,
+(
+SELECT LOT_ID, WAFER_ID, WAFER_SEQ, to_char(A.END_TIME, 'yyyy-MM-dd') DAY FROM T_TPS_WAFER A, T_TPS_LOT B
+WHERE WAFER_SEQ IN (??)
+AND A.LOT_SEQ=B.LOT_SEQ
+) B
+WHERE A.WAFER_SEQ=B.WAFER_SEQ
+ORDER BY DAY]]></commandtext>
+    </query>
+    <query statement="Select" queryid="YIELD_TREND_BY_WAFER" commandtype="Text" description="pcm yield trend" commandtimeout="60">
+        <commandtext><![CDATA[-- pcm yield trend by wafer
+SELECT LOT_ID || '-' || WAFER_ID "LOT-WAFER", YIELD FROM T_TPS_WAFER_SUM
+WHERE LOT_ID || WAFER_ID IN (
+SELECT B.LOT_ID || A.WAFER_ID FROM T_TPS_WAFER A, T_TPS_LOT B
+WHERE WAFER_SEQ IN (??)
+AND A.LOT_SEQ = B.LOT_SEQ
+)
+ORDER BY LOT_ID, WAFER_ID]]></commandtext>
+    </query>
+    <query statement="Select" queryid="YIELD_TREND_BY_LOT" commandtype="Text" description="pcm yield trend" commandtimeout="60">
+        <commandtext><![CDATA[-- pcm yield trend by lot
+SELECT LOT_ID, ROUND(AVG(YIELD), 2) YIELD FROM T_TPS_WAFER_SUM
+WHERE LOT_ID || WAFER_ID IN (
+SELECT B.LOT_ID || A.WAFER_ID FROM T_TPS_WAFER A, T_TPS_LOT B
+WHERE WAFER_SEQ IN (??)
+AND A.LOT_SEQ = B.LOT_SEQ
+)
+GROUP BY LOT_ID
+ORDER BY LOT_ID]]></commandtext>
+    </query>
+    <query statement="Select" queryid="YIELD_TREND_BY_DAY" commandtype="Text" description="pcm yield trend" commandtimeout="60">
+        <commandtext><![CDATA[SELECT TO_CHAR(END_TIME, 'yyyy-MM-dd') "DATE", ROUND(AVG(YIELD), 2) YIELD FROM T_TPS_WAFER_SUM
+WHERE LOT_ID || WAFER_ID IN (
+SELECT B.LOT_ID || A.WAFER_ID FROM T_TPS_WAFER A, T_TPS_LOT B
+WHERE WAFER_SEQ IN (??)
+AND A.LOT_SEQ = B.LOT_SEQ
+)
+GROUP BY TO_CHAR(END_TIME, 'yyyy-MM-dd')
+ORDER BY "DATE"]]></commandtext>
+    </query>
+    <query statement="Select" queryid="ZONE_CNT" commandtype="Text" description="zone id 별 갯수" commandtimeout="60">
+        <commandtext><![CDATA[SELECT COUNT(ZONEID) CNT FROM T_TPS_ZONE
+WHERE PRODUCT=:product
+AND USER_NAME=:userId
+AND ZONEID=:zone]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:product</param>
+            <param direction="Input" dbtype="VarChar" size="0">:userId</param>
+            <param direction="Input" dbtype="VarChar" size="0">:zone</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="BIN_CNT_ON_ZONE" commandtype="Text" description="11존에 해당하는 Bin 갯수" commandtimeout="60">
+        <commandtext><![CDATA[SELECT COUNT(DIEID) CNT
+FROM TD_?? A,
+(
+SELECT X, Y FROM T_TPS_ZONE
+WHERE PRODUCT=:product
+AND USER_NAME=:user
+AND ZONEID=:zoneId
+) B
+WHERE WAFER_SEQ=:waferSeq
+AND A.X = B.X
+AND A.Y = B.Y
+AND BIN IN (1)]]></commandtext>
+    </query>
+    <query statement="Select" queryid="BIN_LIST" commandtype="Text" description="lot에 대한 bin 항목을 가져온다" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT 'BIN' || BIN || ' : ' || BIN_NAME BIN
+FROM T_TPS_BINDESC
+WHERE PROGRAM IN (SELECT DISTINCT PROGRAM FROM T_TPS_LOT_SUM WHERE LOT_ID IN (??))
+AND PRODUCT IN (SELECT DISTINCT PRODUCT FROM T_TPS_LOT_SUM WHERE LOT_ID IN (??))
+ORDER BY BIN
+]]></commandtext>
+    </query>
+    <query statement="Select" queryid="YIELD_PCM_DATA_ZONE" commandtype="Text" description="Zone 선택한 zone에 해당하는 yield를 가져온다." commandtimeout="60">
+        <commandtext><![CDATA[-- pcm die(1, 2, 3, 4, 5,...) 과 test bin을 선택했을때
+SELECT B.LOT_ID, B.WAFER_ID, B.YIELD, ??
+FROM
+(
+	SELECT L.LOT_ID,W.WAFER_ID,P.WAFER_SEQ, ??
+	FROM T_PCM_?? P,T_TPS_LOT L,T_TPS_WAFER W
+	WHERE L.LOT_ID IN (??)
+	AND L.LOT_SEQ = W.LOT_SEQ
+	AND W.WAFER_SEQ = P.WAFER_SEQ
+	AND P.DIEID=:zone
+) A, (
+	SELECT LOT_ID, WAFER_ID, B.YIELD
+	FROM T_TPS_WAFER_SUM A,
+	(
+		SELECT WAFER_SEQ, ROUND(COUNT(DIEID) / ?? * 100, 2) YIELD
+		FROM TD_?? A,
+		(
+			SELECT X, Y FROM T_TPS_ZONE
+			WHERE PRODUCT=:product
+			AND USER_NAME=:userId
+			AND ZONEID=:zone
+		) B
+		WHERE WAFER_SEQ IN
+		(
+			SELECT WAFER_SEQ FROM T_TPS_WAFER
+			WHERE LOT_SEQ IN
+			(
+				SELECT LOT_SEQ FROM T_TPS_LOT WHERE LOT_ID IN (??) AND TESTAREA IN ('PT1', 'PT2', 'MULTIPROBE')
+			)
+		)
+		AND A.X = B.X
+		AND A.Y = B.Y
+		AND BIN IN (??)
+		GROUP BY WAFER_SEQ
+		ORDER BY WAFER_SEQ
+	) B
+	WHERE A.WAFER_SEQ=B.WAFER_SEQ
+	ORDER BY LOT_ID, WAFER_ID
+) B
+WHERE A.LOT_ID = B.LOT_ID
+AND A.WAFER_ID = B.WAFER_ID
+ORDER BY B.LOT_ID, B.WAFER_ID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:product</param>
+            <param direction="Input" dbtype="VarChar" size="0">:userId</param>
+            <param direction="Input" dbtype="VarChar" size="0">:zone</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="PRODUCT_PROGRAM_BY_LOT" commandtype="Text" description="lot을 test한 program을 가져온다" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT PRODUCT, PROGRAM FROM T_TPS_WAFER_SUM
+WHERE LOT_ID IN (??)
+AND TESTAREA IN ('PT1', 'PT2', 'MULTIPROBE')]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SITE_CNT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT SITE_CNT FROM T_TPS_PROGRAM
+WHERE PROGRAM = :program
+AND TESTAREA='PARAMETRIC']]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:program</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_PCM_DATA_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-06-12 11:39:04
+  SELECT T1.WAFER_SEQ,
+         T1.WAFER_ID,
+         MAX(T1.YIELD) AS "YIELD",
+         '' AS "LSL",
+         '' AS "TARGET",
+         '' AS "USL",
+         '' AS "LCL",
+         '' AS "UCL",
+         COUNT(??) AS "CNT",
+         ROUND(MIN (??), 6) AS "MININUM",
+         ROUND(PERCENTILE_DISC (.25) WITHIN GROUP (ORDER BY ??), 6) Q1,
+         ROUND(MEDIAN (??), 6) AS "MEDIAN",
+         ROUND(PERCENTILE_DISC (.75) WITHIN GROUP (ORDER BY ??), 6) Q3,
+         ROUND(MAX (??), 6) AS "MAXINUM", 
+         ROUND(AVG (??), 6) AS "AVERAGE",
+         ROUND(STDDEV (??), 6) AS "STDDEV"
+    FROM TQP_WAFER_SUM T1, ?? T2
+   WHERE     1 = 1
+     AND T1.WAFER_SEQ = T2.WAFER_SEQ
+     AND T1.FACILITY = :factory
+     AND T1.WAFER_SEQ IN (??)
+GROUP BY T1.WAFER_SEQ, T1.WAFER_ID
+ORDER BY T1.WAFER_ID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:factory</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_PCM_DATA_02" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-06-13 20:28:28
+SELECT ??
+  FROM ??
+ WHERE WAFER_SEQ IN (??)]]></commandtext>
+    </query>
+</queryxml>

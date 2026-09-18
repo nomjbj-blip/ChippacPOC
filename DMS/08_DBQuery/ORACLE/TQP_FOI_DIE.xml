@@ -1,0 +1,192 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Insert" queryid="INSERT_TQP_FOI_DIE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_FOI_DIE
+(WAFER_SEQ,
+ DIE_NUM,
+ TEST_AREA,
+ DIEPROBE_CNT,
+ X,
+ Y,
+ BIN,
+ BIN_CHAR,
+ IMAGE_PATH,
+ THUMB_PATH,
+ IMAGE_FILE_NAME,
+ THUMB_FILENAME)
+ VALUES
+ (:wafer_seq,
+:die_num,
+:test_area,
+:dieprobe_cnt,
+:xindex,
+:yindex,
+:avi_bin,
+:bin_char,
+:image_path,
+:thumb_path,
+:image_file_name,
+:thumb_filename)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="wafer_seq">:wafer_seq</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="die_num">:die_num</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="test_area">:test_area</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="dieprobe_cnt">:dieprobe_cnt</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="xindex">:xindex</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="yindex">:yindex</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="avi_bin">:avi_bin</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="bin_char">:bin_char</param>
+            <param direction="Input" dbtype="VarChar" size="200" value="image_path">:image_path</param>
+            <param direction="Input" dbtype="VarChar" size="200" value="thumb_path">:thumb_path</param>
+            <param direction="Input" dbtype="VarChar" size="200" value="image_file_name">:image_file_name</param>
+            <param direction="Input" dbtype="VarChar" size="200" value="thumb_filename">:thumb_filename</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_FOI_BIN_SUM" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT BIN, BIN_CHAR, COUNT(*) AS CNT  FROM TQP_FOI_DIE
+WHERE 1= 1 
+AND WAFER_SEQ = :wafer_seq
+GROUP BY  BIN, BIN_CHAR]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="wafer_seq">:wafer_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_FOI_MAP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT WAFER_SEQ,
+       DIE_NUM,
+       TEST_AREA,
+       DIEPROBE_CNT,
+       X,
+       Y,
+       BIN,
+       BIN_CHAR,
+       IMAGE_PATH,
+       THUMB_PATH,
+       IMAGE_FILE_NAME,
+       THUMB_FILENAME
+  FROM TQP_FOI_DIE
+ WHERE 1 = 1 
+  AND WAFER_SEQ = :waferseq
+  AND DIEPROBE_CNT = :prbcnt
+   ORDER BY DIE_NUM]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="waferseq">:waferseq</param>
+            <param direction="Input" dbtype="VarChar" size="40" value="prbcnt">:prbcnt</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_AVI_BIN_SUMMARY" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[  SELECT A.BIN,
+         NVL(B.BIN_NAME, A.BIN) AS BIN_NAME,
+         A.CNT,
+         NVL(B.COLOR, '#FFFFFF') AS COLOR,
+         B.UPPER_LIMIT_CNT AS UPPER_LIMIT_CNT,
+         B.LOWER_LIMIT_CNT AS LOWER_LIMIT_CNT FROM 
+         (SELECT NVL (BIN, 0) AS BIN, COUNT (*) AS CNT
+              FROM TQP_FOI_DIE
+             WHERE 1 = 1 
+             AND WAFER_SEQ = :wafer_seq
+              group by BIN) A,
+         (SELECT * FROM TQP_BINDESC
+                  WHERE 1= 1 
+                  AND PROGRAM = 'AVI') B
+            WHERE 1 = 1 
+        AND A.BIN = B.BIN(+)
+        ORDER BY A.BIN]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="wafer_seq">:wafer_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_WAFER_RAW" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT A.*,
+       (SELECT HIGH_GEC
+          FROM TQP_BINDESC
+         WHERE PROGRAM = 'AVI' AND BIN = A.BIN)
+          AS HIGH_GEC
+  FROM TQP_FOI_DIE A
+ WHERE 1 = 1 
+ AND A.WAFER_SEQ = :waferseq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40" value="waferseq">:waferseq</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_TQP_FOI_DIE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[DELETE  FROM TQP_FOI_DIE
+WHERE 1= 1 
+AND WAFER_SEQ = :wafer_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="wafer_seq">:wafer_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_SCOPE_RAW" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT *
+  FROM TQP_FOI_DIE
+ WHERE     1 = 1
+       AND WAFER_SEQ =
+              (SELECT WAFER_SEQ
+                 FROM TQP_WAFER_SUM
+                WHERE     1 = 1
+                      AND TESTAREA = 'AVI'
+                      AND PROGRAM = 'SCOPE'
+                      AND LOT_ID = :lotid
+                      AND WAFER_ID = :waferid
+                      AND PROBE_CNT = 0)
+ORDER BY X, Y                      ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="lotid">:lotid</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="waferid">:waferid</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_FOI_MAP_MULTI" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[WITH WT
+     AS ( SELECT X, Y, SUM(DECODE( BIN, 0, 0, 1)) AS COUNT
+             FROM TQP_FOI_DIE
+            WHERE 1 = 1 
+            AND WAFER_SEQ IN (??)
+         GROUP BY X, Y
+         ORDER BY X, Y)
+SELECT X,
+       Y,
+       COUNT,
+       ROWNUM AS DIE_NUM
+  FROM WT]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_FOI_MAP_MULTI_IMAGE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT A.*,
+       B.LOT_ID,
+       B.PROGRAM,
+       B.WAFER_ID,
+       B.DEVICE_ALIAS,
+       B.PRODUCT
+  FROM TQP_FOI_DIE A, TQP_WAFER_SUM B
+ WHERE     1 = 1
+       AND A.WAFER_SEQ = B.WAFER_SEQ
+       AND A.IMAGE_PATH IS NOT NULL
+       AND A.WAFER_SEQ IN (??)
+]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_FOI_MAP_MULTI_RAW" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT NULL CHECKBOX,
+       B.WAFER_ID,
+       A.DIE_NUM AS "NUM",
+       A.WAFER_SEQ,
+       A.DIE_NUM,
+       A.X,
+       A.Y,
+       A.BIN
+  FROM TQP_FOI_DIE A, TQP_WAFER_SUM B
+ WHERE 1 = 1 
+     AND A.WAFER_SEQ = B.WAFER_SEQ 
+     AND A.WAFER_SEQ IN (??)]]></commandtext>
+    </query>
+    <query statement="Update" queryid="UPDATE_TQP_FOI_DIE_BIN" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_FOI_DIE SET BIN = :bin
+WHERE 1 = 1 
+AND WAFER_SEQ = :wafer_seq
+AND DIE_NUM = :die_num]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="bin">:bin</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="wafer_seq">:wafer_seq</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="die_num">:die_num</param>
+        </parameters>
+    </query>
+</queryxml>

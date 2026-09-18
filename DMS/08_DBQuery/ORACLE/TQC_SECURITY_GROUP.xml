@@ -1,0 +1,55 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="QMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Select" queryid="LOADGROUPLIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[Select  sec_grp_id, sec_grp_desc from TQC_SECURITY_GROUP where sec_grp_id <> :strGrpCode or sec_grp_desc <> :strGrpCode order by sec_grp_desc]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="20" description="GrpID" value="None">:strGrpCode</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="LOADGROUPINFO" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[Select * from TQC_SECURITY_GROUP where  sec_grp_id=:strSelVal]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="20" description="Selected Item Value" value="G001">:strSelVal</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="LOADMAXGROUP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[select MAX(SEC_GRP_ID) from TQC_SECURITY_GROUP ]]></commandtext>
+    </query>
+    <query statement="Insert" queryid="INSERTGROUPINFO" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[Insert into TQC_SECURITY_GROUP values(:strGrpCode,  :strGrpName, :strGrpCaption)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:strGrpCode</param>
+            <param direction="Input" dbtype="VarChar" size="40">:strGrpName</param>
+            <param direction="Input" dbtype="VarChar" size="40">:strGrpCaption</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATEGROUPINFO" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[Update TQC_SECURITY_GROUP 
+ Set SEC_GRP_DESC=:strGrpName, REMARK=:strGrpCaption Where SEC_GRP_ID=:strGrpCode]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:strGrpName</param>
+            <param direction="Input" dbtype="VarChar" size="40">:strGrpCaption</param>
+            <param direction="Input" dbtype="VarChar" size="40">:strGrpCode</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETEGROUP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[ DELETE FROM TQC_SECURITY_GROUP where SEC_GRP_ID=:strGrpCode]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:strGrpCode</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GETUSERGROUP" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT SEC_GRP_ID, SEC_GRP_DESC
+    FROM TQC_SECURITY_GROUP 
+ WHERE SEC_GRP_ID IN (SELECT SEC_GRP_ID 
+                                                     FROM TQC_GROUP_USER
+                                                  WHERE USER_ID = :UserID) ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:UserID</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_GRP_LIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2014-01-27 17:34:01
+SELECT * FROM TQC_SECURITY_GROUP]]></commandtext>
+    </query>
+</queryxml>

@@ -1,0 +1,123 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Select" queryid="SELECT_COLOR_BY_SIZE" commandtype="Text" description="select" commandtimeout="60">
+        <commandtext><![CDATA[  SELECT SIZE_SEQ,
+         SIZE_FROM,
+         SIZE_TO,
+         COLOR
+    FROM TQD_COLORBYSIZE
+    WHERE USER_ID IN( :user_id, 'ADMIN')
+ORDER BY SIZE_SEQ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:user_id</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_COLOR_BY_SIZE" commandtype="Text" description="delete" commandtimeout="60">
+        <commandtext><![CDATA[DELETE FROM TQD_COLORBYSIZE 
+WHERE USER_ID = :user_id]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:user_id</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="INSERT_COLOR_BY_SIZE" commandtype="Text" description="insert" commandtimeout="60">
+        <commandtext><![CDATA[INSERT
+INTO TQD_COLORBYSIZE VALUES
+  (
+    :user_id,
+    :size_seq,
+    :size_from,
+    :size_to,
+    :color
+  )]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:user_id</param>
+            <param direction="Input" dbtype="Number" size="10">:size_seq</param>
+            <param direction="Input" dbtype="Number" size="10">:size_from</param>
+            <param direction="Input" dbtype="Number" size="10">:size_to</param>
+            <param direction="Input" dbtype="VarChar" size="9">:color</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_COLOR_BY_SIZE_01" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-07-29 10:12:41
+SELECT SIZE_SEQ, COLOR
+  FROM TQD_COLORBYSIZE
+ WHERE 1=1
+ AND USER_ID IN( :userid, 'ADMIN')
+ ORDER BY SIZE_SEQ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="userid">:userid</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="EXISTS_DEFECT_SIZE_BY_COLOR" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-08-09 17:21:45
+SELECT COUNT(1)
+  FROM TQD_COLORBYSIZE
+ WHERE 1=1
+   AND USER_ID IN( :userid, 'ADMIN')
+   AND SIZE_SEQ = :seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="userid">:userid</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="seq">:seq</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_DEFECT_SIZE_BY_COLOR" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-08-09 17:29:26
+UPDATE TQD_COLORBYSIZE
+   SET SIZE_FROM = :sizefrom
+     , SIZE_TO = :sizeto
+     , COLOR = :color
+ WHERE 1=1
+   AND USER_ID = :userid
+   AND SIZE_SEQ = :seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="userid">:userid</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="seq">:seq</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="sizefrom">:sizefrom</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="sizeto">:sizeto</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="color">:color</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELECT_DEFECT_SIZE_BY_COLOR" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-08-09 17:30:52
+DELETE FROM TQD_COLORBYSIZE
+ WHERE 1=1
+   AND USER_ID = :userid
+   AND SIZE_SEQ = :sizeseq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="userid">:userid</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="sizeseq">:sizeseq</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="INSERT_DEFECT_SIZE_BY_COLOR" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2019-08-09 17:31:12
+INSERT
+  INTO TQD_COLORBYSIZE(USER_ID, SIZE_SEQ, SIZE_FROM, SIZE_TO, COLOR)
+  VALUES (:user_id, SELECT MAX(SIZE_SEQ) + 1 FROM TQD_COLORBYSIZE WHERE 1=1 AND USER_ID = :user_id),:size_from,:size_to,:color)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="user_id">:user_id</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="size_from">:size_from</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="size_to">:size_to</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="color">:color</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_SIZE_COLOR" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT   ROWNUM AS NO,
+         SIZE_FROM,
+         SIZE_TO,
+         COLOR,
+         LABEL,
+         0 AS DSIZE
+    FROM (  SELECT SIZE_FROM,
+                   SIZE_TO,
+                   COLOR,
+                   SIZE_FROM || '~' || SIZE_TO AS LABEL
+              FROM TQD_COLORBYSIZE
+              WHERE 1 = 1 
+              AND USER_ID IN( :userid, 'ADMIN')
+          ORDER BY SIZE_FROM)
+ORDER BY 1]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="userid">:userid</param>
+        </parameters>
+    </query>
+</queryxml>

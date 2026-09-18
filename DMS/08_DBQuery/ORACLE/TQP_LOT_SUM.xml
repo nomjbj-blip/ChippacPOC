@@ -1,0 +1,500 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="TPSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Select" queryid="GET_LOT_LIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT ??,LOT_SEQ,WAFER_SEQ FROM TQP_LOT_SUM
+??]]></commandtext>
+    </query>
+    <query statement="Select" queryid="PRODUCT_LIST" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT PRODUCT FROM TQP_LOT_SUM
+WHERE END_TIME BETWEEN TO_DATE(:sTime,'YYYY-MM-DD') AND TO_DATE(:eTime,'YYYY-MM-DD')
+AND TESTAREA='MULTIPROBE']]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:sTime</param>
+            <param direction="Input" dbtype="VarChar" size="0">:eTime</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_LOT_SUM_BY_TESTAREA" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQP_LOT_SUM
+WHERE LOT_ID = :lot_id
+AND TESTAREA = :testarea]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="0">:testarea</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="YIELD_BY_PRODUCT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT MIN(START_TIME) START_TIME, MAX(END_TIME) END_TIME, PRODUCT, ROUND(AVG(YIELD), 2) YIELD, SUM(WAFERS) WAFERS FROM TQP_LOT_SUM
+WHERE END_TIME BETWEEN TO_DATE(:sTime,'YYYY-MM-DD') AND TO_DATE(:eTime,'YYYY-MM-DD')
+AND TESTAREA='MULTIPROBE'
+GROUP BY PRODUCT]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:sTime</param>
+            <param direction="Input" dbtype="VarChar" size="0">:eTime</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="YIELD_BY_LOT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT MIN(START_TIME) START_TIME, MAX(END_TIME) END_TIEM, LOT_ID, ROUND(AVG(YIELD), 2) YIELD, SUM(WAFERS) WAFERS FROM TQP_LOT_SUM
+WHERE END_TIME BETWEEN TO_DATE(:sTime,'YYYY-MM-DD') AND TO_DATE(:eTime,'YYYY-MM-DD')
+AND TESTAREA='MULTIPROBE'
+AND PRODUCT=:product
+GROUP BY LOT_ID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:sTime</param>
+            <param direction="Input" dbtype="VarChar" size="0">:eTime</param>
+            <param direction="Input" dbtype="VarChar" size="0">:product</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="GET_ISLOT" commandtype="Text" description="해당 Lot 유무를 조회한다" commandtimeout="60">
+        <commandtext><![CDATA[SELECT LOT_SEQ FROM TQP_LOT_SUM WHERE LOT_SEQ = :lot_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="9">lot_seq</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="CREATE_LOT" commandtype="Text" description="Lot Sum 생성한다." commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_LOT_SUM VALUES( ?? )]]></commandtext>
+    </query>
+    <query statement="Delete" queryid="DELETE_LOT" commandtype="Text" description="Lot 삭제" commandtimeout="60">
+        <commandtext><![CDATA[DELETE TQP_LOT_SUM WHERE LOT_SEQ = :lot_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:lot_seq</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_LOSSDIE" commandtype="Text" description="Loss Die Update" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_LOT_SUM
+SET LOSS_DIE = (SELECT SUM(LOSS_DIE) LOSS_DIE FROM TQP_WAFER
+                          WHERE LOT_SEQ = :lot_seq
+          AND PROBE_CNT = 0)
+WHERE LOT_SEQ = :lot_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">lot_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_YIELD_BY_PRODUCT" commandtype="Text" description="YIELD BY PRODUCT" commandtimeout="60">
+        <commandtext><![CDATA[SELECT PRODUCT, SUM(TESTED_DIE) AS TESTDIE, SUM(GEC) AS PASSDIE, ROUND(AVG(YIELD), 5) AS YIELD FROM TQP_LOT_SUM WHERE PRODUCT in (??) GROUP BY PRODUCT]]></commandtext>
+    </query>
+    <query statement="Select" queryid="GET_LOT_SUM_INFO" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT *
+FROM TQP_LOT_SUM
+WHERE 1=1
+AND LOT_SEQ = :lot_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:lot_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_LOT_SUM_BY_LOT_ID" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT * FROM TQP_LOT_SUM
+WHERE LOT_ID = :lot_id]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_LOT_INFO_BY_LOT_ID_EXCLUDE_FINAL" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT *
+FROM TQP_LOT_SUM
+WHERE LOT_ID = :lot_id
+AND TESTAREA NOT LIKE '%FINAL%'
+AND TESTAREA LIKE '%MERGE%'
+ORDER BY LOT_SEQ DESC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_LOT_SUM_LAST_MERGE" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[SELECT *
+FROM TQP_LOT_SUM
+WHERE LOT_ID = :lot_id
+AND TESTAREA LIKE '%MERGE%'
+ORDER BY LOT_SEQ DESC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="CREATE_DMS_LOT" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[-- Create Date : 2014-11-27 19:33:03
+INSERT INTO TQP_LOT_SUM 
+(LOT_SEQ, LOT_ID, TESTAREA, PRODUCT, PROGRAM, CUSTOMER, FACILITY, START_TIME, END_TIME) 
+VALUES 
+(:LOT_SEQ, :LOT_ID, :TESTAREA, :PRODUCT, :PROGRAM, :CUSTOMER, :FACILITY, 
+TO_DATE(:START_TIME,'YYYY-MM-DD HH24:MI:SS'), TO_DATE(:END_TIME,'YYYY-MM-DD HH24:MI:SS'))]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:LOT_SEQ</param>
+            <param direction="Input" dbtype="VarChar" size="0">:LOT_ID</param>
+            <param direction="Input" dbtype="VarChar" size="0">:TESTAREA</param>
+            <param direction="Input" dbtype="VarChar" size="0">:PRODUCT</param>
+            <param direction="Input" dbtype="VarChar" size="0">:PROGRAM</param>
+            <param direction="Input" dbtype="VarChar" size="0">:CUSTOMER</param>
+            <param direction="Input" dbtype="VarChar" size="0">:FACILITY</param>
+            <param direction="Input" dbtype="VarChar" size="0">:START_TIME</param>
+            <param direction="Input" dbtype="VarChar" size="0">:END_TIME</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="INSERT_LOT_SUMMARY" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_LOT_SUM (CUSTOMER,
+                         FACILITY,
+                         PRODUCT,
+                         DEVICE_ALIAS,
+                         TESTAREA,
+                         PROGRAM,
+                         LOT_ID,
+                         LOT_SEQ,
+                         START_TIME,
+                         END_TIME,
+                         YIELD,
+                         TESTED_DIE,
+                         BIN0,
+                         BIN1,
+                         BIN2,
+                         BIN3,
+                         BIN4,
+                         BIN5,
+                         BIN6,
+                         BIN7,
+                         BIN8,
+                         BIN9,
+                         BIN10,
+                         BIN11,
+                         BIN12,
+                         BIN13,
+                         BIN14,
+                         BIN15,
+                         BIN16,
+                         BIN17,
+                         BIN18,
+                         BIN19,
+                         BIN20,
+                         BIN21,
+                         BIN22,
+                         BIN23,
+                         BIN24,
+                         BIN25,
+                         BIN26,
+                         BIN27,
+                         BIN28,
+                         BIN29,
+                         BIN30,
+                         BIN31,
+                         BIN32,
+                         BIN33,
+                         BIN34,
+                         BIN35,
+                         BIN36,
+                         BIN37,
+                         BIN38,
+                         BIN39,
+                         BIN40,
+                         BIN41,
+                         BIN42,
+                         BIN43,
+                         BIN44,
+                         BIN45,
+                         BIN46,
+                         BIN47,
+                         BIN48,
+                         BIN49,
+                         BIN50,
+                         BIN51,
+                         BIN52,
+                         BIN53,
+                         BIN54,
+                         BIN55,
+                         BIN56,
+                         BIN57,
+                         BIN58,
+                         BIN59,
+                         BIN60,
+                         BIN61,
+                         BIN62,
+                         BIN63,
+                         BIN64,
+                         BIN65,
+                         BIN66,
+                         BIN67,
+                         BIN68,
+                         BIN69,
+                         BIN70,
+                         BIN71,
+                         BIN72,
+                         BIN73,
+                         BIN74,
+                         BIN75,
+                         BIN76,
+                         BIN77,
+                         BIN78,
+                         BIN79,
+                         BIN80,
+                         BIN81,
+                         BIN82,
+                         BIN83,
+                         BIN84,
+                         BIN85,
+                         BIN86,
+                         BIN87,
+                         BIN88,
+                         BIN89,
+                         BIN90,
+                         BIN91,
+                         BIN92,
+                         BIN93,
+                         BIN94,
+                         BIN95,
+                         BIN96,
+                         BIN97,
+                         BIN98,
+                         BIN99,
+                         BIN100,
+                         BIN101,
+                         BIN102,
+                         BIN103,
+                         BIN104,
+                         BIN105,
+                         BIN106,
+                         BIN107,
+                         BIN108,
+                         BIN109,
+                         BIN110,
+                         BIN111,
+                         BIN112,
+                         BIN113,
+                         BIN114,
+                         BIN115,
+                         BIN116,
+                         BIN117,
+                         BIN118,
+                         BIN119,
+                         BIN120,
+                         BIN121,
+                         BIN122,
+                         BIN123,
+                         BIN124,
+                         BIN125,
+                         BIN126,
+                         BIN127,
+                         BIN128,
+                         BIN129,
+                         BIN130,
+                         BIN131,
+                         BIN132,
+                         BIN133,
+                         BIN134,
+                         BIN135,
+                         BIN136,
+                         BIN137,
+                         BIN138,
+                         BIN139,
+                         BIN140,
+                         BIN141,
+                         BIN142,
+                         BIN143,
+                         BIN144,
+                         BIN145,
+                         BIN146,
+                         BIN147,
+                         BIN148,
+                         BIN149,
+                         BIN150,
+                         WAFERS)
+   SELECT MAX (CUSTOMER) AS CUSTOMER,
+          MAX (FACILITY) AS FACILITY,
+          MAX (PRODUCT) AS PRODUCT,
+          MAX (DEVICE_ALIAS) AS DEVICE_ALIAS,
+          MAX (TESTAREA) AS TEST_AREA,
+          MAX (PROGRAM) AS PROGRAM,
+          MAX (LOT_ID) AS LOT_ID,
+          MAX (LOT_SEQ) AS LOT_SEQ,
+          MAX (START_TIME) AS START_TIME,
+          MAX (END_TIME) AS END_TIME,
+          AVG (YIELD) AS YIELD,
+          SUM (TESTED_DIE) AS TESTED_DIE,
+          SUM (BIN0) AS BIN0,
+          SUM (BIN1) AS BIN1,
+          SUM (BIN2) AS BIN2,
+          SUM (BIN3) AS BIN3,
+          SUM (BIN4) AS BIN4,
+          SUM (BIN5) AS BIN5,
+          SUM (BIN6) AS BIN6,
+          SUM (BIN7) AS BIN7,
+          SUM (BIN8) AS BIN8,
+          SUM (BIN9) AS BIN9,
+          SUM (BIN10) AS BIN10,
+          SUM (BIN11) AS BIN11,
+          SUM (BIN12) AS BIN12,
+          SUM (BIN13) AS BIN13,
+          SUM (BIN14) AS BIN14,
+          SUM (BIN15) AS BIN15,
+          SUM (BIN16) AS BIN16,
+          SUM (BIN17) AS BIN17,
+          SUM (BIN18) AS BIN18,
+          SUM (BIN19) AS BIN19,
+          SUM (BIN20) AS BIN20,
+          SUM (BIN21) AS BIN21,
+          SUM (BIN22) AS BIN22,
+          SUM (BIN23) AS BIN23,
+          SUM (BIN24) AS BIN24,
+          SUM (BIN25) AS BIN25,
+          SUM (BIN26) AS BIN26,
+          SUM (BIN27) AS BIN27,
+          SUM (BIN28) AS BIN28,
+          SUM (BIN29) AS BIN29,
+          SUM (BIN30) AS BIN30,
+          SUM (BIN31) AS BIN31,
+          SUM (BIN32) AS BIN32,
+          SUM (BIN33) AS BIN33,
+          SUM (BIN34) AS BIN34,
+          SUM (BIN35) AS BIN35,
+          SUM (BIN36) AS BIN36,
+          SUM (BIN37) AS BIN37,
+          SUM (BIN38) AS BIN38,
+          SUM (BIN39) AS BIN39,
+          SUM (BIN40) AS BIN40,
+          SUM (BIN41) AS BIN41,
+          SUM (BIN42) AS BIN42,
+          SUM (BIN43) AS BIN43,
+          SUM (BIN44) AS BIN44,
+          SUM (BIN45) AS BIN45,
+          SUM (BIN46) AS BIN46,
+          SUM (BIN47) AS BIN47,
+          SUM (BIN48) AS BIN48,
+          SUM (BIN49) AS BIN49,
+          SUM (BIN50) AS BIN50,
+          SUM (BIN51) AS BIN51,
+          SUM (BIN52) AS BIN52,
+          SUM (BIN53) AS BIN53,
+          SUM (BIN54) AS BIN54,
+          SUM (BIN55) AS BIN55,
+          SUM (BIN56) AS BIN56,
+          SUM (BIN57) AS BIN57,
+          SUM (BIN58) AS BIN58,
+          SUM (BIN59) AS BIN59,
+          SUM (BIN60) AS BIN60,
+          SUM (BIN61) AS BIN61,
+          SUM (BIN62) AS BIN62,
+          SUM (BIN63) AS BIN63,
+          SUM (BIN64) AS BIN64,
+          SUM (BIN65) AS BIN65,
+          SUM (BIN66) AS BIN66,
+          SUM (BIN67) AS BIN67,
+          SUM (BIN68) AS BIN68,
+          SUM (BIN69) AS BIN69,
+          SUM (BIN70) AS BIN70,
+          SUM (BIN71) AS BIN71,
+          SUM (BIN72) AS BIN72,
+          SUM (BIN73) AS BIN73,
+          SUM (BIN74) AS BIN74,
+          SUM (BIN75) AS BIN75,
+          SUM (BIN76) AS BIN76,
+          SUM (BIN77) AS BIN77,
+          SUM (BIN78) AS BIN78,
+          SUM (BIN79) AS BIN79,
+          SUM (BIN80) AS BIN80,
+          SUM (BIN81) AS BIN81,
+          SUM (BIN82) AS BIN82,
+          SUM (BIN83) AS BIN83,
+          SUM (BIN84) AS BIN84,
+          SUM (BIN85) AS BIN85,
+          SUM (BIN86) AS BIN86,
+          SUM (BIN87) AS BIN87,
+          SUM (BIN88) AS BIN88,
+          SUM (BIN89) AS BIN89,
+          SUM (BIN90) AS BIN90,
+          SUM (BIN91) AS BIN91,
+          SUM (BIN92) AS BIN92,
+          SUM (BIN93) AS BIN93,
+          SUM (BIN94) AS BIN94,
+          SUM (BIN95) AS BIN95,
+          SUM (BIN96) AS BIN96,
+          SUM (BIN97) AS BIN97,
+          SUM (BIN98) AS BIN98,
+          SUM (BIN99) AS BIN99,
+          SUM (BIN100) AS BIN100,
+          SUM (BIN101) AS BIN101,
+          SUM (BIN102) AS BIN102,
+          SUM (BIN103) AS BIN103,
+          SUM (BIN104) AS BIN104,
+          SUM (BIN105) AS BIN105,
+          SUM (BIN106) AS BIN106,
+          SUM (BIN107) AS BIN107,
+          SUM (BIN108) AS BIN108,
+          SUM (BIN109) AS BIN109,
+          SUM (BIN110) AS BIN110,
+          SUM (BIN111) AS BIN111,
+          SUM (BIN112) AS BIN112,
+          SUM (BIN113) AS BIN113,
+          SUM (BIN114) AS BIN114,
+          SUM (BIN115) AS BIN115,
+          SUM (BIN116) AS BIN116,
+          SUM (BIN117) AS BIN117,
+          SUM (BIN118) AS BIN118,
+          SUM (BIN119) AS BIN119,
+          SUM (BIN120) AS BIN120,
+          SUM (BIN121) AS BIN121,
+          SUM (BIN122) AS BIN122,
+          SUM (BIN123) AS BIN123,
+          SUM (BIN124) AS BIN124,
+          SUM (BIN125) AS BIN125,
+          SUM (BIN126) AS BIN126,
+          SUM (BIN127) AS BIN127,
+          SUM (BIN128) AS BIN128,
+          SUM (BIN129) AS BIN129,
+          SUM (BIN130) AS BIN130,
+          SUM (BIN131) AS BIN131,
+          SUM (BIN132) AS BIN132,
+          SUM (BIN133) AS BIN133,
+          SUM (BIN134) AS BIN134,
+          SUM (BIN135) AS BIN135,
+          SUM (BIN136) AS BIN136,
+          SUM (BIN137) AS BIN137,
+          SUM (BIN138) AS BIN138,
+          SUM (BIN139) AS BIN139,
+          SUM (BIN140) AS BIN140,
+          SUM (BIN141) AS BIN141,
+          SUM (BIN142) AS BIN142,
+          SUM (BIN143) AS BIN143,
+          SUM (BIN144) AS BIN144,
+          SUM (BIN145) AS BIN145,
+          SUM (BIN146) AS BIN146,
+          SUM (BIN147) AS BIN147,
+          SUM (BIN148) AS BIN148,
+          SUM (BIN149) AS BIN149,
+          SUM (BIN150) AS BIN150,
+          COUNT (*) AS WAFERS
+     FROM TQP_WAFER_SUM
+    WHERE 1 = 1 AND LOT_SEQ = :lotseq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0" value="lotseq">:lotseq</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_LOT_STS" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_LOT_SUM SET CUSTOMER = :customer, DEVICE_ALIAS = :device
+WHERE 1 = 1 
+AND LOT_SEQ = :lotseq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="0" value="customer">:customer</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="device">:device</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="lotseq">:lotseq</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_LOT_ID" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_LOT_SUM
+SET 
+    LOT_ID = :LOT_ID,
+    MOTHER_LOT_ID = :LOT_ID,
+    DEVICE_ALIAS = :DEVICE_ALIAS
+WHERE LOT_SEQ = :LOT_SEQ
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="0">:LOT_SEQ</param>
+            <param direction="Input" dbtype="VarChar2" size="0">:LOT_ID</param>
+            <param direction="Input" dbtype="VarChar2" size="0">:DEVICE_ALIAS</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_PROGRAM" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_LOT_SUM
+SET 
+    PROGRAM = :PROGRAM
+WHERE LOT_SEQ = :LOT_SEQ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="0">:LOT_SEQ</param>
+            <param direction="Input" dbtype="VarChar2" size="0">:PROGRAM</param>
+        </parameters>
+    </query>
+</queryxml>

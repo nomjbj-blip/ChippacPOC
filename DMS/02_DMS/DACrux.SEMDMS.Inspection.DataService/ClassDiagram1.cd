@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="DACrux.SEMDMS.Inspection.DataService.InspectionDataService">
+    <Position X="0.5" Y="0.5" Width="3" />
+    <NestedTypes>
+      <Enum Name="DACrux.SEMDMS.Inspection.DataService.InspectionDataService.TQD_SETUP" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>InspectionDataService.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+      <Enum Name="DACrux.SEMDMS.Inspection.DataService.InspectionDataService.TQD_SETUP_MAP" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>InspectionDataService.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+      <Enum Name="DACrux.SEMDMS.Inspection.DataService.InspectionDataService.TQD_PRODUCT" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>InspectionDataService.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+      <Enum Name="DACrux.SEMDMS.Inspection.DataService.InspectionDataService.TQD_LOT" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>InspectionDataService.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+      <Enum Name="DACrux.SEMDMS.Inspection.DataService.InspectionDataService.TQD_WAFER" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>InspectionDataService.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+      <Enum Name="DACrux.SEMDMS.Inspection.DataService.InspectionDataService.TQD_STEP" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>InspectionDataService.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+      <Enum Name="DACrux.SEMDMS.Inspection.DataService.InspectionDataService.TQD_DEFECT" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>InspectionDataService.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAAAAwAAACAAAAQAABCAgAACAAwAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>InspectionDataService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DACrux.SEMDMS.Inspection.DataService.Program" Collapsed="true">
+    <Position X="4.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAA=</HashCode>
+      <FileName>Program.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DACrux.SEMDMS.Inspection.DataService.ProjectInstaller" Collapsed="true">
+    <Position X="4.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAAAAAAAACAAAAAAAACAAAACAAAAAAAAAAAAAAAAIAA=</HashCode>
+      <FileName>ProjectInstaller.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="맑은 고딕" Size="9" />
+</ClassDiagram>

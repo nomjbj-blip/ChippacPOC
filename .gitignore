@@ -1,0 +1,40 @@
+# Visual Studio user and build output
+.vs/
+**/bin/
+**/obj/
+*.user
+*.suo
+*.cache
+*.db
+*.pdb
+*.pfx
+*.vspscc
+*.bkp
+
+# Runtime binaries and restored package files
+*.dll
+*.exe
+*.nupkg
+**/packages/
+**/Build/
+**/Build1/
+**/100_ClientBin/
+**/71_CoreLib/
+**/07_CoreLib/
+**/101_ServerBin/
+**/103_Migration/
+**/References/
+**/Build - 복사본/
+**/Build2/
+**/.svn/
+
+# Runtime logs and inspection backup data
+*.log
+**/LOG/
+**/Log/
+**/INSP_BACKUP/
+
+# Archive and temporary files
+*.zip
+*.vsidx
+temp
