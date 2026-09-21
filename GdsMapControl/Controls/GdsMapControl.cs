@@ -10,6 +10,22 @@ using System.Windows.Forms;
 
 namespace NexplantQMS.GdsMap
 {
+	/// <summary>StatusStrip에 전달할 도면 구성과 GPU 처리 진행 상태다.</summary>
+	public sealed class GdsMapRenderProgressChangedEventArgs : EventArgs
+	{
+		public string Message { get; private set; }
+		public int Percent { get; private set; }
+		public bool IsMarquee { get; private set; }
+		public bool IsCompleted { get; private set; }
+		public GdsMapRenderProgressChangedEventArgs(string message, int percent, bool isMarquee, bool isCompleted)
+		{
+			Message = message;
+			Percent = percent;
+			IsMarquee = isMarquee;
+			IsCompleted = isCompleted;
+		}
+	}
+
 	/// <summary>
 	/// High-performance GDSII Viewer control based on OpenTK 4.x and OpenGL 4.0 Core Profile.
 	/// Replaces GDI+ rendering pipeline with GPU VBO/VAO batching for extreme scale performance.
@@ -38,6 +54,8 @@ namespace NexplantQMS.GdsMap
 		public event EventHandler SelectionChanged;
 		public event EventHandler<ViewMode> ModeChanged;
 		public event EventHandler<double> ZoomChanged;
+		/// <summary>도면 구성, GPU 버퍼 생성, 최초 화면 그리기 단계를 화면에 전달한다.</summary>
+		public event EventHandler<GdsMapRenderProgressChangedEventArgs> RenderProgressChanged;
 
 		// Colors & Palette
 		private static readonly Color SelectionColor = Color.FromArgb(255, 235, 59);
@@ -63,6 +81,8 @@ namespace NexplantQMS.GdsMap
 		private int _uMatrixLoc;
 		private bool _glInitialized;
 		private List<Vertex> _gpuVertices = new List<Vertex>(50000000);
+		private int _lastRenderProgressTick;
+		private bool _firstFrameProgressPending;
 
 		// GLSL Shaders
 		private const string VertexShaderCode = @"
@@ -213,10 +233,19 @@ namespace NexplantQMS.GdsMap
 		{
 			if (lib != null && lib.Structures.TryGetValue(structureName, out var str))
 			{
+				ReportRenderProgress("도면 구조 생성 중", 0, true, false, true);
 				Structure = str;
 
+				// 파일을 다시 열 때 이전 레이어/선택이 새 목록과 섞이지 않도록 도면 상태를 비운다.
+				ClearSelectionInternal();
+				_layerList.Clear();
+				_defectList.Clear();
+				_layer775Labels.Clear();
+
 				using (var identity = new System.Drawing.Drawing2D.Matrix())
-					FlattenStructure(lib, str, identity, new HashSet<string>(StringComparer.OrdinalIgnoreCase), 0);
+					FlattenStructure(lib, str, identity, new HashSet<string>(StringComparer.OrdinalIgnoreCase), 0, str.Name);
+				CalculateLayer775LabelDisplayAreas();
+				// GDS TEXT에는 특정 도형 소유 관계가 없으므로 주변 도형 검색으로 표시 여부를 제한하지 않는다.
 			}
 
 			BuildGpuBuffers();
@@ -227,6 +256,9 @@ namespace NexplantQMS.GdsMap
 		private void BuildGpuBuffers()
 		{
 			_gpuVertices.Clear();
+			int totalItems = _layerList.Sum(layer => layer.Items.Count) + _defectList.Count;
+			int processedItems = 0;
+			ReportRenderProgress("GPU 버퍼 생성 중", 0, false, false, true);
 
 			foreach (var layer in _layerList)
 			{
@@ -271,6 +303,7 @@ namespace NexplantQMS.GdsMap
 							}
 							item.LineVertexCount = _gpuVertices.Count - item.LineVertexOffset;
 						}
+						ReportBufferBuildProgress(++processedItems, totalItems);
 					}
 
 				}
@@ -282,6 +315,7 @@ namespace NexplantQMS.GdsMap
 						item.FillVertexCount = 0;
 						item.LineVertexOffset = -1;
 						item.LineVertexCount = 0;
+						ReportBufferBuildProgress(++processedItems, totalItems);
 					}
 				}
 			}
@@ -309,14 +343,21 @@ namespace NexplantQMS.GdsMap
 				//	_gpuVertices.Add(new Vertex(new Vector2((float)p2.X, (float)p2.Y), DefectColor));
 				//}
 				//item.LineVertexCount = _gpuVertices.Count - item.LineVertexOffset;
+				ReportBufferBuildProgress(++processedItems, totalItems);
 			}
 
 			UpdateGpuBuffers();
+			ReportRenderProgress("GPU 버퍼 생성 완료", 100, false, false, true);
+			// 다음 OnPaint에서 실제 DrawArrays 실행 진행률을 이어서 보고한다.
+			_firstFrameProgressPending = true;
 		}
 
 		private void UpdateGpuBuffers()
 		{
 			if (!_glInitialized) return;
+			ReportRenderProgress("GPU 업로드 중", 0, true, false, true);
+			// 색상 선택 창을 닫은 뒤에도 이 컨트롤의 OpenGL 컨텍스트에 업로드한다.
+			MakeCurrent();
 
 			// Sync selections to GPU Vertex Array
 			foreach (var layer in _layerList)
@@ -367,11 +408,29 @@ namespace NexplantQMS.GdsMap
 			{
 				GL.BufferData(BufferTarget.ArrayBuffer, _gpuVertices.Count * sizeof(float) * 7, _gpuVertices.ToArray(), BufferUsageHint.DynamicDraw);
 			}
+			ReportRenderProgress("GPU 업로드 완료", 100, false, false, true);
+		}
+
+		/// <summary>128개 단위와 120ms 제한을 함께 적용해 진행 상태 갱신 비용을 제한한다.</summary>
+		private void ReportBufferBuildProgress(int processedItems, int totalItems)
+		{
+			if (processedItems % 128 != 0 && processedItems != totalItems) return;
+			int percent = totalItems == 0 ? 100 : processedItems * 100 / totalItems;
+			ReportRenderProgress("GPU 버퍼 생성 중 / " + processedItems + "개", percent, false, false, processedItems == totalItems);
+		}
+
+		/// <summary>상태 이벤트를 시간 제한해 렌더링 작업에 미치는 영향을 줄인다.</summary>
+		private void ReportRenderProgress(string message, int percent, bool marquee, bool completed, bool force)
+		{
+			int now = Environment.TickCount;
+			if (!force && unchecked(now - _lastRenderProgressTick) < 120) return;
+			_lastRenderProgressTick = now;
+			RenderProgressChanged?.Invoke(this, new GdsMapRenderProgressChangedEventArgs(message, percent, marquee, completed));
 		}
 
 		// ---- Flattening (Identical logic to GDS Geometry Engine) --------------------------
 
-		private void FlattenStructure(GdsLibrary lib, GdsStructure str, System.Drawing.Drawing2D.Matrix parent, HashSet<string> stack, int depth)
+		private void FlattenStructure(GdsLibrary lib, GdsStructure str, System.Drawing.Drawing2D.Matrix parent, HashSet<string> stack, int depth, string structurePath)
 		{
 			if (depth > 64 || stack.Contains(str.Name)) 
 				return;
@@ -404,8 +463,9 @@ namespace NexplantQMS.GdsMap
 						}
 						else if (e is GdsText text)
 						{
-							var pts = TransformPoints(new GPoint[] { text.Position }, local, parent);
+							var pts = TransformTextPosition(text, parent);
 							_layerList.AddSceneItem(new GlSceneItem(e, pts, false, 0, text.Text));
+							AddLayer775Label(text, pts, structurePath);
 						}
 						else if (e is GdsSRef sref && lib.Structures.TryGetValue(sref.StructureName, out var child))
 						{
@@ -415,7 +475,8 @@ namespace NexplantQMS.GdsMap
 								using (var combined = (System.Drawing.Drawing2D.Matrix)parent.Clone())
 								{
 									combined.Multiply(m, System.Drawing.Drawing2D.MatrixOrder.Append);
-									FlattenStructure(lib, child, combined, stack, depth + 1);
+									string childPath = structurePath + " > " + child.Name + " @ (" + sref.Origin.X + ", " + sref.Origin.Y + ")";
+									FlattenStructure(lib, child, combined, stack, depth + 1, childPath);
 								}
 							}
 						}
@@ -436,11 +497,22 @@ namespace NexplantQMS.GdsMap
 			// Set Layer Color
 			foreach (var layer in _layerList)
 			{
-				if (_layerColor.ContainsKey(layer.LayerID))
-					layer.Color = _layerColor[layer.LayerID];
+				layer.Color = GetLayerColor(layer.LayerID);
 			}
 
 			stack.Remove(str.Name);
+		}
+
+		/// <summary>
+		/// GDS TEXT의 XY는 문자열 삽입점이므로 부모 구조의 배치 변환만 적용한다.
+		/// TEXT 자체 MAG/ANGLE/Mirror는 삽입점을 중심으로 글자 모양에 적용되는 값이므로 좌표에는 적용하지 않는다.
+		/// </summary>
+		private static GPoint[] TransformTextPosition(GdsText text, System.Drawing.Drawing2D.Matrix parent)
+		{
+			using (var identity = new System.Drawing.Drawing2D.Matrix())
+			{
+				return TransformPoints(new GPoint[] { text.Position }, identity, parent);
+			}
 		}
 
 		private static GPoint[] TransformPoints(double x, double y, double width, double height, System.Drawing.Drawing2D.Matrix local, System.Drawing.Drawing2D.Matrix parent)
@@ -500,6 +572,12 @@ namespace NexplantQMS.GdsMap
 			GL.Viewport(0, 0, Width, Height);
 			GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
+			bool reportFirstFrame = _firstFrameProgressPending;
+			int drawTotal = _layerList.Where(layer => layer.Visible).Sum(layer => layer.Items.Count) + _defectList.Count;
+			int drawProcessed = 0;
+			if (reportFirstFrame)
+				ReportRenderProgress("초기 화면 그리기 중", 0, false, false, true);
+
 			if (_gpuVertices.Count > 0)
 			{
 				GL.UseProgram(_shaderProgram);
@@ -528,6 +606,9 @@ namespace NexplantQMS.GdsMap
 
 						if (item.LineVertexCount > 0)
 							GL.DrawArrays(PrimitiveType.Lines, item.LineVertexOffset, item.LineVertexCount);
+
+						if (reportFirstFrame)
+							ReportDrawProgress(++drawProcessed, drawTotal);
 					}
 				}
 
@@ -538,10 +619,19 @@ namespace NexplantQMS.GdsMap
 
 					if (item.LineVertexCount > 0)
 						GL.DrawArrays(PrimitiveType.Lines, item.LineVertexOffset, item.LineVertexCount);
+
+					if (reportFirstFrame)
+						ReportDrawProgress(++drawProcessed, drawTotal);
 				}
 			}
 
 			SwapBuffers();
+			DrawLayer775Labels();
+			if (reportFirstFrame)
+			{
+				_firstFrameProgressPending = false;
+				ReportRenderProgress("초기 화면 그리기 완료", 100, false, true, true);
+			}
 
 			if (_isDragTracking)
 			{
@@ -563,6 +653,14 @@ namespace NexplantQMS.GdsMap
 						g.DrawRectangle(pen, Rectangle.Round(rect));
 				}
 			}
+		}
+
+		/// <summary>최초 화면 그리기 중에는 128개 단위로만 진행률을 갱신한다.</summary>
+		private void ReportDrawProgress(int drawProcessed, int drawTotal)
+		{
+			if (drawProcessed % 128 != 0 && drawProcessed != drawTotal) return;
+			int percent = drawTotal == 0 ? 100 : drawProcessed * 100 / drawTotal;
+			ReportRenderProgress("초기 화면 그리기 중 / " + drawProcessed + "개", percent, false, false, drawProcessed == drawTotal);
 		}
 
 		// ---- Navigation & Interactive Math ----------------------------------------------

@@ -10,6 +10,15 @@ using System.Threading.Tasks;
 
 namespace NexplantQMS.GdsMap
 {
+	/// <summary>파일 읽기 진행률을 UI에 전달한다. 바이트 기준이라 파일 크기와 직접 대응한다.</summary>
+	public sealed class GdsReadProgressChangedEventArgs : EventArgs
+	{
+		public long BytesRead { get; private set; }
+		public long TotalBytes { get; private set; }
+		public int Percent { get { return TotalBytes <= 0 ? 0 : (int)(BytesRead * 100 / TotalBytes); } }
+		public GdsReadProgressChangedEventArgs(long bytesRead, long totalBytes) { BytesRead = bytesRead; TotalBytes = totalBytes; }
+	}
+
 	public class GdsReader
 	{
 		private GdsStructure str = null;
@@ -17,6 +26,10 @@ namespace NexplantQMS.GdsMap
 		private GdsLibrary lib = null;
 
 		private List<int> _layerArr = new List<int>();
+		private int _lastProgressReportTick;
+
+		/// <summary>약 100ms 간격으로만 발생해 대용량 GDS 읽기 속도에 영향을 주지 않는다.</summary>
+		public event EventHandler<GdsReadProgressChangedEventArgs> ProgressChanged;
 
 		public GdsReader()
 		{
@@ -36,6 +49,7 @@ namespace NexplantQMS.GdsMap
 			{
 
 			long length = fs.Length;
+			ReportProgress(0, length, true);
 			var bytes = new byte[65536];
 
 			while (bs.Position < length)
@@ -50,7 +64,7 @@ namespace NexplantQMS.GdsMap
 				dataLength = br.Read(bytes, 0, dataLength);
 
 				// 4. 레코드 종류에 따른 분기 처리
-				switch (recordType)
+					switch (recordType)
 				{
 					case 0x02: lib.Name = Ascii(bytes, dataLength); break; // LIBNAME
 					case 0x03: ReadUnits(bytes); break;
@@ -69,16 +83,28 @@ namespace NexplantQMS.GdsMap
 					case 0x12: SetSName(bytes, dataLength); break;
 					case 0x13: SetColRow(bytes); break;
 					case 0x16: if (el is GdsText) ((GdsText)el).TextType = I16(bytes); break;
+					case 0x17: SetPresentation(bytes); break;
 					case 0x19: if (el is GdsText) ((GdsText)el).Text = Ascii(bytes, dataLength); break;
 					case 0x1A: SetStrans(bytes); break;
 					case 0x1B: SetMag(bytes); break;
 					case 0x1C: SetAngle(bytes); break;
 					case 0x11: EndElement(); break;
 				}
+				ReportProgress(bs.Position, length, false);
 			}
 
+				ReportProgress(length, length, true);
 				return lib;
 			}
+		}
+
+		/// <summary>빈번한 UI 호출을 막기 위해 시간 또는 완료 시점에만 진행률을 보낸다.</summary>
+		private void ReportProgress(long bytesRead, long totalBytes, bool force)
+		{
+			int now = Environment.TickCount;
+			if (!force && unchecked(now - _lastProgressReportTick) < 100) return;
+			_lastProgressReportTick = now;
+			ProgressChanged?.Invoke(this, new GdsReadProgressChangedEventArgs(bytesRead, totalBytes));
 		}
 
 		private ushort BE16(BinaryReader br)
@@ -195,6 +221,29 @@ namespace NexplantQMS.GdsMap
 		{
 			if (el != null)
 				el.DataType = I16(bytes);
+		}
+
+		/// <summary>
+		/// GDS PRESENTATION 비트를 해석해 TEXT 삽입 좌표가 문자의 어느 지점인지 보관한다.
+		/// 예약값 3은 GDS 기본값인 왼쪽/위쪽으로 처리해 비정상 파일도 안전하게 표시한다.
+		/// </summary>
+		private void SetPresentation(byte[] bytes)
+		{
+			var text = el as GdsText;
+			if (text == null) return;
+
+			ushort presentation = unchecked((ushort)I16(bytes));
+			text.FontNumber = (presentation >> 4) & 0x03;
+
+			int vertical = (presentation >> 2) & 0x03;
+			text.VerticalPresentation = vertical == 1
+				? GdsTextVerticalPresentation.Middle
+				: vertical == 2 ? GdsTextVerticalPresentation.Bottom : GdsTextVerticalPresentation.Top;
+
+			int horizontal = presentation & 0x03;
+			text.HorizontalPresentation = horizontal == 1
+				? GdsTextHorizontalPresentation.Center
+				: horizontal == 2 ? GdsTextHorizontalPresentation.Right : GdsTextHorizontalPresentation.Left;
 		}
 
 		void SetSName(byte[] bytes, int dataLength)

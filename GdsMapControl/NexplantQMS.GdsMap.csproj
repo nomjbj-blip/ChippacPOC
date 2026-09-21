@@ -59,10 +59,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controls\GdsMapControl.cs">
+    <Compile Include="Controls\GdsMapControl.cs" />
+    <Compile Include="Controls\GdsMapControl_Layer.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Controls\GdsMapControl_Layer.cs">
+    <Compile Include="Controls\GdsMapControl_Label.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Controls\GdsMapControl_Mouse.cs">
@@ -70,6 +71,7 @@
     </Compile>
     <Compile Include="Controls\GlDefectItem.cs" />
     <Compile Include="Controls\GlSceneItem.cs" />
+    <Compile Include="Controls\LayerColorCheckedListBox.cs" />
     <Compile Include="Defects\Defect.cs" />
     <Compile Include="Elements\GdsARef.cs" />
     <Compile Include="Elements\GdsBoundary.cs" />
