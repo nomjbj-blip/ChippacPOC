@@ -76,6 +76,8 @@ namespace NexplantQMS.GdsMap
 			else if (_isDragTracking && e.Button == MouseButtons.Left)
 			{
 				_isDragTracking = false;
+				// 선택 상태가 바뀐 Item만 VBO에 다시 전송한다.
+				var changedItems = new List<GlSceneItem>();
 
 				// 현재 러버밴드의 월드 박스 계산
 				var wPt1 = ScreenToWorld(_rubberStartScreen);
@@ -108,6 +110,7 @@ namespace NexplantQMS.GdsMap
 
 						//it.Selected = !_dragInitialSelection.Contains(it);
 						it.Selected = !ContainsSelectedItem(it);
+						changedItems.Add(it);
 
 						if (it.Selected)
 							AppendSelectedItem(it);
@@ -133,6 +136,7 @@ namespace NexplantQMS.GdsMap
 								//bool desired = inside ? !_dragInitialSelection.Contains(it) : _dragInitialSelection.Contains(it);
 
 								it.Selected = !contains;
+								changedItems.Add(it);
 
 								if (contains)
 									RemoveSelectedItem(it);
@@ -144,7 +148,7 @@ namespace NexplantQMS.GdsMap
 				}
 
 				// GPU에 반영 및 후처리
-				UpdateGpuBuffers();
+				UpdateSelectionVertices(changedItems);
 				RaiseSelectionChanged();
 				Invalidate();
 

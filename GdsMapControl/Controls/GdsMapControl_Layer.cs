@@ -36,8 +36,7 @@ namespace NexplantQMS.GdsMap
 			foreach (var layer in Structure.Layers)
 				_layerList.GetLayer(layer.LayerID).Visible = layer.Visible;
 
-			BuildGpuBuffers();
-			Invalidate();
+			InvalidateWithDrawProgress();
 		}
 
 		public void VisibleAllLayer(bool visible)
@@ -45,8 +44,7 @@ namespace NexplantQMS.GdsMap
 			foreach (var layer in _layerList)
 				layer.Visible = visible;
 
-			BuildGpuBuffers();
-			Invalidate();
+			InvalidateWithDrawProgress();
 		}
 
 		/// <summary>기존 호출 방식과 호환되는 일괄 색상 지정. 사전을 복사하고 현재 도면에도 반영한다.</summary>
@@ -55,9 +53,13 @@ namespace NexplantQMS.GdsMap
 			_layerColor = dic == null ? new Dictionary<int, Color>()
 				: dic.ToDictionary(p => p.Key, p => Color.FromArgb(255, p.Value));
 			foreach (var layer in _layerList)
-				layer.Color = GetLayerColor(layer.LayerID);
-			BuildGpuBuffers();
-			Invalidate();
+			{
+				Color color = GetLayerColor(layer.LayerID);
+				if (layer.Color.ToArgb() == color.ToArgb()) continue;
+				layer.Color = color;
+				UpdateLayerColorVertices(layer);
+			}
+			InvalidateWithDrawProgress();
 		}
 
 		/// <summary>1~8번의 기존 색상을 유지하고, 다른 번호에도 일정한 기본 색상을 배정한다.</summary>
@@ -83,9 +85,12 @@ namespace NexplantQMS.GdsMap
 			var layer = _layerList.FirstOrDefault(p => p.LayerID == layerId);
 			if (layer == null) return false;
 			_layerColor[layerId] = Color.FromArgb(255, color);
-			layer.Color = _layerColor[layerId];
-			BuildGpuBuffers();
-			Invalidate();
+			if (layer.Color.ToArgb() != _layerColor[layerId].ToArgb())
+			{
+				layer.Color = _layerColor[layerId];
+				UpdateLayerColorVertices(layer);
+			}
+			InvalidateWithDrawProgress();
 			return true;
 		}
 
@@ -106,8 +111,7 @@ namespace NexplantQMS.GdsMap
 			if (Structure != null)
 				foreach (var layer in Structure.Layers)
 					if (visibility.TryGetValue(layer.LayerID, out var visible)) layer.Visible = visible;
-			BuildGpuBuffers();
-			Invalidate();
+			InvalidateWithDrawProgress();
 		}
 
 		/// <summary>

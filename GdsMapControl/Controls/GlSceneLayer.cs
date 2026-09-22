@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace NexplantQMS.GdsMap
 {
+	/// <summary>Layer별 도형과 고정 VBO 구간을 보관하여 체크/색상 변경 시 전체 버퍼를 재구성하지 않는다.</summary>
 	internal class GlSceneLayer : IComparable<GlSceneLayer>
 	{
 		public GlSceneLayer(int layerID)
@@ -20,6 +21,9 @@ namespace NexplantQMS.GdsMap
 		public bool Visible { get; set; } = true;
 		public GlSceneItemList Items { get; set; } = new GlSceneItemList();
 		public GBox Bounds = GBox.Empty;
+		// 파일 조회 시 모든 Layer를 연속 구간으로 배치한다. 표시/색상 변경 중에는 이 위치를 유지한다.
+		public int VertexOffset { get; set; }
+		public int VertexCount { get; set; }
 
 		public int CompareTo(GlSceneLayer other)
 		{
