@@ -79,6 +79,7 @@ namespace NexplantQMS.GdsMap
 					case 0x0D: SetLayer(bytes); break;
 					case 0x0E: SetDataType(bytes); break;
 					case 0x0F: SetWidth(bytes); break;
+					case 0x21: if (el is GdsPath) ((GdsPath)el).PathType = (byte)I16(bytes); break; // PATHTYPE
 					case 0x10: SetXY(bytes, dataLength); break;
 					case 0x12: SetSName(bytes, dataLength); break;
 					case 0x13: SetColRow(bytes); break;

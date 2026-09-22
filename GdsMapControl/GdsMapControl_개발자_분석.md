@@ -1,5 +1,7 @@
 # GdsMapControl 개발자 분석서
 
+> 성능 개선 작업 순서와 완료 기준은 `GdsMapControl_성능개선_우선순위.md`를 참고한다.
+
 ## 1. 문서 목적
 
 이 문서는 `GdsMapControl` 프로젝트의 GDSII 파일 파싱과 OpenGL 도면 표시 구조를 개발자가 유지보수하거나 확장할 수 있도록 정리한 자료이다.

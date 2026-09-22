@@ -18,18 +18,14 @@ D:\Private\taihikim\source\repos\ACadSharp\ACadSharp\src\NexplantQMS.GdsMap\obj\
 D:\Private\taihikim\source\repos\ACadSharp\ACadSharp\src\NexplantQMS.GdsMap\bin\Debug\Oracle.ManagedDataAccess.dll
 D:\Private\taihikim\source\repos\ACadSharp\ACadSharp\src\NexplantQMS.GdsMap\obj\Debug\NexplantQMS.GdsMap.exe.config
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\GdsMapControl\obj\Debug\NexplantQMS.GdsMap.csproj.AssemblyReference.cache
-D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\GdsMapControl\obj\Debug\NexplantQMS.GdsMap.exe.config
-D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\GdsMapControl\obj\Debug\NexplantQMS.GdsMap.Form1.resources
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\GdsMapControl\obj\Debug\NexplantQMS.GdsMap.Properties.Resources.resources
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\GdsMapControl\obj\Debug\NexplantQMS.GdsMap.csproj.GenerateResource.cache
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\GdsMapControl\obj\Debug\NexplantQMS.GdsMap.csproj.CoreCompileInputs.cache
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\GdsMapControl\obj\Debug\NexplantQMS.GdsMap.exe
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\GdsMapControl\obj\Debug\NexplantQMS.GdsMap.pdb
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\GdsMapControl\bin\Debug\NexplantQMS.GdsMap.exe.config
-D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\GdsMapControl\bin\Debug\NexplantQMS.GdsMap.exe
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\GdsMapControl\bin\Debug\NexplantQMS.GdsMap.pdb
-D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\GdsMapControl\bin\Debug\OpenTK.pdb
-D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\GdsMapControl\bin\Debug\OpenTK.xml
-D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\GdsMapControl\bin\Debug\OpenTK.GLControl.pdb
-D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\GdsMapControl\bin\Debug\OpenTK.GLControl.xml
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\GdsMapControl\obj\Debug\Nexplant.673C19C3.Up2Date
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\GdsMapControl\bin\Debug\NexplantQMS.GdsMap.exe
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\GdsMapControl\obj\Debug\NexplantQMS.GdsMap.GdsMapTestForm.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\GdsMapControl\obj\Debug\NexplantQMS.GdsMap.exe.config
