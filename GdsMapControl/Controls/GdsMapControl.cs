@@ -31,11 +31,24 @@ namespace NexplantQMS.GdsMap
 	public sealed class GdsMapLoadMetrics : EventArgs
 	{
 		public double FlattenMs { get; internal set; }
+		public double CoordinateTransformMs { get; internal set; }
+		public double SceneItemCreateMs { get; internal set; }
 		public double SceneInsertMs { get; internal set; }
+		public double SrefLookupMs { get; internal set; }
+		public double SrefMatrixMs { get; internal set; }
+		public double SrefPathMs { get; internal set; }
+		public double TextRegisterMs { get; internal set; }
 		public double VertexBuildMs { get; internal set; }
 		public double GpuUploadMs { get; internal set; }
 		public double FirstDrawMs { get; internal set; }
 		public int SceneItemCount { get; internal set; }
+		public int BoundaryCount { get; internal set; }
+		public int PathCount { get; internal set; }
+		public int TextCount { get; internal set; }
+		public int SrefCount { get; internal set; }
+		public long SourcePointCount { get; internal set; }
+		public int ReusedPointArrayCount { get; internal set; }
+		public long ReusedPointCount { get; internal set; }
 		public int VertexCount { get; internal set; }
 	}
 
@@ -115,7 +128,13 @@ namespace NexplantQMS.GdsMap
 		private bool _firstFrameProgressPending;
 		private bool _loadFramePending;
 		private GdsMapLoadMetrics _loadMetrics;
+		private long _coordinateTransformTicks;
+		private long _sceneItemCreateTicks;
 		private long _sceneInsertTicks;
+		private long _srefLookupTicks;
+		private long _srefMatrixTicks;
+		private long _srefPathTicks;
+		private long _textRegisterTicks;
 
 		// GLSL Shaders
 		private const string VertexShaderCode = @"
@@ -269,7 +288,7 @@ namespace NexplantQMS.GdsMap
 		public void ShowStructure(GdsLibrary lib, string structureName)
 		{
 			_loadMetrics = new GdsMapLoadMetrics();
-			_sceneInsertTicks = 0;
+			ResetFlattenMeasurements();
 			_loadFramePending = false;
 			if (lib != null && lib.Structures.TryGetValue(structureName, out var str))
 			{
@@ -287,7 +306,7 @@ namespace NexplantQMS.GdsMap
 					FlattenStructure(lib, str, identity, new HashSet<string>(StringComparer.OrdinalIgnoreCase), 0, str.Name);
 				ApplyInitialLayerColors();
 				_loadMetrics.FlattenMs = ElapsedMilliseconds(flattenStart);
-				_loadMetrics.SceneInsertMs = _sceneInsertTicks * 1000.0 / Stopwatch.Frequency;
+				CompleteFlattenMeasurements();
 				CalculateTextLabelDisplayAreas();
 				// GDS TEXT에는 특정 도형 소유 관계가 없으므로 주변 도형 검색으로 표시 여부를 제한하지 않는다.
 			}
@@ -637,6 +656,7 @@ namespace NexplantQMS.GdsMap
 				return;
 
 			stack.Add(str.Name);
+			bool parentIsIdentity = parent.IsIdentity;
 
 			foreach (var layer in str.Layers)
 			{
@@ -644,30 +664,48 @@ namespace NexplantQMS.GdsMap
 				{
 					if (e is GdsBoundary boundary)
 					{
-						var pts = TransformGeometryPoints(boundary.Points, e.Transform, parent);
+						_loadMetrics.BoundaryCount++;
+						_loadMetrics.SourcePointCount += boundary.Points.Length;
+						var pts = TransformMeasuredGeometryPoints(boundary.Points, e.Transform, parent, parentIsIdentity);
 
 						if (pts.Length >= 2)
-							AddMeasuredSceneItem(new GlSceneItem(e, pts, true, 0));
+							AddMeasuredSceneItem(CreateMeasuredSceneItem(e, pts, true, 0));
 						else
 							_layerList.AddLayer(e.LayerID);
 					}
 					else if (e is GdsPath path)
 					{
-						var pts = TransformGeometryPoints(path.Points, e.Transform, parent);
+						_loadMetrics.PathCount++;
+						_loadMetrics.SourcePointCount += path.Points.Length;
+						var pts = TransformMeasuredGeometryPoints(path.Points, e.Transform, parent, parentIsIdentity);
 
 						if (pts.Length >= 1)
-							AddMeasuredSceneItem(new GlSceneItem(e, pts, false, Math.Abs(path.Width)));
+							AddMeasuredSceneItem(CreateMeasuredSceneItem(e, pts, false, Math.Abs(path.Width)));
 						else
 							_layerList.AddLayer(e.LayerID);
 					}
 					else if (e is GdsText text)
 					{
-						var pts = TransformTextPosition(text, parent);
-						AddMeasuredSceneItem(new GlSceneItem(e, pts, false, 0, text.Text));
+						_loadMetrics.TextCount++;
+						_loadMetrics.SourcePointCount++;
+						long transformStart = Stopwatch.GetTimestamp();
+						var pts = TransformTextPosition(text, parent, parentIsIdentity);
+						_coordinateTransformTicks += Stopwatch.GetTimestamp() - transformStart;
+						AddMeasuredSceneItem(CreateMeasuredSceneItem(e, pts, false, 0, text.Text));
+						long textStart = Stopwatch.GetTimestamp();
 						AddTextLabel(text, pts, structurePath);
+						_textRegisterTicks += Stopwatch.GetTimestamp() - textStart;
 					}
-					else if (e is GdsSRef sref && lib.Structures.TryGetValue(sref.StructureName, out var child))
+					else if (e is GdsSRef sref)
 					{
+						_loadMetrics.SrefCount++;
+						long lookupStart = Stopwatch.GetTimestamp();
+						bool found = lib.Structures.TryGetValue(sref.StructureName, out var child);
+						_srefLookupTicks += Stopwatch.GetTimestamp() - lookupStart;
+						if (!found)
+							continue;
+
+						long matrixStart = Stopwatch.GetTimestamp();
 						using (var local = GdsGeometry.CreateTransform(e.Transform))
 						using (var m = (System.Drawing.Drawing2D.Matrix)local.Clone())
 						{
@@ -675,7 +713,10 @@ namespace NexplantQMS.GdsMap
 							using (var combined = (System.Drawing.Drawing2D.Matrix)parent.Clone())
 							{
 								combined.Multiply(m, System.Drawing.Drawing2D.MatrixOrder.Append);
+								_srefMatrixTicks += Stopwatch.GetTimestamp() - matrixStart;
+								long pathStart = Stopwatch.GetTimestamp();
 								string childPath = structurePath + " > " + child.Name + " @ (" + sref.Origin.X + ", " + sref.Origin.Y + ")";
+								_srefPathTicks += Stopwatch.GetTimestamp() - pathStart;
 								FlattenStructure(lib, child, combined, stack, depth + 1, childPath);
 							}
 						}
@@ -686,7 +727,7 @@ namespace NexplantQMS.GdsMap
 			// defect
 			foreach (var defect in str.DefectList)
 			{
-				var pts = TransformPoints(defect.X, defect.Y, defect.Width, defect.Height, null, parent);
+				var pts = TransformPoints(defect.X, defect.Y, defect.Width, defect.Height, null, parent, parentIsIdentity);
 				_defectList.Add(new GlDefectItem(defect, pts));
 			}
 
@@ -698,6 +739,53 @@ namespace NexplantQMS.GdsMap
 		{
 			foreach (var layer in _layerList)
 				layer.Color = GetLayerColor(layer.LayerID);
+		}
+
+		/// <summary>새 도면을 열 때 Flatten 내부 구간별 누적 시간을 초기화한다.</summary>
+		private void ResetFlattenMeasurements()
+		{
+			_coordinateTransformTicks = 0;
+			_sceneItemCreateTicks = 0;
+			_sceneInsertTicks = 0;
+			_srefLookupTicks = 0;
+			_srefMatrixTicks = 0;
+			_srefPathTicks = 0;
+			_textRegisterTicks = 0;
+		}
+
+		/// <summary>Stopwatch 누적 Tick을 화면에서 비교할 수 있는 밀리초 값으로 확정한다.</summary>
+		private void CompleteFlattenMeasurements()
+		{
+			_loadMetrics.CoordinateTransformMs = TicksToMilliseconds(_coordinateTransformTicks);
+			_loadMetrics.SceneItemCreateMs = TicksToMilliseconds(_sceneItemCreateTicks);
+			_loadMetrics.SceneInsertMs = TicksToMilliseconds(_sceneInsertTicks);
+			_loadMetrics.SrefLookupMs = TicksToMilliseconds(_srefLookupTicks);
+			_loadMetrics.SrefMatrixMs = TicksToMilliseconds(_srefMatrixTicks);
+			_loadMetrics.SrefPathMs = TicksToMilliseconds(_srefPathTicks);
+			_loadMetrics.TextRegisterMs = TicksToMilliseconds(_textRegisterTicks);
+		}
+
+		/// <summary>좌표 변환 시간만 누적하여 배열 생성과 Matrix 적용 비용을 확인한다.</summary>
+		private GPoint[] TransformMeasuredGeometryPoints(GPoint[] points, GTransform transform, System.Drawing.Drawing2D.Matrix parent, bool parentIsIdentity)
+		{
+			long start = Stopwatch.GetTimestamp();
+			GPoint[] result = TransformGeometryPoints(points, transform, parent, parentIsIdentity);
+			_coordinateTransformTicks += Stopwatch.GetTimestamp() - start;
+			if (Object.ReferenceEquals(points, result))
+			{
+				_loadMetrics.ReusedPointArrayCount++;
+				_loadMetrics.ReusedPointCount += points.Length;
+			}
+			return result;
+		}
+
+		/// <summary>GlSceneItem 생성자 안의 Bounds 계산을 Layer 등록 시간과 분리하여 측정한다.</summary>
+		private GlSceneItem CreateMeasuredSceneItem(GdsElement source, GPoint[] points, bool closed, double width, string text = null)
+		{
+			long start = Stopwatch.GetTimestamp();
+			var item = new GlSceneItem(source, points, closed, width, text);
+			_sceneItemCreateTicks += Stopwatch.GetTimestamp() - start;
+			return item;
 		}
 
 		/// <summary>Flatten 내부에서 Layer 검색과 도형 등록이 차지하는 시간을 별도로 합산한다.</summary>
@@ -715,27 +803,33 @@ namespace NexplantQMS.GdsMap
 			return (Stopwatch.GetTimestamp() - start) * 1000.0 / Stopwatch.Frequency;
 		}
 
+		/// <summary>누적된 Stopwatch Tick을 밀리초로 변환한다.</summary>
+		private static double TicksToMilliseconds(long ticks)
+		{
+			return ticks * 1000.0 / Stopwatch.Frequency;
+		}
+
 		/// <summary>
 		/// GDS TEXT의 XY는 문자열 삽입점이므로 부모 구조의 배치 변환만 적용한다.
 		/// TEXT 자체 MAG/ANGLE/Mirror는 삽입점을 중심으로 글자 모양에 적용되는 값이므로 좌표에는 적용하지 않는다.
 		/// </summary>
-		private static GPoint[] TransformTextPosition(GdsText text, System.Drawing.Drawing2D.Matrix parent)
+		private static GPoint[] TransformTextPosition(GdsText text, System.Drawing.Drawing2D.Matrix parent, bool parentIsIdentity)
 		{
-			return TransformPoints(new GPoint[] { text.Position }, null, parent);
+			return TransformPoints(new GPoint[] { text.Position }, null, parent, parentIsIdentity);
 		}
 
 		/// <summary>회전/배율/반전이 없는 도형에는 동일한 좌표 결과를 내는 부모 변환만 적용한다.</summary>
-		private static GPoint[] TransformGeometryPoints(GPoint[] points, GTransform transform, System.Drawing.Drawing2D.Matrix parent)
+		private static GPoint[] TransformGeometryPoints(GPoint[] points, GTransform transform, System.Drawing.Drawing2D.Matrix parent, bool parentIsIdentity)
 		{
 			if (!transform.MirrorX && transform.Rotation == 0 && (transform.Magnification == 0 || transform.Magnification == 1))
-				return TransformPoints(points, null, parent);
+				return TransformPoints(points, null, parent, parentIsIdentity);
 
 			using (var local = GdsGeometry.CreateTransform(transform))
-				return TransformPoints(points, local, parent);
+				return TransformPoints(points, local, parent, parentIsIdentity);
 		}
 
 		/// <summary>결함 사각형의 네 꼭짓점을 만들어 일반 도형과 같은 좌표 변환을 적용한다.</summary>
-		private static GPoint[] TransformPoints(double x, double y, double width, double height, System.Drawing.Drawing2D.Matrix local, System.Drawing.Drawing2D.Matrix parent)
+		private static GPoint[] TransformPoints(double x, double y, double width, double height, System.Drawing.Drawing2D.Matrix local, System.Drawing.Drawing2D.Matrix parent, bool parentIsIdentity)
 		{
 			double w = 0.5 * width;
 			double h = 0.5 * height;
@@ -748,12 +842,16 @@ namespace NexplantQMS.GdsMap
 				new GPoint(x - w, y + h) // top left
 			};
 
-			return TransformPoints(points, local, parent);
+			return TransformPoints(points, local, parent, parentIsIdentity);
 		}
 
 		/// <summary>도형 자체 변환이 있을 때만 적용한 뒤 부모 구조의 배치 변환을 적용한다.</summary>
-		private static GPoint[] TransformPoints(GPoint[] src, System.Drawing.Drawing2D.Matrix local, System.Drawing.Drawing2D.Matrix parent)
+		private static GPoint[] TransformPoints(GPoint[] src, System.Drawing.Drawing2D.Matrix local, System.Drawing.Drawing2D.Matrix parent, bool parentIsIdentity)
 		{
+			// 파싱이 끝난 원본 좌표는 이후 수정하지 않는다. 변환이 없으면 배열 생성과 복사를 생략한다.
+			if (local == null && parentIsIdentity)
+				return src;
+
 			var a = new PointF[src.Length];
 
 			for (int i = 0; i < src.Length; i++)

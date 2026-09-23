@@ -36,26 +36,33 @@
             this.btnLoad = new System.Windows.Forms.Button();
             this.btnSave = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
-            this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.dataGrid = new System.Windows.Forms.DataGridView();
             this.btnLayer = new System.Windows.Forms.Button();
             this.btnLayerCheckNone = new System.Windows.Forms.Button();
             this.btnLayerCheckAll = new System.Windows.Forms.Button();
-            this.map = new NexplantQMS.GdsMap.GdsMapControl();
             this.statusStripMap = new System.Windows.Forms.StatusStrip();
             this.progressMapLoad = new System.Windows.Forms.ToolStripProgressBar();
             this.lblMapStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.lblMapCoordinate = new System.Windows.Forms.ToolStripStatusLabel();
             this.GDSContainer = new System.Windows.Forms.SplitContainer();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.TxtToolTip = new System.Windows.Forms.TextBox();
             this.chkLayerItems = new NexplantQMS.GdsMap.LayerColorCheckedListBox();
+            this.map = new NexplantQMS.GdsMap.GdsMapControl();
+            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
             this.panel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGrid)).BeginInit();
             this.statusStripMap.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.GDSContainer)).BeginInit();
             this.GDSContainer.Panel1.SuspendLayout();
             this.GDSContainer.Panel2.SuspendLayout();
             this.GDSContainer.SuspendLayout();
             this.panel2.SuspendLayout();
+            this.tabControl1.SuspendLayout();
+            this.tabPage1.SuspendLayout();
+            this.tabPage2.SuspendLayout();
             this.SuspendLayout();
             // 
             // panel1
@@ -67,7 +74,7 @@
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Margin = new System.Windows.Forms.Padding(4);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(1785, 60);
+            this.panel1.Size = new System.Drawing.Size(1521, 60);
             this.panel1.TabIndex = 2;
             // 
             // btnLoad
@@ -103,10 +110,10 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
-            // dataGridView1
+            // dataGrid
             // 
-            this.dataGridView1.AllowUserToAddRows = false;
-            this.dataGridView1.AllowUserToDeleteRows = false;
+            this.dataGrid.AllowUserToAddRows = false;
+            this.dataGrid.AllowUserToDeleteRows = false;
             dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Control;
             dataGridViewCellStyle4.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
@@ -114,8 +121,8 @@
             dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Highlight;
             dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
             dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle4;
-            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGrid.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle4;
+            this.dataGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Window;
             dataGridViewCellStyle5.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
@@ -123,12 +130,12 @@
             dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
             dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
             dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dataGridView1.DefaultCellStyle = dataGridViewCellStyle5;
-            this.dataGridView1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.dataGridView1.Location = new System.Drawing.Point(0, 870);
-            this.dataGridView1.Margin = new System.Windows.Forms.Padding(4);
-            this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.ReadOnly = true;
+            this.dataGrid.DefaultCellStyle = dataGridViewCellStyle5;
+            this.dataGrid.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dataGrid.Location = new System.Drawing.Point(3, 3);
+            this.dataGrid.Margin = new System.Windows.Forms.Padding(4);
+            this.dataGrid.Name = "dataGrid";
+            this.dataGrid.ReadOnly = true;
             dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Control;
             dataGridViewCellStyle6.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
@@ -136,11 +143,11 @@
             dataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.Highlight;
             dataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
             dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridView1.RowHeadersDefaultCellStyle = dataGridViewCellStyle6;
-            this.dataGridView1.RowHeadersWidth = 62;
-            this.dataGridView1.RowTemplate.Height = 23;
-            this.dataGridView1.Size = new System.Drawing.Size(1785, 240);
-            this.dataGridView1.TabIndex = 3;
+            this.dataGrid.RowHeadersDefaultCellStyle = dataGridViewCellStyle6;
+            this.dataGrid.RowHeadersWidth = 62;
+            this.dataGrid.RowTemplate.Height = 23;
+            this.dataGrid.Size = new System.Drawing.Size(1281, 718);
+            this.dataGrid.TabIndex = 3;
             // 
             // btnLayer
             // 
@@ -178,20 +185,6 @@
             this.btnLayerCheckAll.UseVisualStyleBackColor = true;
             this.btnLayerCheckAll.Click += new System.EventHandler(this.btnLayerCheckAll_Click);
             // 
-            // map
-            // 
-            this.map.BackColor = System.Drawing.Color.Black;
-            this.map.ColorAlpha = 50;
-            this.map.Cursor = System.Windows.Forms.Cursors.SizeAll;
-            this.map.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.map.Location = new System.Drawing.Point(0, 0);
-            this.map.Margin = new System.Windows.Forms.Padding(6, 4, 6, 4);
-            this.map.Mode = NexplantQMS.GdsMap.GdsMapControl.ViewMode.View;
-            this.map.Name = "map";
-            this.map.Size = new System.Drawing.Size(1549, 772);
-            this.map.TabIndex = 4;
-            this.map.VSync = false;
-            // 
             // statusStripMap
             // 
             this.statusStripMap.ImageScalingSize = new System.Drawing.Size(20, 20);
@@ -199,9 +192,9 @@
             this.progressMapLoad,
             this.lblMapStatus,
             this.lblMapCoordinate});
-            this.statusStripMap.Location = new System.Drawing.Point(0, 772);
+            this.statusStripMap.Location = new System.Drawing.Point(0, 756);
             this.statusStripMap.Name = "statusStripMap";
-            this.statusStripMap.Size = new System.Drawing.Size(1549, 36);
+            this.statusStripMap.Size = new System.Drawing.Size(1295, 36);
             this.statusStripMap.SizingGrip = false;
             this.statusStripMap.TabIndex = 0;
             // 
@@ -215,7 +208,7 @@
             // lblMapStatus
             // 
             this.lblMapStatus.Name = "lblMapStatus";
-            this.lblMapStatus.Size = new System.Drawing.Size(1422, 29);
+            this.lblMapStatus.Size = new System.Drawing.Size(1168, 29);
             this.lblMapStatus.Spring = true;
             this.lblMapStatus.Text = "대기";
             this.lblMapStatus.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -236,47 +229,101 @@
             // 
             // GDSContainer.Panel1
             // 
+            this.GDSContainer.Panel1.Controls.Add(this.chkLayerItems);
             this.GDSContainer.Panel1.Controls.Add(this.panel2);
             this.GDSContainer.Panel1MinSize = 220;
             // 
             // GDSContainer.Panel2
             // 
-            this.GDSContainer.Panel2.Controls.Add(this.map);
+            this.GDSContainer.Panel2.Controls.Add(this.tabControl1);
             this.GDSContainer.Panel2.Controls.Add(this.statusStripMap);
             this.GDSContainer.Panel2MinSize = 400;
-            this.GDSContainer.Size = new System.Drawing.Size(1785, 810);
-            this.GDSContainer.SplitterDistance = 230;
+            this.GDSContainer.Size = new System.Drawing.Size(1521, 794);
+            this.GDSContainer.SplitterDistance = 220;
             this.GDSContainer.TabIndex = 5;
             // 
             // panel2
             // 
+            this.panel2.Controls.Add(this.TxtToolTip);
             this.panel2.Controls.Add(this.btnLayerCheckAll);
             this.panel2.Controls.Add(this.btnLayer);
             this.panel2.Controls.Add(this.btnLayerCheckNone);
-            this.panel2.Controls.Add(this.chkLayerItems);
-            this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel2.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel2.Location = new System.Drawing.Point(0, 0);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(228, 808);
+            this.panel2.Size = new System.Drawing.Size(218, 199);
             this.panel2.TabIndex = 0;
+            // 
+            // TxtToolTip
+            // 
+            this.TxtToolTip.Location = new System.Drawing.Point(11, 133);
+            this.TxtToolTip.Name = "TxtToolTip";
+            this.TxtToolTip.Size = new System.Drawing.Size(194, 28);
+            this.TxtToolTip.TabIndex = 5;
             // 
             // chkLayerItems
             // 
             this.chkLayerItems.CheckOnClick = true;
-            this.chkLayerItems.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.chkLayerItems.Dock = System.Windows.Forms.DockStyle.Fill;
             this.chkLayerItems.FormattingEnabled = true;
-            this.chkLayerItems.Location = new System.Drawing.Point(0, 179);
+            this.chkLayerItems.Location = new System.Drawing.Point(0, 199);
             this.chkLayerItems.Name = "chkLayerItems";
-            this.chkLayerItems.Size = new System.Drawing.Size(228, 629);
+            this.chkLayerItems.Size = new System.Drawing.Size(218, 593);
             this.chkLayerItems.TabIndex = 4;
+            // 
+            // map
+            // 
+            this.map.BackColor = System.Drawing.Color.Black;
+            this.map.ColorAlpha = 50;
+            this.map.Cursor = System.Windows.Forms.Cursors.SizeAll;
+            this.map.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.map.Location = new System.Drawing.Point(3, 3);
+            this.map.Margin = new System.Windows.Forms.Padding(6, 4, 6, 4);
+            this.map.Mode = NexplantQMS.GdsMap.GdsMapControl.ViewMode.View;
+            this.map.Name = "map";
+            this.map.Size = new System.Drawing.Size(1281, 718);
+            this.map.TabIndex = 4;
+            this.map.VSync = false;
+            // 
+            // tabControl1
+            // 
+            this.tabControl1.Controls.Add(this.tabPage1);
+            this.tabControl1.Controls.Add(this.tabPage2);
+            this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tabControl1.Location = new System.Drawing.Point(0, 0);
+            this.tabControl1.Name = "tabControl1";
+            this.tabControl1.SelectedIndex = 0;
+            this.tabControl1.Size = new System.Drawing.Size(1295, 756);
+            this.tabControl1.TabIndex = 1;
+            // 
+            // tabPage1
+            // 
+            this.tabPage1.Controls.Add(this.map);
+            this.tabPage1.Location = new System.Drawing.Point(4, 28);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage1.Size = new System.Drawing.Size(1287, 724);
+            this.tabPage1.TabIndex = 0;
+            this.tabPage1.Text = "Map";
+            this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // tabPage2
+            // 
+            this.tabPage2.Controls.Add(this.dataGrid);
+            this.tabPage2.Location = new System.Drawing.Point(4, 28);
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage2.Size = new System.Drawing.Size(1287, 724);
+            this.tabPage2.TabIndex = 1;
+            this.tabPage2.Text = "Grid";
+            this.tabPage2.UseVisualStyleBackColor = true;
             // 
             // GdsMapTestForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1785, 1110);
+            this.ClientSize = new System.Drawing.Size(1521, 854);
             this.Controls.Add(this.GDSContainer);
-            this.Controls.Add(this.dataGridView1);
             this.Controls.Add(this.panel1);
             this.Margin = new System.Windows.Forms.Padding(4);
             this.MinimumSize = new System.Drawing.Size(900, 600);
@@ -285,7 +332,7 @@
             this.Text = "GDS Map Test";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.panel1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGrid)).EndInit();
             this.statusStripMap.ResumeLayout(false);
             this.statusStripMap.PerformLayout();
             this.GDSContainer.Panel1.ResumeLayout(false);
@@ -294,13 +341,17 @@
             ((System.ComponentModel.ISupportInitialize)(this.GDSContainer)).EndInit();
             this.GDSContainer.ResumeLayout(false);
             this.panel2.ResumeLayout(false);
+            this.panel2.PerformLayout();
+            this.tabControl1.ResumeLayout(false);
+            this.tabPage1.ResumeLayout(false);
+            this.tabPage2.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
 
 		#endregion
 		private System.Windows.Forms.Panel panel1;
-		private System.Windows.Forms.DataGridView dataGridView1;
+		private System.Windows.Forms.DataGridView dataGrid;
 		private System.Windows.Forms.Button button1;
 		private System.Windows.Forms.Button btnSave;
 		private NexplantQMS.GdsMap.GdsMapControl map;
@@ -315,6 +366,10 @@
         private System.Windows.Forms.SplitContainer GDSContainer;
         private System.Windows.Forms.Panel panel2;
         private NexplantQMS.GdsMap.LayerColorCheckedListBox chkLayerItems;
+        private System.Windows.Forms.TextBox TxtToolTip;
+        private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.TabPage tabPage2;
     }
 }
 

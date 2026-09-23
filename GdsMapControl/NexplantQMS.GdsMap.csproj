@@ -89,6 +89,7 @@
     <Compile Include="Gds\GdsGeometry.cs" />
     <Compile Include="Gds\GdsLayer.cs" />
     <Compile Include="Gds\GdsLibrary.cs" />
+    <Compile Include="Gds\GdsElementGridRow.cs" />
     <Compile Include="Gds\GdsReader.cs" />
     <Compile Include="Gds\GdsStructure.cs" />
     <Compile Include="Gds\GPoint.cs" />

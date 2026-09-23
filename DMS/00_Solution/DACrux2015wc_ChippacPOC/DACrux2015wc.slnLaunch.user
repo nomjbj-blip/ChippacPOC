@@ -1,0 +1,23 @@
+[
+  {
+    "Name": "새 프로필",
+    "Projects": [
+      {
+        "Path": "..\\..\\06_CoreLibSource\\DACrux.Framework.Service\\DACrux.Framework.Service.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "..\\..\\02_DMS\\DACrux.SEMDMS.Service\\DACrux.SEMDMS.Service.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "..\\..\\09_TEST\\DACrux.TEST.Service\\DACrux.TEST.Service.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "..\\..\\01_WinApp\\DACruxV5\\DACruxV5.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

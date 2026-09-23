@@ -65,7 +65,7 @@ namespace NexplantQMS.GdsMap
 				str.DefectList.Add(new Defect() { X = 1000, Y = 1500, Width = 30, Height = 20 });
 				SetMapStage("도면 구성 및 화면 반영 중", true);
 				map.ShowStructure(lib);
-				BindElementList(str);
+				BindElementList(lib);
 				RefreshLayerList();
 				EndMapLoad("완료 / Layer " + map.GetLayerDisplayItems().Count + "개 / " + _mapLoadWatch.Elapsed.TotalSeconds.ToString("0.0") + "초");
 			}
@@ -98,7 +98,7 @@ namespace NexplantQMS.GdsMap
 				lib.Structures.Add(str);
 				SetMapStage("DB 도면 구성 및 화면 반영 중", true);
 				map.ShowStructure(lib);
-				BindElementList(str);
+				BindElementList(lib);
 				RefreshLayerList();
 				EndMapLoad("완료 / " + elements.Count + "건 / " + _mapLoadWatch.Elapsed.TotalSeconds.ToString("0.0") + "초");
 			}
@@ -164,16 +164,43 @@ namespace NexplantQMS.GdsMap
 			btnLayerCheckNone.Enabled = chkLayerItems.Items.Count > 0;
 		}
 
-		/// <summary>도형 목록 바인딩은 파일/DB 조회 흐름에서 공통으로 사용한다.</summary>
-		private void BindElementList(GdsStructure str)
+		/// <summary>
+		/// GDS에 파싱된 모든 Structure와 Element를 상세 열로 표시한다.
+		/// 좌표 배열은 복사하지 않고 조회 전용 행이 원본 Element를 참조하여 대용량 메모리 증가를 줄인다.
+		/// </summary>
+		private void BindElementList(GdsLibrary lib)
 		{
-			dataGridView1.DataSource = str.Layers.SelectMany(s => s.Elements).Select(element => new
+			int elementCount = lib.Structures.Sum(structure =>
+				structure.Layers.Sum(layer => layer.Elements.Count) + structure.Layers.DuplicatedItems.Count);
+			var rows = new List<GdsElementGridRow>(elementCount);
+			int gridNumber = 1;
+			foreach (var structure in lib.Structures)
 			{
-				element.LayerID,
-				element.ElementName,
-				element.Bounds,
-				etc = element is GdsText ? ((GdsText)element).Text : element is GdsPath ? ((GdsPath)element).Width.ToString() : String.Empty
-			}).ToList();
+				foreach (var layer in structure.Layers)
+				{
+					foreach (var element in layer.Elements)
+						rows.Add(new GdsElementGridRow(lib, structure, gridNumber++, element, false));
+				}
+
+				// 파서가 동일 키로 판단해 도면 목록에서 제외한 Element도 원본 확인을 위해 별도 행으로 표시한다.
+				foreach (var duplicate in structure.Layers.DuplicatedItems)
+					rows.Add(new GdsElementGridRow(lib, structure, gridNumber++, duplicate, true));
+			}
+
+			dataGrid.DataSource = rows;
+			ConfigureElementGridColumns();
+		}
+
+		/// <summary>상세 열이 많아도 좌표와 TEXT를 확인하기 쉽도록 주요 열의 기본 폭과 숫자 형식을 설정한다.</summary>
+		private void ConfigureElementGridColumns()
+		{
+			dataGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
+			foreach (DataGridViewColumn column in dataGrid.Columns)
+			{
+				column.Width = column.Name == "Text" ? 220 : column.Name == "StructureName" || column.Name == "ReferenceStructure" ? 150 : 95;
+				if (column.ValueType == typeof(double) || column.ValueType == typeof(double?))
+					column.DefaultCellStyle.Format = "0.#####";
+			}
 		}
 
 		/// <summary>도면 구성과 GPU 처리 단계의 진행 상태를 StatusStrip에 표시한다.</summary>
@@ -199,8 +226,28 @@ namespace NexplantQMS.GdsMap
 			_lastLoadMetrics = metrics;
 			if (_mapLoadSucceeded)
 				lblMapStatus.Text = FormatLoadMetrics(metrics);
-			lblMapStatus.ToolTipText = "Flatten " + metrics.FlattenMs.ToString("0") + "ms (도형 등록 " + metrics.SceneInsertMs.ToString("0") + "ms) / 정점 생성 " + metrics.VertexBuildMs.ToString("0") + "ms / GPU 업로드 " + metrics.GpuUploadMs.ToString("0") + "ms / Draw " + metrics.FirstDrawMs.ToString("0") + "ms / 도형 " + metrics.SceneItemCount.ToString("N0") + "개 / 정점 " + metrics.VertexCount.ToString("N0") + "개";
-		}
+			lblMapStatus.ToolTipText = "Flatten " + metrics.FlattenMs.ToString("0") + "ms"
+				+ " / 좌표 변환 " + metrics.CoordinateTransformMs.ToString("0") + "ms"
+				+ " / Item 생성 및 Bounds " + metrics.SceneItemCreateMs.ToString("0") + "ms"
+				+ " / Layer 등록 " + metrics.SceneInsertMs.ToString("0") + "ms"
+				+ " / SREF 조회 " + metrics.SrefLookupMs.ToString("0") + "ms"
+				+ " / SREF 행렬 " + metrics.SrefMatrixMs.ToString("0") + "ms"
+				+ " / SREF 경로 " + metrics.SrefPathMs.ToString("0") + "ms"
+				+ " / TEXT 등록 " + metrics.TextRegisterMs.ToString("0") + "ms"
+				+ " / 정점 생성 " + metrics.VertexBuildMs.ToString("0") + "ms"
+				+ " / GPU 업로드 " + metrics.GpuUploadMs.ToString("0") + "ms"
+				+ " / Draw " + metrics.FirstDrawMs.ToString("0") + "ms"
+				+ " / BOUNDARY " + metrics.BoundaryCount.ToString("N0")
+				+ " / PATH " + metrics.PathCount.ToString("N0")
+				+ " / TEXT " + metrics.TextCount.ToString("N0")
+				+ " / SREF " + metrics.SrefCount.ToString("N0")
+				+ " / 원본 좌표 " + metrics.SourcePointCount.ToString("N0")
+				+ " / 배열 재사용 " + metrics.ReusedPointArrayCount.ToString("N0") + "개"
+				+ " / 재사용 좌표 " + metrics.ReusedPointCount.ToString("N0") + "개"
+				+ " / 도형 " + metrics.SceneItemCount.ToString("N0") + "개"
+				+ " / 정점 " + metrics.VertexCount.ToString("N0") + "개";
+			TxtToolTip.Text = lblMapStatus.ToolTipText;
+        }
 
 		/// <summary>병목 비교에 필요한 시간만 짧게 표시하고 처리량은 마우스를 올리면 확인하게 한다.</summary>
 		private string FormatLoadMetrics(GdsMapLoadMetrics metrics)
