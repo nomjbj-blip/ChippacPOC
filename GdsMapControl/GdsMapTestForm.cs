@@ -23,9 +23,10 @@ namespace NexplantQMS.GdsMap
 		private bool _mapLoadSucceeded;
 		private int _lastCoordinateUpdateTick;
 		private bool _updatingLayerChecks;
-        public GdsMapTestForm()
+		public GdsMapTestForm()
         {
 			InitializeComponent();
+			InitializeChainSetupPanel();
 			statusStripMap.ShowItemToolTips = true;
 			map.RenderProgressChanged += Map_RenderProgressChanged;
 			map.FirstFrameMeasured += Map_FirstFrameMeasured;
@@ -162,6 +163,7 @@ namespace NexplantQMS.GdsMap
 			btnLayer.Enabled = chkLayerItems.Items.Count > 0;
 			btnLayerCheckAll.Enabled = chkLayerItems.Items.Count > 0;
 			btnLayerCheckNone.Enabled = chkLayerItems.Items.Count > 0;
+			ResetChainSetupAfterMapLoad(_mapLoadSucceeded);
 		}
 
 		/// <summary>
@@ -330,6 +332,7 @@ namespace NexplantQMS.GdsMap
 					? newState == CheckState.Checked : chkLayerItems.GetItemChecked(i);
 			}
 			map.SetLayerVisibility(visibility);
+			InvalidateChainTraceResult();
 		}
 
 		/// <summary>파일/DB 로드 후 실제 렌더링 레이어에서 목록과 색상 견본을 다시 만든다.</summary>

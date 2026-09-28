@@ -59,7 +59,22 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Chain\ChainCandidateTracer.cs" />
+    <Compile Include="Chain\ChainElementCandidateForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Chain\ChainGeometryOverlap.cs" />
+    <Compile Include="Chain\ChainLayerRuleEditorForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Chain\ChainTraceModels.cs" />
     <Compile Include="Controls\GdsMapControl.cs" />
+    <Compile Include="Controls\GdsMapControl_Chain.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\GdsMapControl_ChainOverlay.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="Controls\GdsMapControl_Layer.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -80,6 +95,13 @@
     <Compile Include="Elements\GdsSRef.cs" />
     <Compile Include="Elements\GdsText.cs" />
     <Compile Include="GdsMapTestForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GdsMapTestForm_Chain.cs">
+      <DependentUpon>GdsMapTestForm.cs</DependentUpon>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GdsMapTestForm_ChainEdit.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="GdsMapTestForm.Designer.cs">

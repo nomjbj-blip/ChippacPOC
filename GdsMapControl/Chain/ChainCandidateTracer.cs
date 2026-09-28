@@ -5,59 +5,87 @@ using System.Linq;
 namespace NexplantQMS.GdsMap.Chain
 {
     /// <summary>
-    /// Input Element에서 시작하여 Device별 Layer 연결 규칙에 맞는 Element를 탐색하고 Output까지의 후보 경로를 찾는다.
-    /// 현재 단계는 Bounding Box 접촉을 사용하므로 결과를 자동 확정하지 않고 엔지니어 검토 대상으로 반환한다.
+    /// 모든 Input Element에서 시작하여 선택 Layer의 실제 도형 접촉 관계를 따라 어느 Output까지 탐색한다.
+    /// Layer 규칙은 요청에 따라 추가 적용하고 결과는 엔지니어 검토 대상으로 반환한다.
     /// </summary>
     public sealed class ChainCandidateTracer
     {
         /// <summary>
-        /// 작업 영역 안의 Element를 공간 격자로 색인한 뒤 BFS로 Input에서 Output까지 가장 짧은 후보 경로를 찾는다.
+        /// 선택 Layer의 Element를 공간 격자로 색인한 뒤 다중 시작점 BFS로 가장 먼저 닿는 후보 경로를 찾는다.
         /// 공간 격자는 전체 Element를 매번 비교하지 않도록 주변 Element만 연결 후보로 조회하는 역할을 한다.
         /// </summary>
         public ChainTraceResult Trace(ChainTraceRequest request)
         {
             if (request == null)
                 throw new ArgumentNullException(nameof(request));
-            if (string.IsNullOrWhiteSpace(request.InputElementKey))
-                throw new ArgumentException("Input ElementKey가 필요합니다.", nameof(request));
-            if (string.IsNullOrWhiteSpace(request.OutputElementKey))
-                throw new ArgumentException("Output ElementKey가 필요합니다.", nameof(request));
+            if (request.InputElementKeys.Count == 0 || request.InputElementKeys.Any(string.IsNullOrWhiteSpace))
+                throw new ArgumentException("Input ElementKey가 한 개 이상 필요합니다.", nameof(request));
+            if (request.OutputElementKeys.Count == 0 || request.OutputElementKeys.Any(string.IsNullOrWhiteSpace))
+                throw new ArgumentException("Output ElementKey가 한 개 이상 필요합니다.", nameof(request));
+            if (request.InputElementKeys.Intersect(request.OutputElementKeys, StringComparer.Ordinal).Any())
+                throw new ArgumentException("같은 Element를 Input과 Output에 함께 지정할 수 없습니다.", nameof(request));
             if (request.SpatialCellSize <= 0)
                 throw new ArgumentOutOfRangeException(nameof(request), "SpatialCellSize는 0보다 커야 합니다.");
 
             List<ChainTraceElement> elements = request.Elements
+                .Where(element => request.SelectedLayerIds == null || request.SelectedLayerIds.Contains(element.LayerId))
                 .Where(element => !request.WorkArea.HasValue || request.WorkArea.Value.IntersectsWith(element.Bounds))
                 .ToList();
             Dictionary<string, ChainTraceElement> elementsByKey = BuildElementDictionary(elements);
 
-            if (!elementsByKey.TryGetValue(request.InputElementKey, out ChainTraceElement input))
-                return Failed("작업 영역에서 Input Element를 찾을 수 없습니다.");
-            if (!elementsByKey.TryGetValue(request.OutputElementKey, out ChainTraceElement output))
-                return Failed("작업 영역에서 Output Element를 찾을 수 없습니다.");
+            if (request.InputElementKeys.Any(key => !elementsByKey.ContainsKey(key)))
+                return Failed("선택한 Layer에서 Input Element 일부를 찾을 수 없습니다.");
+            if (request.OutputElementKeys.Any(key => !elementsByKey.ContainsKey(key)))
+                return Failed("선택한 Layer에서 Output Element 일부를 찾을 수 없습니다.");
+
+            var inputs = request.InputElementKeys.Distinct(StringComparer.Ordinal)
+                .Select(key => elementsByKey[key]).ToList();
+            var outputs = new HashSet<string>(request.OutputElementKeys, StringComparer.Ordinal);
+            var endpoints = inputs.Concat(request.OutputElementKeys.Select(key => elementsByKey[key]))
+                .GroupBy(element => element.ElementKey, StringComparer.Ordinal)
+                .Select(group => group.First()).ToList();
 
             List<ChainLayerConnectionRule> rules = request.LayerRules.ToList();
-            if (rules.Count == 0)
-                return Failed("Layer 연결 규칙이 없습니다.");
+            if (request.ApplyLayerRules && rules.Count == 0)
+                return Failed("Layer 연결 규칙이 없습니다.", endpoints);
 
-            double maximumTolerance = rules.Max(rule => rule.Tolerance);
+            // 실제 형상이 있으면 허용 오차와 무관하게 겹치는 도형만 연결하므로 격자를 넓혀 조회하지 않는다.
+            double maximumTolerance = elements.All(element => element.WorldPoints != null)
+                ? 0 : request.ApplyLayerRules ? rules.Max(rule => rule.Tolerance) : 0;
             var spatialIndex = new ChainSpatialIndex(elements, request.SpatialCellSize, maximumTolerance);
             var queue = new Queue<ChainTraceElement>();
             var visitedKeys = new HashSet<string>(StringComparer.Ordinal);
             var parents = new Dictionary<string, string>(StringComparer.Ordinal);
             var visitedElements = new List<ChainTraceElement>();
 
-            queue.Enqueue(input);
-            visitedKeys.Add(input.ElementKey);
+            foreach (ChainTraceElement input in inputs)
+            {
+                queue.Enqueue(input);
+                visitedKeys.Add(input.ElementKey);
+            }
 
             while (queue.Count > 0)
             {
                 ChainTraceElement current = queue.Dequeue();
                 visitedElements.Add(current);
 
-                if (current.ElementKey == output.ElementKey)
+                if (outputs.Contains(current.ElementKey))
                 {
-                    IList<ChainTraceElement> path = BuildPath(input, output, parents, elementsByKey);
-                    return new ChainTraceResult(true, path, visitedElements, "Input에서 Output까지 후보 경로를 찾았습니다.");
+                    IList<ChainTraceElement> path = BuildPath(current, parents, elementsByKey);
+                    List<ChainTraceElement> overlapping;
+                    List<ChainTraceElement> branches;
+                    CollectDirectOverlaps(path, endpoints, spatialIndex, rules, request.ApplyLayerRules,
+                        out overlapping, out branches);
+                    return new ChainTraceResult(
+                        true,
+                        path,
+                        visitedElements,
+                        "선택한 Input 중 하나에서 Output 중 하나까지 후보 경로를 찾았습니다.",
+                        path[0].LayerId,
+                        current.LayerId,
+                        overlapping,
+                        branches,
+                        endpoints);
                 }
 
                 foreach (ChainTraceElement candidate in spatialIndex.FindNearby(current.Bounds))
@@ -65,8 +93,7 @@ namespace NexplantQMS.GdsMap.Chain
                     if (candidate.ElementKey == current.ElementKey || visitedKeys.Contains(candidate.ElementKey))
                         continue;
 
-                    ChainLayerConnectionRule rule = FindRule(rules, current.LayerId, candidate.LayerId);
-                    if (rule == null || !AreBoundsConnected(current.Bounds, candidate.Bounds, rule.Tolerance))
+                    if (!AreElementsConnected(current, candidate, rules, request.ApplyLayerRules))
                         continue;
 
                     visitedKeys.Add(candidate.ElementKey);
@@ -79,7 +106,125 @@ namespace NexplantQMS.GdsMap.Chain
                 false,
                 new List<ChainTraceElement>(),
                 visitedElements,
-                "Input과 연결된 후보는 찾았지만 Output까지 도달하지 못했습니다.");
+                "선택한 모든 Input에서 탐색했지만 어느 Output에도 도달하지 못했습니다.",
+                inputs.Count == 1 ? (int?)inputs[0].LayerId : null,
+                request.OutputElementKeys.Count == 1
+                    ? (int?)elementsByKey[request.OutputElementKeys[0]].LayerId : null,
+                null,
+                null,
+                endpoints);
+        }
+
+        /// <summary>
+        /// 수동 추가/제외를 적용한 최종 후보만 공간 색인에 넣고 첫 Input에서 탐색을 끝까지 진행한다.
+        /// 첫 Output에서 멈추는 후보 탐색과 달리 모든 지정 단자와 후보의 단절을 찾아낸다.
+        /// </summary>
+        public ChainConnectivityResult CheckSelectionConnectivity(ChainTraceRequest request)
+        {
+            if (request == null)
+                throw new ArgumentNullException(nameof(request));
+            if (request.SpatialCellSize <= 0)
+                throw new ArgumentOutOfRangeException(nameof(request), "SpatialCellSize는 0보다 커야 합니다.");
+
+            List<ChainTraceElement> elements = request.Elements
+                .Where(element => request.SelectedLayerIds == null || request.SelectedLayerIds.Contains(element.LayerId))
+                .ToList();
+            Dictionary<string, ChainTraceElement> byKey = BuildElementDictionary(elements);
+            if (request.InputElementKeys.Count == 0 || request.OutputElementKeys.Count == 0
+                || request.InputElementKeys.Any(key => !byKey.ContainsKey(key))
+                || request.OutputElementKeys.Any(key => !byKey.ContainsKey(key)))
+                throw new ArgumentException("최종 후보에 지정한 Input/Output이 모두 있어야 합니다.", nameof(request));
+
+            List<ChainLayerConnectionRule> rules = request.LayerRules.ToList();
+            if (request.ApplyLayerRules && rules.Count == 0)
+                throw new ArgumentException("적용할 Layer 규칙이 없습니다.", nameof(request));
+            double maximumTolerance = elements.All(element => element.WorldPoints != null)
+                ? 0 : request.ApplyLayerRules ? rules.Max(rule => rule.Tolerance) : 0;
+            var index = new ChainSpatialIndex(elements, request.SpatialCellSize, maximumTolerance);
+            var queue = new Queue<ChainTraceElement>();
+            var reached = new HashSet<string>(StringComparer.Ordinal);
+            ChainTraceElement start = byKey[request.InputElementKeys[0]];
+            queue.Enqueue(start);
+            reached.Add(start.ElementKey);
+
+            while (queue.Count > 0)
+            {
+                ChainTraceElement current = queue.Dequeue();
+                foreach (ChainTraceElement next in index.FindNearby(current.Bounds))
+                {
+                    if (reached.Contains(next.ElementKey)
+                        || !AreElementsConnected(current, next, rules, request.ApplyLayerRules))
+                        continue;
+                    reached.Add(next.ElementKey);
+                    queue.Enqueue(next);
+                }
+            }
+
+            List<string> disconnected = elements.Select(element => element.ElementKey)
+                .Where(key => !reached.Contains(key)).ToList();
+            int reachedOutputs = request.OutputElementKeys.Count(key => reached.Contains(key));
+            return new ChainConnectivityResult(disconnected, reachedOutputs, request.OutputElementKeys.Count);
+        }
+
+        /// <summary>
+        /// 기본 경로와 모든 지정 단자에 한 단계로 직접 닿는 Element를 중복 없이 모은다.
+        /// 그중 경로 밖으로 한 번 더 이어지는 항목만 분기 후보로 표시하며 자동 확장은 하지 않는다.
+        /// </summary>
+        private static void CollectDirectOverlaps(
+            IEnumerable<ChainTraceElement> path,
+            IEnumerable<ChainTraceElement> endpoints,
+            ChainSpatialIndex spatialIndex,
+            IList<ChainLayerConnectionRule> rules,
+            bool applyLayerRules,
+            out List<ChainTraceElement> overlapping,
+            out List<ChainTraceElement> branches)
+        {
+            var anchors = path.Concat(endpoints)
+                .GroupBy(element => element.ElementKey, StringComparer.Ordinal)
+                .Select(group => group.First()).ToList();
+            var anchorKeys = new HashSet<string>(anchors.Select(element => element.ElementKey),
+                StringComparer.Ordinal);
+            var overlapKeys = new HashSet<string>(StringComparer.Ordinal);
+            overlapping = new List<ChainTraceElement>();
+
+            foreach (ChainTraceElement anchor in anchors)
+                foreach (ChainTraceElement candidate in spatialIndex.FindNearby(anchor.Bounds))
+                {
+                    if (anchorKeys.Contains(candidate.ElementKey)
+                        || !overlapKeys.Add(candidate.ElementKey))
+                        continue;
+                    if (AreElementsConnected(anchor, candidate, rules, false))
+                        overlapping.Add(candidate);
+                    else
+                        overlapKeys.Remove(candidate.ElementKey);
+                }
+
+            branches = new List<ChainTraceElement>();
+            foreach (ChainTraceElement overlap in overlapping)
+                foreach (ChainTraceElement next in spatialIndex.FindNearby(overlap.Bounds))
+                {
+                    if (next.ElementKey == overlap.ElementKey
+                        || anchorKeys.Contains(next.ElementKey)
+                        || !AreElementsConnected(overlap, next, rules, applyLayerRules))
+                        continue;
+                    branches.Add(overlap);
+                    break;
+                }
+        }
+
+        /// <summary>Layer 규칙이 켜진 경우 조합을 확인하고 Bounds와 실제 형상의 접촉을 검사한다.</summary>
+        private static bool AreElementsConnected(ChainTraceElement first,
+            ChainTraceElement second, IList<ChainLayerConnectionRule> rules, bool applyLayerRules)
+        {
+            ChainLayerConnectionRule rule = applyLayerRules
+                ? FindRule(rules, first.LayerId, second.LayerId) : null;
+            if (applyLayerRules && rule == null)
+                return false;
+            double tolerance = rule == null ? 0 : rule.Tolerance;
+            if (!AreBoundsConnected(first.Bounds, second.Bounds, tolerance))
+                return false;
+            return first.WorldPoints == null || second.WorldPoints == null
+                || ChainGeometryOverlap.Intersects(first, second);
         }
 
         /// <summary>
@@ -109,8 +254,8 @@ namespace NexplantQMS.GdsMap.Chain
         }
 
         /// <summary>
-        /// 두 Bounding Box의 X/Y 간격이 모두 허용 오차 이내인지 확인한다.
-        /// Polygon 정밀 접촉 판정이 추가되기 전까지 후보를 빠르게 좁히는 1차 조건으로 사용한다.
+        /// Bounding Box의 X/Y 간격으로 주변 후보를 먼저 걸러낸다.
+        /// 실제 형상이 있으면 이후 ChainGeometryOverlap으로 접촉을 별도 확인한다.
         /// </summary>
         private static bool AreBoundsConnected(GBox first, GBox second, double tolerance)
         {
@@ -132,10 +277,9 @@ namespace NexplantQMS.GdsMap.Chain
         }
 
         /// <summary>
-        /// BFS가 기록한 부모 Element를 Output부터 Input까지 역추적하여 화면 표시 순서의 경로로 만든다.
+        /// BFS가 기록한 부모를 Output부터 역추적하고 부모가 없는 시작 Input에서 멈춘다.
         /// </summary>
         private static IList<ChainTraceElement> BuildPath(
-            ChainTraceElement input,
             ChainTraceElement output,
             IDictionary<string, string> parents,
             IDictionary<string, ChainTraceElement> elementsByKey)
@@ -146,9 +290,9 @@ namespace NexplantQMS.GdsMap.Chain
             while (true)
             {
                 path.Add(elementsByKey[currentKey]);
-                if (currentKey == input.ElementKey)
+                if (!parents.TryGetValue(currentKey, out string parentKey))
                     break;
-                currentKey = parents[currentKey];
+                currentKey = parentKey;
             }
 
             path.Reverse();
@@ -158,13 +302,15 @@ namespace NexplantQMS.GdsMap.Chain
         /// <summary>
         /// 입력 검증 단계에서 경로 탐색을 시작할 수 없을 때 일관된 실패 결과를 만든다.
         /// </summary>
-        private static ChainTraceResult Failed(string message)
+        private static ChainTraceResult Failed(string message,
+            IList<ChainTraceElement> endpointElements = null)
         {
             return new ChainTraceResult(
                 false,
                 new List<ChainTraceElement>(),
                 new List<ChainTraceElement>(),
-                message);
+                message,
+                endpointElements: endpointElements);
         }
 
         /// <summary>
@@ -173,8 +319,11 @@ namespace NexplantQMS.GdsMap.Chain
         /// </summary>
         private sealed class ChainSpatialIndex
         {
+            private const long MaximumCellsPerItem = 4096;
             private readonly Dictionary<CellKey, List<ChainTraceElement>> _cells =
                 new Dictionary<CellKey, List<ChainTraceElement>>();
+            private readonly List<ChainTraceElement> _largeItems = new List<ChainTraceElement>();
+            private readonly List<ChainTraceElement> _allItems = new List<ChainTraceElement>();
             private readonly double _cellSize;
             private readonly double _maximumTolerance;
 
@@ -187,7 +336,10 @@ namespace NexplantQMS.GdsMap.Chain
                 _maximumTolerance = maximumTolerance;
 
                 foreach (ChainTraceElement element in elements)
+                {
+                    _allItems.Add(element);
                     Add(element);
+                }
             }
 
             /// <summary>
@@ -195,6 +347,11 @@ namespace NexplantQMS.GdsMap.Chain
             /// </summary>
             private void Add(ChainTraceElement element)
             {
+                if (ExceedsCellLimit(element.Bounds))
+                {
+                    _largeItems.Add(element);
+                    return;
+                }
                 VisitCells(element.Bounds, cellKey =>
                 {
                     if (!_cells.TryGetValue(cellKey, out List<ChainTraceElement> items))
@@ -219,6 +376,14 @@ namespace NexplantQMS.GdsMap.Chain
                 var foundKeys = new HashSet<string>(StringComparer.Ordinal);
                 var result = new List<ChainTraceElement>();
 
+                // 넓은 현재 도형은 전체와 비교하고, 일반 도형은 격자와 넓은 도형만 검사한다.
+                if (ExceedsCellLimit(expanded))
+                    return _allItems;
+
+                foreach (ChainTraceElement largeItem in _largeItems)
+                    if (foundKeys.Add(largeItem.ElementKey))
+                        result.Add(largeItem);
+
                 VisitCells(expanded, cellKey =>
                 {
                     if (!_cells.TryGetValue(cellKey, out List<ChainTraceElement> items))
@@ -232,6 +397,14 @@ namespace NexplantQMS.GdsMap.Chain
                 });
 
                 return result;
+            }
+
+            /// <summary>큰 도형 하나가 수백만 Cell을 만드는 것을 막기 위해 등록 방식을 분기한다.</summary>
+            private bool ExceedsCellLimit(GBox bounds)
+            {
+                double widthCells = Math.Floor(bounds.MaxX / _cellSize) - Math.Floor(bounds.MinX / _cellSize) + 1;
+                double heightCells = Math.Floor(bounds.MaxY / _cellSize) - Math.Floor(bounds.MinY / _cellSize) + 1;
+                return widthCells * heightCells > MaximumCellsPerItem;
             }
 
             /// <summary>

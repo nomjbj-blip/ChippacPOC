@@ -114,6 +114,7 @@ namespace NexplantQMS.GdsMap
 		private ViewMode _mode = ViewMode.View;
 
 		private ContextMenuStrip _contextMenu;
+		private bool _showOriginCross = true;
 
 		// OpenGL Resources
 		private int _vao;
@@ -188,6 +189,22 @@ namespace NexplantQMS.GdsMap
 
 		public double ZoomFactor => _scale;
 
+		/// <summary>
+		/// 월드 좌표 원점인 (0, 0)에 십자가를 표시할지 결정한다.
+		/// 값이 바뀌면 현재 Zoom과 Offset을 사용해 화면 위치를 다시 계산하도록 다시 그린다.
+		/// </summary>
+		[DefaultValue(true)]
+		public bool ShowOriginCross
+		{
+			get => _showOriginCross;
+			set
+			{
+				if (_showOriginCross == value) return;
+				_showOriginCross = value;
+				Invalidate();
+			}
+		}
+
 		public IEnumerable<GdsElement> GetSelectedElements()
 		{
 			return _selectedItems.Select(a => a.Source);
@@ -198,11 +215,17 @@ namespace NexplantQMS.GdsMap
 			_contextMenu = new ContextMenuStrip();
 			var viewModeItem = new ToolStripMenuItem("보기 모드 (View)", null, (s, e) => Mode = ViewMode.View);
 			var selectModeItem = new ToolStripMenuItem("선택 모드 (Select)", null, (s, e) => Mode = ViewMode.Select);
+			var originCrossItem = new ToolStripMenuItem("원점 십자가 표시")
+			{
+				CheckOnClick = true
+			};
+			originCrossItem.CheckedChanged += (s, e) => ShowOriginCross = originCrossItem.Checked;
 
 			_contextMenu.Items.Add(viewModeItem);
 			_contextMenu.Items.Add(selectModeItem);
 			_contextMenu.Items.Add(new ToolStripSeparator());
 			_contextMenu.Items.Add(new ToolStripMenuItem("전체 보기 (Zoom to Fit)", null, (s, e) => ZoomToFit()));
+			_contextMenu.Items.Add(originCrossItem);
 			_contextMenu.Items.Add(new ToolStripMenuItem("선택 해제 (Clear Selection)", null, (s, e) =>
 			{
 				var changedItems = _selectedItems.ToArray();
@@ -216,6 +239,7 @@ namespace NexplantQMS.GdsMap
 			{
 				viewModeItem.Checked = _mode == ViewMode.View;
 				selectModeItem.Checked = _mode == ViewMode.Select;
+				originCrossItem.Checked = ShowOriginCross;
 			};
 			ContextMenuStrip = _contextMenu;
 		}
@@ -933,6 +957,9 @@ namespace NexplantQMS.GdsMap
 					}
 				}
 
+				// 뒤에 그린 Layer가 이미 선택된 Chain 객체를 덮지 않도록 선택 객체를 마지막에 다시 그린다.
+				DrawSelectedItemsOnTop();
+
 				foreach (var item in _defectList)
 				{
 					if (item.FillVertexCount > 0)
@@ -948,6 +975,8 @@ namespace NexplantQMS.GdsMap
 
 			SwapBuffers();
 			DrawTextLabels();
+			DrawOriginCross();
+			DrawChainSetupOverlay();
 			if (reportFirstFrame)
 			{
 				_firstFrameProgressPending = false;
@@ -979,6 +1008,50 @@ namespace NexplantQMS.GdsMap
 					using (var pen = new Pen(Color.DodgerBlue, 1f) { DashStyle = DashStyle.Dash })
 						g.DrawRectangle(pen, Rectangle.Round(rect));
 				}
+			}
+		}
+
+		/// <summary>
+		/// 모든 GDS Layer를 그린 뒤 보이는 선택 Element만 다시 그려 선택 색상이 뒤쪽 Layer에 가리지 않게 한다.
+		/// 선택 항목의 기존 GPU 정점을 재사용하므로 후보 계산과 Element 수는 바꾸지 않는다.
+		/// </summary>
+		private void DrawSelectedItemsOnTop()
+		{
+			if (_selectedItems.Count == 0)
+				return;
+
+			var visibleLayers = new HashSet<int>(_layerList.Where(layer => layer.Visible)
+				.Select(layer => layer.LayerID));
+			foreach (var item in _selectedItems)
+			{
+				if (!visibleLayers.Contains(item.LayerID))
+					continue;
+				if (item.FillVertexCount > 0)
+					GL.DrawArrays(PrimitiveType.Triangles, item.FillVertexOffset, item.FillVertexCount);
+				if (item.LineVertexCount > 0)
+					GL.DrawArrays(PrimitiveType.Lines, item.LineVertexOffset, item.LineVertexCount);
+			}
+		}
+
+		/// <summary>
+		/// 월드 좌표 (0, 0)을 화면 좌표로 변환하여 얇은 초록색 십자가로 표시한다.
+		/// 십자가 길이는 화면 픽셀 기준으로 고정해 Zoom 변경 중에도 원점 표식이 과도하게 커지지 않게 한다.
+		/// </summary>
+		private void DrawOriginCross()
+		{
+			if (!ShowOriginCross) return;
+
+			PointF center = WorldToScreen(new GPoint(0, 0));
+			if (center.X < 0 || center.Y < 0 || center.X > ClientSize.Width || center.Y > ClientSize.Height)
+				return;
+
+			const float armLength = 12f;
+			using (Graphics graphics = CreateGraphics())
+			using (var pen = new Pen(Color.LimeGreen, 1f))
+			{
+				graphics.SmoothingMode = SmoothingMode.None;
+				graphics.DrawLine(pen, center.X - armLength, center.Y, center.X + armLength, center.Y);
+				graphics.DrawLine(pen, center.X, center.Y - armLength, center.X, center.Y + armLength);
 			}
 		}
 

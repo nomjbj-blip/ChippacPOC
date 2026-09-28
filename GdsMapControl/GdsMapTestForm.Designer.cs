@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             this.panel1 = new System.Windows.Forms.Panel();
             this.btnLoad = new System.Windows.Forms.Button();
             this.btnSave = new System.Windows.Forms.Button();
@@ -45,12 +45,12 @@
             this.lblMapStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.lblMapCoordinate = new System.Windows.Forms.ToolStripStatusLabel();
             this.GDSContainer = new System.Windows.Forms.SplitContainer();
+            this.chkLayerItems = new NexplantQMS.GdsMap.LayerColorCheckedListBox();
             this.panel2 = new System.Windows.Forms.Panel();
             this.TxtToolTip = new System.Windows.Forms.TextBox();
-            this.chkLayerItems = new NexplantQMS.GdsMap.LayerColorCheckedListBox();
-            this.map = new NexplantQMS.GdsMap.GdsMapControl();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.map = new NexplantQMS.GdsMap.GdsMapControl();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGrid)).BeginInit();
@@ -74,7 +74,7 @@
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Margin = new System.Windows.Forms.Padding(4);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(1521, 60);
+            this.panel1.Size = new System.Drawing.Size(1464, 60);
             this.panel1.TabIndex = 2;
             // 
             // btnLoad
@@ -114,36 +114,36 @@
             // 
             this.dataGrid.AllowUserToAddRows = false;
             this.dataGrid.AllowUserToDeleteRows = false;
-            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle4.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGrid.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGrid.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.dataGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle5.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            dataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dataGrid.DefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dataGrid.DefaultCellStyle = dataGridViewCellStyle2;
             this.dataGrid.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataGrid.Location = new System.Drawing.Point(3, 3);
             this.dataGrid.Margin = new System.Windows.Forms.Padding(4);
             this.dataGrid.Name = "dataGrid";
             this.dataGrid.ReadOnly = true;
-            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle6.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            dataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGrid.RowHeadersDefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle3.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGrid.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
             this.dataGrid.RowHeadersWidth = 62;
             this.dataGrid.RowTemplate.Height = 23;
             this.dataGrid.Size = new System.Drawing.Size(1281, 718);
@@ -192,9 +192,9 @@
             this.progressMapLoad,
             this.lblMapStatus,
             this.lblMapCoordinate});
-            this.statusStripMap.Location = new System.Drawing.Point(0, 756);
+            this.statusStripMap.Location = new System.Drawing.Point(0, 1261);
             this.statusStripMap.Name = "statusStripMap";
-            this.statusStripMap.Size = new System.Drawing.Size(1295, 36);
+            this.statusStripMap.Size = new System.Drawing.Size(1238, 36);
             this.statusStripMap.SizingGrip = false;
             this.statusStripMap.TabIndex = 0;
             // 
@@ -208,7 +208,7 @@
             // lblMapStatus
             // 
             this.lblMapStatus.Name = "lblMapStatus";
-            this.lblMapStatus.Size = new System.Drawing.Size(1168, 29);
+            this.lblMapStatus.Size = new System.Drawing.Size(1111, 29);
             this.lblMapStatus.Spring = true;
             this.lblMapStatus.Text = "대기";
             this.lblMapStatus.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -238,9 +238,19 @@
             this.GDSContainer.Panel2.Controls.Add(this.tabControl1);
             this.GDSContainer.Panel2.Controls.Add(this.statusStripMap);
             this.GDSContainer.Panel2MinSize = 400;
-            this.GDSContainer.Size = new System.Drawing.Size(1521, 794);
+            this.GDSContainer.Size = new System.Drawing.Size(1464, 1299);
             this.GDSContainer.SplitterDistance = 220;
             this.GDSContainer.TabIndex = 5;
+            // 
+            // chkLayerItems
+            // 
+            this.chkLayerItems.CheckOnClick = true;
+            this.chkLayerItems.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.chkLayerItems.FormattingEnabled = true;
+            this.chkLayerItems.Location = new System.Drawing.Point(0, 199);
+            this.chkLayerItems.Name = "chkLayerItems";
+            this.chkLayerItems.Size = new System.Drawing.Size(218, 1098);
+            this.chkLayerItems.TabIndex = 4;
             // 
             // panel2
             // 
@@ -261,15 +271,27 @@
             this.TxtToolTip.Size = new System.Drawing.Size(194, 28);
             this.TxtToolTip.TabIndex = 5;
             // 
-            // chkLayerItems
+            // tabControl1
             // 
-            this.chkLayerItems.CheckOnClick = true;
-            this.chkLayerItems.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.chkLayerItems.FormattingEnabled = true;
-            this.chkLayerItems.Location = new System.Drawing.Point(0, 199);
-            this.chkLayerItems.Name = "chkLayerItems";
-            this.chkLayerItems.Size = new System.Drawing.Size(218, 593);
-            this.chkLayerItems.TabIndex = 4;
+            this.tabControl1.Controls.Add(this.tabPage1);
+            this.tabControl1.Controls.Add(this.tabPage2);
+            this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tabControl1.Location = new System.Drawing.Point(0, 0);
+            this.tabControl1.Name = "tabControl1";
+            this.tabControl1.SelectedIndex = 0;
+            this.tabControl1.Size = new System.Drawing.Size(1238, 1261);
+            this.tabControl1.TabIndex = 1;
+            // 
+            // tabPage1
+            // 
+            this.tabPage1.Controls.Add(this.map);
+            this.tabPage1.Location = new System.Drawing.Point(4, 28);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage1.Size = new System.Drawing.Size(1230, 1229);
+            this.tabPage1.TabIndex = 0;
+            this.tabPage1.Text = "Map";
+            this.tabPage1.UseVisualStyleBackColor = true;
             // 
             // map
             // 
@@ -281,31 +303,9 @@
             this.map.Margin = new System.Windows.Forms.Padding(6, 4, 6, 4);
             this.map.Mode = NexplantQMS.GdsMap.GdsMapControl.ViewMode.View;
             this.map.Name = "map";
-            this.map.Size = new System.Drawing.Size(1281, 718);
+            this.map.Size = new System.Drawing.Size(1224, 1223);
             this.map.TabIndex = 4;
             this.map.VSync = false;
-            // 
-            // tabControl1
-            // 
-            this.tabControl1.Controls.Add(this.tabPage1);
-            this.tabControl1.Controls.Add(this.tabPage2);
-            this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tabControl1.Location = new System.Drawing.Point(0, 0);
-            this.tabControl1.Name = "tabControl1";
-            this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(1295, 756);
-            this.tabControl1.TabIndex = 1;
-            // 
-            // tabPage1
-            // 
-            this.tabPage1.Controls.Add(this.map);
-            this.tabPage1.Location = new System.Drawing.Point(4, 28);
-            this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(1287, 724);
-            this.tabPage1.TabIndex = 0;
-            this.tabPage1.Text = "Map";
-            this.tabPage1.UseVisualStyleBackColor = true;
             // 
             // tabPage2
             // 
@@ -322,7 +322,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1521, 854);
+            this.ClientSize = new System.Drawing.Size(1464, 1359);
             this.Controls.Add(this.GDSContainer);
             this.Controls.Add(this.panel1);
             this.Margin = new System.Windows.Forms.Padding(4);
