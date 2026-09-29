@@ -46,6 +46,13 @@ namespace NexplantQMS.GdsMap.Chain
         /// <summary>새 화면에서 추출한 실제 배치 좌표와 PATH 폭을 함께 보관한다.</summary>
         public ChainTraceElement(string elementKey, int layerId, GBox bounds, string elementType,
             GPoint[] worldPoints, double pathWidth)
+            : this(elementKey, layerId, bounds, elementType, worldPoints, pathWidth, 0)
+        {
+        }
+
+        /// <summary>반복 도형 비교에서 같은 Layer의 서로 다른 DataType을 구분한다.</summary>
+        public ChainTraceElement(string elementKey, int layerId, GBox bounds, string elementType,
+            GPoint[] worldPoints, double pathWidth, int dataType)
         {
             if (string.IsNullOrWhiteSpace(elementKey))
                 throw new ArgumentException("ElementKey가 필요합니다.", nameof(elementKey));
@@ -54,6 +61,7 @@ namespace NexplantQMS.GdsMap.Chain
 
             ElementKey = elementKey;
             LayerId = layerId;
+            DataType = dataType;
             Bounds = bounds;
             ElementType = elementType ?? string.Empty;
             WorldPoints = worldPoints == null ? null : (GPoint[])worldPoints.Clone();
@@ -62,6 +70,7 @@ namespace NexplantQMS.GdsMap.Chain
 
         public string ElementKey { get; private set; }
         public int LayerId { get; private set; }
+        public int DataType { get; private set; }
         public GBox Bounds { get; private set; }
         public string ElementType { get; private set; }
         public GPoint[] WorldPoints { get; private set; }
@@ -99,7 +108,7 @@ namespace NexplantQMS.GdsMap.Chain
     }
 
     /// <summary>
-    /// 사용자가 확정한 Input/Output, 왼쪽 Layer 필터와 선택적 Layer 규칙을 후보 추적기에 전달한다.
+    /// 사용자가 확정한 Input과 선택적 Output, 왼쪽 Layer 필터와 Layer 규칙을 후보 추적기에 전달한다.
     /// WorkArea는 이전 Probe와의 호환을 위해 남겨 두며 새 화면에서는 지정하지 않는다.
     /// </summary>
     public sealed class ChainTraceRequest
@@ -156,9 +165,11 @@ namespace NexplantQMS.GdsMap.Chain
             int? outputLayerId = null,
             IList<ChainTraceElement> overlappingElements = null,
             IList<ChainTraceElement> branchCandidates = null,
-            IList<ChainTraceElement> endpointElements = null)
+            IList<ChainTraceElement> endpointElements = null,
+            bool isOpenEnded = false)
         {
             IsConnected = isConnected;
+            IsOpenEnded = isOpenEnded;
             Path = new List<ChainTraceElement>(path).AsReadOnly();
             VisitedElements = new List<ChainTraceElement>(visitedElements).AsReadOnly();
             OverlappingElements = new List<ChainTraceElement>(
@@ -172,7 +183,8 @@ namespace NexplantQMS.GdsMap.Chain
             OffPathEndpointElements = EndpointElements
                 .Where(element => !pathKeys.Contains(element.ElementKey)).ToList().AsReadOnly();
             var candidateKeys = new HashSet<string>(StringComparer.Ordinal);
-            CandidateElements = Path.Concat(EndpointElements).Concat(OverlappingElements)
+            CandidateElements = (IsOpenEnded ? VisitedElements : Path)
+                .Concat(EndpointElements).Concat(OverlappingElements)
                 .Where(element => candidateKeys.Add(element.ElementKey)).ToList().AsReadOnly();
             Message = message ?? string.Empty;
             InputLayerId = inputLayerId;
@@ -180,6 +192,8 @@ namespace NexplantQMS.GdsMap.Chain
         }
 
         public bool IsConnected { get; private set; }
+        /// <summary>Output을 지정하지 않고 Input에서 닿는 모든 Element를 탐색한 결과인지 구분한다.</summary>
+        public bool IsOpenEnded { get; private set; }
         public IList<ChainTraceElement> Path { get; private set; }
         public IList<ChainTraceElement> VisitedElements { get; private set; }
         /// <summary>기본 경로 또는 지정 단자와 실제 형상이 직접 겹치는 선택 Layer Element다.</summary>

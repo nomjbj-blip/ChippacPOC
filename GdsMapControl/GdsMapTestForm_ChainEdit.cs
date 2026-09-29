@@ -88,6 +88,8 @@ namespace NexplantQMS.GdsMap
         {
             if (_chainLastTraceResult == null || _chainEditMode == ChainEditMode.None)
                 return;
+            ClearChainExampleSelection();
+            if (HasSelectedChain) _activeChain.LastSimilarUndo = null;
             var automaticKeys = GetAutomaticChainKeys();
             var endpointKeys = new HashSet<string>(_chainInputSelections.Keys
                 .Concat(_chainOutputSelections.Keys), StringComparer.Ordinal);
@@ -142,11 +144,10 @@ namespace NexplantQMS.GdsMap
             return keys;
         }
 
-        /// <summary>후보 재탐색과 역할 Marker 복원에도 현재 수동 보정을 다시 적용한다.</summary>
+        /// <summary>후보/수동 보정을 Chain 색 외곽선과 역할 Marker에 같은 표시 규칙으로 반영한다.</summary>
         private void ShowEditedChainCandidate()
         {
-            if (_chainLastTraceResult != null)
-                map.ShowChainCandidate(_chainLastTraceResult, GetEditedChainKeys());
+            RefreshChainDisplay();
         }
 
         /// <summary>현재 수동 보정 수를 상태 문구에 덧붙인다.</summary>
@@ -168,7 +169,12 @@ namespace NexplantQMS.GdsMap
             {
                 ChainConnectivityResult check = map.CheckChainSelectionConnectivity(
                     GetEditedChainKeys(), _chainInputSelections.Keys, _chainOutputSelections.Keys,
-                    _chainLayerRules, _chkChainApplyLayerRules.Checked, (double)_numChainCellSize.Value);
+                    _activeChain.LayerIds, _chainLayerRules, _applyChainLayerRules,
+                    (double)_numChainCellSize.Value);
+                if (_chainOutputSelections.Count == 0)
+                    return check.DisconnectedKeys.Count == 0
+                        ? " / Input에서 후보 객체 연결 유지 / Output 미지정"
+                        : " / 단절 객체 " + check.DisconnectedKeys.Count + "개 / Output 미지정";
                 return check.IsConnected
                     ? " / 도형 연결 유지(전기적 확인 필요)"
                     : " / 연결 검증 필요: Output " + check.ReachedOutputCount + "/"

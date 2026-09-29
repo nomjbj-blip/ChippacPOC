@@ -5,13 +5,14 @@ using System.Linq;
 namespace NexplantQMS.GdsMap.Chain
 {
     /// <summary>
-    /// 모든 Input Element에서 시작하여 선택 Layer의 실제 도형 접촉 관계를 따라 어느 Output까지 탐색한다.
+    /// 모든 Input Element에서 시작하여 선택 Layer의 실제 도형 접촉 관계를 따라 탐색한다.
+    /// Output이 있으면 첫 도달 경로를, 없으면 Input에서 닿는 연결 성분 전체를 반환한다.
     /// Layer 규칙은 요청에 따라 추가 적용하고 결과는 엔지니어 검토 대상으로 반환한다.
     /// </summary>
     public sealed class ChainCandidateTracer
     {
         /// <summary>
-        /// 선택 Layer의 Element를 공간 격자로 색인한 뒤 다중 시작점 BFS로 가장 먼저 닿는 후보 경로를 찾는다.
+        /// 선택 Layer의 Element를 공간 격자로 색인한 뒤 다중 시작점 BFS로 후보를 찾는다.
         /// 공간 격자는 전체 Element를 매번 비교하지 않도록 주변 Element만 연결 후보로 조회하는 역할을 한다.
         /// </summary>
         public ChainTraceResult Trace(ChainTraceRequest request)
@@ -20,8 +21,8 @@ namespace NexplantQMS.GdsMap.Chain
                 throw new ArgumentNullException(nameof(request));
             if (request.InputElementKeys.Count == 0 || request.InputElementKeys.Any(string.IsNullOrWhiteSpace))
                 throw new ArgumentException("Input ElementKey가 한 개 이상 필요합니다.", nameof(request));
-            if (request.OutputElementKeys.Count == 0 || request.OutputElementKeys.Any(string.IsNullOrWhiteSpace))
-                throw new ArgumentException("Output ElementKey가 한 개 이상 필요합니다.", nameof(request));
+            if (request.OutputElementKeys.Any(string.IsNullOrWhiteSpace))
+                throw new ArgumentException("Output ElementKey가 비어 있습니다.", nameof(request));
             if (request.InputElementKeys.Intersect(request.OutputElementKeys, StringComparer.Ordinal).Any())
                 throw new ArgumentException("같은 Element를 Input과 Output에 함께 지정할 수 없습니다.", nameof(request));
             if (request.SpatialCellSize <= 0)
@@ -102,6 +103,15 @@ namespace NexplantQMS.GdsMap.Chain
                 }
             }
 
+            if (outputs.Count == 0)
+            {
+                // Output이 없는 단절 경로는 첫 도달 지점에서 멈추지 않고 Input 연결 성분 전체를 후보로 돌려준다.
+                return new ChainTraceResult(false, new List<ChainTraceElement>(), visitedElements,
+                    "Output 미지정 / Input에서 실제 도형이 연결된 모든 Element를 탐색했습니다.",
+                    inputs.Count == 1 ? (int?)inputs[0].LayerId : null,
+                    null, null, null, endpoints, true);
+            }
+
             return new ChainTraceResult(
                 false,
                 new List<ChainTraceElement>(),
@@ -130,7 +140,7 @@ namespace NexplantQMS.GdsMap.Chain
                 .Where(element => request.SelectedLayerIds == null || request.SelectedLayerIds.Contains(element.LayerId))
                 .ToList();
             Dictionary<string, ChainTraceElement> byKey = BuildElementDictionary(elements);
-            if (request.InputElementKeys.Count == 0 || request.OutputElementKeys.Count == 0
+            if (request.InputElementKeys.Count == 0
                 || request.InputElementKeys.Any(key => !byKey.ContainsKey(key))
                 || request.OutputElementKeys.Any(key => !byKey.ContainsKey(key)))
                 throw new ArgumentException("최종 후보에 지정한 Input/Output이 모두 있어야 합니다.", nameof(request));

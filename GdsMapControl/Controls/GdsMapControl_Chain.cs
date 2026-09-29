@@ -24,6 +24,20 @@ namespace NexplantQMS.GdsMap
             return ScreenToWorld(screenPoint);
         }
 
+        /// <summary>목록에서 고른 묶음이 화면 중앙에 충분한 크기로 보이도록 이동하고 확대한다.</summary>
+        public void FocusChainBounds(GBox bounds)
+        {
+            if (bounds.IsEmpty) return;
+            double widthScale = ClientSize.Width / Math.Max(bounds.Width * 4, 0.000001);
+            double heightScale = ClientSize.Height / Math.Max(bounds.Height * 4, 0.000001);
+            _scale = Clamp(Math.Min(widthScale, heightScale), MinScale, MaxScale);
+            SetTextLabelFitScale();
+            _offset = new OpenTK.Vector2((float)(bounds.MinX + bounds.Width / 2),
+                (float)(bounds.MinY + bounds.Height / 2));
+            Invalidate();
+            ZoomChanged?.Invoke(this, _scale);
+        }
+
         /// <summary>
         /// 클릭 주변의 보이는 BOUNDARY/PATH 중 실제 형상이 클릭점에 닿는 후보를 반환한다.
         /// Bounds는 빠른 사전 검색에만 쓰고 최종 선택은 엔지니어가 한다.
@@ -83,18 +97,20 @@ namespace NexplantQMS.GdsMap
             var changedItems = new HashSet<GlSceneItem>(_selectedItems);
             ClearSelectionInternal();
             int sceneNumber = 0;
-            foreach (GlSceneItem item in AllItems)
-            {
-                if (!(item.Source is GdsBoundary) && !(item.Source is GdsPath))
-                    continue;
-                if (keys.Contains("SCENE:" + sceneNumber))
+            if (keys.Count > 0)
+                foreach (GlSceneItem item in AllItems)
                 {
-                    item.Selected = true;
-                    _selectedItems.Add(item);
-                    changedItems.Add(item);
+                    if (!(item.Source is GdsBoundary) && !(item.Source is GdsPath))
+                        continue;
+                    if (keys.Contains("SCENE:" + sceneNumber))
+                    {
+                        _lastChainTraceItems["SCENE:" + sceneNumber] = item;
+                        item.Selected = true;
+                        _selectedItems.Add(item);
+                        changedItems.Add(item);
+                    }
+                    sceneNumber++;
                 }
-                sceneNumber++;
-            }
             _selectedItems.Sort();
             UpdateSelectionVertices(changedItems);
             RaiseSelectionChanged();
@@ -131,8 +147,8 @@ namespace NexplantQMS.GdsMap
 
             var inputKeys = new HashSet<string>(inputElementKeys, StringComparer.Ordinal);
             var outputKeys = new HashSet<string>(outputElementKeys, StringComparer.Ordinal);
-            if (inputKeys.Count == 0 || outputKeys.Count == 0)
-                throw new ArgumentException("Input과 Output Element를 각각 한 개 이상 확정해야 합니다.");
+            if (inputKeys.Count == 0)
+                throw new ArgumentException("Input Element를 한 개 이상 확정해야 합니다.");
             if (inputKeys.Overlaps(outputKeys))
                 throw new ArgumentException("같은 Element를 Input과 Output에 함께 지정할 수 없습니다.");
 
@@ -141,10 +157,9 @@ namespace NexplantQMS.GdsMap
                 throw new ArgumentException("탐색할 Layer를 한 개 이상 선택해야 합니다.", nameof(selectedLayerIds));
 
             List<SceneTracePair> pairs = CreateSceneTracePairs(selectedLayers);
-            _lastChainTraceItems = pairs.ToDictionary(
-                pair => pair.TraceElement.ElementKey,
-                pair => pair.SceneItem,
-                StringComparer.Ordinal);
+            // 같은 GDS의 다른 Chain으로 전환해도 이전 Chain의 배치 Element를 다시 찾을 수 있게 누적한다.
+            foreach (SceneTracePair pair in pairs)
+                _lastChainTraceItems[pair.TraceElement.ElementKey] = pair.SceneItem;
             var availableKeys = new HashSet<string>(
                 pairs.Select(pair => pair.TraceElement.ElementKey), StringComparer.Ordinal);
             if (!inputKeys.IsSubsetOf(availableKeys))
@@ -230,16 +245,19 @@ namespace NexplantQMS.GdsMap
             IEnumerable<string> includedElementKeys,
             IEnumerable<string> inputElementKeys,
             IEnumerable<string> outputElementKeys,
+            IEnumerable<int> selectedLayerIds,
             IEnumerable<ChainLayerConnectionRule> layerRules,
             bool applyLayerRules,
             double spatialCellSize)
         {
             var included = new HashSet<string>(includedElementKeys, StringComparer.Ordinal);
+            var selectedLayers = new HashSet<int>(selectedLayerIds);
             var elements = _lastChainTraceItems
-                .Where(pair => included.Contains(pair.Key))
+                .Where(pair => included.Contains(pair.Key) && selectedLayers.Contains(pair.Value.LayerID))
                 .Select(pair => new ChainTraceElement(pair.Key, pair.Value.LayerID,
                     pair.Value.WorldBounds, pair.Value.Source.ElementName,
-                    pair.Value.WorldPoints, pair.Value.Source is GdsPath ? pair.Value.Width : 0))
+                    pair.Value.WorldPoints, pair.Value.Source is GdsPath ? pair.Value.Width : 0,
+                    pair.Value.Source.DataType))
                 .ToList();
             if (elements.Count != included.Count)
                 throw new ArgumentException("현재 Layer에 없는 수동 후보가 있습니다.", nameof(includedElementKeys));
@@ -249,6 +267,24 @@ namespace NexplantQMS.GdsMap
                 ApplyLayerRules = applyLayerRules
             };
             return new ChainCandidateTracer().CheckSelectionConnectivity(request);
+        }
+
+        /// <summary>
+        /// 이미 탐색한 Chain의 Element 키를 현재 GDS 도형으로 되돌려 Visible Chain 외곽선에 제공한다.
+        /// 다른 GDS를 열면 캐시가 초기화되므로 이전 도면과 섞이지 않는다.
+        /// </summary>
+        public IList<ChainTraceElement> GetChainTraceElements(IEnumerable<string> elementKeys)
+        {
+            var result = new List<ChainTraceElement>();
+            foreach (string key in new HashSet<string>(elementKeys, StringComparer.Ordinal))
+            {
+                if (!_lastChainTraceItems.TryGetValue(key, out GlSceneItem item))
+                    continue;
+                result.Add(new ChainTraceElement(key, item.LayerID, item.WorldBounds,
+                    item.Source.ElementName, item.WorldPoints,
+                    item.Source is GdsPath ? item.Width : 0, item.Source.DataType));
+            }
+            return result;
         }
 
         /// <summary>Input 또는 Output이 바뀌면 이전 후보 경로 강조를 제거한다.</summary>
@@ -287,7 +323,8 @@ namespace NexplantQMS.GdsMap
                     item.WorldBounds,
                     item.Source.ElementName,
                     item.WorldPoints,
-                    item.Source is GdsPath ? item.Width : 0);
+                    item.Source is GdsPath ? item.Width : 0,
+                    item.Source.DataType);
                 result.Add(new SceneTracePair(item, traceElement));
             }
 

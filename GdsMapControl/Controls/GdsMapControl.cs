@@ -136,6 +136,7 @@ namespace NexplantQMS.GdsMap
 		private long _srefMatrixTicks;
 		private long _srefPathTicks;
 		private long _textRegisterTicks;
+		private int _lastFrameTimingLogTick;
 
 		// GLSL Shaders
 		private const string VertexShaderCode = @"
@@ -294,6 +295,7 @@ namespace NexplantQMS.GdsMap
 			// Selected Attribute
 			GL.VertexAttribPointer(2, 1, VertexAttribPointerType.Float, false, stride, sizeof(float) * 6);
 			GL.EnableVertexAttribArray(2);
+			InitializeChainOverlayGlResources();
 
 			_glInitialized = true;
 			// 컨트롤 초기화 전에 도면을 받은 경우에도 한 번만 전체 정점을 업로드한다.
@@ -907,6 +909,7 @@ namespace NexplantQMS.GdsMap
 			}
 
 			if (!_glInitialized) return;
+			long frameStart = Stopwatch.GetTimestamp();
 			long firstDrawStart = _loadFramePending ? Stopwatch.GetTimestamp() : 0;
 
 			MakeCurrent();
@@ -923,6 +926,7 @@ namespace NexplantQMS.GdsMap
 			if (reportFirstFrame)
 				ReportRenderProgress("화면 그리기 중", 0, false, false, true);
 
+			long mapDrawEnd = frameStart;
 			if (_gpuVertices.Count > 0)
 			{
 				GL.UseProgram(_shaderProgram);
@@ -971,12 +975,19 @@ namespace NexplantQMS.GdsMap
 					if (reportFirstFrame)
 						ReportDrawProgress(++drawProcessed, drawTotal);
 				}
+
+				// Map과 같은 투영 행렬로 모든 Chain Element 외곽선을 그린다.
+				mapDrawEnd = Stopwatch.GetTimestamp();
+				DrawChainElementOverlaysGl(ref projection);
 			}
 
+			long chainDrawEnd = Stopwatch.GetTimestamp();
 			SwapBuffers();
+			long swapEnd = Stopwatch.GetTimestamp();
 			DrawTextLabels();
 			DrawOriginCross();
 			DrawChainSetupOverlay();
+			ReportFrameTiming(frameStart, mapDrawEnd, chainDrawEnd, swapEnd);
 			if (reportFirstFrame)
 			{
 				_firstFrameProgressPending = false;
@@ -1009,6 +1020,25 @@ namespace NexplantQMS.GdsMap
 						g.DrawRectangle(pen, Rectangle.Round(rect));
 				}
 			}
+		}
+
+		/// <summary>
+		/// 디버그 출력에 Map/Chain CPU 제출 시간과 버퍼 교체/GDI 시간을 1초 간격으로 기록한다.
+		/// GL 명령은 비동기이므로 Map/Chain 수치는 GPU 실행 시간이 아닌 CPU 호출 시간이다.
+		/// </summary>
+		private void ReportFrameTiming(long frameStart, long mapDrawEnd, long chainDrawEnd, long swapEnd)
+		{
+			int now = Environment.TickCount;
+			if (unchecked(now - _lastFrameTimingLogTick) < 1000) return;
+			_lastFrameTimingLogTick = now;
+			double mapSubmitMs = (mapDrawEnd - frameStart) * 1000.0 / Stopwatch.Frequency;
+			double chainSubmitMs = (chainDrawEnd - mapDrawEnd) * 1000.0 / Stopwatch.Frequency;
+			double swapMs = (swapEnd - chainDrawEnd) * 1000.0 / Stopwatch.Frequency;
+			double gdiMs = ElapsedMilliseconds(swapEnd);
+			Debug.WriteLine(string.Format(
+				"GDS FRAME MapSubmit={0:F1}ms ChainSubmit={1:F1}ms Swap={2:F1}ms GDI={3:F1}ms ChainVertices={4} Ranges={5}",
+				mapSubmitMs, chainSubmitMs, swapMs, gdiMs,
+				_chainOverlayVertices.Count, _chainOverlayDrawRanges.Count));
 		}
 
 		/// <summary>
@@ -1166,6 +1196,8 @@ namespace NexplantQMS.GdsMap
 			{
 				if (!IsDisposed && _glInitialized)
 				{
+					MakeCurrent();
+					ReleaseChainOverlayGlResources();
 					GL.DeleteBuffer(_vbo);
 					GL.DeleteVertexArray(_vao);
 					GL.DeleteProgram(_shaderProgram);

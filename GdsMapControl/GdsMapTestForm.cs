@@ -26,12 +26,8 @@ namespace NexplantQMS.GdsMap
 		public GdsMapTestForm()
         {
 			InitializeComponent();
-			InitializeChainSetupPanel();
+			InitializeChainSetupState();
 			statusStripMap.ShowItemToolTips = true;
-			map.RenderProgressChanged += Map_RenderProgressChanged;
-			map.FirstFrameMeasured += Map_FirstFrameMeasured;
-			map.MouseWorldPositionChanged += Map_MouseWorldPositionChanged;
-			chkLayerItems.ItemCheck += ChkLayerItems_ItemCheck;
         }
 
 		private void Form1_Load(object sender, EventArgs e)
@@ -248,7 +244,6 @@ namespace NexplantQMS.GdsMap
 				+ " / 재사용 좌표 " + metrics.ReusedPointCount.ToString("N0") + "개"
 				+ " / 도형 " + metrics.SceneItemCount.ToString("N0") + "개"
 				+ " / 정점 " + metrics.VertexCount.ToString("N0") + "개";
-			TxtToolTip.Text = lblMapStatus.ToolTipText;
         }
 
 		/// <summary>병목 비교에 필요한 시간만 짧게 표시하고 처리량은 마우스를 올리면 확인하게 한다.</summary>
@@ -320,7 +315,7 @@ namespace NexplantQMS.GdsMap
 			ApplyLayerVisibility();
 		}
 
-		/// <summary>현재 목록의 체크 상태를 모아 Map에 한 번만 전달한다. 변경 중인 항목은 새 상태를 우선 사용한다.</summary>
+		/// <summary>Layer 체크를 공통 지도 표시로 적용한다. 이미 찾은 Chain 경로와 Chain별 탐색 Layer는 유지한다.</summary>
 		private void ApplyLayerVisibility(int changingIndex = -1, CheckState newState = CheckState.Unchecked)
 		{
 			if (map.Structure == null) return;
@@ -332,7 +327,6 @@ namespace NexplantQMS.GdsMap
 					? newState == CheckState.Checked : chkLayerItems.GetItemChecked(i);
 			}
 			map.SetLayerVisibility(visibility);
-			InvalidateChainTraceResult();
 		}
 
 		/// <summary>파일/DB 로드 후 실제 렌더링 레이어에서 목록과 색상 견본을 다시 만든다.</summary>

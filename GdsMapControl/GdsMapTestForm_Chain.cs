@@ -9,7 +9,7 @@ using System.Windows.Forms;
 namespace NexplantQMS.GdsMap
 {
     /// <summary>
-    /// GDS 테스트 화면에 Chain Input, Output, Layer 필터와 선택적 Layer 규칙을 입력하는 POC 패널을 제공한다.
+    /// GDS 테스트 화면에 Chain Input, Output, Layer 필터와 경로 편집 기능을 제공한다.
     /// 후보 경로 검증이 끝나기 전까지 DB 저장 기능과 확정 Chain 관리는 포함하지 않는다.
     /// </summary>
     public partial class GdsMapTestForm
@@ -42,202 +42,83 @@ namespace NexplantQMS.GdsMap
         private Dictionary<string, ChainEndpointPick> _chainDraftSelections;
         private ChainTraceResult _chainLastTraceResult;
         private Point _chainMouseDownPoint;
-        private Button _btnChainInput;
-        private Button _btnChainOutput;
-        private Button _btnChainApply;
-        private Button _btnChainCancel;
-        private Button _btnChainTrace;
-        private Button _btnChainAdd;
-        private Button _btnChainRemove;
-        private Button _btnChainRuleEdit;
-        private CheckBox _chkChainApplyLayerRules;
         private bool _chainTraceResultShown;
         private int _chainTraceGeneration;
-        private TextBox _txtChainLayerRules;
         private List<ChainLayerConnectionRule> _chainLayerRules = new List<ChainLayerConnectionRule>();
-        private NumericUpDown _numChainCellSize;
-        private Label _lblChainSetupStatus;
 
         /// <summary>
-        /// 기존 Designer를 크게 변경하지 않고 Map 탭 위쪽에 Chain 설정용 컨트롤을 추가한다.
-        /// 기존 파일 조회, Layer 목록, Grid 기능은 그대로 유지한다.
+        /// 화면에서 Layer 규칙 설정을 제거한 뒤에도 하위 추적 API와 Chain 상태 구조를 유지하기 위한 내부 값이다.
+        /// 현재 화면에서는 사용자가 규칙을 켤 수 없으므로 항상 false로 초기화한다.
         /// </summary>
-        private void InitializeChainSetupPanel()
+        private bool _applyChainLayerRules;
+
+        /// <summary>Designer에서 이벤트가 연결된 Chain 설정 화면의 최초 상태를 준비한다.</summary>
+        private void InitializeChainSetupState()
         {
-            var panel = new TableLayoutPanel
-            {
-                Name = "chainSetupPanel",
-                Dock = DockStyle.Top,
-                Height = 118,
-                ColumnCount = 1,
-                RowCount = 3,
-                BackColor = SystemColors.Control,
-                Padding = new Padding(4)
-            };
-            panel.RowStyles.Add(new RowStyle(SizeType.Absolute, 38));
-            panel.RowStyles.Add(new RowStyle(SizeType.Absolute, 38));
-            panel.RowStyles.Add(new RowStyle(SizeType.Absolute, 26));
-
-            var firstRow = new FlowLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                WrapContents = false,
-                AutoScroll = true
-            };
-            var secondRow = new FlowLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                WrapContents = false,
-                AutoScroll = true
-            };
-
-            _btnChainInput = CreateChainButton("Input 지정", (sender, args) => BeginChainPointCapture(ChainPointCaptureMode.Input));
-            _btnChainOutput = CreateChainButton("Output 지정", (sender, args) => BeginChainPointCapture(ChainPointCaptureMode.Output));
-            _btnChainInput.Width = 100;
-            _btnChainOutput.Width = 100;
-            _btnChainTrace = CreateChainButton("후보 경로 찾기", BtnChainTrace_Click);
-            _btnChainTrace.Width = 115;
-
-            _btnChainApply = CreateChainButton("선택 적용", (sender, args) => ApplyChainEndpointSelection());
-            _btnChainCancel = CreateChainButton("선택 취소", (sender, args) => CancelChainEndpointSelection());
-            _btnChainApply.Width = 80;
-            _btnChainCancel.Width = 80;
-
-            firstRow.Controls.Add(_btnChainInput);
-            firstRow.Controls.Add(_btnChainOutput);
-            firstRow.Controls.Add(_btnChainApply);
-            firstRow.Controls.Add(_btnChainCancel);
-            firstRow.Controls.Add(_btnChainTrace);
-            _btnChainAdd = CreateChainButton("경로 추가", (sender, args) => ToggleChainEditMode(ChainEditMode.Add));
-            _btnChainRemove = CreateChainButton("경로 제외", (sender, args) => ToggleChainEditMode(ChainEditMode.Remove));
-            _btnChainAdd.Width = 85;
-            _btnChainRemove.Width = 85;
-            firstRow.Controls.Add(_btnChainAdd);
-            firstRow.Controls.Add(_btnChainRemove);
-
-            _chkChainApplyLayerRules = new CheckBox
-            {
-                Text = "Layer 규칙 적용",
-                AutoSize = true,
-                Margin = new Padding(8, 7, 3, 0)
-            };
-            _chkChainApplyLayerRules.CheckedChanged += (sender, args) => InvalidateChainTraceResult();
-            secondRow.Controls.Add(_chkChainApplyLayerRules);
-            secondRow.Controls.Add(CreateChainLabel("Layer 규칙"));
-            _txtChainLayerRules = new TextBox
-            {
-                Name = "txtChainLayerRules",
-                Width = 220,
-                ReadOnly = true,
-                Text = "규칙 없음"
-            };
-            secondRow.Controls.Add(_txtChainLayerRules);
-            _btnChainRuleEdit = CreateChainButton("Layer 규칙 편집", BtnChainRuleEdit_Click);
-            _btnChainRuleEdit.Width = 115;
-            secondRow.Controls.Add(_btnChainRuleEdit);
-            secondRow.Controls.Add(CreateChainLabel("격자 크기"));
-            _numChainCellSize = CreateChainNumber(0.001m, 1000000000, 10, 3);
-            secondRow.Controls.Add(_numChainCellSize);
-            _lblChainSetupStatus = new Label
-            {
-                AutoEllipsis = true,
-                Dock = DockStyle.Fill,
-                Margin = new Padding(8, 3, 3, 0),
-                Text = "GDS 조회 후 Input부터 지정하세요."
-            };
-
-            panel.Controls.Add(firstRow, 0, 0);
-            panel.Controls.Add(secondRow, 0, 1);
-            panel.Controls.Add(_lblChainSetupStatus, 0, 2);
-            tabPage1.Controls.Add(panel);
-            panel.BringToFront();
-
-            map.MouseClick += Map_ChainMouseClick;
-            map.MouseDown += (sender, args) => _chainMouseDownPoint = args.Location;
-            KeyPreview = true;
-            KeyDown += GdsMapTestForm_ChainKeyDown;
+            InitializeChainListState();
             SetChainButtonsEnabled(false);
             UpdateChainSelectionButtons();
         }
 
-        /// <summary>
-        /// 현재 GDS Layer 목록을 규칙 편집 화면에 전달하고 적용한 규칙을 후보 추적 입력으로 보관한다.
-        /// 편집 화면에서 취소한 경우 현재 규칙은 그대로 유지한다.
-        /// </summary>
-        private void BtnChainRuleEdit_Click(object sender, EventArgs e)
+        /// <summary>Map에서 Chain Input으로 사용할 점 선택을 시작한다.</summary>
+        private void BtnChainInput_Click(object sender, EventArgs e)
         {
-            List<int> layerIds = chkLayerItems.Items
-                .Cast<LayerDisplayItem>()
-                .Select(item => item.LayerId)
-                .Distinct()
-                .OrderBy(id => id)
-                .ToList();
-
-            using (var editor = new ChainLayerRuleEditorForm(layerIds, _chainLayerRules))
-            {
-                if (editor.ShowDialog(this) != DialogResult.OK)
-                    return;
-
-                _chainLayerRules = editor.Rules.ToList();
-                UpdateChainLayerRuleSummary();
-                InvalidateChainTraceResult();
-                _lblChainSetupStatus.Text = "Layer 규칙 " + _chainLayerRules.Count + "개를 보관했습니다.";
-            }
+            BeginChainPointCapture(ChainPointCaptureMode.Input);
         }
 
-        /// <summary>현재 Layer 규칙 수와 일부 조합을 읽기 전용 요약 칸에 표시한다.</summary>
-        private void UpdateChainLayerRuleSummary()
+        /// <summary>Map에서 Chain Output으로 사용할 점 선택을 시작한다.</summary>
+        private void BtnChainOutput_Click(object sender, EventArgs e)
         {
-            if (_chainLayerRules.Count == 0)
-            {
-                _txtChainLayerRules.Text = "규칙 없음";
-                return;
-            }
-
-            string preview = string.Join(", ", _chainLayerRules.Take(3).Select(rule =>
-                rule.FirstLayerId + "-" + rule.SecondLayerId + ":" + rule.Tolerance.ToString("0.###")));
-            _txtChainLayerRules.Text = _chainLayerRules.Count + "개 / " + preview
-                + (_chainLayerRules.Count > 3 ? " ..." : string.Empty);
+            BeginChainPointCapture(ChainPointCaptureMode.Output);
         }
 
-        /// <summary>Chain 패널에서 같은 크기와 여백을 사용하는 버튼을 만든다.</summary>
-        private static Button CreateChainButton(string text, EventHandler clickHandler)
+        /// <summary>임시 Input/Output 선택 내용을 현재 Chain에 반영한다.</summary>
+        private void BtnChainApply_Click(object sender, EventArgs e)
         {
-            var button = new Button
-            {
-                Width = 100,
-                Height = 30,
-                Margin = new Padding(3),
-                Text = text,
-                UseVisualStyleBackColor = true
-            };
-            button.Click += clickHandler;
-            return button;
+            ApplyChainEndpointSelection();
         }
 
-        /// <summary>Chain 설정값의 의미를 짧게 표시하는 공통 Label을 만든다.</summary>
-        private static Label CreateChainLabel(string text)
+        /// <summary>진행 중인 Input/Output 선택을 취소한다.</summary>
+        private void BtnChainCancel_Click(object sender, EventArgs e)
         {
-            return new Label
-            {
-                AutoSize = true,
-                Margin = new Padding(8, 7, 3, 0),
-                Text = text
-            };
+            CancelChainEndpointSelection();
         }
 
-        /// <summary>GDS 좌표 단위에 맞춰 소수점 입력이 가능한 공통 NumericUpDown을 만든다.</summary>
-        private static NumericUpDown CreateChainNumber(decimal minimum, decimal maximum, decimal value, int decimalPlaces)
+        /// <summary>지도에서 후보 경로를 추가하는 편집 모드로 전환한다.</summary>
+        private void BtnChainAdd_Click(object sender, EventArgs e)
         {
-            return new NumericUpDown
-            {
-                Width = 90,
-                Minimum = minimum,
-                Maximum = maximum,
-                Value = value,
-                DecimalPlaces = decimalPlaces,
-                Increment = decimalPlaces > 0 ? 0.1m : 1m
-            };
+            ToggleChainEditMode(ChainEditMode.Add);
+        }
+
+        /// <summary>지도에서 후보 경로를 제외하는 편집 모드로 전환한다.</summary>
+        private void BtnChainRemove_Click(object sender, EventArgs e)
+        {
+            ToggleChainEditMode(ChainEditMode.Remove);
+        }
+
+        /// <summary>유사 묶음 검색의 기준으로 사용할 예시 선택을 전환한다.</summary>
+        private void BtnChainExample_Click(object sender, EventArgs e)
+        {
+            ToggleChainExampleSelection();
+        }
+
+        /// <summary>선택한 예시와 유사한 Chain 묶음을 검색한다.</summary>
+        private void BtnChainFindSimilar_Click(object sender, EventArgs e)
+        {
+            FindChainSimilarGroups();
+        }
+
+        /// <summary>유사 묶음 미리보기만 지우고 예시 선택은 유지한다.</summary>
+        private void BtnChainClearSimilar_Click(object sender, EventArgs e)
+        {
+            ClearChainSimilarPreview();
+            _lblChainSetupStatus.Text = "유사 묶음 미리보기를 취소했습니다. 예시 묶음은 유지합니다.";
+        }
+
+        /// <summary>Chain 편집과 클릭을 구분하기 위해 Map MouseDown 위치를 보관한다.</summary>
+        private void Map_ChainMouseDown(object sender, MouseEventArgs e)
+        {
+            _chainMouseDownPoint = e.Location;
         }
 
         /// <summary>
@@ -252,12 +133,21 @@ namespace NexplantQMS.GdsMap
                 return;
             }
 
+            if (!EnsureSelectedChainForEndpoint()) return;
+
             if (_chainPointCaptureMode != ChainPointCaptureMode.None || _chainEditMode != ChainEditMode.None)
                 return;
 
-            _chainPointCaptureMode = mode;
+            // 확정한 역할은 이 Chain에서 다시 지정하지 않는다. 다른 단자 쌍은 새 Chain에 만든다.
             var confirmed = mode == ChainPointCaptureMode.Input
                 ? _chainInputSelections : _chainOutputSelections;
+            if (confirmed.Count > 0)
+            {
+                ShowChainEndpointLimitWarning(mode == ChainPointCaptureMode.Input ? "Input" : "Output");
+                return;
+            }
+
+            _chainPointCaptureMode = mode;
             _chainDraftSelections = new Dictionary<string, ChainEndpointPick>(confirmed, StringComparer.Ordinal);
             map.Mode = GdsMapControl.ViewMode.View;
             map.Cursor = Cursors.Cross;
@@ -266,18 +156,41 @@ namespace NexplantQMS.GdsMap
             _lblChainSetupStatus.Text = GetCaptureGuide(mode);
         }
 
+        /// <summary>Input/Output 작업은 목록에서 선택한 Chain에만 귀속되도록 마지막 진입 지점에서도 검사한다.</summary>
+        private bool EnsureSelectedChainForEndpoint()
+        {
+            if (HasSelectedChain && _activeChain.Visible) return true;
+            CaptureActiveChain();
+            ClearActiveChainSelection();
+            const string message = "Chain을 먼저 선택하세요. 목록이 비어 있으면 새 Chain을 만드세요.";
+            _lblChainSetupStatus.Text = message;
+            MessageBox.Show(this, message, "Chain 선택 필요",
+                MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return false;
+        }
+
         /// <summary>현재 지정할 좌표의 종류에 맞는 화면 안내 문구를 반환한다.</summary>
         private static string GetCaptureGuide(ChainPointCaptureMode mode)
         {
             switch (mode)
             {
                 case ChainPointCaptureMode.Input:
-                    return "Input 선택 중 / 지도에서 여러 Element를 클릭한 뒤 선택 적용을 누르세요.";
+                    return "Input 선택 중 / Element 하나를 클릭한 뒤 선택 적용을 누르세요.";
                 case ChainPointCaptureMode.Output:
-                    return "Output 선택 중 / 지도에서 여러 Element를 클릭한 뒤 선택 적용을 누르세요.";
+                    return "Output 선택 중 / Element 하나를 클릭한 뒤 선택 적용을 누르세요.";
                 default:
                     return "Chain 설정 대기";
             }
+        }
+
+        /// <summary>역할별 두 번째 단자 또는 확정 단자 재지정을 막고 새 Chain 생성 방법을 안내한다.</summary>
+        private void ShowChainEndpointLimitWarning(string role)
+        {
+            string message = "한 Chain에는 Input과 Output을 각각 한 개씩만 지정할 수 있습니다. "
+                + role + "을 추가하거나 다시 지정하려면 새 Chain을 만드세요.";
+            _lblChainSetupStatus.Text = message;
+            MessageBox.Show(this, message, "Chain 단자 지정 제한",
+                MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
 
         /// <summary>
@@ -286,14 +199,24 @@ namespace NexplantQMS.GdsMap
         private void Map_ChainMouseClick(object sender, MouseEventArgs e)
         {
             if (e.Button != MouseButtons.Left
-                || (_chainPointCaptureMode == ChainPointCaptureMode.None && _chainEditMode == ChainEditMode.None))
+                || (_chainPointCaptureMode == ChainPointCaptureMode.None
+                    && _chainEditMode == ChainEditMode.None && !_chainExampleSelecting))
                 return;
+
+            if (!HasSelectedChain || !_activeChain.Visible)
+            {
+                CaptureActiveChain();
+                ClearActiveChainSelection();
+                return;
+            }
 
             if (Math.Abs(e.X - _chainMouseDownPoint.X) > 4
                 || Math.Abs(e.Y - _chainMouseDownPoint.Y) > 4)
                 return;
 
-            if (_chainEditMode != ChainEditMode.None)
+            if (_chainExampleSelecting)
+                SelectChainExampleElement(e.Location);
+            else if (_chainEditMode != ChainEditMode.None)
                 SelectChainEditElement(e.Location);
             else
                 SelectChainEndpointElement(e.Location);
@@ -333,10 +256,6 @@ namespace NexplantQMS.GdsMap
                 item.Click += (sender, args) => ToggleChainEndpointCandidate(current, point);
                 menu.Items.Add(item);
             }
-            menu.Items.Add(new ToolStripSeparator());
-            var addAll = new ToolStripMenuItem("이 위치의 후보 모두 추가");
-            addAll.Click += (sender, args) => AddChainEndpointCandidates(candidates, point);
-            menu.Items.Add(addAll);
             menu.Closed += (sender, args) =>
             {
                 ShowChainEndpointSelection();
@@ -347,26 +266,6 @@ namespace NexplantQMS.GdsMap
             menu.Show(map, screenPoint);
         }
 
-        /// <summary>겹친 후보를 한 번에 임시 추가하되 다른 역할에 속한 Element는 건너뛴다.</summary>
-        private void AddChainEndpointCandidates(IEnumerable<ChainElementCandidate> candidates, GPoint point)
-        {
-            var other = _chainPointCaptureMode == ChainPointCaptureMode.Input
-                ? _chainOutputSelections : _chainInputSelections;
-            int added = 0;
-            foreach (ChainElementCandidate candidate in candidates)
-            {
-                if (other.ContainsKey(candidate.ElementKey)
-                    || _chainDraftSelections.ContainsKey(candidate.ElementKey))
-                    continue;
-                _chainDraftSelections.Add(candidate.ElementKey,
-                    new ChainEndpointPick { Candidate = candidate, Point = point });
-                added++;
-            }
-            ShowChainEndpointSelection();
-            _lblChainSetupStatus.Text = "이 위치에서 " + added + "개 추가 / 임시 "
-                + _chainDraftSelections.Count + "개 / 선택 적용 전 확인하세요.";
-        }
-
         /// <summary>한 Element의 임시 선택을 전환하고 역할별 Marker와 개수를 즉시 갱신한다.</summary>
         private void ToggleChainEndpointCandidate(ChainElementCandidate candidate, GPoint point)
         {
@@ -375,6 +274,14 @@ namespace NexplantQMS.GdsMap
             if (other.ContainsKey(candidate.ElementKey))
             {
                 _lblChainSetupStatus.Text = "이 Element는 이미 다른 역할로 지정되었습니다.";
+                return;
+            }
+
+            if (!_chainDraftSelections.ContainsKey(candidate.ElementKey)
+                && _chainDraftSelections.Count >= 1)
+            {
+                ShowChainEndpointLimitWarning(_chainPointCaptureMode == ChainPointCaptureMode.Input
+                    ? "Input" : "Output");
                 return;
             }
 
@@ -389,18 +296,17 @@ namespace NexplantQMS.GdsMap
         /// <summary>역할별 임시/확정 선택을 합쳐 지도에 표시하고 후보 메뉴의 Hover를 추가한다.</summary>
         private void ShowChainEndpointSelection(ChainElementCandidate hovered = null)
         {
+            if (_chainPointCaptureMode == ChainPointCaptureMode.None)
+            {
+                RefreshChainDisplay();
+                return;
+            }
             var input = _chainPointCaptureMode == ChainPointCaptureMode.Input
                 ? _chainDraftSelections : _chainInputSelections;
             var output = _chainPointCaptureMode == ChainPointCaptureMode.Output
                 ? _chainDraftSelections : _chainOutputSelections;
             map.SetChainEndpointPoints(input.Values.Select(pick => pick.Point),
                 output.Values.Select(pick => pick.Point));
-            if (_chainPointCaptureMode == ChainPointCaptureMode.None
-                && _chainTraceResultShown && _chainLastTraceResult != null)
-            {
-                ShowEditedChainCandidate();
-                return;
-            }
             map.HighlightChainElements(input.Keys.Concat(output.Keys).Concat(
                 hovered == null ? Enumerable.Empty<string>() : new[] { hovered.ElementKey }));
         }
@@ -410,9 +316,16 @@ namespace NexplantQMS.GdsMap
         {
             if (_chainPointCaptureMode == ChainPointCaptureMode.None)
                 return;
+            if (!EnsureSelectedChainForEndpoint()) return;
             if (_chainDraftSelections.Count == 0)
             {
                 _lblChainSetupStatus.Text = "Element를 한 개 이상 선택해야 적용할 수 있습니다.";
+                return;
+            }
+            if (_chainDraftSelections.Count != 1)
+            {
+                ShowChainEndpointLimitWarning(_chainPointCaptureMode == ChainPointCaptureMode.Input
+                    ? "Input" : "Output");
                 return;
             }
             var checkedLayers = new HashSet<int>();
@@ -431,6 +344,7 @@ namespace NexplantQMS.GdsMap
                 _chainInputSelections = confirmed;
             else
                 _chainOutputSelections = confirmed;
+            if (HasSelectedChain) _activeChain.LastSimilarUndo = null;
             _chainPointCaptureMode = ChainPointCaptureMode.None;
             _chainDraftSelections = null;
             _chainTraceResultShown = false;
@@ -438,7 +352,7 @@ namespace NexplantQMS.GdsMap
             _chainTraceGeneration++;
             map.Cursor = Cursors.SizeAll;
             UpdateChainSelectionButtons();
-            ShowChainEndpointSelection();
+            RefreshChainDisplay();
             _lblChainSetupStatus.Text = role + " " + confirmed.Count + "개 확정 / Input "
                 + _chainInputSelections.Count + "개 / Output " + _chainOutputSelections.Count + "개";
         }
@@ -452,7 +366,7 @@ namespace NexplantQMS.GdsMap
             _chainDraftSelections = null;
             map.Cursor = Cursors.SizeAll;
             UpdateChainSelectionButtons();
-            ShowChainEndpointSelection();
+            RefreshChainDisplay();
             _lblChainSetupStatus.Text = "선택을 취소했습니다. Input " + _chainInputSelections.Count
                 + "개 / Output " + _chainOutputSelections.Count + "개";
         }
@@ -462,7 +376,13 @@ namespace NexplantQMS.GdsMap
         {
             if (e.KeyCode != Keys.Escape)
                 return;
-            if (_chainEditMode != ChainEditMode.None)
+            if (_chainExampleSelecting)
+            {
+                ToggleChainExampleSelection();
+                ClearChainExampleSelection();
+                _lblChainSetupStatus.Text = "예시 묶음 지정을 취소했습니다.";
+            }
+            else if (_chainEditMode != ChainEditMode.None)
                 ToggleChainEditMode(_chainEditMode);
             else if (_chainPointCaptureMode != ChainPointCaptureMode.None)
                 CancelChainEndpointSelection();
@@ -475,31 +395,53 @@ namespace NexplantQMS.GdsMap
         private void UpdateChainSelectionButtons()
         {
             bool editing = _chainPointCaptureMode != ChainPointCaptureMode.None
-                || _chainEditMode != ChainEditMode.None;
-            bool loaded = map.Structure != null;
+                || _chainEditMode != ChainEditMode.None || _chainExampleSelecting
+                || _chainSimilarSearching || _chainSimilarApplying;
+            bool loaded = map.Structure != null && HasSelectedChain && _activeChain.Visible
+                && !_chainTraceInProgress;
             _btnChainInput.Enabled = loaded && !editing;
             _btnChainOutput.Enabled = loaded && !editing;
             _btnChainTrace.Enabled = loaded && !editing;
             _btnChainAdd.Enabled = loaded && _chainTraceResultShown
                 && _chainPointCaptureMode == ChainPointCaptureMode.None
+                && !_chainExampleSelecting
+                && !_chainSimilarSearching && !_chainSimilarApplying
                 && (_chainEditMode == ChainEditMode.None || _chainEditMode == ChainEditMode.Add);
             _btnChainRemove.Enabled = loaded && _chainTraceResultShown
                 && _chainPointCaptureMode == ChainPointCaptureMode.None
+                && !_chainExampleSelecting
+                && !_chainSimilarSearching && !_chainSimilarApplying
                 && (_chainEditMode == ChainEditMode.None || _chainEditMode == ChainEditMode.Remove);
+            _btnChainExample.Enabled = loaded && _chainTraceResultShown
+                && (_chainExampleSelecting || !editing);
+            _btnChainExample.BackColor = _chainExampleSelecting
+                ? Color.Plum : SystemColors.Control;
+            _btnChainFindSimilar.Enabled = loaded && _chainTraceResultShown
+                && !editing && _chainExampleKeys.Count > 0;
+            _btnChainClearSimilar.Enabled = !_chainSimilarApplying
+                && (_chainSimilarSearching || _chainSimilarGroups.Count > 0);
+            _btnChainApplySimilar.Enabled = loaded && !editing && _chainSimilarGroups.Count > 0
+                && _chainSimilarList.CheckedItems.Count > 0;
+            _btnChainUndoSimilar.Enabled = loaded && !editing
+                && _activeChain.LastSimilarUndo != null;
+            _chainSimilarList.Enabled = !_chainSimilarApplying && !_chainSimilarSearching
+                && _chainSimilarGroups.Count > 0;
             _btnChainAdd.BackColor = _chainEditMode == ChainEditMode.Add ? Color.LightGoldenrodYellow : SystemColors.Control;
             _btnChainRemove.BackColor = _chainEditMode == ChainEditMode.Remove ? Color.LightGoldenrodYellow : SystemColors.Control;
             _btnChainApply.Enabled = loaded && _chainPointCaptureMode != ChainPointCaptureMode.None;
             _btnChainCancel.Enabled = loaded && _chainPointCaptureMode != ChainPointCaptureMode.None;
+            SetChainListButtonsEnabled(map.Structure != null);
         }
 
         /// <summary>확정된 Input/Output과 현재 후보 경로를 지도에 다시 표시한다.</summary>
         private void RestoreChainEndpointHighlight()
         {
-            ShowChainEndpointSelection();
+            RefreshChainDisplay();
         }
 
         /// <summary>
-        /// 확정된 Element와 왼쪽 Layer 체크 상태를 검증한 뒤 실제 형상 접촉 경로를 계산한다.
+        /// Input과 왼쪽 Layer 체크 상태를 검증한 뒤 실제 형상 접촉 경로를 계산한다.
+        /// Output이 없으면 Input에서 더 이상 연결되지 않는 곳까지 후보를 찾는다.
         /// 대량 Element 탐색 중 화면이 멈추지 않도록 계산은 백그라운드에서 실행한다.
         /// </summary>
         private async void BtnChainTrace_Click(object sender, EventArgs e)
@@ -513,9 +455,12 @@ namespace NexplantQMS.GdsMap
                 return;
             }
 
+            _chainTraceInProgress = true;
+            if (HasSelectedChain) _activeChain.LastSimilarUndo = null;
             _btnChainTrace.Enabled = false;
             _btnChainInput.Enabled = false;
             _btnChainOutput.Enabled = false;
+            SetChainListButtonsEnabled(false);
             int traceGeneration = _chainTraceGeneration;
             _lblChainSetupStatus.Text = "후보 경로를 찾는 중입니다.";
             progressMapLoad.Style = ProgressBarStyle.Marquee;
@@ -524,7 +469,7 @@ namespace NexplantQMS.GdsMap
             {
                 string[] inputElementKeys = _chainInputSelections.Keys.ToArray();
                 string[] outputElementKeys = _chainOutputSelections.Keys.ToArray();
-                bool applyLayerRules = _chkChainApplyLayerRules.Checked;
+                bool applyLayerRules = _applyChainLayerRules;
                 double cellSize = (double)_numChainCellSize.Value;
                 ChainTraceResult result = await Task.Run(() => map.TraceChainCandidate(
                     inputElementKeys,
@@ -538,6 +483,7 @@ namespace NexplantQMS.GdsMap
                     return;
                 _chainTraceResultShown = true;
                 _chainLastTraceResult = result;
+                _activeChain.LayerIds = new HashSet<int>(selectedLayerIds);
                 ShowEditedChainCandidate();
                 _lblChainSetupStatus.Text = FormatEditedConnectivity().TrimStart(' ', '/')
                     + " / " + FormatChainTraceResult(result) + FormatChainManualCounts();
@@ -551,6 +497,7 @@ namespace NexplantQMS.GdsMap
             }
             finally
             {
+                _chainTraceInProgress = false;
                 progressMapLoad.Visible = false;
                 UpdateChainSelectionButtons();
             }
@@ -562,6 +509,10 @@ namespace NexplantQMS.GdsMap
         /// </summary>
         private static string FormatChainTraceResult(ChainTraceResult result)
         {
+            if (result.IsOpenEnded)
+                return "Output 미지정 / Input에서 닿는 후보 "
+                    + result.VisitedElements.Count.ToString("N0")
+                    + "개 Element / 마지막 연결 지점은 지도에서 확인 필요";
             if (result.IsConnected)
                 return "후보 경로 " + result.Path.Count.ToString("N0") + "개 Element / "
                     + "지정 단자 " + result.EndpointElements.Count.ToString("N0")
@@ -604,9 +555,14 @@ namespace NexplantQMS.GdsMap
                 message = "GDS 도면을 먼저 조회하세요.";
                 return false;
             }
-            if (_chainInputSelections.Count == 0 || _chainOutputSelections.Count == 0)
+            if (!HasSelectedChain || !_activeChain.Visible)
             {
-                message = "Input과 Output Element를 각각 확정하세요.";
+                message = "Chain을 먼저 선택하세요. 목록이 비어 있으면 새 Chain을 만드세요.";
+                return false;
+            }
+            if (_chainInputSelections.Count != 1 || _chainOutputSelections.Count > 1)
+            {
+                message = "Input Element는 한 개가 필요하며 Output은 한 개 이하로 지정할 수 있습니다.";
                 return false;
             }
             for (int i = 0; i < chkLayerItems.Items.Count; i++)
@@ -627,7 +583,7 @@ namespace NexplantQMS.GdsMap
                     return false;
                 }
             }
-            if (_chkChainApplyLayerRules.Checked && _chainLayerRules.Count == 0)
+            if (_applyChainLayerRules && _chainLayerRules.Count == 0)
             {
                 message = "Layer 규칙 적용을 사용하려면 규칙을 한 개 이상 추가하세요.";
                 return false;
@@ -638,11 +594,13 @@ namespace NexplantQMS.GdsMap
         }
 
         /// <summary>
-        /// Layer 체크 또는 규칙이 바뀌면 이전 탐색 결과를 해제한다.
+        /// Layer 체크가 바뀌면 이전 탐색 결과를 해제한다.
         /// 확정된 Input/Output은 유지하여 엔지니어가 새 조건으로 다시 탐색할 수 있게 한다.
         /// </summary>
         private void InvalidateChainTraceResult()
         {
+            ClearChainExampleSelection();
+            if (HasSelectedChain) _activeChain.LastSimilarUndo = null;
             _chainTraceGeneration++;
             if (!_chainTraceResultShown)
                 return;
@@ -663,15 +621,21 @@ namespace NexplantQMS.GdsMap
             _btnChainTrace.Enabled = enabled;
             _btnChainAdd.Enabled = enabled && _chainTraceResultShown;
             _btnChainRemove.Enabled = enabled && _chainTraceResultShown;
+            _btnChainExample.Enabled = enabled && _chainTraceResultShown;
+            _btnChainFindSimilar.Enabled = enabled && _chainTraceResultShown
+                && _chainExampleKeys.Count > 0;
+            _btnChainClearSimilar.Enabled = false;
+            _btnChainApplySimilar.Enabled = false;
+            _btnChainUndoSimilar.Enabled = false;
+            _chainSimilarList.Enabled = false;
             _btnChainApply.Enabled = false;
             _btnChainCancel.Enabled = false;
-            _btnChainRuleEdit.Enabled = enabled;
-            _chkChainApplyLayerRules.Enabled = enabled;
         }
 
         /// <summary>새 GDS를 조회한 뒤 이전 도면의 Chain 좌표를 제거하고 설정을 시작할 수 있게 한다.</summary>
         private void ResetChainSetupAfterMapLoad(bool loadSucceeded)
         {
+            ClearChainExampleSelection();
             _chainPointCaptureMode = ChainPointCaptureMode.None;
             _chainEditMode = ChainEditMode.None;
             _chainDraftSelections = null;
@@ -683,14 +647,14 @@ namespace NexplantQMS.GdsMap
             _chainManualExcluded.Clear();
             _chainTraceGeneration++;
             _chainLayerRules.Clear();
+            _applyChainLayerRules = false;
             map.Cursor = Cursors.SizeAll;
-            _chkChainApplyLayerRules.Checked = false;
-            UpdateChainLayerRuleSummary();
             map.ResetChainSetupOverlay();
             SetChainButtonsEnabled(loadSucceeded);
             _lblChainSetupStatus.Text = loadSucceeded
                 ? "Input / Output을 지정하고 왼쪽 Layer를 체크하세요."
                 : "GDS 조회 후 Input부터 지정하세요.";
+            ResetChainWorkspace(loadSucceeded);
         }
     }
 }
