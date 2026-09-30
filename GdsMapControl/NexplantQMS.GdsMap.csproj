@@ -75,6 +75,9 @@
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Controls\GdsMapControl_ChainOverlay.cs" />
+    <Compile Include="Controls\GdsMapControl_Persistence.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="Controls\GdsMapControl_Layer.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -132,6 +135,10 @@
     <Compile Include="Controls\GlSceneLayer.cs" />
     <Compile Include="Oracle\OracleLoadUtil.cs" />
     <Compile Include="Oracle\OracleSaveUtil.cs" />
+    <Compile Include="Persistence\MapPlacedElementData.cs" />
+    <Compile Include="Persistence\MapPlacedElementBatchBuilder.cs" />
+    <Compile Include="Persistence\MapPlacedBatchPayload.cs" />
+    <Compile Include="Persistence\MapPlacedBatchReader.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="GdsMapTestForm.resx">
@@ -147,6 +154,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <None Include="OpenTK.dll.config" />
+    <None Include="Persistence\2026-09-29_device_map_oracle_schema.sql" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

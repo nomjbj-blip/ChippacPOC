@@ -16,11 +16,14 @@ namespace NexplantQMS.GdsMap
 		private readonly GPoint _lastPoint;
 		private readonly bool _hasPoint;
 
-		public GdsElementGridRow(GdsLibrary library, GdsStructure structure, int gridNumber, GdsElement element, bool parserDuplicate)
+		/// <summary>원본 행 ID를 보관해 배치 인스턴스/Chain 소속 조회의 출발점으로 사용한다.</summary>
+		public GdsElementGridRow(GdsLibrary library, GdsStructure structure, int gridNumber,
+			GdsElement element, bool parserDuplicate, string sourceElementId = null)
 		{
 			_library = library;
 			_structure = structure;
 			GridNumber = gridNumber;
+			SourceElementId = sourceElementId;
 			_element = element;
 			ParserDuplicate = parserDuplicate;
 
@@ -71,6 +74,8 @@ namespace NexplantQMS.GdsMap
 		public double? StructureMaxY { get { return _structure.Bounds.IsEmpty ? (double?)null : _structure.Bounds.MaxY; } }
 		[DisplayName("Grid No")]
 		public int GridNumber { get; private set; }
+		[DisplayName("Source Element ID")]
+		public string SourceElementId { get; private set; }
 		[DisplayName("Parser 중복 제외")]
 		public bool ParserDuplicate { get; private set; }
 		[DisplayName("Layer")]

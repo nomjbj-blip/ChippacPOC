@@ -6,6 +6,8 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,6 +28,7 @@ namespace NexplantQMS.GdsMap
 		public GdsMapTestForm()
         {
 			InitializeComponent();
+			InitializeElementGridFeatures();
 			InitializeChainSetupState();
 			statusStripMap.ShowItemToolTips = true;
         }
@@ -174,10 +177,15 @@ namespace NexplantQMS.GdsMap
 			int gridNumber = 1;
 			foreach (var structure in lib.Structures)
 			{
+				int sourceOrdinal = 0;
 				foreach (var layer in structure.Layers)
 				{
 					foreach (var element in layer.Elements)
-						rows.Add(new GdsElementGridRow(lib, structure, gridNumber++, element, false));
+					{
+						// Flatten과 같은 순서로 번호를 매겨 원본 Grid 행에서 배치 도형을 역조회할 수 있게 한다.
+						string sourceId = structure.Name + "/E" + sourceOrdinal++;
+						rows.Add(new GdsElementGridRow(lib, structure, gridNumber++, element, false, sourceId));
+					}
 				}
 
 				// 파서가 동일 키로 판단해 도면 목록에서 제외한 Element도 원본 확인을 위해 별도 행으로 표시한다.
@@ -198,6 +206,144 @@ namespace NexplantQMS.GdsMap
 				column.Width = column.Name == "Text" ? 220 : column.Name == "StructureName" || column.Name == "ReferenceStructure" ? 150 : 95;
 				if (column.ValueType == typeof(double) || column.ValueType == typeof(double?))
 					column.DefaultCellStyle.Format = "0.#####";
+			}
+
+			// 원본 Element의 순번을 항상 가장 왼쪽에서 확인할 수 있게 고정한다.
+			DataGridViewColumn numberColumn = dataGrid.Columns["GridNumber"];
+			if (numberColumn != null)
+			{
+				numberColumn.HeaderText = "No";
+				numberColumn.DisplayIndex = 0;
+				numberColumn.Width = 65;
+				numberColumn.Frozen = true;
+			}
+		}
+
+		/// <summary>
+		/// Element Grid에 Cell 단위 선택, Ctrl+C 복사, 우클릭 복사/Excel CSV 저장 기능을 연결한다.
+		/// Designer 배치를 바꾸지 않고 Grid 자체 기능으로 제공하여 기존 화면 크기를 유지한다.
+		/// </summary>
+		private void InitializeElementGridFeatures()
+		{
+			dataGrid.SelectionMode = DataGridViewSelectionMode.CellSelect;
+			dataGrid.MultiSelect = true;
+			dataGrid.ClipboardCopyMode = DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
+			dataGrid.KeyDown += DataGrid_KeyDown;
+			dataGrid.CellMouseDown += DataGrid_CellMouseDown;
+
+			var menu = new ContextMenuStrip();
+			menu.Items.Add(new ToolStripMenuItem("선택 Cell 복사", null, (sender, args) => CopySelectedGridCells()));
+			menu.Items.Add(new ToolStripSeparator());
+			menu.Items.Add(new ToolStripMenuItem("Excel Export (CSV)", null, async (sender, args) => await ExportElementGridAsync()));
+			dataGrid.ContextMenuStrip = menu;
+		}
+
+		/// <summary>Ctrl+C 입력 시 현재 선택된 Cell들을 행/열 형태를 유지한 탭 구분 문자열로 복사한다.</summary>
+		private void DataGrid_KeyDown(object sender, KeyEventArgs e)
+		{
+			if (!e.Control || e.KeyCode != Keys.C) return;
+			CopySelectedGridCells();
+			e.Handled = true;
+			e.SuppressKeyPress = true;
+		}
+
+		/// <summary>우클릭한 Cell이 선택되지 않았다면 해당 Cell을 먼저 선택하여 바로 복사할 수 있게 한다.</summary>
+		private void DataGrid_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
+		{
+			if (e.Button != MouseButtons.Right || e.RowIndex < 0 || e.ColumnIndex < 0) return;
+			if (!dataGrid[e.ColumnIndex, e.RowIndex].Selected)
+			{
+				dataGrid.ClearSelection();
+				dataGrid[e.ColumnIndex, e.RowIndex].Selected = true;
+				dataGrid.CurrentCell = dataGrid[e.ColumnIndex, e.RowIndex];
+			}
+		}
+
+		/// <summary>선택된 Cell 내용을 Windows Clipboard에 복사한다.</summary>
+		private void CopySelectedGridCells()
+		{
+			if (dataGrid.GetCellCount(DataGridViewElementStates.Selected) == 0) return;
+			DataObject data = dataGrid.GetClipboardContent();
+			if (data != null)
+				Clipboard.SetDataObject(data, true);
+		}
+
+		/// <summary>
+		/// 현재 Element Grid 전체를 Excel에서 바로 열 수 있는 UTF-8 BOM CSV로 저장한다.
+		/// UI에서는 저장 위치와 열 순서만 수집하고, 대용량 행 쓰기는 백그라운드에서 처리한다.
+		/// </summary>
+		private async Task ExportElementGridAsync()
+		{
+			var rows = dataGrid.DataSource as IEnumerable<GdsElementGridRow>;
+			if (rows == null) return;
+
+			string path;
+			using (var dialog = new SaveFileDialog())
+			{
+				dialog.Filter = "Excel CSV (*.csv)|*.csv";
+				dialog.DefaultExt = "csv";
+				dialog.AddExtension = true;
+				dialog.FileName = "GdsElements_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".csv";
+				if (dialog.ShowDialog(this) != DialogResult.OK) return;
+				path = dialog.FileName;
+			}
+
+			PropertyDescriptorCollection properties = TypeDescriptor.GetProperties(typeof(GdsElementGridRow));
+			var columns = dataGrid.Columns.Cast<DataGridViewColumn>()
+				.Where(column => column.Visible && properties[column.DataPropertyName] != null)
+				.OrderBy(column => column.DisplayIndex)
+				.Select(column => new GridExportColumn(column.HeaderText, properties[column.DataPropertyName]))
+				.ToArray();
+			var exportRows = rows.ToList();
+
+			dataGrid.Enabled = false;
+			try
+			{
+				await Task.Run(() => WriteElementGridCsv(path, columns, exportRows));
+				MessageBox.Show(this, "Excel CSV 저장이 완료되었습니다.\r\n" + path,
+					"Excel Export", MessageBoxButtons.OK, MessageBoxIcon.Information);
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show(this, ex.Message, "Excel Export 실패", MessageBoxButtons.OK, MessageBoxIcon.Error);
+			}
+			finally
+			{
+				dataGrid.Enabled = true;
+			}
+		}
+
+		/// <summary>Grid 열 순서대로 Header와 모든 Element 값을 CSV 한 행씩 기록한다.</summary>
+		private static void WriteElementGridCsv(string path, GridExportColumn[] columns, List<GdsElementGridRow> rows)
+		{
+			using (var writer = new StreamWriter(path, false, new UTF8Encoding(true)))
+			{
+				writer.WriteLine(String.Join(",", columns.Select(column => EscapeCsv(column.HeaderText))));
+				foreach (GdsElementGridRow row in rows)
+				{
+					writer.WriteLine(String.Join(",", columns.Select(column =>
+						EscapeCsv(Convert.ToString(column.Property.GetValue(row), CultureInfo.InvariantCulture)))));
+				}
+			}
+		}
+
+		/// <summary>쉼표, 큰따옴표, 줄바꿈이 있는 값도 Excel에서 한 Cell로 열리도록 CSV 규칙으로 감싼다.</summary>
+		private static string EscapeCsv(string value)
+		{
+			value = value ?? String.Empty;
+			return "\"" + value.Replace("\"", "\"\"") + "\"";
+		}
+
+		/// <summary>화면 Header와 원본 Row 속성을 연결하여 백그라운드 CSV 저장에 사용한다.</summary>
+		private sealed class GridExportColumn
+		{
+			public string HeaderText { get; private set; }
+			public PropertyDescriptor Property { get; private set; }
+
+			public GridExportColumn(string headerText, PropertyDescriptor property)
+			{
+				HeaderText = headerText;
+				Property = property;
 			}
 		}
 

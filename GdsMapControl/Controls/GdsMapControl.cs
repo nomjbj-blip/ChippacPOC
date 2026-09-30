@@ -313,6 +313,8 @@ namespace NexplantQMS.GdsMap
 
 		public void ShowStructure(GdsLibrary lib, string structureName)
 		{
+			// 진행 중인 Service 배치 추출이 새 도면의 도형을 이어 보내지 않도록 버전을 먼저 바꾼다.
+			_mapContentVersion++;
 			_loadMetrics = new GdsMapLoadMetrics();
 			ResetFlattenMeasurements();
 			_loadFramePending = false;
@@ -329,7 +331,8 @@ namespace NexplantQMS.GdsMap
 
 				long flattenStart = Stopwatch.GetTimestamp();
 				using (var identity = new System.Drawing.Drawing2D.Matrix())
-					FlattenStructure(lib, str, identity, new HashSet<string>(StringComparer.OrdinalIgnoreCase), 0, str.Name);
+					FlattenStructure(lib, str, identity, new HashSet<string>(StringComparer.OrdinalIgnoreCase),
+						0, str.Name, "R0");
 				ApplyInitialLayerColors();
 				_loadMetrics.FlattenMs = ElapsedMilliseconds(flattenStart);
 				CompleteFlattenMeasurements();
@@ -676,18 +679,24 @@ namespace NexplantQMS.GdsMap
 		// ---- Flattening (Identical logic to GDS Geometry Engine) --------------------------
 
 		/// <summary>참조 구조를 재귀적으로 펼쳐 도형을 월드 좌표로 바꾸고 화면용 Layer에 모은다.</summary>
-		private void FlattenStructure(GdsLibrary lib, GdsStructure str, System.Drawing.Drawing2D.Matrix parent, HashSet<string> stack, int depth, string structurePath)
+		private void FlattenStructure(GdsLibrary lib, GdsStructure str, System.Drawing.Drawing2D.Matrix parent,
+			HashSet<string> stack, int depth, string structurePath, string instancePath)
 		{
 			if (depth > 64 || stack.Contains(str.Name)) 
 				return;
 
 			stack.Add(str.Name);
 			bool parentIsIdentity = parent.IsIdentity;
+			int sourceOrdinal = 0;
 
 			foreach (var layer in str.Layers)
 			{
 				foreach (var e in layer.Elements)
 				{
+					// 좌표가 같아도 서로 다른 원본/참조 인스턴스는 다른 배치 ID를 갖는다.
+					int elementOrdinal = sourceOrdinal++;
+					string placedId = instancePath + "/E" + elementOrdinal;
+					string sourceId = str.Name + "/E" + elementOrdinal;
 					if (e is GdsBoundary boundary)
 					{
 						_loadMetrics.BoundaryCount++;
@@ -695,7 +704,7 @@ namespace NexplantQMS.GdsMap
 						var pts = TransformMeasuredGeometryPoints(boundary.Points, e.Transform, parent, parentIsIdentity);
 
 						if (pts.Length >= 2)
-							AddMeasuredSceneItem(CreateMeasuredSceneItem(e, pts, true, 0));
+							AddMeasuredSceneItem(CreateMeasuredSceneItem(e, pts, true, 0, null, placedId, sourceId));
 						else
 							_layerList.AddLayer(e.LayerID);
 					}
@@ -706,7 +715,7 @@ namespace NexplantQMS.GdsMap
 						var pts = TransformMeasuredGeometryPoints(path.Points, e.Transform, parent, parentIsIdentity);
 
 						if (pts.Length >= 1)
-							AddMeasuredSceneItem(CreateMeasuredSceneItem(e, pts, false, Math.Abs(path.Width)));
+							AddMeasuredSceneItem(CreateMeasuredSceneItem(e, pts, false, Math.Abs(path.Width), null, placedId, sourceId));
 						else
 							_layerList.AddLayer(e.LayerID);
 					}
@@ -717,7 +726,7 @@ namespace NexplantQMS.GdsMap
 						long transformStart = Stopwatch.GetTimestamp();
 						var pts = TransformTextPosition(text, parent, parentIsIdentity);
 						_coordinateTransformTicks += Stopwatch.GetTimestamp() - transformStart;
-						AddMeasuredSceneItem(CreateMeasuredSceneItem(e, pts, false, 0, text.Text));
+						AddMeasuredSceneItem(CreateMeasuredSceneItem(e, pts, false, 0, text.Text, placedId, sourceId));
 						long textStart = Stopwatch.GetTimestamp();
 						AddTextLabel(text, pts, structurePath);
 						_textRegisterTicks += Stopwatch.GetTimestamp() - textStart;
@@ -743,7 +752,8 @@ namespace NexplantQMS.GdsMap
 								long pathStart = Stopwatch.GetTimestamp();
 								string childPath = structurePath + " > " + child.Name + " @ (" + sref.Origin.X + ", " + sref.Origin.Y + ")";
 								_srefPathTicks += Stopwatch.GetTimestamp() - pathStart;
-								FlattenStructure(lib, child, combined, stack, depth + 1, childPath);
+								FlattenStructure(lib, child, combined, stack, depth + 1, childPath,
+									instancePath + "/R" + elementOrdinal);
 							}
 						}
 					}
@@ -806,10 +816,13 @@ namespace NexplantQMS.GdsMap
 		}
 
 		/// <summary>GlSceneItem 생성자 안의 Bounds 계산을 Layer 등록 시간과 분리하여 측정한다.</summary>
-		private GlSceneItem CreateMeasuredSceneItem(GdsElement source, GPoint[] points, bool closed, double width, string text = null)
+		private GlSceneItem CreateMeasuredSceneItem(GdsElement source, GPoint[] points, bool closed,
+			double width, string text = null, string placedElementId = null,
+			string sourceElementId = null)
 		{
 			long start = Stopwatch.GetTimestamp();
-			var item = new GlSceneItem(source, points, closed, width, text);
+			var item = new GlSceneItem(source, points, closed, width, text,
+				placedElementId, sourceElementId);
 			_sceneItemCreateTicks += Stopwatch.GetTimestamp() - start;
 			return item;
 		}

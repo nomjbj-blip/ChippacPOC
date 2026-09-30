@@ -57,8 +57,6 @@ namespace NexplantQMS.GdsMap
             double tolerance = Math.Max(hitArea.Width, hitArea.Height) / 2;
             var visibleLayers = new HashSet<int>(_layerList.Where(layer => layer.Visible).Select(layer => layer.LayerID));
             var candidates = new List<ChainElementCandidate>();
-            int sceneNumber = 0;
-
             foreach (GlSceneItem item in AllItems)
             {
                 if (!(item.Source is GdsBoundary) && !(item.Source is GdsPath))
@@ -71,7 +69,7 @@ namespace NexplantQMS.GdsMap
                 {
                     var points = item.WorldPoints;
                     candidates.Add(new ChainElementCandidate(
-                        "SCENE:" + sceneNumber,
+                        item.PlacedElementId,
                         item.LayerID,
                         item.Source.DataType,
                         item.Source.ElementName,
@@ -79,7 +77,6 @@ namespace NexplantQMS.GdsMap
                         points == null ? 0 : points.Length,
                         item.Source is GdsPath ? item.Width : 0));
                 }
-                sceneNumber++;
             }
 
             return candidates.OrderBy(candidate => GetBoundsArea(candidate.Bounds))
@@ -88,7 +85,7 @@ namespace NexplantQMS.GdsMap
 
         /// <summary>
         /// 후보 목록에서 고른 Element와 이미 확정한 Input/Output Element를 기존 GPU 선택 색상으로 강조한다.
-        /// 임시 키는 현재 GDS 화면에서만 찾아 사용한다.
+        /// 배치 ID로 현재 화면 도형을 찾아 사용한다.
         /// </summary>
         public void HighlightChainElements(IEnumerable<string> elementKeys)
         {
@@ -96,20 +93,18 @@ namespace NexplantQMS.GdsMap
             var keys = new HashSet<string>(elementKeys ?? Enumerable.Empty<string>(), StringComparer.Ordinal);
             var changedItems = new HashSet<GlSceneItem>(_selectedItems);
             ClearSelectionInternal();
-            int sceneNumber = 0;
             if (keys.Count > 0)
                 foreach (GlSceneItem item in AllItems)
                 {
                     if (!(item.Source is GdsBoundary) && !(item.Source is GdsPath))
                         continue;
-                    if (keys.Contains("SCENE:" + sceneNumber))
+                    if (keys.Contains(item.PlacedElementId))
                     {
-                        _lastChainTraceItems["SCENE:" + sceneNumber] = item;
+                        _lastChainTraceItems[item.PlacedElementId] = item;
                         item.Selected = true;
                         _selectedItems.Add(item);
                         changedItems.Add(item);
                     }
-                    sceneNumber++;
                 }
             _selectedItems.Sort();
             UpdateSelectionVertices(changedItems);
@@ -302,19 +297,16 @@ namespace NexplantQMS.GdsMap
 
         /// <summary>
         /// 현재 화면에 펼쳐진 Boundary와 Path 중 체크한 Layer의 항목만 추적용 Element로 변환한다.
-        /// SCENE 번호는 현재 조회 세션의 후보 표시용이며 DB 영구 식별자로 사용하지 않는다.
+        /// 도면 개정본 안의 배치 ID를 사용해 선택/탐색/DB 도형 참조 기준을 일치시킨다.
         /// </summary>
         private List<SceneTracePair> CreateSceneTracePairs(ISet<int> selectedLayerIds)
         {
             var result = new List<SceneTracePair>();
-            int sceneNumber = 0;
-
             foreach (GlSceneItem item in AllItems)
             {
                 if (!(item.Source is GdsBoundary) && !(item.Source is GdsPath))
                     continue;
-                string key = "SCENE:" + sceneNumber.ToString();
-                sceneNumber++;
+                string key = item.PlacedElementId;
                 if (!selectedLayerIds.Contains(item.LayerID))
                     continue;
                 var traceElement = new ChainTraceElement(
