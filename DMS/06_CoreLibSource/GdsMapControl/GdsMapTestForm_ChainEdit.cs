@@ -11,7 +11,7 @@ namespace NexplantQMS.GdsMap
     /// 자동 후보를 계산한 다음 엔지니어가 지도에서 Element를 추가하거나 제외하는 화면 동작이다.
     /// GDS 원본과 자동 탐색 결과는 수정하지 않고 현재 설정의 수동 보정 키만 보관한다.
     /// </summary>
-    public partial class GdsMapTestForm
+    public partial class GdsMapForm
     {
         /// <summary>같은 버튼 또는 Esc로 편집을 끝내며 Input/Output 지정과 동시에 실행되지 않게 한다.</summary>
         private void ToggleChainEditMode(ChainEditMode mode)

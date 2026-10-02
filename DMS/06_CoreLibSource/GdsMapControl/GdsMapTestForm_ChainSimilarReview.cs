@@ -11,7 +11,7 @@ namespace NexplantQMS.GdsMap
     /// 찾은 묶음을 목록에서 검토하고 체크한 결과만 현재 Chain의 수동 제외에 반영한다.
     /// 한 번의 확정에서 실제 바뀐 키만 보관하여 다른 수동 편집 기록을 지우지 않고 되돌린다.
     /// </summary>
-    public partial class GdsMapTestForm
+    public partial class GdsMapForm
     {
         /// <summary>목록의 한 행이 가리키는 검색 결과와 보호 여부를 함께 유지한다.</summary>
         private sealed class ChainSimilarListItem

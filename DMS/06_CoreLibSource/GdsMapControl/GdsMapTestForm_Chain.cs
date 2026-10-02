@@ -12,7 +12,7 @@ namespace NexplantQMS.GdsMap
     /// GDS 테스트 화면에 Chain Input, Output, Layer 필터와 경로 편집 기능을 제공한다.
     /// 후보 경로 검증이 끝나기 전까지 DB 저장 기능과 확정 Chain 관리는 포함하지 않는다.
     /// </summary>
-    public partial class GdsMapTestForm
+    public partial class GdsMapForm
     {
         private enum ChainPointCaptureMode
         {

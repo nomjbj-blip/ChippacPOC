@@ -13,7 +13,7 @@ namespace NexplantQMS.GdsMap
     /// 유사 묶음 검색에 사용할 한 곳의 예시 Element를 현재 Chain에서 클릭으로 고른다.
     /// 이 파일은 예시만 보관하며 Chain 소속이나 GDS 원본을 변경하지 않는다.
     /// </summary>
-    public partial class GdsMapTestForm
+    public partial class GdsMapForm
     {
         private readonly HashSet<string> _chainExampleKeys = new HashSet<string>(StringComparer.Ordinal);
         private bool _chainExampleSelecting;

@@ -11,7 +11,7 @@ namespace NexplantQMS.GdsMap
     /// 한 GDS 화면의 여러 Chain 초안을 메모리에서 관리한다.
     /// 목록 선택은 편집 대상을, 체크는 지도 표시를 결정하며 서로 영향을 주지 않는다.
     /// </summary>
-    public partial class GdsMapTestForm
+    public partial class GdsMapForm
     {
         /// <summary>한 Chain의 편집 상태를 다른 Chain과 섞이지 않게 보관하는 현재 세션의 초안이다.</summary>
         private sealed class ChainDefinition

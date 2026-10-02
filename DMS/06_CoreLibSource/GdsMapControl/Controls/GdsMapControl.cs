@@ -122,7 +122,9 @@ namespace NexplantQMS.GdsMap
 		private int _shaderProgram;
 		private int _uMatrixLoc;
 		private bool _glInitialized;
-		private List<Vertex> _gpuVertices = new List<Vertex>(50000000);
+		// 미리 5천만 개(약 1.4GB)를 잡으면 x86 DMS 호스트(DACruxV5)에서 컨트롤 생성만으로 OutOfMemory가 난다.
+		// 실제 도면 크기만큼만 늘어나도록 기본 용량으로 만든다.
+		private List<Vertex> _gpuVertices = new List<Vertex>();
 		private bool _gpuBufferReady;
 		private Vertex[] _partialUploadChunk;
 		private int _lastRenderProgressTick;
@@ -563,7 +565,19 @@ namespace NexplantQMS.GdsMap
 			}
 			else
 			{
-				GL.BufferData(BufferTarget.ArrayBuffer, _gpuVertices.Count * sizeof(float) * 7, _gpuVertices.ToArray(), BufferUsageHint.DynamicDraw);
+				// ToArray()로 전체 정점을 한 번 더 복사하면 메모리가 두 배로 필요하다.
+				// VBO 크기만 먼저 잡고 고정 크기 배열로 나눠 전송하여 추가 메모리를 8192개 분량으로 제한한다.
+				const int chunkVertices = 8192;
+				const int stride = sizeof(float) * 7;
+				GL.BufferData(BufferTarget.ArrayBuffer, new IntPtr((long)_gpuVertices.Count * stride), IntPtr.Zero, BufferUsageHint.DynamicDraw);
+				if (_partialUploadChunk == null)
+					_partialUploadChunk = new Vertex[chunkVertices];
+				for (int position = 0; position < _gpuVertices.Count; position += chunkVertices)
+				{
+					int count = Math.Min(chunkVertices, _gpuVertices.Count - position);
+					_gpuVertices.CopyTo(position, _partialUploadChunk, 0, count);
+					GL.BufferSubData(BufferTarget.ArrayBuffer, new IntPtr((long)position * stride), count * stride, _partialUploadChunk);
+				}
 			}
 			_gpuBufferReady = true;
 			ReportRenderProgress("GPU 업로드 완료", 100, false, false, true);
