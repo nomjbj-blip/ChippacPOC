@@ -26,3 +26,17 @@ D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Comm
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Common.VideoCapture\obj\Debug\DACrux.C.FC185F5A.Up2Date
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Common.VideoCapture\obj\Debug\DACrux.Common.VideoCapture.dll
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Common.VideoCapture\obj\Debug\DACrux.Common.VideoCapture.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\07_CoreLib\DACrux.Common.VideoCapture.dll.config
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\07_CoreLib\DACrux.Common.VideoCapture.dll
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\07_CoreLib\DACrux.Common.VideoCapture.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\06_CoreLibSource\DACrux.Common.VideoCapture\obj\Debug\DACrux.Common.VideoCapture.csproj.AssemblyReference.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\06_CoreLibSource\DACrux.Common.VideoCapture\obj\Debug\DACrux.Common.VideoCapture.FrmSnapshotPopup.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\06_CoreLibSource\DACrux.Common.VideoCapture\obj\Debug\DACrux.Common.VideoCapture.FrmVideoCaptureOption.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\06_CoreLibSource\DACrux.Common.VideoCapture\obj\Debug\DACrux.Common.VideoCapture.Properties.Resources.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\06_CoreLibSource\DACrux.Common.VideoCapture\obj\Debug\DACrux.Common.VideoCapture.VideoCaptureControl.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\06_CoreLibSource\DACrux.Common.VideoCapture\obj\Debug\DACrux.Common.VideoCapture.VideoCaptureControl_Old.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\06_CoreLibSource\DACrux.Common.VideoCapture\obj\Debug\DACrux.Common.VideoCapture.csproj.GenerateResource.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\06_CoreLibSource\DACrux.Common.VideoCapture\obj\Debug\DACrux.Common.VideoCapture.csproj.CoreCompileInputs.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\06_CoreLibSource\DACrux.Common.VideoCapture\obj\Debug\DACrux.C.FC185F5A.Up2Date
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\06_CoreLibSource\DACrux.Common.VideoCapture\obj\Debug\DACrux.Common.VideoCapture.dll
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\06_CoreLibSource\DACrux.Common.VideoCapture\obj\Debug\DACrux.Common.VideoCapture.pdb

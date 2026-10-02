@@ -69,6 +69,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="iDefectAlarm.cs" />
+    <Compile Include="iGdsMapImport.cs" />
+    <Compile Include="iGdsMapView.cs" />
     <Compile Include="iDefectMapAnalysis.cs" />
     <Compile Include="iDMReport.cs" />
     <Compile Include="iSEMConfiguration.cs" />

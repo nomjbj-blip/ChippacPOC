@@ -10,3 +10,13 @@ D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Comm
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Common.Interface\obj\Debug\DACrux.Common.Interface.csproj.CoreCompileInputs.cache
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Common.Interface\obj\Debug\DACrux.Common.Interface.dll
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\06_CoreLibSource\DACrux.Common.Interface\obj\Debug\DACrux.Common.Interface.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\06_CoreLibSource\DACrux.Common.Interface\bin\Debug\DACrux.Common.Interface.dll
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\06_CoreLibSource\DACrux.Common.Interface\bin\Debug\DACrux.Common.Interface.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\06_CoreLibSource\DACrux.Common.Interface\obj\Debug\DACrux.Common.Interface.csproj.AssemblyReference.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\06_CoreLibSource\DACrux.Common.Interface\obj\Debug\DACrux.Common.Interface.csproj.CoreCompileInputs.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\06_CoreLibSource\DACrux.Common.Interface\obj\Debug\DACrux.Common.Interface.dll
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\06_CoreLibSource\DACrux.Common.Interface\obj\Debug\DACrux.Common.Interface.pdb
+C:\Users\USER\AppData\Local\Temp\GdsMapViewBuild\DACrux.Common.Interface.dll
+C:\Users\USER\AppData\Local\Temp\GdsMapViewBuild\DACrux.Common.Interface.pdb
+C:\Users\USER\AppData\Local\Temp\GdsMapView018Build\DACrux.Common.Interface.dll
+C:\Users\USER\AppData\Local\Temp\GdsMapView018Build\DACrux.Common.Interface.pdb

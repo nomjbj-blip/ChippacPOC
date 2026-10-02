@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <asmv1:assembly xsi:schemaLocation="urn:schemas-microsoft-com:asm.v1 assembly.adaptive.xsd" manifestVersion="1.0" xmlns:asmv1="urn:schemas-microsoft-com:asm.v1" xmlns="urn:schemas-microsoft-com:asm.v2" xmlns:asmv2="urn:schemas-microsoft-com:asm.v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:co.v1="urn:schemas-microsoft-com:clickonce.v1" xmlns:asmv3="urn:schemas-microsoft-com:asm.v3" xmlns:dsig="http://www.w3.org/2000/09/xmldsig#" xmlns:co.v2="urn:schemas-microsoft-com:clickonce.v2">
-  <asmv1:assemblyIdentity name="DACruxV5.exe" version="1.0.0.152" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="x86" type="win32" />
+  <asmv1:assemblyIdentity name="DACruxV5.exe" version="1.0.0.152" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="msil" type="win32" />
   <description asmv2:iconFile="Resources\FAB1.ico" asmv2:publisher="Miracom Inc" co.v1:suiteName="DACruxV5" asmv2:product="DACruxV5_FAB1" xmlns="urn:schemas-microsoft-com:asm.v1" />
   <application />
   <entryPoint>
-    <assemblyIdentity name="DACruxV5" version="1.0.0.0" language="neutral" processorArchitecture="x86" />
+    <assemblyIdentity name="DACruxV5" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
     <commandLine file="DACruxV5.exe" parameters="" />
   </entryPoint>
   <co.v1:useManifestForTrust xmlns="urn:schemas-microsoft-com:asm.v1" />
@@ -99,7 +99,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>EO9t1KNARqs+16cBjqEy+Q9mQ/I=</dsig:DigestValue>
+        <dsig:DigestValue>9SQ+cIGE6j9I1OpEBy2cCdkv39A=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -135,7 +135,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>b7pDVscYA85OmW2wsNjp5eou/H4=</dsig:DigestValue>
+        <dsig:DigestValue>l/1Qh/8xVl9oQAbpwb4Zd+0HdAE=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -147,7 +147,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>A9sOJSZb64++54w8MYP4vYQxISA=</dsig:DigestValue>
+        <dsig:DigestValue>aZE+e0orxG/+COBGXmE33YnRBgE=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -159,7 +159,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>SeuR1r7dEl3cDLRMG6cmpDv04HI=</dsig:DigestValue>
+        <dsig:DigestValue>2ksp3FEwJrffdl0MI7g3oSL+W6w=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -171,7 +171,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>d5KedkQWmIpjVyjLTN9tStv+zAk=</dsig:DigestValue>
+        <dsig:DigestValue>Xj6Y3cGMtrFsXbVdLV16pHc8u+M=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -183,19 +183,19 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>FVsSmIRC6Yo3KSscSMaBdtVywFo=</dsig:DigestValue>
+        <dsig:DigestValue>DLZqc5Yq8gpZ85CX4B67yAEuQXA=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="DACrux.Data.Parser.dll" size="123392">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="DACrux.Data.Parser.dll" size="123904">
       <assemblyIdentity name="DACrux.Data.Parser" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>BRC7KnJhGGfGl76rwErRMuoQ4X0=</dsig:DigestValue>
+        <dsig:DigestValue>F3//EZ0FIviXnjjzI7Rn9M4KGp0=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -207,7 +207,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>PEBPBLLudS5Xuzpi6rYRhI34Ey4=</dsig:DigestValue>
+        <dsig:DigestValue>6BUaC+lNVgEcSpaZxM6+cIXG8aM=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -219,7 +219,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>U4bsPe6VkyUEx7WQMwz/AQW7suU=</dsig:DigestValue>
+        <dsig:DigestValue>hdrCZQESsqG1VJhw/VIae2yr8Ww=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -231,31 +231,31 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>QIQIdRWuXzBK5yBm1awDnm4xUwY=</dsig:DigestValue>
+        <dsig:DigestValue>jFA9XJWxWUS7SVSQfvBB/L/lcKA=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="DACrux.Framework.BSL.dll" size="32256">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="DACrux.Framework.BSL.dll" size="32768">
       <assemblyIdentity name="DACrux.Framework.BSL" version="4.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>2qvGePXMXOKwei0Z293q3/Ofu0E=</dsig:DigestValue>
+        <dsig:DigestValue>f4TpFQQHh/daq0D0k9Nuz5/uy3U=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="DACrux.Framework.Controls.dll" size="239104">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="DACrux.Framework.Controls.dll" size="253440">
       <assemblyIdentity name="DACrux.Framework.Controls" version="4.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>QddGm8ffaef0fxur/0BUOZiHwhA=</dsig:DigestValue>
+        <dsig:DigestValue>T4yKZ1k3nReSjcaeGAZQLo7QHoc=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -267,7 +267,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>V6X4gy/ChL3iB6Blt/I9cwgho7M=</dsig:DigestValue>
+        <dsig:DigestValue>rEKj1C8SBdPRc77qEwoksDEo3NM=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -279,7 +279,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>BzYftO0Pb6D3ho9uresrTPbNb9o=</dsig:DigestValue>
+        <dsig:DigestValue>4lTySkCsyAvmFie1e39RnjjvWe0=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -303,7 +303,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>cvSlkL/8Y3dStdEF42mObbpAtNQ=</dsig:DigestValue>
+        <dsig:DigestValue>rT0dO8YYVtVoeFo34aXCwXFfqCw=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -315,7 +315,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>7b7DoAZqFHJNSW5BrARLHwsZmuI=</dsig:DigestValue>
+        <dsig:DigestValue>ind5w87Op7w6aplf3OmIKZ0w8e8=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -327,7 +327,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>Y+WCN8vxzUlPFrDn6jvoCTstzwc=</dsig:DigestValue>
+        <dsig:DigestValue>Vujm1og6ov9TY8pOHIgJBEPddlo=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -339,7 +339,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>CESbzbdH0MXukDR4n6z8vyU81JI=</dsig:DigestValue>
+        <dsig:DigestValue>2/EQDEmVheOpnc8OgiLsF0RjoEk=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -351,55 +351,55 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>D5UYB++dqQ3ZbOfQs0UuBmARa5M=</dsig:DigestValue>
+        <dsig:DigestValue>GOU+mgFP3zwBZfw9DVBu1e3NReE=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
     <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="DACrux.SEMDMS.Control.dll" size="688128">
-      <assemblyIdentity name="DACrux.SEMDMS.Control" version="1.0.9757.17702" language="neutral" processorArchitecture="msil" />
+      <assemblyIdentity name="DACrux.SEMDMS.Control" version="1.0.9771.31047" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>u4XoWiwHPaYGh8prRWz7UrJN1SU=</dsig:DigestValue>
+        <dsig:DigestValue>22cvpcen77Eu+iC+QkOODgJeoTw=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="DACrux.SEMDMS.ENGUI.dll" size="463872">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="DACrux.SEMDMS.ENGUI.dll" size="491520">
       <assemblyIdentity name="DACrux.SEMDMS.ENGUI" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>4BHlOt3AMzWYZeI00iZCrQoT0SE=</dsig:DigestValue>
+        <dsig:DigestValue>zQSeZ0QRw9vTc/YTc3iqGvOjSv8=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="DACrux.SEMDMS.Interface.dll" size="13824">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="DACrux.SEMDMS.Interface.dll" size="14848">
       <assemblyIdentity name="DACrux.SEMDMS.Interface" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>26FIQGfNihJ7w1MinC5jpJPNBOQ=</dsig:DigestValue>
+        <dsig:DigestValue>OQ1zB7xptK6j1sQfHELxDtxtVtU=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="DACrux.SEMDMS.RO.dll" size="37376">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="DACrux.SEMDMS.RO.dll" size="39424">
       <assemblyIdentity name="DACrux.SEMDMS.RO" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>wnF2mCvRZsCr7zV+7jWK8FuMiVg=</dsig:DigestValue>
+        <dsig:DigestValue>A4T2vjkVc6+D5mLb/G7mqQsfal0=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -411,7 +411,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>UeiXkmIuRLKTPEC260CkcxSbdJQ=</dsig:DigestValue>
+        <dsig:DigestValue>MuQVs0zVN4ozqYwyC5bC88GPX4o=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -447,19 +447,19 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>AyaHrH5foxbKJt8wugEJWXaFVUI=</dsig:DigestValue>
+        <dsig:DigestValue>5b0jUCEAjKsvg7+ypRczF6KY/CQ=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="DACrux.TEST.ENGUI.dll" size="1481728">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="DACrux.TEST.ENGUI.dll" size="1502208">
       <assemblyIdentity name="DACrux.TEST.ENGUI" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>fBkWAcRtC0SdoYpEimD9kZ2FW4Q=</dsig:DigestValue>
+        <dsig:DigestValue>O6rVRhMH6k7+ynuksc2ZaY4hhr8=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -471,7 +471,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>r1w80I50MboXmnjTd8GhS8hnORY=</dsig:DigestValue>
+        <dsig:DigestValue>Rr1hZ36tzFlBxhkdqLEzbffudjk=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -483,7 +483,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>TTljhe5sfWcM3vS8bpJ/9hwYnXw=</dsig:DigestValue>
+        <dsig:DigestValue>ehYzzUI5fHamisyLoC6n24uniKM=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -495,19 +495,19 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>ZxdO/l2GXctCMAR751pSuuhL3w0=</dsig:DigestValue>
+        <dsig:DigestValue>3SUX2BSaP0Lk06E0INLpkd5YDBc=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
     <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="DACruxV5.exe" size="12288">
-      <assemblyIdentity name="DACruxV5" version="1.0.0.0" language="neutral" processorArchitecture="x86" />
+      <assemblyIdentity name="DACruxV5" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>B6ZvQq5LER2MAw9ltRxVKtR2T9k=</dsig:DigestValue>
+        <dsig:DigestValue>mU5j2v4DbhFaigP8DIYkAaoEZg8=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -1078,13 +1078,13 @@
       <dsig:DigestValue>32tKQa9eX+ObAMpwu51tLkZByrM=</dsig:DigestValue>
     </hash>
   </file>
-  <file name="MenuFile.mnu" size="661430">
+  <file name="MenuFile.mnu" size="690376">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-      <dsig:DigestValue>WxUoHVnXlif4n2z+My3RmP6b7VQ=</dsig:DigestValue>
+      <dsig:DigestValue>jTnw49H9gJkVho2k33IN43B1xek=</dsig:DigestValue>
     </hash>
   </file>
   <file name="Resources\FAB1.ico" size="2238">

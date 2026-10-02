@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TQP_GDS_CHAIN: Device의 Chain 마스터. 2026-10-02 Claude CLAUDE-017 추가(현재는 삭제 쿼리만).
+  Chain 하위 테이블(CHAIN_VER -> CHAIN_MEMBER / CHAIN_LAYER / CHAIN_RULE / CHAIN_EDIT)은 FK ON DELETE CASCADE로 함께 지워진다.
+  Device 데이터 삭제(GdsMapImport.DeleteMap) 시 PLACED_EL보다 먼저 지워야 한다(CHAIN_MEMBER / EDIT -> PLACED_EL FK는 CASCADE가 아님).
+-->
+<queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Delete" queryid="DELETE_CHAIN" commandtype="Text" description="Device의 Chain 전체 삭제 (하위 Chain 테이블은 FK CASCADE)" commandtimeout="600">
+        <commandtext><![CDATA[DELETE FROM TQP_GDS_CHAIN
+ WHERE FACTORY = :factory
+   AND DEVICE_ID = :device_id]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
+        </parameters>
+    </query>
+</queryxml>

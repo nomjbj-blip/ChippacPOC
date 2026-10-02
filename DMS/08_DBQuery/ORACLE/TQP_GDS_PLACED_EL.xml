@@ -1,0 +1,211 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+  logging="FALSE": 이 파일은 BLOB(byte[]) / 숫자 객체를 Middleware Execute1(object[])로 넘기는 쿼리가 있다.
+  Middleware SQL 로그(SQLTrace)가 모든 파라미터 값을 string으로 형변환해 InvalidCastException이 나므로 SQL 로그를 끈다(2026-10-02 확인).
+  좌표 double은 G17 문자열 + TO_BINARY_DOUBLE로 받는다. dbtype="Double"은 15자리로 반올림되어 저장된다(2026-10-02 확인).
+-->
+<queryxml conid="DMSMGR" logging="FALSE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Insert" queryid="CREATE_PLACED_EL_MULTI" commandtype="Text" description="작은 배치 도형 다건 추가 (좌표 2,000바이트=125점 이하 / ExecuteMultiple / 좌표 16진수 문자열을 HEXTORAW)" commandtimeout="600">
+        <commandtext><![CDATA[INSERT INTO TQP_GDS_PLACED_EL
+    (FACTORY,
+    DEVICE_ID,
+    PLACED_ELEMENT_ID,
+    SOURCE_ELEMENT_ID,
+    LAYER_ID,
+    DATA_TYPE,
+    ELEMENT_TYPE,
+    CLOSED_FLAG,
+    PATH_WIDTH,
+    PATH_TYPE,
+    MIN_X,
+    MIN_Y,
+    MAX_X,
+    MAX_Y,
+    POINT_COUNT,
+    POINTS_FORMAT_VERSION,
+    POINTS_BIN,
+    TEXT_VALUE,
+    TEXT_TYPE,
+    TEXT_FONT,
+    TEXT_HORIZONTAL,
+    TEXT_VERTICAL)
+VALUES
+    (:factory,
+    :device_id,
+    :placed_element_id,
+    :source_element_id,
+    :layer_id,
+    :data_type,
+    :element_type,
+    :closed_flag,
+    TO_BINARY_DOUBLE(:path_width),
+    :path_type,
+    TO_BINARY_DOUBLE(:min_x),
+    TO_BINARY_DOUBLE(:min_y),
+    TO_BINARY_DOUBLE(:max_x),
+    TO_BINARY_DOUBLE(:max_y),
+    :point_count,
+    :points_format_version,
+    HEXTORAW(:points_hex),
+    :text_value,
+    :text_type,
+    :text_font,
+    :text_horizontal,
+    :text_vertical)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
+            <param direction="Input" dbtype="VarChar" size="1024">:placed_element_id</param>
+            <param direction="Input" dbtype="VarChar" size="2048">:source_element_id</param>
+            <param direction="Input" dbtype="Number" size="0">:layer_id</param>
+            <param direction="Input" dbtype="Number" size="0">:data_type</param>
+            <param direction="Input" dbtype="VarChar" size="20">:element_type</param>
+            <param direction="Input" dbtype="Number" size="0">:closed_flag</param>
+            <param direction="Input" dbtype="VarChar" size="40">:path_width</param>
+            <param direction="Input" dbtype="Number" size="0">:path_type</param>
+            <param direction="Input" dbtype="VarChar" size="40">:min_x</param>
+            <param direction="Input" dbtype="VarChar" size="40">:min_y</param>
+            <param direction="Input" dbtype="VarChar" size="40">:max_x</param>
+            <param direction="Input" dbtype="VarChar" size="40">:max_y</param>
+            <param direction="Input" dbtype="Number" size="0">:point_count</param>
+            <param direction="Input" dbtype="Number" size="0">:points_format_version</param>
+            <param direction="Input" dbtype="VarChar" size="4000">:points_hex</param>
+            <param direction="Input" dbtype="VarChar" size="4000">:text_value</param>
+            <param direction="Input" dbtype="Number" size="0">:text_type</param>
+            <param direction="Input" dbtype="Number" size="0">:text_font</param>
+            <param direction="Input" dbtype="VarChar" size="20">:text_horizontal</param>
+            <param direction="Input" dbtype="VarChar" size="20">:text_vertical</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="CREATE_PLACED_EL" commandtype="Text" description="큰 배치 도형 / 긴 TEXT 한 건 추가 (BLOB / Execute1 / 같은 키가 있으면 건너뜀). 다건 저장 실패 후 재시도에도 사용" commandtimeout="600">
+        <commandtext><![CDATA[INSERT INTO TQP_GDS_PLACED_EL
+    (FACTORY,
+    DEVICE_ID,
+    PLACED_ELEMENT_ID,
+    SOURCE_ELEMENT_ID,
+    LAYER_ID,
+    DATA_TYPE,
+    ELEMENT_TYPE,
+    CLOSED_FLAG,
+    PATH_WIDTH,
+    PATH_TYPE,
+    MIN_X,
+    MIN_Y,
+    MAX_X,
+    MAX_Y,
+    POINT_COUNT,
+    POINTS_FORMAT_VERSION,
+    POINTS_BIN,
+    TEXT_VALUE,
+    TEXT_TYPE,
+    TEXT_FONT,
+    TEXT_HORIZONTAL,
+    TEXT_VERTICAL)
+SELECT :factory, :device_id, :placed_element_id, :source_element_id, :layer_id, :data_type, :element_type,
+       :closed_flag, TO_BINARY_DOUBLE(:path_width), :path_type,
+       TO_BINARY_DOUBLE(:min_x), TO_BINARY_DOUBLE(:min_y), TO_BINARY_DOUBLE(:max_x), TO_BINARY_DOUBLE(:max_y),
+       :point_count, :points_format_version, :points_bin,
+       :text_value, :text_type, :text_font, :text_horizontal, :text_vertical FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM TQP_GDS_PLACED_EL
+                    WHERE FACTORY = :chk_factory AND DEVICE_ID = :chk_device_id AND PLACED_ELEMENT_ID = :chk_placed_id)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
+            <param direction="Input" dbtype="VarChar" size="1024">:placed_element_id</param>
+            <param direction="Input" dbtype="VarChar" size="2048">:source_element_id</param>
+            <param direction="Input" dbtype="Number" size="0">:layer_id</param>
+            <param direction="Input" dbtype="Number" size="0">:data_type</param>
+            <param direction="Input" dbtype="VarChar" size="20">:element_type</param>
+            <param direction="Input" dbtype="Number" size="0">:closed_flag</param>
+            <param direction="Input" dbtype="VarChar" size="40">:path_width</param>
+            <param direction="Input" dbtype="Number" size="0">:path_type</param>
+            <param direction="Input" dbtype="VarChar" size="40">:min_x</param>
+            <param direction="Input" dbtype="VarChar" size="40">:min_y</param>
+            <param direction="Input" dbtype="VarChar" size="40">:max_x</param>
+            <param direction="Input" dbtype="VarChar" size="40">:max_y</param>
+            <param direction="Input" dbtype="Number" size="0">:point_count</param>
+            <param direction="Input" dbtype="Number" size="0">:points_format_version</param>
+            <param direction="Input" dbtype="Blob" size="0">:points_bin</param>
+            <param direction="Input" dbtype="Clob" size="0">:text_value</param>
+            <param direction="Input" dbtype="Number" size="0">:text_type</param>
+            <param direction="Input" dbtype="Number" size="0">:text_font</param>
+            <param direction="Input" dbtype="VarChar" size="20">:text_horizontal</param>
+            <param direction="Input" dbtype="VarChar" size="20">:text_vertical</param>
+            <param direction="Input" dbtype="VarChar" size="30">:chk_factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:chk_device_id</param>
+            <param direction="Input" dbtype="VarChar" size="1024">:chk_placed_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_PLACED_EL_COUNT" commandtype="Text" description="완료 확정: Device의 배치 도형 수 / 좌표 수 합계" commandtimeout="600">
+        <commandtext><![CDATA[SELECT COUNT(*) AS PLACED_COUNT, NVL(SUM(POINT_COUNT), 0) AS POINT_COUNT
+  FROM TQP_GDS_PLACED_EL
+ WHERE FACTORY = :factory
+   AND DEVICE_ID = :device_id]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_PLACED_POINTS" commandtype="Text" description="배치 도형 좌표 재조회 (저장 검증용)" commandtimeout="600">
+        <commandtext><![CDATA[SELECT PLACED_ELEMENT_ID, POINT_COUNT, POINTS_BIN, PATH_WIDTH, MIN_X, MAX_Y, TEXT_VALUE
+  FROM TQP_GDS_PLACED_EL
+ WHERE FACTORY = :factory
+   AND DEVICE_ID = :device_id
+   AND PLACED_ELEMENT_ID = :placed_element_id]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
+            <param direction="Input" dbtype="VarChar" size="1024">:placed_element_id</param>
+        </parameters>
+    </query>
+    <!-- 조회 화면(GdsMapView): Device의 Layer별 키 순서 페이지 조회. OFFSET 대신 이전 페이지 마지막 ID 다음부터 읽어 IX_GDS_PLACED_LAYER 범위 스캔을 쓴다. 2026-10-02 CLAUDE-018 키 FACTORY + DEVICE_ID -->
+    <query statement="Select" queryid="SELECT_PLACED_EL_PAGE_FIRST" commandtype="Text" description="조회 화면: Layer의 첫 페이지 (빈 문자열은 Oracle에서 NULL이라 첫 페이지를 별도 쿼리로 둔다)" commandtimeout="600">
+        <commandtext><![CDATA[SELECT * FROM (
+        SELECT PLACED_ELEMENT_ID, SOURCE_ELEMENT_ID, LAYER_ID, DATA_TYPE, ELEMENT_TYPE,
+               CLOSED_FLAG, PATH_WIDTH, PATH_TYPE, MIN_X, MIN_Y, MAX_X, MAX_Y,
+               POINT_COUNT, POINTS_FORMAT_VERSION, POINTS_BIN,
+               TEXT_VALUE, TEXT_TYPE, TEXT_FONT, TEXT_HORIZONTAL, TEXT_VERTICAL
+          FROM TQP_GDS_PLACED_EL
+         WHERE FACTORY = :factory
+           AND DEVICE_ID = :device_id
+           AND LAYER_ID = :layer_id
+         ORDER BY PLACED_ELEMENT_ID)
+ WHERE ROWNUM <= :max_rows]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
+            <param direction="Input" dbtype="Number" size="0">:layer_id</param>
+            <param direction="Input" dbtype="Number" size="0">:max_rows</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_PLACED_EL_PAGE" commandtype="Text" description="조회 화면: Layer의 다음 페이지 (이전 페이지 마지막 PLACED_ELEMENT_ID 다음부터)" commandtimeout="600">
+        <commandtext><![CDATA[SELECT * FROM (
+        SELECT PLACED_ELEMENT_ID, SOURCE_ELEMENT_ID, LAYER_ID, DATA_TYPE, ELEMENT_TYPE,
+               CLOSED_FLAG, PATH_WIDTH, PATH_TYPE, MIN_X, MIN_Y, MAX_X, MAX_Y,
+               POINT_COUNT, POINTS_FORMAT_VERSION, POINTS_BIN,
+               TEXT_VALUE, TEXT_TYPE, TEXT_FONT, TEXT_HORIZONTAL, TEXT_VERTICAL
+          FROM TQP_GDS_PLACED_EL
+         WHERE FACTORY = :factory
+           AND DEVICE_ID = :device_id
+           AND LAYER_ID = :layer_id
+           AND PLACED_ELEMENT_ID > :after_id
+         ORDER BY PLACED_ELEMENT_ID)
+ WHERE ROWNUM <= :max_rows]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
+            <param direction="Input" dbtype="Number" size="0">:layer_id</param>
+            <param direction="Input" dbtype="VarChar" size="1024">:after_id</param>
+            <param direction="Input" dbtype="Number" size="0">:max_rows</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_PLACED_EL" commandtype="Text" description="Device의 배치 도형 전체 삭제 (기존 데이터 삭제 후 재등록, Chain Member / Edit은 FK CASCADE)" commandtimeout="1800">
+        <commandtext><![CDATA[DELETE FROM TQP_GDS_PLACED_EL
+ WHERE FACTORY = :factory
+   AND DEVICE_ID = :device_id]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
+        </parameters>
+    </query>
+</queryxml>

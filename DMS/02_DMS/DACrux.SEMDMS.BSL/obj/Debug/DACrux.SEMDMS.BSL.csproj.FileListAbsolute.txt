@@ -12,3 +12,16 @@ D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.BSL\obj
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.BSL\obj\Debug\DACrux.S.2C5B6136.Up2Date
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.BSL\obj\Debug\DACrux.SEMDMS.BSL.dll
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.BSL\obj\Debug\DACrux.SEMDMS.BSL.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\101_ServerBin\DACrux.SEMDMS.BSL.dll
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\101_ServerBin\DACrux.SEMDMS.BSL.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\02_DMS\DACrux.SEMDMS.BSL\obj\Debug\DACrux.SEMDMS.BSL.csproj.AssemblyReference.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\02_DMS\DACrux.SEMDMS.BSL\obj\Debug\DACrux.SEMDMS.BSL.csproj.CoreCompileInputs.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\02_DMS\DACrux.SEMDMS.BSL\obj\Debug\DACrux.S.2C5B6136.Up2Date
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\02_DMS\DACrux.SEMDMS.BSL\obj\Debug\DACrux.SEMDMS.BSL.dll
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\02_DMS\DACrux.SEMDMS.BSL\obj\Debug\DACrux.SEMDMS.BSL.pdb
+C:\Users\USER\AppData\Local\Temp\GdsMapViewBuild\DACrux.SEMDMS.BSL.dll
+C:\Users\USER\AppData\Local\Temp\GdsMapViewBuild\DACrux.SEMDMS.BSL.pdb
+C:\Users\USER\AppData\Local\Temp\GdsMapView018Build\DACrux.SEMDMS.BSL.dll
+C:\Users\USER\AppData\Local\Temp\GdsMapView018Build\DACrux.SEMDMS.BSL.pdb
+C:\Users\USER\AppData\Local\Temp\claude\semdmsbuild\DACrux.SEMDMS.BSL.dll
+C:\Users\USER\AppData\Local\Temp\claude\semdmsbuild\DACrux.SEMDMS.BSL.pdb

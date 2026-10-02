@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TQP_GDS_MAP: Factory + Device(제품)별 GDS Map 헤더 1건. 2026-10-02 Claude CLAUDE-017 추가.
+  리비전 관리를 하지 않는다(사용자 결정). Device당 Map은 1개이고, 다시 등록하려면 기존 데이터를 삭제한 뒤 등록한다.
+  하위 테이블(LAYER / SOURCE_EL / PLACED_EL / IMPORT_JOB / IMPORT_BATCH / CHAIN 6개)은 FK ON DELETE CASCADE로 함께 지워진다.
+  단위 double은 G17 문자열 + TO_BINARY_DOUBLE로 받는다(dbtype Decimal / Double은 지수 표기 / 15자리 반올림 문제가 있음).
+-->
+<queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Select" queryid="SELECT_MAP_INFO" commandtype="Text" description="Device의 기존 Map 헤더 / 저장 작업 상태 / 건수 (저장 전 기존 데이터 확인)" commandtimeout="60">
+        <commandtext><![CDATA[SELECT M.FACTORY, M.DEVICE_ID, M.TOP_STRUCTURE, M.GDS_FILE_NAME, M.GDS_SHA256, M.MAP_STATUS,
+       M.CREATE_USER, TO_CHAR(M.CREATE_TIME, 'YYYY-MM-DD HH24:MI:SS') AS CREATE_TIME,
+       J.IMPORT_JOB_SEQ, J.JOB_STATUS,
+       NVL(J.RECEIVED_SOURCE_COUNT, 0) AS SOURCE_COUNT,
+       NVL(J.RECEIVED_PLACED_COUNT, 0) AS PLACED_COUNT,
+       NVL(J.RECEIVED_POINT_COUNT, 0) AS POINT_COUNT
+  FROM TQP_GDS_MAP M
+  LEFT JOIN TQP_GDS_IMPORT_JOB J ON J.FACTORY = M.FACTORY AND J.DEVICE_ID = M.DEVICE_ID
+ WHERE M.FACTORY = :factory
+   AND M.DEVICE_ID = :device_id]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="CREATE_MAP" commandtype="Text" description="Device Map 헤더 생성 (DRAFT)" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_GDS_MAP
+    (FACTORY,
+    DEVICE_ID,
+    TOP_STRUCTURE,
+    GDS_FILE_NAME,
+    GDS_SHA256,
+    USER_UNIT,
+    DATABASE_UNIT,
+    MAP_STATUS,
+    CREATE_USER)
+VALUES
+    (:factory,
+    :device_id,
+    :top_structure,
+    :gds_file_name,
+    :gds_sha256,
+    TO_BINARY_DOUBLE(:user_unit),
+    TO_BINARY_DOUBLE(:database_unit),
+    'DRAFT',
+    :create_user)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
+            <param direction="Input" dbtype="VarChar" size="1024">:top_structure</param>
+            <param direction="Input" dbtype="VarChar" size="1040">:gds_file_name</param>
+            <param direction="Input" dbtype="VarChar" size="64">:gds_sha256</param>
+            <param direction="Input" dbtype="VarChar" size="40">:user_unit</param>
+            <param direction="Input" dbtype="VarChar" size="40">:database_unit</param>
+            <param direction="Input" dbtype="VarChar" size="30">:create_user</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_MAP_READY" commandtype="Text" description="저장 확정된 DRAFT Map을 READY로 변경" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_GDS_MAP
+   SET MAP_STATUS = 'READY',
+       UPDATE_USER = :update_user,
+       UPDATE_TIME = SYSDATE
+ WHERE FACTORY = :factory
+   AND DEVICE_ID = :device_id
+   AND MAP_STATUS = 'DRAFT']]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:update_user</param>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_MAP" commandtype="Text" description="Device Map 헤더 삭제 (하위 LAYER / 저장 작업 / Chain 등은 FK CASCADE)" commandtimeout="1800">
+        <commandtext><![CDATA[DELETE FROM TQP_GDS_MAP
+ WHERE FACTORY = :factory
+   AND DEVICE_ID = :device_id]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
+        </parameters>
+    </query>
+    <!-- 조회 화면(GdsMapView, 2026-10-02 CLAUDE-018): 저장이 끝난(READY) Map이 있는 Factory / Device 목록. -->
+    <query statement="Select" queryid="SELECT_MAP_DEVICE_LIST" commandtype="Text" description="조회 화면: READY Map이 있는 Factory / Device 목록" commandtimeout="60">
+        <commandtext><![CDATA[SELECT FACTORY, DEVICE_ID
+  FROM TQP_GDS_MAP
+ WHERE MAP_STATUS = 'READY'
+ ORDER BY FACTORY, DEVICE_ID]]></commandtext>
+    </query>
+</queryxml>

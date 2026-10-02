@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Select" queryid="SELECT_IMPORT_BATCH_ONE" commandtype="Text" description="배치 한 건 조회 (재전송 판단: 같은 해시면 완료 / 다른 해시면 오류)" commandtimeout="60">
+        <commandtext><![CDATA[SELECT STREAM_KIND, BATCH_NO, PAYLOAD_SHA256, ITEM_COUNT
+  FROM TQP_GDS_IMPORT_BATCH
+ WHERE IMPORT_JOB_SEQ = :import_job_seq
+   AND STREAM_KIND = :stream_kind
+   AND BATCH_NO = :batch_no]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:import_job_seq</param>
+            <param direction="Input" dbtype="VarChar" size="10">:stream_kind</param>
+            <param direction="Input" dbtype="Number" size="0">:batch_no</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="CREATE_IMPORT_BATCH" commandtype="Text" description="배치 완료 기록 (행 저장이 끝난 뒤 마지막에 기록)" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_GDS_IMPORT_BATCH
+    (IMPORT_JOB_SEQ,
+    STREAM_KIND,
+    BATCH_NO,
+    FORMAT_VERSION,
+    PAYLOAD_SHA256,
+    ITEM_COUNT,
+    POINT_COUNT,
+    PAYLOAD_BYTES)
+VALUES
+    (:import_job_seq,
+    :stream_kind,
+    :batch_no,
+    :format_version,
+    :payload_sha256,
+    :item_count,
+    :point_count,
+    :payload_bytes)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:import_job_seq</param>
+            <param direction="Input" dbtype="VarChar" size="10">:stream_kind</param>
+            <param direction="Input" dbtype="Number" size="0">:batch_no</param>
+            <param direction="Input" dbtype="Number" size="0">:format_version</param>
+            <param direction="Input" dbtype="VarChar" size="64">:payload_sha256</param>
+            <param direction="Input" dbtype="Number" size="0">:item_count</param>
+            <param direction="Input" dbtype="Number" size="0">:point_count</param>
+            <param direction="Input" dbtype="Number" size="0">:payload_bytes</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_IMPORT_BATCH_SUMMARY" commandtype="Text" description="완료 확정: 종류별 배치 수 / 최소 / 최대 번호 (누락 번호 확인)" commandtimeout="60">
+        <commandtext><![CDATA[SELECT STREAM_KIND, COUNT(*) AS BATCH_COUNT, MIN(BATCH_NO) AS MIN_NO, MAX(BATCH_NO) AS MAX_NO
+  FROM TQP_GDS_IMPORT_BATCH
+ WHERE IMPORT_JOB_SEQ = :import_job_seq
+ GROUP BY STREAM_KIND]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:import_job_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_IMPORT_BATCH" commandtype="Text" description="저장 작업의 완료 배치 목록 (재개 시 건너뛸 배치)" commandtimeout="60">
+        <commandtext><![CDATA[SELECT STREAM_KIND, BATCH_NO, PAYLOAD_SHA256
+  FROM TQP_GDS_IMPORT_BATCH
+ WHERE IMPORT_JOB_SEQ = :import_job_seq
+ ORDER BY DECODE(STREAM_KIND, 'LAYER', 1, 'SOURCE', 2, 'PLACED', 3, 9), BATCH_NO]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:import_job_seq</param>
+        </parameters>
+    </query>
+</queryxml>

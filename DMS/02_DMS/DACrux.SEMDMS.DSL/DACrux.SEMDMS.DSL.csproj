@@ -82,6 +82,13 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TQD_ALARM_DATA.cs" />
+    <Compile Include="TQP_GDS_IMPORT_JOB.cs" />
+    <Compile Include="TQP_GDS_IMPORT_BATCH.cs" />
+    <Compile Include="TQP_GDS_LAYER.cs" />
+    <Compile Include="TQP_GDS_SOURCE_EL.cs" />
+    <Compile Include="TQP_GDS_PLACED_EL.cs" />
+    <Compile Include="TQP_GDS_MAP.cs" />
+    <Compile Include="TQP_GDS_CHAIN.cs" />
     <Compile Include="TQD_ALARM_SETUP.cs" />
     <Compile Include="TQD_ALARM_USER.cs" />
     <Compile Include="TQD_COLORBYSIZE.cs" />

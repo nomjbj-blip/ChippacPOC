@@ -307,21 +307,75 @@ namespace DACrux.Data.Parser
             return GetDictionaryWithLength(dic[key]);
         }
 
+        /// <summary>
+        /// ClassLookup 처럼 "개수 코드 이름 코드 이름 ..." 형식을 코드 -> 이름 사전으로 읽는다.
+        /// GetStringList 는 빈 이름("")을 버려서 쌍이 깨지므로 따로 나눈다. (예: 1 "" / 0 "	Unclassified")
+        /// - 따옴표 안 값은 비어 있어도 1개 값으로 인정하고 앞뒤 공백/Tab 은 지운다.
+        /// - 같은 코드가 다시 나오면 뒤의 값으로 덮어쓰되, 뒤의 값이 빈 이름이면 앞의 이름을 유지한다. (예: 0 "Unclassified" ... 0 "")
+        /// </summary>
         internal static Dictionary<int, string> GetDictionaryWithLength(string data)
         {
             if (String.IsNullOrEmpty(data))
                 return null;
 
-            List<string> list = GetStringWithLength(data, false);
+            List<string> list = SplitLookupTokens(data);
             Dictionary<int, string> result = new Dictionary<int, string>();
+
+            if (list.Count == 0)
+                return result;
+
+            // 첫 값은 개수이므로 제외한다. (기존과 같이 개수 일치는 검사하지 않음)
+            list.RemoveAt(0);
 
             if (list.Count % 2 != 0)
                 throw new Exception(String.Format("데이터는 짝수이어야 합니다.({0})", list.Count));
 
             for (int i = 0; i < list.Count; i += 2)
-                result.Add(GetInt(list[i]), list[i + 1]);
+            {
+                int code = GetInt(list[i]);
+
+                // 빈 이름은 앞에서 읽은 이름을 지우지 않는다.
+                if (result.ContainsKey(code) && list[i + 1].Length == 0)
+                    continue;
+
+                result[code] = list[i + 1];
+            }
 
             return result;
+        }
+
+        /// <summary>
+        /// 공백/Tab/줄바꿈으로 값을 나누되, 큰따옴표로 감싼 값은 1개로 본다. 빈 따옴표("")는 빈 문자열 값으로 남긴다.
+        /// </summary>
+        private static List<string> SplitLookupTokens(string data)
+        {
+            List<string> list = new List<string>();
+            int i = 0;
+
+            while (i < data.Length)
+            {
+                if (Char.IsWhiteSpace(data[i]))
+                {
+                    i++;
+                    continue;
+                }
+
+                if (data[i] == '"')
+                {
+                    int end = data.IndexOf('"', i + 1);
+                    if (end < 0) end = data.Length;
+                    list.Add(data.Substring(i + 1, end - i - 1).Trim());
+                    i = end + 1;
+                    continue;
+                }
+
+                int start = i;
+                while (i < data.Length && !Char.IsWhiteSpace(data[i]) && data[i] != '"')
+                    i++;
+                list.Add(data.Substring(start, i - start));
+            }
+
+            return list;
         }
 
         internal static SizeF GetSizeF(Dictionary<string, string> dic, string key)

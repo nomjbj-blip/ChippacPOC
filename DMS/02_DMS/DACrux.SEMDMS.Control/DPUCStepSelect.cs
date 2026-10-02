@@ -141,8 +141,8 @@ namespace DACrux.SEMDMS.Control
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DPUCStepSelect));
-            Infragistics.Win.ValueListItem valueListItem3 = new Infragistics.Win.ValueListItem();
-            Infragistics.Win.ValueListItem valueListItem4 = new Infragistics.Win.ValueListItem();
+            Infragistics.Win.ValueListItem valueListItem1 = new Infragistics.Win.ValueListItem();
+            Infragistics.Win.ValueListItem valueListItem2 = new Infragistics.Win.ValueListItem();
             Infragistics.Win.UltraWinTree.Override _override1 = new Infragistics.Win.UltraWinTree.Override();
             this.splitter1 = new System.Windows.Forms.Splitter();
             this.fpSelectOption_Sheet1 = new FarPoint.Win.Spread.SheetView();
@@ -232,7 +232,7 @@ namespace DACrux.SEMDMS.Control
             // 
             this.splitter1.Dock = System.Windows.Forms.DockStyle.Top;
             this.splitter1.Location = new System.Drawing.Point(0, 628);
-            this.splitter1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.splitter1.Margin = new System.Windows.Forms.Padding(4);
             this.splitter1.Name = "splitter1";
             this.splitter1.Size = new System.Drawing.Size(600, 15);
             this.splitter1.TabIndex = 68;
@@ -250,21 +250,21 @@ namespace DACrux.SEMDMS.Control
             this.fpSelectOption_Sheet1.AutoGenerateColumns = false;
             this.fpSelectOption_Sheet1.ColumnFooter.Columns.Default.VisualStyles = FarPoint.Win.VisualStyles.Off;
             this.fpSelectOption_Sheet1.ColumnFooter.DefaultStyle.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(107)))), ((int)(((byte)(105)))), ((int)(((byte)(107)))));
-            this.fpSelectOption_Sheet1.ColumnFooter.DefaultStyle.Font = new System.Drawing.Font("Gulim", 9F, System.Drawing.FontStyle.Bold);
+            this.fpSelectOption_Sheet1.ColumnFooter.DefaultStyle.Font = new System.Drawing.Font("±¼¸²", 9F, System.Drawing.FontStyle.Bold);
             this.fpSelectOption_Sheet1.ColumnFooter.DefaultStyle.ForeColor = System.Drawing.Color.White;
             this.fpSelectOption_Sheet1.ColumnFooter.DefaultStyle.NoteIndicatorColor = System.Drawing.Color.Red;
             this.fpSelectOption_Sheet1.ColumnFooter.DefaultStyle.Parent = "ColumnFooterEnhanced";
             this.fpSelectOption_Sheet1.ColumnFooter.DefaultStyle.VisualStyles = FarPoint.Win.VisualStyles.Off;
             this.fpSelectOption_Sheet1.ColumnFooter.Rows.Default.VisualStyles = FarPoint.Win.VisualStyles.Off;
             this.fpSelectOption_Sheet1.ColumnFooterSheetCornerStyle.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(107)))), ((int)(((byte)(105)))), ((int)(((byte)(107)))));
-            this.fpSelectOption_Sheet1.ColumnFooterSheetCornerStyle.Font = new System.Drawing.Font("Gulim", 9F, System.Drawing.FontStyle.Bold);
+            this.fpSelectOption_Sheet1.ColumnFooterSheetCornerStyle.Font = new System.Drawing.Font("±¼¸²", 9F, System.Drawing.FontStyle.Bold);
             this.fpSelectOption_Sheet1.ColumnFooterSheetCornerStyle.ForeColor = System.Drawing.Color.White;
             this.fpSelectOption_Sheet1.ColumnFooterSheetCornerStyle.NoteIndicatorColor = System.Drawing.Color.Red;
             this.fpSelectOption_Sheet1.ColumnFooterSheetCornerStyle.Parent = "CornerEnhanced";
             this.fpSelectOption_Sheet1.ColumnFooterSheetCornerStyle.VisualStyles = FarPoint.Win.VisualStyles.Off;
             this.fpSelectOption_Sheet1.ColumnHeader.Columns.Default.VisualStyles = FarPoint.Win.VisualStyles.Off;
             this.fpSelectOption_Sheet1.ColumnHeader.DefaultStyle.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(107)))), ((int)(((byte)(105)))), ((int)(((byte)(107)))));
-            this.fpSelectOption_Sheet1.ColumnHeader.DefaultStyle.Font = new System.Drawing.Font("Gulim", 9F, System.Drawing.FontStyle.Bold);
+            this.fpSelectOption_Sheet1.ColumnHeader.DefaultStyle.Font = new System.Drawing.Font("±¼¸²", 9F, System.Drawing.FontStyle.Bold);
             this.fpSelectOption_Sheet1.ColumnHeader.DefaultStyle.ForeColor = System.Drawing.Color.White;
             this.fpSelectOption_Sheet1.ColumnHeader.DefaultStyle.NoteIndicatorColor = System.Drawing.Color.Red;
             this.fpSelectOption_Sheet1.ColumnHeader.DefaultStyle.Parent = "ColumnHeaderEnhanced";
@@ -281,7 +281,7 @@ namespace DACrux.SEMDMS.Control
             this.fpSelectOption_Sheet1.RowHeader.Columns.Default.Resizable = false;
             this.fpSelectOption_Sheet1.RowHeader.Columns.Default.VisualStyles = FarPoint.Win.VisualStyles.Off;
             this.fpSelectOption_Sheet1.RowHeader.DefaultStyle.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(107)))), ((int)(((byte)(105)))), ((int)(((byte)(107)))));
-            this.fpSelectOption_Sheet1.RowHeader.DefaultStyle.Font = new System.Drawing.Font("Gulim", 9F, System.Drawing.FontStyle.Bold);
+            this.fpSelectOption_Sheet1.RowHeader.DefaultStyle.Font = new System.Drawing.Font("±¼¸²", 9F, System.Drawing.FontStyle.Bold);
             this.fpSelectOption_Sheet1.RowHeader.DefaultStyle.ForeColor = System.Drawing.Color.White;
             this.fpSelectOption_Sheet1.RowHeader.DefaultStyle.NoteIndicatorColor = System.Drawing.Color.Red;
             this.fpSelectOption_Sheet1.RowHeader.DefaultStyle.Parent = "RowHeaderEnhanced";
@@ -290,7 +290,7 @@ namespace DACrux.SEMDMS.Control
             this.fpSelectOption_Sheet1.SelectionPolicy = FarPoint.Win.Spread.Model.SelectionPolicy.Single;
             this.fpSelectOption_Sheet1.SelectionUnit = FarPoint.Win.Spread.Model.SelectionUnit.Row;
             this.fpSelectOption_Sheet1.SheetCornerStyle.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(107)))), ((int)(((byte)(105)))), ((int)(((byte)(107)))));
-            this.fpSelectOption_Sheet1.SheetCornerStyle.Font = new System.Drawing.Font("Gulim", 9F, System.Drawing.FontStyle.Bold);
+            this.fpSelectOption_Sheet1.SheetCornerStyle.Font = new System.Drawing.Font("±¼¸²", 9F, System.Drawing.FontStyle.Bold);
             this.fpSelectOption_Sheet1.SheetCornerStyle.ForeColor = System.Drawing.Color.White;
             this.fpSelectOption_Sheet1.SheetCornerStyle.NoteIndicatorColor = System.Drawing.Color.Red;
             this.fpSelectOption_Sheet1.SheetCornerStyle.Parent = "CornerEnhanced";
@@ -321,7 +321,7 @@ namespace DACrux.SEMDMS.Control
             this.pnlRunLoad.Controls.Add(this.panel3);
             this.pnlRunLoad.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pnlRunLoad.Location = new System.Drawing.Point(0, 643);
-            this.pnlRunLoad.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.pnlRunLoad.Margin = new System.Windows.Forms.Padding(4);
             this.pnlRunLoad.Name = "pnlRunLoad";
             this.pnlRunLoad.Size = new System.Drawing.Size(600, 293);
             this.pnlRunLoad.TabIndex = 66;
@@ -333,7 +333,7 @@ namespace DACrux.SEMDMS.Control
             this.fpSpread1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.fpSpread1.HorizontalScrollBarPolicy = FarPoint.Win.Spread.ScrollBarPolicy.AsNeeded;
             this.fpSpread1.Location = new System.Drawing.Point(0, 77);
-            this.fpSpread1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.fpSpread1.Margin = new System.Windows.Forms.Padding(4);
             this.fpSpread1.Name = "fpSpread1";
             this.fpSpread1.RowSplitBoxPolicy = FarPoint.Win.Spread.SplitBoxPolicy.Never;
             this.fpSpread1.ScrollBarTrackPolicy = FarPoint.Win.Spread.ScrollBarTrackPolicy.Both;
@@ -358,21 +358,21 @@ namespace DACrux.SEMDMS.Control
             this.fpSpread1_Sheet1.AutoCalculation = false;
             this.fpSpread1_Sheet1.ColumnFooter.Columns.Default.VisualStyles = FarPoint.Win.VisualStyles.Off;
             this.fpSpread1_Sheet1.ColumnFooter.DefaultStyle.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(107)))), ((int)(((byte)(105)))), ((int)(((byte)(107)))));
-            this.fpSpread1_Sheet1.ColumnFooter.DefaultStyle.Font = new System.Drawing.Font("Gulim", 9F, System.Drawing.FontStyle.Bold);
+            this.fpSpread1_Sheet1.ColumnFooter.DefaultStyle.Font = new System.Drawing.Font("±¼¸²", 9F, System.Drawing.FontStyle.Bold);
             this.fpSpread1_Sheet1.ColumnFooter.DefaultStyle.ForeColor = System.Drawing.Color.White;
             this.fpSpread1_Sheet1.ColumnFooter.DefaultStyle.NoteIndicatorColor = System.Drawing.Color.Red;
             this.fpSpread1_Sheet1.ColumnFooter.DefaultStyle.Parent = "ColumnFooterEnhanced";
             this.fpSpread1_Sheet1.ColumnFooter.DefaultStyle.VisualStyles = FarPoint.Win.VisualStyles.Off;
             this.fpSpread1_Sheet1.ColumnFooter.Rows.Default.VisualStyles = FarPoint.Win.VisualStyles.Off;
             this.fpSpread1_Sheet1.ColumnFooterSheetCornerStyle.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(107)))), ((int)(((byte)(105)))), ((int)(((byte)(107)))));
-            this.fpSpread1_Sheet1.ColumnFooterSheetCornerStyle.Font = new System.Drawing.Font("Gulim", 9F, System.Drawing.FontStyle.Bold);
+            this.fpSpread1_Sheet1.ColumnFooterSheetCornerStyle.Font = new System.Drawing.Font("±¼¸²", 9F, System.Drawing.FontStyle.Bold);
             this.fpSpread1_Sheet1.ColumnFooterSheetCornerStyle.ForeColor = System.Drawing.Color.White;
             this.fpSpread1_Sheet1.ColumnFooterSheetCornerStyle.NoteIndicatorColor = System.Drawing.Color.Red;
             this.fpSpread1_Sheet1.ColumnFooterSheetCornerStyle.Parent = "CornerEnhanced";
             this.fpSpread1_Sheet1.ColumnFooterSheetCornerStyle.VisualStyles = FarPoint.Win.VisualStyles.Off;
             this.fpSpread1_Sheet1.ColumnHeader.Columns.Default.VisualStyles = FarPoint.Win.VisualStyles.Off;
             this.fpSpread1_Sheet1.ColumnHeader.DefaultStyle.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(107)))), ((int)(((byte)(105)))), ((int)(((byte)(107)))));
-            this.fpSpread1_Sheet1.ColumnHeader.DefaultStyle.Font = new System.Drawing.Font("Gulim", 9F, System.Drawing.FontStyle.Bold);
+            this.fpSpread1_Sheet1.ColumnHeader.DefaultStyle.Font = new System.Drawing.Font("±¼¸²", 9F, System.Drawing.FontStyle.Bold);
             this.fpSpread1_Sheet1.ColumnHeader.DefaultStyle.ForeColor = System.Drawing.Color.White;
             this.fpSpread1_Sheet1.ColumnHeader.DefaultStyle.NoteIndicatorColor = System.Drawing.Color.Red;
             this.fpSpread1_Sheet1.ColumnHeader.DefaultStyle.Parent = "ColumnHeaderEnhanced";
@@ -388,7 +388,7 @@ namespace DACrux.SEMDMS.Control
             this.fpSpread1_Sheet1.RowHeader.Columns.Default.VisualStyles = FarPoint.Win.VisualStyles.Off;
             this.fpSpread1_Sheet1.RowHeader.Columns.Get(0).Width = 83F;
             this.fpSpread1_Sheet1.RowHeader.DefaultStyle.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(107)))), ((int)(((byte)(105)))), ((int)(((byte)(107)))));
-            this.fpSpread1_Sheet1.RowHeader.DefaultStyle.Font = new System.Drawing.Font("Gulim", 9F, System.Drawing.FontStyle.Bold);
+            this.fpSpread1_Sheet1.RowHeader.DefaultStyle.Font = new System.Drawing.Font("±¼¸²", 9F, System.Drawing.FontStyle.Bold);
             this.fpSpread1_Sheet1.RowHeader.DefaultStyle.ForeColor = System.Drawing.Color.White;
             this.fpSpread1_Sheet1.RowHeader.DefaultStyle.NoteIndicatorColor = System.Drawing.Color.Red;
             this.fpSpread1_Sheet1.RowHeader.DefaultStyle.Parent = "RowHeaderEnhanced";
@@ -397,7 +397,7 @@ namespace DACrux.SEMDMS.Control
             this.fpSpread1_Sheet1.SelectionPolicy = FarPoint.Win.Spread.Model.SelectionPolicy.MultiRange;
             this.fpSpread1_Sheet1.SelectionUnit = FarPoint.Win.Spread.Model.SelectionUnit.Row;
             this.fpSpread1_Sheet1.SheetCornerStyle.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(107)))), ((int)(((byte)(105)))), ((int)(((byte)(107)))));
-            this.fpSpread1_Sheet1.SheetCornerStyle.Font = new System.Drawing.Font("Gulim", 9F, System.Drawing.FontStyle.Bold);
+            this.fpSpread1_Sheet1.SheetCornerStyle.Font = new System.Drawing.Font("±¼¸²", 9F, System.Drawing.FontStyle.Bold);
             this.fpSpread1_Sheet1.SheetCornerStyle.ForeColor = System.Drawing.Color.White;
             this.fpSpread1_Sheet1.SheetCornerStyle.NoteIndicatorColor = System.Drawing.Color.Red;
             this.fpSpread1_Sheet1.SheetCornerStyle.Parent = "CornerEnhanced";
@@ -415,7 +415,7 @@ namespace DACrux.SEMDMS.Control
             this.panel5.Controls.Add(this.rbtStepList);
             this.panel5.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel5.Location = new System.Drawing.Point(0, 0);
-            this.panel5.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.panel5.Margin = new System.Windows.Forms.Padding(4);
             this.panel5.Name = "panel5";
             this.panel5.Size = new System.Drawing.Size(600, 77);
             this.panel5.TabIndex = 3;
@@ -427,7 +427,7 @@ namespace DACrux.SEMDMS.Control
             this.BtnColRefresh.Image = ((System.Drawing.Image)(resources.GetObject("BtnColRefresh.Image")));
             this.BtnColRefresh.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.BtnColRefresh.Location = new System.Drawing.Point(4, 36);
-            this.BtnColRefresh.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.BtnColRefresh.Margin = new System.Windows.Forms.Padding(4);
             this.BtnColRefresh.Name = "BtnColRefresh";
             this.BtnColRefresh.Size = new System.Drawing.Size(226, 34);
             this.BtnColRefresh.TabIndex = 6;
@@ -441,7 +441,7 @@ namespace DACrux.SEMDMS.Control
             this.chkLotListFilter.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.chkLotListFilter.AutoSize = true;
             this.chkLotListFilter.Location = new System.Drawing.Point(457, 43);
-            this.chkLotListFilter.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.chkLotListFilter.Margin = new System.Windows.Forms.Padding(4);
             this.chkLotListFilter.Name = "chkLotListFilter";
             this.chkLotListFilter.Size = new System.Drawing.Size(133, 22);
             this.chkLotListFilter.TabIndex = 5;
@@ -454,15 +454,15 @@ namespace DACrux.SEMDMS.Control
             // 
             this.cmbValueTypes.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.cmbValueTypes.DropDownStyle = Infragistics.Win.DropDownStyle.DropDownList;
-            valueListItem3.DataValue = "ValueListItem0";
-            valueListItem3.DisplayText = "DEFECTS";
-            valueListItem4.DataValue = "ValueListItem1";
-            valueListItem4.DisplayText = "DEFECTIVE_DIE";
+            valueListItem1.DataValue = "ValueListItem0";
+            valueListItem1.DisplayText = "DEFECTS";
+            valueListItem2.DataValue = "ValueListItem1";
+            valueListItem2.DisplayText = "DEFECTIVE_DIE";
             this.cmbValueTypes.Items.AddRange(new Infragistics.Win.ValueListItem[] {
-            valueListItem3,
-            valueListItem4});
+            valueListItem1,
+            valueListItem2});
             this.cmbValueTypes.Location = new System.Drawing.Point(404, 36);
-            this.cmbValueTypes.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.cmbValueTypes.Margin = new System.Windows.Forms.Padding(4);
             this.cmbValueTypes.Name = "cmbValueTypes";
             this.cmbValueTypes.Size = new System.Drawing.Size(186, 28);
             this.cmbValueTypes.TabIndex = 4;
@@ -485,7 +485,7 @@ namespace DACrux.SEMDMS.Control
             this.rbtWaferList.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.rbtWaferList.AutoSize = true;
             this.rbtWaferList.Location = new System.Drawing.Point(465, 6);
-            this.rbtWaferList.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.rbtWaferList.Margin = new System.Windows.Forms.Padding(4);
             this.rbtWaferList.Name = "rbtWaferList";
             this.rbtWaferList.Size = new System.Drawing.Size(106, 22);
             this.rbtWaferList.TabIndex = 0;
@@ -499,7 +499,7 @@ namespace DACrux.SEMDMS.Control
             this.rbtStepList.AutoSize = true;
             this.rbtStepList.Checked = true;
             this.rbtStepList.Location = new System.Drawing.Point(300, 6);
-            this.rbtStepList.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.rbtStepList.Margin = new System.Windows.Forms.Padding(4);
             this.rbtStepList.Name = "rbtStepList";
             this.rbtStepList.Size = new System.Drawing.Size(146, 22);
             this.rbtStepList.TabIndex = 0;
@@ -515,7 +515,7 @@ namespace DACrux.SEMDMS.Control
             this.panel3.Controls.Add(this.butRun);
             this.panel3.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.panel3.Location = new System.Drawing.Point(0, 236);
-            this.panel3.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.panel3.Margin = new System.Windows.Forms.Padding(4);
             this.panel3.Name = "panel3";
             this.panel3.Padding = new System.Windows.Forms.Padding(7, 8, 7, 8);
             this.panel3.Size = new System.Drawing.Size(600, 57);
@@ -527,7 +527,7 @@ namespace DACrux.SEMDMS.Control
             this.chkWaferID.Checked = true;
             this.chkWaferID.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkWaferID.Location = new System.Drawing.Point(154, 12);
-            this.chkWaferID.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.chkWaferID.Margin = new System.Windows.Forms.Padding(4);
             this.chkWaferID.Name = "chkWaferID";
             this.chkWaferID.Size = new System.Drawing.Size(100, 22);
             this.chkWaferID.TabIndex = 5;
@@ -540,7 +540,7 @@ namespace DACrux.SEMDMS.Control
             this.chkOrdered.Checked = true;
             this.chkOrdered.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkOrdered.Location = new System.Drawing.Point(10, 12);
-            this.chkOrdered.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.chkOrdered.Margin = new System.Windows.Forms.Padding(4);
             this.chkOrdered.Name = "chkOrdered";
             this.chkOrdered.Size = new System.Drawing.Size(130, 22);
             this.chkOrdered.TabIndex = 5;
@@ -555,7 +555,7 @@ namespace DACrux.SEMDMS.Control
             this.butRun.Image = ((System.Drawing.Image)(resources.GetObject("butRun.Image")));
             this.butRun.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.butRun.Location = new System.Drawing.Point(344, 8);
-            this.butRun.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.butRun.Margin = new System.Windows.Forms.Padding(4);
             this.butRun.Name = "butRun";
             this.butRun.Size = new System.Drawing.Size(249, 41);
             this.butRun.TabIndex = 0;
@@ -570,7 +570,7 @@ namespace DACrux.SEMDMS.Control
             this.fpSelectOption.Dock = System.Windows.Forms.DockStyle.Fill;
             this.fpSelectOption.HorizontalScrollBarPolicy = FarPoint.Win.Spread.ScrollBarPolicy.Never;
             this.fpSelectOption.Location = new System.Drawing.Point(4, 4);
-            this.fpSelectOption.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.fpSelectOption.Margin = new System.Windows.Forms.Padding(4);
             this.fpSelectOption.Name = "fpSelectOption";
             this.fpSelectOption.RowSplitBoxPolicy = FarPoint.Win.Spread.SplitBoxPolicy.Never;
             this.fpSelectOption.Sheets.AddRange(new FarPoint.Win.Spread.SheetView[] {
@@ -589,7 +589,7 @@ namespace DACrux.SEMDMS.Control
             this.pnlControl.Controls.Add(this.btnClear);
             this.pnlControl.Dock = System.Windows.Forms.DockStyle.Right;
             this.pnlControl.Location = new System.Drawing.Point(542, 4);
-            this.pnlControl.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.pnlControl.Margin = new System.Windows.Forms.Padding(4);
             this.pnlControl.Name = "pnlControl";
             this.pnlControl.Size = new System.Drawing.Size(46, 263);
             this.pnlControl.TabIndex = 4;
@@ -600,7 +600,7 @@ namespace DACrux.SEMDMS.Control
             this.butQuery.Dock = System.Windows.Forms.DockStyle.Fill;
             this.butQuery.Image = ((System.Drawing.Image)(resources.GetObject("butQuery.Image")));
             this.butQuery.Location = new System.Drawing.Point(0, 102);
-            this.butQuery.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.butQuery.Margin = new System.Windows.Forms.Padding(4);
             this.butQuery.Name = "butQuery";
             this.butQuery.Size = new System.Drawing.Size(46, 161);
             this.butQuery.TabIndex = 0;
@@ -613,7 +613,7 @@ namespace DACrux.SEMDMS.Control
             this.BtnConfig.Dock = System.Windows.Forms.DockStyle.Top;
             this.BtnConfig.Image = ((System.Drawing.Image)(resources.GetObject("BtnConfig.Image")));
             this.BtnConfig.Location = new System.Drawing.Point(0, 34);
-            this.BtnConfig.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.BtnConfig.Margin = new System.Windows.Forms.Padding(4);
             this.BtnConfig.Name = "BtnConfig";
             this.BtnConfig.Size = new System.Drawing.Size(46, 68);
             this.BtnConfig.TabIndex = 5;
@@ -623,11 +623,11 @@ namespace DACrux.SEMDMS.Control
             // btnClear
             // 
             this.btnClear.Dock = System.Windows.Forms.DockStyle.Top;
-            this.btnClear.Font = new System.Drawing.Font("Gulim", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.btnClear.Font = new System.Drawing.Font("±¼¸²", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.btnClear.ImageIndex = 11;
             this.btnClear.ImageList = this.imageList1;
             this.btnClear.Location = new System.Drawing.Point(0, 0);
-            this.btnClear.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnClear.Margin = new System.Windows.Forms.Padding(4);
             this.btnClear.Name = "btnClear";
             this.btnClear.Size = new System.Drawing.Size(46, 34);
             this.btnClear.TabIndex = 6;
@@ -639,7 +639,7 @@ namespace DACrux.SEMDMS.Control
             this.butDown.BackColor = System.Drawing.Color.Orange;
             this.butDown.Image = ((System.Drawing.Image)(resources.GetObject("butDown.Image")));
             this.butDown.Location = new System.Drawing.Point(617, 20);
-            this.butDown.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.butDown.Margin = new System.Windows.Forms.Padding(4);
             this.butDown.Name = "butDown";
             this.butDown.Size = new System.Drawing.Size(46, 48);
             this.butDown.TabIndex = 0;
@@ -652,7 +652,7 @@ namespace DACrux.SEMDMS.Control
             this.butUp.BackColor = System.Drawing.Color.Orange;
             this.butUp.Image = ((System.Drawing.Image)(resources.GetObject("butUp.Image")));
             this.butUp.Location = new System.Drawing.Point(569, 20);
-            this.butUp.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.butUp.Margin = new System.Windows.Forms.Padding(4);
             this.butUp.Name = "butUp";
             this.butUp.Size = new System.Drawing.Size(46, 48);
             this.butUp.TabIndex = 0;
@@ -675,7 +675,7 @@ namespace DACrux.SEMDMS.Control
             this.panel2.Controls.Add(this.dtpEnd);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel2.Location = new System.Drawing.Point(0, 22);
-            this.panel2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.panel2.Margin = new System.Windows.Forms.Padding(4);
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(600, 94);
             this.panel2.TabIndex = 2;
@@ -684,7 +684,7 @@ namespace DACrux.SEMDMS.Control
             // 
             this.chkLsatInspect.AutoSize = true;
             this.chkLsatInspect.Location = new System.Drawing.Point(240, 4);
-            this.chkLsatInspect.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.chkLsatInspect.Margin = new System.Windows.Forms.Padding(4);
             this.chkLsatInspect.Name = "chkLsatInspect";
             this.chkLsatInspect.Size = new System.Drawing.Size(156, 22);
             this.chkLsatInspect.TabIndex = 6;
@@ -695,7 +695,7 @@ namespace DACrux.SEMDMS.Control
             // 
             this.chkDefectImage.AutoSize = true;
             this.chkDefectImage.Location = new System.Drawing.Point(240, 34);
-            this.chkDefectImage.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.chkDefectImage.Margin = new System.Windows.Forms.Padding(4);
             this.chkDefectImage.Name = "chkDefectImage";
             this.chkDefectImage.Size = new System.Drawing.Size(144, 22);
             this.chkDefectImage.TabIndex = 6;
@@ -706,7 +706,7 @@ namespace DACrux.SEMDMS.Control
             // 
             this.chkDate.AutoSize = true;
             this.chkDate.Location = new System.Drawing.Point(240, 64);
-            this.chkDate.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.chkDate.Margin = new System.Windows.Forms.Padding(4);
             this.chkDate.Name = "chkDate";
             this.chkDate.Size = new System.Drawing.Size(141, 22);
             this.chkDate.TabIndex = 6;
@@ -738,7 +738,7 @@ namespace DACrux.SEMDMS.Control
             this.dtpStart.CustomFormat = "yyyy-MM-dd";
             this.dtpStart.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
             this.dtpStart.Location = new System.Drawing.Point(81, 12);
-            this.dtpStart.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.dtpStart.Margin = new System.Windows.Forms.Padding(4);
             this.dtpStart.Name = "dtpStart";
             this.dtpStart.Size = new System.Drawing.Size(148, 28);
             this.dtpStart.TabIndex = 0;
@@ -749,7 +749,7 @@ namespace DACrux.SEMDMS.Control
             this.butPeriodReflash.Image = ((System.Drawing.Image)(resources.GetObject("butPeriodReflash.Image")));
             this.butPeriodReflash.ImageAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.butPeriodReflash.Location = new System.Drawing.Point(414, 6);
-            this.butPeriodReflash.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.butPeriodReflash.Margin = new System.Windows.Forms.Padding(4);
             this.butPeriodReflash.Name = "butPeriodReflash";
             this.butPeriodReflash.Size = new System.Drawing.Size(140, 69);
             this.butPeriodReflash.TabIndex = 4;
@@ -762,7 +762,7 @@ namespace DACrux.SEMDMS.Control
             this.dtpEnd.CustomFormat = "yyyy-MM-dd";
             this.dtpEnd.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
             this.dtpEnd.Location = new System.Drawing.Point(81, 50);
-            this.dtpEnd.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.dtpEnd.Margin = new System.Windows.Forms.Padding(4);
             this.dtpEnd.Name = "dtpEnd";
             this.dtpEnd.Size = new System.Drawing.Size(148, 28);
             this.dtpEnd.TabIndex = 0;
@@ -774,7 +774,7 @@ namespace DACrux.SEMDMS.Control
             this.tabControl1.Controls.Add(this.tabPage3);
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Top;
             this.tabControl1.Location = new System.Drawing.Point(0, 116);
-            this.tabControl1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabControl1.Margin = new System.Windows.Forms.Padding(4);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
             this.tabControl1.Size = new System.Drawing.Size(600, 303);
@@ -786,9 +786,9 @@ namespace DACrux.SEMDMS.Control
             this.tabPage1.Controls.Add(this.fpSelectOption);
             this.tabPage1.Controls.Add(this.pnlControl);
             this.tabPage1.Location = new System.Drawing.Point(4, 28);
-            this.tabPage1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabPage1.Margin = new System.Windows.Forms.Padding(4);
             this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(4);
             this.tabPage1.Size = new System.Drawing.Size(592, 271);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Dynamic";
@@ -800,9 +800,9 @@ namespace DACrux.SEMDMS.Control
             this.tabPage2.Controls.Add(this.panel1);
             this.tabPage2.Controls.Add(this.butStaticSearch);
             this.tabPage2.Location = new System.Drawing.Point(4, 28);
-            this.tabPage2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabPage2.Margin = new System.Windows.Forms.Padding(4);
             this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(4);
             this.tabPage2.Size = new System.Drawing.Size(592, 271);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Static";
@@ -828,7 +828,7 @@ namespace DACrux.SEMDMS.Control
             this.panel1.Controls.Add(this.lstEQ);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(4, 4);
-            this.panel1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.panel1.Margin = new System.Windows.Forms.Padding(4);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(534, 263);
             this.panel1.TabIndex = 3;
@@ -836,7 +836,7 @@ namespace DACrux.SEMDMS.Control
             // txtFilterWafer
             // 
             this.txtFilterWafer.Location = new System.Drawing.Point(607, 45);
-            this.txtFilterWafer.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtFilterWafer.Margin = new System.Windows.Forms.Padding(4);
             this.txtFilterWafer.Name = "txtFilterWafer";
             this.txtFilterWafer.Size = new System.Drawing.Size(188, 28);
             this.txtFilterWafer.TabIndex = 2;
@@ -844,7 +844,7 @@ namespace DACrux.SEMDMS.Control
             // txtFilterLot
             // 
             this.txtFilterLot.Location = new System.Drawing.Point(409, 45);
-            this.txtFilterLot.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtFilterLot.Margin = new System.Windows.Forms.Padding(4);
             this.txtFilterLot.Name = "txtFilterLot";
             this.txtFilterLot.Size = new System.Drawing.Size(188, 28);
             this.txtFilterLot.TabIndex = 2;
@@ -852,7 +852,7 @@ namespace DACrux.SEMDMS.Control
             // txtFilterStep
             // 
             this.txtFilterStep.Location = new System.Drawing.Point(210, 45);
-            this.txtFilterStep.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtFilterStep.Margin = new System.Windows.Forms.Padding(4);
             this.txtFilterStep.Name = "txtFilterStep";
             this.txtFilterStep.Size = new System.Drawing.Size(188, 28);
             this.txtFilterStep.TabIndex = 2;
@@ -860,7 +860,7 @@ namespace DACrux.SEMDMS.Control
             // txtFilterProduct
             // 
             this.txtFilterProduct.Location = new System.Drawing.Point(11, 45);
-            this.txtFilterProduct.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtFilterProduct.Margin = new System.Windows.Forms.Padding(4);
             this.txtFilterProduct.Name = "txtFilterProduct";
             this.txtFilterProduct.Size = new System.Drawing.Size(188, 28);
             this.txtFilterProduct.TabIndex = 2;
@@ -868,7 +868,7 @@ namespace DACrux.SEMDMS.Control
             // txtFilterEQ
             // 
             this.txtFilterEQ.Location = new System.Drawing.Point(806, 45);
-            this.txtFilterEQ.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtFilterEQ.Margin = new System.Windows.Forms.Padding(4);
             this.txtFilterEQ.Name = "txtFilterEQ";
             this.txtFilterEQ.Size = new System.Drawing.Size(188, 28);
             this.txtFilterEQ.TabIndex = 2;
@@ -925,12 +925,12 @@ namespace DACrux.SEMDMS.Control
             // 
             // lstWafer
             // 
-            this.lstWafer.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)));
+            this.lstWafer.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
             this.lstWafer.FormattingEnabled = true;
             this.lstWafer.ItemHeight = 18;
             this.lstWafer.Location = new System.Drawing.Point(607, 78);
-            this.lstWafer.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.lstWafer.Margin = new System.Windows.Forms.Padding(4);
             this.lstWafer.Name = "lstWafer";
             this.lstWafer.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
             this.lstWafer.Size = new System.Drawing.Size(188, 4);
@@ -938,12 +938,12 @@ namespace DACrux.SEMDMS.Control
             // 
             // lstLot
             // 
-            this.lstLot.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)));
+            this.lstLot.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
             this.lstLot.FormattingEnabled = true;
             this.lstLot.ItemHeight = 18;
             this.lstLot.Location = new System.Drawing.Point(409, 78);
-            this.lstLot.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.lstLot.Margin = new System.Windows.Forms.Padding(4);
             this.lstLot.Name = "lstLot";
             this.lstLot.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
             this.lstLot.Size = new System.Drawing.Size(188, 4);
@@ -951,12 +951,12 @@ namespace DACrux.SEMDMS.Control
             // 
             // lstStep
             // 
-            this.lstStep.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)));
+            this.lstStep.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
             this.lstStep.FormattingEnabled = true;
             this.lstStep.ItemHeight = 18;
             this.lstStep.Location = new System.Drawing.Point(210, 78);
-            this.lstStep.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.lstStep.Margin = new System.Windows.Forms.Padding(4);
             this.lstStep.Name = "lstStep";
             this.lstStep.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
             this.lstStep.Size = new System.Drawing.Size(188, 4);
@@ -964,12 +964,12 @@ namespace DACrux.SEMDMS.Control
             // 
             // lstProduct
             // 
-            this.lstProduct.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)));
+            this.lstProduct.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
             this.lstProduct.FormattingEnabled = true;
             this.lstProduct.ItemHeight = 18;
             this.lstProduct.Location = new System.Drawing.Point(11, 78);
-            this.lstProduct.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.lstProduct.Margin = new System.Windows.Forms.Padding(4);
             this.lstProduct.Name = "lstProduct";
             this.lstProduct.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
             this.lstProduct.Size = new System.Drawing.Size(188, 4);
@@ -977,12 +977,12 @@ namespace DACrux.SEMDMS.Control
             // 
             // lstEQ
             // 
-            this.lstEQ.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)));
+            this.lstEQ.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
             this.lstEQ.FormattingEnabled = true;
             this.lstEQ.ItemHeight = 18;
             this.lstEQ.Location = new System.Drawing.Point(806, 78);
-            this.lstEQ.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.lstEQ.Margin = new System.Windows.Forms.Padding(4);
             this.lstEQ.Name = "lstEQ";
             this.lstEQ.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
             this.lstEQ.Size = new System.Drawing.Size(188, 4);
@@ -994,7 +994,7 @@ namespace DACrux.SEMDMS.Control
             this.butStaticSearch.Dock = System.Windows.Forms.DockStyle.Right;
             this.butStaticSearch.Image = ((System.Drawing.Image)(resources.GetObject("butStaticSearch.Image")));
             this.butStaticSearch.Location = new System.Drawing.Point(538, 4);
-            this.butStaticSearch.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.butStaticSearch.Margin = new System.Windows.Forms.Padding(4);
             this.butStaticSearch.Name = "butStaticSearch";
             this.butStaticSearch.Size = new System.Drawing.Size(50, 263);
             this.butStaticSearch.TabIndex = 5;
@@ -1005,9 +1005,9 @@ namespace DACrux.SEMDMS.Control
             // 
             this.tabPage3.Controls.Add(this.btnKlarfFileOpen);
             this.tabPage3.Location = new System.Drawing.Point(4, 28);
-            this.tabPage3.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabPage3.Margin = new System.Windows.Forms.Padding(4);
             this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabPage3.Padding = new System.Windows.Forms.Padding(4);
             this.tabPage3.Size = new System.Drawing.Size(592, 271);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "Klarf File";
@@ -1020,7 +1020,7 @@ namespace DACrux.SEMDMS.Control
             this.btnKlarfFileOpen.Image = ((System.Drawing.Image)(resources.GetObject("btnKlarfFileOpen.Image")));
             this.btnKlarfFileOpen.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnKlarfFileOpen.Location = new System.Drawing.Point(11, 9);
-            this.btnKlarfFileOpen.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnKlarfFileOpen.Margin = new System.Windows.Forms.Padding(4);
             this.btnKlarfFileOpen.Name = "btnKlarfFileOpen";
             this.btnKlarfFileOpen.Size = new System.Drawing.Size(214, 36);
             this.btnKlarfFileOpen.TabIndex = 215;
@@ -1033,7 +1033,7 @@ namespace DACrux.SEMDMS.Control
             this.trvWaferList.Dock = System.Windows.Forms.DockStyle.Top;
             this.trvWaferList.ImageList = this.imageList1;
             this.trvWaferList.Location = new System.Drawing.Point(0, 434);
-            this.trvWaferList.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.trvWaferList.Margin = new System.Windows.Forms.Padding(4);
             this.trvWaferList.Name = "trvWaferList";
             _override1.SelectionType = Infragistics.Win.UltraWinTree.SelectType.Single;
             this.trvWaferList.Override = _override1;
@@ -1052,7 +1052,7 @@ namespace DACrux.SEMDMS.Control
             this.panel4.Controls.Add(this.label8);
             this.panel4.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel4.Location = new System.Drawing.Point(0, 0);
-            this.panel4.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.panel4.Margin = new System.Windows.Forms.Padding(4);
             this.panel4.Name = "panel4";
             this.panel4.Size = new System.Drawing.Size(600, 0);
             this.panel4.TabIndex = 71;
@@ -1063,7 +1063,7 @@ namespace DACrux.SEMDMS.Control
             this.BtnSave.Image = ((System.Drawing.Image)(resources.GetObject("BtnSave.Image")));
             this.BtnSave.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.BtnSave.Location = new System.Drawing.Point(314, 45);
-            this.BtnSave.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.BtnSave.Margin = new System.Windows.Forms.Padding(4);
             this.BtnSave.Name = "BtnSave";
             this.BtnSave.Size = new System.Drawing.Size(109, 44);
             this.BtnSave.TabIndex = 1;
@@ -1076,7 +1076,7 @@ namespace DACrux.SEMDMS.Control
             this.BtnDelete.Image = ((System.Drawing.Image)(resources.GetObject("BtnDelete.Image")));
             this.BtnDelete.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.BtnDelete.Location = new System.Drawing.Point(197, 45);
-            this.BtnDelete.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.BtnDelete.Margin = new System.Windows.Forms.Padding(4);
             this.BtnDelete.Name = "BtnDelete";
             this.BtnDelete.Size = new System.Drawing.Size(109, 44);
             this.BtnDelete.TabIndex = 1;
@@ -1089,7 +1089,7 @@ namespace DACrux.SEMDMS.Control
             this.BtnLoad.Image = ((System.Drawing.Image)(resources.GetObject("BtnLoad.Image")));
             this.BtnLoad.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.BtnLoad.Location = new System.Drawing.Point(80, 45);
-            this.BtnLoad.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.BtnLoad.Margin = new System.Windows.Forms.Padding(4);
             this.BtnLoad.Name = "BtnLoad";
             this.BtnLoad.Size = new System.Drawing.Size(109, 44);
             this.BtnLoad.TabIndex = 1;
@@ -1099,7 +1099,7 @@ namespace DACrux.SEMDMS.Control
             // cmbRecipe
             // 
             this.cmbRecipe.Location = new System.Drawing.Point(103, 3);
-            this.cmbRecipe.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.cmbRecipe.Margin = new System.Windows.Forms.Padding(4);
             this.cmbRecipe.Name = "cmbRecipe";
             this.cmbRecipe.Size = new System.Drawing.Size(323, 28);
             this.cmbRecipe.TabIndex = 1;
@@ -1120,7 +1120,7 @@ namespace DACrux.SEMDMS.Control
             this.ultraSplitter1.Dock = System.Windows.Forms.DockStyle.Top;
             this.ultraSplitter1.Enabled = false;
             this.ultraSplitter1.Location = new System.Drawing.Point(0, 0);
-            this.ultraSplitter1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ultraSplitter1.Margin = new System.Windows.Forms.Padding(4);
             this.ultraSplitter1.Name = "ultraSplitter1";
             this.ultraSplitter1.RestoreExtent = 63;
             this.ultraSplitter1.Size = new System.Drawing.Size(600, 22);
@@ -1131,7 +1131,7 @@ namespace DACrux.SEMDMS.Control
             // 
             this.splitter2.Dock = System.Windows.Forms.DockStyle.Top;
             this.splitter2.Location = new System.Drawing.Point(0, 419);
-            this.splitter2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.splitter2.Margin = new System.Windows.Forms.Padding(4);
             this.splitter2.Name = "splitter2";
             this.splitter2.Size = new System.Drawing.Size(600, 15);
             this.splitter2.TabIndex = 74;
@@ -1148,7 +1148,7 @@ namespace DACrux.SEMDMS.Control
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.ultraSplitter1);
             this.Controls.Add(this.panel4);
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "DPUCStepSelect";
             this.Size = new System.Drawing.Size(600, 936);
             this.Load += new System.EventHandler(this.DPUCStepSelect_Load);

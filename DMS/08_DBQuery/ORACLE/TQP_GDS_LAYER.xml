@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Insert" queryid="CREATE_LAYER" commandtype="Text" description="Device Layer 추가 (같은 키가 있으면 건너뜀 / PLACED FK 대상이라 먼저 저장)" commandtimeout="600">
+        <commandtext><![CDATA[INSERT INTO TQP_GDS_LAYER
+    (FACTORY,
+    DEVICE_ID,
+    LAYER_ID,
+    COLOR_ARGB,
+    DISPLAY_NAME)
+SELECT :factory, :device_id, :layer_id, :color_argb, :display_name FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM TQP_GDS_LAYER
+                    WHERE FACTORY = :chk_factory AND DEVICE_ID = :chk_device_id AND LAYER_ID = :chk_layer_id)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
+            <param direction="Input" dbtype="Number" size="0">:layer_id</param>
+            <param direction="Input" dbtype="Number" size="0">:color_argb</param>
+            <param direction="Input" dbtype="VarChar" size="400">:display_name</param>
+            <param direction="Input" dbtype="VarChar" size="30">:chk_factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:chk_device_id</param>
+            <param direction="Input" dbtype="Number" size="0">:chk_layer_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_LAYER_WITH_COUNT" commandtype="Text" description="조회 화면: Device Layer 목록 + Layer별 배치 도형 수 / 좌표 수 (2026-10-02 CLAUDE-018 키 FACTORY + DEVICE_ID)" commandtimeout="600">
+        <commandtext><![CDATA[SELECT L.LAYER_ID, L.COLOR_ARGB, L.DISPLAY_NAME,
+       NVL(P.PLACED_COUNT, 0) AS PLACED_COUNT,
+       NVL(P.POINT_COUNT, 0) AS POINT_COUNT
+  FROM TQP_GDS_LAYER L
+  LEFT JOIN (SELECT LAYER_ID, COUNT(*) AS PLACED_COUNT, SUM(POINT_COUNT) AS POINT_COUNT
+               FROM TQP_GDS_PLACED_EL
+              WHERE FACTORY = :placed_factory
+                AND DEVICE_ID = :placed_device_id
+              GROUP BY LAYER_ID) P ON P.LAYER_ID = L.LAYER_ID
+ WHERE L.FACTORY = :factory
+   AND L.DEVICE_ID = :device_id
+ ORDER BY L.LAYER_ID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:placed_factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:placed_device_id</param>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
+        </parameters>
+    </query>
+</queryxml>

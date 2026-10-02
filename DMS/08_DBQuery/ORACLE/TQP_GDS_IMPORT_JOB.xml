@@ -1,0 +1,107 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Insert" queryid="CREATE_IMPORT_JOB" commandtype="Text" description="GDS Map 저장 작업 생성 (Device당 1건 / UPLOADING)" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_GDS_IMPORT_JOB
+    (IMPORT_JOB_SEQ,
+    FACTORY,
+    DEVICE_ID,
+    JOB_STATUS,
+    EXPECTED_SOURCE_COUNT,
+    EXPECTED_PLACED_COUNT,
+    EXPECTED_POINT_COUNT,
+    CREATE_USER,
+    UPDATE_USER)
+VALUES
+    (:import_job_seq,
+    :factory,
+    :device_id,
+    'UPLOADING',
+    :expected_source_count,
+    :expected_placed_count,
+    :expected_point_count,
+    :create_user,
+    :update_user)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:import_job_seq</param>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
+            <param direction="Input" dbtype="Number" size="0">:expected_source_count</param>
+            <param direction="Input" dbtype="Number" size="0">:expected_placed_count</param>
+            <param direction="Input" dbtype="Number" size="0">:expected_point_count</param>
+            <param direction="Input" dbtype="VarChar" size="30">:create_user</param>
+            <param direction="Input" dbtype="VarChar" size="30">:update_user</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_NEXT_IMPORT_JOB_SEQ" commandtype="Text" description="저장 작업 번호 채번 (기존 SELECT_NEXT_STEP_SEQ와 같은 방식)" commandtimeout="60">
+        <commandtext><![CDATA[SELECT IMPORT_JOB_SEQ.NEXTVAL FROM DUAL]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_IMPORT_JOB" commandtype="Text" description="GDS Map 저장 작업 조회 (작업 번호)" commandtimeout="60">
+        <commandtext><![CDATA[SELECT IMPORT_JOB_SEQ, FACTORY, DEVICE_ID, JOB_STATUS,
+       EXPECTED_SOURCE_COUNT, EXPECTED_PLACED_COUNT, EXPECTED_POINT_COUNT,
+       RECEIVED_SOURCE_COUNT, RECEIVED_PLACED_COUNT, RECEIVED_POINT_COUNT
+  FROM TQP_GDS_IMPORT_JOB
+ WHERE IMPORT_JOB_SEQ = :import_job_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:import_job_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_IMPORT_JOB_BY_MAP" commandtype="Text" description="GDS Map 저장 작업 조회 (Factory / Device)" commandtimeout="60">
+        <commandtext><![CDATA[SELECT IMPORT_JOB_SEQ, FACTORY, DEVICE_ID, JOB_STATUS,
+       EXPECTED_SOURCE_COUNT, EXPECTED_PLACED_COUNT, EXPECTED_POINT_COUNT,
+       RECEIVED_SOURCE_COUNT, RECEIVED_PLACED_COUNT, RECEIVED_POINT_COUNT
+  FROM TQP_GDS_IMPORT_JOB
+ WHERE FACTORY = :factory
+   AND DEVICE_ID = :device_id]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_IMPORT_JOB_RECEIVED" commandtype="Text" description="배치 저장 후 수신 건수 누적 (UPLOADING 작업만)" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_GDS_IMPORT_JOB
+   SET RECEIVED_SOURCE_COUNT = RECEIVED_SOURCE_COUNT + :received_source,
+       RECEIVED_PLACED_COUNT = RECEIVED_PLACED_COUNT + :received_placed,
+       RECEIVED_POINT_COUNT = RECEIVED_POINT_COUNT + :received_point,
+       UPDATE_USER = :update_user,
+       UPDATE_TIME = SYSDATE
+ WHERE IMPORT_JOB_SEQ = :import_job_seq
+   AND JOB_STATUS = 'UPLOADING' ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:received_source</param>
+            <param direction="Input" dbtype="Number" size="0">:received_placed</param>
+            <param direction="Input" dbtype="Number" size="0">:received_point</param>
+            <param direction="Input" dbtype="VarChar" size="30">:update_user</param>
+            <param direction="Input" dbtype="Number" size="0">:import_job_seq</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_IMPORT_JOB_READY" commandtype="Text" description="완료 확정: DB에서 다시 센 건수로 수신 건수를 맞추고 READY로 변경 (UPLOADING 작업만)" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_GDS_IMPORT_JOB
+   SET JOB_STATUS = 'READY',
+       RECEIVED_SOURCE_COUNT = :received_source,
+       RECEIVED_PLACED_COUNT = :received_placed,
+       RECEIVED_POINT_COUNT = :received_point,
+       UPDATE_USER = :update_user,
+       UPDATE_TIME = SYSDATE
+ WHERE IMPORT_JOB_SEQ = :import_job_seq
+   AND JOB_STATUS = 'UPLOADING' ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:received_source</param>
+            <param direction="Input" dbtype="Number" size="0">:received_placed</param>
+            <param direction="Input" dbtype="Number" size="0">:received_point</param>
+            <param direction="Input" dbtype="VarChar" size="30">:update_user</param>
+            <param direction="Input" dbtype="Number" size="0">:import_job_seq</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_IMPORT_JOB_CANCEL" commandtype="Text" description="진행 중(UPLOADING / VALIDATING) 저장 작업 취소. UPDATE_TIME은 DEFAULT로 갱신되지 않아 직접 기록" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_GDS_IMPORT_JOB
+   SET JOB_STATUS = 'CANCELLED',
+       UPDATE_USER = :update_user,
+       UPDATE_TIME = SYSDATE
+ WHERE IMPORT_JOB_SEQ = :import_job_seq
+   AND JOB_STATUS IN ('UPLOADING', 'VALIDATING')]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:update_user</param>
+            <param direction="Input" dbtype="Number" size="0">:import_job_seq</param>
+        </parameters>
+    </query>
+</queryxml>

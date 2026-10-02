@@ -1,0 +1,100 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+  logging="FALSE": 이 파일은 BLOB(byte[]) / 숫자 객체를 Middleware Execute1(object[])로 넘기는 쿼리가 있다.
+  Middleware SQL 로그(SQLTrace)가 모든 파라미터 값을 string으로 형변환해 InvalidCastException이 나므로 SQL 로그를 끈다(2026-10-02 확인).
+  좌표 double은 G17 문자열 + TO_BINARY_DOUBLE로 받는다. dbtype="Double"은 15자리로 반올림되어 저장된다(2026-10-02 확인).
+-->
+<queryxml conid="DMSMGR" logging="FALSE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Insert" queryid="CREATE_SOURCE_EL_MULTI" commandtype="Text" description="원본 Grid 행 다건 추가 (Payload 2,000바이트 이하 / ExecuteMultiple / Payload 16진수 문자열을 HEXTORAW)" commandtimeout="600">
+        <commandtext><![CDATA[INSERT INTO TQP_GDS_SOURCE_EL
+    (FACTORY,
+    DEVICE_ID,
+    SOURCE_ELEMENT_ID,
+    STRUCTURE_NAME,
+    SOURCE_ORDINAL,
+    ELEMENT_TYPE,
+    LAYER_ID,
+    DATA_TYPE,
+    PARSER_DUPLICATE,
+    SOURCE_PAYLOAD_VERSION,
+    SOURCE_PAYLOAD_BIN)
+VALUES
+    (:factory,
+    :device_id,
+    :source_element_id,
+    :structure_name,
+    :source_ordinal,
+    :element_type,
+    :layer_id,
+    :data_type,
+    :parser_duplicate,
+    :payload_version,
+    HEXTORAW(:payload_hex))]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
+            <param direction="Input" dbtype="VarChar" size="2048">:source_element_id</param>
+            <param direction="Input" dbtype="VarChar" size="1024">:structure_name</param>
+            <param direction="Input" dbtype="Number" size="0">:source_ordinal</param>
+            <param direction="Input" dbtype="VarChar" size="20">:element_type</param>
+            <param direction="Input" dbtype="Number" size="0">:layer_id</param>
+            <param direction="Input" dbtype="Number" size="0">:data_type</param>
+            <param direction="Input" dbtype="Number" size="0">:parser_duplicate</param>
+            <param direction="Input" dbtype="Number" size="0">:payload_version</param>
+            <param direction="Input" dbtype="VarChar" size="4000">:payload_hex</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_SOURCE_EL_COUNT" commandtype="Text" description="완료 확정: Device의 원본 행 수" commandtimeout="600">
+        <commandtext><![CDATA[SELECT COUNT(*) AS SOURCE_COUNT
+  FROM TQP_GDS_SOURCE_EL
+ WHERE FACTORY = :factory
+   AND DEVICE_ID = :device_id]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_SOURCE_EL" commandtype="Text" description="Device의 원본 행 전체 삭제 (기존 데이터 삭제 후 재등록)" commandtimeout="1800">
+        <commandtext><![CDATA[DELETE FROM TQP_GDS_SOURCE_EL
+ WHERE FACTORY = :factory
+   AND DEVICE_ID = :device_id]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="CREATE_SOURCE_EL" commandtype="Text" description="원본 Grid 행 추가 (BLOB / Execute1 / 같은 키가 있으면 건너뜀)" commandtimeout="600">
+        <commandtext><![CDATA[INSERT INTO TQP_GDS_SOURCE_EL
+    (FACTORY,
+    DEVICE_ID,
+    SOURCE_ELEMENT_ID,
+    STRUCTURE_NAME,
+    SOURCE_ORDINAL,
+    ELEMENT_TYPE,
+    LAYER_ID,
+    DATA_TYPE,
+    PARSER_DUPLICATE,
+    SOURCE_PAYLOAD_VERSION,
+    SOURCE_PAYLOAD_BIN)
+SELECT :factory, :device_id, :source_element_id, :structure_name, :source_ordinal, :element_type,
+       :layer_id, :data_type, :parser_duplicate, :payload_version, :payload_bin FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM TQP_GDS_SOURCE_EL
+                    WHERE FACTORY = :chk_factory AND DEVICE_ID = :chk_device_id AND SOURCE_ELEMENT_ID = :chk_source_id)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
+            <param direction="Input" dbtype="VarChar" size="2048">:source_element_id</param>
+            <param direction="Input" dbtype="VarChar" size="1024">:structure_name</param>
+            <param direction="Input" dbtype="Number" size="0">:source_ordinal</param>
+            <param direction="Input" dbtype="VarChar" size="20">:element_type</param>
+            <param direction="Input" dbtype="Number" size="0">:layer_id</param>
+            <param direction="Input" dbtype="Number" size="0">:data_type</param>
+            <param direction="Input" dbtype="Number" size="0">:parser_duplicate</param>
+            <param direction="Input" dbtype="Number" size="0">:payload_version</param>
+            <param direction="Input" dbtype="Blob" size="0">:payload_bin</param>
+            <param direction="Input" dbtype="VarChar" size="30">:chk_factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:chk_device_id</param>
+            <param direction="Input" dbtype="VarChar" size="2048">:chk_source_id</param>
+        </parameters>
+    </query>
+</queryxml>

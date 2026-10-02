@@ -157,6 +157,12 @@
     <Compile Include="DUCTextBox.Designer.cs">
       <DependentUpon>DUCTextBox.cs</DependentUpon>
     </Compile>
+    <Compile Include="DUCTreeView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DUCTreeView.Designer.cs">
+      <DependentUpon>DUCTreeView.cs</DependentUpon>
+    </Compile>
     <Compile Include="DUCUpDownListView.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -247,6 +253,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="DUCTextBox.resx">
       <DependentUpon>DUCTextBox.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DUCTreeView.resx">
+      <DependentUpon>DUCTreeView.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="DUCUpDownListView.resx">
       <DependentUpon>DUCUpDownListView.cs</DependentUpon>

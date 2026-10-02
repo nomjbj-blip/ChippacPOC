@@ -124,8 +124,6 @@ D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\100_ClientBin\DACrux.TEST.EN
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.ENGUI\obj\Debug\DACrux.T.3F4A615B.Up2Date
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.ENGUI\obj\Debug\DACrux.TEST.ENGUI.dll
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\09_TEST\DACrux.TEST.ENGUI\obj\Debug\DACrux.TEST.ENGUI.pdb
-D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\100_ClientBin\DACrux.TEST.ENGUI.dll
-D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\100_ClientBin\DACrux.TEST.ENGUI.pdb
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.ENGUI\obj\Debug\DACrux.TEST.ENGUI.csproj.AssemblyReference.cache
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.ENGUI\obj\Debug\DACrux.TEST.ENGUI.DlgBinCopy.resources
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.ENGUI\obj\Debug\DACrux.TEST.ENGUI.DlgSetOrigin.resources
@@ -184,6 +182,11 @@ D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TE
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.ENGUI\obj\Debug\DACrux.TEST.ENGUI.csproj.GenerateResource.cache
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.ENGUI\obj\Debug\DACrux.TEST.ENGUI.dll.licenses
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.ENGUI\obj\Debug\DACrux.TEST.ENGUI.csproj.CoreCompileInputs.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\100_ClientBin\DACrux.TEST.ENGUI.pdb
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.ENGUI\obj\Debug\DACrux.T.3F4A615B.Up2Date
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.ENGUI\obj\Debug\DACrux.TEST.ENGUI.dll
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.ENGUI\obj\Debug\DACrux.TEST.ENGUI.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.ENGUI\obj\Debug\DACrux.TEST.ENGUI.frmStandardMapSetup.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\100_ClientBin\DACrux.TEST.ENGUI.dll
+C:\Users\USER\AppData\Local\Temp\claude\testbuild\DACrux.TEST.ENGUI.dll
+C:\Users\USER\AppData\Local\Temp\claude\testbuild\DACrux.TEST.ENGUI.pdb

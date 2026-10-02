@@ -20,3 +20,14 @@ D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Inspect
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Inspection.PreConvertingService\obj\Debug\DACrux.S.C2727004.Up2Date
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Inspection.PreConvertingService\obj\Debug\DACrux.SEMDMS.Inspection.PreConvertingService.exe
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\DMS\02_DMS\DACrux.SEMDMS.Inspection.PreConvertingService\obj\Debug\DACrux.SEMDMS.Inspection.PreConvertingService.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\101_ServerBin\DACrux.SEMDMS.Inspection.PreConvertingService.exe.config
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\101_ServerBin\DACrux.SEMDMS.Inspection.PreConvertingService.exe
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\101_ServerBin\DACrux.SEMDMS.Inspection.PreConvertingService.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\02_DMS\DACrux.SEMDMS.Inspection.PreConvertingService\obj\Debug\DACrux.SEMDMS.Inspection.PreConvertingService.csproj.AssemblyReference.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\02_DMS\DACrux.SEMDMS.Inspection.PreConvertingService\obj\Debug\DACrux.SEMDMS.Inspection.PreConvertingService.InspectionPreConvertingService.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\02_DMS\DACrux.SEMDMS.Inspection.PreConvertingService\obj\Debug\DACrux.SEMDMS.Inspection.PreConvertingService.ProjectInstaller.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\02_DMS\DACrux.SEMDMS.Inspection.PreConvertingService\obj\Debug\DACrux.SEMDMS.Inspection.PreConvertingService.csproj.GenerateResource.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\02_DMS\DACrux.SEMDMS.Inspection.PreConvertingService\obj\Debug\DACrux.SEMDMS.Inspection.PreConvertingService.csproj.CoreCompileInputs.cache
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\02_DMS\DACrux.SEMDMS.Inspection.PreConvertingService\obj\Debug\DACrux.S.C2727004.Up2Date
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\02_DMS\DACrux.SEMDMS.Inspection.PreConvertingService\obj\Debug\DACrux.SEMDMS.Inspection.PreConvertingService.exe
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\02_DMS\DACrux.SEMDMS.Inspection.PreConvertingService\obj\Debug\DACrux.SEMDMS.Inspection.PreConvertingService.pdb

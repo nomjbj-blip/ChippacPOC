@@ -84,6 +84,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DefectAlarm.cs" />
+    <Compile Include="GdsMapImport.cs" />
+    <Compile Include="GdsMapView.cs" />
     <Compile Include="DefectMapAnalysis.cs" />
     <Compile Include="DMReport.cs" />
     <Compile Include="DMReview.cs" />
