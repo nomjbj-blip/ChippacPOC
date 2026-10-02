@@ -1,0 +1,72 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_POC\\ChippacPOC\\GdsMapControl\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{393FF757-F840-4205-B983-6788698C499B}|NexplantQMS.GdsMap.csproj|d:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_poc\\chippacpoc\\gdsmapcontrol\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{393FF757-F840-4205-B983-6788698C499B}|NexplantQMS.GdsMap.csproj|solutionrelative:form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{393FF757-F840-4205-B983-6788698C499B}|NexplantQMS.GdsMap.csproj|d:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_poc\\chippacpoc\\gdsmapcontrol\\gds\\gdsreader.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{393FF757-F840-4205-B983-6788698C499B}|NexplantQMS.GdsMap.csproj|solutionrelative:gds\\gdsreader.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{00000000-0000-0000-0000-000000000000}|\u003CSolution\u003E|NexplantQMS.GdsMap||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{393FF757-F840-4205-B983-6788698C499B}|NexplantQMS.GdsMap.csproj|d:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_poc\\chippacpoc\\gdsmapcontrol\\||{B270807C-D8C6-49EB-8EBE-8E8D566637A1}|5e9a8ac2-4f34-4521-858f-4c248ba31532"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 2,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "GdsReader.cs",
+              "DocumentMoniker": "D:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_POC\\ChippacPOC\\GdsMapControl\\Gds\\GdsReader.cs",
+              "RelativeDocumentMoniker": "Gds\\GdsReader.cs",
+              "ToolTip": "D:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_POC\\ChippacPOC\\GdsMapControl\\Gds\\GdsReader.cs",
+              "RelativeToolTip": "Gds\\GdsReader.cs",
+              "ViewState": "AgIAADgAAAAAAAAAAAAnwF8AAAAxAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-18T00:51:10.064Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "NexplantQMS.GdsMap",
+              "DocumentMoniker": "D:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_POC\\ChippacPOC\\GdsMapControl\\NexplantQMS.GdsMap.csproj",
+              "RelativeDocumentMoniker": "NexplantQMS.GdsMap.csproj",
+              "ToolTip": "D:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_POC\\ChippacPOC\\GdsMapControl\\NexplantQMS.GdsMap.csproj",
+              "RelativeToolTip": "NexplantQMS.GdsMap.csproj",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2026-09-18T00:50:53.515Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Form1.cs",
+              "DocumentMoniker": "D:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_POC\\ChippacPOC\\GdsMapControl\\Form1.cs",
+              "RelativeDocumentMoniker": "Form1.cs",
+              "ToolTip": "D:\\1_\uD504\uB85C\uC81D\uD2B8 \uBB38\uC11C\\18.\uC2A4\uD14C\uCE20\uCE69\uD329_POC\\ChippacPOC\\GdsMapControl\\Form1.cs",
+              "RelativeToolTip": "Form1.cs",
+              "ViewState": "AgIAACkAAAAAAAAAAAAWwEsAAAAIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-18T00:50:44.233Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

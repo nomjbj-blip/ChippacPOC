@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "새 프로필",
+    "Projects": [
+      {
+        "Path": "ACadSharp.Sample\\ACadSharp.Sample.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "NexplantQMS.GdsMap\\NexplantQMS.GdsMap.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]
