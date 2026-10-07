@@ -3276,4 +3276,36 @@
     <IS_START>False</IS_START>
     <MULTI>False</MULTI>
   </Table1>
+  <Table1>
+    <MENU_KEY>MNU_DMS_ET_LIMIT</MENU_KEY>
+    <MENU_ID>MNU_DMS_ET_LIMIT</MENU_ID>
+    <POPUP_MENU>MNU_DMS</POPUP_MENU>
+    <STOCK_TOOLBAR />
+    <CAPTION001>E-Test Limit Setup</CAPTION001>
+    <CAPTION002>E-Test Limit 설정</CAPTION002>
+    <CAPTION003 />
+    <CAPTION004 />
+    <CAPTION005 />
+    <TOOL_TIP>E-Test Para 별 Limit (Lower / Upper / Enable) 설정 - Device 단위</TOOL_TIP>
+    <ICON32 />
+    <ICON16 />
+    <FORM_TYPE>BASIC_FORM</FORM_TYPE>
+    <MODULE>DACrux.SEMDMS.ENGUI.dll</MODULE>
+    <ASSEMBLY>DACrux.SEMDMS.ENGUI.frmEtLimitSetup</ASSEMBLY>
+    <HELP_URL />
+    <MNU_ORDER>24</MNU_ORDER>
+    <MNU_LEVEL>2</MNU_LEVEL>
+    <FUNCTION_CODE>F03121</FUNCTION_CODE>
+    <RIBBON_TAB />
+    <RIBBON_GROUP />
+    <RESV_01 />
+    <RESV_02 />
+    <RESV_03 />
+    <RESV_04>DMS</RESV_04>
+    <RESV_05>S</RESV_05>
+    <ENABLE>True</ENABLE>
+    <VISIBLE>True</VISIBLE>
+    <IS_START>False</IS_START>
+    <MULTI>False</MULTI>
+  </Table1>
 </NewDataSet>

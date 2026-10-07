@@ -66,4 +66,13 @@ $sample = Join-Path $rootDir 'SampleFile\26_10_06 Sample File\CAI_OMM_ATV_A0_TSV
 $keepArg = if ($Keep) { 'keep' } else { '' }
 & "$out\EtResultUploadSmoke.exe" $sample "$buildRoot\upload.png" "$buildRoot\work" $keepArg
 if ($LASTEXITCODE -ne 0) { throw 'E-Test 업로드 화면 Smoke 실패' }
-Write-Output "검사 완료: $buildRoot (화면 이미지 upload.png)"
+
+# 3) Limit 설정 화면 Smoke (2026-10-07 추가, FACTORY=PROBE / DEVICE_ID=ET_LIMIT_SMOKE / Slot 4)
+& $csc /nologo /target:exe /platform:anycpu "/out:$out\EtLimitSetupSmoke.exe" /r:System.Windows.Forms.dll /r:System.Drawing.dll /r:System.Data.dll `
+    "/r:$out\DACrux.SEMDMS.ENGUI.dll" "/r:$out\DACrux.Framework.Base.dll" "/r:$out\DACrux.Base.dll" `
+    "/r:$out\DACrux.SEMDMS.RO.dll" "/r:$out\DACrux.SEMDMS.Interface.dll" "/r:$out\DACrux.SEMDMS.BSL.dll" "/r:$out\Miracom.Middleware.dll" "$PSScriptRoot\EtLimitSetupFormSmoke.cs"
+if ($LASTEXITCODE -ne 0) { throw 'Limit Smoke 빌드 실패' }
+Copy-Item "$out\EtResultUploadSmoke.exe.config" "$out\EtLimitSetupSmoke.exe.config" -Force
+& "$out\EtLimitSetupSmoke.exe" $sample "$buildRoot\limit.png" $keepArg
+if ($LASTEXITCODE -ne 0) { throw 'E-Test Limit 설정 화면 Smoke 실패' }
+Write-Output "검사 완료: $buildRoot (화면 이미지 upload.png / view.png / limit.png)"

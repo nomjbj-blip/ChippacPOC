@@ -91,5 +91,32 @@ namespace DACrux.SEMDMS.Interface
         DataTable GetEtValueList(string strSrcFileSeq);
 
         #endregion
+
+        #region [TQP_GDS_ET_LIMIT]
+
+        /// <summary>측정 항목이 있는 Device 목록. 열: DEVICE_ID / ITEM_COUNT</summary>
+        DataTable GetEtDeviceList(string strFactory);
+
+        /// <summary>
+        /// Limit 설정 화면 목록: Device 의 Para(측정 항목 PARA_NAME 대문자 묶음) + 저장된 Limit + READY 파일 값 통계.
+        /// 열: PARA_NAME / UNIT / UNIT_KINDS / ITEM_COUNT / VALUE_COUNT / NOT_TESTED_COUNT / MIN_VALUE / MEDIAN_VALUE / P99_VALUE / MAX_VALUE /
+        ///     OUT_COUNT(Enable Limit 기준 범위 밖 값 수) / LOWER_LIMIT / UPPER_LIMIT / ENABLE_FLAG / REMARK / UPDATE_USER / UPDATE_TIME / HAS_LIMIT(Y/N)
+        /// </summary>
+        DataTable GetEtLimitList(string strFactory, string strDeviceID);
+
+        /// <summary>Device 의 저장된 Limit (판정용). 열: PARA_NAME / LOWER_LIMIT / UPPER_LIMIT / UNIT / ENABLE_FLAG / REMARK</summary>
+        DataTable GetEtLimit(string strFactory, string strDeviceID);
+
+        /// <summary>
+        /// Para Limit 저장(있으면 수정 / 없으면 추가). aKey: 0 Factory / 1 Device ID
+        /// aRows 열: 0 PARA_NAME(대소문자 무관, 대문자로 저장) / 1 LOWER(빈 값 = 없음) / 2 UPPER(빈 값 = 없음) / 3 ENABLE_FLAG(Y/N) / 4 REMARK
+        /// Lower / Upper 중 하나는 있어야 하고 둘 다 있으면 Lower &lt;= Upper. 단위는 측정 항목에서 서버가 채운다. 반환: 저장한 행 수
+        /// </summary>
+        int SaveEtLimit(string[] aKey, string[,] aRows, string strUpdateUser);
+
+        /// <summary>Para Limit 1행 삭제. aKey: 0 Factory / 1 Device ID / 2 PARA_NAME. 반환: 지운 행 수(0 또는 1)</summary>
+        int DeleteEtLimit(string[] aKey, string strUpdateUser);
+
+        #endregion
     }
 }

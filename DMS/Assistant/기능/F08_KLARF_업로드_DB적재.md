@@ -62,6 +62,9 @@ frmKlarfUpload (신규, SEMDMS.ENGUI/DefectMapAnalysis)
 - FTP: Docker 컨테이너 `dms-ftp`(vsftpd, 127.0.0.1:21 / Passive 21000~21010, 계정 dacrux, D:\FTP -> /FTP 읽기 전용). TQC_CONFIG DEFECT_FTP = IP 127.0.0.1 / PORT 21 / MAIN_PATH /%2f/ / PASS 는 새 시험 값(문서에 적지 않음). 기존 HFtpClient 로 다운로드 확인(2026-10-07).
 - 배포 DLL 은 E-Test(CLAUDE-029) 진행 중 파일을 뺀 임시 csproj 로 빌드했다. E-Test 쪽이 나중에 전체 소스로 배포하면 KLARF 업로드 코드도 함께 들어간다(정상).
 
+- 이미지 폴더 선택은 탐색기 형식 창(`FolderPickerDialog.cs`, IFileOpenDialog 폴더 선택 모드, 실패 시 기존 창). 이미지 폴더 자동 찾기는 사용자가 화면 코드에서 뺐다(2026-10-07) -> [폴더 선택]으로 직접 지정.
+- Probe / Smoke 는 샘플 Wafer 에 사용자가 올린 데이터(STEP COMMENT USER 가 PROBE / SMOKE 아님)가 있으면 바꾸지 않고 종료 코드 2 로 멈춘다(재등록으로 사용자 데이터를 지운 사고 후 추가).
+
 ## 설계만 된 부분과 미완료
 
 - 이미지 화면 표시: Map Viewer 이미지 목록은 FTP(`TQC_CONFIG DEFECT_FTP`) 경유라 POC PC FTP 환경 결정 필요. `KLARF_IMAGE_ROOT` 는 FTP 루트(MAIN_PATH `/%2f/` = 드라이브 루트) 아래여야 한다.

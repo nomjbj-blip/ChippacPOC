@@ -423,6 +423,129 @@ namespace DACrux.SEMDMS.BSL
 
         #endregion
 
+        #region [TQP_GDS_ET_LIMIT]
+
+        /// <summary>측정 항목이 있는 Device 목록을 조회한다.</summary>
+        public DataTable GetEtDeviceList(string strFactory)
+        {
+            DACrux.SEMDMS.DSL.TQP_GDS_ET_ITEM oTQP_GDS_ET_ITEM = new DACrux.SEMDMS.DSL.TQP_GDS_ET_ITEM();
+            return oTQP_GDS_ET_ITEM.GetData("SELECT_ET_ITEM_DEVICE_LIST", null, new string[] { Required(strFactory, "Factory", 30) });
+        }
+
+        /// <summary>Limit 설정 화면 목록(Para + Limit + READY 파일 값 통계)을 조회한다. 같은 Factory / Device 를 쿼리에 세 번 넘긴다(이름이 다른 바인딩 변수).</summary>
+        public DataTable GetEtLimitList(string strFactory, string strDeviceID)
+        {
+            string strCleanFactory = Required(strFactory, "Factory", 30);
+            string strCleanDevice = Required(strDeviceID, "Device ID", 50);
+            DACrux.SEMDMS.DSL.TQP_GDS_ET_LIMIT oTQP_GDS_ET_LIMIT = new DACrux.SEMDMS.DSL.TQP_GDS_ET_LIMIT();
+            return oTQP_GDS_ET_LIMIT.GetData("SELECT_ET_LIMIT_LIST", null, new string[] {
+                strCleanFactory, strCleanDevice, strCleanFactory, strCleanDevice, strCleanFactory, strCleanDevice });
+        }
+
+        /// <summary>Device 의 저장된 Limit 을 조회한다(판정용).</summary>
+        public DataTable GetEtLimit(string strFactory, string strDeviceID)
+        {
+            DACrux.SEMDMS.DSL.TQP_GDS_ET_LIMIT oTQP_GDS_ET_LIMIT = new DACrux.SEMDMS.DSL.TQP_GDS_ET_LIMIT();
+            return oTQP_GDS_ET_LIMIT.GetData("SELECT_ET_LIMIT", null,
+                new string[] { Required(strFactory, "Factory", 30), Required(strDeviceID, "Device ID", 50) });
+        }
+
+        /// <summary>
+        /// Para Limit 을 저장한다(2026-10-07 사용자 결정: Para 별 구간 / Device 별 / 등록 시 대문자 / Enable / 한쪽 Limit 허용).
+        /// 처리 흐름:
+        ///  1) 입력 검증: Para 는 대문자로 바꾼다. 같은 Para 가 두 번 오면 거부. Lower / Upper 는 숫자 또는 빈 값, 하나는 있어야 하고 둘 다 있으면 Lower &lt;= Upper. Enable 은 Y / N.
+        ///  2) Device 의 Para 목록(GetEtLimitList)에 없는 Para 는 거부. 측정 항목 단위가 섞인 Para 는 거부.
+        ///  3) 단위는 측정 항목에서 채우고 MERGE 로 한 번에 저장한다(InsertExecuteMultiple).
+        /// </summary>
+        public int SaveEtLimit(string[] aKey, string[,] aRows, string strUpdateUser)
+        {
+            if (aKey == null || aKey.Length != 2)
+                throw new ArgumentException("Limit 키는 2개 항목(Factory / Device)이어야 합니다.", "aKey");
+            string strFactory = Required(aKey[0], "Factory", 30);
+            string strDevice = Required(aKey[1], "Device ID", 50);
+            string strUser = Required(strUpdateUser, "Update User", 30);
+            if (aRows == null || aRows.GetLength(0) == 0)
+                throw new ArgumentException("저장할 Limit 이 없습니다.", "aRows");
+            if (aRows.GetLength(1) != 5)
+                throw new ArgumentException("Limit 열 수는 5개여야 합니다.", "aRows");
+
+            Dictionary<string, DataRow> dicPara = new Dictionary<string, DataRow>(StringComparer.Ordinal);
+            DataTable dtList = null;
+            try
+            {
+                dtList = GetEtLimitList(strFactory, strDevice);
+                foreach (DataRow dr in dtList.Rows)
+                    dicPara[dr["PARA_NAME"].ToString()] = dr;
+
+                int iRows = aRows.GetLength(0);
+                string[,] aMerge = new string[iRows, 9];
+                HashSet<string> setPara = new HashSet<string>(StringComparer.Ordinal);
+                for (int i = 0; i < iRows; i++)
+                {
+                    string strPara = RequiredChars(aRows[i, 0], "Para", 50).ToUpperInvariant();
+                    if (!setPara.Add(strPara))
+                        throw new ArgumentException("같은 Para 가 두 번 있습니다: " + strPara, "aRows");
+                    DataRow drPara;
+                    if (!dicPara.TryGetValue(strPara, out drPara))
+                        throw new InvalidOperationException("Device " + strDevice + " 에 없는 Para 입니다: " + strPara);
+                    if (DACrux.Base.Convert.longParse(drPara["UNIT_KINDS"].ToString()) > 1)
+                        throw new InvalidOperationException("Para " + strPara + " 의 측정 항목 단위가 섞여 있어 Limit 을 정할 수 없습니다.");
+                    string strLower = OptionalDouble(aRows[i, 1], strPara + " Lower");
+                    string strUpper = OptionalDouble(aRows[i, 2], strPara + " Upper");
+                    if (strLower.Length == 0 && strUpper.Length == 0)
+                        throw new ArgumentException("Para " + strPara + " 의 Lower / Upper 중 하나는 입력해야 합니다.", "aRows");
+                    if (strLower.Length > 0 && strUpper.Length > 0
+                        && double.Parse(strLower, CultureInfo.InvariantCulture) > double.Parse(strUpper, CultureInfo.InvariantCulture))
+                        throw new ArgumentException("Para " + strPara + " 의 Lower(" + strLower + ") 가 Upper(" + strUpper + ") 보다 큽니다.", "aRows");
+                    string strEnable = Clean(aRows[i, 3]).ToUpperInvariant();
+                    if (strEnable != "Y" && strEnable != "N")
+                        throw new ArgumentException("Enable 은 Y 또는 N 이어야 합니다: " + aRows[i, 3], "aRows");
+                    aMerge[i, 0] = strFactory;
+                    aMerge[i, 1] = strDevice;
+                    aMerge[i, 2] = strPara;
+                    aMerge[i, 3] = strLower;
+                    aMerge[i, 4] = strUpper;
+                    aMerge[i, 5] = drPara["UNIT"].ToString();
+                    aMerge[i, 6] = strEnable;
+                    aMerge[i, 7] = OptionalChars(aRows[i, 4], "비고", 200);
+                    aMerge[i, 8] = strUser;
+                }
+                DACrux.SEMDMS.DSL.TQP_GDS_ET_LIMIT oTQP_GDS_ET_LIMIT = new DACrux.SEMDMS.DSL.TQP_GDS_ET_LIMIT();
+                oTQP_GDS_ET_LIMIT.InsertExecuteMultiple("MERGE_ET_LIMIT", aMerge);
+                return iRows;
+            }
+            finally
+            {
+                if (dtList != null)
+                    dtList.Dispose();
+            }
+        }
+
+        /// <summary>Para Limit 1행을 삭제한다. Para 는 대문자로 바꿔 찾는다.</summary>
+        public int DeleteEtLimit(string[] aKey, string strUpdateUser)
+        {
+            if (aKey == null || aKey.Length != 3)
+                throw new ArgumentException("Limit 삭제 키는 3개 항목(Factory / Device / Para)이어야 합니다.", "aKey");
+            Required(strUpdateUser, "Update User", 30);
+            DACrux.SEMDMS.DSL.TQP_GDS_ET_LIMIT oTQP_GDS_ET_LIMIT = new DACrux.SEMDMS.DSL.TQP_GDS_ET_LIMIT();
+            return oTQP_GDS_ET_LIMIT.DeleteDataNonQuery("DELETE_ET_LIMIT", null, new string[] {
+                Required(aKey[0], "Factory", 30), Required(aKey[1], "Device ID", 50), RequiredChars(aKey[2], "Para", 50).ToUpperInvariant() });
+        }
+
+        /// <summary>빈 값이면 빈 문자열(NULL), 아니면 유한한 숫자인지 확인해 R 형식(왕복 가능) 문자열로 돌려준다.</summary>
+        private static string OptionalDouble(string strValue, string strName)
+        {
+            string strClean = Clean(strValue);
+            if (strClean.Length == 0)
+                return string.Empty;
+            double dValue;
+            if (!double.TryParse(strClean, NumberStyles.Float, CultureInfo.InvariantCulture, out dValue) || double.IsNaN(dValue) || double.IsInfinity(dValue))
+                throw new ArgumentException(strName + " 값이 숫자가 아닙니다: " + strValue, strName);
+            return dValue.ToString("R", CultureInfo.InvariantCulture);
+        }
+
+        #endregion
+
         #region [Batch Common]
 
         /// <summary>한 번에 받을 수 있는 배치 행 수. Remoting 요청 크기와 DB 배열 바인딩 크기를 제한한다(GdsMapImport와 같음).</summary>

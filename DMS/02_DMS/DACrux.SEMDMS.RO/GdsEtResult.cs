@@ -183,5 +183,69 @@ namespace DACrux.SEMDMS.RO
         }
 
         #endregion
+
+        #region [TQP_GDS_ET_LIMIT]
+
+        public DataTable GetEtDeviceList(string strFactory)
+        {
+            try
+            {
+                return m_OBJ.GetEtDeviceList(strFactory);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public DataTable GetEtLimitList(string strFactory, string strDeviceID)
+        {
+            try
+            {
+                return m_OBJ.GetEtLimitList(strFactory, strDeviceID);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public DataTable GetEtLimit(string strFactory, string strDeviceID)
+        {
+            try
+            {
+                return m_OBJ.GetEtLimit(strFactory, strDeviceID);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public int SaveEtLimit(string[] aKey, string[,] aRows, string strUpdateUser)
+        {
+            try
+            {
+                return m_OBJ.SaveEtLimit(aKey, aRows, strUpdateUser);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public int DeleteEtLimit(string[] aKey, string strUpdateUser)
+        {
+            try
+            {
+                return m_OBJ.DeleteEtLimit(aKey, strUpdateUser);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        #endregion
     }
 }

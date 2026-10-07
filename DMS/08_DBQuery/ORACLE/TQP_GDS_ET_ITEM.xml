@@ -64,4 +64,14 @@ VALUES
             <param direction="Input" dbtype="VarChar" size="200">:device_id</param>
         </parameters>
     </query>
+    <query statement="Select" queryid="SELECT_ET_ITEM_DEVICE_LIST" commandtype="Text" description="Limit 설정 화면: 측정 항목이 있는 Device 목록 (Factory 별)" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DEVICE_ID, COUNT(*) AS ITEM_COUNT
+  FROM TQP_GDS_ET_ITEM
+ WHERE FACTORY = :factory
+ GROUP BY DEVICE_ID
+ ORDER BY DEVICE_ID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="120">:factory</param>
+        </parameters>
+    </query>
 </queryxml>

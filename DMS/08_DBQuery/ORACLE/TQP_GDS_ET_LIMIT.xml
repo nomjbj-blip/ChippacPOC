@@ -1,0 +1,106 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TQP_GDS_ET_LIMIT: E-Test Para Limit (Factory + Device + Para 대문자). 2026-10-07 Claude CLAUDE-029 추가.
+  설계: 문서/2026-10-07_ETest_Limit_설정_설계.md 10절. 사용자 결정: Para 별 구간 / Device 별 / 등록 시 대문자 / Enable / 한쪽 Limit 허용.
+  측정 항목 PARA_NAME 은 UPPER(PARA_NAME) 로 비교한다. double 은 G17(R) 문자열 + TO_BINARY_DOUBLE, 빈 문자열은 NULL(그쪽 Limit 없음).
+  같은 :이름 을 두 번 쓰지 않는다(Middleware 는 순서대로 바인딩) -> f1 / f2 / f3 처럼 이름을 나눴다.
+-->
+<queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Select" queryid="SELECT_ET_LIMIT_LIST" commandtype="Text" description="Limit 설정 화면: Device 의 Para 목록(측정 항목 UPPER 묶음) + 저장된 Limit + READY 파일 값 통계 / 범위 밖 수" commandtimeout="600">
+        <commandtext><![CDATA[WITH I AS (SELECT ET_ITEM_SEQ, UPPER(PARA_NAME) AS PARA, UNIT, DISPLAY_ORDER FROM TQP_GDS_ET_ITEM WHERE FACTORY = :f1 AND DEVICE_ID = :d1),
+P AS (SELECT PARA, COUNT(*) AS ITEM_COUNT, MIN(UNIT) AS UNIT, COUNT(DISTINCT UNIT) AS UNIT_KINDS, MIN(DISPLAY_ORDER) AS FIRST_ORDER FROM I GROUP BY PARA),
+L AS (SELECT * FROM TQP_GDS_ET_LIMIT WHERE FACTORY = :f2 AND DEVICE_ID = :d2),
+V AS (SELECT I.PARA, V.MEAS_VALUE, V.VALUE_STATUS
+        FROM TQP_GDS_ET_VALUE V
+        JOIN I ON I.ET_ITEM_SEQ = V.ET_ITEM_SEQ
+        JOIN TQP_GDS_SRC_FILE F ON F.SRC_FILE_SEQ = V.SRC_FILE_SEQ
+       WHERE F.FACTORY = :f3 AND F.DEVICE_ID = :d3 AND F.LOAD_STATUS = 'READY'),
+S AS (SELECT V.PARA,
+             COUNT(V.MEAS_VALUE) AS VALUE_COUNT,
+             SUM(CASE WHEN V.VALUE_STATUS = 'N' THEN 1 ELSE 0 END) AS NOT_TESTED_COUNT,
+             MIN(V.MEAS_VALUE) AS MIN_VALUE,
+             PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY V.MEAS_VALUE) AS MEDIAN_VALUE,
+             PERCENTILE_CONT(0.99) WITHIN GROUP (ORDER BY V.MEAS_VALUE) AS P99_VALUE,
+             MAX(V.MEAS_VALUE) AS MAX_VALUE,
+             SUM(CASE WHEN L.ENABLE_FLAG = 'Y' AND V.VALUE_STATUS = 'V'
+                       AND ((L.LOWER_LIMIT IS NOT NULL AND V.MEAS_VALUE < L.LOWER_LIMIT) OR (L.UPPER_LIMIT IS NOT NULL AND V.MEAS_VALUE > L.UPPER_LIMIT))
+                      THEN 1 ELSE 0 END) AS OUT_COUNT
+        FROM V LEFT JOIN L ON L.PARA_NAME = V.PARA
+       GROUP BY V.PARA)
+SELECT NVL(P.PARA, L.PARA_NAME) AS PARA_NAME, NVL(P.UNIT, L.UNIT) AS UNIT, NVL(P.UNIT_KINDS, 0) AS UNIT_KINDS, NVL(P.ITEM_COUNT, 0) AS ITEM_COUNT,
+       NVL(S.VALUE_COUNT, 0) AS VALUE_COUNT, NVL(S.NOT_TESTED_COUNT, 0) AS NOT_TESTED_COUNT,
+       S.MIN_VALUE, S.MEDIAN_VALUE, S.P99_VALUE, S.MAX_VALUE, NVL(S.OUT_COUNT, 0) AS OUT_COUNT,
+       L.LOWER_LIMIT, L.UPPER_LIMIT, L.ENABLE_FLAG, L.REMARK, NVL(L.UPDATE_USER, L.CREATE_USER) AS UPDATE_USER, NVL(L.UPDATE_TIME, L.CREATE_TIME) AS UPDATE_TIME,
+       CASE WHEN L.PARA_NAME IS NULL THEN 'N' ELSE 'Y' END AS HAS_LIMIT
+  FROM P
+  FULL OUTER JOIN L ON L.PARA_NAME = P.PARA
+  LEFT JOIN S ON S.PARA = P.PARA
+ ORDER BY NVL(P.FIRST_ORDER, 999999999), NVL(P.PARA, L.PARA_NAME)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="120">:f1</param>
+            <param direction="Input" dbtype="VarChar" size="200">:d1</param>
+            <param direction="Input" dbtype="VarChar" size="120">:f2</param>
+            <param direction="Input" dbtype="VarChar" size="200">:d2</param>
+            <param direction="Input" dbtype="VarChar" size="120">:f3</param>
+            <param direction="Input" dbtype="VarChar" size="200">:d3</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ET_LIMIT" commandtype="Text" description="Device 의 저장된 Limit (판정용)" commandtimeout="60">
+        <commandtext><![CDATA[SELECT PARA_NAME, LOWER_LIMIT, UPPER_LIMIT, UNIT, ENABLE_FLAG, REMARK
+  FROM TQP_GDS_ET_LIMIT
+ WHERE FACTORY = :factory
+   AND DEVICE_ID = :device_id
+ ORDER BY PARA_NAME]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="120">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="200">:device_id</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="MERGE_ET_LIMIT" commandtype="Text" description="Limit 저장 (있으면 수정 / 없으면 추가, InsertExecuteMultiple)" commandtimeout="60">
+        <commandtext><![CDATA[MERGE INTO TQP_GDS_ET_LIMIT T
+USING (SELECT :factory AS FACTORY,
+              :device_id AS DEVICE_ID,
+              :para_name AS PARA_NAME,
+              TO_BINARY_DOUBLE(:lower_limit) AS LOWER_LIMIT,
+              TO_BINARY_DOUBLE(:upper_limit) AS UPPER_LIMIT,
+              :unit AS UNIT,
+              :enable_flag AS ENABLE_FLAG,
+              :remark AS REMARK,
+              :update_user AS UPDATE_USER
+         FROM DUAL) S
+   ON (T.FACTORY = S.FACTORY AND T.DEVICE_ID = S.DEVICE_ID AND T.PARA_NAME = S.PARA_NAME)
+ WHEN MATCHED THEN UPDATE SET
+      T.LOWER_LIMIT = S.LOWER_LIMIT,
+      T.UPPER_LIMIT = S.UPPER_LIMIT,
+      T.UNIT = S.UNIT,
+      T.ENABLE_FLAG = S.ENABLE_FLAG,
+      T.REMARK = S.REMARK,
+      T.UPDATE_USER = S.UPDATE_USER,
+      T.UPDATE_TIME = SYSDATE
+ WHEN NOT MATCHED THEN INSERT
+      (FACTORY, DEVICE_ID, PARA_NAME, LOWER_LIMIT, UPPER_LIMIT, UNIT, ENABLE_FLAG, REMARK, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+      VALUES (S.FACTORY, S.DEVICE_ID, S.PARA_NAME, S.LOWER_LIMIT, S.UPPER_LIMIT, S.UNIT, S.ENABLE_FLAG, S.REMARK, S.UPDATE_USER, SYSDATE, S.UPDATE_USER, SYSDATE)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="120">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="200">:device_id</param>
+            <param direction="Input" dbtype="VarChar" size="200">:para_name</param>
+            <param direction="Input" dbtype="VarChar" size="40">:lower_limit</param>
+            <param direction="Input" dbtype="VarChar" size="40">:upper_limit</param>
+            <param direction="Input" dbtype="VarChar" size="40">:unit</param>
+            <param direction="Input" dbtype="VarChar" size="1">:enable_flag</param>
+            <param direction="Input" dbtype="VarChar" size="800">:remark</param>
+            <param direction="Input" dbtype="VarChar" size="30">:update_user</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_ET_LIMIT" commandtype="Text" description="Para Limit 1행 삭제 (판정 안 함으로 돌아감)" commandtimeout="60">
+        <commandtext><![CDATA[DELETE FROM TQP_GDS_ET_LIMIT
+ WHERE FACTORY = :factory
+   AND DEVICE_ID = :device_id
+   AND PARA_NAME = :para_name]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="120">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="200">:device_id</param>
+            <param direction="Input" dbtype="VarChar" size="200">:para_name</param>
+        </parameters>
+    </query>
+</queryxml>

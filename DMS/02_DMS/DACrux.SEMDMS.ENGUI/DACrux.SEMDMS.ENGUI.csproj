@@ -236,6 +236,12 @@
     <Compile Include="ETest\frmEtResultView.Designer.cs">
       <DependentUpon>frmEtResultView.cs</DependentUpon>
     </Compile>
+    <Compile Include="ETest\frmEtLimitSetup.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ETest\frmEtLimitSetup.Designer.cs">
+      <DependentUpon>frmEtLimitSetup.cs</DependentUpon>
+    </Compile>
     <Compile Include="GdsMap\frmGdsMapSetup.cs">
       <SubType>Form</SubType>
     </Compile>
