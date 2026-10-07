@@ -4,10 +4,11 @@
   리비전 관리를 하지 않는다(사용자 결정). Device당 Map은 1개이고, 다시 등록하려면 기존 데이터를 삭제한 뒤 등록한다.
   하위 테이블(LAYER / SOURCE_EL / PLACED_EL / IMPORT_JOB / IMPORT_BATCH / CHAIN 6개)은 FK ON DELETE CASCADE로 함께 지워진다.
   단위 double은 G17 문자열 + TO_BINARY_DOUBLE로 받는다(dbtype Decimal / Double은 지수 표기 / 15자리 반올림 문제가 있음).
+  2026-10-06 CLAUDE-027: VIEW_SIDE(FRONT = GDS 원본 / BACK = GDS 원점 기준 좌우 반전 X' = -X로 PLACED 저장) 추가.
 -->
 <queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
     <query statement="Select" queryid="SELECT_MAP_INFO" commandtype="Text" description="Device의 기존 Map 헤더 / 저장 작업 상태 / 건수 (저장 전 기존 데이터 확인)" commandtimeout="60">
-        <commandtext><![CDATA[SELECT M.FACTORY, M.DEVICE_ID, M.TOP_STRUCTURE, M.GDS_FILE_NAME, M.GDS_SHA256, M.MAP_STATUS,
+        <commandtext><![CDATA[SELECT M.FACTORY, M.DEVICE_ID, M.TOP_STRUCTURE, M.GDS_FILE_NAME, M.GDS_SHA256, M.MAP_STATUS, M.VIEW_SIDE,
        M.CREATE_USER, TO_CHAR(M.CREATE_TIME, 'YYYY-MM-DD HH24:MI:SS') AS CREATE_TIME,
        J.IMPORT_JOB_SEQ, J.JOB_STATUS,
        NVL(J.RECEIVED_SOURCE_COUNT, 0) AS SOURCE_COUNT,
@@ -32,6 +33,7 @@
     USER_UNIT,
     DATABASE_UNIT,
     MAP_STATUS,
+    VIEW_SIDE,
     CREATE_USER)
 VALUES
     (:factory,
@@ -42,6 +44,7 @@ VALUES
     TO_BINARY_DOUBLE(:user_unit),
     TO_BINARY_DOUBLE(:database_unit),
     'DRAFT',
+    :view_side,
     :create_user)]]></commandtext>
         <parameters>
             <param direction="Input" dbtype="VarChar" size="30">:factory</param>
@@ -51,6 +54,7 @@ VALUES
             <param direction="Input" dbtype="VarChar" size="64">:gds_sha256</param>
             <param direction="Input" dbtype="VarChar" size="40">:user_unit</param>
             <param direction="Input" dbtype="VarChar" size="40">:database_unit</param>
+            <param direction="Input" dbtype="VarChar" size="10">:view_side</param>
             <param direction="Input" dbtype="VarChar" size="30">:create_user</param>
         </parameters>
     </query>

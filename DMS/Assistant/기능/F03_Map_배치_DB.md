@@ -2,6 +2,13 @@
 
 확인일: 2026-10-02 / 상태: 클라이언트 배치 소스 확인 / DB 적용은 과거 문서 기록
 
+## 2026-10-06 GDS 파일 SHA-256 계산 제거 (CLAUDE-028)
+
+- 사용자 지시 "빼줘". GDS Map Setup DB 저장이 원본 GDS 파일 SHA-256 을 더 이상 계산하지 않는다 (재등록 확인창의 같은 파일 / 다른 파일 표시도 삭제, 파일 이름만 표시).
+- `TQP_GDS_MAP.GDS_SHA256` 은 남기고 NULL 허용 (`Persistence/2026-10-06_tqp_gds_map_sha_nullable.sql`, 로컬 DB 적용). BSL `BeginMapImport` 는 SHA 를 선택 입력으로 받는다 (빈 값 -> NULL, 값이 오면 64자리 16진수 검사).
+- 배치 본문 지문 `PAYLOAD_SHA256` (`MapPlacedBatchPayload` / 배치 재개 / 재조회 검증) 은 다른 용도라 그대로 둔다.
+- 검증 `Probes/GdsImportShaOptionalProbe.ps1`.
+
 ## 목적과 파일
 
 큰 GDS 도면을 제한된 배치로 저장하고 같은 Map 개정본의 도형 / Chain을 복원할 기반을 만든다.
@@ -89,3 +96,16 @@ SOURCE 전송 계약과 ID를 정리한 뒤 Layer -> Source -> Placed 순서의 
 
 
 **2026-10-02 리비전 관리 제거(CLAUDE-017, 최신 기준):** 키 FACTORY + DEVICE_ID(Device당 Map 1개, 헤더 TQP_GDS_MAP). 기존 데이터가 있으면 화면이 삭제 후 재등록 여부를 묻고 `DeleteMap`(CHAIN -> PLACED -> SOURCE -> MAP). MAP_REV_SEQ / MAP_ACTIVE / RETIRED / 리비전 자동 처리 제거. 설계 20절 / DB 스키마 현황 마지막 절.
+
+
+**2026-10-06 화면에 표시된 Layer만 저장(CLAUDE-021, 최신 기준):** 사용자 결정 "Filter된 정보 기반으로 생성". GDS Map Setup의 DB 저장은 저장 버튼을 누른 시점에 Layer 목록에서 체크된 Layer만 저장한다(LAYER / SOURCE / PLACED 공통, SREF / AREF 원본 행은 항상 저장). SOURCE_ELEMENT_ID 순번은 전체 기준을 유지하고 제외 행은 번호만 건너뛴다. 일부만 체크되면 제외 Layer 확인창(기본 아니오)이 뜨고, 0개면 저장을 막는다. 저장 중에는 Layer 목록이 잠긴다. 서버 / DB 스키마는 변경 없음. 제외한 Layer는 조회 / Chain에서 쓸 수 없고 다시 쓰려면 삭제 후 재등록한다. 설계 21절. 검증: `Probes/GdsImportLayerFilterProbe.ps1` 8 PASS(샘플 9개 Layer 중 1,2,6 선택 -> SOURCE 29,874 / PLACED 29,871 / 좌표 169,875, 확정 OK, 조회 서비스 Layer 목록 = 선택 Layer). 샘플에 SREF / AREF가 없어 "참조 행 항상 저장" 규칙은 실제 데이터로 미확인.
+
+**2026-10-06 Service 호출 배치 크기 2,000 -> 10,000(CLAUDE-023):** 클라이언트 `DbSaveBatchRows`와 BSL `MaxBatchRows`를 10,000으로 맞춤(둘 중 하나만 바꾸면 저장 실패). 저장은 이미 `ExecuteMultiple` 배열 바인딩이며, 느린 주 원인은 배치마다 붙는 부가 처리(상태 조회 / 해시 / 배치 기록)와 Remoting 호출 횟수로 판단. 2,000 기준 PLACED 서버 저장 215.5초(행당 0.356ms).
+
+**2026-10-06 배치 저장을 DefectDefine.CreateDefect 방식으로 전환(CLAUDE-023, 최신 기준):** 사용자 지시. BSL 배치 저장은 작업 키 조회 + `InsertExecuteMultiple`만 한다(큰 도형만 `Execute1`). 행 검증 / 해시 / 배치 기록(TQP_GDS_IMPORT_BATCH) / 수신 건수 누적 / 중복 재시도 제거, 확정은 DB 건수 비교만. 실패 시 삭제 후 재등록. Service config에서 사라졌던 GdsMapImport / GdsMapView wellknown을 운영 config와 원본 App.config에 다시 넣음.
+
+**2026-10-06 화면 역할 재정의(CLAUDE-026):** GDS Map Setup = GDS 읽기 + Layer 필터 + Map DB 저장, GDS Map View = Map 조회 + Chain 설정 / 저장 / 불러오기. View 조회 옵션 라디오(도면만 / Chain만 / 둘 다)는 제거됨. [화면 역할 재정의 설계](../../../문서/2026-10-06_GDS_Map_화면역할_재정의_설계.md) 9~12절.
+
+**2026-10-06 저장 기준 Front / Back side(CLAUDE-027):** GDS 원본은 Front side. Setup DB 저장 시 콤보로 Back side(기본)를 고르면 PLACED 좌표를 GDS 원점 기준 좌우 반전(X' = -X)해 저장하고 `TQP_GDS_MAP.VIEW_SIDE`에 BACK 기록. SOURCE는 항상 원본. Device당 하나의 기준(바꾸려면 삭제 후 재등록). [GDS 반전 설계](../../../문서/2026-10-06_GDS_반전_BackSide_설계.md) 8~9절.
+
+**2026-10-07 Front / Back 보기 전환(CLAUDE-030, 최신 기준 - 10-06 저장 기준 콤보 대체):** Setup 저장은 항상 원본(Front). View에서 [보기 기준 Front / Back]을 골라 화면에서 좌우 반전(X' = -X, `GdsSideTransform`)해 보여 준다. DB / Chain은 1벌(저장 기준 좌표), Chain Marker만 저장 / 불러오기 / 전환 때 변환. 로컬 DB의 기존 GDS 데이터는 전부 삭제됨. [Front / Back 전환 설계](../../../문서/2026-10-07_GDS_FrontBack_전환_설계.md).

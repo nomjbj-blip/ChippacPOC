@@ -1,0 +1,70 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TQP_GDS_ET_DIE: E-Test Die 정보 (파일 행 단위). 2026-10-07 Claude CLAUDE-029 추가.
+  좌표는 파일 원본 (X, Y) 그대로. 숫자 빈 값은 VarChar + TO_NUMBER 로 받아 NULL 로 저장한다.
+-->
+<queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Insert" queryid="CREATE_ET_DIE" commandtype="Text" description="Die 정보 저장 (InsertExecuteMultiple)" commandtimeout="600">
+        <commandtext><![CDATA[INSERT INTO TQP_GDS_ET_DIE
+    (SRC_FILE_SEQ,
+    DUT_NO,
+    DIE_X,
+    DIE_Y,
+    HW_BIN,
+    SW_BIN,
+    PASS_FLAG,
+    FLAG_CODE,
+    TEST_TIME_MS,
+    TESTS_EXECUTED,
+    HEAD_SITE)
+VALUES
+    (:src_file_seq,
+    :dut_no,
+    :die_x,
+    :die_y,
+    TO_NUMBER(:hw_bin),
+    TO_NUMBER(:sw_bin),
+    :pass_flag,
+    :flag_code,
+    TO_NUMBER(:test_time_ms),
+    TO_NUMBER(:tests_executed),
+    :head_site)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:src_file_seq</param>
+            <param direction="Input" dbtype="Number" size="0">:dut_no</param>
+            <param direction="Input" dbtype="Number" size="0">:die_x</param>
+            <param direction="Input" dbtype="Number" size="0">:die_y</param>
+            <param direction="Input" dbtype="VarChar" size="20">:hw_bin</param>
+            <param direction="Input" dbtype="VarChar" size="20">:sw_bin</param>
+            <param direction="Input" dbtype="VarChar" size="1">:pass_flag</param>
+            <param direction="Input" dbtype="VarChar" size="40">:flag_code</param>
+            <param direction="Input" dbtype="VarChar" size="20">:test_time_ms</param>
+            <param direction="Input" dbtype="VarChar" size="20">:tests_executed</param>
+            <param direction="Input" dbtype="VarChar" size="120">:head_site</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ET_DIE" commandtype="Text" description="파일의 Die 목록 (DUT 번호 순)" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DUT_NO, DIE_X, DIE_Y, HW_BIN, SW_BIN, PASS_FLAG, FLAG_CODE, TEST_TIME_MS, TESTS_EXECUTED, HEAD_SITE
+  FROM TQP_GDS_ET_DIE
+ WHERE SRC_FILE_SEQ = :src_file_seq
+ ORDER BY DUT_NO]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:src_file_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ET_DIE_COUNT" commandtype="Text" description="저장 확정 검사: Die 수 / Fail Die 수" commandtimeout="60">
+        <commandtext><![CDATA[SELECT COUNT(*) AS DIE_COUNT,
+       NVL(SUM(CASE WHEN PASS_FLAG = 'F' THEN 1 ELSE 0 END), 0) AS FAIL_DIE_COUNT
+  FROM TQP_GDS_ET_DIE
+ WHERE SRC_FILE_SEQ = :src_file_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:src_file_seq</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_ET_DIE" commandtype="Text" description="파일의 Die 정보 삭제 (측정값을 먼저 지운 뒤 호출)" commandtimeout="600">
+        <commandtext><![CDATA[DELETE FROM TQP_GDS_ET_DIE WHERE SRC_FILE_SEQ = :src_file_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:src_file_seq</param>
+        </parameters>
+    </query>
+</queryxml>

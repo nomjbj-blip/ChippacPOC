@@ -341,10 +341,7 @@ namespace DACrux.TEST.ENGUI
             lsFiles.EndUpdate();
 
             //File 을 선택 하는 형태가 Fab 마다 틀리다.
-            if (DACrux.Base.GlobalVariable.Factory == "FAB1")
-                chkFileGet.Checked = true;
-            else
-                chkFileGet.Checked = false;
+            chkFileGet.Checked = false;
 
             GetDriveFolderList();
         }

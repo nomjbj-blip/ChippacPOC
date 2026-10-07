@@ -63,3 +63,16 @@ GDSII 도면을 읽고 Layer별 도형 / TEXT를 표시한다. Chain 지정과 �
 ## 2026-10-02 / DB 저장 화면 (CLAUDE-012)
 
 DMS 호스트 모드에서 상단에 Factory / Device / Revision 입력과 `DB 저장` / `저장 중지` 버튼이 보인다(단독 실행은 숨김). 로직은 `GdsMapForm_DbSave.cs`, 상세는 [GDS Map DB 저장 설계 18절](../../../문서/2026-10-02_GDS_Map_DB저장_설계.md).
+
+
+**2026-10-06 Layer 목록 도형 수 표시(CLAUDE-022):** GDS Map Setup의 Layer 목록이 `Layer 1 (15,866)`처럼 Layer별 화면 배치 도형 수(참조 펼친 인스턴스 포함, DB 저장 시 PLACED 행 수와 같음)를 표시한다. 목록 위 `lblLayerSummary`에 `선택 3 / 9 Layer · 도형 29,871 / 605,080` 합계를 체크 변경 때마다 갱신한다. 개수는 도면을 읽을 때 `GdsMapControl.GetLayerElementCounts()`로 한 번 만든다. 조회 화면(GdsMapViewForm)은 기존부터 DB 건수를 표시한다(변경 없음).
+
+**2026-10-06 GDS 반전(Back side) 설계(CLAUDE-027, 설계만):** 회의 결정으로 GDS(Front side 원본)를 반전해 Back side 형태로 Map / Chain을 구성한다. [GDS 반전 설계](../../../문서/2026-10-06_GDS_반전_BackSide_설계.md). 사용자 결정 대기.
+
+**2026-10-07 Label 검색 설계(CLAUDE-032, 설계만):** View에서 Label 값(예: `C4DC_212_71`)으로 위치를 찾는다. 속성 기준 = TEXT 도형 전체(Layer 무관). 샘플 TEXT 30,992개(Layer 775). [Label 검색 설계](../../../문서/2026-10-07_GDS_Label_검색_설계.md).
+
+**2026-10-07 Factory 기준(CLAUDE-033, 사용자 지시):** GDS Map Setup / View 화면은 Factory를 고르거나 입력하지 않고 DACrux 로그인 Factory(`DACrux.Base.GlobalVariable.Factory`, `DmsHostContext.Factory`)를 쓴다. View Device 목록은 그 Factory의 Map만, Setup 저장 Factory도 그 값. 로그인 Factory가 없으면(단독 실행) DB 기능을 막는다. Probe `GdsFactoryContextProbe.ps1`.
+
+**2026-10-07 Label 검색(CLAUDE-032):** View 화면 조회 조건 아래 Label 검색 줄. [Label 검색 설계](../../../문서/2026-10-07_GDS_Label_검색_설계.md) 9절.
+
+**2026-10-07 Label 크기 보정(CLAUDE-032 결정 A):** 한쪽 방향에만 이웃 TEXT가 있는 Label은 그 간격을 다른 방향 제한에도 사용(`CalculateTextLabelDisplayAreas`). 이웃 없는 방향이 화면 크기 제한이 되어 확대 시 64px까지 커지던 문제(예: `C4DC_HBM0_N_FH`) 수정.

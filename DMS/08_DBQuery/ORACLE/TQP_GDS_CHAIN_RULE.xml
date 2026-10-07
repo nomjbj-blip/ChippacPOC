@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TQP_GDS_CHAIN_RULE: Chain 후보 탐색의 Layer 연결 규칙(두 Layer + 허용 오차). 2026-10-06 Claude CLAUDE-024 추가.
+  FIRST_LAYER_ID <= SECOND_LAYER_ID (DB CHECK). 허용 오차 double은 G17 문자열 + TO_BINARY_DOUBLE로 받는다.
+-->
+<queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Insert" queryid="CREATE_CHAIN_RULE" commandtype="Text" description="Chain Layer 연결 규칙 저장 (InsertExecuteMultiple, 허용 오차는 G17 문자열)" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_GDS_CHAIN_RULE
+    (FACTORY,
+    DEVICE_ID,
+    CHAIN_SEQ,
+    VERSION_NO,
+    FIRST_LAYER_ID,
+    SECOND_LAYER_ID,
+    TOLERANCE)
+VALUES
+    (:factory,
+    :device_id,
+    :chain_seq,
+    1,
+    :first_layer_id,
+    :second_layer_id,
+    TO_BINARY_DOUBLE(:tolerance))]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
+            <param direction="Input" dbtype="Number" size="0">:chain_seq</param>
+            <param direction="Input" dbtype="Number" size="0">:first_layer_id</param>
+            <param direction="Input" dbtype="Number" size="0">:second_layer_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:tolerance</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_CHAIN_RULE" commandtype="Text" description="Chain Layer 연결 규칙 조회" commandtimeout="60">
+        <commandtext><![CDATA[SELECT FIRST_LAYER_ID, SECOND_LAYER_ID, TOLERANCE
+  FROM TQP_GDS_CHAIN_RULE
+ WHERE FACTORY = :factory
+   AND DEVICE_ID = :device_id
+   AND CHAIN_SEQ = :chain_seq
+   AND VERSION_NO = 1
+ ORDER BY FIRST_LAYER_ID, SECOND_LAYER_ID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
+            <param direction="Input" dbtype="Number" size="0">:chain_seq</param>
+        </parameters>
+    </query>
+</queryxml>

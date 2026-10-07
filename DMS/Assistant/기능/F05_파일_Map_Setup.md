@@ -1,6 +1,21 @@
 # F05 / 파일 Map Setup
 
-확인일: 2026-10-02 / 상태: 파일 배치 표시 코드 확인 / 원형 생성 설계는 구현 전
+확인일: 2026-10-06 / 상태: 입력을 KLARF 로 변경 / KLARF 기준 설계 확정 / 구현 2단계 완료 (화면이 KLARF 로 원형 생성, Probe / 화면 검사 PASS, 미배포 / DMS 화면 확인 대기)
+
+## 2026-10-06 KLARF 기준으로 변경 (CLAUDE-025)
+
+- 사용자 결정: "klarf 로 하자" (이후 GDS <-> KLARF Overlap 기준을 맞추기 위함). 설계: [KLARF 기준 Map Setup 설계](../../../문서/2026-10-06_KLARF_Map_Setup_설계.md). 좌표 / 격자 / 입력은 이 설계가 10/02 설계보다 우선한다.
+- 확인 근거: 로컬 DB `TQP_MAPDEF` 402건 모두 µm / LeftTop / ANGLE 0. DMS 는 KLARF 원본 인덱스를 `TQD_SETUP.DIE_ORIGIN` 또는 `WaferDieCalculator` 값만큼 옮겨 좌하단 (1,1) 로 저장한다. 샘플 옮기는 양 (7,5), 격자 X 1~12 / Y 1~9, 검사 Die 26개 모두 격자 안 (음수 인덱스 없음).
+- Notch 각도는 `Klarf/ParserKlarf.GetAngle()` (OrientationMarkLocation -> DOWN 0 / LEFT 90 / UP 180 / RIGHT 270) 을 그대로 쓴다. (처음 "버그" 로 적은 것은 빌드 제외된 루트 `ParserKlarf.cs` 를 읽은 착오, 정정함)
+- 구현 1단계 (2026-10-06): `Admin/KlarfMapSource.cs` (FileAnalyzer -> ParserKlarf / _18, 원점 조회 함수를 받으면 읽는 동안만 `ParserKlarf.GetOriginDieIndex` 에 넣고 되돌림, Wafer 별 Center / 옮긴 양 / 검사 Die / Defect) + `Admin/KlarfMapRule.cs` (`CalculateGrid`: WaferDieCalculator 격자를 Parser 옮긴 양 기준으로 맞춤, Edge 는 격자에 넣지 않음 / `ToDirection`·`FromDirection`: 형상 유지 번호 변환). 검증 `Verification/Verify-KlarfMapRule.ps1` -> `KLARF_MAP_PROBE=PASS` (샘플 Shift (7,5) / 격자 X 1~12 Y 1~9 / 검사 Die 26 = SINF 26 / Defect 109 모두 검사 Die 안 / 물리 좌표식 일치 / 방향 4종 왕복).
+- 구현 2단계 (2026-10-06): 화면 입력을 KLARF 로 교체 (SINF `StandardMapFile` 은 파일 / csproj 에 남기고 화면에서 사용 안 함). `GenerateCircleMap` = `CalculateGrid` -> `MapOriginIndex` (방향별) -> Map 설정 -> Redraw -> DieClear -> 격자 전체 `AddDie` -> `StandardMapEditMap.IsInsideWafer` (protected `UseDie` 재사용) 로 1 / -1. `DieCalculation(true)` 는 쓰지 않는다: LeftBottom 등에서 `AddDie` 와 Die 위치가 한 칸 다르다 (Core 코드 확인). `AddDie` 는 방향마다 원점 Die 모서리가 달라 `MapOriginIndex` 로 맞춘다 (LeftTop 은 X 가 s-1). 화면: KLARF Wafer 콤보 / Wafer 크기(기본 SampleSize) / Edge(µm) / XY 방향(기본 LeftBottom) / 원점(µm, SampleCenterLocation) / [원형 생성] / 정보창 / 좌표(선택 방향 번호 / LeftBottom / KLARF 원본 / 검사 Die 여부). 설정 변경은 [원형 생성] 으로 반영, Die 편집 후 다시 생성하면 확인창. 원점 조회(TQD_SETUP)는 아직 null (4단계).
+- 검증: `Verification/Verify-KlarfMapSetupForm.ps1` -> `KLARF_FORM_SMOKE=PASS` (실제 폼 / Map 컨트롤, 샘플 300 mm: 격자 108 / 사용 79 / 방향 4종 모두 Die 좌하단 = KLARF 물리 위치, 사용 Die 수 같음, 검사 Die 26 모두 사용 / USECODE 1·-1 / 좌표 표시 KLARF 원본 0,0 / Edge 5000 -> 76 / Wafer 200 -> 40 중 28 / 경로 변경 시 저장 막힘). 기존 `Verify-StandardMapSetup.ps1` 은 SINF 화면용이라 더 이상 맞지 않음 (빌드 단계에서도 SEMDMS.Interface 복사 누락).
+- 남은 범위: 3단계 편집 모드(보기 / 제거 / 복원, 기본 EditMode 가 ADD 라 지금은 클릭하면 원 밖 Die 가 살아남) + 보조 버튼 2개 / 4단계 TQD_SETUP 조회 / 5단계 저장 후 Map Define 에서 확인.
+- 저장 규칙 (2026-10-06, Map Define 불러오기 실패 원인 수정): EDGE_SIZE 는 mm (기존 데이터 2.5~5, Map Define 입력칸 최대 5) -> 화면 µm / 1000, 입력 최대 5000 µm. ORIGIN_MICRO_Y 는 DieSizeY - OriginY 로 저장 (조회 쿼리 GET_MAPDEF 등이 CHIP_SIZE_Y - 값 으로 되돌림). `MapCreationService.ToStoredValues`. Shot Map View 는 DELETE_FLAG N Map 의 Die 를 `TQP_MAPDEF_DIE` 에서만 읽는다 (이 테이블 INSERT 코드는 소스에 없음, Map Define 으로 만든 Map 도 표시 안 됨) - 사용자 결정 2026-10-06: 지원 안 함.
+- 저장 (2026-10-06): 같은 Map ID 가 있으면 덮어쓰기 확인 후 `MapCreationService.Update` (UpdateMapDef + CreateUseMap, Map Define Save As 덮어쓰기와 같은 서비스). DELETE_FLAG = Y 인 ID 는 덮어쓰지 않음.
+- 개수 표시 (2026-10-07): Map 위 `lblDieCount` 에 Net Die (사용 Die = 저장 NETDIE) / 생성 Die (격자 전체) / 제거 / 기타 / 검사 Die 중 사용.
+- 사용자 결정 (2026-10-06): XY 방향 작업자 선택 + 기본 LeftBottom / 옮기는 양은 TQD_SETUP 조회 우선 + 없으면 계산기 (Interface / RO 함수 추가) / SINF txt 지원 중지. GDS 도 µm (샘플 UNITS DB 1 nm / User 1 µm).
+
 
 ## 목적과 파일
 

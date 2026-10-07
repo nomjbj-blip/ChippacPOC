@@ -13,7 +13,10 @@ using System.Windows.Forms;
 
 namespace NexplantQMS.GdsMap
 {
-    /// <summary>GDS 파일 읽기와 레이어 표시/색상 변경을 뷰어에 전달하는 화면이다.</summary>
+    /// <summary>
+    /// GDS Map Setup(등록) 화면: GDS 파일 읽기 -> Layer 필터(도형 수 확인) -> Map DB 저장 / 원본 Grid 확인.
+    /// 2026-10-06 사용자 결정(CLAUDE-026): Chain 설정 / Chain DB 반영은 GDS Map View(GdsMapViewForm)에서 한다.
+    /// </summary>
     public partial class GdsMapForm : Form
     {
 		public static readonly string SAMPLE_FILE = @"D:\PROJECT\스태츠칩팩\Defect E-Test\sample\OMM all layer2\OMM all layer2.gds";
@@ -24,13 +27,14 @@ namespace NexplantQMS.GdsMap
 		private int _lastCoordinateUpdateTick;
 		private bool _updatingLayerChecks;
 		private bool _hostedByDms;
+		// Layer별 화면 배치 도형 수. 도면을 읽을 때(RefreshLayerList) 한 번 만들고 목록 표시 / 선택 합계에 쓴다.
+		private Dictionary<int, int> _layerElementCounts = new Dictionary<int, int>();
 
 		/// <summary>단독 실행에서 기존 GDS 테스트 화면 동작을 유지한다.</summary>
 		public GdsMapForm()
         {
 			InitializeComponent();
 			InitializeElementGridFeatures();
-			InitializeChainSetupState();
 			InitializeDbSaveState();
 			statusStripMap.ShowItemToolTips = true;
         }
@@ -144,7 +148,6 @@ namespace NexplantQMS.GdsMap
 			btnLayer.Enabled = chkLayerItems.Items.Count > 0;
 			btnLayerCheckAll.Enabled = chkLayerItems.Items.Count > 0;
 			btnLayerCheckNone.Enabled = chkLayerItems.Items.Count > 0;
-			ResetChainSetupAfterMapLoad(_mapLoadSucceeded);
 		}
 
 		/// <summary>
@@ -455,6 +458,41 @@ namespace NexplantQMS.GdsMap
 					? newState == CheckState.Checked : chkLayerItems.GetItemChecked(i);
 			}
 			map.SetLayerVisibility(visibility);
+			UpdateLayerSummary(visibility);
+		}
+
+		/// <summary>Layer 이름 뒤에 화면 배치 도형 수를 붙인다. 예: Layer 1 (12,345)</summary>
+		private void ChkLayerItems_Format(object sender, ListControlConvertEventArgs e)
+		{
+			var item = e.ListItem as LayerDisplayItem;
+			if (item == null) return;
+			int count;
+			e.Value = "Layer " + item.LayerId + " ("
+				+ (_layerElementCounts.TryGetValue(item.LayerId, out count) ? count.ToString("N0") : "-") + ")";
+		}
+
+		/// <summary>
+		/// 목록 위에 선택 Layer 수 / 선택 도형 수 합계를 표시한다. DB 저장 시 PLACED 행 수와 같다.
+		/// visibility가 null이면 목록의 현재 체크 상태를 사용한다(ItemCheck 중에는 새 상태를 넘겨받는다).
+		/// </summary>
+		private void UpdateLayerSummary(IDictionary<int, bool> visibility = null)
+		{
+			int layerCount = chkLayerItems.Items.Count, selectedLayers = 0;
+			long total = 0, selected = 0;
+			for (int i = 0; i < layerCount; i++)
+			{
+				int id = ((LayerDisplayItem)chkLayerItems.Items[i]).LayerId;
+				int count;
+				_layerElementCounts.TryGetValue(id, out count);
+				total += count;
+				bool isChecked;
+				if (visibility == null || !visibility.TryGetValue(id, out isChecked)) isChecked = chkLayerItems.GetItemChecked(i);
+				if (!isChecked) continue;
+				selectedLayers++;
+				selected += count;
+			}
+			lblLayerSummary.Text = layerCount == 0 ? "Layer (도형 수)"
+				: "선택 " + selectedLayers + " / " + layerCount + " Layer · 도형 " + selected.ToString("N0") + " / " + total.ToString("N0");
 		}
 
 		/// <summary>파일/DB 로드 후 실제 렌더링 레이어에서 목록과 색상 견본을 다시 만든다.</summary>
@@ -465,6 +503,7 @@ namespace NexplantQMS.GdsMap
 			try
 			{
 				chkLayerItems.Items.Clear();
+				_layerElementCounts = map.GetLayerElementCounts();
 				foreach (var layer in map.GetLayerDisplayItems())
 					chkLayerItems.Items.Add(layer, layer.Visible);
 				if (chkLayerItems.Items.Count > 0) chkLayerItems.SelectedIndex = 0;
@@ -477,6 +516,7 @@ namespace NexplantQMS.GdsMap
 				chkLayerItems.EndUpdate();
 				_updatingLayerChecks = false;
 			}
+			UpdateLayerSummary();
 		}
 
 	}

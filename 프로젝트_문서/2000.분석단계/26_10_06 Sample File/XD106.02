@@ -1,0 +1,143 @@
+FileVersion 1 2;
+FileTimestamp 06-05-26 13:51:15;
+InspectionStationID "KLA" "LDS CIRCL" "Tool";
+SampleType WAFER;
+ResultTimestamp 06-05-26 12:01:42;
+LotID "PFIC_RH-HS2615_C4Bump";
+SampleSize 1 300;
+DeviceID "OMM_Hybrid";
+SetupID "ROOT-CAI-OMM_Hybrid-OMM_Hybrid_C4Bump_Silterra" 05-26-26 11:39:00;
+StepID "OMM_Hybrid_C4Bump_Silterra";
+SampleOrientationMarkType NOTCH;
+OrientationMarkLocation DOWN;
+DiePitch 2.3832000000e+004 3.0060000000e+004;
+DieOrigin 0.0000000000e+000 0.0000000000e+000;
+WaferID "XD106.02";
+Slot 2;
+SampleCenterLocation -2.8900000000e+002 1.5336000000e+004;
+ClassLookup 42
+  0 "	Unclassified"
+  1 ""
+  3 ""
+  6 ""
+  4 ""
+  25 "F/M        	"
+  115 "PI defect        	"
+  116 "PI wrinkle        	"
+  27 "Flux residue	"
+  117 "PR residue	"
+  10 "UBM residue	"
+  11 "Small bump	"
+  12 "Missing Bump	"
+  9 "Satellite bump	"
+  13 "Large bump	"
+  16 "Irregular bump	"
+  14 "Bridged bump	"
+  17 "Damaged bump	"
+  36 "Via defect	"
+  61 "Pad oxidation	"
+  63 "Delamination	"
+  64 "Tape Residue	"
+  56 "Irregular RDL	"
+  60 "RDL Lump	"
+  53 "RDLopen	"
+  54 "RDLshort	"
+  28 "Scratch	"
+  29 "Passivation Peel off	"
+  30 "Irregular TSV	"
+  31 "Release Residue	"
+  401 "MissingDie	"
+  402 "DummyDie	"
+  405 "ReferenceDie	"
+  32 "Un-reveal TSV	"
+  33 ""
+  34 "TSV Original Defect	"
+  403 "BadDie	"
+  404 "UglyDie	"
+  406 "SkipDie	"
+  5010 "Wafer map	"
+  5000 "Wafer map2	"
+  0 ""  ;
+OrientationInstructions "Front";
+CoordinatesMirrored NO;
+InspectionTest 3;
+SampleTestPlan 26
+  -5 -1 
+  -5 0 
+  -5 1 
+  -3 -3 
+  -3 3 
+  -2 -3 
+  -2 0 
+  -2 3 
+  -1 -3 
+  -1 -1 
+  -1 0 
+  -1 1 
+  -1 3 
+  0 -3 
+  0 -1 
+  0 0 
+  0 1 
+  0 3 
+  1 -3 
+  1 0 
+  1 3 
+  2 -3 
+  2 3 
+  4 -1 
+  4 0 
+  4 1 ;
+AreaPerTest 1.9812500000e+010;
+DefectRecordSpec 22 DEFECTID X Y XREL YREL XINDEX YINDEX XSIZE YSIZE DEFECTAREA DSIZE CLASSNUMBER TEST CLUSTERNUMBER ROUGHBINNUMBER FINEBINNUMBER CHANNELID MACROSIGCLASS INTENSITY MACROSIGID IMAGECOUNT IMAGELIST ;
+DefectList;
+TiffFileName XD106.02_-1_3_0_1_RDLshort_54.jpg;
+DefectList
+ 1 -23229.419 86770.970 313.580 11926.970 -1 3 9.700 19.400 188.120000 19.400 0 3 0 54 1 1 0 2309 0 1 1 1 69;
+TiffFileName XD106.02_-1_3_0_2_RDLshort_54.jpg;
+DefectList
+ 2 -23274.679 86716.010 268.320 11872.010 -1 3 96.980 35.560 3448.930000 96.980 0 3 0 54 1 1 0 2691 0 1 1 1 69;
+TiffFileName XD106.02_-1_3_0_3_RDLshort_54.jpg;
+DefectList
+ 3 -23255.279 86800.060 287.720 11956.060 -1 3 3.230 3.230 10.450000 3.230 0 3 0 54 1 1 0 2148 0 1 1 1 69;
+TiffFileName XD106.02_-1_3_0_4_RDLshort_54.jpg;
+DefectList
+ 4 -23297.309 86796.830 245.690 11952.830 -1 3 3.230 6.470 20.900000 6.470 0 3 0 54 1 1 0 1983 0 1 1 1 69;
+TiffFileName XD106.02_-1_3_0_5_RDLshort_54.jpg;
+DefectList
+ 5 -23326.399 86770.970 216.600 11926.970 -1 3 16.160 35.560 574.820000 35.560 0 3 0 54 1 1 0 1871 0 1 1 1 69;
+TiffFileName XD106.02_1_3_0_6_RDLshort_54.jpg;
+DefectList
+ 6 24444.280 88969.360 323.280 14125.360 1 3 6.470 9.700 62.710000 9.700 0 3 0 54 1 1 0 2681 0 1 1 1 69;
+TiffFileName XD106.02_1_3_0_7_RDLshort_54.jpg;
+DefectList
+ 7 24405.480 89017.850 284.480 14173.850 1 3 3.230 3.230 10.450000 3.230 0 3 0 54 1 1 0 2505 0 1 1 1 69;
+TiffFileName XD106.02_1_3_0_8_RDLshort_54.jpg;
+DefectList
+ 8 24340.830 88956.420 219.830 14112.420 1 3 3.230 3.230 10.450000 3.230 0 3 0 54 1 1 0 2545 0 1 1 1 69;
+TiffFileName XD106.02_2_3_0_9_RDLshort_54.jpg;
+DefectList
+ 9 49462.700 83670.590 1509.700 8826.590 2 3 12.930 6.470 83.610000 12.930 0 3 0 54 1 1 0 2844 0 1 1 1 69;
+TiffFileName XD106.02_2_3_0_10_RDLshort_54.jpg;
+DefectList
+ 10 49456.240 83725.550 1503.240 8881.550 2 3 16.160 25.860 418.050000 25.860 0 3 0 54 1 1 0 1315 0 1 1 1 69;
+TiffFileName XD106.02_-1_1_0_11_RDLopen_53.jpg;
+DefectList
+ 11 -18044.049 16173.560 5498.950 1449.560 -1 1 6.470 6.470 41.810000 6.470 0 3 0 53 1 1 0 559 0 1 1 1 69;
+TiffFileName XD106.02_-1_1_0_12_RDLopen_53.jpg;
+DefectList
+ 12 -18021.419 16008.690 5521.580 1284.690 -1 1 3.230 3.230 10.450000 3.230 0 3 0 53 1 1 0 966 0 1 1 1 69;
+TiffFileName XD106.02_-1_1_0_13_RDLopen_53.jpg;
+DefectList
+ 13 -17976.169 16041.010 5566.830 1317.010 -1 1 6.470 3.230 20.900000 6.470 0 3 0 53 1 1 0 415 0 1 1 1 69;
+TiffFileName XD106.02_-1_1_0_14_RDLopen_53.jpg;
+DefectList
+ 14 -17940.599 16147.700 5602.400 1423.700 -1 1 3.230 3.230 10.450000 3.230 0 3 0 53 1 1 0 839 0 1 1 1 69;
+TiffFileName XD106.02_-1_1_0_15_RDLopen_53.jpg;
+DefectList
+ 15 -515.959 16913.900 23027.040 2189.900 -1 1 3.230 6.470 20.900000 6.470 0 3 0 53 2 2 0 1039 0 1 1 1 69;
+SummarySpec 5
+  TESTNO    NDEFECT    DEFDENSITY    NDIE    NDEFDIE  ;
+SummaryList 
+  3    13    6.5615136856e-002    26    4  ;
+EndOfFile;

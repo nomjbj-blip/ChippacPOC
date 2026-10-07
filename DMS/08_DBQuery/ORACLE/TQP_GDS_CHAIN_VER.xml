@@ -1,0 +1,86 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TQP_GDS_CHAIN_VER: Chain 저장 내용(이름 / 색상 / 탐색 옵션 / 상태). 2026-10-06 Claude CLAUDE-024 추가.
+  사용자 결정으로 버전 이력을 두지 않는다. VERSION_NO는 항상 1이고 다시 저장하면 지우고 새로 만든다(DRAFT -> 확정 시 READY).
+  격자 크기는 소수점 문자열을 NLS와 무관하게 TO_NUMBER로 받는다.
+-->
+<queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Insert" queryid="CREATE_CHAIN_VER" commandtype="Text" description="Chain 저장 내용 생성 (VERSION 1 / DRAFT)" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_GDS_CHAIN_VER
+    (FACTORY,
+    DEVICE_ID,
+    CHAIN_SEQ,
+    VERSION_NO,
+    CHAIN_NAME,
+    COLOR_ARGB,
+    APPLY_LAYER_RULES,
+    CELL_SIZE,
+    VERSION_STATUS,
+    IS_CURRENT,
+    CREATE_USER)
+VALUES
+    (:factory,
+    :device_id,
+    :chain_seq,
+    1,
+    :chain_name,
+    :color_argb,
+    :apply_layer_rules,
+    TO_NUMBER(:cell_size, '999999999999990.9999', 'NLS_NUMERIC_CHARACTERS=''.,'''),
+    'DRAFT',
+    0,
+    :create_user)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
+            <param direction="Input" dbtype="Number" size="0">:chain_seq</param>
+            <param direction="Input" dbtype="VarChar" size="800">:chain_name</param>
+            <param direction="Input" dbtype="Number" size="0">:color_argb</param>
+            <param direction="Input" dbtype="Number" size="0">:apply_layer_rules</param>
+            <param direction="Input" dbtype="VarChar" size="40">:cell_size</param>
+            <param direction="Input" dbtype="VarChar" size="30">:create_user</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_CHAIN_VER" commandtype="Text" description="Chain 저장 상태 (VERSION 1)" commandtimeout="60">
+        <commandtext><![CDATA[SELECT CHAIN_SEQ, VERSION_NO, VERSION_STATUS, IS_CURRENT
+  FROM TQP_GDS_CHAIN_VER
+ WHERE FACTORY = :factory
+   AND DEVICE_ID = :device_id
+   AND CHAIN_SEQ = :chain_seq
+   AND VERSION_NO = 1]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
+            <param direction="Input" dbtype="Number" size="0">:chain_seq</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_CHAIN_VER_READY" commandtype="Text" description="저장 확정: DRAFT -> READY / 현재 사용" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_GDS_CHAIN_VER
+   SET VERSION_STATUS = 'READY',
+       IS_CURRENT = 1,
+       UPDATE_USER = :update_user,
+       UPDATE_TIME = SYSDATE
+ WHERE FACTORY = :factory
+   AND DEVICE_ID = :device_id
+   AND CHAIN_SEQ = :chain_seq
+   AND VERSION_NO = 1
+   AND VERSION_STATUS = 'DRAFT' ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:update_user</param>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
+            <param direction="Input" dbtype="Number" size="0">:chain_seq</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_CHAIN_VER" commandtype="Text" description="다시 저장 전 이전 저장 내용 삭제 (MEMBER / LAYER / RULE / EDIT는 FK CASCADE)" commandtimeout="600">
+        <commandtext><![CDATA[DELETE FROM TQP_GDS_CHAIN_VER
+ WHERE FACTORY = :factory
+   AND DEVICE_ID = :device_id
+   AND CHAIN_SEQ = :chain_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
+            <param direction="Input" dbtype="Number" size="0">:chain_seq</param>
+        </parameters>
+    </query>
+</queryxml>

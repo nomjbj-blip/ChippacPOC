@@ -139,6 +139,7 @@
     <Compile Include="Persistence\MapPlacedElementBatchBuilder.cs" />
     <Compile Include="Persistence\MapPlacedBatchPayload.cs" />
     <Compile Include="Persistence\MapPlacedBatchReader.cs" />
+    <Compile Include="Persistence\MapPlacedSceneItemFactory.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="GdsMapTestForm.resx">

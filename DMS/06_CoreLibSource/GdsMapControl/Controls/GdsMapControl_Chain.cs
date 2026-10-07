@@ -324,6 +324,34 @@ namespace NexplantQMS.GdsMap
         }
 
         /// <summary>
+        /// 같은 Map을 다른 Layer 조합으로 다시 그린 뒤, 화면 Chain이 가진 도형 ID를 새 도형에 다시 연결한다.
+        /// 탐색 캐시는 탐색한 Layer만 채우므로, 다시 그린 지도의 모든 Boundary / Path를 ID로 등록해 Chain 외곽선 / 단자 표시가 바로 되게 한다.
+        /// 호출 전 ResetChainSetupOverlay로 이전 도형 참조를 지운다. (2026-10-06 CLAUDE-026 2단계)
+        /// </summary>
+        public void RebuildChainTraceItems()
+        {
+            _lastChainTraceItems.Clear();
+            foreach (GlSceneItem item in AllItems)
+            {
+                if ((item.Source is GdsBoundary || item.Source is GdsPath) && !String.IsNullOrEmpty(item.PlacedElementId))
+                    _lastChainTraceItems[item.PlacedElementId] = item;
+            }
+        }
+
+        /// <summary>
+        /// DB에서 불러온 Chain의 Input / Output 도형 ID로 단자 후보를 만든다(클릭 선택과 같은 형식).
+        /// RebuildChainTraceItems 뒤에 호출한다. 지금 지도에 없는 ID(미조회 Layer)는 null. (2026-10-06 CLAUDE-026 3단계)
+        /// </summary>
+        public ChainElementCandidate GetChainElementCandidate(string placedElementId)
+        {
+            GlSceneItem item;
+            if (placedElementId == null || !_lastChainTraceItems.TryGetValue(placedElementId, out item))
+                return null;
+            return new ChainElementCandidate(item.PlacedElementId, item.LayerID, item.Source.DataType, item.Source.ElementName,
+                item.WorldBounds, item.WorldPoints == null ? 0 : item.WorldPoints.Length, item.Source is GdsPath ? item.Width : 0);
+        }
+
+        /// <summary>
         /// 클릭 후보 목록에서 작은 도형을 앞에 표시하기 위한 면적을 계산한다.
         /// 정렬 순서와 관계없이 사용자의 확정 동작 없이는 선택하지 않는다.
         /// </summary>

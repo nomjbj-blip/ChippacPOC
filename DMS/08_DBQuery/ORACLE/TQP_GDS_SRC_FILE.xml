@@ -1,0 +1,138 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TQP_GDS_SRC_FILE: E-Test 결과 파일 기준 정보 (한 행 = 파일 1개). 2026-10-07 Claude CLAUDE-029 추가.
+  설계: 문서/2026-10-07_ETest_결과파일_Parsing_DB설계.md 9절 / 10절.
+  WAFER_ID 는 LOT_ID + '-' + 2자리 SLOT_NO 가상 컬럼이라 INSERT / UPDATE 에 넣지 않는다 (ORA-54013).
+  TEST_TIME 은 yyyyMMddHHmmss 문자열 + TO_DATE. LOAD_STATUS 는 LOADING 으로 만들고 CompleteEtFile 이 건수 확인 후 READY 로 바꾼다.
+-->
+<queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Select" queryid="SELECT_NEXT_SRC_FILE_SEQ" commandtype="Text" description="파일 번호 채번 (시퀀스 SRC_FILE_SEQ)" commandtimeout="60">
+        <commandtext><![CDATA[SELECT SRC_FILE_SEQ.NEXTVAL FROM DUAL]]></commandtext>
+    </query>
+    <query statement="Insert" queryid="CREATE_SRC_FILE" commandtype="Text" description="E-Test 파일 헤더 생성 (LOAD_STATUS = LOADING)" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_GDS_SRC_FILE
+    (SRC_FILE_SEQ,
+    FILE_NAME,
+    FACTORY,
+    DEVICE_ID,
+    LOT_ID,
+    SLOT_NO,
+    TEST_PROGRAM,
+    TEST_TIME,
+    FILE_PREFIX,
+    SHEET_NAME,
+    DIE_COUNT,
+    ITEM_COUNT,
+    LOAD_STATUS,
+    CREATE_USER,
+    CREATE_TIME,
+    UPDATE_USER,
+    UPDATE_TIME)
+VALUES
+    (:src_file_seq,
+    :file_name,
+    :factory,
+    :device_id,
+    :lot_id,
+    :slot_no,
+    :test_program,
+    TO_DATE(:test_time, 'YYYYMMDDHH24MISS'),
+    :file_prefix,
+    :sheet_name,
+    :die_count,
+    :item_count,
+    'LOADING',
+    :create_user,
+    SYSDATE,
+    :update_user,
+    SYSDATE)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:src_file_seq</param>
+            <param direction="Input" dbtype="VarChar" size="1040">:file_name</param>
+            <param direction="Input" dbtype="VarChar" size="120">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="200">:device_id</param>
+            <param direction="Input" dbtype="VarChar" size="200">:lot_id</param>
+            <param direction="Input" dbtype="Number" size="0">:slot_no</param>
+            <param direction="Input" dbtype="VarChar" size="200">:test_program</param>
+            <param direction="Input" dbtype="VarChar" size="14">:test_time</param>
+            <param direction="Input" dbtype="VarChar" size="400">:file_prefix</param>
+            <param direction="Input" dbtype="VarChar" size="200">:sheet_name</param>
+            <param direction="Input" dbtype="Number" size="0">:die_count</param>
+            <param direction="Input" dbtype="Number" size="0">:item_count</param>
+            <param direction="Input" dbtype="VarChar" size="30">:create_user</param>
+            <param direction="Input" dbtype="VarChar" size="30">:update_user</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_SRC_FILE" commandtype="Text" description="E-Test 파일 1건 조회 (파일 번호)" commandtimeout="60">
+        <commandtext><![CDATA[SELECT SRC_FILE_SEQ, FILE_NAME, FACTORY, DEVICE_ID, LOT_ID, SLOT_NO, WAFER_ID, TEST_PROGRAM,
+       TO_CHAR(TEST_TIME, 'YYYYMMDDHH24MISS') AS TEST_TIME, FILE_PREFIX, SHEET_NAME,
+       DIE_COUNT, ITEM_COUNT, VALUE_COUNT, LOAD_STATUS, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME
+  FROM TQP_GDS_SRC_FILE
+ WHERE SRC_FILE_SEQ = :src_file_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:src_file_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_SRC_FILE_BY_KEY" commandtype="Text" description="(이전 키, 2026-10-07 13:13 이전 배포 BSL 호환용으로만 남김) 같은 시험 파일 존재 확인 (Factory / Device / Lot / Slot / 시험 프로그램 / 시험 일시)" commandtimeout="60">
+        <commandtext><![CDATA[SELECT SRC_FILE_SEQ, FILE_NAME, WAFER_ID, LOAD_STATUS, DIE_COUNT, ITEM_COUNT, VALUE_COUNT, CREATE_USER, CREATE_TIME
+  FROM TQP_GDS_SRC_FILE
+ WHERE FACTORY = :factory
+   AND DEVICE_ID = :device_id
+   AND LOT_ID = :lot_id
+   AND SLOT_NO = :slot_no
+   AND TEST_PROGRAM = :test_program
+   AND TEST_TIME = TO_DATE(:test_time, 'YYYYMMDDHH24MISS')]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="120">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="200">:device_id</param>
+            <param direction="Input" dbtype="VarChar" size="200">:lot_id</param>
+            <param direction="Input" dbtype="Number" size="0">:slot_no</param>
+            <param direction="Input" dbtype="VarChar" size="200">:test_program</param>
+            <param direction="Input" dbtype="VarChar" size="14">:test_time</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_SRC_FILE_BY_WAFER" commandtype="Text" description="같은 Wafer 파일 존재 확인 (UNIQUE 키: Factory / WAFER_ID = Lot + '-' + 2자리 Slot. 2026-10-07 사용자 지시로 Device / 시험 일시는 키에서 제외)" commandtimeout="60">
+        <commandtext><![CDATA[SELECT SRC_FILE_SEQ, FILE_NAME, DEVICE_ID, WAFER_ID, TEST_PROGRAM, TO_CHAR(TEST_TIME, 'YYYYMMDDHH24MISS') AS TEST_TIME,
+       LOAD_STATUS, DIE_COUNT, ITEM_COUNT, VALUE_COUNT, CREATE_USER, CREATE_TIME
+  FROM TQP_GDS_SRC_FILE
+ WHERE FACTORY = :factory
+   AND WAFER_ID = :wafer_id]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="120">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="240">:wafer_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_SRC_FILE_LIST" commandtype="Text" description="Device 의 E-Test 파일 목록 (최근 시험 순)" commandtimeout="60">
+        <commandtext><![CDATA[SELECT SRC_FILE_SEQ, FILE_NAME, LOT_ID, SLOT_NO, WAFER_ID, TEST_PROGRAM,
+       TO_CHAR(TEST_TIME, 'YYYYMMDDHH24MISS') AS TEST_TIME, DIE_COUNT, ITEM_COUNT, VALUE_COUNT, LOAD_STATUS,
+       CREATE_USER, CREATE_TIME
+  FROM TQP_GDS_SRC_FILE
+ WHERE FACTORY = :factory
+   AND DEVICE_ID = :device_id
+ ORDER BY TEST_TIME DESC, SRC_FILE_SEQ DESC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="120">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="200">:device_id</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_SRC_FILE_READY" commandtype="Text" description="저장 확정: 건수 확인 후 LOADING -> READY" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_GDS_SRC_FILE
+   SET LOAD_STATUS = 'READY',
+       VALUE_COUNT = :value_count,
+       UPDATE_USER = :update_user,
+       UPDATE_TIME = SYSDATE
+ WHERE SRC_FILE_SEQ = :src_file_seq
+   AND LOAD_STATUS = 'LOADING']]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:value_count</param>
+            <param direction="Input" dbtype="VarChar" size="30">:update_user</param>
+            <param direction="Input" dbtype="Number" size="0">:src_file_seq</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_SRC_FILE" commandtype="Text" description="파일 헤더 삭제 (Die / 측정값은 BSL 이 먼저 지운다)" commandtimeout="600">
+        <commandtext><![CDATA[DELETE FROM TQP_GDS_SRC_FILE WHERE SRC_FILE_SEQ = :src_file_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:src_file_seq</param>
+        </parameters>
+    </query>
+</queryxml>

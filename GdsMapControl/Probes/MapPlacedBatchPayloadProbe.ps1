@@ -56,7 +56,7 @@ $stream = [IO.MemoryStream]::new($payload.Payload)
 $reader = [IO.BinaryReader]::new($stream, [Text.Encoding]::UTF8)
 try {
     Assert-True ([Text.Encoding]::ASCII.GetString($reader.ReadBytes(4)) -eq 'GMP1') '본문 형식 식별자가 다릅니다.'
-    Assert-True ($reader.ReadInt32() -eq 1) '형식 버전이 다릅니다.'
+    Assert-True ($reader.ReadInt32() -eq 2) '형식 버전이 다릅니다.'
     Assert-True ($reader.ReadInt32() -eq 2) '배치 번호가 다릅니다.'
     Assert-True ($reader.ReadInt32() -eq 1) '도형 수가 다릅니다.'
     Assert-True ($reader.ReadInt64() -eq 1) '좌표 수가 다릅니다.'
@@ -66,6 +66,7 @@ try {
     Assert-True ((Read-Text $reader) -eq 'TEXT') '도형 종류가 다릅니다.'
     [void]$reader.ReadBoolean()
     [void]$reader.ReadDouble()
+    Assert-True ($reader.ReadByte() -eq 0) 'TEXT의 PATH 끝 모양 기본값이 다릅니다.'
     1..4 | ForEach-Object { [void]$reader.ReadDouble() }
     Assert-True ((Read-Text $reader) -eq '입력 단자') 'UTF-8 문자열이 다릅니다.'
     Assert-True ($reader.ReadBoolean() -and $reader.ReadInt32() -eq 0) 'TEXT Type이 다릅니다.'
@@ -102,7 +103,7 @@ catch [System.IO.InvalidDataException] { $hashRejected = $true }
 Assert-True $hashRejected '변조된 본문을 해시 검사에서 거부하지 않았습니다.'
 
 $versionChanged = [byte[]]$payload.Payload.Clone()
-$versionChanged[4] = 2
+$versionChanged[4] = 1
 $versionRejected = $false
 try { [void][NexplantQMS.GdsMap.Persistence.MapPlacedBatchReader]::Read($versionChanged, (Get-Sha256 $versionChanged), 100000, 10) }
 catch [System.IO.InvalidDataException] { $versionRejected = $true }
@@ -124,5 +125,34 @@ $duplicateRejected = $false
 try { [void][NexplantQMS.GdsMap.Persistence.MapPlacedBatchReader]::Read($duplicatePayload.Payload, $duplicatePayload.PayloadSha256, 100000, 10) }
 catch [System.IO.InvalidDataException] { $duplicateRejected = $true }
 Assert-True $duplicateRejected '중복 배치 Element ID를 거부하지 않았습니다.'
+
+# 복원된 DTO를 기존 OpenGL/Chain SceneItem으로 바꿀 때 PATH/TEXT 속성을 유지한다.
+$assembly = [Reflection.Assembly]::LoadFrom((Resolve-Path $assemblyPath).Path)
+$factoryType = $assembly.GetType('NexplantQMS.GdsMap.Persistence.MapPlacedSceneItemFactory', $true)
+$factory = $factoryType.GetMethod('Create', [Reflection.BindingFlags]'Static, NonPublic')
+$textItem = $factory.Invoke($null, [object[]]@($restoredElement))
+$textSource = $textItem.GetType().GetProperty('Source').GetValue($textItem)
+Assert-True ($textItem.PlacedElementId -eq 'R0/E7' -and $textItem.LayerID -eq 5) '복원 TEXT의 Scene ID/Layer가 다릅니다.'
+Assert-True ($textSource.Text -eq '입력 단자' -and $textSource.HorizontalPresentation.ToString() -eq 'Center') '복원 TEXT 표시 속성이 다릅니다.'
+
+$path = [NexplantQMS.GdsMap.Persistence.MapPlacedElementData]::new()
+$path.PlacedElementId = 'R0/E8'
+$path.SourceElementId = 'TOP/E8'
+$path.LayerId = 6
+$path.ElementType = 'PATH'
+$path.PathWidth = 4.5
+$path.PathType = 1
+$path.WorldPoints = [NexplantQMS.GdsMap.GPoint[]]@([NexplantQMS.GdsMap.GPoint]::new(3, 4))
+$path.Bounds = [NexplantQMS.GdsMap.GBox]::new(0.75, 1.75, 5.25, 6.25)
+$pathBuilder = [NexplantQMS.GdsMap.Persistence.MapPlacedElementBatchBuilder]::new(10, 100000L)
+Assert-True ($pathBuilder.TryAdd($path)) 'PATH 배치 추가 실패'
+$pathPayload = [NexplantQMS.GdsMap.Persistence.MapPlacedBatchPayload]::Create(
+    $pathBuilder.TakeBatch(4), $jobId, $revisionId, 100000)
+$restoredPath = [NexplantQMS.GdsMap.Persistence.MapPlacedBatchReader]::Read(
+    $pathPayload.Payload, $pathPayload.PayloadSha256, 100000, 10).Elements[0]
+$pathItem = $factory.Invoke($null, [object[]]@($restoredPath))
+$pathSource = $pathItem.GetType().GetProperty('Source').GetValue($pathItem)
+Assert-True ($restoredPath.PathType -eq 1 -and $pathSource.PathType -eq 1) 'PATH 끝 모양이 복원되지 않았습니다.'
+Assert-True ($pathItem.Width -eq 4.5 -and $pathItem.WorldPoints[0].X -eq 3) 'PATH 폭/좌표가 다릅니다.'
 
 'MAP_PLACED_BATCH_PAYLOAD_PROBE=PASS'

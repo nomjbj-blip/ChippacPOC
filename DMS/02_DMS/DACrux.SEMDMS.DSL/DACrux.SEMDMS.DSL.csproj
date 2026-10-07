@@ -89,6 +89,15 @@
     <Compile Include="TQP_GDS_PLACED_EL.cs" />
     <Compile Include="TQP_GDS_MAP.cs" />
     <Compile Include="TQP_GDS_CHAIN.cs" />
+    <Compile Include="TQP_GDS_CHAIN_VER.cs" />
+    <Compile Include="TQP_GDS_CHAIN_MEMBER.cs" />
+    <Compile Include="TQP_GDS_SRC_FILE.cs" />
+    <Compile Include="TQP_GDS_ET_ITEM.cs" />
+    <Compile Include="TQP_GDS_ET_DIE.cs" />
+    <Compile Include="TQP_GDS_ET_VALUE.cs" />
+    <Compile Include="TQP_GDS_CHAIN_LAYER.cs" />
+    <Compile Include="TQP_GDS_CHAIN_RULE.cs" />
+    <Compile Include="TQP_GDS_CHAIN_EDIT.cs" />
     <Compile Include="TQD_ALARM_SETUP.cs" />
     <Compile Include="TQD_ALARM_USER.cs" />
     <Compile Include="TQD_COLORBYSIZE.cs" />

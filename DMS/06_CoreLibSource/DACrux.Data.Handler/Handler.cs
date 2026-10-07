@@ -10,8 +10,6 @@ namespace DACrux.Data.Handler
         #region 멤버 변수
 
         public delegate void LogDelegate(string message);
-        public static readonly string FAB1 = "FAB1";
-        public static readonly string FAB2 = "FAB2";
 
         /// <summary>
         /// 한번에 처리할 DATA FILE의 개수

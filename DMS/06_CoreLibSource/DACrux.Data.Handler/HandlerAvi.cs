@@ -97,17 +97,9 @@ namespace DACrux.Data.Handler
                     for (int iDie = 0; iDie < parser.DieList.Count; iDie++)
                     {
                         //Image 의 경우 원본 X, Y 의 값을 기준으로 Mapping 해준다. 
-                        if (FACTORY == FAB1)
-                        {
-                            //ex)QPE110$AU09001Q_2X_HY$9127010$AK9127010-16$2$24$1849.767$3141.579$5$ALL$1.jpg
-                            oImages = oDir.GetFiles(string.Format("*{0}${1}${2}${3}${4}*.jpg", parser.DEVICE, parser.LotID, Path.GetFileNameWithoutExtension(oAVIFile.FullName), (parser.DieList[iDie].X - 1), (parser.DieList[iDie].Y - 1)));
-                        }
-                        else
-                        {
-                            //ex)P_D136BY33001U_191S52_01_7,16_A.jpg
-                            oImages = oDir.GetFiles(string.Format("{0}_{1}_{2}_{3},{4}*.jpg", parser.DEVICE, parser.LotID, parser.WAFER, (parser.DieList[iDie].X - 1), (parser.DieList[iDie].Y - 1)));
-                        }
-
+                        //ex)P_D136BY33001U_191S52_01_7,16_A.jpg
+                        oImages = oDir.GetFiles(string.Format("{0}_{1}_{2}_{3},{4}*.jpg", parser.DEVICE, parser.LotID, parser.WAFER, (parser.DieList[iDie].X - 1), (parser.DieList[iDie].Y - 1)));
+                        
                         parser.DieList[iDie].IMAGE = null;
                         if (oImages != null && oImages.Length > 0)
                             parser.DieList[iDie].IMAGE = oImages;

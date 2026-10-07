@@ -20,7 +20,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\..\100_ClientBin\GdsMap\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -47,6 +47,11 @@
     <!-- GDS Map DB 저장(GdsMapForm_DbSave)이 DMS Service를 호출하는 RO / Interface. DACrux가 ClientBin에서 로드하므로 복사하지 않는다. -->
     <Reference Include="DACrux.SEMDMS.RO">
       <HintPath>..\..\100_ClientBin\DACrux.SEMDMS.RO.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <!-- DACrux 로그인 Factory(GlobalVariable.Factory)를 읽는다(DmsHostContext). DACrux가 ClientBin에서 이미 로드하므로 복사하지 않는다. -->
+    <Reference Include="DACrux.Base">
+      <HintPath>..\..\100_ClientBin\DACrux.Base.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="DACrux.SEMDMS.Interface">
@@ -109,32 +114,50 @@
     <Compile Include="GdsMapForm.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="GdsMapViewForm_LabelSearch.cs">
+      <DependentUpon>GdsMapViewForm.cs</DependentUpon>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GdsMapViewForm_ChainSide.cs">
+      <DependentUpon>GdsMapViewForm.cs</DependentUpon>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GdsMapViewForm_ChainLoad.cs">
+      <DependentUpon>GdsMapViewForm.cs</DependentUpon>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GdsMapViewForm_ChainDb.cs">
+      <DependentUpon>GdsMapViewForm.cs</DependentUpon>
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="GdsMapForm_DbSave.cs">
       <DependentUpon>GdsMapForm.cs</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GdsMapTestForm_Chain.cs">
-      <DependentUpon>GdsMapForm.cs</DependentUpon>
+    <Compile Include="GdsMapViewForm_Chain.cs">
+      <DependentUpon>GdsMapViewForm.cs</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GdsMapTestForm_ChainEdit.cs">
+    <Compile Include="GdsMapViewForm_ChainEdit.cs">
+      <DependentUpon>GdsMapViewForm.cs</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GdsMapTestForm_ChainExample.cs">
-      <DependentUpon>GdsMapForm.cs</DependentUpon>
+    <Compile Include="GdsMapViewForm_ChainExample.cs">
+      <DependentUpon>GdsMapViewForm.cs</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GdsMapTestForm_ChainSimilarReview.cs">
-      <DependentUpon>GdsMapForm.cs</DependentUpon>
+    <Compile Include="GdsMapViewForm_ChainSimilarReview.cs">
+      <DependentUpon>GdsMapViewForm.cs</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GdsMapTestForm_ChainList.cs">
-      <DependentUpon>GdsMapForm.cs</DependentUpon>
+    <Compile Include="GdsMapViewForm_ChainList.cs">
+      <DependentUpon>GdsMapViewForm.cs</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="GdsMapForm.Designer.cs">
       <DependentUpon>GdsMapForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="DmsHostContext.cs" />
     <Compile Include="GdsMapViewForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -158,12 +181,17 @@
     <Compile Include="Persistence\MapPlacedBatchReader.cs" />
     <Compile Include="Persistence\MapPlacedSceneItemFactory.cs" />
     <Compile Include="Persistence\GdsMapSourceRowBuilder.cs" />
+    <Compile Include="Persistence\GdsSideTransform.cs" />
+    <Compile Include="Persistence\GdsLabelIndex.cs" />
     <Compile Include="Persistence\GdsMapPlacedRowBuilder.cs" />
     <Compile Include="Persistence\GdsMapPlacedRowReader.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="GdsMapForm.resx">
       <DependentUpon>GdsMapForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GdsMapViewForm.resx">
+      <DependentUpon>GdsMapViewForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

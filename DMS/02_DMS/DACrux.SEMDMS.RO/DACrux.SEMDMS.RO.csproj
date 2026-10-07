@@ -78,6 +78,9 @@
     <Compile Include="DefectAlarm.cs" />
     <Compile Include="GdsMapImport.cs" />
     <Compile Include="GdsMapView.cs" />
+    <Compile Include="GdsChain.cs" />
+    <Compile Include="GdsEtResult.cs" />
+    <Compile Include="KlarfUpload.cs" />
     <Compile Include="DefectMapAnalysis.cs" />
     <Compile Include="DMReport.cs" />
     <Compile Include="SEMConfiguration.cs" />

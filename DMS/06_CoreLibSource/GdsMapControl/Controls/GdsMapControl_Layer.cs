@@ -101,6 +101,15 @@ namespace NexplantQMS.GdsMap
 		}
 
 		/// <summary>
+		/// Layer별 화면 배치 도형 수(참조 구조를 펼친 인스턴스 포함). DB 저장 시 PLACED 행 수와 같다.
+		/// Layer 목록의 도형 수 / 선택 합계 표시에 사용한다.
+		/// </summary>
+		public Dictionary<int, int> GetLayerElementCounts()
+		{
+			return _layerList.ToDictionary(p => p.LayerID, p => p.Items.Count);
+		}
+
+		/// <summary>
 		/// 목록의 체크 상태를 실제 렌더링 레이어에 일괄 반영한 뒤 한 번만 다시 그린다.
 		/// 최상위 Structure에도 같은 번호가 있으면 표시 상태를 함께 맞춘다.
 		/// </summary>

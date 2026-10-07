@@ -156,6 +156,11 @@
     <EmbeddedResource Include="Admin\frmStandardMapSetup.resx">
       <DependentUpon>frmStandardMapSetup.cs</DependentUpon>
     </EmbeddedResource>
+    <Compile Include="Admin\KlarfMapRule.cs" />
+    <Compile Include="Admin\KlarfMapSource.cs" />
+    <Compile Include="Admin\StandardMapEditMap.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="Admin\MapCreationService.cs" />
     <Compile Include="Admin\StandardMapFile.cs" />
     <Compile Include="Admin\frmStandardMapSetup.cs">

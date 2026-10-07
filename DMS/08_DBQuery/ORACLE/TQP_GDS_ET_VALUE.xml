@@ -1,0 +1,55 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TQP_GDS_ET_VALUE: E-Test 측정값 (Die x 항목 1행). 2026-10-07 Claude CLAUDE-029 추가.
+  double 은 G17 문자열 + TO_BINARY_DOUBLE (Middleware dbtype="Double" 은 15자리 반올림이라 쓰지 않음).
+  VALUE_STATUS V 숫자 / N 미측정(-) / E 빈 값. N / E 는 MEAS_VALUE 빈 문자열 -> NULL (CHECK 제약으로 검사).
+-->
+<queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Insert" queryid="CREATE_ET_VALUE" commandtype="Text" description="측정값 저장 (InsertExecuteMultiple, 10,000행 배치)" commandtimeout="600">
+        <commandtext><![CDATA[INSERT INTO TQP_GDS_ET_VALUE
+    (SRC_FILE_SEQ,
+    DUT_NO,
+    ET_ITEM_SEQ,
+    MEAS_VALUE,
+    VALUE_STATUS)
+VALUES
+    (:src_file_seq,
+    :dut_no,
+    :et_item_seq,
+    TO_BINARY_DOUBLE(:meas_value),
+    :value_status)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:src_file_seq</param>
+            <param direction="Input" dbtype="Number" size="0">:dut_no</param>
+            <param direction="Input" dbtype="Number" size="0">:et_item_seq</param>
+            <param direction="Input" dbtype="VarChar" size="40">:meas_value</param>
+            <param direction="Input" dbtype="VarChar" size="1">:value_status</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ET_VALUE" commandtype="Text" description="파일의 측정값 전체 (Die / 항목 순, 원문 헤더 포함)" commandtimeout="600">
+        <commandtext><![CDATA[SELECT V.DUT_NO, V.ET_ITEM_SEQ, I.ITEM_NAME, V.MEAS_VALUE, V.VALUE_STATUS
+  FROM TQP_GDS_ET_VALUE V
+  JOIN TQP_GDS_ET_ITEM I ON I.ET_ITEM_SEQ = V.ET_ITEM_SEQ
+ WHERE V.SRC_FILE_SEQ = :src_file_seq
+ ORDER BY V.DUT_NO, I.DISPLAY_ORDER, V.ET_ITEM_SEQ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:src_file_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ET_VALUE_COUNT" commandtype="Text" description="저장 확정 검사: 측정값 수 / 미측정 수 / 빈 값 수" commandtimeout="60">
+        <commandtext><![CDATA[SELECT COUNT(*) AS VALUE_COUNT,
+       NVL(SUM(CASE WHEN VALUE_STATUS = 'N' THEN 1 ELSE 0 END), 0) AS NOT_TESTED_COUNT,
+       NVL(SUM(CASE WHEN VALUE_STATUS = 'E' THEN 1 ELSE 0 END), 0) AS EMPTY_COUNT
+  FROM TQP_GDS_ET_VALUE
+ WHERE SRC_FILE_SEQ = :src_file_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:src_file_seq</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_ET_VALUE" commandtype="Text" description="파일의 측정값 삭제" commandtimeout="600">
+        <commandtext><![CDATA[DELETE FROM TQP_GDS_ET_VALUE WHERE SRC_FILE_SEQ = :src_file_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:src_file_seq</param>
+        </parameters>
+    </query>
+</queryxml>

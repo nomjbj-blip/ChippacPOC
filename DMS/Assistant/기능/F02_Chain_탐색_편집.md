@@ -71,3 +71,18 @@ powershell -NoProfile -ExecutionPolicy Bypass -File '.\Probes\ChainOpenEndedProb
 ## 다음 단계
 
 현재 소스와 EXE 기준의 모델 검사부터 수행한다. 영구 저장은 [F03](F03_Map_배치_DB.md)의 Map / Chain 버전 계약과 함께 작은 단위로 연결한다. AREF와 배치 ID 재파싱 안정성도 남은 확인 대상이다.
+
+
+**2026-10-06 격자 크기 입력 숨김(CLAUDE-022, 사용자 결정 "소스상에 넣어줘. 필요시 꺼내자"):** 격자 크기는 Chain 탐색 공간 색인(`ChainSpatialIndex`)의 칸 크기다. 후보만 줄이고 연결은 실제 형상으로 판단하므로 결과가 아니라 속도 / 메모리에만 영향을 준다(동일 길이 경로가 여럿이면 표시 경로 순서만 달라질 수 있음). 화면 입력(`chainCellSizeLabel` / `_numChainCellSize`)은 Designer에서 `Visible = false`로 숨기고 `GdsMapTestForm_ChainList.cs`의 `DefaultChainCellSize = 10m`(µm)를 사용한다. 다시 꺼낼 때는 두 컨트롤의 Visible만 true로 바꾼다. 고정값이라 도형 크기 / 밀도가 크게 다른 GDS에서는 느려질 수 있다(후속 후보: 선택 Layer 도형 크기 기반 자동 계산). Chain DB 저장 시 `TQP_GDS_CHAIN_VER.CELL_SIZE`에는 사용한 값을 그대로 기록한다.
+
+**2026-10-06 Chain DB 저장 설계(CLAUDE-024, 설계만):** [GDS Chain DB 저장 설계](../../../문서/2026-10-06_GDS_Chain_DB저장_설계.md). 요점: 스키마 변경 없이 기존 6개 테이블 사용 / 도형 키 = PLACED_ELEMENT_ID(화면 ElementKey와 같음) / 신규 서비스 `iGdsChain`(Chain 1개 = Begin -> Member·Edit 배치 -> Complete) / 저장 전 검사: DB Map READY + 같은 GDS 파일(SHA-256) + Chain Layer가 DB Map Layer 안 / 불러오기는 TRACE Member를 `SavedTraceKeys`로 복원해 편집 재개 / 삭제는 RETIRED. 사용자 결정 6건(버전 이력 여부 등) 대기.
+
+**2026-10-06 Chain 저장 서비스 1단계(CLAUDE-024):** 사용자 결정(덮어쓰기 / 실제 삭제 등, 설계 10.1절) 반영. `iGdsChain`(GetChainList / BeginChainSave / CreateChainMemberBatch / CreateChainEditBatch / CompleteChainSave / DeleteChain / 상세 조회 4개) 구현, `GdsChainProbe.ps1` 14 PASS(TEMP 빌드 BSL 직접 호출). 화면 연결(저장 / 불러오기)은 2·3단계. 운영 폴더 반영 대기.
+
+**2026-10-06 화면 역할 재정의(CLAUDE-026, 설계만):** 사용자 지시로 Chain 설정 / Chain DB 반영은 **GDS Map View(조회) 화면**에서 한다. Setup 화면은 GDS 읽기 + Layer 필터 + Map DB 저장까지. Chain 화면 코드(`GdsMapTestForm_Chain*.cs`, `GdsMapForm_ChainDb.cs`)를 `GdsMapViewForm` partial로 옮기는 설계: [화면 역할 재정의 설계](../../../문서/2026-10-06_GDS_Map_화면역할_재정의_설계.md). DB 도형으로도 Chain 탐색 가능(Source 재생성 확인). 사용자 결정 5건 대기.
+
+**2026-10-06 Chain 화면 이동 1단계(CLAUDE-026):** Chain 설정 화면 코드가 `GdsMapViewForm_Chain*.cs` / `GdsMapViewForm_ChainDb.cs`(GDS Map View 화면)로 옮겨졌다. 위 표의 `GdsMapTestForm_*` 파일 이름은 이전 이름이다. DB 도형으로 탐색한 결과가 파일 도형과 같음을 `GdsChainDbTraceProbe.ps1`로 확인. DMS 화면 확인 대기.
+
+**2026-10-07 Front / Back 보기(CLAUDE-030):** View 보기 기준을 바꿔도 Chain 소속(도형 ID)은 같다. Marker는 저장 기준 좌표로 저장되고 화면에서만 반전. 전환 처리 `GdsMapViewForm_ChainSide.cs`(`MirrorChainsForSideChange` / `ToStoredX` / `ToDisplayX`). Probe `GdsFrontBackViewProbe.ps1`.
+
+**2026-10-07 Label 검색(CLAUDE-032):** View 화면 조회 조건 아래 Label 검색 줄. TEXT 도형 전체(Layer 무관) 색인을 [조회] 때 받아 정확히 / 시작 / 포함 검색 -> 결과 목록 콤보 + 지도 표시(노란 원 + 십자) + 300µm 이동. Chain 연결 표시는 2단계. 서비스 `iGdsMapView.GetMapTextIndex`, 로직 `Persistence/GdsLabelIndex.cs`, Probe `GdsLabelSearchProbe.ps1`. [Label 검색 설계](../../../문서/2026-10-07_GDS_Label_검색_설계.md) 9절.

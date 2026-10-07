@@ -92,6 +92,19 @@ namespace DACrux.SEMDMS.BSL
             return dt;
         }
 
+        /// <summary>
+        /// Label 검색 색인(2026-10-07 CLAUDE-032). 처리 흐름: READY Map 확인 -> TEXT 도형 전체(ID / Layer / TEXTTYPE / 값 / 위치) 조회.
+        /// Layer가 바뀌어도 찾을 수 있도록 Layer 조건 없이 도형 종류(TEXT)로만 찾는다. 샘플 기준 약 3만 행.
+        /// </summary>
+        public DataTable GetMapTextIndex(string strFactory, string strDeviceID)
+        {
+            string[] key = RequireReadyMap(strFactory, strDeviceID);
+            DACrux.SEMDMS.DSL.TQP_GDS_PLACED_EL oTQP_GDS_PLACED_EL = new DACrux.SEMDMS.DSL.TQP_GDS_PLACED_EL();
+            DataTable dt = oTQP_GDS_PLACED_EL.GetData("SELECT_PLACED_TEXT_INDEX", null, new string[] { key[0], key[1] });
+            dt.RemotingFormat = SerializationFormat.Binary;
+            return dt;
+        }
+
         #endregion
 
         #region [공통 검증]

@@ -69,7 +69,7 @@ namespace DACrux.SEMDMS.ENGUI
             using (var dialog = new OpenFileDialog())
             {
                 dialog.Title = "KLARF 파일 선택";
-                dialog.Filter = "KLARF 파일|*.000;*.001;*.klarf;*.klaf;*.kla;*.krf;*.sinf;*.txt|모든 파일|*.*";
+                dialog.Filter = "모든 파일|*.*";
                 dialog.CheckFileExists = true;
                 if (dialog.ShowDialog(this) != DialogResult.OK) return;
                 txtFile.Text = dialog.FileName;

@@ -57,10 +57,30 @@ namespace NexplantQMS.GdsMap.Persistence
         /// <summary>저장할 SOURCE 행 수(도면 목록 행 + 파서 중복 행). 저장 시작 시 예상 건수로 보낸다.</summary>
         public static long CountSourceRows(GdsLibrary library)
         {
+            return CountSourceRows(library, null);
+        }
+
+        /// <summary>layerIds 조건(설계 21절)으로 저장할 SOURCE 행 수. null이면 전체다.</summary>
+        public static long CountSourceRows(GdsLibrary library, ISet<int> layerIds)
+        {
             long count = 0;
             foreach (var structure in library.Structures)
-                count += structure.Layers.Sum(layer => (long)layer.Elements.Count) + structure.Layers.DuplicatedItems.Count;
+            {
+                foreach (var layer in structure.Layers)
+                    count += layer.Elements.Count(element => IsSourceRowSaved(element, layerIds));
+                count += structure.Layers.DuplicatedItems.Count(element => IsSourceRowSaved(element, layerIds));
+            }
             return count;
+        }
+
+        /// <summary>
+        /// 화면 Layer 필터 기준 저장(설계 21절)에서 SOURCE 행을 저장할지 정한다.
+        /// SREF / AREF는 GDS에 LAYER 레코드가 없고(값 0) 계층 구조라서 항상 저장한다.
+        /// 나머지는 저장 Layer에 있을 때만 저장한다. layerIds가 null이면 전체를 저장한다.
+        /// </summary>
+        public static bool IsSourceRowSaved(GdsElement element, ISet<int> layerIds)
+        {
+            return layerIds == null || element is GdsSRef || element is GdsARef || layerIds.Contains(element.LayerID);
         }
 
         /// <summary>
@@ -68,6 +88,15 @@ namespace NexplantQMS.GdsMap.Persistence
         /// 한 번에 전체를 만들지 않고 배치 단위로 만들어 대형 GDS에서도 메모리를 배치 크기로 제한한다.
         /// </summary>
         public static IEnumerable<string[,]> BuildSourceBatches(GdsLibrary library, int maxRows)
+        {
+            return BuildSourceBatches(library, maxRows, null);
+        }
+
+        /// <summary>
+        /// layerIds 조건(설계 21절)에 맞는 SOURCE 행만 배치로 돌려준다. null이면 전체다.
+        /// 제외 행도 순번은 증가시켜 SOURCE_ELEMENT_ID가 전체 저장 / 화면 배치 도형과 같게 유지한다.
+        /// </summary>
+        public static IEnumerable<string[,]> BuildSourceBatches(GdsLibrary library, int maxRows, ISet<int> layerIds)
         {
             if (library == null) throw new ArgumentNullException(nameof(library));
             if (maxRows <= 0) throw new ArgumentOutOfRangeException(nameof(maxRows));
@@ -78,13 +107,17 @@ namespace NexplantQMS.GdsMap.Persistence
                 foreach (var layer in structure.Layers)
                     foreach (var element in layer.Elements)
                     {
-                        pending.Add(BuildSourceRow(structure.Name, "/E", ordinal++, element, false));
+                        int elementOrdinal = ordinal++;
+                        if (!IsSourceRowSaved(element, layerIds)) continue;
+                        pending.Add(BuildSourceRow(structure.Name, "/E", elementOrdinal, element, false));
                         if (pending.Count == maxRows) { yield return ToArray(pending); pending.Clear(); }
                     }
                 int duplicateOrdinal = 0;
                 foreach (var duplicate in structure.Layers.DuplicatedItems)
                 {
-                    pending.Add(BuildSourceRow(structure.Name, "/D", duplicateOrdinal++, duplicate, true));
+                    int elementOrdinal = duplicateOrdinal++;
+                    if (!IsSourceRowSaved(duplicate, layerIds)) continue;
+                    pending.Add(BuildSourceRow(structure.Name, "/D", elementOrdinal, duplicate, true));
                     if (pending.Count == maxRows) { yield return ToArray(pending); pending.Clear(); }
                 }
             }

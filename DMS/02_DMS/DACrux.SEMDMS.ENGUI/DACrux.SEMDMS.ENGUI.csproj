@@ -42,6 +42,10 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ClosedXML, Version=0.94.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\07_CoreLib\ClosedXML.dll</HintPath>
+    </Reference>
     <Reference Include="DACrux.Base, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\07_CoreLib\DACrux.Base.dll</HintPath>
@@ -211,6 +215,26 @@
     </Compile>
     <Compile Include="DefectMapAnalysis\frmKlarfFileViewer.Designer.cs">
       <DependentUpon>frmKlarfFileViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DefectMapAnalysis\frmKlarfUpload.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DefectMapAnalysis\frmKlarfUpload.Designer.cs">
+      <DependentUpon>frmKlarfUpload.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DefectMapAnalysis\FolderPickerDialog.cs" />
+    <Compile Include="ETest\EtResultFileParser.cs" />
+    <Compile Include="ETest\frmEtResultUpload.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ETest\frmEtResultUpload.Designer.cs">
+      <DependentUpon>frmEtResultUpload.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ETest\frmEtResultView.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ETest\frmEtResultView.Designer.cs">
+      <DependentUpon>frmEtResultView.cs</DependentUpon>
     </Compile>
     <Compile Include="GdsMap\frmGdsMapSetup.cs">
       <SubType>Form</SubType>

@@ -18,7 +18,6 @@ namespace DACrux.TEST.BSL
         /// </summary>
         public static readonly int MAX_COLUMN_COUNT = 900;
         private static readonly Dictionary<String, String> dicParameterReplaceValues = null;
-        private static readonly string FAB1 = "FAB1";
         private static readonly string PARAMETRIC = "PARAMETRIC";
 
         static TestDataManager()
@@ -79,7 +78,7 @@ namespace DACrux.TEST.BSL
 
                 /// FAB1 TestArea: PARAMETRIC
                 /// Normal Test 진행 시 Retest Program 에 대한 DB Table 도 함께 만든다.
-                if (String.Equals(factory, FAB1) && String.Equals(testarea, PARAMETRIC))
+                if (String.Equals(testarea, PARAMETRIC))
                 {
                     /// 프로그램의 맨 마지막 자리가 "N"인 경우, Full map은 제외
                     string wildCard = programName.Substring(programName.Length - 1, 1);
@@ -103,7 +102,7 @@ namespace DACrux.TEST.BSL
                 /// FAB1, Parametric 의 경우 테이블의 동기화 한다.
                 #region [ FAB1 PCM 에 대한 테이블 컬럼 추가 로직 ]
                 List<string> newTableList = new List<string>();
-                if (String.Equals(factory, FAB1) && String.Equals(testarea, PARAMETRIC))
+                if (String.Equals(testarea, PARAMETRIC))
                 {
                     string newProgramName = string.Empty;
                     string wildCardKey = programName.Substring(programName.Length - 1, 1);
@@ -158,7 +157,7 @@ namespace DACrux.TEST.BSL
                         }
                     }
                 }
-                #endregion [ FAB1 Parameteric 에 대한 테이블 컬럼 추가 로직 ]
+                #endregion [ Parameteric 에 대한 테이블 컬럼 추가 로직 ]
             }
 
             using (TD_TABLE tbl = new TD_TABLE())

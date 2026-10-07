@@ -15,6 +15,8 @@ namespace NexplantQMS.GdsMap.Persistence
         public string ElementType { get; set; }
         public bool Closed { get; set; }
         public double PathWidth { get; set; }
+        /// <summary>PATH 원본 타입 바이트다. 화면은 1/2를 특수 처리하고 그 외는 기본 끝 모양으로 그린다.</summary>
+        public byte PathType { get; set; }
         public GBox Bounds { get; set; }
         public string Text { get; set; }
         public int? TextType { get; set; }

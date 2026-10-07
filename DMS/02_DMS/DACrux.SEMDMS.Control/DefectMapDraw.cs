@@ -16,8 +16,6 @@ namespace DACrux.SEMDMS.Control
     /// </summary>
     public static class DefectMapDraw
     {
-        public static readonly string FAB1 = "FAB1";
-        public static readonly string FAB2 = "FAB2";
 
         public static void Draw(DefectMap map, long stepSeq)
         {
@@ -820,9 +818,8 @@ namespace DACrux.SEMDMS.Control
                 FtpServerInfo.Password = dtConfig.Rows[0]["PASS"].ToString();
                 FtpServerInfo.SubPath = dtConfig.Rows[0]["MAIN_PATH"].ToString();
             }
-            /* 260223 Chris */
-            //string fullPath = String.Format("ftp://{0}:{1}/{2}/{3}", FtpServerInfo.IP, FtpServerInfo.Port, FtpServerInfo.SubPath.Trim('/'), strFTPDirectory.Trim('/'));
-            string fullPath = strFTPDirectory.Trim('/');
+
+            string fullPath = String.Format("ftp://{0}:{1}/{2}/{3}", FtpServerInfo.IP, FtpServerInfo.Port, FtpServerInfo.SubPath.Trim('/'), strFTPDirectory.Trim('/'));
             return DownloadToStream(fullPath, FtpServerInfo.UserID, FtpServerInfo.Password);
         }
 

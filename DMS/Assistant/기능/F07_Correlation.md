@@ -35,3 +35,16 @@ AOI KLARF의 Defect 위치가 GDS Chain을 구성하는 Bump / RDL 영역과 관
 ## 2026-10-02 사용자 결정
 
 KLARF Defect와의 연관분석은 Chain 영역(현재 Chain Version의 Member 도형)만 대상으로 한다. 배경 도면 도형은 비교하지 않는다. 1차 후보는 Defect 좌표 +/- Tolerance와 Member 도형 Bounds 겹침. 상세는 [GDS Map DB 저장 설계 13.3절](../../../문서/2026-10-02_GDS_Map_DB저장_설계.md).
+
+
+## 2026-10-07 E-Test 결과 파일 설계 (CLAUDE-029)
+
+샘플 `SampleFile/26_10_06 Sample File/CAI_OMM_ATV_A0_TSVET_..._RH-HS2615-02.xlsx` 분석 결과 헤더 형식은 `{Para}[_{조건}={값}]@{Chain}[:{Chain2}]` (Leakage_Serial 은 Chain 2개). 파일 Limit 은 쓰지 않고 별도 Limit 테이블 / 화면으로 판정한다 (Connectivity / Resistance 는 파일 Limit 이 N/A 라 Open 판정에 Limit 화면 필수). E-Test Chain 이름(최대 19자)과 GDS `CHAIN_CODE` 는 FK 없이 이름으로 대응. 상세와 결정 대기 항목 D1~D8은 [E-Test Parsing / DB 설계](../../../문서/2026-10-07_ETest_결과파일_Parsing_DB설계.md). 설계만 됨 / 구현 없음.
+
+KLARF `XD106.02` 연결 분석 (같은 날): Wafer 는 (Lot 핵심 문자열, Slot) 으로 대응, Die 는 시계 90도 + 이동 (4, 5) 잠정 (Defect Die 4 중 3 이 E-Test Fail Die). 설계 문서 8절, 연구소 좌표 대응표로 확정 필요.
+
+범위 조정 (같은 날 사용자 지시): 먼저 파일 간 기준 정보 관계만 설계 -> [파일 간 기준 정보 관계 설계](../../../문서/2026-10-07_파일간_기준정보_관계_설계.md). 연결 규칙 / Die 좌표 / 결과 Data 는 나중.
+
+E-Test 결과 저장 구현 (CLAUDE-029, 2026-10-07): 테이블 `TQP_GDS_SRC_FILE` / `TQP_GDS_ET_ITEM` / `TQP_GDS_ET_DIE` / `TQP_GDS_ET_VALUE` (로컬 DB 적용), 서비스 `GdsEtResult`, 화면 DMS > E-Test 결과 업로드 (`ENGUI/ETest/frmEtResultUpload`). 13:11 배포, Probe 16/16 / Smoke 17 PASS, DMS 화면 확인 대기. Limit 판정 / KLARF 연결은 나중.
+
+E-Test 중복 기준 변경 (같은 날 사용자 지시): Device 중복 허용, UNIQUE = FACTORY + WAFER_ID, Slot No 는 업로드 화면에서 입력 (설계 12절). 로컬 DB 적용, 배포 승인 대기.

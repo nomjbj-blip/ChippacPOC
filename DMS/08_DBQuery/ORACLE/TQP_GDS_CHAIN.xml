@@ -1,8 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!--
-  TQP_GDS_CHAIN: Device의 Chain 마스터. 2026-10-02 Claude CLAUDE-017 추가(현재는 삭제 쿼리만).
+  TQP_GDS_CHAIN: Device의 Chain 마스터. 2026-10-02 Claude CLAUDE-017 추가(DELETE_CHAIN), 2026-10-06 CLAUDE-024 저장 / 조회 쿼리 추가.
   Chain 하위 테이블(CHAIN_VER -> CHAIN_MEMBER / CHAIN_LAYER / CHAIN_RULE / CHAIN_EDIT)은 FK ON DELETE CASCADE로 함께 지워진다.
   Device 데이터 삭제(GdsMapImport.DeleteMap) 시 PLACED_EL보다 먼저 지워야 한다(CHAIN_MEMBER / EDIT -> PLACED_EL FK는 CASCADE가 아님).
+  2026-10-06 사용자 결정: Chain 버전 이력 없음(VERSION_NO = 1, 저장은 덮어쓰기) / 삭제는 실제 삭제(RETIRED 사용 안 함).
 -->
 <queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
     <query statement="Delete" queryid="DELETE_CHAIN" commandtype="Text" description="Device의 Chain 전체 삭제 (하위 Chain 테이블은 FK CASCADE)" commandtimeout="600">
@@ -12,6 +13,102 @@
         <parameters>
             <param direction="Input" dbtype="VarChar" size="30">:factory</param>
             <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_NEXT_CHAIN_SEQ" commandtype="Text" description="Chain 번호 채번 (시퀀스 CHAIN_SEQ)" commandtimeout="60">
+        <commandtext><![CDATA[SELECT CHAIN_SEQ.NEXTVAL FROM DUAL]]></commandtext>
+    </query>
+    <query statement="Select" queryid="SELECT_CHAIN_LIST" commandtype="Text" description="Device의 Chain 목록 + 저장 상태 / Member 수 / 편집 수 (CLAUDE-024)" commandtimeout="60">
+        <commandtext><![CDATA[SELECT C.CHAIN_SEQ, C.CHAIN_CODE, V.CHAIN_NAME, V.COLOR_ARGB, V.APPLY_LAYER_RULES,
+       TO_CHAR(V.CELL_SIZE, 'TM9', 'NLS_NUMERIC_CHARACTERS=''.,''') AS CELL_SIZE,
+       NVL(V.VERSION_STATUS, 'DRAFT') AS VERSION_STATUS,
+       (SELECT COUNT(*) FROM TQP_GDS_CHAIN_MEMBER M
+         WHERE M.FACTORY = C.FACTORY AND M.DEVICE_ID = C.DEVICE_ID AND M.CHAIN_SEQ = C.CHAIN_SEQ AND M.VERSION_NO = 1) AS MEMBER_COUNT,
+       (SELECT COUNT(*) FROM TQP_GDS_CHAIN_EDIT E
+         WHERE E.FACTORY = C.FACTORY AND E.DEVICE_ID = C.DEVICE_ID AND E.CHAIN_SEQ = C.CHAIN_SEQ AND E.VERSION_NO = 1) AS EDIT_COUNT,
+       NVL(C.UPDATE_USER, C.CREATE_USER) AS UPDATE_USER,
+       TO_CHAR(NVL(C.UPDATE_TIME, C.CREATE_TIME), 'YYYY-MM-DD HH24:MI:SS') AS UPDATE_TIME
+  FROM TQP_GDS_CHAIN C
+  LEFT JOIN TQP_GDS_CHAIN_VER V
+    ON V.FACTORY = C.FACTORY AND V.DEVICE_ID = C.DEVICE_ID AND V.CHAIN_SEQ = C.CHAIN_SEQ AND V.VERSION_NO = 1
+ WHERE C.FACTORY = :factory
+   AND C.DEVICE_ID = :device_id
+ ORDER BY LENGTH(C.CHAIN_CODE), C.CHAIN_CODE]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_CHAIN" commandtype="Text" description="Chain 1건 (Chain 번호)" commandtimeout="60">
+        <commandtext><![CDATA[SELECT CHAIN_SEQ, CHAIN_CODE
+  FROM TQP_GDS_CHAIN
+ WHERE FACTORY = :factory
+   AND DEVICE_ID = :device_id
+   AND CHAIN_SEQ = :chain_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
+            <param direction="Input" dbtype="Number" size="0">:chain_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_CHAIN_BY_CODE" commandtype="Text" description="Chain 1건 (Chain Code, 신규 Code 중복 확인)" commandtimeout="60">
+        <commandtext><![CDATA[SELECT CHAIN_SEQ, CHAIN_CODE
+  FROM TQP_GDS_CHAIN
+ WHERE FACTORY = :factory
+   AND DEVICE_ID = :device_id
+   AND CHAIN_CODE = :chain_code]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
+            <param direction="Input" dbtype="VarChar" size="32">:chain_code</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="CREATE_CHAIN" commandtype="Text" description="Chain 생성 (ACTIVE)" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_GDS_CHAIN
+    (FACTORY,
+    DEVICE_ID,
+    CHAIN_SEQ,
+    CHAIN_CODE,
+    CHAIN_STATUS,
+    CREATE_USER)
+VALUES
+    (:factory,
+    :device_id,
+    :chain_seq,
+    :chain_code,
+    'ACTIVE',
+    :create_user)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
+            <param direction="Input" dbtype="Number" size="0">:chain_seq</param>
+            <param direction="Input" dbtype="VarChar" size="32">:chain_code</param>
+            <param direction="Input" dbtype="VarChar" size="30">:create_user</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_CHAIN" commandtype="Text" description="Chain 수정 사용자 / 일시 갱신 (다시 저장)" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_GDS_CHAIN
+   SET UPDATE_USER = :update_user,
+       UPDATE_TIME = SYSDATE
+ WHERE FACTORY = :factory
+   AND DEVICE_ID = :device_id
+   AND CHAIN_SEQ = :chain_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:update_user</param>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
+            <param direction="Input" dbtype="Number" size="0">:chain_seq</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_CHAIN_ONE" commandtype="Text" description="Chain 1개 실제 삭제 (하위 VER / MEMBER / LAYER / RULE / EDIT는 FK CASCADE)" commandtimeout="600">
+        <commandtext><![CDATA[DELETE FROM TQP_GDS_CHAIN
+ WHERE FACTORY = :factory
+   AND DEVICE_ID = :device_id
+   AND CHAIN_SEQ = :chain_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
+            <param direction="Input" dbtype="Number" size="0">:chain_seq</param>
         </parameters>
     </query>
 </queryxml>

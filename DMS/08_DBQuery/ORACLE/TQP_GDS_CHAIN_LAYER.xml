@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TQP_GDS_CHAIN_LAYER: Chain 후보 탐색에 사용한 Layer 목록. 2026-10-06 Claude CLAUDE-024 추가.
+  LAYER_ID는 TQP_GDS_LAYER FK다. Map을 Layer 필터로 저장할 때 뺀 Layer는 저장할 수 없다(화면이 먼저 검사).
+-->
+<queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Insert" queryid="CREATE_CHAIN_LAYER" commandtype="Text" description="Chain 탐색 Layer 저장 (InsertExecuteMultiple)" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_GDS_CHAIN_LAYER
+    (FACTORY,
+    DEVICE_ID,
+    CHAIN_SEQ,
+    VERSION_NO,
+    LAYER_ID)
+VALUES
+    (:factory,
+    :device_id,
+    :chain_seq,
+    1,
+    :layer_id)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
+            <param direction="Input" dbtype="Number" size="0">:chain_seq</param>
+            <param direction="Input" dbtype="Number" size="0">:layer_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_CHAIN_LAYER" commandtype="Text" description="Chain 탐색 Layer 조회" commandtimeout="60">
+        <commandtext><![CDATA[SELECT LAYER_ID
+  FROM TQP_GDS_CHAIN_LAYER
+ WHERE FACTORY = :factory
+   AND DEVICE_ID = :device_id
+   AND CHAIN_SEQ = :chain_seq
+   AND VERSION_NO = 1
+ ORDER BY LAYER_ID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
+            <param direction="Input" dbtype="Number" size="0">:chain_seq</param>
+        </parameters>
+    </query>
+</queryxml>

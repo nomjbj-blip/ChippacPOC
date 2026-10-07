@@ -199,6 +199,20 @@ SELECT :factory, :device_id, :placed_element_id, :source_element_id, :layer_id, 
             <param direction="Input" dbtype="Number" size="0">:max_rows</param>
         </parameters>
     </query>
+    <query statement="Select" queryid="SELECT_PLACED_TEXT_INDEX" commandtype="Text" description="조회 화면 Label 검색 색인: Device의 TEXT 도형 전체(Layer 무관) ID / Layer / TEXTTYPE / 값 / 위치 (2026-10-07 CLAUDE-032)" commandtimeout="600">
+        <commandtext><![CDATA[SELECT PLACED_ELEMENT_ID, LAYER_ID, TEXT_TYPE,
+       DBMS_LOB.SUBSTR(TEXT_VALUE, 1000, 1) AS TEXT_VALUE,
+       MIN_X, MIN_Y
+  FROM TQP_GDS_PLACED_EL
+ WHERE FACTORY = :factory
+   AND DEVICE_ID = :device_id
+   AND ELEMENT_TYPE = 'TEXT'
+ ORDER BY PLACED_ELEMENT_ID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
+        </parameters>
+    </query>
     <query statement="Delete" queryid="DELETE_PLACED_EL" commandtype="Text" description="Device의 배치 도형 전체 삭제 (기존 데이터 삭제 후 재등록, Chain Member / Edit은 FK CASCADE)" commandtimeout="1800">
         <commandtext><![CDATA[DELETE FROM TQP_GDS_PLACED_EL
  WHERE FACTORY = :factory

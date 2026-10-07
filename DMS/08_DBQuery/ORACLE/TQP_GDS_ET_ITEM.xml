@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TQP_GDS_ET_ITEM: E-Test 측정 항목 마스터 (Device 단위). 2026-10-07 Claude CLAUDE-029 추가.
+  헤더 {PARA_NAME}[={COND_VALUE}]@{CHAIN_NAME}[:{CHAIN_NAME2}] 를 클라이언트가 나눠 보낸다. ITEM_NAME 은 원문 헤더.
+  빈 값 숫자(TEST_NO / DISPLAY_ORDER)는 VarChar + TO_NUMBER 로 받아 NULL 로 저장한다.
+-->
+<queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Insert" queryid="CREATE_ET_ITEM" commandtype="Text" description="측정 항목 추가 (InsertExecuteMultiple, 번호는 시퀀스 ET_ITEM_SEQ)" commandtimeout="600">
+        <commandtext><![CDATA[INSERT INTO TQP_GDS_ET_ITEM
+    (ET_ITEM_SEQ,
+    FACTORY,
+    DEVICE_ID,
+    ITEM_NAME,
+    PARA_NAME,
+    COND_VALUE,
+    CHAIN_NAME,
+    CHAIN_NAME2,
+    UNIT,
+    TEST_NO,
+    DISPLAY_ORDER,
+    CREATE_USER,
+    CREATE_TIME,
+    UPDATE_USER,
+    UPDATE_TIME)
+VALUES
+    (ET_ITEM_SEQ.NEXTVAL,
+    :factory,
+    :device_id,
+    :item_name,
+    :para_name,
+    :cond_value,
+    :chain_name,
+    :chain_name2,
+    :unit,
+    TO_NUMBER(:test_no),
+    TO_NUMBER(:display_order),
+    :create_user,
+    SYSDATE,
+    :update_user,
+    SYSDATE)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="120">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="200">:device_id</param>
+            <param direction="Input" dbtype="VarChar" size="800">:item_name</param>
+            <param direction="Input" dbtype="VarChar" size="200">:para_name</param>
+            <param direction="Input" dbtype="VarChar" size="80">:cond_value</param>
+            <param direction="Input" dbtype="VarChar" size="256">:chain_name</param>
+            <param direction="Input" dbtype="VarChar" size="256">:chain_name2</param>
+            <param direction="Input" dbtype="VarChar" size="40">:unit</param>
+            <param direction="Input" dbtype="VarChar" size="20">:test_no</param>
+            <param direction="Input" dbtype="VarChar" size="20">:display_order</param>
+            <param direction="Input" dbtype="VarChar" size="30">:create_user</param>
+            <param direction="Input" dbtype="VarChar" size="30">:update_user</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ET_ITEM" commandtype="Text" description="Device 의 측정 항목 목록 (등록 순)" commandtimeout="60">
+        <commandtext><![CDATA[SELECT ET_ITEM_SEQ, ITEM_NAME, PARA_NAME, COND_VALUE, CHAIN_NAME, CHAIN_NAME2, UNIT, TEST_NO, DISPLAY_ORDER
+  FROM TQP_GDS_ET_ITEM
+ WHERE FACTORY = :factory
+   AND DEVICE_ID = :device_id
+ ORDER BY DISPLAY_ORDER, ET_ITEM_SEQ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="120">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="200">:device_id</param>
+        </parameters>
+    </query>
+</queryxml>

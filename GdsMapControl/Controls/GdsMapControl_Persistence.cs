@@ -106,6 +106,7 @@ namespace NexplantQMS.GdsMap
                     : item.Source is GdsPath ? "PATH" : "TEXT",
                 Closed = item.Closed,
                 PathWidth = item.Width,
+                PathType = (item.Source as GdsPath)?.PathType ?? 0,
                 Bounds = item.WorldBounds,
                 Text = item.Text,
                 TextType = text == null ? (int?)null : text.TextType,

@@ -14,7 +14,7 @@ namespace NexplantQMS.GdsMap.Persistence
     {
         private static readonly Encoding Utf8 = new UTF8Encoding(false, true);
 
-        /// <summary>형식 v1 배치를 검증하고 도형 목록을 복원한다. 한 번에 한 배치만 메모리에 올린다.</summary>
+        /// <summary>형식 v2 배치를 검증하고 도형 목록을 복원한다. 한 번에 한 배치만 메모리에 올린다.</summary>
         public static MapPlacedElementBatch Read(byte[] payload, string expectedSha256,
             int maxPayloadBytes = 8 * 1024 * 1024, int maxElements = 2000)
         {
@@ -90,6 +90,7 @@ namespace NexplantQMS.GdsMap.Persistence
             string elementType = ReadString(reader);
             byte closed = reader.ReadByte();
             double width = reader.ReadDouble();
+            byte pathType = reader.ReadByte();
             double minX = reader.ReadDouble();
             double minY = reader.ReadDouble();
             double maxX = reader.ReadDouble();
@@ -105,6 +106,7 @@ namespace NexplantQMS.GdsMap.Persistence
                 || String.IsNullOrEmpty(sourceId) || sourceId.Length > 512
                 || (elementType != "BOUNDARY" && elementType != "PATH" && elementType != "TEXT")
                 || closed > 1 || !IsFinite(width) || width < 0
+                || (elementType != "PATH" && pathType != 0)
                 || !IsFinite(minX) || !IsFinite(minY) || !IsFinite(maxX) || !IsFinite(maxY)
                 || minX > maxX || minY > maxY
                 || pointCount <= 0 || pointCount > (reader.BaseStream.Length - reader.BaseStream.Position) / 16L)
@@ -129,6 +131,7 @@ namespace NexplantQMS.GdsMap.Persistence
                 ElementType = elementType,
                 Closed = closed == 1,
                 PathWidth = width,
+                PathType = pathType,
                 Bounds = new GBox(minX, minY, maxX, maxY),
                 Text = text,
                 TextType = textType,

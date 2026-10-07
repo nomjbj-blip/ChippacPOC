@@ -6,7 +6,7 @@ namespace DACrux.SEMDMS.DSL
 {
     /// <summary>
     /// TQP_GDS_CHAIN의 Oracle XML 쿼리를 호출하는 DB 접근 클래스다.
-    /// Device의 Chain 마스터를 담당한다. 현재는 Device 데이터 삭제 시 Chain 전체 삭제(DELETE_CHAIN)만 쓴다.
+    /// Device의 Chain 마스터를 담당한다. Device 삭제 시 Chain 전체 삭제(DELETE_CHAIN), 2026-10-06 CLAUDE-024부터 Chain 저장 / 조회 / 1건 삭제에도 쓴다.
     /// </summary>
     public class TQP_GDS_CHAIN : Miracom.Middleware.QueryComponent
     {

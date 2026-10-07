@@ -1932,4 +1932,147 @@ ORDER BY A.STEP_ID, A.WAFER_ID ]]></commandtext>
             <param direction="Input" dbtype="VarChar" size="0" value="LOT_ID">:LOT_ID</param>
         </parameters>
     </query>
+    <!-- 2026-10-07 CLAUDE-031 (F08 KLARF 업로드) 추가: TQD_INSP_INFO.SUMMARY_FLAG 는 NOT NULL(기본값 없음)인데 기존 CREATE_INSP_INFO_PARSE 는 이 컬럼을 넣지 않아
+         ORA-01400 이 난다(Probe 실측). 같은 INSERT 에 기존 81행과 같은 값 ' '(공백 1자)만 더한 업로드용 쿼리. 기존 쿼리는 그대로 둔다. -->
+    <query statement="Insert" queryid="CREATE_INSP_INFO_KLARF_UPLOAD" description="KLARF 업로드 INSP_INFO 생성 (CREATE_INSP_INFO_PARSE + SUMMARY_FLAG)" commandtype="Text" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQD_INSP_INFO
+( STEP_SEQ,      
+  WAFER_SEQ,        
+  RESULTTIMESTAMP,
+  FILETIMESTAMP,  
+  FACTORY, 
+  TECHNOLOGY,  
+  PRODUCT,   
+  LOT_ID,    
+  WAFER_ID ,    
+  STEP_ID ,     
+  TEST  ,        
+  SLOT_ID,        
+  SETUP_SEQ,      
+  STATUS ,       
+  MAIN_EQ,        
+  ROUTE ,       
+  OPER ,           
+  INSPECTION_EQ,    
+  INSPECTION_PARAM,
+  DEFECTS,     
+  CLASSIFIED_DEFECTS ,
+  KILLER_DEFECTS,  
+  RANDOM_DEFECTS,   
+  ADDER_KILLER_DEFECT,
+  ADDER_RANDOM_DEFECT,
+  CLUSTERS,       
+  ADDER_CLUSTERS ,    
+  CLUSTER_AREA ,    
+  DEFECT_DD,      
+  KILLER_DEFECT_DD,
+  RANDOM_DEFECT_DD,  
+  INSPECTED_DIE,    
+  DEFECTIVE_DIE ,    
+  ADDER_DEF_DIE ,    
+  KILL_DEF_DIE ,    
+  KILL_ADDER_DEF_DIE,
+  IMAGES  ,      
+  SCAN_AREA ,     
+  ADDER_DEFECTS ,    
+  KILL_RND_DEFECTS,
+  "COMMENT",
+  RETICLE_ID,     
+  INTERLOCK_FLAG ,   
+  STEPPER_EQ,
+  SUMMARY_FLAG )
+ VALUES(
+:step_seq
+,:wafer_seq
+,TO_TIMESTAMP(:resulttimestamp,'YYYYMMDD HH24:MI:SS')
+,TO_TIMESTAMP(:filetimestamp,'YYYYMMDD HH24:MI:SS')
+,:factory
+,:technology
+,:product
+,:lot_id
+,:wafer_id
+,:step_id
+,:test
+,:slot_id
+,:setup_seq
+,:status
+,NVL(:main_eq,'UNKNOWN')
+,:route
+,:oper
+,:inspection_eq
+,:inspection_param
+,:defects
+,:classified_defects
+,:killer_defects
+,:random_defects
+,:adder_killer_defect
+,:adder_random_defect
+,:clusters
+,:adder_clusters
+,:cluster_area
+,:defect_dd
+,:killer_defect_dd
+,:random_defect_dd
+,:inspected_die
+,:defective_die
+,:adder_def_die
+,:kill_def_die
+,:kill_adder_def_die
+,:images
+,:scan_area
+,:adder_defects
+,:kill_rnd_defects
+,:commnt
+,:reticle_id
+,:interlock
+,:stepper_eq
+,' ')
+]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="0">:step_seq</param>
+            <param direction="Input" dbtype="VarChar" size="0">:wafer_seq</param>
+            <param direction="Input" dbtype="VarChar" size="0">:resulttimestamp</param>
+            <param direction="Input" dbtype="VarChar" size="0">:filetimestamp</param>
+            <param direction="Input" dbtype="VarChar" size="0">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="0">:technology</param>
+            <param direction="Input" dbtype="VarChar" size="0">:product</param>
+            <param direction="Input" dbtype="VarChar" size="0">:lot_id</param>
+            <param direction="Input" dbtype="VarChar" size="0">:wafer_id</param>
+            <param direction="Input" dbtype="VarChar" size="0">:step_id</param>
+            <param direction="Input" dbtype="VarChar" size="0">:test</param>
+            <param direction="Input" dbtype="VarChar" size="0">:slot_id</param>
+            <param direction="Input" dbtype="VarChar" size="0">:setup_seq</param>
+            <param direction="Input" dbtype="VarChar" size="0">:status</param>
+            <param direction="Input" dbtype="VarChar" size="0">:main_eq</param>
+            <param direction="Input" dbtype="VarChar" size="0">:route</param>
+            <param direction="Input" dbtype="VarChar" size="0">:oper</param>
+            <param direction="Input" dbtype="VarChar" size="0">:inspection_eq</param>
+            <param direction="Input" dbtype="VarChar" size="0">:inspection_param</param>
+            <param direction="Input" dbtype="VarChar" size="0">:defects</param>
+            <param direction="Input" dbtype="VarChar" size="0">:classified_defects</param>
+            <param direction="Input" dbtype="VarChar" size="0">:killer_defects</param>
+            <param direction="Input" dbtype="VarChar" size="0">:random_defects</param>
+            <param direction="Input" dbtype="VarChar" size="0">:adder_killer_defect</param>
+            <param direction="Input" dbtype="VarChar" size="0">:adder_random_defect</param>
+            <param direction="Input" dbtype="VarChar" size="0">:clusters</param>
+            <param direction="Input" dbtype="VarChar" size="0">:adder_clusters</param>
+            <param direction="Input" dbtype="VarChar" size="0">:cluster_area</param>
+            <param direction="Input" dbtype="VarChar" size="0">:defect_dd</param>
+            <param direction="Input" dbtype="VarChar" size="0">:killer_defect_dd</param>
+            <param direction="Input" dbtype="VarChar" size="0">:random_defect_dd</param>
+            <param direction="Input" dbtype="VarChar" size="0">:inspected_die</param>
+            <param direction="Input" dbtype="VarChar" size="0">:defective_die</param>
+            <param direction="Input" dbtype="VarChar" size="0">:adder_def_die</param>
+            <param direction="Input" dbtype="VarChar" size="0">:kill_def_die</param>
+            <param direction="Input" dbtype="VarChar" size="0">:kill_adder_def_die</param>
+            <param direction="Input" dbtype="VarChar" size="0">:images</param>
+            <param direction="Input" dbtype="VarChar" size="0">:scan_area</param>
+            <param direction="Input" dbtype="VarChar" size="0">:adder_defects</param>
+            <param direction="Input" dbtype="VarChar" size="0">:kill_rnd_defects</param>
+            <param direction="Input" dbtype="VarChar" size="0">:commnt</param>
+            <param direction="Input" dbtype="VarChar" size="0">:reticle_id</param>
+            <param direction="Input" dbtype="VarChar" size="0">:interlock</param>
+            <param direction="Input" dbtype="VarChar" size="0">:stepper_eq</param>
+        </parameters>
+    </query>
 </queryxml>

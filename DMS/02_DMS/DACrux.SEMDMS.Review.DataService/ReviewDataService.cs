@@ -68,7 +68,7 @@ namespace DACrux.SEMDMS.Review.DataService
 
                         //FAB1 의 경우 Step ID 를 8자리로 사용한다.
                         //8자리가 아닌 경우 Setup 정보의 _이후 8자리를 사용 한다.
-                        if (Factory == "FAB1" && parser.StepID.Length != 8)
+                        if (parser.StepID.Length != 8)
                         {
                             //Ex) StepID "AMTDL_1439TRET"
                             string[] strStepInfo = parser.SetupID.Split(new string[] { "_" }, StringSplitOptions.RemoveEmptyEntries);

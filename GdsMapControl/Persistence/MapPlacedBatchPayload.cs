@@ -11,7 +11,7 @@ namespace NexplantQMS.GdsMap.Persistence
     /// </summary>
     public sealed class MapPlacedBatchPayload
     {
-        public const int FormatVersion = 1;
+        public const int FormatVersion = 2;
         private static readonly Encoding Utf8 = new UTF8Encoding(false, true);
         public string JobId { get; private set; }
         public string MapRevisionId { get; private set; }
@@ -25,7 +25,7 @@ namespace NexplantQMS.GdsMap.Persistence
         private MapPlacedBatchPayload() { }
 
         /// <summary>
-        /// 형식 v1로 한 배치를 직렬화하고 실제 요청 본문 크기를 검사한다.
+        /// 형식 v2로 한 배치를 직렬화하고 실제 요청 본문 크기를 검사한다.
         /// 반환된 본문은 압축이나 Base64 변환 없이 바이너리 그대로 전송하는 계약이다.
         /// </summary>
         public static MapPlacedBatchPayload Create(MapPlacedElementBatch batch,
@@ -45,7 +45,7 @@ namespace NexplantQMS.GdsMap.Persistence
             using (var stream = new MemoryStream((int)Math.Min(batch.EstimatedBytes, maxPayloadBytes)))
             using (var writer = new BinaryWriter(stream, Utf8))
             {
-                // GMP1 / 버전 / 배치 번호 / 도형 수 / 좌표 수 뒤에 도형 데이터를 순서대로 기록한다.
+            // GMP1 / 버전 / 배치 번호 / 도형 수 / 좌표 수 뒤에 도형 데이터를 순서대로 기록한다.
                 writer.Write(new byte[] { (byte)'G', (byte)'M', (byte)'P', (byte)'1' });
                 writer.Write(FormatVersion);
                 writer.Write(batch.BatchNo);
@@ -97,6 +97,7 @@ namespace NexplantQMS.GdsMap.Persistence
             WriteString(writer, element.ElementType);
             writer.Write(element.Closed);
             writer.Write(element.PathWidth);
+            writer.Write(element.PathType);
             writer.Write(element.Bounds.MinX);
             writer.Write(element.Bounds.MinY);
             writer.Write(element.Bounds.MaxX);

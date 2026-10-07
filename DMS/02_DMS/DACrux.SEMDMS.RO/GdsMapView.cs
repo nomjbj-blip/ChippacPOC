@@ -76,6 +76,18 @@ namespace DACrux.SEMDMS.RO
             }
         }
 
+        public DataTable GetMapTextIndex(string strFactory, string strDeviceID)
+        {
+            try
+            {
+                return m_OBJ.GetMapTextIndex(strFactory, strDeviceID);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         #endregion
     }
 }

@@ -1,4 +1,5 @@
--- Device 기준 Map 저장을 위한 신규 테이블 초안이다.
+-- 과거 Device 기준 Map 저장 초안이다. 실행하지 않는다.
+-- DMSMGR에는 2026-10-01_tqp_gds_map_schema.sql / 2026-10-01_tqp_gds_chain_schema.sql을 적용했다.
 -- 기존 GDS_ELEMENT는 수정하지 않는다. 실제 Device 마스터 키/권한 확인 뒤 적용한다.
 -- 이 파일은 실행하지 않은 설계 산출물이며 Chain 테이블은 다음 단계에서 추가한다.
 -- 대량 전송은 DRAFT 개정본에 배치별로 적재하고, 검증 후 READY로 전환한다.

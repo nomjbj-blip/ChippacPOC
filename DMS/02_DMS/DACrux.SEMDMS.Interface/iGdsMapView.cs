@@ -45,6 +45,12 @@ namespace DACrux.SEMDMS.Interface
         /// </summary>
         DataTable GetPlacedElementPage(string strFactory, string strDeviceID, string strLayerID, string strAfterPlacedID, int iMaxRows);
 
+        /// <summary>
+        /// Label 검색 색인(2026-10-07 CLAUDE-032): READY Map의 TEXT 도형 전체를 Layer와 무관하게 조회한다(속성 기준 = ELEMENT_TYPE TEXT).
+        /// 반환 열: PLACED_ELEMENT_ID / LAYER_ID / TEXT_TYPE / TEXT_VALUE / MIN_X / MIN_Y (TEXT는 점 하나라 MIN = 위치, 저장 기준 좌표)
+        /// </summary>
+        DataTable GetMapTextIndex(string strFactory, string strDeviceID);
+
         #endregion
     }
 }

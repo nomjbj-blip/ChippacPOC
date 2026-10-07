@@ -13,8 +13,10 @@ using System.Windows.Forms;
 namespace NexplantQMS.GdsMap
 {
     /// <summary>
-    /// DB에 저장된 GDS Map(READY)을 GDS 파일 없이 조회하는 화면이다.
-    /// 설계: 문서/2026-10-02_GDS_Map_조회화면_설계.md 3절 / 15절. 등록 화면(GdsMapForm)과 분리한 읽기 전용 화면이며 DB를 바꾸지 않는다.
+    /// DB에 저장된 GDS Map(READY)을 GDS 파일 없이 조회하고, Chain을 설정해 DB에 반영하는 화면이다.
+    /// 설계: 문서/2026-10-02_GDS_Map_조회화면_설계.md 3절 / 15절, 문서/2026-10-06_GDS_Map_화면역할_재정의_설계.md.
+    /// 2026-10-06 사용자 결정(CLAUDE-026): Chain 설정 / Chain DB 반영은 이 화면에서 한다(Chain 동작은 GdsMapViewForm_Chain*.cs).
+    /// Map 도형(LAYER / SOURCE / PLACED)은 바꾸지 않고 Chain 테이블만 저장한다.
     /// DACrux 메뉴(frmGdsMapView)가 이 EXE를 같은 프로세스에 올려 표시하므로 DMS Service(RO GdsMapView)를 호출할 수 있다.
     /// 2026-10-02 리비전 관리 제거(CLAUDE-017): Map은 Factory + Device(제품)당 1개이므로 Revision 선택 단계가 없다.
     ///
@@ -38,32 +40,114 @@ namespace NexplantQMS.GdsMap
         private string _loadSummary;
         /// <summary>현재 선택한 Device의 READY Map 정보. 없거나 READY가 아니면 null.</summary>
         private MapItem _currentMap;
+        /// <summary>지금 도면에 그려진 Map. Chain 저장 대상이다(Device 선택만 바꾸고 조회하지 않은 Map과 구분).</summary>
+        private MapItem _shownMap;
+        /// <summary>
+        /// Front / Back 보기(2026-10-07 CLAUDE-030): 지금 화면 기준과 그 기준으로 변환된 화면 도형 목록 / 색상.
+        /// 보기 기준을 바꾸면 DB를 다시 읽지 않고 이 목록을 좌우 반전(GdsSideTransform)해 다시 그린다.
+        /// </summary>
+        private string _displaySide = GdsSideTransform.Front;
+        private List<MapPlacedElementData> _shownItems;
+        private Dictionary<int, Color> _shownColors;
+        private bool _changingViewSide;
 
         public GdsMapViewForm()
         {
             InitializeComponent();
+            InitializeChainSetupState();
+            InitializeLabelSearchState();
+            // 보기 기준 기본값: 원본 Front side(2026-10-07 사용자 결정).
+            _changingViewSide = true;
+            cboViewSide.SelectedIndex = 0;
+            _changingViewSide = false;
+        }
+
+        /// <summary>콤보에서 고른 보기 기준(0 Front / 1 Back).</summary>
+        private string SelectedViewSide
+        {
+            get { return cboViewSide.SelectedIndex == 1 ? GdsSideTransform.Back : GdsSideTransform.Front; }
+        }
+
+        /// <summary>
+        /// 보기 기준 변경. 도면이 없으면 다음 [조회]에 적용한다.
+        /// 처리 흐름: 편집 중 Chain 보관 -> 화면 도형 목록 좌우 반전 -> 다시 그리기 -> 탐색 캐시 재연결 -> Chain 좌표 사본 반전 -> Chain 다시 연결.
+        /// Chain 소속(도형 ID) / DB 데이터 / 저장 지문은 바뀌지 않는다.
+        /// </summary>
+        private void cboViewSide_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (_changingViewSide) return;
+            string view = SelectedViewSide;
+            if (_shownItems == null || _shownMap == null || view == _displaySide)
+            {
+                SetStatus("보기 기준: " + GdsSideTransform.Text(view) + (_shownItems == null ? " (다음 [조회]에 적용)" : ""));
+                return;
+            }
+            var watch = Stopwatch.StartNew();
+            CaptureActiveChain();
+            List<MapPlacedElementData> items = GdsSideTransform.MirrorAll(_shownItems);
+            map.ShowPlacedElements(_shownMap.TopStructure, _shownColors, items);
+            ApplyLoadedLayerVisibility();
+            _shownItems = items;
+            _displaySide = view;
+            map.RebuildChainTraceItems();
+            MirrorChainsForSideChange();
+            ReattachChainsAfterMapReload();
+            // Label 검색 결과도 새 기준 X로 다시 표시한다(CLAUDE-032).
+            RefreshLabelResultsForSide();
+            UpdateMapInfoText();
+            SetStatus("보기 기준: " + GdsSideTransform.Text(view) + " / 전환 " + watch.Elapsed.TotalSeconds.ToString("0.0") + "초 (도형 "
+                + items.Count.ToString("N0") + ", DB 다시 읽지 않음)");
+        }
+
+        /// <summary>다시 그린 지도에 Layer 목록의 표시 체크를 다시 적용한다(ShowPlacedElements는 모든 Layer를 보이게 만든다).</summary>
+        private void ApplyLoadedLayerVisibility()
+        {
+            var visibility = new Dictionary<int, bool>();
+            foreach (LayerDisplayItem item in chkLayerItems.Items)
+                if (_loadedLayers.Contains(item.LayerId))
+                    visibility[item.LayerId] = chkLayerItems.CheckedItems.Contains(item);
+            if (visibility.Count > 0) map.SetLayerVisibility(visibility);
+        }
+
+        /// <summary>Map 정보에 저장 기준 / 보기 기준을 함께 보여 준다.</summary>
+        private void UpdateMapInfoText()
+        {
+            MapItem item = _shownMap ?? _currentMap;
+            if (item == null) return;
+            lblMapInfo.Text = item.Describe() + "\r\n보기 기준: " + GdsSideTransform.Text(_shownMap != null ? _displaySide : SelectedViewSide);
         }
 
         /// <summary>DACrux 호스트(frmGdsMapView)가 사용하는 생성자. 등록 화면과 같은 형식으로 맞춘다.</summary>
         public GdsMapViewForm(bool hostedByDms) : this()
         {
+            // Chain DB 저장은 DMS Service(RO) 연결 정보가 있는 DACrux 안에서만 가능하므로 호스트 모드에서만 보인다.
+            InitializeChainDbState(hostedByDms);
         }
 
         #region [조회 조건]
 
-        /// <summary>화면이 보인 뒤 READY Map이 있는 Factory / Device 목록을 읽는다.</summary>
+        /// <summary>
+        /// 이 화면의 Factory. 2026-10-07 사용자 지시: 화면에서 고르지 않고 DACrux 로그인 Factory(DACrux.Base.GlobalVariable.Factory)를 쓴다.
+        /// 화면을 열 때 한 번 읽는다(열려 있는 동안 Device 목록과 Factory가 어긋나지 않게).
+        /// </summary>
+        private string _factory = string.Empty;
+
+        /// <summary>화면이 보인 뒤 로그인 Factory의 READY Map Device 목록을 읽는다.</summary>
         private async void GdsMapViewForm_Shown(object sender, EventArgs e)
         {
-            SetStatus("Device 목록 조회 중");
+            HookCloseConfirmation();
+            _factory = DmsHostContext.Factory;
+            if (_factory.Length == 0)
+            {
+                SetStatus("Factory 정보가 없습니다. DACrux에 로그인한 상태에서 메뉴로 여세요.");
+                return;
+            }
+            SetStatus("Device 목록 조회 중 (Factory " + _factory + ")");
             try
             {
                 _deviceTable = await Task.Run(() => new DACrux.SEMDMS.RO.GdsMapView().GetMapDeviceList());
-                cboFactory.Items.Clear();
-                foreach (string factory in _deviceTable.Rows.Cast<DataRow>()
-                    .Select(r => r["FACTORY"].ToString()).Distinct().OrderBy(f => f, StringComparer.Ordinal))
-                    cboFactory.Items.Add(factory);
-                if (cboFactory.Items.Count > 0) cboFactory.SelectedIndex = 0;
-                SetStatus(cboFactory.Items.Count == 0 ? "조회 가능한 GDS Map이 없습니다." : "Device를 선택하세요.");
+                FillDeviceList();
+                SetStatus(cboDevice.Items.Count == 0 ? "Factory " + _factory + "에 조회 가능한 GDS Map이 없습니다." : "Device를 선택하세요. (Factory " + _factory + ")");
             }
             catch (Exception ex)
             {
@@ -71,27 +155,62 @@ namespace NexplantQMS.GdsMap
             }
         }
 
-        /// <summary>Factory가 바뀌면 그 Factory의 Device만 목록에 넣는다.</summary>
-        private void cboFactory_SelectedIndexChanged(object sender, EventArgs e)
+        private Form _closeHookForm;
+
+        /// <summary>
+        /// 화면을 닫을 때 저장하지 않은 Chain 변경을 확인한다(2026-10-06 CLAUDE-026 2단계).
+        /// DMS에서는 이 Form이 호스트(frmGdsMapView) 안에 TopLevel = false로 붙으므로 자기 FormClosing이 오지 않는다.
+        /// 그래서 실제로 닫히는 바깥 Form(호스트, 단독 실행이면 자기 자신)의 FormClosing을 구독한다. DACrux 종료(MDI 닫기)도 여기로 온다.
+        /// </summary>
+        private void HookCloseConfirmation()
         {
-            FillDeviceList();
+            Form owner = TopLevel ? this : (Parent == null ? null : Parent.FindForm());
+            if (owner == null || ReferenceEquals(owner, _closeHookForm)) return;
+            if (_closeHookForm != null) _closeHookForm.FormClosing -= CloseHookForm_FormClosing;
+            _closeHookForm = owner;
+            _closeHookForm.FormClosing += CloseHookForm_FormClosing;
         }
 
-        /// <summary>Factory를 직접 입력하고 Enter를 누르면 Device 목록을 다시 채운다.</summary>
-        private void cboFactory_KeyDown(object sender, KeyEventArgs e)
+        private void CloseHookForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (e.KeyCode == Keys.Enter) FillDeviceList();
+            if (e.Cancel || IsDisposed) return;
+            if (!ConfirmDiscardUnsavedChains("화면을 닫으"))
+                e.Cancel = true;
         }
 
+        /// <summary>조회 조건을 되돌리는 동안 콤보 이벤트를 무시한다.</summary>
+        private bool _restoringCondition;
+
+        /// <summary>
+        /// Device를 바꾸기 전에 저장하지 않은 Chain 변경을 확인한다(2026-10-06 CLAUDE-026 2단계, 설계 4.2절).
+        /// [아니오]면 콤보를 지금 도면의 Device로 되돌리고 false를 돌려준다.
+        /// [예]면 이후 ClearMapInfo에서 Chain이 비워지므로 같은 변경 중 Device 이벤트가 다시 묻지 않는다.
+        /// </summary>
+        private bool ConfirmConditionChange()
+        {
+            if (_restoringCondition) return false;
+            if (_shownMap == null || ConfirmDiscardUnsavedChains("다른 Device를 선택")) return true;
+            _restoringCondition = true;
+            try
+            {
+                cboDevice.Text = _shownMap.DeviceId;
+            }
+            finally
+            {
+                _restoringCondition = false;
+            }
+            return false;
+        }
+
+        /// <summary>로그인 Factory의 Device만 목록에 넣는다.</summary>
         private void FillDeviceList()
         {
             cboDevice.Items.Clear();
             cboDevice.Text = string.Empty;
             ClearMapInfo();
             if (_deviceTable == null) return;
-            string factory = cboFactory.Text.Trim();
             foreach (DataRow row in _deviceTable.Rows)
-                if (string.Equals(row["FACTORY"].ToString(), factory, StringComparison.Ordinal))
+                if (string.Equals(row["FACTORY"].ToString(), _factory, StringComparison.Ordinal))
                     cboDevice.Items.Add(row["DEVICE_ID"].ToString());
             if (cboDevice.Items.Count > 0) cboDevice.SelectedIndex = 0;
         }
@@ -99,13 +218,14 @@ namespace NexplantQMS.GdsMap
         /// <summary>Device를 고르면 Map 정보와 Layer 목록을 읽는다.</summary>
         private void cboDevice_SelectedIndexChanged(object sender, EventArgs e)
         {
+            if (!ConfirmConditionChange()) return;
             LoadMapInfo();
         }
 
         /// <summary>목록에 없는 Device를 직접 입력하고 Enter를 누르면 Map 정보를 읽는다.</summary>
         private void cboDevice_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.Enter) LoadMapInfo();
+            if (e.KeyCode == Keys.Enter && ConfirmConditionChange()) LoadMapInfo();
         }
 
         /// <summary>
@@ -115,7 +235,7 @@ namespace NexplantQMS.GdsMap
         private async void LoadMapInfo()
         {
             ClearMapInfo();
-            string factory = cboFactory.Text.Trim();
+            string factory = _factory;
             string device = cboDevice.Text.Trim();
             if (factory.Length == 0 || device.Length == 0) return;
             SetStatus("Map 정보 조회 중");
@@ -123,7 +243,7 @@ namespace NexplantQMS.GdsMap
             {
                 var service = new DACrux.SEMDMS.RO.GdsMapView();
                 DataTable info = await Task.Run(() => service.GetMapInfo(factory, device));
-                if (factory != cboFactory.Text.Trim() || device != cboDevice.Text.Trim()) return;
+                if (device != cboDevice.Text.Trim()) return;
                 if (info.Rows.Count == 0)
                 {
                     lblMapInfo.Text = "등록된 GDS Map이 없습니다.";
@@ -139,7 +259,7 @@ namespace NexplantQMS.GdsMap
                 }
 
                 DataTable layers = await Task.Run(() => service.GetMapLayerList(factory, device));
-                if (factory != cboFactory.Text.Trim() || device != cboDevice.Text.Trim()) return;
+                if (device != cboDevice.Text.Trim()) return;
                 _updatingLayerChecks = true;
                 chkLayerItems.BeginUpdate();
                 try
@@ -169,6 +289,12 @@ namespace NexplantQMS.GdsMap
         private void ClearMapInfo()
         {
             _currentMap = null;
+            _shownMap = null;
+            _shownItems = null;
+            _shownColors = null;
+            // 다른 Device로 바뀌면 이전 도면의 Chain 편집 상태를 비운다(미저장 변경은 ConfirmConditionChange에서 먼저 확인).
+            ResetChainSetupAfterMapLoad(false);
+            ClearLabelIndex();
             lblMapInfo.Text = "Device를 선택하세요.";
             ClearLayerList();
         }
@@ -207,9 +333,59 @@ namespace NexplantQMS.GdsMap
                 return;
             }
 
+            // Chain(3단계): 다른 Map이면 도면을 그리기 전에 DB Chain을 읽고, 같은 Map이면 화면 Chain을 쓴다.
+            // Chain이 쓰는 Layer가 조회 체크에 없으면 함께 조회할지 묻는다(사용자 결정 3).
+            bool sameMap = _shownMap != null && _shownMap.Factory == target.Factory && _shownMap.DeviceId == target.DeviceId;
+            List<ChainDbData> dbChains = null;
+            if (!sameMap && _chainDbEnabled)
+            {
+                SetStatus("저장된 Chain 조회 중");
+                btnSearch.Enabled = false;
+                try
+                {
+                    var chainProgress = new Progress<string>(SetStatus);
+                    dbChains = await Task.Run(() => ReadDbChains(target.Factory, target.DeviceId, chainProgress));
+                }
+                catch (Exception ex)
+                {
+                    ShowError("저장된 Chain 조회", ex);
+                }
+                finally
+                {
+                    btnSearch.Enabled = true;
+                }
+            }
+            // Label 검색 색인(CLAUDE-032 사용자 결정 5): 다른 Map이면 [조회] 때 함께 받는다. 실패해도 도면은 조회하고 검색만 막는다.
+            GdsLabelIndex labelIndex = null;
+            string labelIndexError = null;
+            if (!sameMap)
+            {
+                SetStatus("Label 색인 조회 중");
+                btnSearch.Enabled = false;
+                try
+                {
+                    labelIndex = await Task.Run(() => ReadLabelIndex(target.Factory, target.DeviceId));
+                }
+                catch (Exception ex)
+                {
+                    labelIndexError = ex.Message;
+                }
+                finally
+                {
+                    btnSearch.Enabled = true;
+                }
+            }
+            bool layersAdded = sameMap
+                ? ConfirmChainLayers(MemoryChainLayers(), "화면의 Chain")
+                : dbChains != null && dbChains.Count > 0 && ConfirmChainLayers(dbChains.SelectMany(c => c.NeededLayers), "저장된 Chain " + dbChains.Count + "개");
+            if (layersAdded)
+                layers = chkLayerItems.CheckedItems.Cast<LayerDisplayItem>().ToList();
+
             long total = layers.Sum(l => _layerCounts.ContainsKey(l.LayerId) ? _layerCounts[l.LayerId] : 0);
             var colors = layers.ToDictionary(l => l.LayerId, l => l.Color);
             var progress = new Progress<long>(received => ReportLoadProgress(received, total));
+            // 지도를 다시 그리기 전에 편집 중인 Chain 상태를 Chain 정의에 보관한다.
+            CaptureActiveChain();
             _loadCancel = new CancellationTokenSource();
             CancellationToken token = _loadCancel.Token;
             SetLoading(true);
@@ -220,12 +396,33 @@ namespace NexplantQMS.GdsMap
                     () => LoadPlacedElements(target.Factory, target.DeviceId, layers.Select(l => l.LayerId).ToList(), progress, token));
                 double dbSeconds = watch.Elapsed.TotalSeconds;
 
+                // 보기 기준(CLAUDE-030): DB 좌표는 저장 기준. 고른 보기 기준과 다르면 좌우 반전해 그린다.
+                string view = SelectedViewSide;
+                if (GdsSideTransform.NeedsMirror(target.ViewSide, view))
+                    items = GdsSideTransform.MirrorAll(items);
+
                 watch.Restart();
                 map.ShowPlacedElements(target.TopStructure, colors, items);
                 double buildSeconds = watch.Elapsed.TotalSeconds;
 
                 _loadedLayers.Clear();
                 foreach (var layer in layers) _loadedLayers.Add(layer.LayerId);
+                // 같은 Map을 다시 조회(Layer 추가 / 변경)했으면 Chain 목록과 편집 내용을 유지하고 새 지도에 다시 연결한다.
+                // 다른 Map이면 Chain 설정을 새로 시작하고 DB Chain을 불러온다. (2026-10-06 CLAUDE-026 2·3단계)
+                _shownMap = target;
+                _shownItems = items;
+                _shownColors = colors;
+                _displaySide = view;
+                UpdateMapInfoText();
+                if (sameMap)
+                    ReattachChainsAfterMapReload();
+                else
+                {
+                    ResetChainSetupAfterMapLoad(true);
+                    if (dbChains != null && dbChains.Count > 0)
+                        LoadChainsFromDb(dbChains);
+                    ReplaceLabelIndex(labelIndex, labelIndexError);
+                }
                 // 목록 문구(미조회 표시)를 새 기준으로 다시 그린다.
                 chkLayerItems.Refresh();
                 _loadSummary = "조회 완료: " + target.Factory + " / " + target.DeviceId + " / 도형 " + items.Count.ToString("N0")
@@ -299,12 +496,27 @@ namespace NexplantQMS.GdsMap
         /// <summary>조회 중에는 조건 / 옵션 / Layer 체크를 막는다.</summary>
         private void SetLoading(bool loading)
         {
-            cboFactory.Enabled = cboDevice.Enabled = !loading;
+            cboDevice.Enabled = !loading;
             btnSearch.Enabled = !loading;
             btnStop.Enabled = loading;
             chkLayerItems.Enabled = btnLayerAll.Enabled = btnLayerNone.Enabled = !loading;
             progressLoad.Value = 0;
             progressLoad.Visible = loading;
+            cboViewSide.Enabled = !loading;
+            // Label 검색은 조회 중 막고, 끝나면 색인이 있을 때만 연다(CLAUDE-032).
+            SetLabelSearchEnabled(!loading);
+            // 조회 중에는 Chain 조작을 막는다. 조회가 끝나면 ResetChainSetupAfterMapLoad 또는 아래에서 다시 연다.
+            if (loading)
+            {
+                SetChainButtonsEnabled(false);
+                SetChainListButtonsEnabled(false);
+            }
+            else if (map.Structure != null)
+            {
+                SetChainButtonsEnabled(true);
+                SetChainListButtonsEnabled(true);
+                UpdateChainSelectionButtons();
+            }
         }
 
         #endregion
@@ -437,6 +649,8 @@ namespace NexplantQMS.GdsMap
             public string DeviceId { get; private set; }
             public string TopStructure { get; private set; }
             public string Status { get; private set; }
+            /// <summary>DB PLACED / Chain Marker 좌표의 저장 기준(TQP_GDS_MAP.VIEW_SIDE, 없으면 FRONT).</summary>
+            public string ViewSide { get; private set; }
             public bool IsReady { get { return Status == "READY"; } }
             private readonly string _description;
 
@@ -446,8 +660,12 @@ namespace NexplantQMS.GdsMap
                 DeviceId = row["DEVICE_ID"].ToString();
                 TopStructure = row["TOP_STRUCTURE"].ToString();
                 Status = row["MAP_STATUS"].ToString();
+                // 저장 기준(2026-10-06 CLAUDE-027): BACK이면 PLACED가 GDS 원점 기준 좌우 반전 좌표로 저장되어 있다(그대로 그림).
+                string side = GdsSideTransform.Normalize(row.Table.Columns.Contains("VIEW_SIDE") ? row["VIEW_SIDE"].ToString() : null);
+                ViewSide = side;
                 _description = "Factory / Device: " + Factory + " / " + DeviceId
                     + "\r\n상태: " + Status
+                    + "\r\n저장 기준: " + GdsSideTransform.Text(side)
                     + "\r\nGDS 파일: " + row["GDS_FILE_NAME"]
                     + "\r\nTop Structure: " + TopStructure
                     + "\r\nSOURCE: " + FormatCount(row["SOURCE_COUNT"])

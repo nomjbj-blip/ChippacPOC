@@ -184,4 +184,62 @@ AND SETUP_TIME = TO_DATE(:SETUP_TIME,'YYYY-MM-DD HH24:MI:SS')]]></commandtext>
             <param direction="Input" dbtype="VarChar2" size="40" value="SETUP_TIME">:SETUP_TIME</param>
         </parameters>
     </query>
+    <!-- 2026-10-07 CLAUDE-031 (F08 KLARF 업로드) 추가: 기존 CREATE_SETUP_INFO / SELECT_ORIGIN_INDEX 는 :setup_id 를 size 40 으로 바인딩해
+         40자 넘는 SetupID 가 오류 없이 잘린다(실측). TQD_SETUP.SETUP_ID 를 128 로 확대(D2)했으므로 업로드는 size 128 쿼리를 쓴다. 기존 쿼리는 그대로 둔다. -->
+    <query statement="Select" queryid="SELECT_SETUP_SEQ_KLARF_UPLOAD" commandtype="Text" description="KLARF 업로드 Setup Seq 조회 (SETUP_ID 128)" commandtimeout="60">
+        <commandtext><![CDATA[SELECT SETUP_SEQ FROM TQD_SETUP
+WHERE SETUP_ID = :setup_id
+AND STEP_ID = :step_id
+AND SETUP_TIME = TO_TIMESTAMP(:setup_time,'YYYYMMDD HH24:MI:SS')
+ORDER BY SETUP_SEQ DESC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="128" description="setup id">:setup_id</param>
+            <param direction="Input" dbtype="VarChar" size="40" description="step id">:step_id</param>
+            <param direction="Input" dbtype="VarChar" size="40" description="setup time yyyyMMddHHmmss">:setup_time</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="CREATE_SETUP_INFO_KLARF_UPLOAD" commandtype="Text" description="KLARF 업로드 Setup 생성 (CREATE_SETUP_INFO 와 같음, SETUP_ID 128)" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQD_SETUP(SETUP_SEQ ,SETUP_ID,STEP_ID,SETUP_TIME,ANGLE,WAFER_SIZE,NOTCH_TYPE,DIE_PITCH_X,
+DIE_PITCH_Y,DIE_ORIGIN_X,DIE_ORIGIN_Y,ORIGIN_X,ORIGIN_Y)
+VALUES(
+SETUP_SEQ.NEXTVAL
+,:setup_id
+,:step_id
+,TO_TIMESTAMP(:setup_time,'YYYYMMDD HH24:MI:SS')
+,:angle
+,:wafer_size
+,:notch_type
+,:die_pitch_x
+,:die_pitch_y
+,:die_origin_x
+,:die_origin_y
+,:origin_x
+,:origin_y)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="128" description="setup id">:setup_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:step_id</param>
+            <param direction="Input" dbtype="VarChar" size="40">:setup_time</param>
+            <param direction="Input" dbtype="VarChar" size="40">:angle</param>
+            <param direction="Input" dbtype="VarChar" size="40">:wafer_size</param>
+            <param direction="Input" dbtype="VarChar" size="40">:notch_type</param>
+            <param direction="Input" dbtype="VarChar" size="40">:die_pitch_x</param>
+            <param direction="Input" dbtype="VarChar" size="40">:die_pitch_y</param>
+            <param direction="Input" dbtype="VarChar" size="40">:die_origin_x</param>
+            <param direction="Input" dbtype="VarChar" size="40">:die_origin_y</param>
+            <param direction="Input" dbtype="VarChar" size="40">:origin_x</param>
+            <param direction="Input" dbtype="VarChar" size="40">:origin_y</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ORIGIN_INDEX_KLARF_UPLOAD" commandtype="Text" description="KLARF 업로드 저장 Map Origin Die Index 조회 (SELECT_ORIGIN_INDEX 와 같음, SETUP_ID 128)" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DIE_ORIGIN_X, DIE_ORIGIN_Y
+FROM TQD_SETUP
+WHERE SETUP_ID = :SETUP_ID
+AND STEP_ID = :STEP_ID
+AND SETUP_TIME = TO_DATE(:SETUP_TIME,'YYYY-MM-DD HH24:MI:SS')]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="128" value="SETUP_ID">:SETUP_ID</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="STEP_ID">:STEP_ID</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="SETUP_TIME">:SETUP_TIME</param>
+        </parameters>
+    </query>
 </queryxml>

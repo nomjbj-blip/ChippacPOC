@@ -146,7 +146,7 @@ namespace DACrux.Data.Handler
                 parser.Equip = EquipInfo.EquipID;
 
                 // FAB1은 LOT 앞에 A가 붙으면 제거
-                if (EquipInfo.Factory == FAB1 && !String.IsNullOrEmpty(parser.LotID) && (parser.LotID[0] == 'A' || parser.LotID[0] == 'a'))
+                if (!String.IsNullOrEmpty(parser.LotID) && (parser.LotID[0] == 'A' || parser.LotID[0] == 'a'))
                     parser.ChangeLotID(parser.LotID.Substring(1));
 
                 // 파서 리스트에 추가
@@ -172,8 +172,8 @@ namespace DACrux.Data.Handler
                 // 설비ID를 Handler 기준으로 변경
                 parser.Equip = EquipInfo.EquipID;
 
-                // FAB1은 LOT 앞에 A가 붙으면 제거
-                if (EquipInfo.Factory == FAB1 && !String.IsNullOrEmpty(parser.LotID) && (parser.LotID[0] == 'A' || parser.LotID[0] == 'a'))
+                // LOT 앞에 A가 붙으면 제거
+                if (!String.IsNullOrEmpty(parser.LotID) && (parser.LotID[0] == 'A' || parser.LotID[0] == 'a'))
                     parser.ChangeLotID(parser.LotID.Substring(1));
 
                 // 파서 리스트에 추가

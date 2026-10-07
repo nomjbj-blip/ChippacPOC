@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TQP_GDS_CHAIN_MEMBER: Chain 최종 포함 도형. 2026-10-06 Claude CLAUDE-024 추가.
+  ROLE_CODE INPUT 1개(필수) / OUTPUT 0~1개 / MEMBER. INCLUSION_SOURCE TRACE(자동 탐색) / MANUAL(수동 추가) / ENDPOINT(Input / Output).
+  PLACED_ELEMENT_ID는 TQP_GDS_PLACED_EL FK다(CASCADE 아님). Marker 좌표 double은 G17 문자열 + TO_BINARY_DOUBLE, MEMBER는 빈 값(NULL).
+  SELECT_CHAIN_MEMBER 힌트(2026-10-06): Member 통계가 0행일 때 옵티마이저가 PLACED_EL을 Layer 인덱스(IX_GDS_PLACED_LAYER)로
+  Device 전체 범위를 훑으며 ID를 거르는 계획을 골라 Member 1행마다 Device 도형 전체를 읽었다(5,840행 30~120초).
+  PK(FACTORY, DEVICE_ID, PLACED_ELEMENT_ID) 단건 조회로 고정한다.
+-->
+<queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Insert" queryid="CREATE_CHAIN_MEMBER" commandtype="Text" description="Chain 포함 도형 저장 (InsertExecuteMultiple, Marker는 INPUT / OUTPUT만)" commandtimeout="600">
+        <commandtext><![CDATA[INSERT INTO TQP_GDS_CHAIN_MEMBER
+    (FACTORY,
+    DEVICE_ID,
+    CHAIN_SEQ,
+    VERSION_NO,
+    PLACED_ELEMENT_ID,
+    ROLE_CODE,
+    INCLUSION_SOURCE,
+    MARKER_X,
+    MARKER_Y)
+VALUES
+    (:factory,
+    :device_id,
+    :chain_seq,
+    1,
+    :placed_element_id,
+    :role_code,
+    :inclusion_source,
+    TO_BINARY_DOUBLE(:marker_x),
+    TO_BINARY_DOUBLE(:marker_y))]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
+            <param direction="Input" dbtype="Number" size="0">:chain_seq</param>
+            <param direction="Input" dbtype="VarChar" size="1024">:placed_element_id</param>
+            <param direction="Input" dbtype="VarChar" size="10">:role_code</param>
+            <param direction="Input" dbtype="VarChar" size="10">:inclusion_source</param>
+            <param direction="Input" dbtype="VarChar" size="40">:marker_x</param>
+            <param direction="Input" dbtype="VarChar" size="40">:marker_y</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_CHAIN_MEMBER" commandtype="Text" description="Chain 포함 도형 조회 + 도형 Layer (2026-10-06 CLAUDE-026 3단계: View 화면이 Chain에 필요한 Layer를 함께 조회하기 위해 LAYER_ID 추가)" commandtimeout="600">
+        <commandtext><![CDATA[SELECT /*+ LEADING(M) USE_NL(P) INDEX(P PK_GDS_PLACED_EL) */
+       M.PLACED_ELEMENT_ID, M.ROLE_CODE, M.INCLUSION_SOURCE, M.MARKER_X, M.MARKER_Y, P.LAYER_ID
+  FROM TQP_GDS_CHAIN_MEMBER M
+  JOIN TQP_GDS_PLACED_EL P
+    ON P.FACTORY = M.FACTORY AND P.DEVICE_ID = M.DEVICE_ID AND P.PLACED_ELEMENT_ID = M.PLACED_ELEMENT_ID
+ WHERE M.FACTORY = :factory
+   AND M.DEVICE_ID = :device_id
+   AND M.CHAIN_SEQ = :chain_seq
+   AND M.VERSION_NO = 1
+ ORDER BY M.PLACED_ELEMENT_ID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
+            <param direction="Input" dbtype="Number" size="0">:chain_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_CHAIN_MEMBER_COUNT" commandtype="Text" description="저장 확정 검사: Member 수 / INPUT 수 / OUTPUT 수" commandtimeout="60">
+        <commandtext><![CDATA[SELECT COUNT(*) AS MEMBER_COUNT,
+       NVL(SUM(CASE ROLE_CODE WHEN 'INPUT' THEN 1 ELSE 0 END), 0) AS INPUT_COUNT,
+       NVL(SUM(CASE ROLE_CODE WHEN 'OUTPUT' THEN 1 ELSE 0 END), 0) AS OUTPUT_COUNT
+  FROM TQP_GDS_CHAIN_MEMBER
+ WHERE FACTORY = :factory
+   AND DEVICE_ID = :device_id
+   AND CHAIN_SEQ = :chain_seq
+   AND VERSION_NO = 1]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
+            <param direction="Input" dbtype="Number" size="0">:chain_seq</param>
+        </parameters>
+    </query>
+</queryxml>

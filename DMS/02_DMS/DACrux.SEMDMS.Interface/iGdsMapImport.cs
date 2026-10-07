@@ -19,7 +19,7 @@ namespace DACrux.SEMDMS.Interface
         /// <summary>
         /// Factory + Device(제품)의 기존 GDS Map 헤더 / 저장 작업 상태 / 건수를 조회한다. 없으면 0행이다.
         /// 2026-10-02 사용자 결정: 리비전 관리 없음, Device당 Map 1개. 화면은 저장 전에 이 결과를 보여 주고 삭제 후 재등록 여부를 묻는다.
-        /// 반환 열: FACTORY / DEVICE_ID / TOP_STRUCTURE / GDS_FILE_NAME / GDS_SHA256 / MAP_STATUS / CREATE_USER / CREATE_TIME /
+        /// 반환 열: FACTORY / DEVICE_ID / TOP_STRUCTURE / GDS_FILE_NAME / GDS_SHA256 / MAP_STATUS / VIEW_SIDE(2026-10-06) / CREATE_USER / CREATE_TIME /
         ///          IMPORT_JOB_SEQ / JOB_STATUS / SOURCE_COUNT / PLACED_COUNT / POINT_COUNT
         /// </summary>
         DataTable GetMapInfo(string strFactory, string strDeviceID);
@@ -33,8 +33,9 @@ namespace DACrux.SEMDMS.Interface
 
         /// <summary>
         /// 저장을 시작한다. Device에 기존 Map이 있으면 오류다(먼저 DeleteMap).
-        /// ImportInfo 순서: 0 Factory / 1 Device ID / 2 Top Structure / 3 GDS 파일 이름 / 4 GDS SHA-256 /
+        /// ImportInfo 순서: 0 Factory / 1 Device ID / 2 Top Structure / 3 GDS 파일 이름 / 4 GDS SHA-256(선택, 2026-10-06부터 화면은 빈 값 -> NULL) /
         /// 5 User Unit / 6 Database Unit / 7 Create User / 8 예상 SOURCE 수 / 9 예상 PLACED 수 / 10 예상 좌표 수
+        /// [11 저장 기준 FRONT / BACK, 2026-10-06 추가. 생략(11개)하면 FRONT. BACK = PLACED가 GDS 원점 기준 좌우 반전 좌표]
         /// 반환: SELECT_IMPORT_JOB 결과 1행(IMPORT_JOB_SEQ / FACTORY / DEVICE_ID / JOB_STATUS / 예상 / 수신 건수)
         /// </summary>
         DataTable BeginMapImport(string[] ImportInfo);

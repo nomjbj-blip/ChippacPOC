@@ -1801,3 +1801,11 @@ Debug 빌드와 `MapPlacedBatchPayloadProbe`가 통과했다. Probe는 형식 �
 Service와 SQL 구현은 뒤로 미루고, 클라이언트 안에서 `MapPlacedBatchReader.Read`를 추가했다. 저장용 본문 한 배치를 읽어 `MapPlacedElementBatch`와 도형 데이터로 복원한다. 본문 최대 크기, SHA-256, 형식 식별자/버전, 배치 번호/도형 수/좌표 수, 문자열 길이, 좌표의 유한성, 중복 배치 Element ID, 끝까지 읽었는지를 검사한다. 본문에 들어 있던 `double` 좌표는 `GPoint` 생성자의 반올림을 거치지 않고 그대로 복원한다.
 
 Debug 빌드와 `MapPlacedBatchPayloadProbe`가 통과했다. Probe는 직렬화 후 복원한 ID/TEXT/소수 좌표를 비교하고, 바이트 변조/미지원 버전/잘린 본문/중복 ID 거부를 확인한다. 현재 검증은 로컬 바이트 왕복에 한정된다. Service 전송, DB 재조회, 복원 데이터를 이용한 Map 화면 재구성은 아직 구현하거나 확인하지 않았다. 다음 클라이언트 작업은 복원한 PLACED 데이터와 Layer/Chain 정보를 Map 화면에 연결하는 경계를 설계하고 작은 단위로 구현하는 것이다.
+
+### 17.45 2026-10-01 / 복원 도형의 화면 모델 변환
+
+Map의 기존 OpenGL/Chain 경로는 `GlSceneItem`과 그 안의 GDS 도형 종류를 사용한다. 저장된 PLACED 배치에는 원본 GDS 객체가 없으므로 `MapPlacedSceneItemFactory`가 복원 데이터를 `BOUNDARY / PATH / TEXT` 소스와 `GlSceneItem`으로 바꾼다. 배치 Element ID, 원본 Element ID, Layer/DataType, 월드 좌표, PATH 폭, TEXT 문자열/기준점을 전달한다. 이 단계에서는 화면의 Layer 목록이나 GPU 버퍼에 아직 넣지 않는다.
+
+기존 PLACED 형식 v1에는 PATH 끝 모양인 `PathType`이 없어 round/extended 끝을 정확히 다시 그릴 수 없었다. 형식 버전을 **v2**로 올리고 PATH 폭 바로 뒤에 `PathType` 1바이트를 추가했다. 읽기는 v2만 허용하므로 앞서 만든 v1 로컬 본문은 재생성해야 한다. 현재 Service/DB 저장은 아직 없어 기존 DB 데이터 변환 작업은 없다. TEXT 원본의 변환 전 좌표와 구조 경로는 PLACED 본문에 없으므로 TEXT 진단 정보까지 원본과 동일하게 복원하는 것은 후속 설계 대상이다.
+
+Debug 빌드와 `MapPlacedBatchPayloadProbe`가 통과했다. Probe에서 v2 직렬화/복원 후 PATH 끝 모양/폭과 TEXT 표시 속성을 `GlSceneItem`까지 확인했다. 실제 Device 기반 조회, Layer 색상/표시 상태, Chain 데이터 연결, OpenGL 화면 출력은 아직 확인하지 않았다. 다음은 여러 배치를 순서대로 받아 Layer 목록을 구성하고, 모두 검증된 뒤 화면 상태를 교체하는 작업이다.

@@ -75,6 +75,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Transactions" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -86,6 +87,9 @@
     <Compile Include="DefectAlarm.cs" />
     <Compile Include="GdsMapImport.cs" />
     <Compile Include="GdsMapView.cs" />
+    <Compile Include="GdsChain.cs" />
+    <Compile Include="GdsEtResult.cs" />
+    <Compile Include="KlarfUpload.cs" />
     <Compile Include="DefectMapAnalysis.cs" />
     <Compile Include="DMReport.cs" />
     <Compile Include="DMReview.cs" />

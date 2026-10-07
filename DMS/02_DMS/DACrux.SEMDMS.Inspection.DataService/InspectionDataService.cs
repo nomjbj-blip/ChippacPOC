@@ -18,8 +18,6 @@ namespace DACrux.SEMDMS.Inspection.DataService
 {
     public partial class InspectionDataService : DACrux.Framework.Server.DataServiceBase
     {
-        public static readonly string FAB1 = "FAB1";
-        public static readonly string FAB2 = "FAB2";
 
         enum TQD_SETUP { SETUP_ID, STEP_ID, SETUP_TIME, ANGLE, WAFER_SIZE, NOTCH_TYPE, DIE_PITCH_X, DIE_PITCH_Y, DIE_ORIGIN_X, DIE_ORIGIN_Y, ORIGIN_X, ORIGIN_Y }
         enum TQD_SETUP_MAP { SETUP_SEQ, TEST_NO, INDEX_X, INDEX_Y }
@@ -159,9 +157,8 @@ namespace DACrux.SEMDMS.Inspection.DataService
                             int iAngle = 0;
                             string strStepID = parser.StepID;
 
-                            //FAB1 의 경우 Step ID 를 8자리로 사용한다.
                             //8자리가 아닌 경우 Setup 정보의 _이후 8자리를 사용 한다.
-                            if (Factory == FAB1 && parser.StepID.Length != 8)
+                            if (parser.StepID.Length != 8)
                             {
                                 //Ex) SetupID "AMTDL_1439TRET"
                                 string[] strStepInfo = parser.SetupID.Split(new string[] { "_" }, StringSplitOptions.RemoveEmptyEntries);
@@ -736,30 +733,17 @@ namespace DACrux.SEMDMS.Inspection.DataService
                             // 부득이하게 STEP_ID LIKE 검색을 한다.
                             bool bFlag;
 
-                            if (Factory == FAB1)
-                            {
-                                bFlag = oReview.GetInspectionInfo_02(
-                                    Factory,
-                                    parser.ResultTimestamp,
-                                    parser.LotID,
-                                    wafer.Slot.ToString(),
-                                    parser.StepID,
-                                    out waferseq,
-                                    out stepseq
-                                    );
-                            }
-                            else
-                            {
-                                bFlag = oReview.GetInspectionInfo_01(
-                                    Factory,
-                                    parser.ResultTimestamp,
-                                    parser.LotID,
-                                    wafer.Slot.ToString(),
-                                    parser.StepID,
-                                    out waferseq,
-                                    out stepseq
-                                    );
-                            }
+                            
+                            bFlag = oReview.GetInspectionInfo_01(
+                                Factory,
+                                parser.ResultTimestamp,
+                                parser.LotID,
+                                wafer.Slot.ToString(),
+                                parser.StepID,
+                                out waferseq,
+                                out stepseq
+                                );
+                            
 
                             if (!bFlag)
                             {
