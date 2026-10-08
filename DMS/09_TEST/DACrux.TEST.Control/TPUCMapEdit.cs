@@ -1358,44 +1358,61 @@ namespace DACrux.TEST.Control
 
         private void SP_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
-            if (!SP.IsOpen)
-                return;
-
-            if (ReceivedPassingCount > ReceivedCount)
+            // 시리얼 수신 스레드에서 실행된다. 여기서 예외가 나가면 전역 처리기가 잡지 못해 클라이언트가 종료되므로
+            // 프레임이 깨지거나 포트가 닫히는 경우를 모두 잡는다. (2026-10-08 CLAUDE-036)
+            try
             {
-                ReceivedCount++;
-                return;
+                if (!SP.IsOpen)
+                    return;
+
+                if (ReceivedPassingCount > ReceivedCount)
+                {
+                    ReceivedCount++;
+                    return;
+                }
+
+                ReceivedPos = ReceivedPos + SP.Read(ReceivedBuffer, ReceivedPos, ReceivedBuffer.Length - ReceivedPos);
+
+                if (ReceivedPos < ReceivedBuffer.Length)
+                    return;
+
+                ReceivedPos = 0;
+                ReceivedCount = 0;
+
+                // 앞 토큰을 찾은 뒤에만 다음 토큰을 찾는다. 예전 코드는 idxX = -1 인 채로 IndexOf(…, -1) 를 불러 예외가 났다.
+                string data = SP.Encoding.GetString(ReceivedBuffer);
+                int idxX = data.IndexOf(ReceivedX);
+                if (idxX == -1)
+                    return;
+
+                int idxY = data.IndexOf(ReceivedY, idxX);
+                if (idxY == -1)
+                    return;
+
+                int idxEnd = data.IndexOf(ReceivedEND, idxY);
+                if (idxEnd == -1)
+                    return;
+
+                string strX = data.Substring(idxX + ReceivedX.Length, idxY - idxX - ReceivedX.Length);
+                string strY = data.Substring(idxY + ReceivedY.Length, idxEnd - idxY - ReceivedY.Length);
+
+                if (!Double.TryParse(strX.Replace(" ", String.Empty), out m_Xaxis) || !Double.TryParse(strY.Replace(" ", String.Empty), out m_Yaxis))
+                    return;
+
+                m_Xaxis = m_Xaxis * 1000d;
+                m_Yaxis = m_Yaxis * 1000d;
+                //System.Diagnostics.Debug.WriteLine(String.Format("X:{0}, Y:{1}", valX, valY));
+
+                SP.DiscardInBuffer();
+
+                SerialDieSelect(m_Xaxis, m_Yaxis);
             }
-
-            ReceivedPos = ReceivedPos + SP.Read(ReceivedBuffer, ReceivedPos, ReceivedBuffer.Length - ReceivedPos);
-
-            if (ReceivedPos < ReceivedBuffer.Length)
-                return;
-
-            ReceivedPos = 0;
-            ReceivedCount = 0;
-
-            string data = SP.Encoding.GetString(ReceivedBuffer);
-            int idxX = data.IndexOf(ReceivedX);
-            int idxY = data.IndexOf(ReceivedY, idxX);
-            int idxEnd = data.IndexOf(ReceivedEND, idxY);
-
-            if (idxX == -1 || idxY == -1 || idxEnd == -1)
-                return;
-
-            string strX = data.Substring(idxX + ReceivedX.Length, idxY - idxX - ReceivedX.Length);
-            string strY = data.Substring(idxY + ReceivedY.Length, idxEnd - idxY - ReceivedY.Length);
-
-            if (!Double.TryParse(strX.Replace(" ", String.Empty), out m_Xaxis) || !Double.TryParse(strY.Replace(" ", String.Empty), out m_Yaxis))
-                return;
-
-            m_Xaxis = m_Xaxis * 1000d;
-            m_Yaxis = m_Yaxis * 1000d;
-            //System.Diagnostics.Debug.WriteLine(String.Format("X:{0}, Y:{1}", valX, valY));
-
-            SP.DiscardInBuffer();
-
-            SerialDieSelect(m_Xaxis, m_Yaxis);
+            catch (Exception ex)
+            {
+                ReceivedPos = 0;
+                ReceivedCount = 0;
+                System.Diagnostics.Trace.TraceError("TPUCMapEdit RS232 수신 처리 실패: {0}", ex.Message);
+            }
 
 
             //string[] strValues = null;

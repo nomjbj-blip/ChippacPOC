@@ -101,7 +101,8 @@ namespace DACrux.TEST.ENGUI
             }
             catch (Exception ex)
             {
-                throw ex;
+                // 작업 스레드에서 다시 던지면 처리기가 없어 클라이언트 프로세스가 종료된다. 기록만 하고 끝낸다. (2026-10-08 CLAUDE-036)
+                System.Diagnostics.Trace.TraceError("TPUCGallery.CreateMap 실패: {0}", ex);
             }
             finally
             {
@@ -281,41 +282,61 @@ namespace DACrux.TEST.ENGUI
             thread.Start();
         }
 
+        /// <summary>
+        /// 열 수 콤보 값. 입력 가능한 콤보라 0 이나 문자가 들어오면 0 으로 나누기가 나므로 최소 1 로 맞춘다. (2026-10-08 CLAUDE-036)
+        /// </summary>
+        private int GetColumnCount()
+        {
+            int colCnt = DACrux.Base.Convert.intParse(comboBoxCol.Text);
+            return colCnt < 1 ? 1 : colCnt;
+        }
+
         void Redraw()
         {
             if (comboBoxCol.Text.Length == 0) return;
 
             isDrawing = true;
 
-            labelStatus.Text = "Draw Map";
-            ultraProgressBar.Value = 0;
-            ultraProgressBar.Maximum = panelMap.Controls.Count;
-            this.Cursor = Cursors.WaitCursor;
-
-            int colCnt = DACrux.Base.Convert.intParse(comboBoxCol.Text);
-            int size = (panelMap.Width - 20) / colCnt;
-            int row = 0;
-            int col = 0;
-            DACrux.TEST.ENGUI.WrapMap map = null;
-            panelMap.SuspendLayout();
-            for (int i = 0; i < panelMap.Controls.Count; i++)
+            // 작업 스레드에서 실행된다. 예외가 나가면 프로세스가 종료되고 isDrawing 이 true 로 남으므로 잡고 복원한다. (CLAUDE-036)
+            try
             {
-                map = (DACrux.TEST.ENGUI.WrapMap)panelMap.Controls[i];
-                map.Location = new Point(col * size, row * size);
-                map.Size = new Size(size, size);
+                labelStatus.Text = "Draw Map";
+                ultraProgressBar.Value = 0;
+                ultraProgressBar.Maximum = panelMap.Controls.Count;
+                this.Cursor = Cursors.WaitCursor;
 
-                col++;
-                if (col % colCnt == 0)
+                int colCnt = GetColumnCount();
+                int size = (panelMap.Width - 20) / colCnt;
+                int row = 0;
+                int col = 0;
+                DACrux.TEST.ENGUI.WrapMap map = null;
+                panelMap.SuspendLayout();
+                for (int i = 0; i < panelMap.Controls.Count; i++)
                 {
-                    row++;
-                    col = 0;
-                }
+                    map = (DACrux.TEST.ENGUI.WrapMap)panelMap.Controls[i];
+                    map.Location = new Point(col * size, row * size);
+                    map.Size = new Size(size, size);
 
-                ultraProgressBar.Value = i + 1;
+                    col++;
+                    if (col % colCnt == 0)
+                    {
+                        row++;
+                        col = 0;
+                    }
+
+                    ultraProgressBar.Value = i + 1;
+                }
+                panelMap.ResumeLayout();
             }
-            panelMap.ResumeLayout();
-            this.Cursor = Cursors.Default;
-            isDrawing = false;
+            catch (Exception ex)
+            {
+                System.Diagnostics.Trace.TraceError("TPUCGallery.Redraw 실패: {0}", ex);
+            }
+            finally
+            {
+                this.Cursor = Cursors.Default;
+                isDrawing = false;
+            }
         }
 
         private void buttonRedraw_Click(object sender, System.EventArgs e)
@@ -416,7 +437,7 @@ namespace DACrux.TEST.ENGUI
         {
             try
             {
-                int colCnt = DACrux.Base.Convert.intParse(comboBoxCol.Text);
+                int colCnt = GetColumnCount();
                 int size = (panelMap.Width - 20) / colCnt;
 
                 int row = panelMap.Controls.Count / colCnt;
@@ -466,11 +487,17 @@ namespace DACrux.TEST.ENGUI
                     ultraProgressBar.Value = i + 1;
                     if (threadStop) break;
                 }
-
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Trace.TraceError("TPUCGallery.DrawWaferMapThread 실패: {0}", ex);
+            }
+            finally
+            {
+                // 예외가 나도 상태를 복원한다. 예전에는 endDrawMap 이 false 로 남아 이후 Draw() 가 계속 바로 return 했다. (CLAUDE-036)
                 threadStop = false;
                 endDrawMap = true;
             }
-            catch (Exception ex) { }
         }
 
         void DrawWaferMap(DACrux.TEST.ENGUI.WrapMap map, long WaferSeqs)

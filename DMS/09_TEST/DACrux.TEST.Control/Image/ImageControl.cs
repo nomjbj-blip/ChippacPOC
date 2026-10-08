@@ -86,18 +86,25 @@ namespace DACrux.TEST.Control
 		                    1
 	                    }
                     };
-            ColorMatrix colorMatrix = new ColorMatrix(colorMatrixElements);
-            ImageAttributes imageAttributes = new ImageAttributes();
-
-            imageAttributes.SetColorMatrix(colorMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
-
             System.Drawing.Image _img = m_DefectImg;
-            //PictureBox1.Image
-            Graphics _g = default(Graphics);
+            if (_img == null)
+                return;
+
+            // 스크롤 틱마다 실행되므로 ImageAttributes / Graphics 를 바로 해제하고, 이전 결과 Bitmap 도 해제한다.
+            // (2026-10-08 CLAUDE-036: 트랙바를 끌면 틱마다 이미지 크기만큼 GDI 객체가 쌓이던 문제)
+            ColorMatrix colorMatrix = new ColorMatrix(colorMatrixElements);
             Bitmap bm_dest = new Bitmap(Convert.ToInt32(_img.Width), Convert.ToInt32(_img.Height));
-            _g = Graphics.FromImage(bm_dest);
-            _g.DrawImage(_img, new Rectangle(0, 0, bm_dest.Width + 1, bm_dest.Height + 1), 0, 0, bm_dest.Width + 1, bm_dest.Height + 1, GraphicsUnit.Pixel, imageAttributes);
+
+            using (ImageAttributes imageAttributes = new ImageAttributes())
+            using (Graphics _g = Graphics.FromImage(bm_dest))
+            {
+                imageAttributes.SetColorMatrix(colorMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
+                _g.DrawImage(_img, new Rectangle(0, 0, bm_dest.Width + 1, bm_dest.Height + 1), 0, 0, bm_dest.Width + 1, bm_dest.Height + 1, GraphicsUnit.Pixel, imageAttributes);
+            }
+
+            System.Drawing.Image oldDisplayed = DectImage.Image;
             DectImage.Image = bm_dest;
+            ReleaseOwnedImage(oldDisplayed);
         }
 
         //--
@@ -131,8 +138,16 @@ namespace DACrux.TEST.Control
             if (m_OriginDefectImg == null)
                 return;
 
+            System.Drawing.Image oldDisplayed = DectImage.Image;
+            System.Drawing.Image oldDefect = m_DefectImg;
+
             Bitmap oBitMap = AdjustGamma(m_OriginDefectImg, (float)GammatrackBar.Value);
             DefectImg = oBitMap;
+
+            // 이전 감마 / 밝기 결과는 이 컨트롤이 만든 Bitmap 이므로 해제한다. (CLAUDE-036)
+            ReleaseOwnedImage(oldDefect);
+            if (oldDisplayed != oldDefect)
+                ReleaseOwnedImage(oldDisplayed);
         }
 
         //--
@@ -150,10 +165,6 @@ namespace DACrux.TEST.Control
             float gamma
             )
         {
-            // Set the ImageAttributes object's gamma value.
-            ImageAttributes attributes = new ImageAttributes();
-            attributes.SetGamma(gamma);
-
             // Draw the image onto the new bitmap
             // while applying the new gamma value.
             Point[] points =
@@ -168,14 +179,36 @@ namespace DACrux.TEST.Control
 
             // Make the result bitmap.
             Bitmap bm = new Bitmap(image.Width, image.Height);
+            using (ImageAttributes attributes = new ImageAttributes())
             using (Graphics gr = Graphics.FromImage(bm))
             {
+                // Set the ImageAttributes object's gamma value.
+                attributes.SetGamma(gamma);
+
                 gr.DrawImage(image, points, rect,
                     GraphicsUnit.Pixel, attributes);
             }
 
             // Return the result.
             return bm;
+        }
+
+        //--
+
+        /// <summary>
+        /// 밝기 / 감마 조정으로 이 컨트롤이 만든 이미지를 해제한다.
+        /// 원본(m_OriginDefectImg, 호출한 쪽 소유)과 지금 표시 중인 이미지는 해제하지 않는다.
+        /// 팝업이 열려 있으면 팝업이 그 이미지를 그리고 있을 수 있으므로 해제하지 않는다. (2026-10-08 CLAUDE-036)
+        /// </summary>
+        private void ReleaseOwnedImage(System.Drawing.Image image)
+        {
+            if (image == null || m_ImagePopup != null)
+                return;
+
+            if (image == m_OriginDefectImg || image == m_DefectImg || image == DectImage.Image)
+                return;
+
+            image.Dispose();
         }
 
         //--

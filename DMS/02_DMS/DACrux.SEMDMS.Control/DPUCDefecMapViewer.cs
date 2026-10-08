@@ -1899,6 +1899,10 @@ namespace DACrux.SEMDMS.Control
 
             try
             {
+                // 빈 곳을 클릭하면 null 이 넘어온다. 아래 AddRange / oDefect.Length 에서 예외가 나지 않게 빈 배열로 바꾼다. (CLAUDE-036)
+                if (oDefect == null)
+                    oDefect = new DACrux.Base.Defect[0];
+
                 toolSelectedDefect.Text = string.Format("Selected Defect : {0}", (oDefect == null) ? 0 : oDefect.Length);
 
                 if (ultraDockManager.ControlPanes["RA"].IsInView)
@@ -1923,7 +1927,11 @@ namespace DACrux.SEMDMS.Control
                     return;
 
                 if (imageList.Controls.Count > 0)
-                    imageList.Controls.Clear();
+                {
+                    // Clear 만 하면 제거된 DPUCDefectInfo(이미지 / 창 핸들)가 해제되지 않아 Defect 를 선택할 때마다 핸들이 쌓인다. (2026-10-08 CLAUDE-036)
+                    while (imageList.Controls.Count > 0)
+                        imageList.Controls[0].Dispose();
+                }
 
                 for (int i = 0; i < oDefect.Length; i++)
                 {
@@ -2273,11 +2281,35 @@ namespace DACrux.SEMDMS.Control
 
         private void GetDefectImagePathAsync(object state)
         {
-            long[] stepSeqArr = state as long[];
+            // ThreadPool 콜백이다. 여기서 처리되지 않은 예외(원격 호출 실패 등)는 클라이언트 프로세스를 종료시키므로
+            // 모든 예외를 잡아 상태 표시줄에만 알린다. (2026-10-08 CLAUDE-036)
+            try
+            {
+                long[] stepSeqArr = state as long[];
 
-            DefectMapAnalysis obj = new DefectMapAnalysis();
-            dtImageList = obj.GetDefectImagePath01(stepSeqArr);
-            UpdateDefectImageInfo(dtImageList);
+                DefectMapAnalysis obj = new DefectMapAnalysis();
+                dtImageList = obj.GetDefectImagePath01(stepSeqArr);
+                UpdateDefectImageInfo(dtImageList);
+            }
+            catch (Exception ex)
+            {
+                NotifyImageInfoError(ex);
+            }
+        }
+
+        private void NotifyImageInfoError(Exception ex)
+        {
+            System.Diagnostics.Trace.TraceError("Defect Image 정보 조회 실패: {0}", ex);
+
+            try
+            {
+                if (IsHandleCreated && !IsDisposed)
+                    BeginInvoke(new Action<string>(StatusMessage), "Defect Image 정보 조회 실패: " + ex.Message);
+            }
+            catch (InvalidOperationException)
+            {
+                // 화면이 이미 닫히는 중이면 알릴 곳이 없다.
+            }
         }
 
         private void UpdateDefectImageInfo(DataTable dt)
@@ -2287,6 +2319,9 @@ namespace DACrux.SEMDMS.Control
                 BeginInvoke(new Action<DataTable>(UpdateDefectImageInfo), dt);
                 return;
             }
+
+            if (dt == null)
+                return;
 
             foreach (DataRow row in dt.Rows)
             {

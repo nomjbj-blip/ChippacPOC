@@ -72,6 +72,9 @@ namespace DACruxV5
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.ThreadException += new ThreadExceptionEventHandler(Application_ThreadException);
+            // 작업 스레드 / ThreadPool 예외는 ThreadException 으로 오지 않고 프로세스를 바로 종료시킨다.
+            // 종료를 막을 수는 없으므로 원인을 로그 파일에 남긴다. (2026-10-08 CLAUDE-036)
+            AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
             System.Drawing.Icon oIcon = (System.Drawing.Icon)(Resources.MainIcon);
 #if DEBUG
             DACrux.Base.GlobalVariable.UserID = "ADMIN";
@@ -133,6 +136,8 @@ namespace DACruxV5
 
         static void Application_ThreadException(object sender, ThreadExceptionEventArgs e)
         {
+            WriteErrorLog("ThreadException", e.Exception);
+
             if (e.Exception.InnerException != null)
                 MessageBox.Show(e.Exception.InnerException.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             else
@@ -141,6 +146,34 @@ namespace DACruxV5
 #if DEBUG
             MessageBox.Show(String.Format("{0}\r\n\r\n{1}", e.Exception.Message, e.Exception.StackTrace), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 #endif
+        }
+
+        static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            WriteErrorLog(e.IsTerminating ? "UnhandledException(terminating)" : "UnhandledException", e.ExceptionObject as Exception);
+        }
+
+        /// <summary>
+        /// 처리되지 않은 예외를 %LOCALAPPDATA%\DACrux\Log\DACrux_Error_yyyyMMdd.log 에 남긴다.
+        /// 설치 폴더(Program Files)는 쓰기 권한이 없을 수 있어 사용자 폴더를 쓴다. 로그 실패는 무시한다. (2026-10-08 CLAUDE-036)
+        /// </summary>
+        static void WriteErrorLog(string kind, Exception ex)
+        {
+            try
+            {
+                string dir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "DACrux", "Log");
+                Directory.CreateDirectory(dir);
+
+                string file = Path.Combine(dir, String.Format("DACrux_Error_{0:yyyyMMdd}.log", DateTime.Now));
+                string text = String.Format("[{0:yyyy-MM-dd HH:mm:ss.fff}] {1} (Thread {2})\r\n{3}\r\n\r\n",
+                    DateTime.Now, kind, Thread.CurrentThread.ManagedThreadId, ex != null ? ex.ToString() : "(exception object is not System.Exception)");
+
+                File.AppendAllText(file, text);
+            }
+            catch
+            {
+                // 로그를 남기지 못해도 원래 예외 처리 흐름을 바꾸지 않는다.
+            }
         }
 
     }

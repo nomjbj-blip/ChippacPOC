@@ -19,6 +19,8 @@ namespace DACrux.TEST.Control
         public event SelectDieIndex OnSelectDieIndex = null;
        
         private System.Drawing.Image DefectImg;
+        // Image.FromStream 으로 만든 이미지는 원본 스트림이 살아 있어야 하므로 이미지와 함께 보관한다.
+        private MemoryStream m_ImageStream;
 
         private string m_ImageFTPPath = string.Empty;
         private string m_ImageLocalPath = string.Empty;
@@ -62,7 +64,10 @@ namespace DACrux.TEST.Control
             m_FTPID = strFTPID;
             m_FTPPass = strFTPPass;
 
+            // 다운로드만 백그라운드 스레드에서 하고 화면 표시는 ShowImage 에서 UI 스레드로 넘긴다.
+            // 앱 종료를 막지 않도록 IsBackground 로 둔다. (2026-10-08 CLAUDE-036)
             System.Threading.Thread trd = new System.Threading.Thread(new System.Threading.ThreadStart(DrawImage));
+            trd.IsBackground = true;
             trd.Start();
         }
 
@@ -93,15 +98,15 @@ namespace DACrux.TEST.Control
                         fs.CopyTo(ms);
                     }
 
-                    DefectImg = System.Drawing.Image.FromStream(ms);
-
-                    imageControl1.ImageControlDraw(
-                        null,
-                        DefectImg
-                        );
+                    System.Drawing.Image image = System.Drawing.Image.FromStream(ms);
+                    ShowImage(image, ms);
+                    ms = null; // 소유권을 ShowImage 로 넘겼다.
                 }
             }
-            catch (Exception) { }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Trace.TraceError("AVI Image 표시 실패 ({0}): {1}", m_ImageFTPPath, ex.Message);
+            }
             finally
             {
                 if (ms != null)
@@ -110,9 +115,52 @@ namespace DACrux.TEST.Control
                 ms = null;
 
                 //Image File 은 사용후 삭제 한다.
-                if (oImage != null && oImage.Exists)
-                    oImage.Delete();
+                try
+                {
+                    if (oImage != null && oImage.Exists)
+                        oImage.Delete();
+                }
+                catch (IOException) { }
+                catch (UnauthorizedAccessException) { }
             }
+        }
+
+        /// <summary>
+        /// 다운로드 스레드에서 만든 이미지를 UI 스레드에서 표시한다.
+        /// 컨트롤이 이미 해제되었으면(한 번도 표시되지 않은 이미지) 이미지 / 스트림을 바로 해제한다.
+        /// 표시된 이미지는 이미지 팝업이 계속 그릴 수 있으므로 직접 해제하지 않고 GC 에 맡긴다. (2026-10-08 CLAUDE-036)
+        /// </summary>
+        private void ShowImage(System.Drawing.Image image, MemoryStream stream)
+        {
+            if (InvokeRequired)
+            {
+                try
+                {
+                    BeginInvoke(new Action<System.Drawing.Image, MemoryStream>(ShowImage), image, stream);
+                }
+                catch (InvalidOperationException)
+                {
+                    // 창 핸들이 이미 사라졌다(목록이 지워지는 중).
+                    image.Dispose();
+                    stream.Dispose();
+                }
+                return;
+            }
+
+            if (IsDisposed)
+            {
+                image.Dispose();
+                stream.Dispose();
+                return;
+            }
+
+            DefectImg = image;
+            m_ImageStream = stream;
+
+            imageControl1.ImageControlDraw(
+                null,
+                DefectImg
+                );
         }
 
         private void BtnFocus_Click(object sender, EventArgs e)

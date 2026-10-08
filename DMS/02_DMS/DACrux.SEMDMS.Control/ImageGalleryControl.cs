@@ -52,12 +52,26 @@ namespace DACrux.SEMDMS.Control
         {
             string ftpPath = arg as string;
 
-            using (System.IO.Stream stream = DefectMapDraw.fnFTPGetStream(ftpPath))
+            // 이미지마다 만드는 작업 스레드이다. 처리되지 않은 예외(FTP 설정 없음 / 손상된 이미지 / 창 핸들 없음)는
+            // 클라이언트 프로세스를 종료시키므로 여기서 잡는다. (2026-10-08 CLAUDE-036)
+            try
             {
-                if (stream == null)
-                    return;
+                // Image.FromStream 은 원본 스트림이 살아 있어야 하므로 FTP 스트림을 메모리로 복사해 그 사본으로 만든다.
+                System.IO.MemoryStream imageStream = new System.IO.MemoryStream();
+                using (System.IO.Stream stream = DefectMapDraw.fnFTPGetStream(ftpPath))
+                {
+                    if (stream == null)
+                        return;
 
-                SetImageToControl(Image.FromStream(stream));
+                    stream.CopyTo(imageStream);
+                }
+                imageStream.Position = 0;
+
+                SetImageToControl(Image.FromStream(imageStream));
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Trace.TraceError("Defect Image 표시 실패 ({0}): {1}", ftpPath, ex.Message);
             }
         }
 
