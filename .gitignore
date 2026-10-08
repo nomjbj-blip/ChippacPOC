@@ -1,2 +1,11 @@
 *.pdb
 *.log
+
+# Visual Studio 사용자 / 캐시 (2026-10-07 CLAUDE-034)
+.vs/
+*.suo
+*.user
+obj/
+
+# Office 잠금 파일
+~$*
