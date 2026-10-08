@@ -34,24 +34,5 @@ namespace DACrux.SEMDMS.RO
             myCompressor.CompressFilesEncrypted(zipFileName, null, sourceFiles);
         }
 
-        public static void ZipFolder(string zipFileName, string sourceFolder)
-        {
-            LoadLibrary();
-
-            SevenZipCompressor myCompressor = new SevenZipCompressor();
-            myCompressor.ArchiveFormat = OutArchiveFormat.Zip;
-            myCompressor.IncludeEmptyDirectories = true;
-            myCompressor.CompressDirectory(sourceFolder, zipFileName);
-        }
-
-        public static void Unzip(string zipFileName, string unzipFolder)
-        {
-            LoadLibrary();
-
-            using (SevenZip.SevenZipExtractor zip = new SevenZip.SevenZipExtractor(zipFileName))
-            {
-                zip.ExtractArchive(unzipFolder);
-            }
-        }
     }
 }

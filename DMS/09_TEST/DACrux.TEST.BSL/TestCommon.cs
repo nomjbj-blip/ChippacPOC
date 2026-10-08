@@ -712,15 +712,6 @@ namespace DACrux.TEST.BSL
             obj.MergeData(factory, program, testarea, device);
         }
 
-        /// <summary>
-        /// WaferSeq를 가져옵니다.
-        /// </summary>
-        public string GetNewWaferSeq()
-        {
-            TQP_WAFER obj = new TQP_WAFER();
-            return obj.SelectNextWaferSeq();
-        }
-
         public void GetCorrectionData(string testArea, string deviceAlias, string program, out string Dir, out int rotate, out int shiftX, out int shiftY, out int ConfigSeq, bool bPST)
         {
             rotate = shiftX = shiftY = ConfigSeq = 0;

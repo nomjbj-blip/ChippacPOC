@@ -19,25 +19,11 @@
             <param direction="Input" dbtype="NUMBER" size="22" description="INDEX_Y">:index_y</param>
         </parameters>
     </query>
-    <query statement="Select" queryid="SELECT_MAP_COUNT" commandtype="Text" description="Read Table [TQD_SETUP_MAP]" commandtimeout="60">
-        <commandtext><![CDATA[SELECT COUNT(*) CNT FROM TQD_SETUP_MAP WHERE SETUP_SEQ = :setup_seq]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="40" value="setup_seq">:setup_seq</param>
-        </parameters>
-    </query>
     <query statement="Select" queryid="SELECT_MAP_SAMPLE" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[SELECT SETUP_SEQ,INDEX_X,INDEX_Y,TEST FROM TQD_SETUP_MAP WHERE SETUP_SEQ = :setup_seq]]></commandtext>
         <parameters>
             <param direction="Input" dbtype="VarChar" size="40" value="1">:setup_seq</param>
         </parameters>
-    </query>
-    <query statement="Select" queryid="SELECT_MAP_DUPLE" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT DISTINCT CNT
-  FROM (  SELECT INDEX_X, INDEX_Y, COUNT (*) AS CNT
-            FROM TQD_SETUP_MAP
-           WHERE     1 = 1
-           AND SETUP_SEQ IN (??)
-        GROUP BY INDEX_X, INDEX_Y)]]></commandtext>
     </query>
     <query statement="Select" queryid="SELECT_MAP_SAMPLE_MULTI" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[  SELECT INDEX_X, INDEX_Y, TEST

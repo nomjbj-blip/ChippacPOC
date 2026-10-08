@@ -9,11 +9,6 @@ namespace DACrux.SEMDMS.Interface
     {
         #region [TQD_SETUP]
 
-        long GetSetupInfo(string SetupID);
-        long GetSetupInfo(string SetupID, string strX, string strY);
-        void CreateSetupInfo(string[] SetupInfo);
-        void UpdateSetupData(string strSetupSeq, string strStreetX, string strStreetY);
-
         #endregion
 
         #region [TQD_LOT]
@@ -33,15 +28,11 @@ namespace DACrux.SEMDMS.Interface
         #region [TQD_STEP]
 
         long GetStepSeq(string[] StepInfo);
-        void CreateStepInfo(string[] StepInfo);
         DataTable GetMigrationData(string strStarttime, string strEndTime);
 
         #endregion
 
         #region [TQD_INSP_INFO]
-
-        void CreateInspInfo(string[] InspInfo);
-        DataTable GetInspInfo(string strStepSeq);
 
         #endregion
 
@@ -49,7 +40,6 @@ namespace DACrux.SEMDMS.Interface
 
         int GetDefectCount(string strWaferSeq, string strStep);
         void CreateDefect(string[,] aParas);
-        void DeleteDefectInfo(string strWaferSeq, string strStep);
         void SetMigrationData(string[,] strData);
 
         #endregion
@@ -57,8 +47,6 @@ namespace DACrux.SEMDMS.Interface
         #region [TQD_IMAGES]
 
         //void CreateImages(string[] ImageInfo);
-        void CreateImagesMulti(string[,] ImageInfo);
-        void DeleteImages(string strStepSeq, string strWaferSeq);
 
         #endregion
 
@@ -71,7 +59,6 @@ namespace DACrux.SEMDMS.Interface
 
         #region [TQD_SETUP_MAP]
 
-        int GetSetupMapCount(long setup_seq);
         void CreateSetupMap(string[,] aParas);
 
         #endregion

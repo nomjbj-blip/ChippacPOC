@@ -179,44 +179,6 @@ namespace DACrux.TEST.DSL
             }
         }
 
-        public DataTable GetInlineLot(string strProd, string strLpt, string strOpn)
-        {
-            DataTable dt = null;
-
-            try
-            {
-                dt = this.GetDataTable("GET_INLINE_LOT", null, new string[] { strProd, strLpt, strOpn });
-                return dt;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-            finally
-            {
-                if (dt != null) dt.Dispose();
-            }
-        }
-
-        public DataTable GetInlinePara(string strProd, string strLpt, string strOpn)
-        {
-            DataTable dt = null;
-
-            try
-            {
-                dt = this.GetDataTable("GET_INLINE_PARA", null, new string[] { strProd, strLpt, strOpn });
-                return dt;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-            finally
-            {
-                if (dt != null) dt.Dispose();
-            }
-        }
-
         public DataTable GetParaSpec(string strProd, string strLpt, string strOpn, string strPara)
         {
             DataTable dt = null;
@@ -236,46 +198,5 @@ namespace DACrux.TEST.DSL
             }
         }
 
-        public DataTable GetInlineSiteData(string strProd, string strLpt, string strOpn, string strPara, string[] strLot)
-        {
-            DataTable dt = null;
-            string Lot = "'" + String.Join("', '", strLot) + "'";
-
-            try
-            {
-                dt = this.GetDataTable("GET_INLINE_SITEDATA", new string[] { Lot }, new string[] { strProd, strLpt, strOpn, strPara });
-                if (dt.Rows.Count < 1) return null;
-
-                return dt;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-            finally
-            {
-                if (dt != null) dt.Dispose();
-            }
-        }
-
-        public DataTable GetInlineData(string strProd, string strLpt, string strOpn, string[] strLot, string[] strPara)
-        {
-            DataTable dt = null;
-
-            try
-            {
-                dt = this.GetDataTable("GET_INLINE_DATA", null, new string[] { strProd, strLpt, strOpn });
-                return dt;
-
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-            finally
-            {
-                if (dt != null) dt.Dispose();
-            }
-        }
     }
 }

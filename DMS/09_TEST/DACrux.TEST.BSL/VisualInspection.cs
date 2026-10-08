@@ -68,20 +68,6 @@ namespace DACrux.TEST.BSL
             }
         }
 
-        public void UpdateQCFailDie(string PRODUCT, string[] strValue)
-        {
-            T_AVI_TABLE oDSL = null;
-            try
-            {
-                oDSL = new T_AVI_TABLE();
-                oDSL.UpdateFailDie(PRODUCT, strValue);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
         public DataTable GetMapData(string TESTAREA, string PRODUCT, string PROGRAM, string LOT_ID, string WAFER_ID)
         {
             T_AVI_TABLE oDSL = null;
@@ -778,72 +764,5 @@ namespace DACrux.TEST.BSL
         }
 
 
-        public int UpdateVI(string strFactory, string TestArea, string Product, string Program, string LotID, string WaferID, object oFailCode)
-        {
-            string strTableName = string.Empty;
-            TQP_LOT oLot = null;
-            TQP_WAFER oWafer = null;
-            TQP_WAFER_SUM oWaferSum = null;
-            T_AVI_TABLE oAviTable = null;
-
-            long lLotSeq = -1;
-            long lWaferSeq = -1;
-            try
-            {
-                /// DSL 선언
-                /// //////////////////////////////////////////////////////////////////////////////////////////////
-                oLot = new TQP_LOT();
-                oWafer = new TQP_WAFER();
-                oWaferSum = new TQP_WAFER_SUM();
-                oAviTable = new T_AVI_TABLE();
-
-                using (TransactionScope ts = new TransactionScope())
-                {
-                    /// Data 확인/정리
-                    /// //////////////////////////////////////////////////////////////////////////////////////////////
-                    List<DACrux.Base.Die> oUpdateDie = (List<DACrux.Base.Die>)DACrux.Base.Convert.Deserialize(oFailCode);
-                    strTableName = string.Format("T_AVI_{0}", Product);
-
-                    /// Lot Create or Lot Seq Select
-                    /// //////////////////////////////////////////////////////////////////////////////////////////////
-                    lLotSeq = oLot.CreateLot(TestArea, Product, Program, LotID);
-
-                    /// Wafer Create 
-                    /// //////////////////////////////////////////////////////////////////////////////////////////////
-                    /// ==> Raw Dat History를 관리학 위해 TQP_WAFER의 기존에 동일한 Wafer[TESTAREA,PRODUCT,PROGRAM,LOT]에 대해 
-                    ///     PROBE_CNT를 증가시키고
-                    ///     새로운 Wafer를 PROBE_CNT=0으로 Creation한다.
-                    lWaferSeq = oWafer.CreateWafer(strFactory, lLotSeq, WaferID);
-                    oWaferSum.ProbeCntPlus(lLotSeq, WaferID);
-                
-                    /// Die Data Update
-                    /// //////////////////////////////////////////////////////////////////////////////////////////////
-                    /// 신규 Map이므로 USEMAP에서 필요한 MAP을 T_AVI_XXXX로 1Set Copy한다.
-                    /// 
-                    oAviTable.CreateCleanMap(Product,lWaferSeq);
-                    /// Update Fail Die
-                    /// 
-                    string[,] strFailDie = new string[oUpdateDie.Count,4];
-                    
-                    for(int i=0; i<oUpdateDie.Count;i++)
-                    {
-                        strFailDie[i, 0] = oUpdateDie[i].VIFail.ToString();
-                        strFailDie[i, 1] = lWaferSeq.ToString();
-                        strFailDie[i, 2] = oUpdateDie[i].IndexX.ToString();
-                        strFailDie[i, 3] = oUpdateDie[i].IndexY.ToString();
-                    }
-                    oAviTable.UpdateFailDie(Product, strFailDie);
-
-                    oWaferSum.ProcWaferSum(Product, lWaferSeq);
-                    ts.Complete();
-                }
-
-                return 0;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
     }
 }

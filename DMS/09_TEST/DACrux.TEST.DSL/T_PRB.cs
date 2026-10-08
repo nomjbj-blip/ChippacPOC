@@ -181,114 +181,6 @@ namespace DACrux.TEST.DSL
             }
         }
 
-        public void CopyPrb(string str1, string str2
-                                , string Wafer_Seq, string PreWafer_Seq)
-        {
-            try
-            {
-                this.Execute("COPY_PRB"
-                    , new string[] { str1, str2 } // Dynamic query
-                    , new string[] { Wafer_Seq, PreWafer_Seq });
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public void UpdatePrb(string strTable
-                                , string Wafer_Seq, string X, string Y, string Bin, string Hbin, string CharBin)
-        {
-            try
-            {
-                this.Execute("UPDATE_PRB"
-                    , new string[] { strTable } // Dynamic query
-                    , new string[] { Wafer_Seq, X, Y, Bin, Hbin, CharBin });
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public DataTable SelectXY(string strTable, string Wafer_Seq, string X, string Y)
-        {
-            DataTable dt = null;
-
-            try
-            {
-                dt = this.GetDataTable("SELECT_XY"
-                                        , new string[] { strTable }
-                                        , new string[] { Wafer_Seq, X, Y });
-                return dt;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-            finally
-            {
-                if (dt != null) dt.Dispose();
-            }
-        }
-
-        public void UpdateAvi(string strTable,
-                                string Wafer_Seq, string X, string Y, string Bin)
-        {
-            try
-            {
-                this.Execute("UPDATE_AVI"
-                                , new string[] { strTable } // Dynamic query
-                                , new string[] { Wafer_Seq, X, Y, Bin });
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public DataTable SelectLossDie(string strTable, string Wafer_Seq, string Program, string Product)
-        {
-            DataTable dt = null;
-
-            try
-            {
-                dt = this.GetDataTable("SELECT_LOSSDIE"
-                                        , new string[] { strTable }
-                                        , new string[] { Wafer_Seq, Program, Product });
-                return dt;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-            finally
-            {
-                if (dt != null) dt.Dispose();
-            }
-        }
-
-        public DataTable SelectFailDie(string strTable, string Wafer_Seq, string Program, string Product)
-        {
-            DataTable dt = null;
-
-            try
-            {
-                dt = this.GetDataTable("SELECT_FAILDIE"
-                                        , new string[] { strTable }
-                                        , new string[] { Wafer_Seq, Program, Product });
-                return dt;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-            finally
-            {
-                if (dt != null) dt.Dispose();
-            }
-        }
-
         public DataTable SelectTestDie(string strTable, string Wafer_Seq)
         {
             DataTable dt = null;
@@ -311,49 +203,11 @@ namespace DACrux.TEST.DSL
             }
         }
 
-        public DataTable SelectTableName(string program)
-        {
-            DataTable dt = null;
-            try
-            {
-                dt = this.GetDataTable("SELECT_TABLENAME", null, new string[] { program });
-                return dt;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
         public DataTable SelectInfo(string Table, string WaferSeq)
         {
             try
             {
                 return this.GetDataTable("SELECT_INFO", new string[] { Table }, new string[] { WaferSeq });
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public DataTable SelectInfoMergeVI(string Table, string WaferSeq)
-        {
-            try
-            {
-                return this.GetDataTable("SELECT_INFO_MERGE_VI", new string[] { Table }, new string[] { WaferSeq });
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public DataTable SelectInfoAVIMergeVI(string LotID, string WaferID, string TestArea)
-        {
-            try
-            {
-                return this.GetDataTable("SELECT_INFO_AVI_MERGE_VI", null, new string[] { LotID, WaferID, TestArea });
             }
             catch (Exception ex)
             {
@@ -397,18 +251,6 @@ namespace DACrux.TEST.DSL
             }
         }
 
-        public void CopyTemporaryTable(string strTable, string strTempTable)
-        {
-            try
-            {
-                this.Execute("COPY_TEMP_TABLE", new string[] { strTable, strTempTable }, null);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
         #region Sum Data 사용---------------------------------------------
 
         public DataTable SelectBinData(string strTable, string Wafer_Seq)
@@ -434,30 +276,6 @@ namespace DACrux.TEST.DSL
 
         #endregion --------------------------------------------------------
 
-        public void CopyRowDataNotPrb(string ToTable, string FromTable, string WaferSeq, string PreWaferSeq)
-        {
-            try
-            {
-                this.Execute("COPY_ROW_DATA_NOT_PRB", new string[] { ToTable, FromTable }, new string[] { WaferSeq, PreWaferSeq });
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public DataTable SelectRowDataWithGec(string WaferSeq)
-        {
-            try
-            {
-                return this.GetDataTable("SELECT_ROW_DATA_WITH_GEC", null, new string[] { WaferSeq });
-            }
-            catch (Exception ex)
-            {
-                throw ex; 
-            }
-        }
-
         public void CopyRowDataForAOI(string ToTable, string FromTable, string WaferSeq, string PreWaferSeq)
         {
             try
@@ -469,18 +287,6 @@ namespace DACrux.TEST.DSL
                 throw ex;
             }
 
-        }
-
-        public DataTable SelectCount(string table, string waferSeq)
-        {
-            try
-            {
-                return this.GetDataTable("SELECT_VI_COUNT", new string[] { table }, new string[] { waferSeq });
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
         }
 
         public DataTable SelectMaxWaferSeq()

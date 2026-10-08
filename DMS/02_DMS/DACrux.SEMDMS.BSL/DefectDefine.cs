@@ -34,63 +34,11 @@ namespace DACrux.SEMDMS.BSL
             }
         }
 
-        public long GetSetupInfo(string SetupID)
-        {
-            DACrux.SEMDMS.DSL.TQD_SETUP oTQD_SETUP = null;
-            DataTable dt = null;
-            try
-            {
-                oTQD_SETUP = new DACrux.SEMDMS.DSL.TQD_SETUP();
-                dt = oTQD_SETUP.GetData("SELECT_SETUP_SEQ_2", null, new string[] { SetupID });
-                if (dt.Rows.Count == 0) return -1;
-                return DACrux.Base.Convert.longParse(dt.Rows[0][0].ToString());
-            }
-            finally
-            {
-                if (dt != null)
-                    dt.Dispose();
-            }
-
-        }
-
-        public long GetSetupInfo(string SetupID, string strX, string strY)
-        {
-            DACrux.SEMDMS.DSL.TQD_SETUP oTQD_SETUP = null;
-            DataTable dt = null;
-            try
-            {
-                oTQD_SETUP = new DACrux.SEMDMS.DSL.TQD_SETUP();
-                dt = oTQD_SETUP.GetData("FAB1_SETUP_SUPLE", null, new string[] { SetupID, strX, strY });
-                if (dt.Rows.Count == 0) return -1;
-                return DACrux.Base.Convert.longParse(dt.Rows[0][0].ToString());
-            }
-            finally
-            {
-                if (dt != null)
-                    dt.Dispose();
-            }
-
-        }
-
-        public void CreateSetupInfo(string[] SetupInfo)
-        {
-            DACrux.SEMDMS.DSL.TQD_SETUP oTQD_SETUP = null;
-            oTQD_SETUP = new DACrux.SEMDMS.DSL.TQD_SETUP();
-            oTQD_SETUP.InsertData("CREATE_SETUP", null, SetupInfo);
-        }
-
         public void CreateSetupData(string[] SetupInfo)
         {
             DACrux.SEMDMS.DSL.TQD_SETUP oTQD_SETUP = null;
             oTQD_SETUP = new DACrux.SEMDMS.DSL.TQD_SETUP();
             oTQD_SETUP.InsertData("CREATE_SETUP_INFO", null, SetupInfo);
-        }
-
-        public void UpdateSetupData(string strSetupSeq, string strStreetX, string strStreetY)
-        {
-            DACrux.SEMDMS.DSL.TQD_SETUP oTQD_SETUP = null;
-            oTQD_SETUP = new DACrux.SEMDMS.DSL.TQD_SETUP();
-            oTQD_SETUP.UpdateData("UPDATE_SETUP_STREET", null, new string[] { strStreetX, strStreetY, strSetupSeq });
         }
 
         #endregion
@@ -240,25 +188,6 @@ namespace DACrux.SEMDMS.BSL
             oTQD_STEP.UpdateStepTestNo(strWaferSeq, strStepID);
         }
 
-        /// <summary>
-        /// FAB1 의 Migration 용으로 사용.
-        /// Migration의 경우 TEST_ORDER 를 0으로 저장 한다.
-        /// </summary>
-        /// <param name="StepInfo"></param>
-        public void CreateStepInfo(string[] StepInfo)
-        {
-            DACrux.SEMDMS.DSL.TQD_STEP oTQD_STEP = null;
-            try
-            {
-                oTQD_STEP = new DACrux.SEMDMS.DSL.TQD_STEP();
-                oTQD_STEP.InsertData("CREATE_STEP", null, StepInfo);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
         public void CreateStepSeq(string[] StepInfo)
         {
             DACrux.SEMDMS.DSL.TQD_STEP oTQD_STEP = null;
@@ -311,24 +240,6 @@ namespace DACrux.SEMDMS.BSL
 
         #region [TQD_INSP_INFO]
 
-        /// <summary>
-        /// FAB1 의 Migration 용으로 사용.
-        /// </summary>
-        /// <param name="InspInfo"></param>
-        public void CreateInspInfo(string[] InspInfo)
-        {
-            DACrux.SEMDMS.DSL.TQD_INSP_INFO oTQD_INSP_INFO = null;
-            try
-            {
-                oTQD_INSP_INFO = new DACrux.SEMDMS.DSL.TQD_INSP_INFO();
-                oTQD_INSP_INFO.InsertData("CREATE_INSP_INFO_MIG", null, InspInfo);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
         public void CreateInspData(string[] InspInfo)
         {
             DACrux.SEMDMS.DSL.TQD_INSP_INFO oTQD_INSP_INFO = null;
@@ -343,21 +254,6 @@ namespace DACrux.SEMDMS.BSL
             }
         }
 
-
-        public DataTable GetInspInfo(string strStepSeq)
-        {
-            DACrux.SEMDMS.DSL.TQD_INSP_INFO oTQD_INSP_INFO = null;
-            try
-            {
-                oTQD_INSP_INFO = new DACrux.SEMDMS.DSL.TQD_INSP_INFO();
-                return oTQD_INSP_INFO.GetData("SELECT_TQD_INSP_INFO_DUPL", null, new string[] { strStepSeq });
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-
-        }
 
         public DataTable GetInspInfoDuple(string strStepSeq, string strTestNo)
         {
@@ -426,20 +322,6 @@ namespace DACrux.SEMDMS.BSL
             return obj.GetLastestStepDefectXY(waferID, stepID, resultTime);
         }
 
-        public void DeleteDefectInfo(string strWaferSeq, string strStep)
-        {
-            DACrux.SEMDMS.DSL.TQD_DEFECT oTQD_DEFECT = new DACrux.SEMDMS.DSL.TQD_DEFECT();
-            try
-            {
-                oTQD_DEFECT.DeleteData("DELETE_DEFECT", null, new string[] { strWaferSeq, strStep });
-                return;
-            }
-            finally
-            {
-
-            }
-        }
-
         public void SetMigrationData(string[,] strData)
         {
             DACrux.SEMDMS.DSL.TQD_DEFECT oTQD_DEFECT = null;
@@ -471,34 +353,6 @@ namespace DACrux.SEMDMS.BSL
         //    }
         //}
 
-        public void CreateImagesMulti(string[,] ImageInfo)
-        {
-            DACrux.SEMDMS.DSL.TQD_IMAGES oTQD_IMAGES = null;
-            try
-            {
-                oTQD_IMAGES = new DACrux.SEMDMS.DSL.TQD_IMAGES();
-                oTQD_IMAGES.InsertExecuteMultiple("CREATE_IMAGES", ImageInfo);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public void DeleteImages(string strStepSeq, string strWaferSeq)
-        {
-            DACrux.SEMDMS.DSL.TQD_IMAGES oTQD_IMAGES = null;
-            try
-            {
-                oTQD_IMAGES = new DACrux.SEMDMS.DSL.TQD_IMAGES();
-                oTQD_IMAGES.DeleteData("DELETE_IMAGES", null, new string[] { strStepSeq, strWaferSeq });
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
         #endregion
 
         #region [TQD_PRODUCT]
@@ -521,25 +375,6 @@ namespace DACrux.SEMDMS.BSL
         #endregion
 
         #region [TQD_SETUP_MAP]
-
-        public int GetSetupMapCount(long setup_seq)
-        {
-            DACrux.SEMDMS.DSL.TQD_SETUP_MAP oTQD_SETUP_MAP = null;
-            DataTable dt = null;
-            int isamplecount = 0;
-            try
-            {
-                oTQD_SETUP_MAP = new DACrux.SEMDMS.DSL.TQD_SETUP_MAP();
-                dt = oTQD_SETUP_MAP.GetData("SELECT_MAP_COUNT", null, new string[] { setup_seq.ToString() });
-                isamplecount = DACrux.Base.Convert.intParse(dt.Rows[0][0].ToString());
-                return isamplecount;
-            }
-            finally
-            {
-                if (dt != null)
-                    dt.Dispose();
-            }
-        }
 
         public DataTable GetSetupTestData(string strsetup_seq, string strTEST)
         {

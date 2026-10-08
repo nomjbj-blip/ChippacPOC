@@ -20,7 +20,6 @@ namespace DACrux.SEMDMS.Interface
         DataTable GetInspectionDetail(string factory, string fromDate, string toDate, string model, bool bAreaFlag);
 
         object[,] GetDmSummaryData(long[] Steps);
-        byte[] GetDmSummaryData_Comp(long[] Steps);
 
         // DM Data Sheet
         byte[] GetDataSheet_Comp(string fromDate, string toDate, string[] products, string[] stepids, string[] lots, string[] wafers, string[] xItem, string[] categorise);

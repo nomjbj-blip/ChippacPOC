@@ -208,14 +208,6 @@ namespace DACrux.TEST.RO
         //}
 
         /// <summary>
-        /// 해당 LOT의 PROGRAM 리스트를 가져옵니다.
-        /// </summary>
-        public string[] GetProgramByLot(string[] lotSeqArr)
-        {
-            return m_OBJ.GetProgramByLot(lotSeqArr);
-        }
-
-        /// <summary>
         /// WAFER_SEQ에 대한 RAW DATA를 가져옵니다. 여러 테이블인 경우 모든 데이터를 가져옵니다.
         /// </summary>
         public DataTable GetAllRawData(string[] waferSeqArr)

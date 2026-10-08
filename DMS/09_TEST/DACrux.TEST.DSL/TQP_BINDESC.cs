@@ -197,47 +197,6 @@ namespace DACrux.TEST.DSL
             }
         }
 
-        public DataTable SelectBinInfoByAll(string Product, string TestArea, string Format)
-        {
-            try
-            {
-                return this.GetDataTable("SELECT_BININFO_BY_ALL_1", null, new string[] { Product, TestArea, Format });
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public DataTable GetBinListEditableByTestArea(string Program, string TestArea)
-        {
-
-            DataTable dt = null;
-            try
-            {
-                dt = this.GetDataTable("SELECT_BIN_EDITABLE_BY_TESTAREA", null, new string[] { Program, TestArea });
-                return dt;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public DataTable SelectBinEditableByAll(string Product, string TestArea, string format)
-        {
-            DataTable dt = null;
-            try
-            {
-                dt = this.GetDataTable("SELECT_BIN_EDITABLE_BY_ALL", null, new string[] { Product, TestArea, format });
-                return dt;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
         public void UpdateProgramBin(string Product, string TestArea, string Format, string[,] BinInf)
         {
             //DELETE_PROGRAM_BIN
@@ -251,47 +210,6 @@ namespace DACrux.TEST.DSL
             {
                 this.Execute("DELETE_BIN_BY_ALL", null, new string[] { Product, TestArea, Format });	//Insert하던 새로운것을 삭제한다.
                 this.Execute("ROLLBACK_BINDESC_TEMP", null, new string[] { Product });	//"UPDATE_TEMP"를 원래의 Product Name으로 바꾼다
-                throw ex;
-            }
-        }
-
-        public void UpdateProgramBinByTestArea(string Program, string TestArea, string[,] BinInf)
-        {
-            //DELETE_PROGRAM_BIN
-            try
-            {
-                this.Execute("UPDATE_PROGRAM_TEMP_BY_TESTAREA", null, new string[] { Program, TestArea });
-                if (BinInf.Length > 0) this.ExecuteMultiple("CREATE_BIN", BinInf);
-                this.Execute("DELETE_TEMP_PROGRAM", null, null);
-            }
-            catch (Exception ex)
-            {
-                this.Execute("DELETE_PROGRAM_BIN_BY_TESTAREA", null, new string[] { Program, TestArea });	//Insert하던 새로운것을 삭제한다.
-                this.Execute("ROLLBACK_BINDESC_TEMP", null, new string[] { Program });	//"UPDATE_TEMP"를 원래의 Program Name으로 바꾼다
-                throw ex;
-            }
-        }
-
-        public void DeleteBinByAll(string Product, string TestArea, string Format)
-        {
-            try
-            {
-                this.Execute("DELETE_BIN_BY_ALL", null, new string[] { Product, TestArea, Format });
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public void DeleteProgramBinByTestArea(string Program, string TestArea)
-        {
-            try
-            {
-                this.Execute("DELETE_PROGRAM_BIN_BY_TESTAREA", null, new string[] { Program, TestArea });
-            }
-            catch (Exception ex)
-            {
                 throw ex;
             }
         }
@@ -372,45 +290,7 @@ namespace DACrux.TEST.DSL
             }
         }
 
-        public DataTable SelectBinfoByAll(string Product, string TestArea, string Format)
-        {
-            DataTable dt = null;
-            try
-            {
-                dt = this.GetDataTable("SELECT_BININFO_BY_ALL", null, new string[] { Product, TestArea });
-                return dt;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
         #region Map Parser 사용 DSL-------------------------------------------------------
-
-        public DataTable SelectBinInfo(string Program, string Product)
-        {
-            try
-            {
-                return this.GetDataTable("SELECT_BININFO", null, new string[] { Program, Product });
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public DataTable SelectBinInfoByTestArea(string Program, string Product, string TestArea)
-        {
-            try
-            {
-                return this.GetDataTable("SELECT_BININFO_BY_TESTAREA", null, new string[] { Program, Product, TestArea });
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
 
         public DataTable SelectGecBin(string Program)
         {
@@ -424,53 +304,7 @@ namespace DACrux.TEST.DSL
             }
         }
 
-        public DataTable SelectBinInforByCharBin(string program, string char_bin)
-        {
-            try
-            {
-                return this.GetDataTable("SELECT_BIN_BY_CHARBIN", null, new string[] { program, char_bin });
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public DataTable GetBinDescDistinct(string Entity)
-        {
-            try
-            {
-                return this.GetDataTable("SELECT_BINDESC_DISTINCT", new string[] { Entity, Entity, Entity }, null);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
         #endregion ------------------------------------------------------------------------
-
-        public DataTable SelectBinRuleList()
-        {
-            DataTable dt = null;
-            try
-            {
-                dt = this.GetDataTable("SELECT_BIN_RULE_LIST", null, null);
-                return dt;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-            finally
-            {
-                if (dt != null)
-                {
-                    dt.Dispose();
-                    dt = null;
-                }
-            }
-        }
 
         public DataTable SelectProgramBin(string strProgram, string strBin)
         {

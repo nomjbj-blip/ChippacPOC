@@ -166,11 +166,6 @@ namespace DACrux.TEST.DSL
             ExecuteNonQuery("INSERT_DATA", null, new string[] { facotry, program, tableName });
         }
 
-        public DataTable SelectProgramAndTable(string waferSeq)
-        {
-            return GetDataTable("SELECT_PROGRAM_AND_TABLE", null, new string[] { waferSeq });
-        }
-
         /// <summary>
         /// wafer seq로 테이블 목록을 가져옵니다.
         /// </summary>

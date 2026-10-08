@@ -178,35 +178,6 @@ namespace DACrux.SEMDMS.DSL
         }
 
 
-        public DataTable GetExistInspWaferID(string[] InspInfo)
-        {
-            this.TraceStartPoint();
-            DataTable dt = null;
-            try
-            {
-                dt = this.GetDataTable("CHECK_EXIST_WAFERID", null, InspInfo);
-                return dt;
-            }
-            catch (Exception ex)
-            {
-                throw this.ProcessErr(ex);
-            }
-        }
-
-        public DataTable GetExistInspSlot(string[] InspInfo)
-        {
-            this.TraceStartPoint();
-            DataTable dt = null;
-            try
-            {
-                dt = this.GetDataTable("CHECK_EXIST_SLOT", null, InspInfo);
-                return dt;
-            }
-            catch (Exception ex)
-            {
-                throw this.ProcessErr(ex);
-            }
-        }
         public string GetWaferSeq(string InspInfo)
         {
             DataTable dt = null;

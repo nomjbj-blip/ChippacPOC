@@ -274,15 +274,6 @@ namespace DACrux.TEST.BSL
         //}
 
         /// <summary>
-        /// 해당 LOT의 PROGRAM 리스트를 가져옵니다.
-        /// </summary>
-        public string[] GetProgramByLot(string[] lotSeqArr)
-        {
-            TQP_LOT obj = new TQP_LOT();
-            return obj.GetProgram(lotSeqArr);
-        }
-
-        /// <summary>
         /// WAFER_SEQ에 대한 RAW DATA를 가져옵니다. 여러 테이블인 경우 모든 데이터를 가져옵니다.
         /// </summary>
         public byte[] GetAllRawData_Comp(string[] waferSeqArr)

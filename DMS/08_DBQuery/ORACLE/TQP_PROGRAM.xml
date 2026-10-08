@@ -92,12 +92,6 @@ AVI        INTEGER
         <commandtext><![CDATA[SELECT * FROM TQP_PROGRAM
 WHERE PROGRAM IN ( ?? )]]></commandtext>
     </query>
-    <query statement="Select" queryid="TABLE_EXIST" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT COUNT(*) AS CNT FROM USER_TABLES WHERE TABLE_NAME = :tName]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="0">:tName</param>
-        </parameters>
-    </query>
     <query statement="Insert" queryid="CREATE_IDX01" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[CREATE INDEX IDX_??01 ON ?? (WAFER_SEQ, X, Y)]]></commandtext>
     </query>
@@ -218,12 +212,6 @@ WHERE PROGRAM = :program]]></commandtext>
             <param direction="Input" dbtype="VarChar" size="30">:program</param>
         </parameters>
     </query>
-    <query statement="Delete" queryid="DELETE_RAW_DATA" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[DELETE FROM ?? WHERE WAFER_SEQ = :wafer_seq]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="Number" size="0">:wafer_seq</param>
-        </parameters>
-    </query>
     <query statement="Select" queryid="GET_TESTAREA_LIST" commandtype="Text" description="Testarea List를 가져온다." commandtimeout="60">
         <commandtext><![CDATA[SELECT DISTINCT TESTAREA FROM TQP_PROGRAM]]></commandtext>
     </query>
@@ -309,36 +297,6 @@ ORDER BY BIN
             <param direction="Input" dbtype="VarChar" size="0">:program</param>
         </parameters>
     </query>
-    <query statement="Select" queryid="GET_FAIL_MAPDATA_MULTI" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT 
-DECODE(A.X,NULL,B.X,A.X) AS X
-,DECODE(A.Y,NULL,B.Y,A.Y) AS Y
-,DECODE(A.BIN,NULL,B.BIN,A.BIN) AS BIN 
-FROM
-( 
-    SELECT X,Y,min(BIN) as BIN 
-    FROM ?? 
-    WHERE 1=1 
-    AND WAFER_SEQ in (??) 
-    AND BIN > 1 
-    GROUP BY X,Y
-) A,
-
-(
-    SELECT X,Y,1 as BIN 
-    FROM ??
-    WHERE 1=1 
-    AND WAFER_SEQ in (??)
-) B 
-WHERE 1=1
-AND A.X(+) = B.X 
-AND A.Y(+) = B.Y]]></commandtext>
-    </query>
-    <query statement="Select" queryid="GET_CUM_MAPDATA_MULTI" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT X,Y,count(BIN) as CNT FROM TD_??
- WHERE 1=1 AND WAFER_SEQ in (??) AND BIN in (??) group by x, y
- ]]></commandtext>
-    </query>
     <query statement="Select" queryid="SELECT_PROGRAMINFO_BY_TESTAREA" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[SELECT * 
 FROM TQP_PROGRAM 
@@ -348,34 +306,6 @@ AND TESTAREA = :testarea]]></commandtext>
         <parameters>
             <param direction="Input" dbtype="VarChar" size="25" value="621-SETH1102">:program</param>
             <param direction="Input" dbtype="VarChar" size="25" value="ALL">:testarea</param>
-        </parameters>
-    </query>
-    <query statement="Update" queryid="UPDATE_PROGRAM_DMS" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[UPDATE TQP_PROGRAM SET 
-TESTAREA=:testarea,
-PRODUCT=:product,
-TARGET_YIELD=:target_yield,
-LASTMODIFY=SYSDATE
-WHERE 1=1
-AND PROGRAM = :program
-AND TESTAREA = :testarea]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="0">:testarea</param>
-            <param direction="Input" dbtype="VarChar" size="0">:product</param>
-            <param direction="Input" dbtype="Number" size="0">:target_yield</param>
-            <param direction="Input" dbtype="VarChar" size="0">:program</param>
-        </parameters>
-    </query>
-    <query statement="Delete" queryid="DELETE_PROGRAM_BY_TESTAREA" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[DELETE 
-FROM TQP_PROGRAM 
-WHERE 1=1
-AND PROGRAM = :program
-AND TESTAREA = :testarea
-]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="0">:program</param>
-            <param direction="Input" dbtype="VarChar" size="0">:testarea</param>
         </parameters>
     </query>
     <query statement="Insert" queryid="CREATE_PROGRAM_TABLE_AVI" commandtype="Text" commandtimeout="60">
@@ -395,13 +325,6 @@ BUMP        INTEGER
     </query>
     <query statement="Insert" queryid="CREATE_AVI_IDX01" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[CREATE INDEX IDX_??01 ON T_AVI_?? (WAFER_SEQ, X, Y)]]></commandtext>
-    </query>
-    <query statement="Select" queryid="GET_DEFAULT_PROGAM_LIST" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[-- Create Date : 2013-09-28 16:35:52
-
-SELECT PROGRAM, PRODUCT
-FROM TQP_PROGRAM 
-WHERE DEFAULT_FLAG = 'Y']]></commandtext>
     </query>
     <query statement="Select" queryid="GET_BIN_DISTRIBUTION_BY_ALL" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[SELECT DECODE(A.BIN,NULL,B.BIN,A.BIN) AS BIN
@@ -479,39 +402,6 @@ ORDER BY BIN]]></commandtext>
             <param direction="Input" dbtype="VarChar" size="40">:product</param>
             <param direction="Input" dbtype="VarChar" size="40">:testarea</param>
         </parameters>
-    </query>
-    <query statement="Select" queryid="GET_BIN_DISTRIBUTION_BY_ALL_BOTH" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT DECODE(A.BIN,NULL,B.BIN,A.BIN) AS BIN
-, DECODE(A.IN_CHAR_BIN,NULL,'EMPTY',A.IN_CHAR_BIN) AS CHAR_BIN
-, DECODE(HIGH_GEC,NULL,'EMPTY', HIGH_GEC) AS HIGH_GEC
-, DECODE(A.BIN_NAME,NULL,'BIN' || B.BIN,A.BIN_NAME) AS BIN_NAME
-, CNT
-, NVL(COLOR, '#FFFFFF') AS COLOR
-, UPPER_LIMIT_CNT
-, LOWER_LIMIT_CNT 
-FROM
-    (SELECT BIN, IN_CHAR_BIN, HIGH_GEC, BIN_NAME, COLOR, UPPER_LIMIT_CNT, LOWER_LIMIT_CNT
-     FROM
-         (
-             ??
-         )
-     GROUP BY BIN, IN_CHAR_BIN, HIGH_GEC, BIN_NAME, COLOR, UPPER_LIMIT_CNT, LOWER_LIMIT_CNT
-     ORDER BY BIN
-    ) A,
-    (SELECT BIN,COUNT(*) AS CNT 
-     FROM ??
-     WHERE WAFER_SEQ IN (??)
-     GROUP BY BIN) B
-     WHERE A.BIN(+)= B.BIN
-ORDER BY BIN]]></commandtext>
-    </query>
-    <query statement="Select" queryid="GET_BIN_DISTRIBUTION_FOR_PROBE_VI" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT BIN, NVL(COLOR, '#FFFFFF')
-FROM
-(
-    ??
-)
-ORDER BY BIN]]></commandtext>
     </query>
     <query statement="Insert" queryid="CREATE_INCUST_AOI_TABLE" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[CREATE TABLE ??(
@@ -676,28 +566,6 @@ ORDER BY PROGRAM]]></commandtext>
     FROM 
   ??
   ORDER BY A.DIE_NUM ASC]]></commandtext>
-    </query>
-    <query statement="Select" queryid="GET_DRAW_TEST_MAP_DATA_CFG" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT T1.WAFER_ID
-    A.WAFER_SEQ,
-    A.DIE_NUM,
-    A.DIEPROBE_CNT,
-    --X,
-    --Y,
-    --DECODE(:angle, 0, A.X, 90, MAX(A.Y) OVER() + MIN(A.Y) OVER() - A.Y, 180, MAX(A.X) OVER() + MIN(A.X) OVER() - A.X, 270, A.Y) + :xoffset AS X,
-    --DECODE(:angle, 0, A.Y, 90, A.X, 180, MAX(A.Y) OVER() + MIN(A.Y) OVER() - A.Y, 270, MAX(A.X) OVER() + MIN(A.X) OVER() - A.X) + :yoffset AS Y,
-    DECODE(:angle, 0, A.X, 90, A.Y , 180, MAX(A.X) OVER() + MIN(A.X) OVER() - A.X, 270,MAX(A.Y) OVER() + MIN(A.Y) OVER() - A.Y) + :xoffset AS X,
-    DECODE(:angle, 0, A.Y, 90, MAX(A.X) OVER() + MIN(A.X) OVER() - A.X, 180, MAX(A.Y) OVER() + MIN(A.Y) OVER() - A.Y, 270, A.X) + :yoffset AS Y,
-    NVL(BIN, 0) AS BIN 
-    ??
-    FROM TQP_WAFER T1
-         ??
-  order by A.DIE_NUM asc]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="40">:angle</param>
-            <param direction="Input" dbtype="VarChar" size="40">:xoffset</param>
-            <param direction="Input" dbtype="VarChar" size="40">:yoffset</param>
-        </parameters>
     </query>
     <query statement="Insert" queryid="MERGE_DATA" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[MERGE INTO TQP_PROGRAM

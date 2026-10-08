@@ -31,16 +31,6 @@ ORDER BY TABLE_NAME]]></commandtext>
             <param direction="Input" dbtype="VarChar" size="0">:TABLE_NAME</param>
         </parameters>
     </query>
-    <query statement="Select" queryid="SELECT_PROGRAM_AND_TABLE" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[-- Create Date : 2019-09-05 13:28:23
-SELECT FACTORY, PROGRAM, TABLE_NAME
-FROM TQP_DATA_TABLES
-WHERE PROGRAM IN (
-    SELECT PROGRAM
-    FROM TQP_WAFER
-    WHERE WAFER_SEQ = :WAFER_SEQ
-)]]></commandtext>
-    </query>
     <query statement="Select" queryid="SELECT_TABLE_BY_WAFER" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[SELECT TABLE_NAME
 FROM TQP_DATA_TABLES

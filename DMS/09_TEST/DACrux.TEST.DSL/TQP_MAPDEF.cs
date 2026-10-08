@@ -215,17 +215,6 @@ namespace DACrux.TEST.DSL
             }
         }
 
-        public DataTable GetMapDefDie(
-            string mapid
-            )
-        {
-            return this.GetDataTable(
-                "GET_MAPDEF_DIE",
-                null,
-                new string[] { mapid }
-                );
-        }
-
         public DataTable GetMapDefByLotID(string LotID)
         {
             DataTable dt = null;
@@ -332,34 +321,6 @@ namespace DACrux.TEST.DSL
             }
         }
 
-        public DataTable GetMapDef_EDS(string MapID)
-        {
-            DataTable dt = null;
-            try
-            {
-                dt = this.GetDataTable("GET_MAPDEF", null, new string[] { MapID });
-                return dt;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public DataTable GetMapIDList_EDS()
-        {
-            DataTable dt = null;
-            try
-            {
-                dt = this.GetDataTable("GET_MAPIDLIST", null, null);
-                return dt;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
         public DataTable GetMapIDAllList()
         {
             DataTable dt = null;
@@ -452,25 +413,6 @@ namespace DACrux.TEST.DSL
         }
 
         #region Map Parsing 사용 ---------------------------------------------------
-
-        public DataTable SelectNetDie(string MapId)
-        {
-            DataTable dt = null;
-            try
-            {
-                dt = this.GetDataTable("SELECT_NETDIE", null, new string[] { MapId });
-                return dt;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-            finally
-            {
-                if (dt != null) dt.Dispose();
-                dt = null;
-            }
-        }
 
         #endregion------------------------------------------------------------
     }

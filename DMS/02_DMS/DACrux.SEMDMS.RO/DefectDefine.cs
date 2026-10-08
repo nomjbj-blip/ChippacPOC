@@ -19,54 +19,6 @@ namespace DACrux.SEMDMS.RO
 
         #region [TQD_SETUP]
 
-        public long GetSetupInfo(string SetupID)
-        {
-            try
-            {
-                return m_OBJ.GetSetupInfo(SetupID);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public long GetSetupInfo(string SetupID, string strX, string strY)
-        {
-            try
-            {
-                return m_OBJ.GetSetupInfo(SetupID, strX, strY);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public void UpdateSetupData(string strSetupSeq, string strStreetX, string strStreetY)
-        {
-            try
-            {
-                m_OBJ.UpdateSetupData(strSetupSeq, strStreetX, strStreetY);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public void CreateSetupInfo(string[] SetupInfo)
-        {
-            try
-            {
-                m_OBJ.CreateSetupInfo(SetupInfo);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
         #endregion
 
         #region [TQD_LOT]
@@ -140,45 +92,9 @@ namespace DACrux.SEMDMS.RO
             }
         }
 
-        public void CreateStepInfo(string[] StepInfo)
-        {
-            try
-            {
-                m_OBJ.CreateStepInfo(StepInfo);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
         #endregion
 
         #region [TQD_INSP_INFO]
-
-        public void CreateInspInfo(string[] InspInfo)
-        {
-            try
-            {
-                m_OBJ.CreateInspInfo(InspInfo);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public DataTable GetInspInfo(string strStepSeq)
-        {
-            try
-            {
-                return m_OBJ.GetInspInfo(strStepSeq);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
 
         #endregion
 
@@ -209,17 +125,6 @@ namespace DACrux.SEMDMS.RO
         }
 
 
-        public void DeleteDefectInfo(string strWaferSeq, string strStep)
-        {
-            try
-            {
-                m_OBJ.DeleteDefectInfo(strWaferSeq, strStep);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
         #endregion
 
         #region [TQD_IMAGES]
@@ -236,30 +141,6 @@ namespace DACrux.SEMDMS.RO
         //    }
         //}
 
-        public void CreateImagesMulti(string[,] ImageInfo)
-        {
-            try
-            {
-                m_OBJ.CreateImagesMulti(ImageInfo);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-
-        public void DeleteImages(string strStepSeq, string strWaferSeq)
-        {
-            try
-            {
-                m_OBJ.DeleteImages(strStepSeq, strWaferSeq);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
 
         #endregion
 
@@ -293,18 +174,6 @@ namespace DACrux.SEMDMS.RO
         #endregion
 
         #region [TQD_SETUP_MAP]
-
-        public int GetSetupMapCount(long setup_seq)
-        {
-            try
-            {
-                return m_OBJ.GetSetupMapCount(setup_seq);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
 
         public void CreateSetupMap(string[,] aParas)
         {

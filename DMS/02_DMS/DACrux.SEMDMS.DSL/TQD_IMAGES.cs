@@ -167,22 +167,6 @@ namespace DACrux.SEMDMS.DSL
                 );
         }
 
-        public DataTable GetImageCount(string[] ImageInfo)
-        {
-            DataTable dt = null;
-            try
-            {
-                dt = this.GetDataTable("GET_IMAGE_COUNT", null, ImageInfo);
-            }
-            catch (Exception ex)
-            {
-                //예외처리
-                throw this.ProcessErr(ex);
-            }
-
-            return dt;
-        }
-
         public DataTable GetDefectImage(long step_seq, int[] defectids)
         {
             DataTable dt = null;

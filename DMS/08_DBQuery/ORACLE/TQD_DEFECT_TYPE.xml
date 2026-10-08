@@ -48,14 +48,6 @@ VALUES (:CLASSNUMBER, :NAME, :DESCRIPTION, :GROUP_ID, :DELETE_FLAG, :DEFECT_COLO
             <param direction="Input" dbtype="VarChar2" size="40" value="UID" description="Update User ID">:UID</param>
         </parameters>
     </query>
-    <query statement="Select" queryid="GET_DEFECT_BY_GROUP" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT * FROM TQD_DEFECT_TYPE
-WHERE GROUP_ID=:group_id
-ORDER BY CLASSNUMBER ]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="40">:group_id</param>
-        </parameters>
-    </query>
     <query statement="Update" queryid="UPDATE_DEFECT_TYPE" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[-- Create Date : 2013-11-06 21:33:41
 UPDATE TQD_DEFECT_TYPE

@@ -40,23 +40,6 @@ namespace DACrux.TEST.RO
             return m_OBJ.GetWaferMap(TestArea, Product, Program, LotID, WaferID, ProbeCnt, IsMaxOper);
         }
 
-        public DataSet GetCumMap(long[] WaferSeqs)
-        {
-            try
-            {
-                return m_OBJ.GetCumMap(WaferSeqs);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public DataTable GetCumRawData(string Program, long[] WaferSeq, string[] SelBin)
-        {
-            return m_OBJ.GetCumRawData(Program, WaferSeq, SelBin);
-        }
-
         public DataTable GetBinDistribution(string program, long waferSeq)
         {
             return m_OBJ.GetBinDistribution(program, waferSeq);
@@ -208,11 +191,6 @@ namespace DACrux.TEST.RO
         }
 
 
-        public DataSet GetCumMapReport(long[] WaferSeqs)
-        {
-            return m_OBJ.GetCumMapReport(WaferSeqs);
-        }
-
         public System.Data.DataSet SelectWaferMapBasic(long WaferSeq)
         {
             return m_OBJ.SelectWaferMapBasic(WaferSeq);
@@ -238,11 +216,6 @@ namespace DACrux.TEST.RO
             return m_OBJ.SelectWaferParaDataMulti(WaferSeqList, strParaItem);
         }
 
-        public System.Data.DataSet SelectWaferMapConfig(long WaferSeq)
-        {
-            return m_OBJ.SelectWaferMapConfig(WaferSeq);
-        }
-
         public System.Data.DataTable SelectWaferShotMap(string strMapID)
         {
             return m_OBJ.SelectWaferShotMap(strMapID);
@@ -253,11 +226,6 @@ namespace DACrux.TEST.RO
             m_OBJ.UpdateMapConfig(strTestArea, strProduct, strProgram, strDir,strAngle, strIndexX, strIndexY, strUser, strcomment);
         }
 
-
-        public DataTable SelectMapConfigList(string strProduct)
-        {
-            return m_OBJ.SelectMapConfigList(strProduct);
-        }
 
         public DataTable SelectMapConfigView(bool bDeleteFlag)
         {

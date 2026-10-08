@@ -164,28 +164,6 @@ namespace DACrux.SEMDMS.DSL
                 );
         }
 
-        public DataTable GetDefectListByGroup(string groupId)
-        {
-            DataTable dt = null;
-            try
-            {
-                dt = this.GetDataTable("GET_DEFECT_BY_GROUP", null, new string[] { groupId });
-                return dt;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-            finally
-            {
-                if (dt != null)
-                {
-                    dt.Dispose();
-                    dt = null;
-                }
-            }
-        }
-
         //--
 
         public object ExistsDefectType(

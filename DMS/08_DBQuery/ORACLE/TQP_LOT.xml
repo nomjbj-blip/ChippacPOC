@@ -77,12 +77,6 @@ AND PROGRAM = :program
             <param direction="Input" dbtype="VarChar" size="30">:program</param>
         </parameters>
     </query>
-    <query statement="Select" queryid="GET_WAFER_COUNT_IN_LOT" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT COUNT(*) AS CNT FROM TQP_WAFER WHERE LOT_SEQ = :lot_seq]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="Number" size="10">:lot_seq</param>
-        </parameters>
-    </query>
     <query statement="Delete" queryid="DELETE_LOT" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[DELETE FROM TQP_LOT
 WHERE LOT_SEQ = :lot_seq]]></commandtext>
@@ -148,30 +142,9 @@ WHERE LOT_SEQ = :pre_lot_seq]]></commandtext>
             <param direction="Input" dbtype="VarChar" size="0">:pre_lot_seq</param>
         </parameters>
     </query>
-    <query statement="Select" queryid="SELECT_LOT_INFO_BY_LOT_ID_EXCLUDE_FINAL" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT *
-FROM TQP_LOT
-WHERE LOT_ID = :lot_id
-AND TEST_AREA NOT LIKE '%FINAL%'
-AND TEST_AREA LIKE '%MERGE%'
-ORDER BY LOT_SEQ DESC]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
-        </parameters>
-    </query>
     <query statement="Select" queryid="SELECT_NEXT_LOTSEQ" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[SELECT LOT_SEQ.NEXTVAL
 FROM DUAL]]></commandtext>
-    </query>
-    <query statement="Select" queryid="SELECT_CURTLOT_TESTAREA" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT TEST_AREA
-FROM TQP_LOT
-WHERE LOT_SEQ =
-  (SELECT MAX(LOT_SEQ) FROM TQP_LOT WHERE LOT_ID = :LOT_ID
-  )]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="40">:LOT_ID</param>
-        </parameters>
     </query>
     <query statement="Insert" queryid="CREATE_LOT_02" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[-- Create Date : 2015-04-15 21:14:57
@@ -293,19 +266,6 @@ INSERT (
             <param direction="Input" dbtype="VarChar" size="0" value="START_TIME">:START_TIME</param>
             <param direction="Input" dbtype="VarChar" size="0" value="END_TIME">:END_TIME</param>
             <param direction="Input" dbtype="VarChar" size="0" value="WAFER_DIAM">:WAFER_DIAM</param>
-        </parameters>
-    </query>
-    <query statement="Delete" queryid="DELETE_LOT_AVI" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[DELETE
-FROM TQP_LOT
-WHERE 1 = 1
-    AND FACTORY = :FACTORY 
-    AND TEST_AREA = :TEST_AREA 
-    AND LOT_ID = :LOT_ID]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="40" value="FACTORY">:FACTORY</param>
-            <param direction="Input" dbtype="VarChar" size="40" value="TEST_AREA">:TEST_AREA</param>
-            <param direction="Input" dbtype="VarChar" size="40" value="LOT_ID">:LOT_ID</param>
         </parameters>
     </query>
     <query statement="Select" queryid="GET_LOT_LIST_01" commandtype="Text" commandtimeout="60">

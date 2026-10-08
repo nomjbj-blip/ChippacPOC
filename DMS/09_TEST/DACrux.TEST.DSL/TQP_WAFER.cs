@@ -148,17 +148,6 @@ namespace DACrux.TEST.DSL
                 );
         }
 
-        public DataTable GetWaferInfoByLSEQ(
-            string lotSeq
-            )
-        {
-            return this.GetDataTable(
-                "GET_WAFER_INFO [LSQ]",
-                null,
-                new string[] { lotSeq }
-                );
-        }
-
         public DataTable GetWaferSummaryInfo(
             string lotSeq,
             decimal waferSeq
@@ -276,63 +265,11 @@ namespace DACrux.TEST.DSL
         //    }
         //}
 
-        public DataTable GetMaintWaferList(string LOTSEQ, string PROBE_CNT)
-        {
-            DataTable dt = null;
-            try
-            {
-                dt = this.GetDataTable("GET_MAINT_WAFER_LIST", new string[] { LOTSEQ, PROBE_CNT }, null);
-                return dt;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
         public void DeleteWaferData(string WaferSeq)
         {
             try
             {
                 this.Execute("DELETE_WAFER_DATA", null, new string[] { WaferSeq });
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public void DeleteWaferDataAVI(string strFactory, string strLotSeq, string strWaferID)
-        {
-            try
-            {
-                this.Execute("DELETE_WAFER_AVI", null, new string[] { strFactory, strLotSeq, strWaferID });
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public void UpdateProbeCount(string WaferSeq, string ProbeCnt)
-        {
-            try
-            {
-                this.Execute("UPDATE_PROBE_CNT", null, new string[] { ProbeCnt, WaferSeq });
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public DataTable GetMapWaferList(string LOTSEQ, string PROBE_CNT)
-        {
-            DataTable dt = null;
-            try
-            {
-                dt = this.GetDataTable("GET_MAP_WAFER_LIST", new string[] { LOTSEQ }, new string[] { PROBE_CNT });
-                return dt;
             }
             catch (Exception ex)
             {

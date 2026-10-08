@@ -142,39 +142,6 @@ namespace DACrux.SEMDMS.DSL
 			}
 		}
 
-		public long GetSetupSeq(string[] SetupInfo)
-		{
-			DataTable dt = null;
-			try
-			{
-				
-				dt = this.GetDataTable( "SELECT_SETUP_SEQ", null, new string[2]{SetupInfo[0],SetupInfo[2]});
-				if(dt.Rows.Count == 0) return -1;
-			}
-			catch (Exception ex)
-			{
-				throw this.ProcessErr(ex);
-			}
-
-			return long.Parse(dt.Rows[0][0].ToString());
-		}
-
-		public long GetSetupSeq(string SetupID)
-		{
-			DataTable dt = null;
-			try
-			{
-
-                dt = this.GetDataTable("SELECT_SETUP_SEQ_2", null, new string[1] { SetupID });
-				if(dt.Rows.Count == 0) return -1;
-			}
-			catch (Exception ex)
-			{
-				throw this.ProcessErr(ex);
-			}
-			return long.Parse(dt.Rows[0][0].ToString());
-		}
-
 		public DataTable GetRecipe(string[] setupinfo)
 		{
 			DataTable dt = null;

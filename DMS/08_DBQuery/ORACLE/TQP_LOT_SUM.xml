@@ -22,16 +22,6 @@ AND TESTAREA = :testarea]]></commandtext>
             <param direction="Input" dbtype="VarChar" size="0">:testarea</param>
         </parameters>
     </query>
-    <query statement="Select" queryid="YIELD_BY_PRODUCT" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT MIN(START_TIME) START_TIME, MAX(END_TIME) END_TIME, PRODUCT, ROUND(AVG(YIELD), 2) YIELD, SUM(WAFERS) WAFERS FROM TQP_LOT_SUM
-WHERE END_TIME BETWEEN TO_DATE(:sTime,'YYYY-MM-DD') AND TO_DATE(:eTime,'YYYY-MM-DD')
-AND TESTAREA='MULTIPROBE'
-GROUP BY PRODUCT]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="0">:sTime</param>
-            <param direction="Input" dbtype="VarChar" size="0">:eTime</param>
-        </parameters>
-    </query>
     <query statement="Select" queryid="GET_ISLOT" commandtype="Text" description="해당 Lot 유무를 조회한다" commandtimeout="60">
         <commandtext><![CDATA[SELECT LOT_SEQ FROM TQP_LOT_SUM WHERE LOT_SEQ = :lot_seq]]></commandtext>
         <parameters>
@@ -57,63 +47,11 @@ WHERE LOT_SEQ = :lot_seq]]></commandtext>
             <param direction="Input" dbtype="Number" size="0">lot_seq</param>
         </parameters>
     </query>
-    <query statement="Select" queryid="SELECT_YIELD_BY_PRODUCT" commandtype="Text" description="YIELD BY PRODUCT" commandtimeout="60">
-        <commandtext><![CDATA[SELECT PRODUCT, SUM(TESTED_DIE) AS TESTDIE, SUM(GEC) AS PASSDIE, ROUND(AVG(YIELD), 5) AS YIELD FROM TQP_LOT_SUM WHERE PRODUCT in (??) GROUP BY PRODUCT]]></commandtext>
-    </query>
-    <query statement="Select" queryid="GET_LOT_SUM_INFO" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT *
-FROM TQP_LOT_SUM
-WHERE 1=1
-AND LOT_SEQ = :lot_seq]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="40">:lot_seq</param>
-        </parameters>
-    </query>
     <query statement="Select" queryid="SELECT_LOT_SUM_BY_LOT_ID" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[SELECT * FROM TQP_LOT_SUM
 WHERE LOT_ID = :lot_id]]></commandtext>
         <parameters>
             <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
-        </parameters>
-    </query>
-    <query statement="Select" queryid="SELECT_LOT_INFO_BY_LOT_ID_EXCLUDE_FINAL" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT *
-FROM TQP_LOT_SUM
-WHERE LOT_ID = :lot_id
-AND TESTAREA NOT LIKE '%FINAL%'
-AND TESTAREA LIKE '%MERGE%'
-ORDER BY LOT_SEQ DESC]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
-        </parameters>
-    </query>
-    <query statement="Select" queryid="SELECT_LOT_SUM_LAST_MERGE" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT *
-FROM TQP_LOT_SUM
-WHERE LOT_ID = :lot_id
-AND TESTAREA LIKE '%MERGE%'
-ORDER BY LOT_SEQ DESC]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
-        </parameters>
-    </query>
-    <query statement="Insert" queryid="CREATE_DMS_LOT" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[-- Create Date : 2014-11-27 19:33:03
-INSERT INTO TQP_LOT_SUM 
-(LOT_SEQ, LOT_ID, TESTAREA, PRODUCT, PROGRAM, CUSTOMER, FACILITY, START_TIME, END_TIME) 
-VALUES 
-(:LOT_SEQ, :LOT_ID, :TESTAREA, :PRODUCT, :PROGRAM, :CUSTOMER, :FACILITY, 
-TO_DATE(:START_TIME,'YYYY-MM-DD HH24:MI:SS'), TO_DATE(:END_TIME,'YYYY-MM-DD HH24:MI:SS'))]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="0">:LOT_SEQ</param>
-            <param direction="Input" dbtype="VarChar" size="0">:LOT_ID</param>
-            <param direction="Input" dbtype="VarChar" size="0">:TESTAREA</param>
-            <param direction="Input" dbtype="VarChar" size="0">:PRODUCT</param>
-            <param direction="Input" dbtype="VarChar" size="0">:PROGRAM</param>
-            <param direction="Input" dbtype="VarChar" size="0">:CUSTOMER</param>
-            <param direction="Input" dbtype="VarChar" size="0">:FACILITY</param>
-            <param direction="Input" dbtype="VarChar" size="0">:START_TIME</param>
-            <param direction="Input" dbtype="VarChar" size="0">:END_TIME</param>
         </parameters>
     </query>
     <query statement="Insert" queryid="INSERT_LOT_SUMMARY" commandtype="Text" commandtimeout="60">

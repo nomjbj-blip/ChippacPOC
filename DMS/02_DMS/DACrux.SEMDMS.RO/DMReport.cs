@@ -43,12 +43,6 @@ namespace DACrux.SEMDMS.RO
             return new DefectMapAnalysis().ArrayToDataTable(obj);
         }
 
-        public DataTable GetDmSummaryData_Comp(long[] Steps)
-        {
-            byte[] bytes = m_OBJ.GetDmSummaryData_Comp(Steps);
-            return DACrux.Base.Util.CompressedBytesToObject(bytes) as DataTable;
-        }
-
         public DataSet GetDataSheet(string fromDate, string toDate, string[] products, string[] stepids, string[] lots, string[] wafers, string[] xItem, string[] categorise)
         {
             byte[] bytes = m_OBJ.GetDataSheet_Comp(fromDate, toDate, products, stepids, lots, wafers, xItem, categorise);

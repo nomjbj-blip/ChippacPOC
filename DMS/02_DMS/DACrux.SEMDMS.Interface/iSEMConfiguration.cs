@@ -11,7 +11,6 @@ namespace DACrux.SEMDMS.Interface
         //TQD_COLORBYSIZE
         DataTable SelectColorListByDftSize(string userId);
         void InsertColorByDftSize(string user, int[] sizeSeq, int[] sizeFrom, int[] sizeTo, System.Drawing.Color[] color);
-        void DeleteColorByDftSize(string userId);
         bool DeleteDefectSizeByColor(string userid, string sizeSeq);
         bool ExistsDefectSizeByColor(string userid, string sizeSeq);
         bool InsertDefectSizeByColor(string userid, string sizeSeq, string sizeFrom, string sizeTo, string color);
@@ -30,7 +29,6 @@ namespace DACrux.SEMDMS.Interface
 
         //TQD_DEFECT_GROUP
         DataTable SelectGroupList();
-        DataTable GetGroup(string groupId);
         bool ExistsDefectGroup(string groupId);
         int InsertDefectGroup(Dictionary<string, string> dicValues, string userid);
         int UpdateDefectGroup(Dictionary<string, string> dicValues, string userid);
@@ -72,6 +70,5 @@ namespace DACrux.SEMDMS.Interface
 
         #endregion [ Yield Prospect ]
 
-        Dictionary<int, string> GetDefectTypeAll();
     }
 }

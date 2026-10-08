@@ -22,7 +22,6 @@ namespace DACrux.SEMDMS.Interface
         DataTable SelectParsingResultStepList();
         DataTable SelectParsingResultInspEqList();
         DataTable SelectParsingResultByItem(string lotId, string waferId, string stepId, string inspEq);
-        DataTable GetImageGallery(long[] step_seqs);
 
         // TQD_SETUP
         DataTable GetSetupRecipe(long setup_seq);
@@ -48,12 +47,9 @@ namespace DACrux.SEMDMS.Interface
 
 
         // TQD_COLORBYSIZE
-        DataTable GetSize(string userid);
         Dictionary<int, Color> GetDefectSizeColor(string userid);
         DataTable SelectColorByDefectSize(string userid);
         
-        void GetFirstStepCnt(long step_seq, ref int newCnt, ref int carryOverCnt, ref int missingCnt);
-        void GetDsaCnt(long first_step_seq, long step_seq, float tolerance, ref int newCnt, ref int carryOverCnt, ref int missingCnt);
         DataTable GetFirstStep(long step_seq);
         DataTable GetDsa(long first_step_seq, long step_seq, float tolerance);
 
@@ -69,10 +65,8 @@ namespace DACrux.SEMDMS.Interface
 
         #region DB 하이텍 
         
-        DataSet GetChartAnalysis(long[] steps);
         System.Data.DataTable GetColorByDefectType();
         DataSet GetDMSStepWaferList(string start, string end, string[] wheres, bool TimeNotCheck, bool bLastInspection);
-        byte[] GetDefectMapViewer(long[] step_seqs);
         DataSet GetBareDefectMapViewer(long[] step_seqs, string strMapID);
         System.Data.DataTable GetShotDeviceList();
         System.Data.DataTable GetMapIDListNotDelete();
@@ -80,9 +74,6 @@ namespace DACrux.SEMDMS.Interface
         
         DataTable GetDefectClassInfo();
         Dictionary<string, Color> GetDefectClassColor();
-
-        DataTable GetDSAReport(long[] step_seqs, string strTol);
-        System.Data.DataSet GetBasicMapViewer(long[] step_seqs);
 
         DataTable GetDefectImages(long[] steps);
         // Reclassify 
@@ -100,10 +91,8 @@ namespace DACrux.SEMDMS.Interface
         byte[] GetDefectMapViewer_Map(long[] step_seqs, string[] setupseq, string[] test);
         byte[] GetDefectMapViewer_Defects(long[] step_seqs, bool bAdder);
         List<object[]> GetDefectMapViewer_Defects2(long[] step_seqs, bool bAdder);
-        byte[] GetDefectMapViewer_Defects2_Comp(long[] step_seqs, bool bAdder);
         object[,] GetDefectMapViewer_Defects3(long[] step_seqs, bool bAdder);
         byte[] GetDefectMapViewer_Defects3_Comp(long[] step_seqs, bool bAdder);
-        byte[] GetDefectMapViewer_Chart(long[] step_seqs, bool bAdder);
      
         #endregion
 
@@ -128,7 +117,6 @@ namespace DACrux.SEMDMS.Interface
         DataTable GetPatternSearch_WaferList(long[] stepSeqArr);
         Dictionary<long, List<PointF>> GetPatternSearch_XYList(long[] stepSeqArr);
         List<PointF> GetPatternSearch_XYList(long stepSeq);
-        byte[] GetPatternSearch_XYList_Comp(long[] stepSeqArr);
 
         #endregion
 

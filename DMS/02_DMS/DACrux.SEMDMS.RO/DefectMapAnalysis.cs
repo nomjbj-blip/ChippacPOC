@@ -222,11 +222,6 @@ namespace DACrux.SEMDMS.RO
             return m_OBJ.GetDensity(step_seq, SelDefects);
         }
 
-        public System.Data.DataTable GetDefectDataCnt(long[] step_seqs, string column)
-        {
-            return m_OBJ.GetDefectCount(step_seqs, column);
-        }
-
         public System.Data.DataTable GetDefectImage(long step_seq, int[] defectid = null)
         {
             return m_OBJ.GetDefectImage(step_seq, defectid);
@@ -242,11 +237,6 @@ namespace DACrux.SEMDMS.RO
             return m_OBJ.GetDieRepeatDefect(step_seq, tolerance);
         }
 
-        public System.Data.DataTable GetSize(string userid)
-        {
-            return m_OBJ.GetSize(userid);
-        }
-
         public System.Data.DataTable SelectColorByDefectSize(string userid)
         {
             return m_OBJ.SelectColorByDefectSize(userid);
@@ -256,30 +246,6 @@ namespace DACrux.SEMDMS.RO
             string userid)
         {
             return m_OBJ.GetDefectSizeColor(userid);
-        }
-
-        public void GetFirstStepCnt(long step_seq, ref int newCnt, ref int carryOverCnt, ref int missingCnt)
-        {
-            m_OBJ.GetFirstStepCnt(step_seq, ref  newCnt, ref  carryOverCnt, ref  missingCnt);
-        }
-
-        public void GetDsaCnt(
-            long first_step_seq,
-            long step_seq,
-            float tolerance,
-            ref int newCnt,
-            ref int carryOverCnt,
-            ref int missingCnt
-            )
-        {
-            m_OBJ.GetDsaCnt(
-                first_step_seq,
-                step_seq,
-                tolerance,
-                ref  newCnt,
-                ref  carryOverCnt,
-                ref  missingCnt
-                );
         }
 
         public System.Data.DataTable GetFirstStep(long step_seq)
@@ -369,21 +335,6 @@ namespace DACrux.SEMDMS.RO
             return m_OBJ.GetStepInfoOverlay(lotId, waferId);
         }
 
-        public DataTable SelectProduct(string LotID, string TestArea, string p)
-        {
-            throw new NotImplementedException();
-        }
-
-        public DataSet GetStepListByAll(string m_TestArea, string m_Device, string m_CusLotID, string waferList)
-        {
-            throw new NotImplementedException();
-        }
-
-        public System.Data.DataTable GetImageGallery(long[] step_seqs)
-        {
-            return m_OBJ.GetImageGallery(step_seqs);
-        }
-
         #region 동부 하이텍
 
         public System.Data.DataTable GetColorByDefectType(
@@ -403,13 +354,6 @@ namespace DACrux.SEMDMS.RO
             {
                 throw ex;
             }
-        }
-
-        [Obsolete("out of memory 문제로 사용금지", true)]
-        public System.Data.DataSet GetDefectMapViewer(long[] step_seqs)
-        {
-            byte[] bytes = m_OBJ.GetDefectMapViewer(step_seqs);
-            return DACrux.Base.Util.CompressedBytesToObject(bytes) as DataSet;
         }
 
         public DataSet GetBareDefectMapViewer(long[] step_seqs, string strMapID = "")
@@ -443,26 +387,7 @@ namespace DACrux.SEMDMS.RO
             return m_OBJ.GetDefectClassColor();
         }
 
-        public DataTable GetDSAReport(long[] step_seqs, string strTol)
-        {
-            return m_OBJ.GetDSAReport(step_seqs, strTol);
-        }
-
-        public System.Data.DataSet GetBasicMapViewer(long[] step_seqs)
-        {
-            return m_OBJ.GetBasicMapViewer(step_seqs);
-        }
-
         //--
-
-        public DataSet GetChartAnalysis(
-            long[] steps
-            )
-        {
-            return m_OBJ.GetChartAnalysis(
-                steps
-                );
-        }
 
         public DefectList GetDefectImages(
             long[] steps
@@ -702,12 +627,6 @@ namespace DACrux.SEMDMS.RO
             return m_OBJ.GetDefectMapViewer_Defects2(step_seqs, bAdder);
         }
 
-        public List<object[]> GetDefectMapViewer_Defects2_Comp(long[] step_seqs, bool bAdder)
-        {
-            byte[] bytes = m_OBJ.GetDefectMapViewer_Defects2_Comp(step_seqs, bAdder);
-            return DACrux.Base.Util.CompressedBytesToObject(bytes) as List<object[]>;
-        }
-
         public object[,] GetDefectMapViewer_Defects3(long[] step_seqs, bool bAdder)
         {
             return m_OBJ.GetDefectMapViewer_Defects3(step_seqs, bAdder);
@@ -732,12 +651,6 @@ namespace DACrux.SEMDMS.RO
         public DataTable GetDefectImagePath01(long[] stepSeqArr)
         {
             return m_OBJ.GetDefectImagePath01(stepSeqArr);
-        }
-
-        public DataTable GetDefectMapViewer_Chart(long[] step_seqs, bool bAdder)
-        {
-            byte[] bytes = m_OBJ.GetDefectMapViewer_Chart(step_seqs, bAdder);
-            return DACrux.Base.Util.CompressedBytesToObject(bytes) as DataTable;
         }
 
         public DataTable ArrayToDataTable(object[,] arr)
@@ -857,150 +770,9 @@ namespace DACrux.SEMDMS.RO
             return m_OBJ.GetPatternSearch_XYList(stepSeqArr);
         }
 
-        public Dictionary<long, List<PointF>> GetPatternSearch_XYList_Comp(long[] stepSeqArr)
-        {
-            byte[] bytes = m_OBJ.GetPatternSearch_XYList_Comp(stepSeqArr);
-            return DACrux.Base.Util.CompressedBytesToObject(bytes) as Dictionary<long, List<PointF>>;
-        }
-
         #endregion
 
         #region Lot 별 압축 파일 생성 관련 메서드
-
-        /// <summary>
-        /// Lot 별 Zip 파일을 생성합니다.
-        /// </summary>
-        /// <param name="lotID">Lot ID</param>
-        /// <param name="saveFolder">압축 파일을 저장할 디렉토리</param>
-        /// <param name="onlyLastInspection">마지막 Inspection만을 포함할지 여부. 기본값은 false</param>
-        /// <param name="statusMessage">진행 상태를 나타내는 메시지를 수신 할 때. 기본값은 수신하지 않음</param>
-        public void MakeZipFile(string lotID, string saveFolder, bool onlyLastInspection = false, Action<string> statusMessage = null)
-        {
-            if (String.IsNullOrEmpty(lotID))
-                throw new Exception("Lot ID가 null 입니다.");
-
-            if (String.IsNullOrEmpty(saveFolder))
-                throw new Exception("압축파일을 저장할 폴더명이 없습니다.");
-
-            DataTable dt = m_OBJ.GetLotInspInfo(lotID, onlyLastInspection);
-            string tempPath = null;
-
-            if (dt == null || dt.Rows.Count == 0)
-                return;
-
-            DmsCache.Instance.ClassLookupDel += DefectMapAnalysis.GetClassLookup;
-            DmsCache.Instance.WaferDieInfoDel += DefectMapAnalysis.GetWaferDieInfo;
-
-            try
-            {
-                // 임시 디렉토리 생성
-                tempPath = Path.GetTempFileName();
-                File.Delete(tempPath);
-                Directory.CreateDirectory(tempPath);
-
-                DACrux.Common.RO.ComConfiguration con = new DACrux.Common.RO.ComConfiguration();
-
-                DACrux.Utility.HFtpClient ftp;
-
-                // FTP 접속 정보 설정
-                using (DataTable dtConfig = con.GetDefectFTP())
-                {
-                    if (dtConfig == null || dtConfig.Rows.Count == 0)
-                        return;
-
-                    string server = dtConfig.Rows[0]["IP"].ToString();
-                    int port = DACrux.Base.Convert.intParse(dtConfig.Rows[0]["PORT"].ToString());
-                    string id = dtConfig.Rows[0]["ID"].ToString();
-                    string password = dtConfig.Rows[0]["PASS"].ToString();
-
-                    ftp = new Utility.HFtpClient(server, port, id, password);
-                }
-
-                // step_seq 별 처리
-                foreach (DataRow row in dt.Rows)
-                {
-                    if (statusMessage != null)
-                        statusMessage(String.Format("Downloading data ({0}/{1})...", dt.Rows.IndexOf(row) + 1, dt.Rows.Count));
-
-                    string stepID = row["STEP_ID"].ToString();
-                    string waferID = row["WAFER_ID"].ToString();
-                    long stepSeq = DACrux.Base.Convert.longParse(row["STEP_SEQ"].ToString());
-
-                    // defect 정보
-                    Defect[] defectArr = GetDefectMapViewer_DefectArray(new long[] { stepSeq });
-                    Array.Sort(defectArr);
-
-                    if (defectArr == null || defectArr.Length == 0)
-                        continue;
-
-                    // defect image 정보 가져오기
-                    DataTable imgDt = m_OBJ.GetDefectImagePath02(stepSeq.ToString());
-
-                    // defect image 정보 Add
-                    foreach (DataRow imgRow in imgDt.Rows)
-                    {
-                        int defectID = DACrux.Base.Convert.intParse(imgRow["DEFECTID"].ToString());
-                        string imagePath = imgRow["PATH"].ToString();
-
-                        if (String.IsNullOrEmpty(imagePath))
-                            continue;
-
-                        int idx = Array.BinarySearch<Defect>(defectArr, new Defect() { STEP_SEQ = stepSeq, DEFECTID = defectID });
-
-                        if (idx < 0)
-                            continue;
-
-                        defectArr[idx].Images.Add(Path.GetFileName(imagePath));
-
-                        try
-                        {
-                            string fileName = Path.Combine(tempPath, stepID, waferID, Path.GetFileName(imagePath));
-
-                            if (!Directory.Exists(Path.GetDirectoryName(fileName)))
-                                Directory.CreateDirectory(Path.GetDirectoryName(fileName));
-
-                            // defect 이미지 다운로드
-                            ftp.Down(imagePath, fileName);
-                        }
-                        catch
-                        {
-                            // 다운로드 실패 시 무시
-                        }
-                    }
-
-                    // KLARF 파일 생성
-                    DACrux.Data.Parser.Klarf.ParserKlarf parser = new Data.Parser.Klarf.ParserKlarf(defectArr, DmsCache.Instance[stepSeq], DmsCache.Instance.ClassLookup);
-
-                    string klarfFile = null;
-
-                    for (int i = 0; i < 999; i++)
-                    {
-                        klarfFile = Path.Combine(tempPath, stepID, waferID, String.Format("{0}_{1}.{2:000}", waferID, stepID, i));
-
-                        if (!File.Exists(klarfFile))
-                            break;
-                    }
-
-                    parser.SaveFile(klarfFile, true, null, true);
-                }
-
-                // 전체 디렉토리를 압축
-                string zipFileName = Path.Combine(saveFolder, String.Format("{0}.zip", lotID));
-
-                if (statusMessage != null)
-                    statusMessage(String.Format("{0} 압축 파일을 생성중입니다...", Path.GetFileName(zipFileName)));
-
-                SevenZipUtil.ZipFolder(zipFileName, tempPath);
-            }
-            finally
-            {
-                if (dt != null)
-                    dt.Dispose();
-
-                if (!String.IsNullOrEmpty(tempPath))
-                    Directory.Delete(tempPath, true);
-            }
-        }
 
         private void SaveFtpImage(string server, int port, string id, string password, string ftpFilePath, string localFilePath)
         {

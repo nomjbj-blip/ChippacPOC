@@ -369,42 +369,11 @@ namespace DACrux.TEST.DSL
             }
         }
 
-        public void UpdateProgramInfoDMS(string PROGRAM, string TESTAREA, string PRODUCT, double TARGET_YIELD, string VERSION, bool bDefaultDMS)
-        {
-            if (VERSION.Length == 0) VERSION = "V1.0";
-            try
-            {
-                this.Execute("UPDATE_PROGRAM_DMS", null, new string[] {TESTAREA,
-																	   PRODUCT,
-																	   TARGET_YIELD.ToString(),
-																	   PROGRAM,
-																		VERSION,
-                                                                        bDefaultDMS ? "Y":"N"
-																   });
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
         public void DeleteProgramInfo(string PROGRAM)
         {
             try
             {
                 this.Execute("DELETE_PROGRAM", null, new string[] { PROGRAM });
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public void DeleteProgramInfoByTestArea(string PROGRAM, string TESTAREA)
-        {
-            try
-            {
-                this.Execute("DELETE_PROGRAM_BY_TESTAREA", null, new string[] { PROGRAM, TESTAREA });
             }
             catch (Exception ex)
             {
@@ -465,46 +434,6 @@ namespace DACrux.TEST.DSL
 																		,string.Join(",",BINS)
 																		,TableName
 																		,WaferSeq[0]}, null);
-                return dt;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public DataTable GetFailBinMapData(string TableName, string[] WaferSeq, string[] BINS)
-        {
-            DataTable dt = null;
-            try
-            {
-
-                //dt = this.GetDataTable("GET_FAIL_MAPDATA_MULTI", new string[] {PROGRAM.Replace("-","_").Replace(".","_")
-                //                                                        ,string.Join(",",WaferSeq)
-                //                                                        ,PROGRAM.Replace("-","_").Replace(".","_")
-                //                                                        ,WaferSeq[0]}, null);
-
-                dt = this.GetDataTable("GET_FAIL_MAPDATA_MULTI", new string[] {TableName
-																		    ,string.Join(",",WaferSeq)
-																		    ,TableName
-																		    ,WaferSeq[0]}, null);
-                return dt;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public DataTable GetCumMapData(string PROGRAM, string[] WaferSeq, string[] BINS)
-        {
-            DataTable dt = null;
-            try
-            {
-
-                dt = this.GetDataTable("GET_CUM_MAPDATA_MULTI", new string[] {PROGRAM.Replace("-","_").Replace(".","_")
-																		,string.Join(",",WaferSeq)
-																		,string.Join(",",BINS)}, null);
                 return dt;
             }
             catch (Exception ex)
@@ -575,49 +504,6 @@ namespace DACrux.TEST.DSL
             try
             {
                 dt = this.GetDataTable("GET_BIN_DISTRIBUTION_BY_ALL", new string[] { strTableName }, new string[] { Product, TestArea, WaferSeq });
-                return dt;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public DataTable GetBinDistributionByAllBoth(string Dynamic_Query, string TableName, string[] WaferSeq)
-        {
-            DataTable dt = null;
-            try
-            {
-                dt = this.GetDataTable("GET_BIN_DISTRIBUTION_BY_ALL_BOTH", new string[] { Dynamic_Query, TableName, string.Join(",", WaferSeq) }, null);
-                return dt;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public DataTable GetBinDistributionForProbeVI(string Dynamic_Query)
-        {
-            DataTable dt = null;
-            try
-            {
-                dt = this.GetDataTable("GET_BIN_DISTRIBUTION_FOR_PROBE_VI", new string[] { Dynamic_Query }, null);
-                return dt;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public DataTable GetBinDistributionMultiWafer(string PROGRAM, string strTableName, string[] WaferSeq, string TestArea)
-        {
-            DataTable dt = null;
-            try
-            {
-                dt = this.GetDataTable("GET_BIN_DISTRIBUTION_MULTI_WAFER"
-                    , new string[] { strTableName, string.Join(",", WaferSeq) }, new string[] { PROGRAM, TestArea });
                 return dt;
             }
             catch (Exception ex)
@@ -763,62 +649,6 @@ namespace DACrux.TEST.DSL
             }
         }
 
-        public DataTable GetTestAreaList_Program()
-        {
-            DataTable dt = null;
-            try
-            {
-                dt = this.GetDataTable("GET_TESTAREA_LIST", null, null);
-                return dt;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public DataTable GetDefaultProgramList()
-        {
-            try
-            {
-                return this.GetDataTable("GET_DEFAULT_PROGAM_LIST", null, null);
-            }
-            catch (Exception ex)
-            {
-
-                throw ex;
-            }
-        }
-
-        public void DeleteWaferRawData(string TESTAREA, string Program, string WaferSeq)
-        {
-            string strTableName = string.Empty;
-            try
-            {
-                switch (TESTAREA)
-                {
-                    case "AVI":
-                        strTableName = string.Format("T_AVI_{0}", Program);
-                        break;
-                    case "MULTIPROBE":
-                    case "AREA":
-                    case "PT1":
-                    case "PT2":
-                        strTableName = string.Format("T_PRB_{0}", Program);
-                        break;
-                    case "PCM":
-                    case "INLINE":
-                    case "PARAMETRIC":
-                        strTableName = string.Format("T_PCM_{0}", Program);
-                        break;
-                }
-                this.Execute("DELETE_RAW_DATA", new string[] { strTableName }, new string[] { WaferSeq });
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
         #endregion
 
         /// <summary>
@@ -905,21 +735,6 @@ namespace DACrux.TEST.DSL
 																		,string.Join(",",SelBin)
 																		,Program
 																		,WaferSeq[0].ToString()}, null);
-                return dt;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public DataTable GetTableExist(string program)
-        {
-            DataTable dt = null;
-            try
-            {
-                string sMap = @"TD_" + program.Replace("-", "_").ToString();
-                dt = this.GetDataTable("TABLE_EXIST", null, new string[] { sMap });
                 return dt;
             }
             catch (Exception ex)

@@ -175,23 +175,6 @@ SELECT MAX (program_rev) AS "MAX_VALUE"
                        IN  (??)))
  ORDER BY DECODE(PARAM_NAME, 'X', 1, 'Y', 2, 'BIN', 3), PARAM_NAME]]></commandtext>
     </query>
-    <query statement="Select" queryid="GET_ITEM_01" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[-- Create Date : 2019-06-13 19:06:39
-SELECT DISTINCT TABLE_NAME, 
-       PARAM_NAME, 
-       DECODE(PARAM_DESC, NULL, PARAM_NAME, PARAM_DESC) AS PARAM_DESC 
-  FROM TQP_PARASPEC
- WHERE 1=1
-   AND FACTORY = :factory
-   AND PROGRAM = :program
-   AND PROGRAM_REV = :rev
- ORDER BY PARAM_NAME ASC]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="40" value="factory">:factory</param>
-            <param direction="Input" dbtype="VarChar" size="40" value="program">:program</param>
-            <param direction="Input" dbtype="VarChar" size="40" value="rev">:rev</param>
-        </parameters>
-    </query>
     <query statement="Select" queryid="SELECT_PARAM_NAME" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[SELECT PARAM_NAME 
 FROM (

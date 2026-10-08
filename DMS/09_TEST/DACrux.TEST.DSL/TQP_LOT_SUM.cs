@@ -106,17 +106,6 @@ namespace DACrux.TEST.DSL
         }
 
 
-        public int UpdateMulti(string sqlName, string[,] paras)
-        {
-            try
-            {
-                return this.ExecuteMultiple(sqlName, null, paras);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
         #endregion
 
         #region [Common Delete]
@@ -274,124 +263,6 @@ namespace DACrux.TEST.DSL
             }
         }
 
-        public DataTable GetBinSum_MAP(string BINLIST, string WAFER_SEQ)
-        {
-            string strDynamic = string.Empty;
-            string strFieldList = string.Empty;
-            string[] strBinList = BINLIST.Split(',');
-
-            strFieldList = "BIN" + string.Join(",BIN", strBinList);
-
-            DataTable dt = null;
-
-            try
-            {
-                dt = this.GetDataTable("GET_WAFER_LIST_WITH_SEQ", new string[] { strFieldList }, new string[] { WAFER_SEQ });
-                return dt;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-            finally
-            {
-                if (dt != null) dt.Dispose();
-            }
-        }
-
-        public DataTable GetWaferInfo_MAP(string WaferSeq)
-        {
-            DataTable dt = null;
-
-            try
-            {
-                dt = this.GetDataTable("GET_WAFER_INFO", null, new string[] { WaferSeq });
-                return dt;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-            finally
-            {
-                if (dt != null) dt.Dispose();
-            }
-        }
-
-        public DataTable GetWaferInfo_MAP(string[] WaferSeq)
-        {
-            DataTable dt = null;
-
-            try
-            {
-                dt = this.GetDataTable("GET_WAFER_INFO_MULTI", new string[] { string.Join(",", WaferSeq) }, null);
-                return dt;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-            finally
-            {
-                if (dt != null) dt.Dispose();
-            }
-        }
-
-        public DataTable GetYiledByProduct(string product)
-        {
-            DataTable dt = null;
-
-            try
-            {
-                dt = this.GetDataTable("SELECT_YIELD_BY_PRODUCT", new string[] { product }, null);
-                return dt;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-            finally
-            {
-                if (dt != null) dt.Dispose();
-            }
-        }
-
-        public DataTable GetLotSumInfo(string LotSeq)
-        {
-            try
-            {
-                return this.GetDataTable("GET_LOT_SUM_INFO", null, new string[] { LotSeq });
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public DataTable SelectLotInfoByLotIDExcludeFinal(string LotId)
-        {
-            try
-            {
-                return this.GetDataTable("SELECT_LOT_INFO_BY_LOT_ID_EXCLUDE_FINAL", null, new string[] { LotId });
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public DataTable SelectLotSumLastMerge(string LotID)
-        {
-            try
-            {
-                return this.GetDataTable("SELECT_LOT_SUM_LAST_MERGE", null, new string[] { LotID });
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
         #region Map Parser DSL ---------------------------------------------------
 
         public bool GetIsLot(string Lot_Seq)
@@ -430,17 +301,6 @@ namespace DACrux.TEST.DSL
         #endregion
 
         #region  "Create DMS Lot"
-        public void CreateDmsLot(string lotSeq, string lotId, string testArea, string product, string program, string customer, string facility, string startTime, string endTime)
-        {
-            try
-            {
-                this.Execute("CREATE_DMS_LOT", null, new string[] { lotSeq, lotId, testArea, product, program, customer, facility, startTime, endTime });
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
         #endregion
 
         public object CreateDataLot(

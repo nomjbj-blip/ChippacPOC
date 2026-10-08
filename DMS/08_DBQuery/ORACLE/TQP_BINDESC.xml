@@ -45,26 +45,6 @@ SELECT '' AS "EDITMODE",
             <param direction="Input" dbtype="VarChar" size="25" value="TESTPROG">:program</param>
         </parameters>
     </query>
-    <query statement="Select" queryid="SELECT_BINDESC_DISTINCT" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT DISTINCT(??)
-FROM TQP_BINDESC
-WHERE ?? != ' '
-ORDER BY ??
-]]></commandtext>
-    </query>
-    <query statement="Select" queryid="SELECT_BIN_EDITABLE_BY_ALL" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT BIN AS "Soft Bin", BIN_GROUP AS "Hard Bin", BIN_NAME AS "Bin Desc", IN_CHAR_BIN AS "In Map Symbol", 
-DECODE(HIGH_GEC,'T','True','False') AS "Is Gec", DECODE(DISPLAY,'T','True','False') AS "Is Display",
-UPPER_LIMIT_CNT AS "Upper Limit", LOWER_LIMIT_CNT AS "Lower Limit", COLOR AS "Color", DESCRIPTION AS "Description"
-FROM TQP_BINDESC
-WHERE PRODUCT = :product 
-AND TESTAREA = :testarea
-order by bin, testarea asc]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="25" value="TESTPROG">:product</param>
-            <param direction="Input" dbtype="VarChar" size="25" value="TESTPROG">:testarea</param>
-        </parameters>
-    </query>
     <query statement="Delete" queryid="DELETE_PROGRAM_BIN" commandtype="Text" description="선택한 Program의 Bin DELETE" commandtimeout="60">
         <commandtext><![CDATA[DELETE FROM TQP_BINDESC WHERE PROGRAM=:program AND BIN=:bin]]></commandtext>
         <parameters>
@@ -144,59 +124,6 @@ ORDER BY BIN]]></commandtext>
             <param direction="Input" dbtype="VarChar" size="30" value="SEPS225F0A">:testarea</param>
         </parameters>
     </query>
-    <query statement="Select" queryid="SELECT_BIN_BY_CHARBIN" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[ SELECT BIN FROM TQP_BINDESC WHERE product = :program AND CHAR_BIN = :char_bin]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="20" value="104-SFHSB127">:program</param>
-            <param direction="Input" dbtype="VarChar" size="20" value="4">:char_bin</param>
-        </parameters>
-    </query>
-    <query statement="Select" queryid="SELECT_BIN_EDITABLE_BY_TESTAREA" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT TESTAREA AS "Test Area", BIN AS "Soft Bin", BIN_GROUP AS "Hard Bin", BIN_NAME AS "Bin Desc", CHAR_BIN AS "Map Symbol", KEYMAP AS "Key", 
-DECODE(HIGH_GEC,'T','True','False') AS "Is Gec", DECODE(DISPLAY,'T','True','False') AS "Is Display",
-UPPER_LIMIT_CNT AS "Upper Limit", LOWER_LIMIT_CNT AS "Lower Limit", COLOR AS "Color", DESCRIPTION AS "Description" 
-FROM TQP_BINDESC
-WHERE PROGRAM = :program
-AND TESTAREA = :testarea
-order by bin, testarea asc]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="40" value="104-SFHSB127">:program</param>
-            <param direction="Input" dbtype="VarChar" size="40" value="4">:testarea</param>
-        </parameters>
-    </query>
-    <query statement="Update" queryid="UPDATE_PROGRAM_TEMP_BY_TESTAREA" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[UPDATE TQP_BINDESC
-SET PROGRAM='UPDATE_TEMP'
-WHERE 1=1
-AND PROGRAM = :program
-AND TESTAREA = :testarea]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="0" value="104-SFHSB127">:program</param>
-            <param direction="Input" dbtype="VarChar" size="0" value="4">:testarea</param>
-        </parameters>
-    </query>
-    <query statement="Delete" queryid="DELETE_PROGRAM_BIN_BY_TESTAREA" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[DELETE FROM TQP_BINDESC 
-WHERE 1=1
-AND PROGRAM = :program
-AND TESTAREA = :testarea]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="0">:program</param>
-            <param direction="Input" dbtype="VarChar" size="0">:testarea</param>
-        </parameters>
-    </query>
-    <query statement="Select" queryid="SELECT_BININFO_BY_TESTAREA" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT  * FROM TQP_BINDESC 
-WHERE UPPER(PROGRAM) = UPPER(:program)
-AND UPPER(PRODUCT) = UPPER(:product)
-AND UPPER(TESTAREA) = UPPER(:testarea)
-ORDER BY BIN]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="40">:program</param>
-            <param direction="Input" dbtype="VarChar" size="40">:product</param>
-            <param direction="Input" dbtype="VarChar" size="40">:testarea</param>
-        </parameters>
-    </query>
     <query statement="Delete" queryid="DELETE_BIN_BY_ALL" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[DELETE FROM TQP_BINDESC 
 WHERE PRODUCT = :product
@@ -223,25 +150,6 @@ AND PRODUCT = :product
 AND TESTAREA = :testarea
 ORDER BY BIN]]></commandtext>
         <parameters>
-            <param direction="Input" dbtype="VarChar" size="40">:product</param>
-            <param direction="Input" dbtype="VarChar" size="40">:testarea</param>
-        </parameters>
-    </query>
-    <query statement="Select" queryid="SELECT_BININFO_BY_ALL_1" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[WITH RT AS (
-SELECT A.*,
-       (DECODE(A.PRODUCT, :product, 10, 0)
-       + DECODE(A.TESTAREA, :testarea, 20, 0))
-    FROM TQP_BINDESC A
-    WHERE 1=1
-    AND A.CUSTOMER IN (' ', :customer)
-    AND A.PRODUCT IN (' ',  :product)
-    AND A.TESTAREA IN (' ', :testarea)
-    )
-SELECT * FROM RT
-ORDER BY BIN]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="40">:customer</param>
             <param direction="Input" dbtype="VarChar" size="40">:product</param>
             <param direction="Input" dbtype="VarChar" size="40">:testarea</param>
         </parameters>
@@ -281,15 +189,6 @@ ORDER BY BIN]]></commandtext>
             <param direction="Input" dbtype="VarChar" size="40">:product</param>
             <param direction="Input" dbtype="VarChar" size="40">:testarea</param>
         </parameters>
-    </query>
-    <query statement="Select" queryid="SELECT_BIN_RULE_LIST" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT DISTINCT 
-  PRODUCT AS "Product",
-  TESTAREA AS "TestArea",
-FROM TQP_BINDESC
-ORDER BY CUSTOMER,
-  PRODUCT,
-  TESTAREA,]]></commandtext>
     </query>
     <query statement="Update" queryid="UPDATE_PROGRAM_TEMP" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[-- Create Date : 2015-03-19 16:58:16

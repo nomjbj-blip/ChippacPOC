@@ -105,17 +105,6 @@ namespace DACrux.TEST.DSL
             }
         }
 
-        public int UpdateMulti(string sqlName, string[,] paras)
-        {
-            try
-            {
-                return this.ExecuteMultiple(sqlName, null, paras);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
         #endregion
 
         #region [Common Delete]
@@ -204,48 +193,12 @@ namespace DACrux.TEST.DSL
             }
         }
 
-        public DataTable SelectWaferSumMaxSeqMerge(string LotID, string WaferID)
-        {
-            try
-            {
-                return this.GetDataTable("SELECT_WAFER_SUM_MAX_SEQ_MERGE", null, new string[] { LotID, WaferID });
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public DataTable SelectWaferSumByLotID(string LotID)
-        {
-            try
-            {
-                return this.GetDataTable("SELECT_WAFER_SUM_BY_LOTID", null, new string[] { LotID });
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
 
         public DataTable SelectWaferSumInfo(string LotID, string WaferID, string TestArea)
         {
             try
             {
                 return this.GetDataTable("SELECT_WAFER_INFO_LOT_WAFER_TESTAREA", null, new string[] { LotID, WaferID, TestArea });
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public DataTable GetWaferInfos(string Product, string LotID, string WaferID, string TestArea)
-        {
-            try
-            {
-                return this.GetDataTable("GET_WAFER_INFOS", new string[] { TestArea }, new string[] { Product, LotID, WaferID });
             }
             catch (Exception ex)
             {
@@ -309,68 +262,6 @@ namespace DACrux.TEST.DSL
             }
         }
 
-        public DataTable SelectGoldenCheckWaferQty(string LotID, string WaferID, string TestArea)
-        {
-            try
-            {
-                return this.GetDataTable("SELECT_GOLDEN_CHECK_WAFER_QTY", new string[] { WaferID }, new string[] { LotID, TestArea });
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public DataTable SelectGoldenCheckAVIEach(string LotID, string Product, string WaferID, string TestArea)
-        {
-            try
-            {
-                return this.GetDataTable("SELECT_GOLDEN_CHECK_AVI_EACH", null, new string[] { LotID, Product, WaferID, TestArea });
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public DataTable GetWaferInfoOverThousand(string wafer_seq, string min, string max)
-        {
-            DataTable dt = null;
-            try
-            {
-                dt = this.GetDataTable("GET_WAFER_INFO_MULTI_OVER_THOUSAND", new string[] { wafer_seq, min, max }, null);
-                return dt;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-            finally
-            {
-                if (dt != null) dt.Dispose();
-            }
-        }
-
-        public DataTable GetWaferInfoOverThousand(string wafer_seq, string min, string max, string[] lot)
-        {
-            DataTable dt = null;
-            string tmp = string.Empty;
-            try
-            {
-                tmp = "'" + string.Join("','", lot) + "'";
-                dt = this.GetDataTable("GET_WAFER_INFO_MULTI_OVER_THOUSAND_BET", new string[] { wafer_seq, min, max, tmp }, null);
-                return dt;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-            finally
-            {
-                if (dt != null) dt.Dispose();
-            }
-        }
-
         public DataTable GetWaferInfo()
         {
             DataTable dt = null;
@@ -397,66 +288,12 @@ namespace DACrux.TEST.DSL
             }
         }
 
-        public void UpdateMaintProbeCount(string WaferSeq, string ProbeCnt)
-        {
-            try
-            {
-                this.Execute("UPDATE_MAINT_PROBE_CNT", null, new string[] { ProbeCnt, WaferSeq });
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public DataTable GetWaferInfo_()
-        {
-            DataTable dt = null;
-            try
-            {
-                dt = this.GetDataTable("GET_K39VAGSL14_PT1", null, null);
-                return dt;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public DataTable GetStdMap(string PROGRAM)
-        {
-            DataTable dt = null;
-            try
-            {
-                dt = this.GetDataTable("GET_STD_MAP", null, new string[] { PROGRAM });
-                return dt;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
         public DataTable GetNextLotSeq()
         {
             DataTable dt = null;
             try
             {
                 dt = this.GetDataTable("GET_MAX_LOTSEQ", null, null);
-                return dt;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public DataTable GetNextWaferSeq()
-        {
-            DataTable dt = null;
-            try
-            {
-                dt = this.GetDataTable("GET_MAX_WAFERSEQ", null, null);
                 return dt;
             }
             catch (Exception ex)
@@ -508,45 +345,6 @@ namespace DACrux.TEST.DSL
             try
             {
                 dt = this.GetDataTable("GET_BINDESC", null, new string[] { PROGRAM });
-                return dt;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public void UpdateLotTime(string STIME, string ETIME, string LOTSEQ)
-        {
-            try
-            {
-                this.Execute("UPDATE_LOT_TIME", null, new string[] { STIME, ETIME, LOTSEQ });
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public void ProcPrbWaferSum(string TESTAREA, string PRODUCT, string PROGRAM, string WAFERSEQ, string GEC)
-        {
-            try
-            {
-                this.ExecuteScalar("PROC_RUN_PRB_SUMMARY", null, new string[] { TESTAREA, PRODUCT, PROGRAM, WAFERSEQ, GEC });
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-
-        }
-
-        public DataTable GetMesWaferList(string[] strFields)
-        {
-            DataTable dt = null;
-            try
-            {
-                dt = this.GetDataTable("GET_MES_WAFER_LIST", null, strFields);
                 return dt;
             }
             catch (Exception ex)
@@ -695,31 +493,6 @@ namespace DACrux.TEST.DSL
             this.Execute("UPDATE_FTA", null, new string[] { FTA.ToString(), WAFER_SEQ });
         }
 
-        public DataTable GetYieldByWafer(string[] WAFERSEQ)
-        {
-            return this.GetDataTable("GET_YIELD_BYWAFER", new string[] { string.Join(",", WAFERSEQ) }, null);
-        }
-
-        public DataTable GetYieldByLot(string[] WAFERSEQ)
-        {
-            return this.GetDataTable("GET_YIELD_BYLOT", new string[] { string.Join(",", WAFERSEQ) }, null);
-        }
-
-        public DataTable GetYieldByDate(string[] WAFERSEQ)
-        {
-            return this.GetDataTable("GET_YIELD_BYDATE", new string[] { string.Join(",", WAFERSEQ) }, null);
-        }
-
-        public DataTable GetBoxYieldByLot(string[] WAFERSEQ)
-        {
-            return this.GetDataTable("GET_BOX_YIELD_BYLOT", new string[] { string.Join(",", WAFERSEQ) }, null);
-        }
-
-        public DataTable GetBoxYieldByDate(string[] WAFERSEQ)
-        {
-            return this.GetDataTable("GET_BOX_YIELD_BYDATE", new string[] { string.Join(",", WAFERSEQ) }, null);
-        }
-
         #region Map Parser DSL-------------------------------------------------
 
         public void UpdateDataProbeCnt(string Lot_Seq, string WaferID)
@@ -802,56 +575,6 @@ namespace DACrux.TEST.DSL
             }
         }
 
-        public void CreateDeviceTable(string device)
-        {
-            try
-            {
-                this.Execute("CREATE_DEVICE_TABLE", new string[] { device }, null);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public DataTable SelectByDynamic(string Dynamic)
-        {
-            try
-            {
-                return this.GetDataTable("SELECT_BY_DYNAMIC", new string[] { Dynamic }, null);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public DataTable SelectGoldenCheckList(string LotID, string WaferID, string TestArea)
-        {
-            try
-            {
-                return this.GetDataTable("SELECT_GOLDEN_CHECK_LIST", new string[] { WaferID }, new string[] { LotID, TestArea });
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public DataTable SelectGoldenCheckAVI(string LotID, string WaferID, string TestArea, string Product)
-        {
-            try
-            {
-                return this.GetDataTable("SELECT_GOLDEN_CHECK_AVI"
-                    , new string[] { WaferID, WaferID, WaferID, WaferID, WaferID, WaferID, WaferID }
-                    , new string[] { LotID, TestArea, Product });
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
         public DataTable GetMergeSum(string TableName, string WaferSeq)
         {
             try
@@ -864,17 +587,6 @@ namespace DACrux.TEST.DSL
             }
         }
 
-        public DataTable GetWaferInfoListByTestArea(string TestArea, string LotID)
-        {
-            try
-            {
-                return this.GetDataTable("GET_WAFER_INFO_LIST_BY_TESTAREA", null, new string[] { TestArea, LotID });
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
         #endregion
 
         public DataTable GetWaferInfo(long WaferSeq)
@@ -1042,71 +754,11 @@ namespace DACrux.TEST.DSL
             }
         }
 
-        public DataTable SelecTestAreaLastMerge(string lotId, string waferID, string product)
-        {
-            try
-            {
-                return this.GetDataTable("SELECT_TESTAREA_LAST_MERGE", null, new string[] { lotId, waferID, product });
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public DataTable SelectProbeData(string LotID)
-        {
-            try
-            {
-                return this.GetDataTable("SELECT_PROBE_DATA", null, new string[] { LotID });
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public DataTable SelectWaferMatch(string strFactory, string strLotId, string strTestArea, string[] waferid)
-        {
-            try
-            {
-                return this.GetDataTable("SELECT_WAFER_MATCH", new string[] { string.Format("'{0}'", string.Join("','", waferid)) }, new string[] { strFactory, strLotId, strTestArea });
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
         #region  "Create DMS Wafer"
-        public void CreateDmsWafer(string lotSeq, string lotId, string testArea, string product, string program, string customer, string facility,
-                                    string startTime, string endTime, string waferSeq, string waferId)
-        {
-            try
-            {
-                this.Execute("CREATE_DMS_WAFER", null, new string[] { lotSeq, lotId, testArea, product, program, customer, facility, 
-                                                                                       startTime, endTime, waferSeq, waferId });
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
         #endregion
 
         #region  "Update Bin Information For DMS Lot"
         //  UPDATE_BIN_INFO_DMS
-        public void UpdateBinInfoDms(string value, string waferSeq, string lotSeq, string lotId, string testarea)
-        {
-            try
-            {
-                this.Execute("UPDATE_BIN_INFO_DMS", new string[] { value }, new string[] { waferSeq, lotSeq, lotId, testarea });
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
         #endregion
 
         public DataTable GetWaferInfoByLotSlot(string lot_id, string slot_id, string testarea)

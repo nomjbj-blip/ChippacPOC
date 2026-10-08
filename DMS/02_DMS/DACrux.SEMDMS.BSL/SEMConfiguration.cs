@@ -80,14 +80,6 @@ namespace DACrux.SEMDMS.BSL
         }
 
 
-        public DataTable GetGroup(
-            string groupID
-            )
-        {
-            TQD_DEFECT_GROUP oGetGroup = new TQD_DEFECT_GROUP();
-            return oGetGroup.SelectGroupID(groupID);
-        }
-
         //--
 
         // TQD_DEFECT_GROUP    GET
@@ -156,25 +148,6 @@ namespace DACrux.SEMDMS.BSL
         //---------------------------------------------------------------------------------------
 
         #region [ TQD_DEFECT_TYPE ]
-
-        public Dictionary<int, String> GetDefectTypeAll(
-            )
-        {
-            Dictionary<int, String> dic = new Dictionary<int, string>();
-            using (TQD_DEFECT_TYPE oDefectType = new TQD_DEFECT_TYPE())
-            {
-                DataTable dt = oDefectType.SelectDefectList();
-
-                int classnumber = -1;
-                foreach (DataRow r in dt.Rows)
-                {
-                    classnumber = Base.Convert.intParse(r["CLASSNUMBER"].ToString());
-                    if (!dic.ContainsKey(classnumber))
-                        dic.Add(classnumber, r["NAME"].ToString());
-                }
-            }
-            return dic;
-        }
 
         public DataTable GetDefectTypeList(
             string DefectGroupId = "ALL"
@@ -313,22 +286,6 @@ namespace DACrux.SEMDMS.BSL
         }
 
         // TQD_COLORBYSIZE    DELETE
-        public void DeleteColorByDftSize(
-            string userId
-            )
-        {
-            TQD_COLORBYSIZE oDeleteColorS = null;
-
-            try
-            {
-                oDeleteColorS = new TQD_COLORBYSIZE();
-                oDeleteColorS.DeleteColorByDefectSize(userId);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
 
         public bool DeleteDefectSizeByColor(
             string userid,

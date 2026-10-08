@@ -42,11 +42,6 @@ namespace DACrux.SEMDMS.RO
             return m_OBJ.SelectGroupList();
         }
 
-        public DataTable GetGroup(string groupId)
-        {
-            return m_OBJ.GetGroup(groupId);
-        }
-
         //TQD_DEFECT_GROUP     GET
         public bool ExistsDefectGroup(
             string groupId
@@ -109,11 +104,6 @@ namespace DACrux.SEMDMS.RO
         #region [ TQD_DEFECT_TYPE ]
 
         //--
-
-        public Dictionary<int, String> GetDefectTypeAll()
-        {
-            return m_OBJ.GetDefectTypeAll();
-        }
 
         public DataTable GetDefectTypeList(
             string DefectGroupId = "ALL"
@@ -194,32 +184,8 @@ namespace DACrux.SEMDMS.RO
         }
 
         //TQD_COLORBYSIZE     CREATE
-        public void CreateColorByDftSize(string user, int[] sizeSeq, int[] sizeFrom, int[] sizeTo, System.Drawing.Color[] color)
-        {
-            try
-            {
-                m_OBJ.InsertColorByDftSize(user, sizeSeq, sizeFrom, sizeTo, color);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
 
         //TQD_COLORBYSIZE     DELETE
-        public void DeleteColorByDftSize(string userId)
-        {
-            try
-            {
-                m_OBJ.DeleteColorByDftSize(
-                    userId
-                    );
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
 
         public bool ExistsDefectSizeByColor(
             string userid,

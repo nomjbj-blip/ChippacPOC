@@ -138,21 +138,6 @@ namespace DACrux.SEMDMS.BSL
             }
         }
 
-        public System.Data.DataTable GetSize(string userid)
-        {
-            DACrux.SEMDMS.DSL.TQD_COLORBYSIZE oImage = null;
-
-            try
-            {
-                oImage = new DACrux.SEMDMS.DSL.TQD_COLORBYSIZE();
-                return oImage.SelectColorListByDefectSize(userid);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
         public System.Data.DataTable SelectColorByDefectSize(string userid)
         {
             DACrux.SEMDMS.DSL.TQD_COLORBYSIZE oImage = null;
@@ -216,87 +201,6 @@ namespace DACrux.SEMDMS.BSL
             catch (Exception ex)
             {
                 throw ex;
-            }
-        }
-
-        public void GetFirstStepCnt(long step_seq, ref int newCnt, ref int carryOverCnt, ref int missingCnt)
-        {
-            DACrux.SEMDMS.DSL.TQD_DEFECT oDefect = null;
-            DataTable dt = null;
-            try
-            {
-                oDefect = new DACrux.SEMDMS.DSL.TQD_DEFECT();
-
-                dt = oDefect.GetNewDefectCnt(step_seq);
-                string kind;
-                int cnt;
-                kind = string.Format("{0}", dt.Rows[0]["NEW_CARRYOVER_MISSING"]);
-                cnt = DACrux.Base.Convert.intParse(string.Format("{0}", dt.Rows[0]["CNT"]));
-                newCnt = cnt;
-                carryOverCnt = 0;
-                missingCnt = 0;
-
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-            finally
-            {
-                if (dt != null) dt.Dispose();
-                dt = null;
-            }
-        }
-
-        public void GetDsaCnt(
-            long first_step_seq,
-            long step_seq,
-            float tolerance,
-            ref int newCnt,
-            ref int carryOverCnt,
-            ref int missingCnt
-            )
-        {
-            DataTable dt = null;
-            DataRow[] dr = null;
-            DACrux.SEMDMS.DSL.TQD_DEFECT oDefect = null;
-            try
-            {
-                oDefect = new DACrux.SEMDMS.DSL.TQD_DEFECT();
-                // DEFECT 의 갯수가 많으면 GROUP BY에서 DELAY 발생
-                // rawdata 를 가져와서 count 체크
-                //dt = oDefect.GetDSACnt(first_step_seq, step_seq, tolerance);
-                dt = oDefect.GetDSAData(first_step_seq, step_seq, tolerance);
-
-                newCnt = 0;
-                carryOverCnt = 0;
-                missingCnt = 0;
-
-                //string kind;
-                //int cnt;
-                //for (int a = 0; a < dt.Rows.Count; a++)
-                //{
-                //    kind = string.Format("{0}", dt.Rows[a]["NEW_CARRYOVER_MISSING"]);
-                //    cnt = DACrux.Base.Convert.intParse(string.Format("{0}", dt.Rows[a]["CNT"]));
-                //    if (kind.Equals("N")) newCnt = cnt;
-                //    else if (kind.Equals("C")) carryOverCnt = cnt;
-                //    else if (kind.Equals("M")) missingCnt = -cnt;
-                //}
-                dr = dt.Select(String.Format("[NEW_CARRYOVER_MISSING] = 'N'"));
-                newCnt = dr.Length;
-
-                dr = dt.Select(String.Format("[NEW_CARRYOVER_MISSING] = 'C'"));
-                carryOverCnt = dr.Length;
-
-                dr = dt.Select(String.Format("[NEW_CARRYOVER_MISSING] = 'M'"));
-                missingCnt = -dr.Length;
-
-            }
-            finally
-            {
-                if (dt != null) dt.Dispose();
-                dr = null;
-                dt = null;
             }
         }
 
@@ -449,16 +353,6 @@ namespace DACrux.SEMDMS.BSL
         }
         #endregion ===============================================================
 
-        public System.Data.DataTable GetImageGallery(long[] step_seqs)
-        {
-            DACrux.SEMDMS.DSL.TQD_INSP_INFO oInspInfo = null;
-            string[] str_step_seq = new string[step_seqs.Length];
-            for (int i = 0; i < str_step_seq.Length; i++) str_step_seq[i] = step_seqs[i].ToString();
-
-            oInspInfo = new DACrux.SEMDMS.DSL.TQD_INSP_INFO();
-            return oInspInfo.GetData("SELECT_IMAGE_GALLERY", new string[] { string.Join(",", str_step_seq) }, null);
-        }
-
         public DataTable GetInspInfo01(long[] stepSeqArr)
         {
             TQD_INSP_INFO obj = new TQD_INSP_INFO();
@@ -478,47 +372,6 @@ namespace DACrux.SEMDMS.BSL
         }
 
         #region DB 하이텍
-
-        public DataSet GetChartAnalysis(
-            long[] steps
-            )
-        {
-            DataSet ds = new DataSet();
-
-            //--
-
-            using (TQD_INSP_INFO oInspInfo = new TQD_INSP_INFO())
-            {
-                //-- .INSPECTION INFORMATION
-                DataTable dt = oInspInfo.GetStepInfo(
-                    steps
-                    );
-                dt.TableName = "INSPECTION_INFO";
-                ds.Tables.Add(dt);
-            }
-
-            //--
-
-            using (TQD_DEFECT oDefect = new TQD_DEFECT())
-            {
-                DataTable dt = oDefect.GetDefect(
-                    steps
-                    );
-                dt.TableName = "DEFECT_INFO";
-                ds.Tables.Add(dt);
-            }
-
-            //--
-
-            using (TQD_DEFECT_TYPE oDefectType = new TQD_DEFECT_TYPE())
-            {
-                DataTable dt = oDefectType.SelectDefectList();
-                dt.TableName = "DEFECT_TYPE_INFO";
-                ds.Tables.Add(dt);
-            }
-
-            return ds;
-        }
 
         public DataTable GetDefectImages(
             long[] steps
@@ -698,31 +551,6 @@ namespace DACrux.SEMDMS.BSL
         }
 
 
-        public System.Data.DataTable GetStepWaferList(string start, string end, string[] wheres, bool TimeNotCheck)
-        {
-            DACrux.SEMDMS.DSL.TQD_INSP_INFO oInspInfo = null;
-            StringBuilder sQuery = new StringBuilder();
-            oInspInfo = new DACrux.SEMDMS.DSL.TQD_INSP_INFO();
-
-            //시간을 지정 하지않을 경우 조건에서 시간을 뺀다.
-            if (TimeNotCheck != true)
-            {
-                sQuery.AppendLine(" AND RESULTTIMESTAMP BETWEEN ");
-                sQuery.AppendLine(string.Format("     TO_DATE ( '{0}', 'YYYY-MM-DD') ", start));
-                sQuery.AppendLine(string.Format(" AND TO_DATE ( '{0}', 'YYYY-MM-DD') ", end));
-            }
-
-            foreach (string strVal in wheres)
-                sQuery.AppendLine(string.Format(" AND {0} ", strVal));
-
-            //if(string.IsNullOrEmpty(sort) == false)
-            //    sQuery.AppendLine(string.Format(" ORDER BY {0} ", sort));
-
-            //Wafer List 를 가져온다.
-            return oInspInfo.GetData("SELECT_DMS_WAFER_LIST", new string[] { sQuery.ToString() }, null);
-
-        }
-
         public System.Data.DataSet GetDMSStepWaferList(string start, string end, string[] wheres, bool TimeNotCheck, bool bLastInspection)
         {
             DACrux.SEMDMS.DSL.TQD_INSP_INFO oInspInfo = null;
@@ -774,136 +602,6 @@ namespace DACrux.SEMDMS.BSL
                     dtTemp.Dispose();
             }
 
-        }
-
-        /// <summary>
-        /// Defect Map View 화면에 대한 기준 Data Gathering
-        /// </summary>
-        /// <param name="step_seqs"></param>
-        /// <returns></returns>
-        public byte[] GetDefectMapViewer(long[] step_seqs)
-        {
-            DataSet dsData = null;
-            DataTable dtTemp = null;
-
-            string strSetupSeq = string.Empty;
-
-            List<string> arrSetupSeq;
-            List<string> arrTest;
-
-            DACrux.SEMDMS.DSL.TQD_INSP_INFO oInspInfo = null;
-            DACrux.SEMDMS.DSL.TQD_SETUP oSetup = null;
-            DACrux.SEMDMS.DSL.TQD_SETUP_MAP oSetupMap = null;
-            DACrux.SEMDMS.DSL.TQD_DEFECT oDefect = null;
-
-            try
-            {
-                arrSetupSeq = new List<string>();
-                arrTest = new List<string>();
-                dsData = new DataSet();
-                oInspInfo = new DACrux.SEMDMS.DSL.TQD_INSP_INFO();
-                oSetup = new DACrux.SEMDMS.DSL.TQD_SETUP();
-                oSetupMap = new DACrux.SEMDMS.DSL.TQD_SETUP_MAP();
-                oDefect = new TQD_DEFECT();
-
-                //=================================================================================================================================
-                //Step Seq 정보를 가져 온다.
-                //=================================================================================================================================
-                dtTemp = oInspInfo.GetData("GET_INSP_INFO_MULTI_SEQ", new string[] { string.Join(",", step_seqs) }, null);
-                if (dtTemp == null || dtTemp.Rows.Count <= 0)
-                    throw new Exception("정의된 Wafer 정보가 없습니다. TQD_INSP_INFO Empty");
-
-                dtTemp.TableName = "STEP_INFO";
-                dsData.Tables.Add(dtTemp.Copy());
-
-                for (int ir = 0; ir < dtTemp.Rows.Count; ir++)
-                {
-                    if (arrSetupSeq.IndexOf(dtTemp.Rows[ir]["SETUP_SEQ"].ToString()) < 0)
-                        arrSetupSeq.Add(dtTemp.Rows[ir]["SETUP_SEQ"].ToString());
-
-                    if (arrTest.IndexOf(dtTemp.Rows[ir]["TEST"].ToString()) < 0)
-                        arrTest.Add(dtTemp.Rows[ir]["TEST"].ToString());
-
-                    if (ir == 0)
-                        strSetupSeq = dtTemp.Rows[ir]["SETUP_SEQ"].ToString();
-
-                    //Setup Seq 가 다를 경우 Error 처리 한다. 서로 다른 Map 형상일 경우 그릴수 없음.
-                    //if (string.IsNullOrEmpty(strSetupSeq) == false && strSetupSeq != dtTemp.Rows[ir]["SETUP_SEQ"].ToString())
-                    //    throw new Exception("서로 다른 형상의 Map 은 해당 화면에서 같이 볼 수 없습니다.");
-                }
-
-                //형상이 다른 Map 이 있는지 확인 한다.
-                //X, Y 를 Group 하여 Count 수가 다른것이 있으면 Row 가 1 이상이 나옴.
-                //dtTemp = oSetupMap.GetData("SELECT_MAP_DUPLE", new string[] { string.Join(",", arrSetupSeq.ToArray()) }, null);
-                //if(dtTemp == null || dtTemp.Rows.Count != 1) 
-                //    throw new Exception("서로 다른 형상의 Map 은 해당 화면에서 같이 볼 수 없습니다.");
-
-                //dtTemp = oInspInfo.GetData("SELECT_DUPLE_PRODUCT", new string[] { string.Join(",", step_seqs) }, null);
-                //if (dtTemp.Rows.Count > 1)
-                //    throw new Exception("서로 다른 제품의 Map은 해당 화면에서 같이 볼 수 없습니다.");
-
-                //=================================================================================================================================
-                //Setup Seq 정보를 가져 온다.
-                //=================================================================================================================================
-                dtTemp = oSetup.GetData("GET_SETUP", null, new string[] { strSetupSeq });
-                if (dtTemp == null || dtTemp.Rows.Count <= 0)
-                    throw new Exception("정의된 Setup 정보가 없습니다. TQD_SETUP Empty");
-
-                dtTemp.TableName = "SETUP_INFO";
-                dsData.Tables.Add(dtTemp.Copy());
-
-
-                //=================================================================================================================================
-                //Setup Map 정보를 가져 온다.
-                //=================================================================================================================================
-                //dtTemp = oSetupMap.GetData("SELECT_MAP_SAMPLE", null, new string[] { strSetupSeq });
-                //if (dtTemp == null || dtTemp.Rows.Count <= 0)
-                //    throw new Exception("정의된 Setup Map 정보가 없습니다. TQD_SETUP_MAP Empty");
-
-                //여러 Step 정보를 보여 준다.
-                //TEST 정보 추가
-                dtTemp = oSetupMap.GetData("SELECT_MAP_SAMPLE_MULTI", new string[] { string.Join(",", arrSetupSeq.ToArray())}, null);
-                if (dtTemp == null || dtTemp.Rows.Count <= 0)
-                    throw new Exception("정의된 Setup Map 정보가 없습니다. TQD_SETUP_MAP Empty");
-
-                dtTemp.TableName = "SETUP_MAP";
-                dsData.Tables.Add(dtTemp.Copy());
-
-                //Size 를 1000으로 버림했을때 다른 Size 가 있을 경우 Map 을 보여 주지 않는다.
-                dtTemp = oSetup.GetData("SELECT_SETUP_DUPLE", new string[] { string.Join(",", step_seqs) }, null);
-                if (dtTemp.Rows.Count > 1)
-                {
-                    dsData.Tables["SETUP_MAP"].Rows.Clear();
-                    dsData.Tables["SETUP_MAP"].AcceptChanges();
-                }
-
-                //=================================================================================================================================
-                //Defect Map 정보를 가져 온다.
-                //=================================================================================================================================
-                dtTemp = oDefect.GetData("SELECT_DEFECT_MULTI", new string[] { string.Join(",", step_seqs) }, null);
-                if (dtTemp == null)
-                    throw new Exception("정의된 Defect 정보가 없습니다. TQD_DEFECT Empty");
-
-                dtTemp.TableName = "DEFECT_INFO";
-                dsData.Tables.Add(dtTemp.Copy());
-
-                dtTemp = oDefect.GetData("SELECT_INDEX_GRP", new string[] { string.Join(",", step_seqs) }, null);
-                if (dtTemp == null)
-                    throw new Exception("정의된 Defect Group 정보가 없습니다. TQD_DEFECT Group Empty");
-
-                dtTemp.TableName = "DEFECT_GRP";
-                dsData.Tables.Add(dtTemp.Copy());
-
-                return DACrux.Base.Util.ObjectToCompressedBytes(dsData);
-            }
-            finally
-            {
-                if (dtTemp != null)
-                    dtTemp.Dispose();
-
-                if (dsData != null)
-                    dsData.Dispose();
-            }
         }
 
         /// <summary>
@@ -1123,131 +821,6 @@ namespace DACrux.SEMDMS.BSL
         }
 
 
-        /// <summary>
-        /// WaferMap 관련 Defect 제외한 Map 을 그릴때 사용한다.
-        /// </summary>
-        /// <param name="step_seqs"></param>
-        /// <returns></returns>
-        public System.Data.DataSet GetBasicMapViewer(long[] step_seqs)
-        {
-            DataSet dsData = null;
-            DataTable dtTemp = null;
-
-            string strSetupSeq = string.Empty;
-
-            List<string> arrSetupSeq;
-            List<string> arrTest;
-
-            TQD_INSP_INFO oInspInfo = null;
-            TQD_SETUP oSetup = null;
-            TQD_SETUP_MAP oSetupMap = null;
-
-            try
-            {
-                arrSetupSeq = new List<string>();
-                arrTest = new List<string>();
-                dsData = new DataSet();
-                oInspInfo = new TQD_INSP_INFO();
-                oSetup = new TQD_SETUP();
-                oSetupMap = new TQD_SETUP_MAP();
-
-                //=================================================================================================================================
-                //Step Seq 정보를 가져 온다.
-                //=================================================================================================================================
-                dtTemp = oInspInfo.GetData("GET_INSP_INFO_MULTI_SEQ", new string[] { string.Join(",", step_seqs) }, null);
-                if (dtTemp == null || dtTemp.Rows.Count <= 0)
-                    throw new Exception("정의된 Wafer 정보가 없습니다. TQD_INSP_INFO Empty");
-
-                dtTemp.TableName = "STEP_INFO";
-                dsData.Tables.Add(dtTemp.Copy());
-
-                for (int ir = 0; ir < dtTemp.Rows.Count; ir++)
-                {
-                    if (arrSetupSeq.IndexOf(dtTemp.Rows[ir]["SETUP_SEQ"].ToString()) < 0)
-                        arrSetupSeq.Add(dtTemp.Rows[ir]["SETUP_SEQ"].ToString());
-
-                    if (arrTest.IndexOf(dtTemp.Rows[ir]["TEST"].ToString()) < 0)
-                        arrTest.Add(dtTemp.Rows[ir]["TEST"].ToString());
-
-                    if (ir == 0)
-                        strSetupSeq = dtTemp.Rows[ir]["SETUP_SEQ"].ToString();
-
-                    //Setup Seq 가 다를 경우 Error 처리 한다. 서로 다른 Map 형상일 경우 그릴수 없음.
-                    //if (string.IsNullOrEmpty(strSetupSeq) == false && strSetupSeq != dtTemp.Rows[ir]["SETUP_SEQ"].ToString())
-                    //    throw new Exception("서로 다른 형상의 Map 은 해당 화면에서 같이 볼 수 없습니다.");
-                }
-
-                //형상이 다른 Map 이 있는지 확인 한다.
-                //X, Y 를 Group 하여 Count 수가 다른것이 있으면 Row 가 1 이상이 나옴.
-                //dtTemp = oSetupMap.GetData("SELECT_MAP_DUPLE", new string[] { string.Join(",", arrSetupSeq.ToArray()) }, null);
-                //if (dtTemp == null || dtTemp.Rows.Count != 1)
-                //    throw new Exception("서로 다른 형상의 Map 은 해당 화면에서 같이 볼 수 없습니다.");
-
-                //dtTemp = oInspInfo.GetData("SELECT_DUPLE_PRODUCT", new string[] { string.Join(",", step_seqs) }, null);
-                //if (dtTemp.Rows.Count > 1)
-                //    throw new Exception("서로 다른 제품의 Map은 해당 화면에서 같이 볼 수 없습니다.");
-
-                //=================================================================================================================================
-                //Setup Seq 정보를 가져 온다.
-                //=================================================================================================================================
-                dtTemp = oSetup.GetData("GET_SETUP", null, new string[] { strSetupSeq });
-                if (dtTemp == null || dtTemp.Rows.Count <= 0)
-                    throw new Exception("정의된 Setup 정보가 없습니다. TQD_SETUP Empty");
-
-                dtTemp.TableName = "SETUP_INFO";
-                dsData.Tables.Add(dtTemp.Copy());
-
-
-                //=================================================================================================================================
-                //Setup Map 정보를 가져 온다.
-                //=================================================================================================================================
-                //dtTemp = oSetupMap.GetData("SELECT_MAP_SAMPLE", null, new string[] { strSetupSeq });
-                //if (dtTemp == null || dtTemp.Rows.Count <= 0)
-                //    throw new Exception("정의된 Setup Map 정보가 없습니다. TQD_SETUP_MAP Empty");
-
-                //여러 Step 정보를 보여 준다.
-                dtTemp = oSetupMap.GetData("SELECT_MAP_SAMPLE_MULTI", new string[] { string.Join(",", arrSetupSeq.ToArray()) }, null);
-                if (dtTemp == null || dtTemp.Rows.Count <= 0)
-                    throw new Exception("정의된 Setup Map 정보가 없습니다. TQD_SETUP_MAP Empty");
-
-                dtTemp.TableName = "SETUP_MAP";
-                dsData.Tables.Add(dtTemp.Copy());
-
-                //Size 를 1000으로 버림했을때 다른 Size 가 있을 경우 Map 을 보여 주지 않는다.
-                dtTemp = oSetup.GetData("SELECT_SETUP_DUPLE", new string[] { string.Join(",", step_seqs) }, null);
-                if (dtTemp.Rows.Count > 1)
-                {
-                    dsData.Tables["SETUP_MAP"].Rows.Clear();
-                    dsData.Tables["SETUP_MAP"].AcceptChanges();
-                }
-
-                return dsData;
-            }
-            finally
-            {
-                if (dtTemp != null)
-                    dtTemp.Dispose();
-
-                if (dsData != null)
-                    dsData.Dispose();
-            }
-        }
-
-        /// <summary>
-        /// DSA 관련 Report
-        /// </summary>
-        /// <param name="step_seqs"></param>
-        /// <returns></returns>
-        public DataTable GetDSAReport(long[] step_seqs, string strTol)
-        {
-            TQD_INSP_INFO oInspInfo = null;
-            DataTable dt = null;
-            oInspInfo = new TQD_INSP_INFO();
-            dt = oInspInfo.GetData("SELECT_DAS_REPORT_NEW", new string[] { string.Join(",", step_seqs) }, null);
-            return dt;
-
-        }
-
         public string GetImagePath(
             long stepsseq,
             long waferseq,
@@ -1428,17 +1001,6 @@ namespace DACrux.SEMDMS.BSL
             }
         }
 
-        /// <summary>
-        /// 기존 Data Set 을 각각 정보들로 나눔.
-        /// </summary>
-        /// <param name="step_seqs"></param>
-        /// <returns></returns>
-        public byte[] GetDefectMapViewer_Defects2_Comp(long[] step_seqs, bool bAdder)
-        {
-            List<object[]> list = GetDefectMapViewer_Defects2(step_seqs, bAdder);
-            return DACrux.Base.Util.ObjectToCompressedBytes(list);
-        }
-
         public object[,] GetDefectMapViewer_Defects3(long[] step_seqs, bool bAdder)
         {
             DACrux.SEMDMS.DSL.TQD_DEFECT oDefect = null;
@@ -1480,41 +1042,6 @@ namespace DACrux.SEMDMS.BSL
                 strDynamic = " AND A.ADDER = 1 ";
 
             return oDefect.GetDataToArrayList("SELECT_DEFECT_VIEW", new string[] { string.Join(",", step_seqs), strDynamic }, null);
-        }
-
-        /// <summary>
-        /// 기존 Data Set 을 각각 정보들로 나눔.
-        /// </summary>
-        /// <param name="step_seqs"></param>
-        /// <param name="bAdder"></param>
-        /// <returns></returns>
-        public byte[] GetDefectMapViewer_Chart(long[] step_seqs, bool bAdder)
-        {
-            DataTable dtTemp = null;
-            DACrux.SEMDMS.DSL.TQD_DEFECT oDefect = null;
-            string strDynamic = string.Empty;
-            try
-            {
-                oDefect = new TQD_DEFECT();
-                //=================================================================================================================================
-                //Defect Map 정보를 가져 온다.
-                //=================================================================================================================================
-
-                if (bAdder)
-                    strDynamic = " AND A.ADDER = 1 ";
-
-                dtTemp = oDefect.GetData("SELECT_DEFECT_VIEW_CHART", new string[] { string.Join(",", step_seqs), strDynamic }, null);
-                if (dtTemp == null)
-                    throw new Exception("정의된 Defect 정보가 없습니다. TQD_DEFECT Empty");
-
-                dtTemp.TableName = "CHART";
-                return DACrux.Base.Util.ObjectToCompressedBytes(dtTemp);
-            }
-            finally
-            {
-                if (dtTemp != null)
-                    dtTemp.Dispose();
-            }
         }
 
         #endregion
@@ -2048,12 +1575,6 @@ namespace DACrux.SEMDMS.BSL
             }
 
             return dic;
-        }
-
-        public byte[] GetPatternSearch_XYList_Comp(long[] stepSeqArr)
-        {
-            var obj = GetPatternSearch_XYList(stepSeqArr);
-            return DACrux.Base.Util.ObjectToCompressedBytes(obj);
         }
 
         #endregion

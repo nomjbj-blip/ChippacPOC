@@ -36,14 +36,6 @@
             <param direction="Input" dbtype="VarChar" size="100" value="10.144.251.226">:image_server</param>
         </parameters>
     </query>
-    <query statement="Select" queryid="GET_IMAGE_COUNT" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT DEFECTID,MAX(IMAGE_ID)+1 AS NEXT_IMAGE_ID FROM TQD_IMAGES
-WHERE STEP_SEQ = :step_seq
-GROUP BY DEFECTID]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="Number" size="0" description="step_seq">:step_seq</param>
-        </parameters>
-    </query>
     <query statement="Select" queryid="GET_DEFECT_IMAGE_OF_STEP_DEFECTID" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[-- Create Date : 2013-09-14 11:46:10
 SELECT * FROM TQD_IMAGES

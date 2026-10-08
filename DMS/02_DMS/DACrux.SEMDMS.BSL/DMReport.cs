@@ -63,15 +63,6 @@ namespace DACrux.SEMDMS.BSL
 
         #region [ Dm Summary Data ]
 
-        public byte[] GetDmSummaryData_Comp(
-            long[] Steps
-            )
-        {
-            return DACrux.Base.Util.ObjectToCompressedBytes(
-                GetDmSummaryData(Steps)
-                );
-        }
-
         public object[,] GetDmSummaryData(
             long[] Steps
             )

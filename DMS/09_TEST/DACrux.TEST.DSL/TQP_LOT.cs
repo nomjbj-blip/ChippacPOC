@@ -161,37 +161,11 @@ namespace DACrux.TEST.DSL
             }
         }
 
-        public DataTable GetWaferCountInLot(string LotSeq)
-        {
-            DataTable dt = null;
-            try
-            {
-                dt = this.GetDataTable("GET_WAFER_COUNT_IN_LOT", null, new string[] { LotSeq });
-                return dt;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
         public void DeleteLot(string LotSeq)
         {
             try
             {
                 this.Execute("DELETE_LOT", null, new string[] { LotSeq });
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public void DeleteLotAVI(string factory, string testArea, string lotID)
-        {
-            try
-            {
-                this.Execute("DELETE_LOT_AVI", null, new string[] { factory, testArea, lotID });
             }
             catch (Exception ex)
             {
@@ -353,24 +327,6 @@ namespace DACrux.TEST.DSL
 
         #endregion------------------------------------------------------------------------
 
-        public DataTable SelectCurrentLotTesarea(string lotId)
-        {
-            DataTable ds = null;
-            try
-            {
-                ds = this.GetDataTable("SELECT_CURTLOT_TESTAREA", null, new string[] { lotId });
-                return ds;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-            finally
-            {
-                if (ds != null) ds.Dispose();
-            }
-        }
-
         public long CreateLot(string TestArea, string Product, string Program, string LotID)
         {
             DataTable dt = null;
@@ -467,15 +423,6 @@ namespace DACrux.TEST.DSL
                 END_TIME,
                 WAFER_DIAM
             });
-        }
-
-        public DataTable GetLotSummaryInfo(string lotseq)
-        {
-            return this.GetDataTable(
-                "GET_LOT_SUMMARY_INFO",
-                null,
-                new string[] { lotseq }
-                );
         }
 
         /// <summary>

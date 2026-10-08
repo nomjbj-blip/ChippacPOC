@@ -88,17 +88,6 @@ namespace DACrux.TEST.RO
                 throw ex;
             }
         }
-        public void UpdateQCFailDie(string PRODUCT, string[] strValue)
-        {
-            try
-            {
-                m_OBJ.UpdateQCFailDie(PRODUCT, strValue);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
         public DataTable GetMapData(string TESTAREA, string PRODUCT, string PROGRAM, string LOT_ID, string WAFER_ID)
         {
             try
@@ -753,17 +742,5 @@ namespace DACrux.TEST.RO
             }
         }
 
-        public int UpdateVI(string strFactory, string m_TestArea, string m_Product, string m_Program, string m_LotID, string m_WaferID, List<DACrux.Base.Die> oUpdateDie)
-        {
-            try
-            {
-                object oFailDie = DACrux.Base.Convert.Serialize(oUpdateDie);
-                return m_OBJ.UpdateVI(strFactory, m_TestArea, m_Product, m_Program, m_LotID, m_WaferID, oFailDie);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
     }
 }

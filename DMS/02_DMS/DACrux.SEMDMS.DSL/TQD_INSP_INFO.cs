@@ -42,19 +42,6 @@ namespace DACrux.SEMDMS.DSL
             }
         }
 
-        public object ExecuteScala(
-            string sqlName,
-            string[] dynamic,
-            string[] paras
-            )
-        {
-            return base.ExecuteScalar(
-                sqlName,
-                dynamic,
-                paras
-                );
-        }
-
         #endregion
 
         #region [Common Insert]
@@ -159,18 +146,6 @@ namespace DACrux.SEMDMS.DSL
             }
         }
 
-        public void CreateMig(string[] stepinfo)
-        {
-            try
-            {
-                this.Execute("CREATE_INSP_INFO_MIG", null, stepinfo);
-            }
-            catch (Exception ex)
-            {
-                throw this.ProcessErr(ex);
-            }
-        }
-
         public void Delete(string stepSeq)
         {
             try
@@ -203,109 +178,6 @@ namespace DACrux.SEMDMS.DSL
             catch (Exception ex)
             {
                 throw ex;
-            }
-        }
-
-        public DataTable GetProdutListPeriod(string[] period)
-        {
-            DataTable dt = null;
-            try
-            {
-                dt = this.GetDataTable("GET_PRODUCT_LIST_PERIOD", null, period);
-            }
-            catch (Exception ex)
-            {
-                throw this.ProcessErr(ex);
-            }
-            return dt;
-        }
-
-        public DataTable GetLotListPeriod(string[] period)
-        {
-            DataTable dt = null;
-            try
-            {
-                dt = this.GetDataTable("GET_LOT_LIST_PERIOD", null, period);
-            }
-            catch (Exception ex)
-            {
-                throw this.ProcessErr(ex);
-            }
-            return dt;
-        }
-
-        public DataTable GetWaferListPeriod(string[] period)
-        {
-            DataTable dt = null;
-            try
-            {
-                dt = this.GetDataTable("GET_WAFER_LIST_PERIOD", null, period);
-                return dt;
-            }
-            catch (Exception ex)
-            {
-                throw this.ProcessErr(ex);
-            }
-        }
-
-        public DataTable GetStepListPeriod(string[] period)
-        {
-            DataTable dt = null;
-            try
-            {
-                dt = this.GetDataTable("GET_STEP_LIST_PERIOD", null, period);
-                return dt;
-            }
-            catch (Exception ex)
-            {
-                throw this.ProcessErr(ex);
-            }
-        }
-
-        public DataTable GetSetupList(string product)
-        {
-            DataTable dt = null;
-            try
-            {
-                dt = this.GetDataTable("GET_SETUP_LIST_IN_PRODUCT", null, new string[] { product });
-                return dt;
-            }
-            catch (Exception ex)
-            {
-                throw this.ProcessErr(ex);
-            }
-        }
-
-        public string GetStepSeqs(string[] period)
-        {
-            string stepids = string.Empty;
-            DataTable dt = null;
-            try
-            {
-                dt = this.GetDataTable("GET_STEP_SEQS", null, period); //StepInfo[1],StepInfo[5],StepInfo[2],StepInfo[8]
-                if (dt.Rows.Count == 0)
-                {
-                    return string.Empty;
-                }
-                else
-                {
-                    for (int i = 0; i < dt.Rows.Count; i++)
-                    {
-                        if (i == 0)
-                        {
-                            stepids = dt.Rows[i]["STEP_SEQ"].ToString();
-                        }
-                        else
-                        {
-                            stepids = string.Format("{0},{1}", stepids, dt.Rows[i]["STEP_SEQ"].ToString());
-                        }
-                    }
-                }
-                return stepids;
-            }
-            catch (Exception ex)
-            {
-                throw this.ProcessErr(ex);
             }
         }
 
@@ -436,56 +308,6 @@ namespace DACrux.SEMDMS.DSL
             }
         }
 
-        public DataTable GetStepListByWafer(string[] StepInfo)
-        {
-            DataTable dt = null;
-            try
-            {
-                dt = this.GetDataTable("GET_STEP_LIST_BY_WAFER", null, StepInfo);
-                return dt;
-            }
-            catch (Exception ex)
-            {
-                throw this.ProcessErr(ex);
-            }
-            finally
-            {
-                if (dt != null) dt.Dispose();
-                dt = null;
-            }
-        }
-
-        public DataTable GetWaferListPeriod(string Query)
-        {
-            DataTable dt = null;
-            try
-            {
-                dt = this.GetDataTable("DYNAMIC", new string[] { Query }, null);
-                return dt;
-            }
-            catch (Exception ex)
-            {
-                throw this.ProcessErr(ex);
-            }
-            finally
-            {
-                if (dt != null) dt.Dispose();
-                dt = null;
-            }
-        }
-
-        public void UpdateInterlockFlag(long StepSeq, string InterlockFlag)
-        {
-            try
-            {
-                this.Execute("UPDATE_INTERLOCK_FLAG", null, new string[] { InterlockFlag, StepSeq.ToString() });
-            }
-            catch (Exception ex)
-            {
-                throw this.ProcessErr(ex);
-            }
-        }
-
         public int UpdateReclassifiedDefect(
             string[,] Params
             )
@@ -495,41 +317,6 @@ namespace DACrux.SEMDMS.DSL
                 null,
                 Params
                 );
-        }
-
-        public DataTable CheckEquipHold(string Product, string StepID, string MainEq, long StepSeq)
-        {
-            this.TraceStartPoint();
-            DataTable dt = null;
-            try
-            {
-                dt = this.GetDataTable("CHECK_EQUIP_HOLD", null, new string[] { Product, StepID, MainEq, StepSeq.ToString() });
-                return dt;
-            }
-            catch (Exception ex)
-            {
-                throw this.ProcessErr(ex);
-            }
-        }
-
-        public DataTable GetDynamicQuery(string Query)
-        {
-            this.TraceStartPoint();
-            DataTable dt = null;
-            try
-            {
-                dt = this.GetDataTable("DYNAMIC", new string[] { Query }, null);
-                return dt;
-            }
-            catch (Exception ex)
-            {
-                throw this.ProcessErr(ex);
-            }
-            finally
-            {
-                if (dt != null) dt.Dispose();
-                dt = null;
-            }
         }
 
 
@@ -770,15 +557,6 @@ namespace DACrux.SEMDMS.DSL
             return GetDataTable("SELECT_WAFER_LIST_01", new string[] { where }, null);
         }
 
-        public DataTable GetStepInfoOverlayMulti(string lotid, string[] wafers)
-        {
-            return this.GetDataTable(
-                "GET_INSP_INFO_OVERLAY[MULTI]",
-                new string[] { string.Format("'{0}'", string.Join("','", wafers)) },
-                new string[] { lotid }
-                );
-        }
-
         public DataTable GetStepWaferData(string strStepSeq, string strWaferSeq)
         {
             return GetDataTable("SELECT_INSP_STEP_WAFER", null, new string[] { strStepSeq, strWaferSeq });
@@ -840,14 +618,6 @@ namespace DACrux.SEMDMS.DSL
         public object[,] GetInspectionDefectSummaryData(long[] steps)
         {
             return GetDataToObjectArray("SELECT_DM_DEFECT_SUMMARY", new String[] { String.Format("{0}", String.Join(",", steps)) }, null);
-        }
-
-        public DataTable GetInspectionDefectiveDieSummaryData(string[] xAxis, string yAxis, long[] steps, string groupBy, string orderBy)
-        {
-            String selectCondition = String.Format("{0}", String.Join(",", xAxis));
-            if (!String.IsNullOrEmpty(yAxis))
-                selectCondition = String.Format("{0}, {1}", selectCondition, yAxis);
-            return GetDataTable("SELECT_DM_DEFECTIVE_SUMMARY", new String[] { selectCondition, String.Format("{0}", String.Join(",", steps)), groupBy, orderBy }, null);
         }
 
         public DataTable GetInspInfo01(long[] stepSeqArr)

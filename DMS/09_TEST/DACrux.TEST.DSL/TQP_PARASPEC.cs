@@ -274,19 +274,6 @@ namespace DACrux.TEST.DSL
                 );
         }
 
-        public DataTable GetParameterItems(
-            string factory,
-            string program,
-            string programRev
-            )
-        {
-            return this.GetDataTable(
-                "GET_ITEM_01",
-                null,
-                new string[] { factory, program, programRev }
-                );
-        }
-
         public string GetBinTTable(
             decimal waferSeq
             )

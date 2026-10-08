@@ -35,13 +35,6 @@ AND W.WAFER_SEQ = :wafer_seq]]></commandtext>
             <param direction="Input" dbtype="Number" size="10">:wafer_seq</param>
         </parameters>
     </query>
-    <query statement="Select" queryid="GET_WAFER_INFO [LSQ]" commandtype="Text" description="Wafer 정보를 가져온다." commandtimeout="60">
-        <commandtext><![CDATA[SELECT * FROM TQP_WAFER
- WHERE LOT_SEQ = :lotseq]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="Number" size="40" value="lotseq">:lotseq</param>
-        </parameters>
-    </query>
     <query statement="Select" queryid="GET_WAFER_INFO [WSQ]" commandtype="Text" description="Wafer 정보를 가져온다." commandtimeout="60">
         <commandtext><![CDATA[SELECT * FROM TQP_WAFER 
  WHERE WAFER_SEQ = :wafer_seq]]></commandtext>
@@ -96,14 +89,6 @@ WHERE WAFER_SEQ = :wafer_seq]]></commandtext>
             <param direction="Input" dbtype="Number" size="0">:loss_die</param>
         </parameters>
     </query>
-    <query statement="Select" queryid="GET_TESTPROGRAM" commandtype="Text" description="Tset Program을 가져온다." commandtimeout="60">
-        <commandtext><![CDATA[SELECT PROGRAM FROM TQP_LOT
-WHERE LOT_SEQ = (SELECT LOT_SEQ FROM TQP_WAFER
-               WHERE WAFER_SEQ = :wafer_seq)]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="Number" size="0">:wafer_seq</param>
-        </parameters>
-    </query>
     <query statement="Select" queryid="GET_LOT_SEQ" commandtype="Text" description="Lot Seq 가저온다." commandtimeout="60">
         <commandtext><![CDATA[SELECT LOT_SEQ FROM TQP_WAFER
 WHERE WAFER_SEQ = :wafer_seq]]></commandtext>
@@ -141,34 +126,10 @@ WHERE WAFER_SEQ = :wafer_seq]]></commandtext>
             <param direction="Input" dbtype="Number" size="0">:test_die</param>
         </parameters>
     </query>
-    <query statement="Select" queryid="GET_MAINT_WAFER_LIST" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT L.LOT_ID || '-' || W.WAFER_ID AS WAFER_ID,W.WAFER_SEQ FROM TQP_LOT L,TQP_WAFER W
-WHERE L.LOT_SEQ IN ( ?? )
-AND W.PROBE_CNT IN (??)
-AND L.LOT_SEQ = W.LOT_SEQ
-ORDER BY L.LOT_ID || '-' || W.WAFER_ID ]]></commandtext>
-    </query>
     <query statement="Delete" queryid="DELETE_WAFER_DATA" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[DELETE FROM TQP_WAFER WHERE WAFER_SEQ = :wafer_seq]]></commandtext>
         <parameters>
             <param direction="Input" dbtype="Number" size="0">:wafer_seq</param>
-        </parameters>
-    </query>
-    <query statement="Update" queryid="UPDATE_MAINT_PROBE_CNT" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[UPDATE TQP_WAFER SET PROBE_CNT=:probe_cnt WHERE WAFER_SEQ = :wafer_seq]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="Number" size="0">:probe_cnt</param>
-            <param direction="Input" dbtype="Number" size="0">:wafer_seq</param>
-        </parameters>
-    </query>
-    <query statement="Select" queryid="GET_MAP_WAFER_LIST" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT L.LOT_ID || '-' || W.WAFER_ID AS WAFER_ID,W.WAFER_SEQ FROM TQP_LOT L,TQP_WAFER W
-WHERE L.LOT_SEQ IN ( ?? )
-AND W.PROBE_CNT=:probecnt
-AND L.LOT_SEQ = W.LOT_SEQ
-ORDER BY L.LOT_ID || '-' || W.WAFER_ID ]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="Number" size="10">:probecnt</param>
         </parameters>
     </query>
     <query statement="Select" queryid="WAFER_LIST" commandtype="Text" description="wafer 목록을 가져온다" commandtimeout="60">
@@ -491,20 +452,6 @@ WHERE 1 = 1
     AND FACTORY = :FACTORY
     AND LOT_SEQ = :LOT_SEQ 
     AND WAFER_ID = :WAFER_ID]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="0" value="FACTORY">:FACTORY</param>
-            <param direction="Input" dbtype="VarChar" size="0" value="LOT_SEQ">:LOT_SEQ</param>
-            <param direction="Input" dbtype="VarChar" size="0" value="WAFER_ID">:WAFER_ID</param>
-        </parameters>
-    </query>
-    <query statement="Delete" queryid="DELETE_WAFER_AVI" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[DELETE
-FROM TQP_WAFER
-WHERE 1 = 1
-    AND FACTORY = :FACTORY
-    AND LOT_SEQ = :LOT_SEQ
-    AND WAFER_ID = :WAFER_ID
-]]></commandtext>
         <parameters>
             <param direction="Input" dbtype="VarChar" size="0" value="FACTORY">:FACTORY</param>
             <param direction="Input" dbtype="VarChar" size="0" value="LOT_SEQ">:LOT_SEQ</param>

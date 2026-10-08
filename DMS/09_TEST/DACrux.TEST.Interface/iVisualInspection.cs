@@ -11,7 +11,6 @@ namespace DACrux.TEST.Interface
         void InsertLot(string FACILITY, string TESTAREA, string PRODUCT, string PROGRAM, string LOTID, string FABLOT, string START_TIME, string END_TIME);
         void InsertWafer(string LOT_SEQ, string WAFER_ID, string TESTER, string OPERATOR, string TESTED_DIE, string START_TIME, string LOSS_DIE);
         void InsertFailDie(string PRODUCT, string[] strValue);
-        void UpdateQCFailDie(string PRODUCT, string[] strValue);
         DataTable GetMapData(string TESTAREA, string PRODUCT, string PROGRAM, string LOT_ID, string WAFER_ID);
         DataTable GetWaferList(string TestArea, string StartTime, string EndTime, string LikeDevice, string LikeLot, string LikeWafer);
         DataTable GetTestAreaList();
@@ -92,18 +91,6 @@ namespace DACrux.TEST.Interface
         void CallProcedure(string testArea, string product, string program, string waferSeq, string strGecBin);
         string ColorString(int iBinNumber);
 
-
-        /// <summary>
-        /// 2015.04.15
-        /// </summary>
-        /// <param name="m_TestArea"></param>
-        /// <param name="m_Product"></param>
-        /// <param name="m_Program"></param>
-        /// <param name="m_LotID"></param>
-        /// <param name="m_WaferID"></param>
-        /// <param name="oUpdateDie"></param>
-        /// <returns></returns>
-        int UpdateVI(string strFactory, string TestArea, string Product, string Program, string LotID, string WaferID, object oFailCode);
 
         DataTable GetAVIMapData(string TESTAREA, string PRODUCT, string LOT_ID, string WAFER_ID);
         DataTable GetAVIMapData(string TESTAREA, string PRODUCT, string LOT_ID, string WAFER_ID, string PROGRAM);

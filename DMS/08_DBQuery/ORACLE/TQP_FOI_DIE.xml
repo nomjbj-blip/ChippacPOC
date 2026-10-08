@@ -96,19 +96,6 @@ GROUP BY  BIN, BIN_CHAR]]></commandtext>
             <param direction="Input" dbtype="VarChar" size="40" value="wafer_seq">:wafer_seq</param>
         </parameters>
     </query>
-    <query statement="Select" queryid="SELECT_WAFER_RAW" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT A.*,
-       (SELECT HIGH_GEC
-          FROM TQP_BINDESC
-         WHERE PROGRAM = 'AVI' AND BIN = A.BIN)
-          AS HIGH_GEC
-  FROM TQP_FOI_DIE A
- WHERE 1 = 1 
- AND A.WAFER_SEQ = :waferseq]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="40" value="waferseq">:waferseq</param>
-        </parameters>
-    </query>
     <query statement="Delete" queryid="DELETE_TQP_FOI_DIE" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[DELETE  FROM TQP_FOI_DIE
 WHERE 1= 1 

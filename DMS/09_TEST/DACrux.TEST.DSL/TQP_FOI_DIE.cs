@@ -51,11 +51,6 @@ namespace DACrux.TEST.DSL
             return this.GetDataTable("SELECT_AVI_BIN_SUMMARY", null, new string[] { strWaferSeq });
         }
 
-        public DataTable SelectFOIBinRaw(string strWaferSeq)
-        {
-            return this.GetDataTable("SELECT_WAFER_RAW", null, new string[] { strWaferSeq });
-        }
-
         public void DeleteFOIDiesMulti(string strWaferSeq)
         {
             this.Execute("DELETE_TQP_FOI_DIE", null, new string[] { strWaferSeq });

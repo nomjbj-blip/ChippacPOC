@@ -13,8 +13,6 @@ namespace DACrux.TEST.Interface
         // 2015-04-22
         DataSet GetWaferMap(string TestArea, string Product, string Program, string LotID, string WaferID, int ProbeCnt, bool IsMaxOper = false);
 
-        DataSet GetCumMap(long[] WaferSeqs);
-        DataTable GetCumRawData(string Program, long[] WaferSeq, string[] SelBin);
         DataTable GetBinDistribution(string program, long waferSeq);
         DataTable GetMapData(string program, long[] WaferSeq, string[] BINS);
         DataTable GetWaferInfo(long[] WaferSeq);
@@ -48,16 +46,13 @@ namespace DACrux.TEST.Interface
         DataSet SelectWaferMapDrawData(long[] WaferSeq);
         DataTable SelectWaferParaItem(long WaferSeq, string strParaItem, int decimalLength);
         DataTable SelectWaferParaItem(long[] WaferSeq, string strParaItem, int decimalLength);
-        DataSet GetCumMapReport(long[] WaferSeqs);
         System.Data.DataSet SelectWaferMapBasic(long WaferSeq);
         System.Data.DataSet SelectWaferMapConfigMap(long WaferSeq);
         System.Data.DataSet SelectWaferShotMapBasic(string strDevice);
         System.Data.DataSet SelectWaferParaData(long WaferSeq, string[] strParaItem);
         System.Data.DataTable SelectWaferParaDataMulti(long[] WaferSeqList, string[] strParaItem);
-        System.Data.DataSet SelectWaferMapConfig(long WaferSeq);
         System.Data.DataTable SelectWaferShotMap(string strMapID);
         void UpdateMapConfig(string strTestArea, string strProduct, string strProgram, string strDir, string strAngle, string strIndexX, string strIndexY, string strUser, string strcomment);
-        DataTable SelectMapConfigList(string strProduct);
         DataTable SelectMapConfigView(bool bDeleteFlag);
         void DeleteMapConfig(string strSequence, string strUser, string strcomment);
         DataSet GetCumWaferReport(long[] WaferSeqs);

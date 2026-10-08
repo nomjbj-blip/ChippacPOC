@@ -40,26 +40,6 @@ GROUP BY WAFER_SEQ,VISUALINSP]]></commandtext>
             <param direction="Input" dbtype="Number" size="0">:wafer_seq</param>
         </parameters>
     </query>
-    <query statement="Update" queryid="UPDATE_MAINT_PROBE_CNT" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[UPDATE TQP_WAFER_SUM SET PROBE_CNT=:probe_cnt WHERE WAFER_SEQ = :wafer_seq]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="Number" size="0">:probe_cnt</param>
-            <param direction="Input" dbtype="Number" size="0">:wafer_seq</param>
-        </parameters>
-    </query>
-    <query statement="Select" queryid="GET_K39VAGSL14_PT1" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT LOT_SEQ,WAFER_SEQ,ROUND(YIELD,2) FROM TQP_WAFER_SUM
-WHERE PROGRAM='K39VAGSL14_PT1'
-ORDER BY LOT_SEQ,WAFER_ID]]></commandtext>
-    </query>
-    <query statement="Select" queryid="GET_STD_MAP" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT X,Y,1 AS BIN FROM TQP_USEMAP
-WHERE MAPID = (SELECT MAPID FROM TQP_PRODUCT WHERE PRODUCT = (SELECT PRODUCT FROM TQP_PROGRAM WHERE PROGRAM = :program))
-AND USECODE=1]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="40">:program</param>
-        </parameters>
-    </query>
     <query statement="Insert" queryid="CREATE_NEW_LOT" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[INSERT INTO TQP_LOT(
 LOT_SEQ,
@@ -152,9 +132,6 @@ VALUES
     <query statement="Select" queryid="GET_MAX_LOTSEQ" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[SELECT MAX(LOT_SEQ) AS CURR_LOT_SEQ FROM TQP_LOT]]></commandtext>
     </query>
-    <query statement="Select" queryid="GET_MAX_WAFERSEQ" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT MAX(WAFER_SEQ) AS CURR_WAFER_SEQ FROM TQP_WAFER]]></commandtext>
-    </query>
     <query statement="Select" queryid="GET_BINDESC" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[SELECT BIN FROM TQP_BINDESC
 WHERE PROGRAM = :program
@@ -162,40 +139,6 @@ AND DISPLAY='T'
 ORDER BY BIN]]></commandtext>
         <parameters>
             <param direction="Input" dbtype="VarChar" size="40" value="K39VAGSL14_PT1">:program</param>
-        </parameters>
-    </query>
-    <query statement="Update" queryid="UPDATE_LOT_TIME" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[UPDATE TQP_LOT 
-SET START_TIME = TO_DATE(:stime,'YYYY-MM-DD HH24:MI:SS')
-,END_TIME = TO_DATE(:etime,'YYYY-MM-DD HH24:MI:SS')
-WHERE LOT_SEQ = :lot_seq]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="0">:stime</param>
-            <param direction="Input" dbtype="VarChar" size="0">:etime</param>
-            <param direction="Input" dbtype="Number" size="0">:lot_seq</param>
-        </parameters>
-    </query>
-    <query statement="Insert" queryid="PROC_RUN_PRB_SUMMARY" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[CALL PROC_RUN_PRB_SUMMARY(:testarea,:product,:program,:waferseq,:gec)]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="0">:testarea</param>
-            <param direction="Input" dbtype="VarChar" size="0">:product</param>
-            <param direction="Input" dbtype="VarChar" size="0">:program</param>
-            <param direction="Input" dbtype="Number" size="0">:waferseq</param>
-            <param direction="Input" dbtype="VarChar" size="0">:gec</param>
-        </parameters>
-    </query>
-    <query statement="Select" queryid="GET_MES_WAFER_LIST" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT *
-FROM TQP_WAFER_SUM
-WHERE 1=1
-AND TESTAREA = :oper
-AND LOT_ID = :lot_id
-AND WAFER_ID = :wafer_id]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="10">:oper</param>
-            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
-            <param direction="Input" dbtype="VarChar" size="2">:wafer_id</param>
         </parameters>
     </query>
     <query statement="Select" queryid="GET_WAFER_INFO_2" commandtype="Text" description="Defect Map과 Overlay 할 수 있는 wafer list" commandtimeout="60">
@@ -262,26 +205,6 @@ AND BIN=0 AND AVI=0 AND VISUALINSP>0]]></commandtext>
             <param direction="Input" dbtype="Number" size="10">:wafer_seq</param>
         </parameters>
     </query>
-    <query statement="Select" queryid="GET_YIELD_BYWAFER" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT LOT_ID || '-'  || WAFER_ID AS WAFER_ID, YIELD FROM TQP_WAFER_SUM
-WHERE WAFER_SEQ IN (??) ORDER BY END_TIME]]></commandtext>
-    </query>
-    <query statement="Select" queryid="GET_YIELD_BYLOT" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT LOT_ID , ROUND(AVG(YIELD),2) AS YIELD FROM TQP_WAFER_SUM
-WHERE WAFER_SEQ IN (??) GROUP BY LOT_ID]]></commandtext>
-    </query>
-    <query statement="Select" queryid="GET_YIELD_BYDATE" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT TO_CHAR(END_TIME,'YYYY-MM-DD') AS DAY, ROUND(AVG(YIELD),2) AS YIELD FROM TQP_WAFER_SUM
-WHERE WAFER_SEQ IN (??) GROUP BY TO_CHAR(END_TIME,'YYYY-MM-DD') ORDER BY TO_CHAR(END_TIME,'YYYY-MM-DD') ]]></commandtext>
-    </query>
-    <query statement="Select" queryid="GET_BOX_YIELD_BYLOT" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT LOT_ID,WAFER_ID,ROUND(YIELD,2) AS YIELD FROM TQP_WAFER_SUM
-WHERE WAFER_SEQ IN (??)]]></commandtext>
-    </query>
-    <query statement="Select" queryid="GET_BOX_YIELD_BYDATE" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT TO_CHAR(END_TIME,'YYYY-MM-DD') AS DAY,WAFER_ID,ROUND(YIELD,2) AS YIELD  FROM TQP_WAFER_SUM
-WHERE WAFER_SEQ IN (??)]]></commandtext>
-    </query>
     <query statement="Insert" queryid="CREATE_WAFER" commandtype="Text" description="Wafer Sum 생성한다." commandtimeout="60">
         <commandtext><![CDATA[INSERT INTO TQP_WAFER_SUM VALUES( ?? )]]></commandtext>
     </query>
@@ -346,47 +269,12 @@ WHERE WAFER_SEQ = :wafer_seq
             <param direction="Input" dbtype="Number" size="0">:loss_die</param>
         </parameters>
     </query>
-    <query statement="Insert" queryid="CREATE_DEVICE_TABLE" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[CREATE TABLE ??(
-WAFER_SEQ    NUMBER(8)    NOT NULL,
-DIEID        INTEGER    NOT NULL,
-X        INTEGER    NOT NULL,
-Y        INTEGER    NOT NULL,
-BIN        INTEGER    NOT NULL,
-HBIN        INTEGER    NOT NULL,
-CHARBIN    VarChar(4),
-SITE        INTEGER,
-VISUALINSP    INTEGER,
-AVI        INTEGER
-)
-]]></commandtext>
-    </query>
-    <query statement="Select" queryid="GET_WAFER_INFO_MULTI_OVER_THOUSAND" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[select * from TQP_WAFER_SUM WHERE WAFER_SEQ in (select level from dual connect by level <= ??) AND WAFER_SEQ >= ?? AND WAFER_SEQ <= ??]]></commandtext>
-    </query>
-    <query statement="Select" queryid="GET_WAFER_INFO_MULTI_OVER_THOUSAND_BET" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[select * from TQP_WAFER_SUM WHERE WAFER_SEQ in (select level from dual connect by level <= ??) AND WAFER_SEQ >= ?? AND WAFER_SEQ <= ?? AND LOT_ID in (??)]]></commandtext>
-    </query>
     <query statement="Select" queryid="SELECT_WAFER_SUM_INFO" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[SELECT *
 FROM TQP_WAFER_SUM
 WHERE LOT_ID = :lot_id
 AND WAFER_ID = :wafer_id
 AND PROBE_CNT = 0]]></commandtext>
-    </query>
-    <query statement="Select" queryid="GET_WAFER_INFOS" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT * FROM TQP_WAFER_SUM
-WHERE 1=1
-AND PRODUCT=:product
-AND LOT_ID = :lot_id
-AND WAFER_ID = :wafer_id
-AND PROBE_CNT=0
-AND TESTAREA IN ( ?? ) ]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="40">:product</param>
-            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
-            <param direction="Input" dbtype="VarChar" size="40">:wafer_id</param>
-        </parameters>
     </query>
     <query statement="Select" queryid="SELECT_WAFER_INFO_LOT_WAFER_TESTAREA" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[SELECT *
@@ -400,26 +288,6 @@ AND PROBE_CNT = 0  ]]></commandtext>
             <param direction="Input" dbtype="VarChar" size="40" value="8293360">:lot_id</param>
             <param direction="Input" dbtype="VarChar" size="40" value="AK8293360-21">:wafer_id</param>
             <param direction="Input" dbtype="VarChar" size="40" value="MULTIPROBE">:testarea</param>
-        </parameters>
-    </query>
-    <query statement="Select" queryid="SELECT_WAFER_SUM_MAX_SEQ_MERGE" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT MAX(WAFER_SEQ)
-FROM TQP_WAFER_SUM
-WHERE LOT_ID = :lot_id
-AND WAFER_ID = :wafer_id
-AND TESTAREA LIKE '%MERGE'
- ]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
-            <param direction="Input" dbtype="VarChar" size="40">:wafer_id</param>
-        </parameters>
-    </query>
-    <query statement="Select" queryid="SELECT_WAFER_SUM_BY_LOTID" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT *
-FROM TQP_WAFER_SUM
-WHERE LOT_ID = :lot_id]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
         </parameters>
     </query>
     <query statement="Insert" queryid="COPY_WAFER_SUM" commandtype="Text" commandtimeout="60">
@@ -441,23 +309,6 @@ WHERE WAFER_SEQ = :pre_wafer_seq]]></commandtext>
             <param direction="Input" dbtype="Number" size="0">:yield</param>
             <param direction="Input" dbtype="VarChar" size="0">:copy_flag</param>
             <param direction="Input" dbtype="Number" size="0">:pre_wafer_seq</param>
-        </parameters>
-    </query>
-    <query statement="Select" queryid="SELECT_BY_DYNAMIC" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[??]]></commandtext>
-    </query>
-    <query statement="Select" queryid="SELECT_GOLDEN_CHECK_LIST" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT GOLDEN_CHECK, WAFER_ID
-FROM TQP_WAFER_SUM
-WHERE 1=1
-AND LOT_ID = :lot_id
-AND WAFER_ID IN (??)
-AND TESTAREA = :testarea
-AND PROBE_CNT = 0
-ORDER BY WAFER_ID]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
-            <param direction="Input" dbtype="VarChar" size="40">:testarea</param>
         </parameters>
     </query>
     <query statement="Select" queryid="GET_WAFER_INFO_BY_TESTAREA" commandtype="Text" commandtimeout="60">
@@ -501,17 +352,6 @@ ORDER BY BIN]]></commandtext>
             <param direction="Input" dbtype="Number" size="20">:wafer_seq</param>
         </parameters>
     </query>
-    <query statement="Select" queryid="GET_WAFER_INFO_LIST_BY_TESTAREA" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT *
-FROM TQP_WAFER_SUM
-WHERE TESTAREA = :testarea
-AND LOT_ID = :lot_id
-AND PROBE_CNT = 0]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="40">:testarea</param>
-            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
-        </parameters>
-    </query>
     <query statement="Select" queryid="SELECT_GOLDEN_CHECK_1" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[SELECT X,Y
 FROM TQP_USEMAP
@@ -548,241 +388,6 @@ WHERE WAFER_SEQ = :wafer_seq]]></commandtext>
             <param direction="Input" dbtype="Number" size="0">:wafer_seq</param>
         </parameters>
     </query>
-    <query statement="Select" queryid="SELECT_GOLDEN_CHECK_AVI" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT DECODE(SELECTED_WAFER_ID, null, 'T','F') AS GOLDEN_CHECK, ALL_WAFER_ID AS WAFER_ID 
-FROM (SELECT LPAD(LEVEL,2,'0') ALL_WAFER_ID
-                        from dual 
-                        CONNECT BY LEVEL IN (??)) A,
-(
-    SELECT DISTINCT WAFER_ID AS SELECTED_WAFER_ID
-    FROM
-    (
-        SELECT *
-        FROM
-        (
-            SELECT
-            A.WAFER_ID
-            ,( A.X - B.MIN_X +1) X --X
-            , (B.MAX_Y - A.Y +1 ) Y  --Y
-            FROM 
-            (
-                SELECT A.WAFER_ID, INDEX_X AS X, INDEX_Y AS Y  
-                FROM 
-                (
-                    SELECT B.WAFER_ID, STEP_SEQ, RESULTTIMESTAMP
-                    , RANK() OVER (ORDER BY RESULTTIMESTAMP DESC) AS RANK
-                    FROM TQD_LOT A, TQD_WAFER B, TQD_STEP C
-                    WHERE 1=1
-                    AND A.LOT_ID = :lot_id
-                    AND A.PRODUCT = :product
-                    AND A.LOT_SEQ = B.LOT_SEQ
-                    AND B.WAFER_ID IN (??)
-                    AND B.WAFER_SEQ = C.WAFER_SEQ
-                    AND C.STEP_ID = :step_id
-                    ) A, TQD_SCAN_SAMPLE B
-                WHERE A.RANK = 1
-                AND A.STEP_SEQ = B.STEP_SEQ
-            ) A,
-            (
-                SELECT
-                MAX(INDEX_X) MAX_X, MAX(INDEX_Y) MAX_Y
-                , MIN(INDEX_X) MIN_X, MIN(INDEX_Y) MIN_Y
-                FROM(
-                    SELECT B.WAFER_ID, STEP_SEQ, RESULTTIMESTAMP, RANK() OVER (ORDER BY RESULTTIMESTAMP DESC) AS RANK
-                    FROM TQD_LOT A, TQD_WAFER B, TQD_STEP C 
-                    WHERE 1=1
-                    AND A.LOT_ID = :lot_id
-                    AND A.PRODUCT = :product
-                    AND A.LOT_SEQ = B.LOT_SEQ
-                    AND B.WAFER_ID IN (??)
-                    AND B.WAFER_SEQ = C.WAFER_SEQ
-                    AND C.STEP_ID = :step_id
-                    ) A, TQD_SCAN_SAMPLE B    
-                WHERE A.RANK = 1
-                AND A.STEP_SEQ = B.STEP_SEQ       
-            ) B 
-            GROUP BY A.WAFER_ID,( A.X - B.MIN_X +1),  (B.MAX_Y - A.Y +1 )
-            MINUS
-            SELECT B.WAFER_ID WAFER_ID, X, Y
-            FROM TQP_USEMAP
-                        , (SELECT LPAD(LEVEL,2,'0') AS WAFER_ID 
-                            from dual 
-                            CONNECT BY LEVEL IN (??)) B
-                            WHERE MAPID = :product
-            AND USECODE = 1
-            GROUP BY WAFER_ID, X, Y
-        ) 
-        UNION ALL
-        SELECT *
-        FROM
-        (
-            SELECT B.WAFER_ID WAFER_ID, X, Y
-            FROM TQP_USEMAP
-                        , (SELECT LPAD(LEVEL,2,'0') AS WAFER_ID 
-                            from dual 
-                            CONNECT BY LEVEL IN (??)) B
-                            WHERE MAPID = :product
-            AND USECODE = 1
-            GROUP BY WAFER_ID, X, Y
-            MINUS
-            SELECT
-            A.WAFER_ID
-            ,( A.X - B.MIN_X +1) X --X
-            , (B.MAX_Y - A.Y +1 ) Y  --Y
-            FROM 
-            (
-                SELECT B.WAFER_ID, INDEX_X AS X, INDEX_Y AS Y 
-                FROM TQD_LOT A, TQD_WAFER B, TQD_STEP C, TQD_SCAN_SAMPLE D
-                WHERE 1=1
-                AND A.LOT_ID = :lot_id
-                AND A.LOT_SEQ = B.LOT_SEQ
-                AND B.WAFER_ID IN (??)
-                AND B.WAFER_SEQ = C.WAFER_SEQ
-                AND C.STEP_ID = :step_id
-                AND C.STEP_SEQ = D.STEP_SEQ
-                GROUP BY B.WAFER_ID, INDEX_X, INDEX_Y
-            ) A,
-            (
-                SELECT
-                MAX(INDEX_X) MAX_X, MAX(INDEX_Y) MAX_Y
-                , MIN(INDEX_X) MIN_X, MIN(INDEX_Y) MIN_Y
-                FROM TQD_LOT A, TQD_WAFER B, TQD_STEP C, TQD_SCAN_SAMPLE D
-                WHERE 1=1
-                AND A.LOT_ID = :lot_id
-                AND A.LOT_SEQ = B.LOT_SEQ
-                AND B.WAFER_ID IN (??)
-                AND B.WAFER_SEQ = C.WAFER_SEQ
-                AND C.STEP_ID = :step_id
-                AND C.STEP_SEQ = D.STEP_SEQ    
-            ) B 
-            GROUP BY A.WAFER_ID,( A.X - B.MIN_X +1),  (B.MAX_Y - A.Y +1 )
-         ) B
-    )
-)B
-WHERE SELECTED_WAFER_ID (+)= ALL_WAFER_ID
-ORDER BY ALL_WAFER_ID
-
-
-
-
-]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
-            <param direction="Input" dbtype="VarChar" size="40">:step_id</param>
-            <param direction="Input" dbtype="VarChar" size="40" value="31702">:product</param>
-        </parameters>
-    </query>
-    <query statement="Select" queryid="SELECT_GOLDEN_CHECK_WAFER_QTY" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT *
-FROM TQP_WAFER_SUM
-WHERE LOT_ID = :lot_id
-AND TESTAREA = :testarea
-AND WAFER_ID IN (??)
-AND PROBE_CNT = 0]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
-            <param direction="Input" dbtype="VarChar" size="40">:testarea</param>
-        </parameters>
-    </query>
-    <query statement="Select" queryid="SELECT_GOLDEN_CHECK_AVI_EACH" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT
-( A.X - B.MIN_X +1) X --X
-, (B.MAX_Y - A.Y +1 ) Y  --Y
-FROM 
-(
-    SELECT INDEX_X AS X, INDEX_Y AS Y  
-    FROM 
-    (
-        SELECT STEP_SEQ, RESULTTIMESTAMP
-        , RANK() OVER (ORDER BY RESULTTIMESTAMP DESC) AS RANK
-        FROM TQD_LOT A, TQD_WAFER B, TQD_STEP C
-        WHERE 1=1
-        AND A.LOT_ID = :lot_id
-        AND A.PRODUCT = :product
-        AND A.LOT_SEQ = B.LOT_SEQ
-        AND B.WAFER_ID = :wafer_id
-        AND B.WAFER_SEQ = C.WAFER_SEQ
-        AND C.STEP_ID = :step_id
-        ) A, TQD_SCAN_SAMPLE B
-    WHERE A.RANK = 1
-    AND A.STEP_SEQ = B.STEP_SEQ
-) A,
-(
-    SELECT
-    MAX(INDEX_X) MAX_X, MAX(INDEX_Y) MAX_Y
-    , MIN(INDEX_X) MIN_X, MIN(INDEX_Y) MIN_Y
-    FROM(
-        SELECT B.WAFER_ID, STEP_SEQ, RESULTTIMESTAMP, RANK() OVER (ORDER BY RESULTTIMESTAMP DESC) AS RANK
-        FROM TQD_LOT A, TQD_WAFER B, TQD_STEP C 
-        WHERE 1=1
-        AND A.LOT_ID = :lot_id
-        AND A.PRODUCT = :product
-        AND A.LOT_SEQ = B.LOT_SEQ
-        AND B.WAFER_ID = :wafer_id
-        AND B.WAFER_SEQ = C.WAFER_SEQ
-        AND C.STEP_ID = :step_id
-        ) A, TQD_SCAN_SAMPLE B    
-    WHERE A.RANK = 1
-    AND A.STEP_SEQ = B.STEP_SEQ       
-) B 
-MINUS
-SELECT  X, Y
-FROM TQP_USEMAP
-WHERE MAPID = :product
-AND USECODE = 1
-UNION ALL
-SELECT  X, Y
-FROM TQP_USEMAP
-WHERE MAPID = :product
-AND USECODE = 1
-MINUS
-SELECT
-( A.X - B.MIN_X +1) X --X
-, (B.MAX_Y - A.Y +1 ) Y  --Y
-FROM 
-(
-    SELECT INDEX_X AS X, INDEX_Y AS Y  
-    FROM 
-    (
-        SELECT STEP_SEQ, RESULTTIMESTAMP
-        , RANK() OVER (ORDER BY RESULTTIMESTAMP DESC) AS RANK
-        FROM TQD_LOT A, TQD_WAFER B, TQD_STEP C
-        WHERE 1=1
-        AND A.LOT_ID = :lot_id
-        AND A.PRODUCT = :product
-        AND A.LOT_SEQ = B.LOT_SEQ
-        AND B.WAFER_ID = :wafer_id
-        AND B.WAFER_SEQ = C.WAFER_SEQ
-        AND C.STEP_ID = :step_id
-        ) A, TQD_SCAN_SAMPLE B
-    WHERE A.RANK = 1
-    AND A.STEP_SEQ = B.STEP_SEQ
-) A,
-(
-    SELECT
-    MAX(INDEX_X) MAX_X, MAX(INDEX_Y) MAX_Y
-    , MIN(INDEX_X) MIN_X, MIN(INDEX_Y) MIN_Y
-    FROM(
-        SELECT B.WAFER_ID, STEP_SEQ, RESULTTIMESTAMP, RANK() OVER (ORDER BY RESULTTIMESTAMP DESC) AS RANK
-        FROM TQD_LOT A, TQD_WAFER B, TQD_STEP C 
-        WHERE 1=1
-        AND A.LOT_ID = :lot_id
-        AND A.PRODUCT = :product
-        AND A.LOT_SEQ = B.LOT_SEQ
-        AND B.WAFER_ID = :wafer_id
-        AND B.WAFER_SEQ = C.WAFER_SEQ
-        AND C.STEP_ID = :step_id
-        ) A, TQD_SCAN_SAMPLE B    
-    WHERE A.RANK = 1
-    AND A.STEP_SEQ = B.STEP_SEQ       
-) B ]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
-            <param direction="Input" dbtype="VarChar" size="40">:product</param>
-            <param direction="Input" dbtype="VarChar" size="40">:wafer_id</param>
-            <param direction="Input" dbtype="VarChar" size="40">:step_id</param>
-        </parameters>
-    </query>
     <query statement="Select" queryid="GET_WAFER_LIST_BY_ALL" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[SELECT *
 FROM TQP_WAFER_SUM
@@ -795,41 +400,6 @@ ORDER BY WAFER_ID]]></commandtext>
             <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
             <param direction="Input" dbtype="VarChar" size="40">:product</param>
             <param direction="Input" dbtype="VarChar" size="40">:testarea</param>
-        </parameters>
-    </query>
-    <query statement="Select" queryid="SELECT_TESTAREA_LAST_MERGE" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT TESTAREA, START_TIME, END_TIME
-FROM TQP_WAFER_SUM
-WHERE 1=1
-AND LOT_ID = :lot_id
-AND WAFER_ID = :wafer_id
-AND PRODUCT = :product
-AND TESTAREA LIKE '%MERGE'
-ORDER BY START_TIME DESC , END_TIME DESC]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
-            <param direction="Input" dbtype="VarChar" size="40">:wafer_id</param>
-            <param direction="Input" dbtype="VarChar" size="40">:product</param>
-        </parameters>
-    </query>
-    <query statement="Insert" queryid="CREATE_DMS_WAFER" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[-- Create Date : 2014-11-27 20:02:41
-INSERT INTO TQP_WAFER_SUM 
-(LOT_SEQ, LOT_ID, TESTAREA, PRODUCT, PROGRAM, CUSTOMER, FACILITY, START_TIME, END_TIME, WAFER_SEQ, WAFER_ID, GOLDEN_CHECK, PROBE_CNT) 
-VALUES 
-(:LOT_SEQ, :LOT_ID, :TESTAREA, :PRODUCT, :PROGRAM, :CUSTOMER, :FACILITY, TO_DATE(:START_TIME,'YYYY-MM-DD HH24:MI:SS'), TO_DATE(:END_TIME,'YYYY-MM-DD HH24:MI:SS'), :WAFER_SEQ, :WAFER_ID, 'T', '0')]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="0">:LOT_SEQ</param>
-            <param direction="Input" dbtype="VarChar" size="0">:LOT_ID</param>
-            <param direction="Input" dbtype="VarChar" size="0">:TESTAREA</param>
-            <param direction="Input" dbtype="VarChar" size="0">:PRODUCT</param>
-            <param direction="Input" dbtype="VarChar" size="0">:PROGRAM</param>
-            <param direction="Input" dbtype="VarChar" size="0">:CUSTOMER</param>
-            <param direction="Input" dbtype="VarChar" size="0">:FACILITY</param>
-            <param direction="Input" dbtype="VarChar" size="0">:START_TIME</param>
-            <param direction="Input" dbtype="VarChar" size="0">:END_TIME</param>
-            <param direction="Input" dbtype="VarChar" size="0">:WAFER_SEQ</param>
-            <param direction="Input" dbtype="VarChar" size="0">:WAFER_ID</param>
         </parameters>
     </query>
     <query statement="Update" queryid="UPDATE_BIN_INFO_DMS" commandtype="Text" commandtimeout="60">
@@ -2633,21 +2203,6 @@ WHERE LOT_SEQ = :LOT_SEQ]]></commandtext>
 WHERE LOT_SEQ = :LOT_SEQ]]></commandtext>
         <parameters>
             <param direction="Input" dbtype="VarChar2" size="0" value="0">:LOT_SEQ</param>
-        </parameters>
-    </query>
-    <query statement="Select" queryid="SELECT_WAFER_MATCH" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT *
-  FROM TQP_WAFER_SUM
- WHERE     1 = 1
- AND FACILITY = :factory
- AND LOT_ID = :lotid
-       AND REGEXP_SUBSTR (WAFER_ID, '[^-]+', REGEXP_INSTR (WAFER_ID, '-')) IN (??)
-       AND TESTAREA = :testarea
-       AND PROBE_CNT = 0]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar2" size="40" value="factory">:factory</param>
-            <param direction="Input" dbtype="VarChar2" size="40" value="lotid">:lotid</param>
-            <param direction="Input" dbtype="VarChar2" size="40" value="testarea">:testarea</param>
         </parameters>
     </query>
     <query statement="Update" queryid="UPDATE_PROGRAM" commandtype="Text" commandtimeout="60">

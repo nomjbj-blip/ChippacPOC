@@ -75,46 +75,7 @@ namespace DACrux.SEMDMS.BSL
             return true;
         }
 
-        public bool GetInspectionInfo_02(
-            string factory,
-            DateTime resulttimestamp,
-            string lot,
-            string slot,
-            string step,
-            out long waferseq,
-            out long stepseq
-            )
-        {
-            DSL.TQD_INSP_INFO objInspInfo = new DSL.TQD_INSP_INFO();
-            DataTable dt = objInspInfo.GetStepInfoByStepSeqAndWaferSeq_02(
-                factory,
-                resulttimestamp,
-                lot,
-                slot,
-                step
-                );
-
-            if (dt == null || dt.Rows.Count <= 0)
-            {
-                waferseq = long.MinValue;
-                stepseq = long.MinValue;
-                return false;
-            }
-
-            waferseq = Int64.Parse(dt.Rows[0]["WAFER_SEQ"].ToString());
-            stepseq = Int64.Parse(dt.Rows[0]["STEP_SEQ"].ToString());
-            return true;
-        }
-
         //--
-
-        public int UpdateDefectList(string[,] defectParams)
-        {
-            DSL.TQD_DEFECT oDefect = new DSL.TQD_DEFECT();
-            return oDefect.UpdateDefect(
-                defectParams
-                );
-        }
 
         //--
 

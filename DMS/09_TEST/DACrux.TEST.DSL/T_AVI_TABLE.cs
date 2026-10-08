@@ -457,25 +457,6 @@ namespace DACrux.TEST.DSL
 
         #region Map Parser DSL ----------------------------------------------------------
 
-        public DataTable SelectBinInfo(string str, string WaferID, string Product, string Program, string LotId)
-        {
-            DataTable dt = null;
-            try
-            {
-                dt = this.GetDataTable("SELECT_BININFO"
-                    , new string[] { str }
-                    , new string[] { WaferID, Product, Program, LotId });
-                return dt;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-            finally
-            {
-            }
-        }
-
         #endregion
 
         public void CreateCleanMap(string Product, long lWaferSeq)

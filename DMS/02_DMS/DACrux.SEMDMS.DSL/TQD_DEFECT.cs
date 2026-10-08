@@ -188,11 +188,6 @@ namespace DACrux.SEMDMS.DSL
             }
         }
 
-        public void commit()
-        {
-            //ContextUtil.SetComplete();
-        }
-
         public int GetDefectCount(string[] DefectInfo)
         {
             //성능로그시작
@@ -245,56 +240,6 @@ namespace DACrux.SEMDMS.DSL
             idefectcount = int.Parse(dt.Rows[0][0].ToString());
             return idefectcount;
         }
-        public int GetDefectevDie(string where, string[] keyinfo)
-        {
-            //성능로그시작
-            this.TraceStartPoint();
-            DataTable dt = null;
-            int idefectcount = 0;
-            try
-            {
-                switch (where)
-                {
-                    case "T_TOTAL":
-                        dt = this.GetDataTable("SELECT_DEFECTEV_DIE_001", null, new string[1] { keyinfo[0] });
-                        break;
-                    case "T_RANDOM":
-                        dt = this.GetDataTable("SELECT_DEFECTEV_DIE_002", null, new string[1] { keyinfo[0] });
-                        break;
-                    case "T_CLUSTER":
-                        dt = this.GetDataTable("SELECT_DEFECTEV_DIE_003", null, new string[1] { keyinfo[0] });
-                        break;
-                    case "N_TOTAL":
-                        dt = this.GetDataTable("SELECT_DEFECTEV_DIE_011", null, new string[1] { keyinfo[0] });
-                        break;
-                    case "N_RANDOM":
-                        dt = this.GetDataTable("SELECT_DEFECTEV_DIE_012", null, new string[1] { keyinfo[0] });
-                        break;
-                    case "N_CLUSTER":
-                        dt = this.GetDataTable("SELECT_DEFECTEV_DIE_013", null, new string[1] { keyinfo[0] });
-                        break;
-                    case "SIZE":
-                        break;
-                    case "TYPE":
-                        break;
-                }
-                //ContextUtil.SetComplete();
-            }
-            catch (Exception ex)
-            {
-                //ContextUtil.SetAbort();
-                //예외처리
-                throw this.ProcessErr(ex);
-            }
-            finally
-            {
-                //성능로그끝
-                this.TraceEndPoint();
-            }
-
-            idefectcount = int.Parse(dt.Rows[0][0].ToString());
-            return idefectcount;
-        }
 
         public DataTable GetDefect(string[] where)
         {
@@ -321,123 +266,6 @@ namespace DACrux.SEMDMS.DSL
         public void Import(string filename)
         {
             this.Execute("IMPORT_DEFECT", null, new string[1] { filename });
-        }
-
-        public void Import2(string filename)
-        {
-            string msgFile = string.Empty;
-            StreamReader oSR = null;
-            string strLine = string.Empty;
-            string[] strArr = null;
-            int[] iUpCount = new int[6];
-            int iWaitCount = 0;
-
-            System.Diagnostics.Process db2proc = new System.Diagnostics.Process();
-
-            msgFile = string.Format("{0}.msg", filename);
-            //			System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo("db2cmd.exe",string.Format("IMPYESDB.bat yesdb0 yes yesmanager {0} {1}",filename,msgFile));			
-
-            this.TraceStartPoint();
-            try
-            {
-                //				startInfo.CreateNoWindow = true;
-                //				startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-                //
-                //				db2proc.StartInfo = startInfo;
-                //				db2proc.WaitForExit();
-                //				db2proc.Start();
-
-
-                db2proc.StartInfo.FileName = "db2cmd.exe";
-                db2proc.StartInfo.Arguments = string.Format("IMPYESDB.bat {0} {1}", filename, msgFile);
-                db2proc.StartInfo.UseShellExecute = true;
-                db2proc.StartInfo.CreateNoWindow = false;
-                db2proc.StartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-                //db2proc.StartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden; 
-
-                db2proc.Start();
-                db2proc.WaitForExit();
-
-                /// MSG File이 생기면 종료 된것으로 확인됨
-                /// db2cmd가 Process.WaitForExit() 가 적용이 않됨 따라서 아래의 Code가 불가피함
-                /// ===========================================================================
-                while (iWaitCount++ < 7200) // 1시간을 기다린다.열라 많이 기다린다. 
-                {
-                    System.Threading.Thread.Sleep(500);
-
-                    if (File.Exists(msgFile))
-                    {
-                        System.Threading.Thread.Sleep(500);
-                        break;
-                    }
-                }
-
-
-                ///DB에 Import Command방식으로 저장하기 때문에 Message File을 Parsing하여 성공 여부 Return
-                ///========================================================================================
-                ///
-                if (File.Exists(msgFile))
-                {
-                    oSR = new StreamReader(msgFile, System.Text.Encoding.Default);
-
-                    /// 1. Line을 읽는다.
-                    /// -------------------------------------------------------------------------------
-                    while ((strLine = oSR.ReadLine()) != null)
-                    {
-                        /// 2. Line을 '='의 경계로 분리한다.
-                        /// ---------------------------------------------------------------------------
-                        strArr = strLine.Split('=');
-
-                        if (strArr.Length < 2) continue;
-                        /// 3. 분리된 Word를 Parsing한다
-                        /// ---------------------------------------------------------------------------
-
-
-                        switch (strArr[0].Trim())
-                        {
-                            case "읽은 행 수":
-                                iUpCount[0] = int.Parse(strArr[1].Trim());
-                                break;
-                            case "건너뛴 행 수":
-                                iUpCount[1] = int.Parse(strArr[1].Trim());
-                                break;
-                            case "삽입된 행 수":
-                                iUpCount[2] = int.Parse(strArr[1].Trim());
-                                break;
-                            case "갱신된 행 수":
-                                iUpCount[3] = int.Parse(strArr[1].Trim());
-                                break;
-                            case "거부된 행 수":
-                                iUpCount[4] = int.Parse(strArr[1].Trim());
-                                break;
-                            case "커미트된 행 수":
-                                iUpCount[5] = int.Parse(strArr[1].Trim());
-                                break;
-                            default:
-                                continue;
-
-                        }
-                    }
-
-                    if (iUpCount[0] == 0 || iUpCount[0] != iUpCount[5])
-                    {
-                        Exception ex = new Exception("Import Error");
-                        throw ex;
-                    }
-                }
-
-            }
-            catch (Exception ex)
-            {
-                //startInfo = null;
-                throw this.ProcessErr(ex);
-            }
-            finally
-            {
-                if (oSR != null) oSR.Close();
-                if (File.Exists(msgFile)) File.Delete(msgFile);
-                this.TraceEndPoint();
-            }
         }
 
         public void Update(string[] UpInfo)
@@ -484,31 +312,6 @@ namespace DACrux.SEMDMS.DSL
         }
 
 
-        public void UpdateBatch(string[] ParamValues)
-        {
-            try
-            {
-                //업무 로직 구현
-                this.Execute("UPDATE_QUERY_BATCH", ParamValues, null);
-            }
-            catch (Exception ex)
-            {
-                throw this.ProcessErr(ex);
-            }
-        }
-        public void UpdateAdder(string[] UpInfo)
-        {
-            this.TraceStartPoint();
-            try
-            {
-                this.Execute("CALL_UPDATE_ADDER_DEFECT", null, UpInfo);
-            }
-            catch (Exception ex)
-            {
-                throw this.ProcessErr(ex);
-            }
-        }
-
         public void CreateTempTable(string[] tabinfo)
         {
             try
@@ -551,85 +354,6 @@ namespace DACrux.SEMDMS.DSL
                 Debug.WriteLine(dtLoggingTime.ToString("G", DateTimeFormatInfo.InvariantInfo));
 
                 throw this.ProcessErr(ex);
-            }
-        }
-
-        public void CreateMulti(string[,] aParas)
-        {
-            try
-            {
-                this.ExecuteMultiple("CREATE_DEFECT", null, aParas);
-            }
-            catch (Exception ex)
-            {
-                throw this.ProcessErr(ex);
-            }
-        }
-
-        public void MoveDefect(string[] tabinfo, string[] step_seq)
-        {
-            DataTable dt = null;
-            try
-            {
-                //업무 로직 구현
-                /// 빌딩블럭이 이상함 
-                /// Excute로 하면 Error남
-                /// ==================================================================
-                dt = this.GetDataTable("MOVE_DEFECT", tabinfo, step_seq);
-                //ContextUtil.SetComplete();
-            }
-            catch (Exception ex)
-            {
-                throw this.ProcessErr(ex);
-            }
-        }
-
-        public DataTable GetDefectsByXY(long step_seq)
-        {
-            DataTable dt = null;
-            try
-            {
-                dt = this.GetDataTable("GET_DEFECS_BY_XY", null, new string[] { step_seq.ToString() });
-                return dt;
-            }
-            catch (Exception ex)
-            {
-                throw this.ProcessErr(ex);
-            }
-        }
-
-        public DataTable GetDynamicDefectiveDie(string sql)
-        {
-            DataTable dt = null;
-            try
-            {
-                dt = this.GetDataTable("GET_DYNAMIC_DEFECTIVE_DIE", new string[] { sql }, null);
-                return dt;
-            }
-            catch (Exception ex)
-            {
-                throw this.ProcessErr(ex);
-            }
-        }
-
-        public DataTable GetDynamicQuery(string Query)
-        {
-            this.TraceStartPoint();
-            DataTable dt = null;
-            try
-            {
-                dt = this.GetDataTable("GET_DYNAMIC_DEFECTS", new string[] { Query }, null);
-                return dt;
-            }
-            catch (Exception ex)
-            {
-                throw this.ProcessErr(ex);
-            }
-            finally
-            {
-                if (dt != null) dt.Dispose();
-                dt = null;
-
             }
         }
 
@@ -713,42 +437,6 @@ namespace DACrux.SEMDMS.DSL
             catch (Exception ex)
             {
                 throw this.ProcessErr(ex);
-            }
-            finally
-            {
-                if (dt != null) dt.Dispose();
-                dt = null;
-
-            }
-        }
-
-        public DataTable GetDSACnt(long first_step_seq, long step_seq, float tolerance)
-        {
-            this.TraceStartPoint();
-            DataTable dt = null;
-
-            try
-            {
-                string strTolerance = string.Format("{0}", tolerance);
-                string[] dynamic = new string[12] {strTolerance
-												, strTolerance
-												, strTolerance
-												, strTolerance
-												, strTolerance
-												, strTolerance
-												, strTolerance
-												, strTolerance
-												, strTolerance
-												, strTolerance
-												, strTolerance
-												, strTolerance  };
-
-                dt = this.GetDataTable("GET_DSA_CNT", dynamic, new string[] { first_step_seq.ToString(), step_seq.ToString() });
-                return dt;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
             }
             finally
             {
@@ -948,20 +636,6 @@ namespace DACrux.SEMDMS.DSL
         #endregion ========================================================================
 
         #region [ MapMathcing ]
-
-        public DataTable GetDefectList01(
-            string stepseq,
-            string waferseq, 
-            string minX,
-            string minY
-            )
-        {
-            return this.GetDataTable(
-                "GET_DEFECT_LIST_01",
-                null,
-                new string[] { stepseq, waferseq, minX, minY }
-                );
-        }
 
         public int GetDefectDataCount(string strWaferSeq, string strStepSeq)
         {

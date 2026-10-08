@@ -369,55 +369,6 @@ TABLESPACE {1})
 
         //--
 
-        public DataTable GetBinXYData(
-            string[] ttable,
-            string program,
-            string wafer, 
-            string minX,
-            string minY
-            )
-        {
-            if (ttable.Length == 1)
-            {
-                return GetDataTable(
-                    "GET_BIN_XY_DATA_SINGLE",
-                    new string[] { ttable[0] },
-                    new string[] { wafer, program, minX, minY }
-                    );
-            }
-            else
-            {
-                return GetDataTable(
-                    "GET_BIN_XY_DATA_MULTI",
-                    new string[] { ttable[0], ttable[1] },
-                    new string[] { wafer, program, minX, minY }
-                    );
-            }
-        }
-
-        public DataTable GetBinXYMinMaxData(
-            string[] ttable,
-            string wafer
-            )
-        {
-            if (ttable.Length == 1)
-            {
-                return GetDataTable(
-                    "GET_BIN_XY_MINMAX_SINGLE",
-                    new string[] { ttable[0] },
-                    new string[] { wafer }
-                    );
-            }
-            else
-            {
-                return GetDataTable(
-                    "GET_BIN_XY_MINMAX_MULTI",
-                    new string[] { ttable[0], ttable[1] },
-                    new string[] { wafer }
-                    );
-            }
-        }
-
         //--
 
 
@@ -483,46 +434,7 @@ TABLESPACE {1})
 
         //--
 
-        public DataTable GetPCMStatistics(
-            string factory,
-            string[] lotids,
-            string tablename,
-            string parameter,
-            string[] wafers
-            )
-        {
-            return this.GetDataTable(
-                "GET_PCM_STATISTICS",
-                new string[] { 
-                    parameter, parameter, parameter, parameter, parameter, 
-                    parameter, parameter, parameter, tablename,
-                    String.Format("'{0}'", String.Join("','", lotids)),
-                    String.Format("'{0}'", String.Join("','", wafers)),
-                    parameter, parameter
-                },
-                new string[] { factory, parameter }
-                );
-        }
-
         //--
-
-        public DataTable GetTestData(
-            string factory,
-            string tablename,
-            string[] lots,
-            string[] wafers
-            )
-        {
-            return this.GetDataTable(
-                "GET_TEST_DATA",
-                new string[] { 
-                    tablename, 
-                    String.Format("'{0}'", String.Join("','", lots)), 
-                    String.Format("'{0}'", String.Join("','", wafers)) 
-                },
-                new string[] { factory }
-                );
-        }
 
         //--
 
@@ -781,23 +693,9 @@ TABLESPACE {1})
                 return true;
         }
 
-        public bool ExistVIEW(string strTable)
-        {
-            DataTable dt = this.GetDataTable("EXISTS_VIEW", null, new string[] { strTable });
-            if (dt == null || dt.Rows.Count <= 0)
-                return false;
-            else
-                return true;
-        }
-
         public DataTable GetDynamic(string strQuery)
         {
             return GetDataTable("SELECT_DYNAMIC", new string[] { strQuery }, null);
-        }
-
-        public int SetTransaction(string strQuery)
-        {
-            return this.ExecuteNonQuery("SELECT_DYNAMIC", new string[] { strQuery }, null);
         }
 
         public DataTable GetPatternSearch_XYList(long waferSeq)

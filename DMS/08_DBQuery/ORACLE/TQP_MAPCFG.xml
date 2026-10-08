@@ -86,41 +86,6 @@ WHERE 1 = 1
             <param direction="Input" dbtype="VarChar2" size="0" value="pgm">:pgm</param>
         </parameters>
     </query>
-    <query statement="Select" queryid="SELECT_CORRECTION_DATA" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT * FROM (
-SELECT /*+ INDEX_DESC(A PK_TQP_MAPCFG) */
-    ALTER_DIRECTION, ALTER_ANGLE, ALTER_INDEX_X, ALTER_INDEX_Y
-FROM TQP_MAPCFG A
-WHERE 1 = 1
-    AND TESTAREA = :TESTAREA
-    AND DEVICE_ALIAS = :DEVICE_ALIAS
-    AND PROGRAM = :PROGRAM
-UNION ALL
-SELECT /*+ INDEX_DESC(A PK_TQP_MAPCFG) */
-    ALTER_DIRECTION, ALTER_ANGLE, ALTER_INDEX_X, ALTER_INDEX_Y 
-FROM TQP_MAPCFG A
-WHERE 1 = 1
-    AND TESTAREA = :TESTAREA
-    AND DEVICE_ALIAS = :DEVICE_ALIAS
-AND PROGRAM = 'ALL'
-)
-WHERE ROWNUM = 1]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="40" value="TESTAREA">:TESTAREA</param>
-            <param direction="Input" dbtype="VarChar" size="40" value="DEVICE_ALIAS">:DEVICE_ALIAS</param>
-            <param direction="Input" dbtype="VarChar" size="40" value="PROGRAM">:PROGRAM</param>
-        </parameters>
-    </query>
-    <query statement="Select" queryid="SELECT_MAPCFG_02" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT DISTINCT PROGRAM FROM TQP_MAPCFG
-    WHERE 1 = 1 
-    AND TESTAREA = 'MULTIPROBE'
-    AND DEVICE_ALIAS = :device
-    ORDER BY PROGRAM]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar2" size="40" value="device">:device</param>
-        </parameters>
-    </query>
     <query statement="Select" queryid="SELECT_MAPCFG_VIEW" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[SELECT 
      MAP_CFG_SEQ,

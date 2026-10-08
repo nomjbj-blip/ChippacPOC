@@ -211,14 +211,6 @@ WHERE MAPID=:mapid]]></commandtext>
     <query statement="Select" queryid="__ALLSELECT" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[??]]></commandtext>
     </query>
-    <query statement="Select" queryid="SELECT_NETDIE" commandtype="Text" description="NetDie를 가져온다." commandtimeout="60">
-        <commandtext><![CDATA[SELECT  NETDIE FROM TQP_MAPDEF 
-WHERE UPPER(MAPID) = UPPER(:mapid)
-AND NVL(DELETE_FLAG,'N') <> 'Y']]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="30" value="MAP1">:mapid</param>
-        </parameters>
-    </query>
     <query statement="Select" queryid="SELECT_MAPINFO" commandtype="Text" description="Map Define 정보를 가져온다." commandtimeout="60">
         <commandtext><![CDATA[SELECT FACTORY,
        MAPID,
