@@ -133,18 +133,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ChartDataTableHelper.cs" />
-    <Compile Include="Chart\ChartUtil.cs" />
     <Compile Include="Chart\PopUpAxisY.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Chart\PopUpAxisY.designer.cs">
       <DependentUpon>PopUpAxisY.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Chart\ucParameterTrend.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Chart\ucParameterTrend.Designer.cs">
-      <DependentUpon>ucParameterTrend.cs</DependentUpon>
     </Compile>
     <Compile Include="Chart\ucTrendChart.cs">
       <SubType>UserControl</SubType>
@@ -202,12 +195,6 @@
     <Compile Include="TPUCPCMView.Designer.cs">
       <DependentUpon>TPUCPCMView.cs</DependentUpon>
     </Compile>
-    <Compile Include="TPUCQCInspection.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="TPUCQCInspection.Designer.cs">
-      <DependentUpon>TPUCQCInspection.cs</DependentUpon>
-    </Compile>
     <Compile Include="TPUCRS232Option.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -217,12 +204,6 @@
     <Compile Include="Util.cs" />
     <Compile Include="WrapMap.cs">
       <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="TPUCMapDefine.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="TPUCMapDefine.designer.cs">
-      <DependentUpon>TPUCMapDefine.cs</DependentUpon>
     </Compile>
     <Compile Include="TPUCMapConfig.cs">
       <SubType>UserControl</SubType>
@@ -244,9 +225,6 @@
     </Compile>
     <EmbeddedResource Include="Chart\PopUpAxisY.resx">
       <DependentUpon>PopUpAxisY.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Chart\ucParameterTrend.resx">
-      <DependentUpon>ucParameterTrend.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Chart\ucTrendChart.resx">
       <DependentUpon>ucTrendChart.cs</DependentUpon>
@@ -286,17 +264,11 @@
     <EmbeddedResource Include="TPUCPCMView.resx">
       <DependentUpon>TPUCPCMView.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="TPUCQCInspection.resx">
-      <DependentUpon>TPUCQCInspection.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="TPUCRS232Option.resx">
       <DependentUpon>TPUCRS232Option.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="WrapMap.resx">
       <DependentUpon>WrapMap.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="TPUCMapDefine.resx">
-      <DependentUpon>TPUCMapDefine.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="TPUCMapConfig.resx">
       <DependentUpon>TPUCMapConfig.cs</DependentUpon>

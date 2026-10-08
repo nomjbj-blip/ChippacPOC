@@ -193,12 +193,6 @@
     <Compile Include="Admin\dlgSetupProgram.Designer.cs">
       <DependentUpon>dlgSetupProgram.cs</DependentUpon>
     </Compile>
-    <Compile Include="Admin\frmAdminCustomer.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Admin\frmAdminCustomer.Designer.cs">
-      <DependentUpon>frmAdminCustomer.cs</DependentUpon>
-    </Compile>
     <Compile Include="Admin\frmMapConfigUpdate.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -210,12 +204,6 @@
     </Compile>
     <Compile Include="Admin\frmPcmEquipStatus.Designer.cs">
       <DependentUpon>frmPcmEquipStatus.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Admin\frmSetupShot.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Admin\frmSetupShot.Designer.cs">
-      <DependentUpon>frmSetupShot.cs</DependentUpon>
     </Compile>
     <Compile Include="Admin\frmTestDataMaint.cs">
       <SubType>Form</SubType>
@@ -259,29 +247,11 @@
     <Compile Include="Admin\frmShotMapInformation.Designer.cs">
       <DependentUpon>frmShotMapInformation.cs</DependentUpon>
     </Compile>
-    <Compile Include="Analysis\frmBinStackBar.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Analysis\frmBinStackBar.Designer.cs">
-      <DependentUpon>frmBinStackBar.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Analysis\frmCummapAnalysis.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Analysis\frmCummapAnalysis.Designer.cs">
-      <DependentUpon>frmCummapAnalysis.cs</DependentUpon>
-    </Compile>
     <Compile Include="Analysis\frmDutByYieldReport.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Analysis\frmDutByYieldReport.Designer.cs">
       <DependentUpon>frmDutByYieldReport.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Analysis\frmPatternSearch.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Analysis\frmPatternSearch.Designer.cs">
-      <DependentUpon>frmPatternSearch.cs</DependentUpon>
     </Compile>
     <Compile Include="Analysis\frmPatternSearchNew.cs">
       <SubType>Form</SubType>
@@ -300,15 +270,6 @@
     </Compile>
     <Compile Include="Analysis\frmSingleMapView.Designer.cs">
       <DependentUpon>frmSingleMapView.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Analysis\frmTPWaferSelect.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Analysis\frmVisualInspection.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Analysis\frmVisualInspection.Designer.cs">
-      <DependentUpon>frmVisualInspection.cs</DependentUpon>
     </Compile>
     <Compile Include="Analysis\frmWaferParaAnalysis.cs">
       <SubType>Form</SubType>
@@ -333,12 +294,6 @@
     </Compile>
     <Compile Include="Admin\frmSelectMapID.Designer.cs">
       <DependentUpon>frmSelectMapID.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Admin\frmSetupDevice.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Admin\frmSetupDevice.Designer.cs">
-      <DependentUpon>frmSetupDevice.cs</DependentUpon>
     </Compile>
     <Compile Include="Admin\frmSetupMap.cs">
       <SubType>Form</SubType>
@@ -492,9 +447,6 @@
     <EmbeddedResource Include="Admin\dlgSetupProgram.resx">
       <DependentUpon>dlgSetupProgram.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Admin\frmAdminCustomer.resx">
-      <DependentUpon>frmAdminCustomer.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Admin\frmMapConfigUpdate.resx">
       <DependentUpon>frmMapConfigUpdate.cs</DependentUpon>
     </EmbeddedResource>
@@ -507,17 +459,11 @@
     <EmbeddedResource Include="Admin\frmSelectMapID.resx">
       <DependentUpon>frmSelectMapID.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Admin\frmSetupDevice.resx">
-      <DependentUpon>frmSetupDevice.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Admin\frmSetupMap.resx">
       <DependentUpon>frmSetupMap.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Admin\frmSetupProgram.resx">
       <DependentUpon>frmSetupProgram.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Admin\frmSetupShot.resx">
-      <DependentUpon>frmSetupShot.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Admin\frmTestDataUserComment.resx">
       <DependentUpon>frmTestDataUserComment.cs</DependentUpon>
@@ -543,17 +489,8 @@
     <EmbeddedResource Include="Admin\frmShotMapInformation.resx">
       <DependentUpon>frmShotMapInformation.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Analysis\frmBinStackBar.resx">
-      <DependentUpon>frmBinStackBar.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Analysis\frmCummapAnalysis.resx">
-      <DependentUpon>frmCummapAnalysis.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Analysis\frmDutByYieldReport.resx">
       <DependentUpon>frmDutByYieldReport.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Analysis\frmPatternSearch.resx">
-      <DependentUpon>frmPatternSearch.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Analysis\frmPatternSearchNew.resx">
       <DependentUpon>frmPatternSearchNew.cs</DependentUpon>
@@ -563,12 +500,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Analysis\frmSingleMapView.resx">
       <DependentUpon>frmSingleMapView.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Analysis\frmTPWaferSelect.resx">
-      <DependentUpon>frmTPWaferSelect.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Analysis\frmVisualInspection.resx">
-      <DependentUpon>frmVisualInspection.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Analysis\frmWaferParaAnalysis.resx">
       <DependentUpon>frmWaferParaAnalysis.cs</DependentUpon>

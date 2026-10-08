@@ -156,15 +156,6 @@
     <Compile Include="Admin\frmDefectAlarmSetup_Notify.Designer.cs">
       <DependentUpon>frmDefectAlarmSetup_Notify.cs</DependentUpon>
     </Compile>
-    <Compile Include="Admin\frmDefectTypeDefine_VerTwo.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Admin\frmDefectTypeDefine_VerTwo.Designer.cs">
-      <DependentUpon>frmDefectTypeDefine_VerTwo.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Admin\frmZoneDefine.cs">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="Admin\frmDefectColorDefine_Property.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -257,19 +248,7 @@
     <Compile Include="DefectMapAnalysis\frmDefectImageGallery.designer.cs">
       <DependentUpon>frmDefectImageGallery.cs</DependentUpon>
     </Compile>
-    <Compile Include="DefectMapAnalysis\frmDefectImgGalleryManyStep.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="DefectMapAnalysis\frmDefectMap.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="DefectMapAnalysis\frmDefectMap.Designer.cs">
-      <DependentUpon>frmDefectMap.cs</DependentUpon>
-    </Compile>
     <Compile Include="DefectMapAnalysis\frmDefectMapGallery.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="DefectMapAnalysis\frmDefectPatternSearch.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="DefectMapAnalysis\frmDefectPatternSearchNew.cs">
@@ -281,41 +260,17 @@
     <Compile Include="DefectMapAnalysis\frmDefectSourceAnalysis.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Admin\frmDefectColoring.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Admin\frmDefectColoring.Designer.cs">
-      <DependentUpon>frmDefectColoring.cs</DependentUpon>
-    </Compile>
     <Compile Include="DefectMapAnalysis\frmDieStackGallery.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="DefectMapAnalysis\frmDieStackGallery.Designer.cs">
       <DependentUpon>frmDieStackGallery.cs</DependentUpon>
     </Compile>
-    <Compile Include="DefectMapAnalysis\frmDMSStepSelect.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="DefectMapAnalysis\frmDMSStepSelect.Designer.cs">
-      <DependentUpon>frmDMSStepSelect.cs</DependentUpon>
-    </Compile>
     <Compile Include="DefectMapAnalysis\frmExportToKlarf.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="DefectMapAnalysis\frmExportToKlarf.Designer.cs">
       <DependentUpon>frmExportToKlarf.cs</DependentUpon>
-    </Compile>
-    <Compile Include="DefectMapAnalysis\frmRepeatedDefect.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="DefectMapAnalysis\frmViewMapParsingResult.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="DefectMapAnalysis\frmViewMapParsingResult.Designer.cs">
-      <DependentUpon>frmViewMapParsingResult.cs</DependentUpon>
-    </Compile>
-    <Compile Include="DefectMapAnalysis\frmTestMapOverlay.cs">
-      <SubType>Form</SubType>
     </Compile>
     <Compile Include="DefectMapAnalysis\frmDefectMapViewer.cs">
       <SubType>Form</SubType>
@@ -335,29 +290,11 @@
     <Compile Include="DefectMapAnalysis\frmDefectBareMapViewer.Designer.cs">
       <DependentUpon>frmDefectBareMapViewer.cs</DependentUpon>
     </Compile>
-    <Compile Include="Admin\frmZipTest.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Admin\frmZipTest.Designer.cs">
-      <DependentUpon>frmZipTest.cs</DependentUpon>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="DefectMapAnalysis\frmChartAnalysis.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="DefectMapAnalysis\frmChartAnalysis.Designer.cs">
-      <DependentUpon>frmChartAnalysis.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Report\dlgSizePopup.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Report\dlgSizePopup.Designer.cs">
-      <DependentUpon>dlgSizePopup.cs</DependentUpon>
     </Compile>
     <Compile Include="Report\frmCommonalityLotList.cs">
       <SubType>Form</SubType>
@@ -370,12 +307,6 @@
     </Compile>
     <Compile Include="Report\frmDataSheet.Designer.cs">
       <DependentUpon>frmDataSheet.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Report\frmDefectDataSummary.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Report\frmDefectDataSummary.Designer.cs">
-      <DependentUpon>frmDefectDataSummary.cs</DependentUpon>
     </Compile>
     <Compile Include="Report\frmDMDataTrend.cs">
       <SubType>Form</SubType>
@@ -445,15 +376,6 @@
     <EmbeddedResource Include="Admin\frmDefectAlarmSetup_Notify.resx">
       <DependentUpon>frmDefectAlarmSetup_Notify.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Admin\frmDefectTypeDefine_VerTwo.resx">
-      <DependentUpon>frmDefectTypeDefine_VerTwo.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Admin\frmZipTest.resx">
-      <DependentUpon>frmZipTest.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Admin\frmZoneDefine.resx">
-      <DependentUpon>frmZoneDefine.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Admin\frmDefectColorDefine_Property.resx">
       <DependentUpon>frmDefectColorDefine_Property.cs</DependentUpon>
     </EmbeddedResource>
@@ -478,17 +400,8 @@
     <EmbeddedResource Include="DefectMapAnalysis\frmDefectImageGallery.resx">
       <DependentUpon>frmDefectImageGallery.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="DefectMapAnalysis\frmDefectImgGalleryManyStep.resx">
-      <DependentUpon>frmDefectImgGalleryManyStep.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="DefectMapAnalysis\frmDefectMap.resx">
-      <DependentUpon>frmDefectMap.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="DefectMapAnalysis\frmDefectMapGallery.resx">
       <DependentUpon>frmDefectMapGallery.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="DefectMapAnalysis\frmDefectPatternSearch.resx">
-      <DependentUpon>frmDefectPatternSearch.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="DefectMapAnalysis\frmDefectPatternSearchNew.resx">
       <DependentUpon>frmDefectPatternSearchNew.cs</DependentUpon>
@@ -496,29 +409,14 @@
     <EmbeddedResource Include="DefectMapAnalysis\frmDefectSourceAnalysis.resx">
       <DependentUpon>frmDefectSourceAnalysis.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Admin\frmDefectColoring.resx">
-      <DependentUpon>frmDefectColoring.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="DefectMapAnalysis\frmDieStackAnalysis.resx">
       <DependentUpon>frmDieStackAnalysis.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="DefectMapAnalysis\frmDieStackGallery.resx">
       <DependentUpon>frmDieStackGallery.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="DefectMapAnalysis\frmDMSStepSelect.resx">
-      <DependentUpon>frmDMSStepSelect.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="DefectMapAnalysis\frmExportToKlarf.resx">
       <DependentUpon>frmExportToKlarf.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="DefectMapAnalysis\frmRepeatedDefect.resx">
-      <DependentUpon>frmRepeatedDefect.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="DefectMapAnalysis\frmViewMapParsingResult.resx">
-      <DependentUpon>frmViewMapParsingResult.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="DefectMapAnalysis\frmTestMapOverlay.resx">
-      <DependentUpon>frmTestMapOverlay.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="DefectMapAnalysis\frmDefectMapViewer.resx">
       <DependentUpon>frmDefectMapViewer.cs</DependentUpon>
@@ -531,23 +429,14 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="DefectMapAnalysis\frmChartAnalysis.resx">
-      <DependentUpon>frmChartAnalysis.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="DefectMapAnalysis\frmChartAnalysisNew.resx">
       <DependentUpon>frmChartAnalysisNew.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Report\dlgSizePopup.resx">
-      <DependentUpon>dlgSizePopup.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Report\frmCommonalityLotList.resx">
       <DependentUpon>frmCommonalityLotList.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Report\frmDataSheet.resx">
       <DependentUpon>frmDataSheet.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Report\frmDefectDataSummary.resx">
-      <DependentUpon>frmDefectDataSummary.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Report\frmDMDataTrend.resx">
       <DependentUpon>frmDMDataTrend.cs</DependentUpon>

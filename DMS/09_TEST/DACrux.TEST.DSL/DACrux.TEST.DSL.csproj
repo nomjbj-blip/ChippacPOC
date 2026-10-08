@@ -68,7 +68,6 @@
     <Compile Include="TQP_LOT.cs" />
     <Compile Include="TQP_LOT_SUM.cs" />
     <Compile Include="TQP_PCM_INPUT_HIS.cs" />
-    <Compile Include="TQP_RAW.cs" />
     <Compile Include="TQP_BINDESC.cs" />
     <Compile Include="TQP_CUSTOMER.cs" />
     <Compile Include="TQP_INLINE.cs" />
@@ -82,10 +81,8 @@
     <Compile Include="TQP_WAFER_SUM.cs" />
     <Compile Include="TQP_PARASPEC.cs" />
     <Compile Include="T_AVI_TABLE.cs" />
-    <Compile Include="T_PCM.cs" />
     <Compile Include="T_PRB.cs" />
     <Compile Include="utilColor.cs" />
-    <Compile Include="T_PRB_TABLE.cs" />
     <Compile Include="TQP_DATA_TABLES.cs" />
     <Compile Include="TQP_MAPCFG.cs" />
     <Compile Include="TQP_FOI_DIE.cs" />

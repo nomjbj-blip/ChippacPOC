@@ -87,12 +87,6 @@
     <Compile Include="Config.Designer.cs">
       <DependentUpon>Config.cs</DependentUpon>
     </Compile>
-    <Compile Include="FrmConfig.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="FrmConfig.Designer.cs">
-      <DependentUpon>FrmConfig.cs</DependentUpon>
-    </Compile>
     <Compile Include="FrmWorkSheet.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -106,10 +100,6 @@
     <EmbeddedResource Include="Config.resx">
       <SubType>Designer</SubType>
       <DependentUpon>Config.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="FrmConfig.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>FrmConfig.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FrmWorkSheet.resx">
       <SubType>Designer</SubType>

@@ -104,7 +104,6 @@
     <Compile Include="TQD_COLORBYSIZE.cs" />
     <Compile Include="TQD_DEFECT.cs" />
     <Compile Include="TQD_DEFECT_GROUP.cs" />
-    <Compile Include="TQD_DEFECT_INFO.cs" />
     <Compile Include="TQD_DEFECT_TYPE.cs" />
     <Compile Include="TQD_IMAGES.cs" />
     <Compile Include="TQD_INSP_INFO.cs" />

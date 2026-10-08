@@ -215,20 +215,11 @@
     </Compile>
     <Compile Include="DmsCacheHelper.cs" />
     <Compile Include="DmsDataGroupBy.cs" />
-    <Compile Include="DPUCChartAnalysis.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="DPUCChartAnalysis.Designer.cs">
-      <DependentUpon>DPUCChartAnalysis.cs</DependentUpon>
-    </Compile>
     <Compile Include="DPUCDataSheetControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="DPUCDataSheetControl.Designer.cs">
       <DependentUpon>DPUCDataSheetControl.cs</DependentUpon>
-    </Compile>
-    <Compile Include="DPUCDefecMap.cs">
-      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="DPUCDefectInfo.cs">
       <SubType>UserControl</SubType>
@@ -239,12 +230,6 @@
     <Compile Include="DefectMapDraw.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="DPUCDefectImgGallery.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="DPUCDefectImgGalleryManyStep.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
     <Compile Include="DPUCDefectMapGallery.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -253,9 +238,6 @@
     </Compile>
     <Compile Include="DPUCDefectMapGalleryItem.Designer.cs">
       <DependentUpon>DPUCDefectMapGalleryItem.cs</DependentUpon>
-    </Compile>
-    <Compile Include="DPUCDefectMapGalleryOld.cs">
-      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="DPUCDefectSourceAnalysis.cs">
       <SubType>UserControl</SubType>
@@ -266,17 +248,11 @@
     <Compile Include="DPUCDieStackViewer.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="DPUCImageGallery.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
     <Compile Include="DPUCImageGalleryGrid.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="DPUCImageGalleryGrid.designer.cs">
       <DependentUpon>DPUCImageGalleryGrid.cs</DependentUpon>
-    </Compile>
-    <Compile Include="DPUCImageListViewer.cs">
-      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="DPUCInformation.cs">
       <SubType>UserControl</SubType>
@@ -284,23 +260,11 @@
     <Compile Include="DPUCInformation.Designer.cs">
       <DependentUpon>DPUCInformation.cs</DependentUpon>
     </Compile>
-    <Compile Include="DPUCOption.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="DPUCOption.Designer.cs">
-      <DependentUpon>DPUCOption.cs</DependentUpon>
-    </Compile>
-    <Compile Include="DPUCPatternSearch.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
     <Compile Include="DPUCReclassify.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="DPUCReclassify.Designer.cs">
       <DependentUpon>DPUCReclassify.cs</DependentUpon>
-    </Compile>
-    <Compile Include="DPUCRepeatedDefect.cs">
-      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="DPUCRDSetup.cs">
       <SubType>UserControl</SubType>
@@ -309,18 +273,6 @@
       <DependentUpon>DPUCRDSetup.cs</DependentUpon>
     </Compile>
     <Compile Include="DPUCStepSelect.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="DPUCTestMapOverlay.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="DPUCWrapDefectMap.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="DPUCZoneDefine.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="DPUCZoneMap.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="frmDefectOption.cs">
@@ -346,15 +298,6 @@
     </Compile>
     <Compile Include="ImagePopUp.Designer.cs">
       <DependentUpon>ImagePopUp.cs</DependentUpon>
-    </Compile>
-    <Compile Include="LargeImage.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="MSChartController.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="MSChartController.Designer.cs">
-      <DependentUpon>MSChartController.cs</DependentUpon>
     </Compile>
     <Compile Include="DPUCExportToKlarf.cs">
       <SubType>UserControl</SubType>
@@ -404,23 +347,8 @@
       <DependentUpon>frmChartYOption.cs</DependentUpon>
     </Compile>
     <Compile Include="UserConfiguration.cs" />
-    <EmbeddedResource Include="DPUCChartAnalysis.resx">
-      <DependentUpon>DPUCChartAnalysis.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="DPUCDataSheetControl.resx">
       <DependentUpon>DPUCDataSheetControl.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="DPUCDefecMap.resx">
-      <DependentUpon>DPUCDefecMap.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="DPUCDefectImgGallery.resx">
-      <DependentUpon>DPUCDefectImgGallery.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="DPUCDefectImgGalleryManyStep.resx">
-      <DependentUpon>DPUCDefectImgGalleryManyStep.cs</DependentUpon>
-      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="DPUCDefectInfo.resx">
       <DependentUpon>DPUCDefectInfo.cs</DependentUpon>
@@ -430,10 +358,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="DPUCDefectMapGalleryItem.resx">
       <DependentUpon>DPUCDefectMapGalleryItem.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="DPUCDefectMapGalleryOld.resx">
-      <DependentUpon>DPUCDefectMapGalleryOld.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="DPUCDefectSourceAnalysis.resx">
@@ -446,52 +370,20 @@
     <EmbeddedResource Include="DPUCDieStackViewer.resx">
       <DependentUpon>DPUCDieStackViewer.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="DPUCImageGallery.resx">
-      <DependentUpon>DPUCImageGallery.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="DPUCImageGalleryGrid.resx">
       <DependentUpon>DPUCImageGalleryGrid.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="DPUCImageListViewer.resx">
-      <DependentUpon>DPUCImageListViewer.cs</DependentUpon>
-      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="DPUCInformation.resx">
       <DependentUpon>DPUCInformation.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="DPUCOption.resx">
-      <DependentUpon>DPUCOption.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="DPUCPatternSearch.resx">
-      <DependentUpon>DPUCPatternSearch.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="DPUCReclassify.resx">
       <DependentUpon>DPUCReclassify.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="DPUCRepeatedDefect.resx">
-      <DependentUpon>DPUCRepeatedDefect.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="DPUCRDSetup.resx">
       <DependentUpon>DPUCRDSetup.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="DPUCStepSelect.resx">
       <DependentUpon>DPUCStepSelect.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="DPUCTestMapOverlay.resx">
-      <DependentUpon>DPUCTestMapOverlay.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="DPUCWrapDefectMap.resx">
-      <DependentUpon>DPUCWrapDefectMap.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="DPUCZoneDefine.resx">
-      <DependentUpon>DPUCZoneDefine.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="DPUCZoneMap.resx">
-      <DependentUpon>DPUCZoneMap.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="frmDefectOption.resx">
@@ -506,14 +398,7 @@
     <EmbeddedResource Include="ImagePopUp.resx">
       <DependentUpon>ImagePopUp.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="LargeImage.resx">
-      <DependentUpon>LargeImage.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="licenses.licx" />
-    <EmbeddedResource Include="MSChartController.resx">
-      <DependentUpon>MSChartController.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="DPUCExportToKlarf.resx">
       <DependentUpon>DPUCExportToKlarf.cs</DependentUpon>
     </EmbeddedResource>
