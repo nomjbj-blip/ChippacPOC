@@ -22,7 +22,6 @@ namespace DACrux.SEMDMS.Service
 				new DACruxSEMDMS() 
 			};
             ServiceBase.Run(ServicesToRun);
-                        ServiceBase.Run(ServicesToRun);
 #endif
         }
     }

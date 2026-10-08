@@ -214,32 +214,37 @@ namespace DACrux.TEST.BSL
             TQP_WAFER waf = new TQP_WAFER();
 
             DataRow waferRow = waf.GetWaferInfo(waferSeq);
-            waf.DeleteWaferData(waferSeq);
-
-            TQP_WAFER_SUM sum = new TQP_WAFER_SUM();
-            waf.DeleteWaferData(waferSeq);
+            string lotSeq = waferRow["LOT_SEQ"].ToString();
 
             // TD 테이블 목록 가져오기
+            // SELECT_TABLE_BY_WAFER 는 TQP_WAFER 의 PROGRAM 으로 찾으므로 WAFER 행을 지우기 전에 조회한다.
+            // (2026-10-08 CLAUDE-035: 삭제 후 조회해서 목록이 항상 비고 TD 데이터 / LOT SUM 이 정리되지 않던 문제)
             TQP_DATA_TABLES tbl = new TQP_DATA_TABLES();
             string[] tableNames = tbl.GetTableNameByWafer(waferSeq);
 
-            if (tableNames == null || tableNames.Length == 0)
-                return;
+            waf.DeleteWaferData(waferSeq);
 
-            TD_TABLE td = new TD_TABLE();
+            // (2026-10-08 CLAUDE-035: TQP_WAFER 를 두 번 지우고 TQP_WAFER_SUM 은 남기던 문제)
+            TQP_WAFER_SUM sum = new TQP_WAFER_SUM();
+            sum.DeleteWaferData(waferSeq);
 
-            // TD 테이블의 데이터 삭제
-            foreach (string tableName in tableNames)
+            if (tableNames != null && tableNames.Length > 0)
             {
-                td.DeleteData(waferSeq, tableName);
+                TD_TABLE td = new TD_TABLE();
 
-                // 빈 테이블인지 확인 후 조치
-                TestDataManager tst = new TestDataManager();
-                tst.CheckTableEmpty(tableName);
+                // TD 테이블의 데이터 삭제
+                foreach (string tableName in tableNames)
+                {
+                    td.DeleteData(waferSeq, tableName);
+
+                    // 빈 테이블인지 확인 후 조치
+                    TestDataManager tst = new TestDataManager();
+                    tst.CheckTableEmpty(tableName);
+                }
             }
 
+            // TD 테이블이 없어도 LOT SUM 재생성 / 빈 LOT 정리는 진행한다.
             TQP_LOT_SUM lotSum = new TQP_LOT_SUM();
-            string lotSeq = waferRow["LOT_SEQ"].ToString();
 
             // LOT SUM 삭제 후 새로 생성
             lotSum.DeleteLot(lotSeq);

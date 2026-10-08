@@ -187,13 +187,17 @@ namespace DACrux.TEST.PCM.DataService
 
             for (int idx = 0; idx < parser.WaferDataList.Count; idx++)
             {
+                // Wafer 마다 최대값을 새로 구한다. (2026-10-08 CLAUDE-035: iMaxX / iMaxY 가 이전 Wafer 값을 이어받고,
+                // iMaxY 를 iMaxX 와 비교하던 오타로 MAX_Y 가 잘못 저장되던 문제)
                 iMaxSite = 0;
+                iMaxX = 0;
+                iMaxY = 0;
                 /// 검사항목 Parameter Count
                 for (int iDieNum = 0; iDieNum < parser.WaferDataList[idx].Count; iDieNum++)
                 {
                     iMaxSite = Math.Max(iMaxSite, parser.WaferDataList[idx][iDieNum].Count);
                     iMaxX = Math.Max(iMaxX, Int32.Parse(parser.WaferDataList[idx][iDieNum].X));
-                    iMaxY = Math.Max(iMaxX, Int32.Parse(parser.WaferDataList[idx][iDieNum].Y));
+                    iMaxY = Math.Max(iMaxY, Int32.Parse(parser.WaferDataList[idx][iDieNum].Y));
                 }
 
                 tst.SaveWaferData(

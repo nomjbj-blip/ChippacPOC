@@ -183,21 +183,39 @@ namespace DACrux.SEMDMS.BSL
                 alarmType = UPPER;
             }
 
-            // 메일 발송
+            string[] notiUserArr = null;
+
             if (alarmYN == YES)
             {
                 TQD_ALARM_USER user = new TQD_ALARM_USER();
-                string[] notiUserArr = user.GetAlarmUserEmail();
-                notiUser = String.Join(";", notiUserArr);
-                
-                string server, sender;
-                int port;
-                GetMailConfig(out server, out port, out sender);
+                notiUserArr = user.GetAlarmUserEmail();
 
-                string subject = String.Format("DM ALARM [{0} / {1} / {2} / {3} / {4} / {5}]", defectType, product, stepId, equipId, alarmType, waferID);
-                string body = String.Format(@"
-{3} 설비의 {0} 카운트가 '{10}'를 벗어났습니다. 확인 바랍니다.
- 
+                if (notiUserArr != null && notiUserArr.Length > 0)
+                    notiUser = String.Join(";", notiUserArr);
+            }
+
+            // 데이터 INSERT
+            // 알람 이력을 먼저 남긴다. 이 메서드는 Inspection DataService 적재 중(Wafer 데이터 커밋 후)에 호출되므로
+            // 메일 실패가 이력 누락이나 파일 오류 처리로 번지지 않게 한다. (2026-10-08 CLAUDE-035)
+            TQD_ALARM_DATA obj = new TQD_ALARM_DATA();
+            obj.InsertAlarmData(factory, defectType, product, stepId, equipId, stepSeq, lower, target, upper, alarmYN, alarmType, count, notiUser);
+
+            // 메일 발송 (알람 대상자가 있을 때만)
+            if (alarmYN == YES && notiUserArr != null && notiUserArr.Length > 0)
+            {
+                try
+                {
+                    string server, sender;
+                    int port;
+                    GetMailConfig(out server, out port, out sender);
+
+                    if (String.IsNullOrEmpty(server) || port <= 0)
+                        throw new Exception("MAIL 설정(MAIL_SERVER / MAIL_PORT)이 없습니다.");
+
+                    string subject = String.Format("DM ALARM [{0} / {1} / {2} / {3} / {4} / {5}]", defectType, product, stepId, equipId, alarmType, waferID);
+                    string body = String.Format(@"
+{3} 설비의 {0} 카운트가 '{4}' 기준을 벗어났습니다. 확인 바랍니다.
+
 - Defect Type = {0}
 - Prodcut = {1}
 - Step ID = {2}
@@ -208,16 +226,16 @@ namespace DACrux.SEMDMS.BSL
 - Lower = {7}
 - Target = {8}
 - Upper = {9}
-- Defect Count = {11}
-- Alarm Type = {10}
-", defectType, product, stepId, equipId, alarmType, lotID, waferID, lower, target, upper, count, alarmType);
+- Defect Count = {10}
+", defectType, product, stepId, equipId, alarmType, lotID, waferID, lower, target, upper, count);
 
-                DACrux.Base.Util.SendMail(server, port, sender, notiUserArr, subject, body);
+                    DACrux.Base.Util.SendMail(server, port, sender, notiUserArr, subject, body);
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Trace.TraceError("DefectAlarm SendMail 실패 (STEP_SEQ={0}, WAFER_ID={1}): {2}", stepSeq, waferID, ex.Message);
+                }
             }
-
-            // 데이터 INSERT
-            TQD_ALARM_DATA obj = new TQD_ALARM_DATA();
-            obj.InsertAlarmData(factory, defectType, product, stepId, equipId, stepSeq, lower, target, upper, alarmYN, alarmType, count, notiUser);
         }
 
         private void GetMailConfig(out string server, out int port, out string defaultMail)
@@ -233,7 +251,7 @@ namespace DACrux.SEMDMS.BSL
                 if (row[NAME].ToString() == MAIL_SERVER)
                     server = row[VALUE].ToString();
                 else if (row[NAME].ToString() == MAIL_PORT)
-                    port = Int32.Parse(row[VALUE].ToString());
+                    Int32.TryParse(row[VALUE].ToString(), out port);
                 else if (row[NAME].ToString() == MAIL_DEFAULT_ADDR)
                     defaultMail = row[VALUE].ToString();
             }

@@ -491,7 +491,6 @@ namespace DACrux.SEMDMS.ENGUI
                     string strLotID= string.Empty;
                     string strOriLotID = string.Empty;
                     string strProduct = string.Empty;
-                    List<string> lsStepSeq = new List<string>();
 
 
                     //Validation 용도로 한번 확인 한다.
@@ -518,6 +517,11 @@ namespace DACrux.SEMDMS.ENGUI
                         strLotID = fpSpreadLot.ActiveSheet.GetValue(ir, (int)LOT_GRP.LOT_ID).ToString().ToUpper();
                         strStepID = fpSpreadLot.ActiveSheet.GetValue(ir, (int)LOT_GRP.STEP_ID).ToString().ToUpper();
                         strProduct = fpSpreadLot.ActiveSheet.GetValue(ir, (int)LOT_GRP.PRODUCT).ToString().ToUpper();
+
+                        // Lot 행마다 새 목록 / 원래 Lot ID 를 쓴다. 루프 밖에서 한 번만 만들면 앞 Lot 의 STEP_SEQ 가
+                        // 누적되어 뒤 Lot 의 LOT_ID 로 함께 덮어써진다. (2026-10-08 CLAUDE-035)
+                        List<string> lsStepSeq = new List<string>();
+                        strOriLotID = string.Empty;
 
                         if(fpSpreadLot.ActiveSheet.Cells[ir, (int)WAFER.LOT_ID].Tag != null)
                             strOriLotID = fpSpreadLot.ActiveSheet.Cells[ir, (int)WAFER.LOT_ID].Tag.ToString();
@@ -616,11 +620,12 @@ namespace DACrux.SEMDMS.ENGUI
 
                     oSelectItem = fpSpreadLot.ActiveSheet.GetSelections();
 
-                    List<string> lsStepSeq = new List<string>();
                     for (int i = 0; i < oSelectItem.Length; i++)
                     {
                         for (int cr = 0; cr < oSelectItem[i].RowCount; cr++)
                         {
+                            // 선택한 Lot 행마다 새 목록을 쓴다. 누적되면 앞 Lot 을 다시 삭제하고 이력도 중복된다. (2026-10-08 CLAUDE-035)
+                            List<string> lsStepSeq = new List<string>();
                             idx = oSelectItem[i].Row + cr;
                             strLotSeq = fpSpreadLot.ActiveSheet.GetValue(idx, (int)LOT_GRP.LOT_SEQ).ToString().ToUpper();
                             strStepID = fpSpreadLot.ActiveSheet.GetValue(idx, (int)LOT_GRP.STEP_ID).ToString().ToUpper();
