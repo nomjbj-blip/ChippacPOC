@@ -50,7 +50,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\..\100_ClientBin\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -58,13 +58,6 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DACrux.Base, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\07_CoreLib\DACrux.Base.dll</HintPath>
-    </Reference>
-    <Reference Include="DACrux.Utility">
-      <HintPath>..\..\07_CoreLib\DACrux.Utility.dll</HintPath>
-    </Reference>
     <Reference Include="SevenZipSharp">
       <HintPath>..\..\07_CoreLib\SevenZipSharp.dll</HintPath>
     </Reference>
@@ -89,6 +82,14 @@
     <Compile Include="SevenZipUtil.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\06_CoreLibSource\DACrux.Base\DACrux.Base.csproj">
+      <Project>{EBEDC52F-2DE6-45EB-9E37-805FC298A0ED}</Project>
+      <Name>DACrux.Base</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\06_CoreLibSource\DACrux.Utility\DACrux.Utility.csproj">
+      <Project>{CE3BFF6D-E027-4833-B8C3-28B0DB081390}</Project>
+      <Name>DACrux.Utility</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\06_CoreLibSource\DACrux.Common.RO\DACrux.Common.RO.csproj">
       <Project>{46A137A3-7FE3-476D-B2C4-0ED113DB4378}</Project>
       <Name>DACrux.Common.RO</Name>

@@ -19,7 +19,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\07_CoreLib\</OutputPath>
+    <OutputPath>..\..\71_CoreLib\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -28,7 +28,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\07_CoreLib\</OutputPath>
+    <OutputPath>..\..\71_CoreLib\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -40,7 +40,6 @@
     <Reference Include="DACrux.Framework.PropertyGrid">
       <HintPath>..\..\07_CoreLib\DACrux.Framework.PropertyGrid.dll</HintPath>
     </Reference>
-    <Reference Include="DACrux.SP.Common, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <Reference Include="DACrux.SP.Controls, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL" />
     <Reference Include="Infragistics4.Win.v12.1, Version=12.1.20121.2135, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -241,6 +240,10 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DACrux.SP.Common\DACrux.SP.Common.csproj">
+      <Project>{C69F38AC-4444-4145-BDC4-42ADFECEC1EB}</Project>
+      <Name>DACrux.SP.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\03_STAT\DACrux.ProjectManager.UI\DACrux.ProjectManager.UI.csproj">
       <Project>{72020eb8-bc7a-4a89-86f7-e731b808b344}</Project>
       <Name>DACrux.ProjectManager.UI</Name>

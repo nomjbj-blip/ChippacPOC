@@ -17,7 +17,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\101_ServerBin\</OutputPath>
+    <OutputPath>..\..\71_CoreLib\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -25,7 +25,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\..\71_CoreLib\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -33,7 +33,7 @@
   <ItemGroup Condition="'$(Configuration)' == 'Debug'">
     <Reference Include="Miracom.Middleware">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\07_CoreLib\Miracom.Middleware\x86\Miracom.Middleware.dll</HintPath>
+      <HintPath>..\..\07_CoreLib\Miracom.Middleware.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup Condition="'$(Configuration)' == 'Release'">
@@ -43,18 +43,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="DACrux.Framework.BSL, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\07_CoreLib\DACrux.Framework.BSL.dll</HintPath>
-    </Reference>
-    <Reference Include="DACrux.Framework.Interface, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\07_CoreLib\DACrux.Framework.Interface.dll</HintPath>
-    </Reference>
-    <Reference Include="DACrux.SP.Common, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\07_CoreLib\DACrux.SP.Common.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
@@ -85,6 +73,20 @@
     <EmbeddedResource Include="DebugForm.resx">
       <DependentUpon>DebugForm.cs</DependentUpon>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DACrux.Framework.BSL\DACrux.Framework.BSL.csproj">
+      <Project>{C4065D50-E57F-4A43-8F72-57751619957B}</Project>
+      <Name>DACrux.Framework.BSL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DACrux.Framework.Interface\DACrux.Framework.Interface.csproj">
+      <Project>{636E5325-AF9E-4C53-B14F-093638CE695D}</Project>
+      <Name>DACrux.Framework.Interface</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DACrux.SP.Common\DACrux.SP.Common.csproj">
+      <Project>{C69F38AC-4444-4145-BDC4-42ADFECEC1EB}</Project>
+      <Name>DACrux.SP.Common</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

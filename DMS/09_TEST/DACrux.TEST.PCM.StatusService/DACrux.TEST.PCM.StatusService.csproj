@@ -2,7 +2,7 @@
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{0DC1B1C1-CCB8-4737-A507-C4CB97B01899}</ProjectGuid>
@@ -21,7 +21,6 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
-    <CodeAnalysisLogFile>..\..\101_ServerBin\DACrux.TEST.PCM.StatusService.exe.CodeAnalysisLog.xml</CodeAnalysisLogFile>
     <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
     <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
     <ErrorReport>prompt</ErrorReport>
@@ -38,7 +37,6 @@
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <CodeAnalysisLogFile>..\..\101_ServerBin\DACrux.TEST.PCM.StatusService.exe.CodeAnalysisLog.xml</CodeAnalysisLogFile>
     <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
     <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
     <ErrorReport>prompt</ErrorReport>
@@ -52,7 +50,7 @@
   <ItemGroup Condition="'$(Configuration)' == 'Debug'">
     <Reference Include="Miracom.Middleware">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\07_CoreLib\Miracom.Middleware\x86\Miracom.Middleware.dll</HintPath>
+      <HintPath>..\..\07_CoreLib\Miracom.Middleware.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup Condition="'$(Configuration)' == 'Release'">
@@ -62,10 +60,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="DACrux.Framework.BSL, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\07_CoreLib\DACrux.Framework.BSL.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Core" />
@@ -100,6 +94,10 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\06_CoreLibSource\DACrux.Framework.BSL\DACrux.Framework.BSL.csproj">
+      <Project>{C4065D50-E57F-4A43-8F72-57751619957B}</Project>
+      <Name>DACrux.Framework.BSL</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\06_CoreLibSource\DACrux.Common.BSL\DACrux.Common.BSL.csproj">
       <Project>{B0E5B50A-DF9A-4BF1-ACDC-F345CB0BC43F}</Project>
       <Name>DACrux.Common.BSL</Name>

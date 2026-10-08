@@ -27,7 +27,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\07_CoreLib\</OutputPath>
+    <OutputPath>..\..\71_CoreLib\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -37,7 +37,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\07_CoreLib\</OutputPath>
+    <OutputPath>..\..\71_CoreLib\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -45,9 +45,6 @@
   <ItemGroup>
     <Reference Include="Accessibility">
       <EmbedInteropTypes>False</EmbedInteropTypes>
-    </Reference>
-    <Reference Include="DACrux.Base">
-      <HintPath>..\..\07_CoreLib\DACrux.Base.dll</HintPath>
     </Reference>
     <Reference Include="FarPoint.CalcEngine, Version=5.0.3522.2008, Culture=neutral, PublicKeyToken=327c3516b1b18457, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -401,6 +398,12 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="DUCLotGroup.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DACrux.Base\DACrux.Base.csproj">
+      <Project>{EBEDC52F-2DE6-45EB-9E37-805FC298A0ED}</Project>
+      <Name>DACrux.Base</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

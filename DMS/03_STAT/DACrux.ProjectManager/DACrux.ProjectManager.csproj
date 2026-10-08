@@ -130,10 +130,11 @@
     <Compile Include="Analysis.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DACrux.BStats\DACrux.BStats.csproj">
-      <Project>{8FCC693A-F9A3-4194-8F8E-9678D5DA3A45}</Project>
-      <Name>DACrux.BStats</Name>
-    </ProjectReference>
+    <!-- DACrux.BStats 는 솔루션 밖 프로젝트이고 NMath(미설치 경로) 참조 때문에 이 환경에서 빌드되지 않는다.
+         이미 빌드된 DLL 을 코어 출력 폴더에서 참조한다. (2026-10-08 CLAUDE-040) -->
+    <Reference Include="DACrux.BStats">
+      <HintPath>..\..\71_CoreLib\DACrux.BStats.dll</HintPath>
+    </Reference>
     <ProjectReference Include="..\DACrux.ProjectManager.UI\DACrux.ProjectManager.UI.csproj">
       <Project>{72020EB8-BC7A-4A89-86F7-E731B808B344}</Project>
       <Name>DACrux.ProjectManager.UI</Name>

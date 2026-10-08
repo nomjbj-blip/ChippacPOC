@@ -46,43 +46,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\07_CoreLib\ClosedXML.dll</HintPath>
     </Reference>
-    <Reference Include="DACrux.Base, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\07_CoreLib\DACrux.Base.dll</HintPath>
-    </Reference>
-    <Reference Include="DACrux.Data.Handler, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\..\101_ServerBin\DACrux.Data.Handler.dll</HintPath>
-    </Reference>
-    <Reference Include="DACrux.FPDMap, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\07_CoreLib\DACrux.FPDMap.dll</HintPath>
-    </Reference>
-    <Reference Include="DACrux.Framework.Base, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\07_CoreLib\DACrux.Framework.Base.dll</HintPath>
-    </Reference>
-    <Reference Include="DACrux.Framework.Controls, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\07_CoreLib\DACrux.Framework.Controls.dll</HintPath>
-    </Reference>
-    <Reference Include="DACrux.Framework.Interface, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\07_CoreLib\DACrux.Framework.Interface.dll</HintPath>
-    </Reference>
     <Reference Include="DACrux.Framework.PropertyGrid, Version=1.0.1.1, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\07_CoreLib\DACrux.Framework.PropertyGrid.dll</HintPath>
-    </Reference>
-    <Reference Include="DACrux.Framework.RO, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL" />
-    <Reference Include="DACrux.Map, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\07_CoreLib\DACrux.Map.dll</HintPath>
-    </Reference>
-    <Reference Include="DACrux.TEST.Interface, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
-    <Reference Include="DACrux.TEST.RO, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL" />
-    <Reference Include="DACrux.Utility, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\07_CoreLib\DACrux.Utility.dll</HintPath>
     </Reference>
     <Reference Include="FarPoint.Win, Version=5.0.3518.2008, Culture=neutral, PublicKeyToken=327c3516b1b18457, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -461,6 +427,50 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\06_CoreLibSource\DACrux.Base\DACrux.Base.csproj">
+      <Project>{EBEDC52F-2DE6-45EB-9E37-805FC298A0ED}</Project>
+      <Name>DACrux.Base</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\06_CoreLibSource\DACrux.Data.Handler\DACrux.Data.Handler.csproj">
+      <Project>{AD7EB035-BE84-44A0-91E8-D75D7517617D}</Project>
+      <Name>DACrux.Data.Handler</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\06_CoreLibSource\DACrux.FPDMap\DACrux.FPDMap.csproj">
+      <Project>{153EAAEC-FEF8-4330-A0F9-8BF1D8577411}</Project>
+      <Name>DACrux.FPDMap</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\06_CoreLibSource\DACrux.Framework.Base\DACrux.Framework.Base.csproj">
+      <Project>{E6E7F026-C24D-4B25-81FE-290BDA3D4AEB}</Project>
+      <Name>DACrux.Framework.Base</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\06_CoreLibSource\DACrux.Framework.Controls\DACrux.Framework.Controls.csproj">
+      <Project>{0CDDB391-0A29-4850-9198-C529509DA64F}</Project>
+      <Name>DACrux.Framework.Controls</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\06_CoreLibSource\DACrux.Framework.Interface\DACrux.Framework.Interface.csproj">
+      <Project>{636E5325-AF9E-4C53-B14F-093638CE695D}</Project>
+      <Name>DACrux.Framework.Interface</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\06_CoreLibSource\DACrux.Framework.RO\DACrux.Framework.RO.csproj">
+      <Project>{E34A0690-0C47-4CEA-8740-7DA4EAACAC21}</Project>
+      <Name>DACrux.Framework.RO</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\06_CoreLibSource\DACrux.Map\DACrux.Map.csproj">
+      <Project>{7DE5B98B-E6CF-4E1D-8CC3-D88D2B0F9454}</Project>
+      <Name>DACrux.Map</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\09_TEST\DACrux.TEST.Interface\DACrux.TEST.Interface.csproj">
+      <Project>{DEF8C916-8445-4FA5-B18B-4AA0F3D0ECB0}</Project>
+      <Name>DACrux.TEST.Interface</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\09_TEST\DACrux.TEST.RO\DACrux.TEST.RO.csproj">
+      <Project>{E1AC51DC-7074-45B4-BD2B-92343BC69411}</Project>
+      <Name>DACrux.TEST.RO</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\06_CoreLibSource\DACrux.Utility\DACrux.Utility.csproj">
+      <Project>{CE3BFF6D-E027-4833-B8C3-28B0DB081390}</Project>
+      <Name>DACrux.Utility</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\06_CoreLibSource\DACrux.Common.RO\DACrux.Common.RO.csproj">
       <Project>{46A137A3-7FE3-476D-B2C4-0ED113DB4378}</Project>
       <Name>DACrux.Common.RO</Name>

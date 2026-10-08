@@ -2,7 +2,7 @@
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{B3ED24CA-1B2C-401B-ACB7-EBBEBA502E2F}</ProjectGuid>
@@ -23,7 +23,6 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <CodeAnalysisLogFile>bin\Debug\DACrux.TEST.Control.dll.CodeAnalysisLog.xml</CodeAnalysisLogFile>
     <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
     <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
     <ErrorReport>prompt</ErrorReport>
@@ -34,12 +33,11 @@
     <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\..\100_ClientBin\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <CodeAnalysisLogFile>bin\Release\DACrux.TEST.Control.dll.CodeAnalysisLog.xml</CodeAnalysisLogFile>
     <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
     <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
     <ErrorReport>prompt</ErrorReport>
@@ -57,29 +55,6 @@
     <Reference Include="AForge.Video.DirectShow, Version=2.2.0.0, Culture=neutral, PublicKeyToken=61ea4348d43881b7, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\07_CoreLib\AForge.Video.DirectShow.dll</HintPath>
-    </Reference>
-    <Reference Include="DACrux.Base, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\07_CoreLib\DACrux.Base.dll</HintPath>
-    </Reference>
-    <Reference Include="DACrux.Common.VideoCapture">
-      <HintPath>..\..\07_CoreLib\DACrux.Common.VideoCapture.dll</HintPath>
-    </Reference>
-    <Reference Include="DACrux.Framework.Base, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\07_CoreLib\DACrux.Framework.Base.dll</HintPath>
-    </Reference>
-    <Reference Include="DACrux.Framework.Controls, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\07_CoreLib\DACrux.Framework.Controls.dll</HintPath>
-    </Reference>
-    <Reference Include="DACrux.Map, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\07_CoreLib\DACrux.Map.dll</HintPath>
-    </Reference>
-    <Reference Include="DACrux.Utility, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\07_CoreLib\DACrux.Utility.dll</HintPath>
     </Reference>
     <Reference Include="FarPoint.CalcEngine, Version=5.0.3522.2008, Culture=neutral, PublicKeyToken=327c3516b1b18457, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -281,6 +256,30 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\06_CoreLibSource\DACrux.Base\DACrux.Base.csproj">
+      <Project>{EBEDC52F-2DE6-45EB-9E37-805FC298A0ED}</Project>
+      <Name>DACrux.Base</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\06_CoreLibSource\DACrux.Common.VideoCapture\DACrux.Common.VideoCapture.csproj">
+      <Project>{CD82C23C-C976-4E9D-A08A-ABC27F900B41}</Project>
+      <Name>DACrux.Common.VideoCapture</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\06_CoreLibSource\DACrux.Framework.Base\DACrux.Framework.Base.csproj">
+      <Project>{E6E7F026-C24D-4B25-81FE-290BDA3D4AEB}</Project>
+      <Name>DACrux.Framework.Base</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\06_CoreLibSource\DACrux.Framework.Controls\DACrux.Framework.Controls.csproj">
+      <Project>{0CDDB391-0A29-4850-9198-C529509DA64F}</Project>
+      <Name>DACrux.Framework.Controls</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\06_CoreLibSource\DACrux.Map\DACrux.Map.csproj">
+      <Project>{7DE5B98B-E6CF-4E1D-8CC3-D88D2B0F9454}</Project>
+      <Name>DACrux.Map</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\06_CoreLibSource\DACrux.Utility\DACrux.Utility.csproj">
+      <Project>{CE3BFF6D-E027-4833-B8C3-28B0DB081390}</Project>
+      <Name>DACrux.Utility</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\06_CoreLibSource\DACrux.Common.RO\DACrux.Common.RO.csproj">
       <Project>{46A137A3-7FE3-476D-B2C4-0ED113DB4378}</Project>
       <Name>DACrux.Common.RO</Name>

@@ -41,7 +41,7 @@
   <ItemGroup Condition="'$(Configuration)' == 'Debug'">
     <Reference Include="Miracom.Middleware">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\07_CoreLib\Miracom.Middleware\x86\Miracom.Middleware.dll</HintPath>
+      <HintPath>..\..\07_CoreLib\Miracom.Middleware.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup Condition="'$(Configuration)' == 'Release'">
@@ -51,10 +51,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="DACrux.Base, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\71_CoreLib\DACrux.Base.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Transactions" />
@@ -75,6 +71,10 @@
     <Compile Include="VisualInspection.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\06_CoreLibSource\DACrux.Base\DACrux.Base.csproj">
+      <Project>{EBEDC52F-2DE6-45EB-9E37-805FC298A0ED}</Project>
+      <Name>DACrux.Base</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\02_DMS\DACrux.SEMDMS.DSL\DACrux.SEMDMS.DSL.csproj">
       <Project>{DAA12975-5F3F-4B7F-870C-C95E36F21FD1}</Project>
       <Name>DACrux.SEMDMS.DSL</Name>

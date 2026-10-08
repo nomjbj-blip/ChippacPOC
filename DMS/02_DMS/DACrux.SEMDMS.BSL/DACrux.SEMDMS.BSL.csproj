@@ -59,7 +59,7 @@
   <ItemGroup Condition="'$(Configuration)' == 'Debug'">
     <Reference Include="Miracom.Middleware">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\07_CoreLib\Miracom.Middleware\x86\Miracom.Middleware.dll</HintPath>
+      <HintPath>..\..\07_CoreLib\Miracom.Middleware.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup Condition="'$(Configuration)' == 'Release'">
@@ -69,10 +69,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="DACrux.Base, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\07_CoreLib\DACrux.Base.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Configuration" />
@@ -120,6 +116,10 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\06_CoreLibSource\DACrux.Base\DACrux.Base.csproj">
+      <Project>{EBEDC52F-2DE6-45EB-9E37-805FC298A0ED}</Project>
+      <Name>DACrux.Base</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\06_CoreLibSource\DACrux.Common.DSL\DACrux.Common.DSL.csproj">
       <Project>{9FC00D33-5582-491E-87DC-E2D7F1095144}</Project>
       <Name>DACrux.Common.DSL</Name>
