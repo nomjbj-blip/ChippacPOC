@@ -186,37 +186,6 @@ ORDER BY USEMAP.Y,USEMAP.X]]></commandtext>
             <param direction="Input" dbtype="VarChar" size="30" description="E461431AP_02">:wafer_id</param>
         </parameters>
     </query>
-    <query statement="Select" queryid="GETD_MAPDATA" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT USEMAP.X,USEMAP.Y,DECODE(REALMAP.VISUALINSP,NULL,0,REALMAP.VISUALINSP) AS VI ,DECODE( REALMAP.BIN ,NULL,0,REALMAP.BIN ) AS BIN,USEMAP.USECODE FROM 
-    (SELECT X, Y, 
-    BIN, VISUALINSP FROM TD_?? A,TQP_WAFER W,TQP_LOT L
-    WHERE L.TESTAREA = :testarea
-    AND L.PRODUCT = :product
-    AND L.PROGRAM = :program
-    AND L.LOT_ID = :lot_id
-    AND W.WAFER_ID = :wafer_id
-    AND W.PROBE_CNT = 0
-    AND L.LOT_SEQ = W.LOT_SEQ
-    AND W.WAFER_SEQ = A.WAFER_SEQ) REALMAP,
-    (SELECT X,Y,USECODE FROM TQP_LOT L, TQP_USEMAP U, TQP_PRODUCT P
-    WHERE L.TESTAREA = :testarea
-    AND L.PRODUCT = :product
-    AND L.PROGRAM = :program
-    AND L.LOT_ID = :lot_id
-    AND U.USECODE =1 
-    AND L.PRODUCT = P.PRODUCT
-    AND P.MAPID = U.MAPID) USEMAP
-WHERE REALMAP.X(+) = USEMAP.X
-AND REALMAP.Y(+) = USEMAP.Y
-ORDER BY USEMAP.Y,USEMAP.X]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="30">:testarea</param>
-            <param direction="Input" dbtype="VarChar" size="30">:product</param>
-            <param direction="Input" dbtype="VarChar" size="30">:program</param>
-            <param direction="Input" dbtype="VarChar" size="30">:lot_id</param>
-            <param direction="Input" dbtype="VarChar" size="30">:wafer_id</param>
-        </parameters>
-    </query>
     <query statement="Delete" queryid="DELETE_ZERO" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[DELETE FROM T_AVI_?? WHERE WAFER_SEQ=:wafer_seq
 AND QC=0 AND CAT=0]]></commandtext>
@@ -238,50 +207,6 @@ AND WAFER_SEQ = :wafer_seq]]></commandtext>
         <parameters>
             <param direction="Input" dbtype="Number" size="10">:lot_seq</param>
             <param direction="Input" dbtype="Number" size="10">:wafer_seq</param>
-        </parameters>
-    </query>
-    <query statement="Select" queryid="GET_AVI_SUM" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT A.WAFER_ID AS WID,NETDIE AS TOTAL
-,ROUND( ((NETDIE - AVI_FAIL) / NETDIE) * 100,2) AS YIELD
-,(NETDIE - AVI_FAIL) AS PASS
-,AVI_FAIL AS FAIL,(TOT_FAIL - AVI_FAIL) AS KILL
-FROM 
-(
-SELECT L.PRODUCT,L.LOT_ID,W.WAFER_ID,L.LOT_SEQ,W.WAFER_SEQ,COUNT(*) AS TOT_FAIL FROM TQP_LOT L,TQP_WAFER W, T_AVI_LG A
-WHERE L.TESTAREA = 'AVI'
-AND L.PRODUCT = :product
-AND L.LOT_ID = :lot_id
-AND CAT > 0
-AND PROBE_CNT = 0
-AND L.LOT_SEQ = W.LOT_SEQ 
-AND W.WAFER_SEQ = A.WAFER_SEQ
-GROUP BY L.PRODUCT,L.LOT_ID,W.WAFER_ID,L.LOT_SEQ,W.WAFER_SEQ
-) A,
-(
-SELECT L.PRODUCT,L.LOT_ID,W.WAFER_ID,L.LOT_SEQ,W.WAFER_SEQ,COUNT(*) AS AVI_FAIL 
-FROM TQP_LOT L,TQP_WAFER W, T_AVI_LG A
-WHERE L.TESTAREA = 'AVI'
-AND L.PRODUCT = :product
-AND L.LOT_ID = :lot_id
-AND KILLER = 'MACHINE'
-AND CAT > 0
-AND PROBE_CNT = 0
-AND L.LOT_SEQ = W.LOT_SEQ 
-AND W.WAFER_SEQ = A.WAFER_SEQ
-GROUP BY L.PRODUCT,L.LOT_ID,W.WAFER_ID,L.LOT_SEQ,W.WAFER_SEQ
-) B,
-(
-SELECT PRODUCT,NETDIE FROM TQP_MAPDEF M,TQP_PRODUCT P
-WHERE P.PRODUCT = :product
-AND M.MAPID = P.MAPID
-) C
-WHERE A.PRODUCT = B.PRODUCT
-AND A.LOT_ID = B.LOT_ID
-AND A.WAFER_ID = B.WAFER_ID
-AND A.PRODUCT = C.PRODUCT]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="40">:product</param>
-            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
         </parameters>
     </query>
     <query statement="Select" queryid="GET_IQC_MAPDATA" commandtype="Text" commandtimeout="60">

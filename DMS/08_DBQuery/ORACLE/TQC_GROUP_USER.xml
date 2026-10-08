@@ -1,12 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <queryxml conid="QMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
-    <query statement="Update" queryid="UPDATEGROUPUSER" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[Update TQC_GROUP_USER Set SEC_GRP_ID=:strNewGrp where SEC_GRP_ID=:strDelGrp]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="40">:strNewGrp</param>
-            <param direction="Input" dbtype="VarChar" size="40">:strDelGrp</param>
-        </parameters>
-    </query>
     <query statement="Select" queryid="LOADGROUPUSER" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[SELECT SEC_GRP_ID, USER_ID 
 FROM TQC_GROUP_USER 
@@ -114,18 +107,6 @@ WHERE FUNC_CODE = :FuncCode
         <parameters>
             <param direction="Input" dbtype="VarChar" size="20">:UserID</param>
             <param direction="Input" dbtype="VarChar" size="20">:FuncCode</param>
-        </parameters>
-    </query>
-    <query statement="Delete" queryid="DELETE_ALL_GROUP_USER" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[-- Create Date : 2014-01-22 19:27:08
-DELETE FROM TQC_GROUP_USER]]></commandtext>
-    </query>
-    <query statement="Insert" queryid="INSERT_MULTI_GROUP_USER" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[-- Create Date : 2014-01-22 19:27:49
-Insert into TQC_GROUP_USER (SEC_GRP_ID, USER_ID) values(:strGrpCode,  :strUserID)]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="40">:strGrpCode</param>
-            <param direction="Input" dbtype="VarChar" size="40">:strUserID</param>
         </parameters>
     </query>
 </queryxml>

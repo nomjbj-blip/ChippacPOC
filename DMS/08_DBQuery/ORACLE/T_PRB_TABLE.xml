@@ -16,26 +16,4 @@ WHERE WAFER_SEQ = :wafer_seq]]></commandtext>
             <param direction="Input" dbtype="Numeric" size="40">:wafer_seq</param>
         </parameters>
     </query>
-    <query statement="Select" queryid="GET_TESTAREA_INFO" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[-- Create Date : 2015-04-22 14:07:56
-SELECT * FROM 
-(
-    SELECT 'IQC' AS OPERDESC, 'IQC' AS OPERCODE, 1 AS OPERNUM , 'AVI' AS TABLEALIAS from dual
-    UNION
-    SELECT 'B5000' AS OPERDESC, 'PQC' AS OPERCODE, 2 AS OPERNUM, 'AVI' AS TABLEALIAS from dual
-    UNION
-    SELECT 'AVI' AS OPERDESC, 'AVI' AS OPERCODE, 3 AS OPERNUM, 'AVI' AS TABLEALIAS from dual
-    UNION
-    SELECT 'QVI' AS OPERDESC, 'QVI' AS OPERCODE, 4 AS OPERNUM, 'AVI' AS TABLEALIAS from dual
-    UNION
-    SELECT 'MULTIPROBE' AS OPERDESC, 'PRB' AS OPERCODE, 5 AS OPERNUM, 'PRB' AS TABLEALIAS from dual
-    UNION
-    SELECT 'FVI' AS OPERDESC, 'PRB' AS OPERCODE, 6 AS OPERNUM, 'PRB' AS TABLEALIAS from dual
-)
-WHERE OPERDESC = :operdesc 
-ORDER BY OPERNUM,9]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="40">:operdesc</param>
-        </parameters>
-    </query>
 </queryxml>

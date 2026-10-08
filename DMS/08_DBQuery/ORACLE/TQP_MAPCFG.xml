@@ -69,30 +69,6 @@
             <param direction="Input" dbtype="VarChar" size="0">:user_comment</param>
         </parameters>
     </query>
-    <query statement="Update" queryid="UPDATE_MAPCFG" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[--UPDATE TQP_MAPCFG SET
- ALTER_ANGLE = :alter_angle,
- ALTER_INDEX_X = :alter_index_x,
- ALTER_INDEX_Y = :alter_index_y,
- UPDATE_USER = :update_user,
- UPDATE_TIME = SYSDATE,
- USER_COMMENT  = :user_comment
-WHERE 1 = 1 
-AND TESTAREA = :testarea
-AND DEVICE_ALIAS = :device_alias
-AND PROGRAM = :pgm
-]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="40">:testarea</param>
-            <param direction="Input" dbtype="VarChar" size="40">:device_alias</param>
-            <param direction="Input" dbtype="VarChar" size="40">:pgm</param>
-            <param direction="Input" dbtype="VarChar" size="40">:alter_angle</param>
-            <param direction="Input" dbtype="VarChar" size="0">:alter_index_x</param>
-            <param direction="Input" dbtype="VarChar" size="0">:alter_index_y</param>
-            <param direction="Input" dbtype="VarChar" size="0">:update_user</param>
-            <param direction="Input" dbtype="VarChar" size="0">:user_comment</param>
-        </parameters>
-    </query>
     <query statement="Update" queryid="DELETE_MAPCFG" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[UPDATE TQP_MAPCFG SET
  DELETE_FLAG = 'Y',
@@ -133,20 +109,6 @@ WHERE ROWNUM = 1]]></commandtext>
             <param direction="Input" dbtype="VarChar" size="40" value="TESTAREA">:TESTAREA</param>
             <param direction="Input" dbtype="VarChar" size="40" value="DEVICE_ALIAS">:DEVICE_ALIAS</param>
             <param direction="Input" dbtype="VarChar" size="40" value="PROGRAM">:PROGRAM</param>
-        </parameters>
-    </query>
-    <query statement="Select" queryid="SELECT_MAPCFG_01" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT * FROM TQP_MAPCFG
-    WHERE 1 = 1 
-    AND TESTAREA = :testarea
-    AND DEVICE_ALIAS = :device
-    AND PROGRAM = :pgm
-    AND NVL(DELETE_FLAG, 'N') = 'N'
-    ORDER BY DECODE(PROGRAM, 'ALL', 99999, 1), MAP_CFG_SEQ DESC]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar2" size="40" value="testarea">:testarea</param>
-            <param direction="Input" dbtype="VarChar2" size="40" value="device">:device</param>
-            <param direction="Input" dbtype="VarChar2" size="40" value="pgm">:pgm</param>
         </parameters>
     </query>
     <query statement="Select" queryid="SELECT_MAPCFG_02" commandtype="Text" commandtimeout="60">

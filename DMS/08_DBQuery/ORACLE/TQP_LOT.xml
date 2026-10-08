@@ -62,16 +62,6 @@ WHERE PRODUCT = :product AND PROGRAM = :program]]></commandtext>
             <param direction="Input" dbtype="VarChar" size="30">:program</param>
         </parameters>
     </query>
-    <query statement="Select" queryid="SELECT_LOT_AVI" commandtype="Text" description="AVI Lot ID를 가져온다." commandtimeout="60">
-        <commandtext><![CDATA[SELECT DISTINCT LOT_ID, LOT_SEQ FROM TQP_LOT 
-WHERE PRODUCT = :product 
-AND PROGRAM = :program
-AND TESTAREA = 'AVI']]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="30">:product</param>
-            <param direction="Input" dbtype="VarChar" size="30">:program</param>
-        </parameters>
-    </query>
     <query statement="Select" queryid="GET_LOT_LIST" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[SELECT LOT_ID,LOT_SEQ FROM TQP_LOT
 WHERE END_TIME BETWEEN TO_DATE(:sdate,'YYYY-MM-DD') AND TO_DATE(:edate,'YYYY-MM-DD')

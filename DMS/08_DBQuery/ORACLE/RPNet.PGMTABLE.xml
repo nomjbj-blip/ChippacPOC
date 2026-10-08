@@ -93,23 +93,4 @@ AND PRODUCT = :product]]></commandtext>
             <param direction="Input" dbtype="Varchar2" size="0" value="product">:product</param>
         </parameters>
     </query>
-    <query statement="Select" queryid="GET_MAPDATA_NO_INSPECT" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT WAFER_SEQ,DIE_NUM AS DIEID, X, Y , BIN , 0 AS INSPECT, 1 AS DIEPROP 
-FROM TD_??
-WHERE WAFER_SEQ = :waferseq]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="Varchar2" size="0" value="waferseq">:waferseq</param>
-        </parameters>
-    </query>
-    <query statement="Select" queryid="EXISTS_INSPECT" commandtype="Text" commandtimeout="180">
-        <commandtext><![CDATA[-- Create Date : 2026-05-15 10:06:48
-SELECT 1
-FROM USER_TAB_COLUMNS
-WHERE 1 = 1
-    AND TABLE_NAME = 'TD_' || :TABLE_NAME
-    AND COLUMN_NAME = 'INSPECT']]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="Varchar2" size="0">:TABLE_NAME</param>
-        </parameters>
-    </query>
 </queryxml>

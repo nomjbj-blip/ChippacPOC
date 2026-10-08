@@ -21,9 +21,6 @@
             <param direction="Input" dbtype="VarChar" size="0">:likevalue</param>
         </parameters>
     </query>
-    <query statement="Update" queryid="UPDATE_MAINT_PRD" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[-- Create Date : 2019-09-26 16:30:49]]></commandtext>
-    </query>
     <query statement="Select" queryid="SELECT_LOT_DATA" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[SELECT *
   FROM TQD_LOT

@@ -48,8 +48,4 @@
             <param direction="Input" dbtype="VarChar" size="40">:UserID</param>
         </parameters>
     </query>
-    <query statement="Select" queryid="SELECT_GRP_LIST" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[-- Create Date : 2014-01-27 17:34:01
-SELECT * FROM TQC_SECURITY_GROUP]]></commandtext>
-    </query>
 </queryxml>

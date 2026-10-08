@@ -40,32 +40,6 @@ AND PROBE_CNT = :probe_cnt]]></commandtext>
             <param direction="Input" dbtype="VarChar2" size="40" value="lotid">:lotid</param>
         </parameters>
     </query>
-    <query statement="Update" queryid="UPDATE_STEP_SLOTID" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[UPDATE TQD_WAFER 
-SET SLOT_ID=:slotid
-WHERE 1 = 1
-AND WAFER_SEQ = :waferseq
-AND LOT_SEQ = :lot_seq
-]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar2" size="40" value="slotid">:slotid</param>
-            <param direction="Input" dbtype="VarChar2" size="40" value="waferseq">:waferseq</param>
-            <param direction="Input" dbtype="VarChar2" size="40" value="lot_seq">:lot_seq</param>
-        </parameters>
-    </query>
-    <query statement="Update" queryid="UPDATE_STEP_WAFERID" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[UPDATE TQD_WAFER 
-SET WAFER_ID=:waferid
-WHERE 1 = 1
-AND WAFER_SEQ = :waferseq
-AND LOT_SEQ = :lot_seq
-]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar2" size="40" value="waferid">:waferid</param>
-            <param direction="Input" dbtype="VarChar2" size="40" value="waferseq">:waferseq</param>
-            <param direction="Input" dbtype="VarChar2" size="40" value="lot_seq">:lot_seq</param>
-        </parameters>
-    </query>
     <query statement="Update" queryid="UPDATE_MAINT_DATA" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[UPDATE TQD_WAFER SET LOT_SEQ = :lot_seq, WAFER_ID = :lot_id || '-' ||  LPAD(SLOT_ID, 2, '0')
  WHERE     1 = 1

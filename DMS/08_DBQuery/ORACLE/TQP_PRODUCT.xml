@@ -1,12 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
-    <query statement="Select" queryid="SELECT_FACILITY" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT FACILITY FROM TQP_PRODUCT 
-WHERE UPPER(PRODUCT) = UPPER(:product)]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="30" value="SEPS225F0A">product</param>
-        </parameters>
-    </query>
     <query statement="Select" queryid="SELECT_CUSTOMER" commandtype="Text" description="CUSTOMER_NAME 을 가져온다." commandtimeout="60">
         <commandtext><![CDATA[SELECT CUSTOMER_NAME FROM TQP_PRODUCT 
 WHERE UPPER(PRODUCT) = UPPER(:product)]]></commandtext>
@@ -14,38 +7,15 @@ WHERE UPPER(PRODUCT) = UPPER(:product)]]></commandtext>
             <param direction="Input" dbtype="VarChar" size="30" value="LGDP4213A">product</param>
         </parameters>
     </query>
-    <query statement="Select" queryid="SELECT_MAPID" commandtype="Text" description="MapID를 가져온다." commandtimeout="60">
-        <commandtext><![CDATA[SELECT MAPID FROM TQP_PRODUCT 
-WHERE UPPER(PRODUCT) = UPPER(:product)]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="30" value="SEPS225F0A">product</param>
-        </parameters>
-    </query>
     <query statement="Select" queryid="SELECT_PRODUCT" commandtype="Text" description="Device 목록을 가져온다." commandtimeout="60">
         <commandtext><![CDATA[SELECT DISTINCT PRODUCT 
 FROM TQP_PRODUCT
 ORDER BY PRODUCT]]></commandtext>
     </query>
-    <query statement="Select" queryid="SELECT_CUSTOMERID" commandtype="Text" description="CUSTOMER_NAME  가져온다." commandtimeout="60">
-        <commandtext><![CDATA[SELECT CUSTOMER_ID FROM TQP_PRODUCT 
-WHERE UPPER(PRODUCT) = UPPER(:product)]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="30">product</param>
-        </parameters>
-    </query>
     <query statement="Select" queryid="GET_MAPID" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[SELECT * FROM TQP_PRODUCT WHERE PRODUCT = :product]]></commandtext>
         <parameters>
             <param direction="Input" dbtype="VarChar" size="30">:product</param>
-        </parameters>
-    </query>
-    <query statement="Select" queryid="SELECT_PRODUCT_BY_CUSTOMER" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT PRODUCT 
-FROM TQP_PRODUCT 
-WHERE CUSTOMER_ID = :customer_id
-ORDER BY PRODUCT]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="30">:customer_id</param>
         </parameters>
     </query>
     <query statement="Insert" queryid="CREATE_PRODUCT" commandtype="Text" description="새로운 Product을 생성한다" commandtimeout="60">
@@ -86,13 +56,6 @@ KILLER        VarChar(40)
             <param direction="Input" dbtype="VarChar" size="20">:mapid</param>
         </parameters>
     </query>
-    <query statement="Select" queryid="IS_PRODUCT" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT PRODUCT FROM TQP_PRODUCT 
-WHERE UPPER(PRODUCT) = UPPER(:product)]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="40">:product</param>
-        </parameters>
-    </query>
     <query statement="Select" queryid="SELECT_CUSTOMER_WITH_MAPDEF" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[SELECT DECODE(B.CUSTOMER_ID, '',  ' ', B.CUSTOMER_ID) AS CUSTOMER,  A.*
 FROM (
@@ -104,31 +67,6 @@ WHERE B.PRODUCT (+)= A.MAPID]]></commandtext>
         <parameters>
             <param direction="Input" dbtype="VarChar" size="40">:map_id</param>
         </parameters>
-    </query>
-    <query statement="Delete" queryid="DELETE_PRODUCT_BY_PRODUCT" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[-- Create Date : 2014-12-19 11:49:39
-DELETE FROM TQP_PRODUCT
-WHERE PRODUCT = :PRODUCT]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="0">:PRODUCT</param>
-        </parameters>
-    </query>
-    <query statement="Delete" queryid="DELETE_PRODUCT_BY_MAPID" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[-- Create Date : 2014-12-19 12:04:32
-DELETE FROM TQP_PRODUCT
-WHERE MAPID = :MAPID]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="0">:MAPID</param>
-        </parameters>
-    </query>
-    <query statement="Select" queryid="SELECT_PRODUCT_INFO_02" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[-- Create Date : 2015-04-16 20:18:24
-SELECT * FROM TQP_PRODUCT A, TQP_MAPDEF B
-WHERE 1=1
-AND FACILITY = NVL(:facility,FACILITY)
-AND PRODUCT = :product
-AND A.MAPID = B.MAPID
-]]></commandtext>
     </query>
     <query statement="Select" queryid="SELECT_PRODUCT_INFO_01" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[-- Create Date : 2015-04-21 16:22:57

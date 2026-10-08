@@ -309,66 +309,6 @@ AND NVL(A.DELETE_FLAG,'N') <> 'Y'
             <param direction="Input" dbtype="VarChar" size="40">:LotId</param>
         </parameters>
     </query>
-    <query statement="Insert" queryid="CREATE_MAP1" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[INSERT INTO TQP_MAPDEF VALUES(:mapid
-,:wafer_size
-,:chip_size_x
-,:chip_size_y
-,:origin_micro_x
-,:origin_micro_y
-,:origin_index_x
-,:origin_index_y
-,:first_micro_x
-,:first_micro_y
-,:first_index_x
-,:first_index_y
-,:edge_size
-,:angle
-,:netdie
-,:notch_type
-,:st_start
-,:st_intype
-,:st_xcnt    
-,:st_ycnt    
-,:st_start_x
-,:st_start_y
-,:die_index_min_x
-,:die_index_max_x
-,:die_index_min_y
-,:die_index_max_y
-,:xy_direction
-,:referance_setting)]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="30">:mapid</param>
-            <param direction="Input" dbtype="Number" size="10">:wafer_size</param>
-            <param direction="Input" dbtype="Number" size="10">:chip_size_x</param>
-            <param direction="Input" dbtype="Number" size="10">:chip_size_y</param>
-            <param direction="Input" dbtype="Number" size="10">:origin_micro_x</param>
-            <param direction="Input" dbtype="Number" size="10">:origin_micro_y</param>
-            <param direction="Input" dbtype="Int32" size="10">:origin_index_x</param>
-            <param direction="Input" dbtype="Int32" size="10">:origin_index_y</param>
-            <param direction="Input" dbtype="Number" size="10">:first_micro_x</param>
-            <param direction="Input" dbtype="Number" size="10">:first_micro_y</param>
-            <param direction="Input" dbtype="Int32" size="10">:first_index_x</param>
-            <param direction="Input" dbtype="Int32" size="10">:first_index_y</param>
-            <param direction="Input" dbtype="Number" size="10">:edge_size</param>
-            <param direction="Input" dbtype="Int32" size="10">:angle</param>
-            <param direction="Input" dbtype="Int32" size="10">:netdie</param>
-            <param direction="Input" dbtype="Int32" size="10">:notch_type</param>
-            <param direction="Input" dbtype="Number" size="10">:st_start</param>
-            <param direction="Input" dbtype="Number" size="10">:st_intype</param>
-            <param direction="Input" dbtype="Number" size="10">:st_xcnt</param>
-            <param direction="Input" dbtype="Number" size="10">:st_ycnt</param>
-            <param direction="Input" dbtype="Number" size="10">:st_start_x</param>
-            <param direction="Input" dbtype="Number" size="10">:st_start_y</param>
-            <param direction="Input" dbtype="Int32" size="10">:die_index_min_x</param>
-            <param direction="Input" dbtype="Int32" size="10">:die_index_max_x</param>
-            <param direction="Input" dbtype="Int32" size="10">:die_index_min_y</param>
-            <param direction="Input" dbtype="Int32" size="10">:die_index_max_y</param>
-            <param direction="Input" dbtype="Int32" size="0">:xy_direction</param>
-            <param direction="Input" dbtype="Int32" size="10">:referance_setting</param>
-        </parameters>
-    </query>
     <query statement="Select" queryid="GET_MAPDEF_DIE" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[SELECT FACTORY, MAPID, DIE_TYPE, TO_NUMBER(DIE_NO) DIE_NO, INDEX_X, INDEX_Y
   FROM TQP_MAPDEF_DIE 

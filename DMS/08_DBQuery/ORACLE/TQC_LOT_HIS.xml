@@ -10,17 +10,6 @@
             <param direction="Input" dbtype="VarChar2" size="40" value="endtime">:endtime</param>
         </parameters>
     </query>    
-    <query statement="Select" queryid="SELECT_WAFER_LIST_BY_LOTIDS" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT DISTINCT WAFER_ID
-  FROM TQC_LOT_HIS_WAFER
-  WHERE 1 = 1 
-  AND LOT_ID IN (??)
-  ORDER BY WAFER_ID]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar2" size="40" value="sttime">:sttime</param>
-            <param direction="Input" dbtype="VarChar2" size="40" value="endtime">:endtime</param>
-        </parameters>
-    </query>    
     <query statement="Select" queryid="SELECT_LOT_HIS_GROUP" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[SELECT DISTINCT ??
   FROM TQC_LOT_HIS

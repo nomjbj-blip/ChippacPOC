@@ -16,16 +16,6 @@ WHERE CATEGORY = :category ORDER BY NAME]]></commandtext>
             <param direction="Input" dbtype="VarChar" size="100">:category</param>
         </parameters>
     </query>
-    <query statement="Select" queryid="SELECT_RND_YIELD_PERIOD_PARM" commandtype="Text" description="주어진 기간동안 특정 Parameter값의 Killer Ratio을 가져온다." commandtimeout="60">
-        <commandtext><![CDATA[SELECT * FROM TQD_YMODEL_RDY
-WHERE PARAMETER = :parameter
-AND STEP_SEQ IN (SELECT STEP_SEQ FROM TDMS_STEP WHERE RESULTTIMESTAMP BETWEEN :start AND :end)]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="100">:parameter</param>
-            <param direction="Input" dbtype="VarChar" size="19">:start</param>
-            <param direction="Input" dbtype="VarChar" size="19">:end</param>
-        </parameters>
-    </query>
     <query statement="Insert" queryid="CREATE_CONFIG_VALUE" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[INSERT INTO TQD_CONFIG(CATEGORY,NAME,VALUE,TYPE,DESCRIPTION)
 VALUES(:category,:name,:value,:type,:description)]]></commandtext>

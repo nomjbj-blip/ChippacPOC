@@ -71,38 +71,6 @@ ORDER BY COUNTX DESC,COUNTY DESC]]></commandtext>
             <param direction="Input" dbtype="VarChar" size="30" value="AAA">:mapid</param>
         </parameters>
     </query>
-    <query statement="Select" queryid="SELECT_MINMAX" commandtype="Text" description="x, y 의 Min Max 값을 가져 온다." commandtimeout="60">
-        <commandtext><![CDATA[SELECT MIN(X) MINX, MIN(Y) MINY, MAX(X) MAXX, MAX(Y) MAXY FROM TQP_USEMAP
-WHERE MAPID = :mapid
-AND USECODE <> 0]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="30">mapid</param>
-        </parameters>
-    </query>
-    <query statement="Select" queryid="SELECT_TARGETX" commandtype="Text" description="Target X 값을 가져온다." commandtimeout="60">
-        <commandtext><![CDATA[select min(x) from TQP_USEMAP
-where usecode = 1
-and y = :y
-and mapid = :mapid]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="Int32" size="0">y</param>
-            <param direction="Input" dbtype="VarChar" size="30">mapid</param>
-        </parameters>
-    </query>
-    <query statement="Select" queryid="SELECT_MINMAXTEST" commandtype="Text" description="Test된 x, y 의 Min Max 값을 가져 온다." commandtimeout="60">
-        <commandtext><![CDATA[SELECT MIN(X) MINX, MIN(Y) MINY, MAX(X) MAXX, MAX(Y) MAXY FROM TQP_USEMAP
-WHERE MAPID = :mapid
-AND USECODE = 1]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="30">mapid</param>
-        </parameters>
-    </query>
-    <query statement="Insert" queryid="CREATE_TEMPTABLE" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[CREATE TABLE ??
-AS SELECT *
-FROM TQP_USEMAP
-WHERE 1=0]]></commandtext>
-    </query>
     <query statement="Insert" queryid="COPY_DATA" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[INSERT INTO TQP_USEMAP
 SELECT * 

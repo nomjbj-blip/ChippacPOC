@@ -1,54 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
-    <query statement="Insert" queryid="INSERT_TQC_LOSS_YIELD_SUM" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[INSERT INTO TQC_LOSS_YIELD_SUM
-  SELECT YEAR,
-         MONTH,
-         DAY,
-         WEEK,
-         TRAN_DAY,
-         CUSTOMER,
-         DEVICE_ALIAS,
-         PRODUCT,
-         TESTAREA,
-         PROGRAM,
-         TESTER,
-         PROBE_CARD,
-         STEP_ID,
-         INSPECTION_EQ,
-         SUM (TESTED_DIE) AS TESTED_DIE,
-         SUM (DEFECTIVE_DIE) AS DEFECTIVE_DIE,
-         SUM (BAD_DIE_CNT) AS BAD_DIE_CNT,
-         ROUND(SUM (BAD_DIE_CNT) / SUM (DEFECTIVE_DIE) * 100, 2) AS KILL_RATIO,
-         SUM (NETDIE) AS NETDIE,
-         SUM (GOOD_CNT) AS GOOD_CNT,
-         SUM (BAD_CNT) AS BAD_CNT,
-         ROUND(SUM (BAD_CNT) / SUM (NETDIE) * 100, 2) AS LOSS_YIELD
-    FROM TQC_MATCH_SUM
-   WHERE     1 = 1
-         AND TEST_TRAN_TIME BETWEEN TO_DATE (
-                                TO_CHAR (SYSDATE - 1, 'YYYYMMDD')
-                                       || '060000',
-                                       'YYYYMMDD HH24MISS')
-                                AND TO_DATE (
-                                TO_CHAR (SYSDATE, 'YYYYMMDD')
-                                       || '055959',
-                                       'YYYYMMDD HH24MISS')
-GROUP BY YEAR,
-         MONTH,
-         DAY,
-         WEEK,
-         TRAN_DAY,
-         CUSTOMER,
-         DEVICE_ALIAS,
-         PRODUCT,
-         TESTAREA,
-         PROGRAM,
-         TESTER,
-         PROBE_CARD,
-         STEP_ID,
-         INSPECTION_EQ]]></commandtext>
-    </query>
     <query statement="Select" queryid="SELECT_FILTER_DATA" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[SELECT LOT_ID, WAFER_ID, PRODUCT, STEP_ID
     FROM TQC_MATCH_SUM

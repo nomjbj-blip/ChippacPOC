@@ -92,65 +92,17 @@ AVI        INTEGER
         <commandtext><![CDATA[SELECT * FROM TQP_PROGRAM
 WHERE PROGRAM IN ( ?? )]]></commandtext>
     </query>
-    <query statement="Delete" queryid="DROP_PROGRAM_TABLE" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[DROP TABLE ??]]></commandtext>
-    </query>
-    <query statement="Insert" queryid="CREATE_PROGRAM_SITE" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[INSERT INTO TQP_PROGRAM VALUES(
-:program,
-:version,
-:product,
-:testarea,
-SYSDATE,
-SYSDATE,
-:target_yield,
-'T',
-:siteCnt
-)
-]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="0" value="a">:program</param>
-            <param direction="Input" dbtype="VarChar" size="0">:version</param>
-            <param direction="Input" dbtype="VarChar" size="0" value="a">:product</param>
-            <param direction="Input" dbtype="VarChar" size="0" value="a">:testarea</param>
-            <param direction="Input" dbtype="Number" size="0">:target_yield</param>
-            <param direction="Input" dbtype="Number" size="0">:siteCnt</param>
-        </parameters>
-    </query>
     <query statement="Select" queryid="TABLE_EXIST" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[SELECT COUNT(*) AS CNT FROM USER_TABLES WHERE TABLE_NAME = :tName]]></commandtext>
         <parameters>
             <param direction="Input" dbtype="VarChar" size="0">:tName</param>
         </parameters>
     </query>
-    <query statement="Insert" queryid="CREATE_PROGRAM_TABLE_PCM" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[CREATE TABLE ??(
-WAFER_SEQ    NUMBER(8)    NOT NULL,
-DIEID        INTEGER    NOT NULL,
-X        INTEGER    NOT NULL,
-Y        INTEGER    NOT NULL
-??
-)
-]]></commandtext>
-    </query>
     <query statement="Insert" queryid="CREATE_IDX01" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[CREATE INDEX IDX_??01 ON ?? (WAFER_SEQ, X, Y)]]></commandtext>
     </query>
     <query statement="Insert" queryid="CREATE_IDX02" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[CREATE INDEX IDX_??02 ON ?? (WAFER_SEQ, BIN)]]></commandtext>
-    </query>
-    <query statement="Insert" queryid="CREATE_PCM_IDX01" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[CREATE INDEX IDX_??01 ON T_PCM_?? (WAFER_SEQ)]]></commandtext>
-    </query>
-    <query statement="Select" queryid="SELECT_PROGRAMINFO2" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT * FROM TQP_PROGRAM
-WHERE PRODUCT=:product
-AND PROGRAM = :program
-]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="0">:product</param>
-            <param direction="Input" dbtype="VarChar" size="0">:program</param>
-        </parameters>
     </query>
     <query statement="Select" queryid="GET_MAPDATA" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[SELECT * FROM TD_??
@@ -586,58 +538,6 @@ REEL_NO     NUMBER(3),
 REEL_POS    VarChar(10)
 )
  ]]></commandtext>
-    </query>
-    <query statement="Select" queryid="GET_BIN_DISTRIBUTION_FOR_AVI" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT DECODE(A.BIN,NULL,B.BIN,A.BIN) AS BIN
-, DECODE(A.BIN_NAME,NULL,'BIN' || B.BIN,A.BIN_NAME) AS BIN_NAME
-, CNT
-, NVL(COLOR, '#FFFFFF') AS COLOR
-, UPPER_LIMIT_CNT
-, LOWER_LIMIT_CNT 
-FROM
-    (WITH RT AS (
-    SELECT A.*,
-           (DECODE(A.CUSTOMER, :customer, 1, 0)
-           + DECODE(A.PRODUCT, :product, 10, 0)
-           + DECODE(A.TESTAREA, :testarea, 20, 0)
-           + DECODE(A.FORMAT, :format, 30, 0)) AS NUM 
-        FROM TQP_BINDESC A
-        WHERE 1=1
-        AND A.CUSTOMER IN (' ', :customer)
-        AND A.PRODUCT IN (' ',  :product)
-        AND A.TESTAREA IN (' ', :testarea)
-        --AND A.FORMAT IN (' ', :format)
-        )
-    SELECT * FROM RT
-    WHERE 1=1
-    AND NUM = (SELECT MAX(NUM) FROM RT)
-    ORDER BY BIN) A,
-    (SELECT 1 AS BIN, 1 AS CNT FROM DUAL
-    UNION
-    SELECT CLASSNUMBER AS BIN, 1 AS CNT
-    FROM TQD_DEFECT
-    WHERE STEP_SEQ = (SELECT STEP_SEQ
-                        FROM
-                        (
-                            SELECT * 
-                            FROM TQD_INSP_INFO
-                            WHERE LOT_ID = :lot_id
-                            AND WAFER_ID = :wafer_id
-                            AND STEP_ID = :testarea
-                        )
-                        WHERE ROWNUM = 1
-                    )
-    GROUP BY CLASSNUMBER) B
-WHERE A.BIN(+) = B.BIN
-ORDER BY BIN]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="40">:customer</param>
-            <param direction="Input" dbtype="VarChar" size="40">:product</param>
-            <param direction="Input" dbtype="VarChar" size="40">:testarea</param>
-            <param direction="Input" dbtype="VarChar" size="40">:format</param>
-            <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
-            <param direction="Input" dbtype="VarChar" size="40">:wafer_id</param>
-        </parameters>
     </query>
     <query statement="Insert" queryid="CREATE_TEMP_TABLE" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[-- Create Date : 2015-03-23 15:22:40

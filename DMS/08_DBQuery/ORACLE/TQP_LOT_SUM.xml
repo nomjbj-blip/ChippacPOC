@@ -32,18 +32,6 @@ GROUP BY PRODUCT]]></commandtext>
             <param direction="Input" dbtype="VarChar" size="0">:eTime</param>
         </parameters>
     </query>
-    <query statement="Select" queryid="YIELD_BY_LOT" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT MIN(START_TIME) START_TIME, MAX(END_TIME) END_TIEM, LOT_ID, ROUND(AVG(YIELD), 2) YIELD, SUM(WAFERS) WAFERS FROM TQP_LOT_SUM
-WHERE END_TIME BETWEEN TO_DATE(:sTime,'YYYY-MM-DD') AND TO_DATE(:eTime,'YYYY-MM-DD')
-AND TESTAREA='MULTIPROBE'
-AND PRODUCT=:product
-GROUP BY LOT_ID]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="0">:sTime</param>
-            <param direction="Input" dbtype="VarChar" size="0">:eTime</param>
-            <param direction="Input" dbtype="VarChar" size="0">:product</param>
-        </parameters>
-    </query>
     <query statement="Select" queryid="GET_ISLOT" commandtype="Text" description="해당 Lot 유무를 조회한다" commandtimeout="60">
         <commandtext><![CDATA[SELECT LOT_SEQ FROM TQP_LOT_SUM WHERE LOT_SEQ = :lot_seq]]></commandtext>
         <parameters>

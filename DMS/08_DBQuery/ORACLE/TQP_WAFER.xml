@@ -96,19 +96,6 @@ WHERE WAFER_SEQ = :wafer_seq]]></commandtext>
             <param direction="Input" dbtype="Number" size="0">:loss_die</param>
         </parameters>
     </query>
-    <query statement="Select" queryid="GET_TESTWAFER_SEQ" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT WAFER_SEQ FROM TQP_WAFER
-WHERE WAFER_ID = :wafer_id
-AND LOT_SEQ = (SELECT LOT_SEQ FROM TQP_LOT
-               WHERE TESTAREA = 'MULTIPROBE'
-               AND PRODUCT = :product
-               AND LOT_ID = :lot_id)]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="30" value="03">:wafer_id</param>
-            <param direction="Input" dbtype="VarChar" size="30" value="LGDP4213A">:product</param>
-            <param direction="Input" dbtype="VarChar" size="30" value="LGJ03804.1">:lot_id</param>
-        </parameters>
-    </query>
     <query statement="Select" queryid="GET_TESTPROGRAM" commandtype="Text" description="Tset Program을 가져온다." commandtimeout="60">
         <commandtext><![CDATA[SELECT PROGRAM FROM TQP_LOT
 WHERE LOT_SEQ = (SELECT LOT_SEQ FROM TQP_WAFER
@@ -143,17 +130,6 @@ AND PROBE_CNT = 0]]></commandtext>
         <parameters>
             <param direction="Input" dbtype="Number" size="9">:lot_seq</param>
             <param direction="Input" dbtype="VarChar" size="30">:wafer_id</param>
-        </parameters>
-    </query>
-    <query statement="Select" queryid="GET_WAFER_SEQ_PROBECNT" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT WAFER_SEQ FROM TQP_WAFER 
-WHERE LOT_SEQ = :lot_seq 
-AND TRIM(UPPER(WAFER_ID)) = TRIM(UPPER(:wafer_id))
-AND PROBE_CNT = :probe_cnt]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="Number" size="9">:lot_seq</param>
-            <param direction="Input" dbtype="VarChar" size="30">:wafer_id</param>
-            <param direction="Input" dbtype="Int32" size="0">:probe_cnt</param>
         </parameters>
     </query>
     <query statement="Select" queryid="UPDATE_TESTDIE" commandtype="Text" description="Test Die 수를 Update 한다" commandtimeout="60">
@@ -261,44 +237,6 @@ AND M.WAFER_SEQ = S5.WAFER_SEQ]]></commandtext>
             <param direction="Input" dbtype="VarChar" size="20">:program</param>
             <param direction="Input" dbtype="VarChar" size="20" value="HFEN_A1$100U">:item</param>
             <param direction="Input" dbtype="Number" size="20">:waferseq</param>
-        </parameters>
-    </query>
-    <query statement="Select" queryid="GET_STDREPORT_5SITE" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT LW.PROGRAM,LW.LOT_ID,LW.WAFER_ID,SP.ITEM,S1.SITE AS SITE1,S2.SITE AS SITE2,S3.SITE AS SITE3,S4.SITE AS SITE4, S5.SITE AS SITE5,M.MINV,M.MAXV,M.AVGV,M.STDV,SP.LSL,'                         ' AS VALUEPOS,SP.USL,SP.UNIT FROM
-(SELECT PROGRAM
-    ,LOT_ID
-    ,WAFER_ID
-    ,WAFER_SEQ 
-    FROM BUMPFA.TQP_LOT L,BUMPFA.TQP_WAFER W
-    WHERE TESTAREA='PARAMETRIC' AND L.LOT_SEQ = W.LOT_SEQ) LW,
-(SELECT PROGRAM
-    ,ITEM
-    ,DECODE(LOWER_LIMIT,1E37,1E18,-1E37,-1E18,LOWER_LIMIT) as LSL
-    ,DECODE(UPPER_LIMIT,1E37,1E18,-1E37,-1E18,UPPER_LIMIT) as USL
-    ,UNIT
-     FROM BUMPFA.TQP_PARASPEC 
-    WHERE TESTAREA='PARAMETRIC'
-    AND PROGRAM =:program 
-    AND ITEM=:item) SP,
-(SELECT WAFER_SEQ, MIN("??") AS MINV,MAX("??") AS MAXV,TRUNC(AVG("??"),4) AS AVGV,TRUNC(STDDEV("??"),4) AS STDV FROM BUMPFA.T_PCM_?? GROUP BY WAFER_SEQ) M,
-(SELECT WAFER_SEQ,"??" AS SITE FROM BUMPFA.T_PCM_?? WHERE DIEID=1) S1,
-(SELECT WAFER_SEQ,"??" AS SITE FROM BUMPFA.T_PCM_?? WHERE DIEID=4) S2,
-(SELECT WAFER_SEQ,"??" AS SITE FROM BUMPFA.T_PCM_?? WHERE DIEID=5) S3,
-(SELECT WAFER_SEQ,"??" AS SITE FROM BUMPFA.T_PCM_?? WHERE DIEID=6) S4,
-(SELECT WAFER_SEQ,"??" AS SITE FROM BUMPFA.T_PCM_?? WHERE DIEID=9) S5
-WHERE LW.WAFER_SEQ = :waferseq
-AND LW.PROGRAM = SP.PROGRAM
-AND LW.WAFER_SEQ = M.WAFER_SEQ
-AND M.WAFER_SEQ = S1.WAFER_SEQ
-AND M.WAFER_SEQ = S2.WAFER_SEQ
-AND M.WAFER_SEQ = S3.WAFER_SEQ
-AND M.WAFER_SEQ = S4.WAFER_SEQ
-AND M.WAFER_SEQ = S5.WAFER_SEQ
-]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="0">:program</param>
-            <param direction="Input" dbtype="VarChar" size="0">:item</param>
-            <param direction="Input" dbtype="Number" size="0">:waferseq</param>
         </parameters>
     </query>
     <query statement="Select" queryid="SITE_CNT" commandtype="Text" commandtimeout="60">

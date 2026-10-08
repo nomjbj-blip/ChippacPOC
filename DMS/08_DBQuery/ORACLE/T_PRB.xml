@@ -177,13 +177,6 @@ AND A.WAFER_SEQ = :wafer_seq
             <param direction="Input" dbtype="Number" size="8">:wafer_seq</param>
         </parameters>
     </query>
-    <query statement="Select" queryid="SELECT_BINDATA_MULTI" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT BIN, COUNT(*)  
-FROM ?? 
-WHERE WAFER_SEQ IN (??)
-GROUP BY BIN
-]]></commandtext>
-    </query>
     <query statement="Insert" queryid="COPY_ROW_DATA_FOR_AOI" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[INSERT INTO ?? (WAFER_SEQ, DIEID, X, Y, BIN, CHARBIN)
 SELECT :wafer_seq AS WAFER_SEQ, DIEID, X, Y, BIN, CHARBIN
@@ -293,14 +286,6 @@ CALL BUMPFA.proc_run_prb_summary(:testarea, :product, :program, :wafer_seq, :gec
             <param direction="Input" dbtype="VarChar" size="40">:program</param>
             <param direction="Input" dbtype="VarChar" size="40">:wafer_seq</param>
             <param direction="Input" dbtype="VarChar" size="40">:gec_bin</param>
-        </parameters>
-    </query>
-    <query statement="Insert" queryid="INSERTD_BYUSEMAP" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[-- Create Date : 2015-04-14 09:53:03
-INSERT INTO ?? SELECT :wafer_seq, ROWNUM, X, Y, 0, 0, '0', 0, 0, 0 FROM TQP_USEMAP WHERE MAPID = :mapid AND USECODE > 0]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="40">:wafer_seq</param>
-            <param direction="Input" dbtype="VarChar" size="40">:mapid</param>
         </parameters>
     </query>
 </queryxml>

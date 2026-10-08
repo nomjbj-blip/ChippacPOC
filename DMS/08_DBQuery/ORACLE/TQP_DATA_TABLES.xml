@@ -1,32 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <queryxml conid="TPSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
-    <query statement="Select" queryid="SELECT_COLUMN_LIST" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT SUBSTR (
-          XMLAGG (XMLELEMENT (X, ',', COLUMN_NAME) ORDER BY
-                                                      DECODE (
-                                                         COLUMN_NAME,
-                                                         'WAFER_SEQ', 1,
-                                                         'DIE_NUM', 2,
-                                                         'X', 3,
-                                                         'Y', 4,
-                                                         'BIN', 5,
-                                                         'SITE', 6,
-                                                         'STEPNUM', 7,
-                                                         'TESTTIME', 8,
-                                                         'UNIT_START_TIME', 9),
-                                                      COLUMN_NAME).EXTRACT ('//text()').GETCLOBVAL (),2)
-          AS COLUMN_NAME
-  FROM (  SELECT DISTINCT TO_CHAR (COLUMN_NAME) AS COLUMN_NAME
-            FROM ALL_TAB_COLUMNS
-           WHERE     1 = 1
-                 AND TABLE_NAME IN (SELECT TABLE_NAME
-                                      FROM TQP_DATA_TABLES
-                                      WHERE PROGRAM = :pgm)
-        GROUP BY COLUMN_NAME)]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="40">:pgm</param>
-        </parameters>
-    </query>
     <query statement="Select" queryid="SELECT_TABLE_LIST" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[SELECT ROWNUM AS RN, TQP_DATA_TABLES.*
   FROM TQP_DATA_TABLES
@@ -56,31 +29,6 @@ ORDER BY TABLE_NAME]]></commandtext>
             <param direction="Input" dbtype="VarChar" size="0">:FACTORY</param>
             <param direction="Input" dbtype="VarChar" size="0">:PROGRAM</param>
             <param direction="Input" dbtype="VarChar" size="0">:TABLE_NAME</param>
-        </parameters>
-    </query>
-    <query statement="Select" queryid="SELECT_TQP_DATA_TABLES_ALL" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[  SELECT TABLE_NAME, PROGRAM
-    FROM TQP_DATA_TABLES
-ORDER BY TABLE_NAME]]></commandtext>
-    </query>
-    <query statement="Select" queryid="SELECT_SYSTEM_COLS" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[  SELECT TABLE_NAME,
-         COLUMN_NAME,
-         DATA_TYPE,
-         DATA_LENGTH
-    FROM COLS
-   WHERE     1 = 1
-   AND TABLE_NAME = :table_name
-         AND COLUMN_NAME NOT IN ('DIEPROBE_CNT', 'DIE_NUM', 'WAFER_SEQ')
-         AND COLUMN_NAME NOT IN (SELECT DISTINCT PARAM_NAME
-                                   FROM TQP_PARASPEC
-                                  WHERE     1 = 1
-                                        AND PROGRAM = :pgm
-                                        AND TABLE_NAME = :table_name)
-ORDER BY COLUMN_NAME]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar2" size="0" value="table_name">:table_name</param>
-            <param direction="Input" dbtype="VarChar2" size="40" value="pgm">:pgm</param>
         </parameters>
     </query>
     <query statement="Select" queryid="SELECT_PROGRAM_AND_TABLE" commandtype="Text" commandtimeout="60">

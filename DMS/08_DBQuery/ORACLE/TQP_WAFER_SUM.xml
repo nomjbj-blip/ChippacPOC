@@ -231,19 +231,6 @@ WHERE WAFER_SEQ IN (??)
 GROUP BY TO_CHAR(END_TIME, 'yyyy-MM-dd')
 ORDER BY "DATE"]]></commandtext>
     </query>
-    <query statement="Select" queryid="GET_WAFER_LIST_02" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT * FROM TQP_WAFER_SUM
-WHERE END_TIME BETWEEN TO_DATE(:sTime,'YYYY-MM-DD') AND TO_DATE(:eTime,'YYYY-MM-DD')
-AND TESTAREA='MULTIPROBE'
-AND PRODUCT=:product
-AND LOT_ID IN (??)
-]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="0">:sTime</param>
-            <param direction="Input" dbtype="VarChar" size="0">:eTime</param>
-            <param direction="Input" dbtype="VarChar" size="0">:product</param>
-        </parameters>
-    </query>
     <query statement="Select" queryid="GET_WAFERINFO" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[SELECT * FROM TQP_WAFER_SUM
 WHERE TESTAREA=:testarea
@@ -359,72 +346,6 @@ WHERE WAFER_SEQ = :wafer_seq
             <param direction="Input" dbtype="Number" size="0">:loss_die</param>
         </parameters>
     </query>
-    <query statement="Select" queryid="SELECT_WAFER_ID_AVI" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT DISTINCT WAFER_ID FROM TQP_WAFER_SUM
-WHERE PRODUCT = :product
-AND PROGRAM = :program
-AND LOT_ID = :lot_id
-AND TESTAREA = 'AVI'
-ORDER BY to_number(WAFER_ID)]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="30">:product</param>
-            <param direction="Input" dbtype="VarChar" size="30">:program</param>
-            <param direction="Input" dbtype="VarChar" size="30">:lot_id</param>
-        </parameters>
-    </query>
-    <query statement="Select" queryid="SELECT_WAFER_ID_RETEST" commandtype="Text" description="WaferID 와 Retest 정보를 가져온다." commandtimeout="60">
-        <commandtext><![CDATA[SELECT TA.WAFER_ID, PROBE_CNT, RETESTCOUNT, TA.WAFER_ID || '     ' || TO_CHAR(PROBE_CNT) RNAME FROM
-(SELECT WAFER_ID, PROBE_CNT FROM TQP_WAFER_SUM
-WHERE PRODUCT = :product
-AND PROGRAM = :program
-AND LOT_ID = :lot_id) TA,
-(SELECT WAFER_ID, COUNT(PROBE_CNT) RETESTCOUNT FROM TQP_WAFER_SUM
-WHERE PRODUCT = :product
-AND PROGRAM = :program
-AND LOT_ID = :lot_id
-GROUP BY WAFER_ID) TB
-WHERE TA.WAFER_ID = TB.WAFER_ID
-AND PROBE_CNT IN( ?? )
-ORDER BY WAFER_ID, PROBE_CNT]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="30" value="LGDP4213A">:product</param>
-            <param direction="Input" dbtype="VarChar" size="30" value="LGDP4213A-EDS-REV1A">:program</param>
-            <param direction="Input" dbtype="VarChar" size="30" value="LGJ03810.1">:lot_id</param>
-        </parameters>
-    </query>
-    <query statement="Select" queryid="SELECT_PROBE_CNT" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT DISTINCT PROBE_CNT FROM TQP_WAFER_SUM
-WHERE PRODUCT = :product
-AND PROGRAM = :program
-AND LOT_ID = :lot_id]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="30">:product</param>
-            <param direction="Input" dbtype="VarChar" size="30">:program</param>
-            <param direction="Input" dbtype="VarChar" size="30">:lot_id</param>
-        </parameters>
-    </query>
-    <query statement="Select" queryid="SELECT_WAFER_ID_VI" commandtype="Text" description="VI data 가 있는 Wafer 만 가져온다." commandtimeout="60">
-        <commandtext><![CDATA[SELECT WAFER_ID FROM
-(SELECT DISTINCT WAFER_ID, WAFER_SEQ FROM TQP_WAFER_SUM
-WHERE PRODUCT = :product
-AND PROGRAM = :program
-AND LOT_ID = :lot_id
-AND PROBE_CNT = 0) TA,
-(SELECT WAFER_SEQ, COUNT(*) FROM ??
-WHERE WAFER_SEQ IN (SELECT DISTINCT WAFER_SEQ FROM TQP_WAFER_SUM
-                    WHERE PRODUCT = :product
-                    AND PROGRAM = :program
-                    AND LOT_ID = :lot_id
-                    AND PROBE_CNT = 0)
-AND VISUALINSP <> 0
-GROUP BY WAFER_SEQ) TB
-WHERE TA.WAFER_SEQ = TB.WAFER_SEQ]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="30">:product</param>
-            <param direction="Input" dbtype="VarChar" size="30">:program</param>
-            <param direction="Input" dbtype="VarChar" size="30">:lot_id</param>
-        </parameters>
-    </query>
     <query statement="Insert" queryid="CREATE_DEVICE_TABLE" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[CREATE TABLE ??(
 WAFER_SEQ    NUMBER(8)    NOT NULL,
@@ -439,9 +360,6 @@ VISUALINSP    INTEGER,
 AVI        INTEGER
 )
 ]]></commandtext>
-    </query>
-    <query statement="Select" queryid="Select_MaxWaferSeq" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[ Select max(WAFER_SEQ) from ??]]></commandtext>
     </query>
     <query statement="Select" queryid="GET_WAFER_INFO_MULTI_OVER_THOUSAND" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[select * from TQP_WAFER_SUM WHERE WAFER_SEQ in (select level from dual connect by level <= ??) AND WAFER_SEQ >= ?? AND WAFER_SEQ <= ??]]></commandtext>
@@ -483,11 +401,6 @@ AND PROBE_CNT = 0  ]]></commandtext>
             <param direction="Input" dbtype="VarChar" size="40" value="AK8293360-21">:wafer_id</param>
             <param direction="Input" dbtype="VarChar" size="40" value="MULTIPROBE">:testarea</param>
         </parameters>
-    </query>
-    <query statement="Select" queryid="GET_ONLYVI_ALL" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT COUNT(*) CNT FROM TD_??
-WHERE WAFER_SEQ = :wafer_seq
-AND BIN=0 AND AVI=0 AND VISUALINSP>0]]></commandtext>
     </query>
     <query statement="Select" queryid="SELECT_WAFER_SUM_MAX_SEQ_MERGE" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[SELECT MAX(WAFER_SEQ)
@@ -598,12 +511,6 @@ AND PROBE_CNT = 0]]></commandtext>
             <param direction="Input" dbtype="VarChar" size="40">:testarea</param>
             <param direction="Input" dbtype="VarChar" size="40">:lot_id</param>
         </parameters>
-    </query>
-    <query statement="Select" queryid="SELECT_GOLDEN_CHECK_MERGE" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT GOLDEN_CHECK, WAFER_ID
-FROM TQP_WAFER_SUM
-WHERE LOT_ID = :lot_id
-AND WAFER_ID IN ]]></commandtext>
     </query>
     <query statement="Select" queryid="SELECT_GOLDEN_CHECK_1" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[SELECT X,Y
@@ -939,14 +846,6 @@ AND TESTAREA = :TESTAREA]]></commandtext>
             <param direction="Input" dbtype="VarChar" size="0">:LOT_ID</param>
             <param direction="Input" dbtype="VarChar" size="0">:TESTAREA</param>
         </parameters>
-    </query>
-    <query statement="Select" queryid="SELECT_DMS_WAFER_BY_LOT" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[-- Create Date : 2014-12-01 10:51:37
-SELECT * FROM TQP_WAFER_SUM
-WHERE LOT_SEQ = :LOT_SEQ
-AND LOT_ID = :LOT_ID
-AND TESTAREA = :TESTAREA
-AND PROBE_CNT = 0]]></commandtext>
     </query>
     <query statement="Select" queryid="SELECT_WAFER_INFO_BY_LOT_SLOT" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[-- Create Date : 2015-03-19 14:57:44
@@ -2082,17 +1981,6 @@ SELECT 'DB',
  AND A.LOT_SEQ = B.LOT_SEQ]]></commandtext>
         <parameters>
             <param direction="Input" dbtype="VarChar" size="0" value="wafer_seq">:wafer_seq</param>
-        </parameters>
-    </query>
-    <query statement="Select" queryid="SELECT_WAFER_SEARCH" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT *
-  FROM TQP_WAFER_SUM
- WHERE 1 = 1 
- AND WAFER_SEQ = :wafer_seq
- AND PROBE_CNT = :prbcnt]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="40" value="wafer_seq">:wafer_seq</param>
-            <param direction="Input" dbtype="VarChar" size="40" value="prbcnt">:prbcnt</param>
         </parameters>
     </query>
     <query statement="Select" queryid="GET_WAFER_SUMMARY_INFO [LSEQ]" commandtype="Text" commandtimeout="60">
