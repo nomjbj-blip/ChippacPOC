@@ -127,7 +127,6 @@ namespace DACrux.TEST.ENGUI
                 panelMap.SuspendLayout();
                 for (int i = 0; i < m_WaferSeqs.Length; i++)
                 {
-                    //Invoke(OnMapCreate);
                     Gallery_OnMapCreate();
 
                     ultraProgressBar.Value = i + 1;
@@ -150,7 +149,6 @@ namespace DACrux.TEST.ENGUI
 
         private void Gallery_Load(object sender, System.EventArgs e)
         {
-            //if(!DesignMode) timer.Enabled = true;
 
             if (DesignMode) return;
 
@@ -176,7 +174,6 @@ namespace DACrux.TEST.ENGUI
                 endCreateMap = false;
                 endDrawMap = false;
 
-                //panelMap.Controls.Clear();
                 DACrux.TEST.ENGUI.WrapMap map = null;
                 for (int i = panelMap.Controls.Count - 1; i >= 0; i--)
                 {
@@ -192,14 +189,11 @@ namespace DACrux.TEST.ENGUI
                 CheckForIllegalCrossThreadCalls = false;
                 thread.Start();
 
-                //CreateMapNoInvoke();
-
                 System.Threading.Thread threadDraw = new System.Threading.Thread(
                     new System.Threading.ThreadStart(DrawWaferMapThread));
                 threadDraw.Name = "Draw map";
                 threadDraw.Start();
 
-                //DrawWaferMapThread();
             }
             catch (Exception ex)
             {
@@ -213,12 +207,7 @@ namespace DACrux.TEST.ENGUI
             {
                 timer.Enabled = false;
 
-                //CreateMap();
-
                 //				System.Threading.Thread thread = new System.Threading.Thread(
-                //					new System.Threading.ThreadStart(CreateMap));
-                //				thread.Name = "맵을 그립니다.";
-                //				thread.Start();
             }
         }
 
@@ -521,7 +510,6 @@ namespace DACrux.TEST.ENGUI
                     {
                         tmpColor = ColorTranslator.FromHtml(ds.Tables["BINSUM"].Rows[i]["COLOR"].ToString());
                         wMap.SetColor(DACrux.Base.Convert.intParse(ds.Tables["BINSUM"].Rows[i]["BIN"].ToString()), tmpColor);
-                        //m_wcZonal.SetColor(DACrux.Base.Convert.intParse(ds.Tables[0].Rows[i]["BIN"].ToString()), chart1.Series[0].Points[i].Color);
                     }
                 }
 
@@ -571,7 +559,6 @@ namespace DACrux.TEST.ENGUI
                     strInfo[0] = string.Format("DEVICE  :{0}", ds.Tables["WAFER_INFO"].Rows[0]["PRODUCT"].ToString());
                     strInfo[1] = string.Format("PROGRAM :{0}", ds.Tables["WAFER_INFO"].Rows[0]["PROGRAM"].ToString());
                     strInfo[2] = string.Format("WAFER_ID:{0}", ds.Tables["WAFER_INFO"].Rows[0]["WAFER_ID"].ToString());
-                    //strInfo[3] = string.Format("YIELD   :{0:0.0#} %", ds.Tables["WAFER_INFO"].Rows[0]["YIELD"].ToString());
 
                     float fTemp = 0;
                     if (float.TryParse(ds.Tables["WAFER_INFO"].Rows[0]["YIELD"].ToString(), out fTemp) == false)
@@ -688,7 +675,6 @@ namespace DACrux.TEST.ENGUI
             else if (map.Parent.Name.Equals("panelSingle"))
             {
                 panelMap.BringToFront();
-                //ControlEnableSingle(false);
             }
         }
 
@@ -766,22 +752,6 @@ namespace DACrux.TEST.ENGUI
             DACrux.Utility.ExcelSheet sheet = new DACrux.Utility.ExcelSheet();
 
             ////int colCnt = DACrux.Base.Convert.intParse(comboBoxCol.Text);
-            //List<Image> lsImages = new List<Image>();
-            //Bitmap bmp = null;
-            //Rectangle rect;
-            //for (int i = 0; i < panelMap.Controls.Count; i++)
-            //{
-            //    rect = ((DACrux.TEST.ENGUI.WrapMap)panelMap.Controls[i]).DisplayRectangle;
-            //    bmp = new Bitmap(rect.Width, rect.Height);
-            //    ((DACrux.TEST.ENGUI.WrapMap)panelMap.Controls[i]).DrawToBitmap(bmp, new Rectangle(0, 0, rect.Width, rect.Height));
-
-            //    lsImages.Add(bmp);
-            //}
-
-            //if (lsImages.Count <= 0)
-            //    return;
-
-            //sheet.Add(lsImages.ToArray());
 
             for (int i = 0; i < panelMap.Controls.Count; i++)
             {

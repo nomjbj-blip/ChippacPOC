@@ -369,7 +369,6 @@ namespace DACrux.MapAnalysis.Control
                 (DataSource as DataSet).Tables["MAPDATA"]
                 );
 
-            //DrawWafer(false, string.Empty, nAngle);
             mapContainer.Controls.Clear();
             mapContainer.Refresh();
 

@@ -167,8 +167,6 @@ namespace DACrux.SEMDMS.DSL
             {
                 //업무 로직 구현
                 this.Execute("CREATE_DEFECT", null, DefectInfo);
-                //ContextUtil.SetComplete();
-                //Tx 명시적 호출
             }
             catch (Exception ex)
             {
@@ -176,8 +174,6 @@ namespace DACrux.SEMDMS.DSL
                 dtLoggingTime = DateTime.Now;
                 Debug.WriteLine(dtLoggingTime.ToString("G", DateTimeFormatInfo.InvariantInfo));
 
-                //Tx 명시적 호출
-                //ContextUtil.SetAbort();
                 //예외처리
                 throw this.ProcessErr(ex);
             }
@@ -197,11 +193,9 @@ namespace DACrux.SEMDMS.DSL
             try
             {
                 dt = this.GetDataTable("SELECT_DEFECT_COUNT", null, new string[2] { DefectInfo[2], DefectInfo[0] });
-                //ContextUtil.SetComplete();
             }
             catch (Exception ex)
             {
-                //ContextUtil.SetAbort();
                 //예외처리
                 throw this.ProcessErr(ex);
             }
@@ -223,11 +217,9 @@ namespace DACrux.SEMDMS.DSL
             try
             {
                 dt = this.GetDataTable("SELECT_DEFECT_COUNT2", null, new string[] { stepSeq });
-                //ContextUtil.SetComplete();
             }
             catch (Exception ex)
             {
-                //ContextUtil.SetAbort();
                 //예외처리
                 throw this.ProcessErr(ex);
             }
@@ -321,13 +313,9 @@ namespace DACrux.SEMDMS.DSL
                 /// Excute로 하면 Error남
                 /// ==================================================================
                 this.Execute("CREATE_TEMP_TABLE", tabinfo, null);
-                //Tx 명시적 호출
-                //ContextUtil.SetComplete();
             }
             catch (Exception ex)
             {
-                //Tx 명시적 호출
-                //ContextUtil.SetAbort();
                 //예외처리
                 throw this.ProcessErr(ex);
             }

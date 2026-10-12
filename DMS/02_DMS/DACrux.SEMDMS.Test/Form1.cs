@@ -34,8 +34,6 @@ namespace DACrux.SEMDMS.Test
 
                 List<string> lsItem = new List<string>();
                 lsItem.Add("-K");
-                //lsItem.Add(@"D:\HitekResultFile\KLA\A9078510________@TRET____05.smf");
-                //lsItem.Add(@"D:\HitekResultFile\KLA\A9078510________@TRET____24.smf");
                 lsItem.Add(TxtPath.Text.Trim());
                     
                 lsItem.Add("-C");

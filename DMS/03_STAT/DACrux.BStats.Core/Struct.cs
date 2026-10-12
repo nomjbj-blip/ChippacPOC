@@ -121,8 +121,6 @@ namespace DACrux.BStats.Core
     public struct SelectedCorrelation
     {
         public bool IsPvalue;
-        //public bool IsScatter;
-        //public bool IsRegression;
         public bool IsSpearman;
         /// <summary>
         /// 초기상태로 세팅
@@ -130,8 +128,6 @@ namespace DACrux.BStats.Core
         public void Reset()
         {
             IsPvalue = true;
-            //IsScatter = true;
-            //IsRegression = true;
             IsSpearman = false;
         }
     }
@@ -151,8 +147,6 @@ namespace DACrux.BStats.Core
 
     public struct SelectedCapaContinuous
     {
-        //public bool IsUseConstantForSubgroupSize;
-        //public int SubGroupSize;
         public double LowerSpec;
         public double UpperSpec;
         public double HistoricalMean;
@@ -168,8 +162,6 @@ namespace DACrux.BStats.Core
         /// </summary>
         public void Reset()
         {
-            //IsUseConstantForSubgroupSize = false;
-            //SubGroupSize = 0;
             LowerSpec = double.NaN;
             UpperSpec = double.NaN;
             HistoricalMean = double.NaN;
@@ -270,8 +262,6 @@ namespace DACrux.BStats.Core
 
         #region Within Capability
         public double CpWithin;
-        //public double CpWithin_Lower;
-        //public double CpWithin_Upper;
         public double CPLWithin;
         public double CPUWithin;
 
@@ -280,15 +270,11 @@ namespace DACrux.BStats.Core
         public double ZuslWithin;
 
         public double CpkWithin;
-        //public double CpkWithin_Lower;
-        //public double CpkWithin_Upper;
         public double CCpkWithin;
         #endregion
 
         #region  B/W Capability
         public double CpBW;
-        //public double CpBW_Lower;
-        //public double CpBW_Upper;
         public double CPLBW;
         public double CPUBW;
 
@@ -298,15 +284,11 @@ namespace DACrux.BStats.Core
 
 
         public double CpkBW;
-        //public double CpkBW_Lower;
-        //public double CpkBW_Upper;
         public double CCpkBW;
         #endregion
 
         #region Overall Capability
         public double Pp;
-        //public double Pp_Lower;
-        //public double Pp_Upper;
         public double PPL;
         public double PPU;
 
@@ -317,10 +299,7 @@ namespace DACrux.BStats.Core
 
 
         public double Ppk;
-        //public double Ppk_Lower;
-        //public double Ppk_Upper;
         public double Cpm;
-        //public double Cpm_Lower;
         #endregion
 
     }

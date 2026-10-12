@@ -46,8 +46,6 @@ namespace DACrux.SEMDMS.Interface
 
         #region [TQD_IMAGES]
 
-        //void CreateImages(string[] ImageInfo);
-
         #endregion
 
         #region [TQD_PRODUCT]

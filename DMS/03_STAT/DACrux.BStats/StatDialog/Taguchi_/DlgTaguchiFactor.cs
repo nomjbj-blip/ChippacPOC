@@ -232,7 +232,6 @@ namespace DACrux.BStats.StatDialog.DlgTaguchi_
                         m_FactorInfos[iRow].Column = int.Parse(fpSpread1.ActiveSheet.Cells[iRow, iCol].Value.ToString());
                         break;
                     case 3: // Read Only
-                        //m_FactorInfos[iRow].Level = (int)fpSpread1.ActiveSheet.Cells[iRow, iCol].Value;
                         break;
                 }
 

@@ -279,19 +279,6 @@ namespace DACrux.BStats.StatDialog
             {
                 throw ex;
             }
-            //List<int> arrReturn = null;
-            //try
-            //{
-            //    arrReturn = new List<int>(OrigSource);
-            //    foreach (int i in arrRemoveFactor)
-            //    {
-            //        arrReturn.Remove(i);
-            //    }
-            //    return arrReturn.ToArray();
-            //}catch(Exception ex)
-            //{
-            //    throw ex;
-            //}
         }
 
         private bool CheckSelectedVar()
@@ -802,7 +789,6 @@ namespace DACrux.BStats.StatDialog
             try
             {
                 SelectedRegressionOptions oSelectedRegressionOptions = new SelectedRegressionOptions();
-                //oSelectedRegressionOptions.Reset();
 
                 oSelectedRegressionOptions.arrGraphVariablesVsResiduals = m_Input.arrGraphVariablesVsResiduals;
                 oSelectedRegressionOptions.IsGraphHistogramResiduals = m_Input.IsGraphHistogramResiduals;
@@ -859,7 +845,6 @@ namespace DACrux.BStats.StatDialog
             try
             {
                 SelectedRegressionMethods oSelectedRegressionMethods = new SelectedRegressionMethods();
-                //oSelectedRegressionMethods.Reset();
                 oSelectedRegressionMethods.arrIncludePredictors = m_Input.arrIncludePredictors;
                 oSelectedRegressionMethods.arrPredictorsInitialModel = m_Input.arrPredictorsInitialModel;
                 oSelectedRegressionMethods.backwardDrop = m_Input.backwardDrop;

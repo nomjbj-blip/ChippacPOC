@@ -25,11 +25,6 @@ namespace DACrux.BStats.Statistics
 
 
         #region [ LANGUAGE ]
-        //string m_PearsonCorrelation = "Pearson correlation";
-        //string m_Pvalue = "P-Value";
-        //string m_Spearman = "Spearman's Rho";
-        //string m_RegressionEquation = "Regression Equation";
-        //string m_ScatterPlot = "ScatterPlot";
 
         #endregion
 
@@ -41,7 +36,6 @@ namespace DACrux.BStats.Statistics
         /// <summary>
         /// Result For Html File
         /// </summary>
-        //private DACruxTable m_dctResult = null;
 
         /// <summary>
         /// Result For Html File

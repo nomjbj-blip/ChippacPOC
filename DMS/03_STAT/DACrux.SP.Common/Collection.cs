@@ -205,9 +205,6 @@ namespace DACrux.SP.Common
         {
             bool bResult = base.Remove(this[item.Name]);
 
-            //foreach (ISectionItem child in this)
-            //    child.Parent = null;
-
             if (ItemRemoved != null)
                 ItemRemoved(item);
 
@@ -285,16 +282,6 @@ namespace DACrux.SP.Common
 
             return bResult;
         }
-
-        //public new void RemoveAll(Predicate<ITask> match)
-        //{
-        //    var list = from Task e in base.ToArray()
-        //               where match(e)
-        //               select e;
-
-        //    foreach (ITask task in list)
-        //        Remove(task);
-        //}
 
         public new void RemoveAt(int index)
         {

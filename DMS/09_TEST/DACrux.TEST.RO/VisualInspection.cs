@@ -31,18 +31,6 @@ namespace DACrux.TEST.RO
         }
 
 
-        //public DataTable SelectAreaGroup(string TestArea)
-        //{
-        //    try
-        //    {
-        //        return m_OBJ.SelectAreaGroup(TestArea);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw ex;
-        //    }
-        //}
-
         public long GetNextLotSeq()
         {
             try
@@ -123,18 +111,6 @@ namespace DACrux.TEST.RO
             }
         }
 
-        //public DataSet GetStepListByStepID(string TestArea, string StartTime, string EndTime, string LikeDevice, string LikeLot, string LikeWafer)
-        //{
-        //    try
-        //    {
-        //        return m_OBJ.GetStepListByStepID(TestArea, StartTime, EndTime, LikeDevice, LikeLot, LikeWafer);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw ex;
-        //    }
-        //}
-
         public DataTable GetWaferList(string TestArea, string StartTime, string EndTime, string LikeDevice, string LikeLot, string LikeWafer)
         {
             try
@@ -146,30 +122,6 @@ namespace DACrux.TEST.RO
                 throw ex;
             }
         }
-
-        //public DataSet GetStepListByStepID(string TestArea, string StartTime, string EndTime, string LikeDevice, string LikeLot, string LikeWafer)
-        //{
-        //    try
-        //    {
-        //        return m_OBJ.GetStepListByStepID(TestArea, StartTime, EndTime, LikeDevice, LikeLot, LikeWafer);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw ex;
-        //    }
-        //}
-
-        //public DataSet GetStepListByStepIDRecent(string TestArea, string StartTime, string EndTime, string LikeDevice, string LikeLot, string LikeWafer)
-        //{
-        //    try
-        //    {
-        //        return m_OBJ.GetStepListByStepIDRecent(TestArea, StartTime, EndTime, LikeDevice, LikeLot, LikeWafer);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw ex;
-        //    }
-        //}
 
         public DataTable SelectLotSumByLotID(string LotID)
         {
@@ -280,18 +232,6 @@ namespace DACrux.TEST.RO
             }
         }
 
-        //public void UpdateRawdataDMS(string VISUALINSP, string STEP_SEQ, string X, string Y)
-        //{
-        //    try
-        //    {
-        //        m_OBJ.UpdateRawdataDMS(VISUALINSP, STEP_SEQ, X, Y);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw ex;
-        //    }
-        //}
-
         public void UpdateReturnRawdata(string TABLE, string WAFER_SEQ)
         {
             try
@@ -303,18 +243,6 @@ namespace DACrux.TEST.RO
                 throw ex;
             }
         }
-
-        //public void UpdateReturnRawdataDMS(string STEP_SEQ)
-        //{
-        //    try
-        //    {
-        //        m_OBJ.UpdateReturnRawdataDMS(STEP_SEQ);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw ex;
-        //    }
-        //}
 
         public DataTable GetWaferInfo(string TESTAREA, string PRODUCT, string LOT_ID, string WAFER_ID)
         {
@@ -349,18 +277,6 @@ namespace DACrux.TEST.RO
                 throw ex;
             }
         }
-
-        //public DataTable SelectDMSStepSeq(string LotID, string Product, string WaferID, string TestAera)
-        //{
-        //    try
-        //    {
-        //        return m_OBJ.SelectDMSStepSeq(LotID, Product, WaferID, TestAera);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw ex;
-        //    }
-        //}
 
         public DataTable SelectCustomerWithMapdef(string product)
         {
@@ -397,18 +313,6 @@ namespace DACrux.TEST.RO
                 throw ex;
             }
         }
-
-        //public DataTable SelectProductByCusLotID(string CustRunId)
-        //{
-        //    try
-        //    {
-        //        return m_OBJ.SelectProductByCusLotID(CustRunId);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw ex;
-        //    }
-        //}
 
         public DataTable GetIslot(string Device, string strTestArea, string TestProgram, string LotID)
         {

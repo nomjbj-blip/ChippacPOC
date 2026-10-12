@@ -24,9 +24,6 @@ namespace DACrux.BStats.StatDialog
         string m_Title = "Correlation";
         string m_Columns = "Columns";
         string m_Variables = "Variables";
-        //string m_Regression = "&Regression equation";
-        //string m_Pvalues = "&Display p-values";
-        //string m_Scatter = "&Scatter plot";
         string m_Ok = "&Ok";
         string m_Cancel = "Cancel";
 
@@ -387,12 +384,6 @@ namespace DACrux.BStats.StatDialog
                 {
                     lvItem = new ListViewItem("");
 
-                    //if (lstColumnInfo[i].DataType == DataType.NUMBER)
-                    //    lvItem.ImageKey = "NUMBER";
-                    //else if (lstColumnInfo[i].DataType == DataType.TEXT)
-                    //    lvItem.ImageKey = "TEXT";
-                    //else if (lstColumnInfo[i].DataType == DataType.DATETIME)
-                    //    lvItem.ImageKey = "DATETIME";  
                     // 숫자형 컬럼만 받도록 수정
 
                     if (lstColumnInfo[i].DataType == DataType.NUMBER)
@@ -502,10 +493,8 @@ namespace DACrux.BStats.StatDialog
 
         #region Check Length of Columns
 
-        //private bool CheckColumns(List<DACrux.ProjectManager.UI.DataView.ColumnInfo> lstValidColumnInfo)
         private bool CheckColumns()
         {
-            //int[] arrVar = null;
             int iVarCnt;
             int iTemp;
             try
@@ -517,12 +506,9 @@ namespace DACrux.BStats.StatDialog
                     return false;
                 }
                 
-                //arrVar = new int[iVarCnt];
-                //iTemp = lstValidColumnInfo[((DACrux.ProjectManager.UI.DataView.ColumnInfo)htColumns[lvVariables.Items[0]]).ColumnIndex].ValidRowIndex;
                 iTemp = ((DACrux.ProjectManager.UI.DataView.ColumnInfo)htColumns[lvVariables.Items[0]]).ValidRowIndex;
                 for (int i = 0; i < iVarCnt; i++)
                 {
-                    //arrVar[i] = ((DACrux.ProjectManager.UI.DataView.ColumnInfo)htColumns[lvVariables.Items[i]]).ColumnIndex;
                     if (iTemp != ((DACrux.ProjectManager.UI.DataView.ColumnInfo)htColumns[lvVariables.Items[i]]).ValidRowIndex)
                     {
                         MessageBox.Show(m_ErrorLength);
@@ -552,7 +538,6 @@ namespace DACrux.BStats.StatDialog
             #region m_Input 정리 및 컬럼길이 체크
             if (!CheckColumns())
             {
-                //MessageBox.Show("Length of Selected Columns doesn't equal");
                 return;
             }
 

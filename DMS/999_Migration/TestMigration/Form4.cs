@@ -494,27 +494,12 @@ namespace FabTwoToMigrationTools
 
 
                 // TQP_PRODUCT 데이터
-                //m.CheckProduct(factory, deviceAlias);
 
                 //TQP_MAPDEF 데이터
                 if (!m.ContainsMAPDEF(deviceAlias) && allCnt > 0)
                     m.SetTQP_MAPDEF(deviceAlias, 0, allXmax, allYmax, allXmin, allYmin, allCnt);
 
                 //// SUMMARY 데이터 추가
-                //DataTable sumDt = GetEmptySumTable();
-
-                //foreach (DataRow waferRow in waferDt.Rows)
-                //{
-                //    sumDt.Rows.Add(
-                //        (string)lotDt.Rows[0]["TEST_AREA"],
-                //        (string)lotDt.Rows[0]["DEVICE"],
-                //        (string)lotDt.Rows[0]["PROGRAM"],
-                //        (decimal)waferRow["WAFER_SEQ"],
-                //        null
-                //        );
-                //}
-
-                //m.ExecuteProcedure(sumDt);
 
                 MessageBox.Show(factory + " 완료");
             }
@@ -604,7 +589,6 @@ namespace FabTwoToMigrationTools
             foreach (DataRow row in dt.Rows)
             {
                 string item = (string)row["TABLE_NAME"];
-                //RunAsync((string)row["TABLE_NAME"]);
                 listBox3.Items.Add(item);
                 Application.DoEvents();
                 Thread.Sleep(10);
@@ -653,12 +637,8 @@ namespace FabTwoToMigrationTools
                 if (m.ExistsData(newTableName))
                 {
                     m.TruncateTTable(newTableName);
-                    //InsertStatus(newTableName + " data exists!!!");
-                    //RemoveItem(newTableName);
-                    //return;
                 }
 
-                //m.TruncateTTable(newTableName);
                 DataTable wafDt = m.GetWaferSeq(newTableName);
 
                 // KEY: old wafer seq, VALUE: new wafer seq
@@ -721,7 +701,6 @@ namespace FabTwoToMigrationTools
                 if (listBox3.Items.Contains(item))
                     listBox3.Items.Remove(item);
 
-                //MessageBox.Show(item + Environment.NewLine + Environment.NewLine + ex.Message + ex.StackTrace);
             }
         }
 
@@ -760,7 +739,6 @@ namespace FabTwoToMigrationTools
                         listBox3.Items.Add(item);
 
                     Thread.Sleep(10);
-                    //RunAsync(item);
                     ThreadPool.QueueUserWorkItem(new WaitCallback(RunAsync), item);
                 }
             }
@@ -814,7 +792,6 @@ namespace FabTwoToMigrationTools
                     (decimal)dieDt.Rows[0]["MAXY"]);
             }
 
-            //m.InsertBulk(prodcutDt);
             m.InsertBulk(mapdefDt);
         }
 
@@ -863,9 +840,6 @@ namespace FabTwoToMigrationTools
             dt.Columns.Add("DIE_INDEX_MAX_Y", typeof(decimal));
             dt.Columns.Add("XY_DIRECTION", typeof(decimal));
             dt.Columns.Add("REFERENCEDIE_SETTING", typeof(decimal));
-            //dt.Columns.Add("DELETE_FLAG", typeof(string));
-            //dt.Columns.Add("UPDATE_TIME", typeof(DateTime));
-            //dt.Columns.Add("UPDATE_USER", typeof(string));
             return dt;
         }
 
@@ -917,9 +891,6 @@ namespace FabTwoToMigrationTools
             row["DIE_INDEX_MAX_Y"] = maxy;
             row["XY_DIRECTION"] = 1;
             row["REFERENCEDIE_SETTING"] = 0;
-            //row["DELETE_FLAG"] = null;
-            //row["UPDATE_TIME"] = null;
-            //row["UPDATE_USER"] = null;
             dt.Rows.Add(row);
         }
 
@@ -996,7 +967,6 @@ namespace FabTwoToMigrationTools
                 if (m.ExistsData(lotSeq))
                     return;
 
-                //MiracomTPS m = new MiracomTPS(GetSelectItem());
                 DataTable waferDt = m.GetWaferSeq(lotSeq);
 
                 DataTable lotSum = EmptyLotSumTable();

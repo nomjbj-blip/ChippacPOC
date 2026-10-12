@@ -39,10 +39,6 @@ namespace DACrux.BStats.StatDialog
         string m_ErrorOneMoreColumn = "Please select one or more column for analysis";
         string m_ErrorLength = "The following must be the same length : factor variable and response variable.";
         
-        //string m_ErrorOneColumn = "Please select only one column.";
-        //string m_ErrorResponse = "Invalid response variable. \r\n Too few items.";
-        //string m_ErrorFactor = "Invalid factor. \r\n Too few items.";
-
         bool m_bSingle = true; // Responses인지 Single인지
         bool m_bFactor = false; // Response인지 Factor인지
         #endregion

@@ -64,7 +64,6 @@ namespace DACrux.TEST.ENGUI
             InitializeComponent();
 
             FPSpreadUtil.InitSpread(fpSpread1, fpSpread2);
-            //fpSpread1_Sheet1.OperationMode = OperationMode.ReadOnly;
             pnlDataInput.Enabled = false;
         }
 
@@ -99,9 +98,6 @@ namespace DACrux.TEST.ENGUI
             while (!IsDisposed)
             {
                 UpdateInterval(Math.Max(_interval--, 0));
-
-                //if (_interval < 0)
-                //    _interval = timer1.Interval / 1000;
 
                 System.Threading.Thread.Sleep(1000);
             }
@@ -368,12 +364,6 @@ namespace DACrux.TEST.ENGUI
             txtEquipID.Text = equipID;
             txtProbeCard.Text = fpSpread1_Sheet1.Cells[e.Range.Row, (int)Col.PROBE_CARD].Text;
 
-            //pnlDataInput.Focus();
-            //Clipboard.Clear();
-            //if (String.IsNullOrEmpty(lotID))
-            //    return;
-
-            //Clipboard.SetText(lotID);
         }
 
 

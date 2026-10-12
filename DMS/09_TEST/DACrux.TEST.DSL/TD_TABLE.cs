@@ -69,10 +69,6 @@ namespace DACrux.TEST.DSL
             }
 
             // VIEW 생성
-            //if (ExistVIEW(viewName) == false)
-            //{
-            //    CreateTDView(columnList, tableName, viewName);
-            //}
 
             // TQP_DATA_TABLES 에 추가
             TQP_DATA_TABLES obj = new TQP_DATA_TABLES();
@@ -256,54 +252,7 @@ TABLESPACE {1})
             ExecuteNonQuery("EXECUTE", new string[] { sb.ToString() }, null);
         }
 
-//        private void CreateTDView(List<string> columnList, string tableName, string viewName)
-//        {
-//            StringBuilder sb = new StringBuilder();
-
-//            sb.AppendFormat(
-//@"
-//CREATE OR REPLACE FORCE VIEW DMSMGR.{0}
-//(
-//TEST_AREA,
-//PROGRAM,
-//LOT,
-//LOT_END_TIME,
-//LOT_SEQ,
-//WAFER_ID,
-//PROBE_CNT,
-//WAFER_SEQ,
-//DIE_NUM,
-//DIEPROBE_CNT,
-//", viewName);
-
-//            foreach (string column in columnList)
-//            {
-//                sb.Append(String.Format("{0},", column));
-//            }
-
 //            // 쉼표 제거
-//            sb.Remove(sb.Length - 1, 1);
-//            sb.AppendFormat(
-//@"
-//)
-//AS
-//SELECT L.TEST_AREA,
-//    L.PROGRAM,
-//    L.LOT_ID,
-//    L.END_TIME LOT_END_TIME,
-//    L.LOT_SEQ,
-//    W.WAFER_ID,
-//    W.PROBE_CNT,
-//    A.*
-//FROM TQP_LOT L, TQP_WAFER W, {0} A
-//WHERE L.LOT_SEQ = W.LOT_SEQ
-//    AND W.WAFER_SEQ = A.WAFER_SEQ
-//    AND W.MERGE_FLAG = 'Y'
-//    AND A.DIEPROBE_CNT = 0
-//", tableName);
-
-//            ExecuteNonQuery("EXECUTE", new string[] { sb.ToString() }, null);
-//        }
 
         /// <summary>
         /// 지정된 테이블의 데이터를 삭제 합니다.
@@ -381,8 +330,6 @@ TABLESPACE {1})
             if (wafers == null || wafers.Length <= 0)
                 return null;
 
-            //TQP_WAFER oWafer = new TQP_WAFER();
-            //string[] programArr = oWafer.GetProgram(wafers);
             TQP_LOT oLot = new TQP_LOT();
             string[] programArr = oLot.GetProgram(lots);
 

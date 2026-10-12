@@ -441,7 +441,6 @@ namespace DACrux.SP.Common
             {
                 case ".xls":
                     return Utility.LoadExcel(fileName);
-                //case ".csv":
                 default:
                     {
                         string data =null;
@@ -455,56 +454,9 @@ namespace DACrux.SP.Common
                         return data;
 
                         // 기존 코드 정리
-                        //string data =null;
-                        //if (enco == encoding.UTF7)
-                        //{
-                        //    using (System.IO.StreamReader sr = new System.IO.StreamReader(fileName, en))
-                        //        data = sr.ReadToEnd().Replace(Environment.NewLine, "\n");
 
-                        //    return data.Replace("?", " ");
-                        //}
-                        //else
-                        //{
-                        //    using (System.IO.StreamReader sr = new System.IO.StreamReader(fileName, en))
-                        //        return sr.ReadToEnd().Replace(Environment.NewLine, "\n");
-                        //}
                     }
             }
-            //if (enco == encoding.ASCII)
-            //{
-            //    using (System.IO.StreamReader sr = new System.IO.StreamReader(fileName, Encoding.ASCII))
-            //        return sr.ReadToEnd().Replace(Environment.NewLine, "\n");
-            //}
-            //else if (enco == encoding.BigEndianUnicode)
-            //{
-            //    using (System.IO.StreamReader sr = new System.IO.StreamReader(fileName, Encoding.BigEndianUnicode))
-            //        return sr.ReadToEnd().Replace(Environment.NewLine, "\n");
-            //}
-            //else if (enco == encoding.Default)
-            //{
-            //    using (System.IO.StreamReader sr = new System.IO.StreamReader(fileName, Encoding.Default))
-            //        return sr.ReadToEnd().Replace(Environment.NewLine, "\n");
-            //}
-            //else if (enco == encoding.Unicode)
-            //{
-            //    using (System.IO.StreamReader sr = new System.IO.StreamReader(fileName, Encoding.Unicode))
-            //        return sr.ReadToEnd().Replace(Environment.NewLine, "\n");
-            //}
-            //else if (enco == encoding.UTF32)
-            //{
-            //    using (System.IO.StreamReader sr = new System.IO.StreamReader(fileName, Encoding.UTF32))
-            //        return sr.ReadToEnd().Replace(Environment.NewLine, "\n");
-            //}
-            //else if (enco == encoding.UTF7)
-            //{
-            //    using (System.IO.StreamReader sr = new System.IO.StreamReader(fileName, Encoding.UTF7))
-            //        return sr.ReadToEnd().Replace(Environment.NewLine, "\n");
-            //}
-            //else if (enco == encoding.UTF8)
-            //{
-            //    using (System.IO.StreamReader sr = new System.IO.StreamReader(fileName, Encoding.UTF8))
-            //        return sr.ReadToEnd().Replace(Environment.NewLine, "\n");
-            //}
 
         }
 
@@ -527,7 +479,6 @@ namespace DACrux.SP.Common
             try
             {
                 connectString = @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + fileName + ";Extended Properties=" + (char)34 + "Excel 12.0 Xml;HDR=No;IMEX=1" + (char)34;
-                //connectString = @"Provider=Microsoft.Jet.OleDb.4.0;Data Source=" + fileName + ";Extended Properties='Excel 8.0;HDR=No;IMEX=1'";
 
                 oleDbConnection = new OleDbConnection(connectString);
                 oleDbConnection.Open();
@@ -540,9 +491,6 @@ namespace DACrux.SP.Common
 
                     if (sheetName.Contains("FilterDatabase"))
                         continue;
-
-                    //if (sheetName.LastIndexOf("$'") == sheetName.Length - 2 && sheetName.LastIndexOf("$") == sheetName.Length - 1)
-                    //    continue;
 
                     oleDbAdapter = new OleDbDataAdapter("SELECT * FROM [" + sheetName + "]", oleDbConnection);
 
@@ -729,8 +677,6 @@ namespace DACrux.SP.Common
                 sb.Append("X:" + strX + "\n");
                 sb.Append("Y:" + strY + "\n");
                 sb.Append("REFDIE:" + "\n");
-                //if (strCbin.Count > 0) 
-                //    strBin = ConvertMap(strBin, strCbin, strHbin);
                 sb.Append(strBin);
                 sb.Append("#" + strWafer + ":    " + "\n");
                 sb.Append("FLAT ZONE : " + strFlat + "\n");
@@ -756,22 +702,15 @@ namespace DACrux.SP.Common
             try
             {
                 sb = new StringBuilder();
-                //string CNVPath = strCNVPath + "\\" + strWafer + ".ASC";
-                //if (!Directory.Exists(strCNVPath))
-                //    Directory.CreateDirectory(strCNVPath);
-                //sw = new StreamWriter(CNVPath, false, Encoding.Default);
 
                 sb.Append("DEVICE:" + strProduct + "\n");
                 sb.Append("WAFERID:" + strWafer + "\n");
                 sb.Append("X:" + strX + "\n");
                 sb.Append("Y:" + strY + "\n");
                 sb.Append("REFDIE:" + "\n");
-                //if (strCbin.Count > 0) 
-                //    strBin = ConvertMap(strBin, strCbin, strHbin);
                 sb.Append(strBin);
                 sb.Append("#" + strWafer + ":    " + "\n");
                 sb.Append("FLAT ZONE : " + strFlat + "\n");
-                //sw.Write(sb.ToString());
                 return sb.ToString();
             }
             catch (Exception ex)
@@ -1325,9 +1264,6 @@ namespace DACrux.SP.Common
                         return string.Format("ERROR : Can not be converted to a number. [Y:{0}]", oAnalysis.Entities["Y"].DefaultValue);
                 }
 
-                //int x = oAnalysis.Entities["X"].DefaultValue == "" ? int.Parse(strTotalValue.Substring(oAnalysis.values["X"][0].Index, oAnalysis.values["X"][0].Length)) : int.Parse(oAnalysis.Entities["X"].DefaultValue);
-                //int y = oAnalysis.Entities["Y"].DefaultValue == "" ? int.Parse(strTotalValue.Substring(oAnalysis.values["Y"][0].Index, oAnalysis.values["Y"][0].Length)) : int.Parse(oAnalysis.Entities["Y"].DefaultValue);
-
                 string sWafer = string.Empty;
 
                 foreach (string tempKey in oAnalysis.values.Keys)
@@ -1338,12 +1274,10 @@ namespace DACrux.SP.Common
                         sWafer = "Wafer_Num";
                 }
                 
-                //if ((strData.Length % oAnalysis.values["Wafer_ID"].Count) > 1)
                 if ((strData.Length % oAnalysis.values[sWafer].Count) > 1)
                     return string.Format("ERROR : (Line Count({0}) % {1} Count({2})) > 1", strData.Length, sWafer, oAnalysis.values[sWafer].Count);
                 if ((oAnalysis.values[EntityString.bin.ToString()].Count % y > 0) && (oAnalysis.Entities[EntityString.Y.ToString()].RegexString != string.Empty))
                     return string.Format("ERROR : (Bin Count({0}) % Y({1})) > 0", oAnalysis.values[EntityString.bin.ToString()].Count, y);
-                //iOneWaferRowCNT = strData.Length / oAnalysis.values["Wafer_ID"].Count;
                 iOneWaferRowCNT = strData.Length / oAnalysis.values[sWafer].Count;
                 if (oAnalysis.Entities[EntityString.X.ToString()].RegexString != string.Empty)
                 {

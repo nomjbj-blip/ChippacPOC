@@ -100,7 +100,6 @@ namespace DACrux.SEMDMS.KtoD
         #region ◎ KLARF Parsing Logic
         public static void Main_KLARF(DACrux.Base.ARGUMENT_TAG oArgValues)
         {
-            //System.Threading.Thread.Sleep(1000);
 
             KLARF oKLARFParser = null;
             string strBackupImage = string.Empty;
@@ -209,8 +208,6 @@ namespace DACrux.SEMDMS.KtoD
                     // Zip Make
 
                     DACrux.Utility.ZipUtil.Compress(strArchiveFileName, Path.GetDirectoryName(oArgValues.ResultFile), strArchiveFiles, SharpCompress.Common.ArchiveType.Zip);
-                    //ZipArchive oArchive = new ZipArchive();
-                    //oArchive.CreateArchive(strArchiveFileName, oArgValues.ResultFile, strArchiveFiles, true);
 
                     Logging.WriteLog(string.Format("[BACKUP] | [File Name {0}]", strArchiveFileName), "PROC", 0);
 
@@ -227,7 +224,6 @@ namespace DACrux.SEMDMS.KtoD
                 }
 
                 //Move로 변경 해야 한다.
-                //File.Move(oArgValues.ResultFile, oArgValues.ProcessFile);
                 File.Copy(oArgValues.ResultFile, oArgValues.ProcessFile);
                 Logging.WriteLog(string.Format("[PROCESSING] | [FILE_MOVE] : [{0} to {1}]", oArgValues.ResultFile, oArgValues.ProcessFile), "PROC", 0);
                 ///----------------------------------------------------------------------------------
@@ -268,8 +264,6 @@ namespace DACrux.SEMDMS.KtoD
 
                 oKLARFParser.ReadKLARF();
                 Logging.WriteLog(string.Format("[PROCESSING] | [PROC_END]"), "PROC", 0);
-
-                //oKLARFParser.UpdateStepSummary();
 
                 /// File을 Service한다.
                 /// =================================================================================
@@ -375,12 +369,6 @@ namespace DACrux.SEMDMS.KtoD
                 ///// 1.현재의 File이 처리 가능한 File인지 Check
                 ///// 2.KLARF에 Image Name이 있다면 이 Image가 전부 존재하는지 Check
                 ///// =================================================================================
-                //if (!oWB3200Parser.PreParsingWB3200(oArgValues.ResultFile))
-                //{
-                //Logging.SocketOpen(oWB3200Parser.UPDATESERVERIP, oWB3200Parser.SOCKETPORT);
-                //Logging.WriteLog(string.Format("SKEEP,{0}", oArgValues.ResultFile), "SENDDATA", 0);
-                //    return; //위 두 조건에 만족하지 않으면 아무런 Action을 취하지 않고 Return
-                //}
                 /////----------------------------------------------------------------------------------
 
                 /// ProcessMonitoring 을 하기 위해 SENDDATA를 한다.
@@ -459,8 +447,6 @@ namespace DACrux.SEMDMS.KtoD
 
                 // 압축푼다..
                 DACrux.Utility.ZipUtil.Uncompress(oArgValues.ProcessFile, strFileRoot);
-                //DACrux.Utility.ZipManager.UnZipFiles(oArgValues.ProcessFile, strFileRoot, null, false);
-                //Uncompress(oArgValues.ProcessFile, strFileRoot);
 
                 if (Directory.Exists(strFileRoot) == false)
                 {

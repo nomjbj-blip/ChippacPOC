@@ -52,9 +52,6 @@ namespace DACrux.BStats
                         dlg = new StatDialog.DlgRegression(dataSource, lstValidColumnInfo, strProject, strWorkSheet, strTitle, resultFilePath, strUser);
                         (dlg as StatDialog.DlgRegression).On_SelectedRegression += new DACrux.BStats.StatDialog.DSelectedRegression(StatAnalysisManager_On_SelectedRegression);
                         break;
-                    //case StatType.DOE_FactorialDesign:
-                    //    dlg = new StatDialog.DlgFactorialDesign();
-                    //    break;
                     case StatType.DOE_TaguchiAnalysis:
                         dlg = new StatDialog.DlgTaguchiAnalysis2(dataSource, lstValidColumnInfo, strProject, strWorkSheet, strTitle, resultFilePath, strUser, TaguchiInfomation);
                         (dlg as StatDialog.DlgTaguchiAnalysis2).On_SelectedTaguchi += new DACrux.BStats.StatDialog.DSelectedTaguchi(StatAnalysisManager_On_SelectedTaguchi);
@@ -71,7 +68,6 @@ namespace DACrux.BStats
             }
             catch(Exception ex)
             {
-                //System.Windows.Forms.MessageBox.Show("An error occured during creating Stat Analysis.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                 throw ex;
             }
         }

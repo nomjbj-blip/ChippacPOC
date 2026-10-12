@@ -49,7 +49,6 @@ namespace DACrux.BStats.GraphDialog
             graphInfo.CreatedInformation = createdInformation;
             graphInfo.DataSource = dataSource;
             // Changed By James Kwon
-            //graphInfo.PointLabel = true;
             graphInfo.PointLabel = false;
 
             SetGraphDataInformation(lstValidColumnInfo);

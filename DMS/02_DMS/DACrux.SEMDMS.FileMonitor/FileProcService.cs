@@ -13,8 +13,6 @@ namespace DACrux.SEMDMS.FileMonitor
     {
         KLARFMonitor oMonitor = null;
         EventLog m_oEventLog = null;
-        //string m_strSource = "DACrux/DMS";
-        //string m_strLogName = "FileMonitorServiceLog";
 
         public FileProcService()
         {

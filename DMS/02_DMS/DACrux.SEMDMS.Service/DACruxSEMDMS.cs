@@ -20,7 +20,6 @@ namespace DACrux.SEMDMS.Service
             InitializeComponent();
             m_oEventLog = new System.Diagnostics.EventLog();
             m_oEventLog.Source = "DACruxSEMDMS";
-            //m_oEventLog.Log = "DACruxSEMDMSServiceLog";
         }
 
         public void Start()
@@ -30,11 +29,6 @@ namespace DACrux.SEMDMS.Service
 
         protected override void OnStart(string[] args)
         {
-            //var file = @"D:\PROJECT\MagnaChip\DMS\UOR0057\L2618803S2D1R0_@00000@_N1.jpg";
-            //ImageManager img = new ImageManager(file);
-
-            //for (int i = 0; i < img.FrameCount; i++)
-            //    img.SaveFrameImageAndThumbnail(i + 1, Path.GetDirectoryName(file));
 
             try{
                 string strCfgPath = Path.GetDirectoryName(Environment.CommandLine.Replace("\"", ""))
@@ -43,10 +37,6 @@ namespace DACrux.SEMDMS.Service
 
                             // Event Log 
                 ///////////////////////////////////////////////////////////////////////////////////////////////
-                //if (!System.Diagnostics.EventLog.SourceExists(m_oEventLog.Source))
-                //{
-                //    System.Diagnostics.EventLog.CreateEventSource(m_oEventLog.Source, m_oEventLog.Log);
-                //}
                 m_oEventLog.WriteEntry("DACruxSEMDMS Service Started");
                 ///////////////////////////////////////////////////////////////////////////////////////////////
             }
@@ -66,10 +56,6 @@ namespace DACrux.SEMDMS.Service
             {
                 // Event Log 
                 ///////////////////////////////////////////////////////////////////////////////////////////////
-                //if (!System.Diagnostics.EventLog.SourceExists(m_oEventLog.Source))
-                //{
-                //    System.Diagnostics.EventLog.CreateEventSource(m_oEventLog.Source, m_oEventLog.Log);
-                //}
                 m_oEventLog.WriteEntry("DACruxSEMDMS Service Stoped!!!!");
                 ///////////////////////////////////////////////////////////////////////////////////////////////
             }

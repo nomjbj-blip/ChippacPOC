@@ -20,7 +20,6 @@ namespace DACrux.BStats.Statistics
         private DACrux.BStats.Core.SelectedHypothesisTesting m_SelectedHypothesisTesting;
         private DACrux.BStats.Core.ResultHypothesisTesting[] m_Result;
         private DataTable m_DataSource;
-        //private GraphInformation[] m_Graph = null;
         #endregion
 
         #region " CREATOR "

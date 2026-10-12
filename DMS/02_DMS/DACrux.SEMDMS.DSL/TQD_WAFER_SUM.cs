@@ -408,7 +408,6 @@ namespace DACrux.SEMDMS.DSL
 
             try
             {
-                //string[] dynamic = new string[] { string.Join(",", waferSeq) };
                 dt = this.GetDataTable("YIELD_REPORT_BY_DAY", new string[] { waferSeq }, null);
                 return dt;
             }
@@ -668,7 +667,6 @@ namespace DACrux.SEMDMS.DSL
 
             try
             {
-                //string[] dynamic = new string[] { string.Join(",", waferSeq) };
                 dt = this.GetDataTable("YIELD_REPORT_BY_DAY", new string[] { string.Join(",", waferSeq) }, null);
                 return dt;
             }

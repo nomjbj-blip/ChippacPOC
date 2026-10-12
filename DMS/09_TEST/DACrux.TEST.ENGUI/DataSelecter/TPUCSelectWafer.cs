@@ -67,7 +67,6 @@ namespace DACrux.TEST.ENGUI
         private CheckBox chkDate;
         private Button BtnConfig;
         private CheckBox chkLastTest;
-        //private string[] TestArea = null;
 
         public TPUCSelectWafer()
         {
@@ -1064,7 +1063,6 @@ namespace DACrux.TEST.ENGUI
 
                 MainForm.SetStatusMessage("Data를 처리 중입니다.");
                 fpSpread1_Sheet1.DataSource = dtWaferList;
-                //Utility.FPSpreadUtil.SpreadSortingAll(fpSpread1_Sheet1);
                 Utility.FPSpreadUtil.AdjustSpread(fpSpread1_Sheet1);
                 Utility.FPSpreadUtil.SetAutoColumnWidth(fpSpread1_Sheet1);
                 fpSpread1_Sheet1.OperationMode = FarPoint.Win.Spread.OperationMode.ExtendedSelect;
@@ -1180,7 +1178,6 @@ namespace DACrux.TEST.ENGUI
                 {
                     Utility.FPSpreadUtil.InitSpread(fpSpread1);
                     fpSpread1_Sheet1.DataSource = dv.ToTable();
-                    //Utility.FPSpreadUtil.SpreadSortingAll(fpSpread1_Sheet1);
                     Utility.FPSpreadUtil.AdjustSpread(fpSpread1_Sheet1);
                     Utility.FPSpreadUtil.SetAutoColumnWidth(fpSpread1_Sheet1);
                 }
@@ -1201,8 +1198,6 @@ namespace DACrux.TEST.ENGUI
         //Cell 수정 시 입력된 Data 초기화
         private void fpSelectOption_EditModeOn(object sender, EventArgs e)
         {
-            //fpSelectOption.ActiveSheet.Cells[fpSelectOption.ActiveSheet.ActiveRowIndex, fpSelectOption.ActiveSheet.ActiveColumnIndex].ResetValue();
-            //Application.DoEvents();
         }
 
         private void fpSelectOption_KeyUp(object sender, KeyEventArgs e)
@@ -1274,7 +1269,6 @@ namespace DACrux.TEST.ENGUI
                         {
                             oWafer = new TPWafer();
                             oWafer.Testarea = dv[cr[i].Row + r]["TESTAREA"].ToString();
-                            //oWafer.Product = dv[cr[i].Row + r]["PRODUCT"].ToString();
                             oWafer.Product = dv[cr[i].Row + r]["DEVICE_ALIAS"].ToString();
                             oWafer.Program = dv[cr[i].Row + r]["PROGRAM"].ToString();
                             oWafer.WaferSeq = dv[cr[i].Row + r]["WAFER_SEQ"].ToString();
@@ -1329,7 +1323,6 @@ namespace DACrux.TEST.ENGUI
             try
             {
                 fpSelectOption.Tag = dtpStart.Value - dtpEnd.Value;
-                //fpSelectOption.Tag = string.Format("{0};{1}", dtpStart.Value.ToString("yyyy-MM-dd HH:mm:ss"), dtpEnd.Value.ToString("yyyy-MM-dd HH:mm:ss"));
                 fpSelectOption.Save(ConditionFile(), false);
                 dtOption = GetSearchOption();
                 dtOption.Rows.Add(new object[] { "chkDate", chkDate.Checked.ToString() });
@@ -1391,18 +1384,6 @@ namespace DACrux.TEST.ENGUI
                 return m_isMultiSelect;
             }
         }
-
-        //public void SetTestArea(string[] TestArea)
-        //{
-        //    try
-        //    {
-        //        TestArea = TestArea;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        MessageBox.Show(string.Format("Testarea를 지정할 수 없습니다.[Err:{0}]", ex.Message));
-        //    }
-        //}
 
 
         private void BtnConfig_Click(object sender, EventArgs e)
@@ -1587,7 +1568,6 @@ namespace DACrux.TEST.ENGUI
                             oForm = (DACrux.Framework.Base.DACruxUXBasic01)Activator.CreateInstance(type);
 
                         oForm.WaferList = strWaferList;
-                        //oForm.FUNC_CODE = drMenu[0]["RESV_03"].ToString();
                         oForm.FUNC_CODE = drMenu[0]["FUNCTION_CODE"].ToString();
                         oForm.MdiParent = this.ParentForm;
 
@@ -1690,7 +1670,6 @@ namespace DACrux.TEST.ENGUI
                     if (dtMenu.Select(string.Format("RESV_04 = '{0}' AND ASSEMBLY = '{1}'", "TEST", fm.GetType().FullName)).Length > 0)
                         dtMenuList.Rows.Add(new object[] { fm.GetType().Name, fm.GetType().Namespace, fm.GetType().FullName, fm.WaferList == null ? "" : string.Join(",", fm.WaferList) });
 
-                    //var vTemp = fm.GetType().GetField.GetMethod("WaferList");
                 }
 
                 if (fpSpread1.DataSource != null)

@@ -144,10 +144,6 @@ namespace DACrux.BStats.Statistics
 
         private GraphInformation[] MergeGraphInformation(GraphInformation[] arrHistogram, GraphInformation[] arrBoxPlot, GraphInformation[] arrRawDataPlot)
         {
-            //int iHistogram = 0;
-            //int iBoxplot = 0;
-            //int iRawDataPlot = 0;
-            //int iTotal;
             GraphInformation[] arrReturn = null;
             try
             {
@@ -161,26 +157,6 @@ namespace DACrux.BStats.Statistics
                 Array.Copy(arrBoxPlot,0 , arrReturn,arrHistogram.Length,arrBoxPlot.Length);
                 Array.Copy(arrRawDataPlot, 0, arrReturn, (arrHistogram.Length + arrBoxPlot.Length), arrRawDataPlot.Length);
 
-                //iHistogram=0;
-                //iBoxplot=0;
-                //iRawDataPlot = 0;
-
-                //if (arrHistogram != null)
-                //    iHistogram = arrHistogram.Length;
-                //if (arrBoxPlot != null)
-                //    iBoxplot = arrBoxPlot.Length;
-                //if (arrRawDataPlot != null)
-                //    iRawDataPlot = arrRawDataPlot.Length;
-
-                //iTotal = iHistogram + iBoxplot + iRawDataPlot;
-                //arrReturn = new GraphInformation[iTotal];
-                //for (int i = 0; i < iTotal; i++)
-                //{
-                //    if (i < iHistogram)
-                //        arrReturn[i] = arrHistogram[i];
-                //    else
-                //        arrReturn[i] = arrBoxPlot[i - iHistogram];
-                //}
                 return arrReturn;
 
             }
@@ -616,10 +592,8 @@ namespace DACrux.BStats.Statistics
         {
             int iRawDataPlotCnt;
             GraphInformation[] arrReturn = null;
-            //int iColCnt;
             double yValue = double.NaN;
             double yLastValue = double.NaN;
-            //System.Data.DataView dv = null;
             string strSortExpression = string.Empty;
             DataTable dtTemp = null;
             try
@@ -649,7 +623,6 @@ namespace DACrux.BStats.Statistics
 
                     arrReturn[i] = new GraphInformation(GraphType.Scatter);
                     arrReturn[i].DataSource = dtTemp;
-                    //arrReturn[i].Name = "RawTrend(" + m_Input.Title + ")";
                     arrReturn[i].Name = "RawTrend(" + m_Input.Title + ") : " + dtTemp.Columns[0].ColumnName;
                     arrReturn[i].AxisX = new GraphInformation.ColumnInfoItem(0, null, dtTemp.Columns[0].ColumnName, dtTemp.Columns[0].DataType);
                     arrReturn[i].AddAxisY(new GraphInformation.ColumnInfoItem(1, null, dtTemp.Columns[1].ColumnName, dtTemp.Columns[1].DataType));
@@ -665,26 +638,7 @@ namespace DACrux.BStats.Statistics
                     arrReturn[i].ImageSize = new System.Drawing.Size(m_DescriptionBoxplotW, GetBoxPlotH(22, m_DescriptionHistogramH));
 
                     //OLD YSIM 2014-10-14
-                    //arrReturn[i] = new GraphInformation(GraphType.Point);
-                    //arrReturn[i].ForceZero = false;
-                    //arrReturn[i].AxisXForceZero = true;
-                    //arrReturn[i].DataSource = dsRawData[0].DACruxTable[i].DataTable;
-                    //arrReturn[i].DecimalPlace = DataTableUtil.GetDecimalPlace(dsRawData[0].DACruxTable[i].DataTable);
-                    //arrReturn[i].ImagePath = GetFileName(m_Input.ResultFilePath) + "RawDataPlot" + DateTime.Now.ToString("yyyyMMddHHmmss") + "-" + i.ToString() + ".jpg";
-                    //arrReturn[i].ImageSize = new System.Drawing.Size(m_DescriptionBoxplotW, GetBoxPlotH(22, m_DescriptionHistogramH));
-                    //arrReturn[i].GridLine = true;
-                    //arrReturn[i].PointColor = System.Drawing.Color.Red;
 
-                    //iColCnt = dsRawData[0].DACruxTable[i].DataTable.Columns.Count;
-
-                    //for (int j = 0; j < iColCnt; j++)
-                    //{
-                    //    arrReturn[i].AddAxisY(new GraphInformation.ColumnInfoItem(j, null, dsRawData[0].DACruxTable[i].DataTable.Columns[j].ColumnName, dsRawData[0].DACruxTable[i].DataTable.Columns[j].DataType));
-                    //}
-
-                    //arrReturn[i].Title = dsRawData[0].DACruxTable[i].Variable;  // 분석컬럼명만..
-                    //arrReturn[i].AxisYTitle = dsRawData[0].DACruxTable[i].Variable;
-                    //arrReturn[i].Name = "RawTrend(" + m_Input.Title + ")";
                     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
                 }
@@ -728,17 +682,8 @@ namespace DACrux.BStats.Statistics
                     dtTemp.ObjVariable = arrRowData[i].ObjVariable;
                     dtTemp.ObjVariableValue = arrRowData[i].ObjVariableValue;
                     
-                    //if (m_Input.arrByVariables != null)
-                    //{
                     //    if (m_Input.arrByVariables.Length > 1)// Obj Var와 Series Var모두 존재할때
-                    //    {
                             
-                    //    }
-                    //    else if (m_Input.arrByVariables.Length == 1)
-                    //    {
-                    //        dtTemp = new DataTable(arrRowData[i].Tables[0].TableName);
-                    //    }
-                    //}
                     #endregion
 
                     iStartTable = 0;
@@ -823,21 +768,7 @@ namespace DACrux.BStats.Statistics
                             }
                             iColCnt++;
 
-                            //if (m_Input.arrByVariables == null)
-                            //{
-                            //    dtTemp = new DataTable(strVar);  // 분석컬럼명만..
-                            //}
-                            //else
-                            //{
                             //    if (m_Input.arrByVariables.Length > 1)// Obj Var와 Series Var모두 존재할때
-                            //    {
-                            //        dtTemp = new DataTable(SubTitle(arrRowData[i].DataSetName + "\r\n" + arrRowData[i].Tables[j].TableName, DataTableUtil.SEPARATOR) + DataTableUtil.SEPARATOR + arrRowData[i].Tables[j].TableName);
-                            //    }
-                            //    else
-                            //    {
-                            //        dtTemp = new DataTable(arrRowData[i].Tables[j].TableName);
-                            //    }
-                            //}
                             #endregion
                         }                        
                     }
@@ -1098,7 +1029,6 @@ namespace DACrux.BStats.Statistics
                     if (!m_Input.IsNtotal)
                         dctResult.DataTable.Columns.Remove(m_Ntotal);
                     dcsReturn.DACruxTable.Add(dctResult);
-                    //dcsReturn.DACruxTable.Add(dctResult.CopyDataTable());  // 에러나면 확인
                     dctResult = null;
                 }
 
@@ -1146,16 +1076,10 @@ namespace DACrux.BStats.Statistics
                 #region DataTable Form
 
                 //누적합을 위해서 수정
-                //if (m_SelectedStatistics.IsNtotal)
-                //{
                 dctReturn.DataTable.Columns.Add(m_Ntotal, typeof(int));
                     arrRow.Add(oStat.Result.Ntotal);
-                //}
-                //if (m_SelectedStatistics.IsNnonmissing)
-                //{
                     dctReturn.DataTable.Columns.Add(m_Nnonmissing, typeof(int));
                     arrRow.Add(oStat.Result.Nnonmissing);
-                //}
                 if (m_SelectedStatistics.IsNmissing)
                 {
                     dctReturn.DataTable.Columns.Add(m_Nmissing, typeof(int));
@@ -1275,9 +1199,7 @@ namespace DACrux.BStats.Statistics
                 }
                 #endregion
 
-                //dctReturn.DataTable.AcceptChanges();
                 dctReturn.DataTable.Rows.Add((object[])arrRow.ToArray(typeof(object)));
-                //dctReturn.DataTable.AcceptChanges();
                 return dctReturn;
             }
             catch (Exception ex)
@@ -1328,7 +1250,6 @@ namespace DACrux.BStats.Statistics
 
                     for (int i = 0; i < iDistinctCnt; i++)
                     {
-                        //dctTemp = SelectWhere(strNameSpace + m_Separator + MakeString(arrDistinctColNames, dtDistinct.Rows[i].ItemArray, m_Separator), dtNewSource, SelectedColumn, MakeString(arrDistinctColNames, dtDistinct.Rows[i].ItemArray, " and "));
                         dctTemp = DataTableUtil.SelectWhere(dctNewSource, SelectedColumn, DataTableUtil.MakeString(arrDistinctColNames, dtDistinct.Rows[i].ItemArray, " and "));
                         dctTemp.Variable = strVar;
                         dctTemp.SeriesVariable = arrDistinctColNames;
@@ -1349,7 +1270,6 @@ namespace DACrux.BStats.Statistics
                         }
                         //여기서 dctTemp의 DataTable작업...null Trim
                         dcsReturn.DACruxTable.Add(dctTemp.Copy());
-                        //dcsReturn.DACruxTable.Add(dctTemp);   // 확인할것
                         dctTemp = null;
                     }
 
@@ -1462,7 +1382,6 @@ namespace DACrux.BStats.Statistics
                     for (int i = 0; i < iDistinctByObjCnt; i++)
                     {
                         strDsFilter = DataTableUtil.MakeString(arrDistinctByObjColNames, dtDistinctByObj.Rows[i].ItemArray, " and ");  // Source에서 하나의 DataSet을 만들기위한 Source DataTable을 가져올 조건
-                        //dcsReturn = new DACruxSet(MakeColumnName(dtDistinctByObj.Rows[i].ItemArray, m_Separator));
                         dcsReturn = new DACruxSet();
                         dcsReturn.ObjVariable = arrDistinctByObjColNames;
                         dctTemp = DataTableUtil.SelectWhere(Source, strDsFilter);
@@ -1476,7 +1395,6 @@ namespace DACrux.BStats.Statistics
                             {
                                 dcsReturn.DACruxTable.Add(dcsUnit.DACruxTable[k].Copy());
                             }
-                            //dsReturn.AcceptChanges();
                             dcsUnit = null;
                         }
                         arrDCS[i] = dcsReturn;
@@ -1496,7 +1414,6 @@ namespace DACrux.BStats.Statistics
                         {
                             dcsReturn.DACruxTable.Add(dcsUnit.DACruxTable[j].Copy());
                         }
-                        //dsReturn.AcceptChanges();
                         dcsUnit = null;
                     }
 

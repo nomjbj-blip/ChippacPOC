@@ -219,9 +219,6 @@ namespace DACrux.TEST.Control
 
         public enum Color
         {
-            //			Black = 0 ,	Blue =1,	Green =2, 		Cyan =3, 	
-            //			Red = 3 ,	Magenta =7 ,	Yellow =6, 		White =15,
-            //			Gray =15,	Lightblue = 9,	Lightgreen =4,	Lightcyan =11, 
             //			Lightred =12, Lightmagenta = 13, Lightyellow = 14, Brightwhite=15
 
             black = 1, blue = 5, bluegreen = 34, brown = 9, darkblue = 11, darkbrown = 52,
@@ -692,7 +689,6 @@ namespace DACrux.TEST.Control
             workSheet.get_Range(c1, c2).VerticalAlignment = align;
             workSheet.get_Range(c1, c2).HorizontalAlignment = Halign;
             workSheet.get_Range(c1, c2).RowHeight = rowHeight;
-            //workSheet.get_Range(workSheet.Cells[rowIdx1,colIdx1],workSheet.Cells[rowIdx2,colIdx2]).ColumnWidth = colWidth;
 
             workSheet.get_Range(c1, c2).set_Value(Missing.Value, values);
             if (gridline)
@@ -1265,14 +1261,7 @@ namespace DACrux.TEST.Control
                 oSeries.Name = sSeriesName;
                 oSeries.MarkerStyle = Excel.XlMarkerStyle.xlMarkerStyleNone;
                 oTrendLines = (Excel.Trendlines)oSeries.Trendlines(Type.Missing);
-                //				if(bOneData)
-                //				{
                 oTrendLine = oTrendLines.Add(Excel.XlTrendlineType.xlLinear, Type.Missing, Type.Missing, 2, 2, iLimit, Type.Missing, Type.Missing, iLimit.ToString());
-                //				}
-                //				else
-                //				{
-                //					oTrendLine = oTrendLines.Add(Excel.XlTrendlineType.xlLinear,Type.Missing,Type.Missing,Type.Missing,Type.Missing,iLimit,Type.Missing,Type.Missing,iLimit.ToString());
-                //				}
 
                 oTrendLine.Border.Color = System.Drawing.Color.Red.R;
             }
@@ -1353,7 +1342,6 @@ namespace DACrux.TEST.Control
 
             if (obj is FarPoint.Win.Spread.FpSpread)
             {
-                //FarPoint.Win.Spread.SheetView spdList = ((FarPoint.Win.Spread.FpSpread)obj).ActiveSheet;
             }
             else
             {

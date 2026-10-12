@@ -4,7 +4,6 @@ using System.Data;
 using System.Runtime.InteropServices;
 using System.Text;
 using DACrux.TEST.DSL;
-//using System.Transactions;
 using DACrux.TEST.Interface;
 using DACrux.Common.DSL;
 
@@ -32,34 +31,6 @@ namespace DACrux.TEST.BSL
                 if (dt != null) dt.Dispose();
             }
         }
-
-        //public DataTable GetWaferInfo(string WAFERSEQ)
-        //{
-        //    TQP_WAFER oDSL = null;
-        //    try
-        //    {
-        //        oDSL = new TQP_WAFER();
-        //        return oDSL.GetWaferInfo(DACrux.Base.Convert.longParse(WAFERSEQ));
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw ex;
-        //    }
-        //}
-
-        //public DataTable GetWaferInfo(long WaferSeq)
-        //{
-        //    TQP_WAFER oDSL = null;
-        //    try
-        //    {
-        //        oDSL = new TQP_WAFER();
-        //        return oDSL.GetWaferInfo(WaferSeq);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw ex;
-        //    }
-        //}
 
         public DataTable GetWaferList(DateTime stime, DateTime etime, string fieldOrder)
         {
@@ -180,9 +151,6 @@ namespace DACrux.TEST.BSL
                 foreach (string strVal in strWhere)
                     sQuery.AppendLine(string.Format(" AND {0} ", strVal));
 
-                //if (string.IsNullOrEmpty(strSort) == false)
-                //    sQuery.AppendLine(string.Format(" ORDER BY {0} ", strSort));
-
                 return oDSL.GetData("SELECT_TEST_WAFER_LIST", new string[] { sQuery.ToString() }, null);
             }
             catch (Exception ex)
@@ -267,11 +235,6 @@ namespace DACrux.TEST.BSL
         /// <summary>
         /// 해당 WAFER의 PROGRAM 리스트를 가져옵니다.
         /// </summary>
-        //public string[] GetProgramByWafer(string[] waferSeqArr)
-        //{
-        //    TQP_WAFER obj = new TQP_WAFER();
-        //    return obj.GetProgram(waferSeqArr);
-        //}
 
         /// <summary>
         /// WAFER_SEQ에 대한 RAW DATA를 가져옵니다. 여러 테이블인 경우 모든 데이터를 가져옵니다.

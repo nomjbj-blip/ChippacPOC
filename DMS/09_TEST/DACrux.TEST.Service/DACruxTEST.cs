@@ -25,7 +25,6 @@ namespace DACrux.TEST.Service
             InitializeComponent();
             m_oEventLog = new System.Diagnostics.EventLog();
             m_oEventLog.Source = "DACruxTEST";
-            //m_oEventLog.Log = "DACruxTESTServiceLog";
         }
 
         protected override void OnStart(string[] args)
@@ -39,10 +38,6 @@ namespace DACrux.TEST.Service
             
                             // Event Log 
                 ///////////////////////////////////////////////////////////////////////////////////////////////
-                //if (!System.Diagnostics.EventLog.SourceExists(m_oEventLog.Source))
-                //{
-                //    System.Diagnostics.EventLog.CreateEventSource(m_oEventLog.Source, m_oEventLog.Log);
-                //}
                 m_oEventLog.WriteEntry("DACruxTEST Service Started");
                 ///////////////////////////////////////////////////////////////////////////////////////////////
             }
@@ -63,10 +58,6 @@ namespace DACrux.TEST.Service
             {
                 // Event Log 
                 ///////////////////////////////////////////////////////////////////////////////////////////////
-                //if (!System.Diagnostics.EventLog.SourceExists(m_oEventLog.Source))
-                //{
-                //    System.Diagnostics.EventLog.CreateEventSource(m_oEventLog.Source, m_oEventLog.Log);
-                //}
                 m_oEventLog.WriteEntry("DACruxTEST Service Stoped!!!!");
                 ///////////////////////////////////////////////////////////////////////////////////////////////
             }

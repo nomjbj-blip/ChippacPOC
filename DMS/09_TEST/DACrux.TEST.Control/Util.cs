@@ -308,21 +308,6 @@ namespace DACrux.TEST.Control
                             {
                                 dc.AllowDBNull = bSetDefault;
 
-                                //switch (dc.DataType.Name.ToUpper())
-                                //{
-                                //    case "STRING":
-                                //        dc.DefaultValue = string.Empty;
-                                //        break;
-                                //    case "DECIMAL":
-                                //        dc.DefaultValue = double.NaN;
-                                //        break;
-                                //    case "INT32":
-                                //        dc.DefaultValue = 0;
-                                //        break;
-                                //    case "DATETIME":
-                                //        dc.DefaultValue = DateTime.Today;
-                                //        break;
-                                //}
                             }
                             dt.Columns.Add(dc.ColumnName, dc.DataType);
                         }
@@ -360,7 +345,6 @@ namespace DACrux.TEST.Control
                                 {
                                     dt.Rows[row + i][dr[sPivotCols[0]].ToString()] = dr[sPivotRows[i]];
                                     IsInsert = false;
-                                    //break;
                                 }
                             }
                         }
@@ -669,7 +653,6 @@ namespace DACrux.TEST.Control
 
                             dr[sDefultValueColumn] = "0";
                             dt.Rows.Add(dr.ItemArray);
-                            //dt.AcceptChanges();
                         }
                     }
 
@@ -797,7 +780,6 @@ namespace DACrux.TEST.Control
                                 dr[sDefultValueColumn[col]] = "0";
 
                             dt.Rows.Add(dr.ItemArray);
-                            //dt.AcceptChanges();
                         }
                     }
 
@@ -1068,7 +1050,6 @@ namespace DACrux.TEST.Control
                 for (int i = nStartIndex - 1; i < Spread.ActiveSheet.Columns.Count; i++)
                 {
                     Spread.ActiveSheet.Columns[i].CellType = num;
-                    //Spread.ActiveSheet.Cells[0, i, Spread.ActiveSheet.Rows.Count - 1, i].CellType = num;
                 }
             }
             catch (Exception ex)
@@ -1111,7 +1092,6 @@ namespace DACrux.TEST.Control
                     if ((nStartIndex - 1) + i < Spread.ActiveSheet.ColumnCount)
                         continue;
                     Spread.ActiveSheet.Columns[(nStartIndex - 1) + i].CellType = num;
-                    //Spread.ActiveSheet.Cells[0, i - (nStartIndex - 1), Spread.ActiveSheet.Rows.Count - 1, i - (nStartIndex - 1)].CellType = num;
                 }
             }
             catch (Exception ex)
@@ -1239,8 +1219,6 @@ namespace DACrux.TEST.Control
                     return null;
 
                 // 기본이 되는 TargetRow가 없으면 Null 반환
-                //if (sDefaultDataColumns == null || sDefaultDataColumns.Length < 1)
-                //    return null;
 
                 // Pivot 대상 데이터가 없으면 Null 반환
                 if (sPivotRowColumns == null || sPivotRowColumns.Length < 1)
@@ -1396,7 +1374,6 @@ namespace DACrux.TEST.Control
         public DataTable AVIFTPFileDownload(DataTable FileList, string ModuleName)
         {
             DACrux.Utility.HFtpClient oFTP = null;
-            //DACrux.Utility.ServerCommunicationFtp oFTP = null;
             string strLocalFullPath = string.Empty;
 
             string strFTPFullPath = string.Empty;
@@ -1406,14 +1383,12 @@ namespace DACrux.TEST.Control
             string strFTPPort = string.Empty;
             string strFTPID = string.Empty;
             string strFTPPass = string.Empty;
-            //string strFTPMainPath = string.Empty;
 
             FileInfo oImageFile = null;
             DirectoryInfo oDirectory = null;
 
             DataTable dtResult = null;
 
-            //DACrux.TEST.RO.DataSelect oData = null;
             ComConfiguration obj = null;
 
             try
@@ -1429,7 +1404,6 @@ namespace DACrux.TEST.Control
                 dtResult.Columns.Add(new DataColumn("THUMB_PATH", typeof(string)));
                 dtResult.AcceptChanges();
 
-                //oData = new RO.DataSelect();
                 obj = new ComConfiguration();
                 DataTable dtConfig = obj.GetAVIImageFTPInfo();
                 if (dtConfig == null || dtConfig.Rows.Count <= 0)
@@ -1439,7 +1413,6 @@ namespace DACrux.TEST.Control
                 strFTPPort = dtConfig.Rows[0]["PORT"].ToString();
                 strFTPID = dtConfig.Rows[0]["ID"].ToString();
                 strFTPPass = dtConfig.Rows[0]["PASS"].ToString();
-                //strFTPMainPath = dtConfig.Rows[0]["MAIN_PATH"].ToString();
 
                 //Local Directory 삭제 후 생성 (쓰레기 Data 는 미리 삭제..)
                 strLocalPathName = System.IO.Path.Combine(Environment.CurrentDirectory, "AVI", ModuleName);
@@ -1453,13 +1426,6 @@ namespace DACrux.TEST.Control
                 bool IsFtpConnect = oFTP.LoginTest();
                 if (IsFtpConnect == false)
                     throw new Exception("FTP에 접속할 수 없습니다.");
-
-                //oFTP = new Utility.ServerCommunicationFtp();
-                //oFTP.Server = strFTPIP;
-                //oFTP.Port = DACrux.Base.Convert.intParse(strFTPPort);
-                //oFTP.UserID = strFTPID;
-                //oFTP.Password = strFTPPass;
-                //oFTP.ChmodValue = 777;
 
                 //Image 및 Thumb File 을 Download 받는다.
                 string strFileName = string.Empty;
@@ -1481,7 +1447,6 @@ namespace DACrux.TEST.Control
                     else
                         strFTPFullPath = System.IO.Path.Combine("BACKUP/", strFilePath, strFileName).Replace("\\", "/");
 
-                    //oFTP.ReceiveFile(strFTPFullPath, strLocalFullPath);
                     oFTP.Down(strFTPFullPath, strLocalFullPath);
                     oImageFile = new FileInfo(strLocalFullPath);
                     if (!oImageFile.Exists)
@@ -1496,7 +1461,6 @@ namespace DACrux.TEST.Control
                         strFilePath = FileList.Rows[f]["THUMB_PATH"].ToString();
                         strLocalFullPath = System.IO.Path.Combine(strLocalPathName, strFileName);
                         strFTPFullPath = System.IO.Path.Combine(strFilePath, strFileName).Replace("\\", "/");
-                        //oFTP.ReceiveFile(strFTPFullPath, strLocalFullPath); 
                         oFTP.Down(strFTPFullPath, strLocalFullPath);
                         oImageFile = new FileInfo(strLocalFullPath);
                         if (!oImageFile.Exists)

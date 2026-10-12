@@ -158,7 +158,6 @@ namespace DACrux.TEST.ENGUI
                 fpBin_Sheet1.SetValue(fpBin_Sheet1.Rows.Count - 1, 1, iMaxSBin + 1);
                 fpBin_Sheet1.SetValue(fpBin_Sheet1.Rows.Count - 1, 2, iMaxHBin + 1);
                 fpBin_Sheet1.SetValue(fpBin_Sheet1.Rows.Count - 1, 3, string.Format("BIN{0:0#}", iMaxSBin + 1));
-                //fpBin_Sheet1.SetValue(fpBin_Sheet1.Rows.Count-1,3,".");
                 fpBin_Sheet1.SetValue(fpBin_Sheet1.Rows.Count - 1, 5, false);
                 fpBin_Sheet1.SetValue(fpBin_Sheet1.Rows.Count - 1, 6, true);
                 fpBin_Sheet1.SetValue(fpBin_Sheet1.Rows.Count - 1, 7, 10);

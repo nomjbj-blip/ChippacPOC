@@ -224,8 +224,6 @@ namespace DACrux.BStats.StatDialog
 
         void btnLeft_SubgroupColumn_Click(object sender, EventArgs e)
         {
-            //if (lvSubgroupColumn.SelectedItems.Count > 0)
-            //    DACrux.ProjectManager.UI.Common.MoveListViewItems(lvSubgroupColumn, lvColumns, (IList)lvSubgroupColumn.SelectedItems);
             //선택 안되어 있어도 이동할수 있도록 변경. 하나밖에 없으므로..
 
             if(lvSubgroupColumn.Items.Count == 1)
@@ -234,8 +232,6 @@ namespace DACrux.BStats.StatDialog
 
         void btnLeft_SingleVar_Click(object sender, EventArgs e)
         {
-            //if (lvSingleVariables.SelectedItems.Count > 0)
-            //    DACrux.ProjectManager.UI.Common.MoveListViewItems(lvSingleVariables, lvColumns, (IList)lvSingleVariables.SelectedItems);
             //선택 안되어 있어도 이동할수 있도록 변경. 하나밖에 없으므로..
             if (lvSingleVariables.Items.Count == 1)
                 DACrux.ProjectManager.UI.Common.MoveListViewItem(lvSingleVariables, lvColumns, lvSingleVariables.Items[0]);
@@ -955,13 +951,6 @@ namespace DACrux.BStats.StatDialog
                     }
                 }
 
-                //m_Input.DataSource.AcceptChanges();
-                //int iRowCnt = m_Input.DataSource.Rows.Count;
-                //for (int i = iRowCnt - 1; i > -1; i--)
-                //{
-                //    if(m_Input.DataSource.Rows[i].ItemArray
-                //}
-
                 #region etc
 
                 if (txtLowerSpec.Text.Trim() != string.Empty)
@@ -1127,12 +1116,9 @@ namespace DACrux.BStats.StatDialog
                     lvSubgroupAcrossRows.Enabled = false;
                     btnLeft_SubgroupsAcrossRows.Enabled = false;
                     btnRight_SubgroupsAcrossRows.Enabled = false;
-                    //if (m_lvSubgroupAcrossRows)
-                    //{
                     m_lvSubgroupAcrossRows = false;
                     m_lvSingleVariables = true;
                     m_lvSubgroupColumn = false;
-                    //}
 
                     if (lvSubgroupAcrossRows.Items.Count > 0)
                     {
@@ -1148,12 +1134,9 @@ namespace DACrux.BStats.StatDialog
                     lvSubgroupAcrossRows.Enabled = true;
                     btnLeft_SubgroupsAcrossRows.Enabled = true;
                     btnRight_SubgroupsAcrossRows.Enabled = true;
-                    //if (m_lvSingleVariables || m_lvSubgroupColumn)
-                    //{
                     m_lvSingleVariables = false;
                     m_lvSubgroupColumn = false;
                     m_lvSubgroupAcrossRows = true;
-                    //}
 
                     if (lvSingleVariables.Items.Count > 0)
                     {
@@ -1202,7 +1185,6 @@ namespace DACrux.BStats.StatDialog
         void btnEstimate_Click(object sender, EventArgs e)
         {
             SelectedCapaContinuousEstimate oSelectedCapaContinuousEstimate = new SelectedCapaContinuousEstimate();
-            //oSelectedCapaContinuousEstimate.Reset();
             oSelectedCapaContinuousEstimate.EstimationBetweenSubgroup = m_Input.EstimationBetweenSubgroup;
             oSelectedCapaContinuousEstimate.EstimationWithinSubgroup = m_Input.EstimationWithinSubgroup;
             oSelectedCapaContinuousEstimate.IsUseUnbiasingOverall = m_Input.IsUseUnbiasingConstantsOverall;
@@ -1227,7 +1209,6 @@ namespace DACrux.BStats.StatDialog
         void btnOptions_Click(object sender, EventArgs e)
         {
             SelectedCapaContinuousOptions oSelectedCapaContinuousOptions = new SelectedCapaContinuousOptions();
-            //oSelectedCapaContinuousOptions.Reset();
             oSelectedCapaContinuousOptions.ConfidenceIntervals = m_Input.ResultConfidenceIntervalsType;
             oSelectedCapaContinuousOptions.ConfidenceLevel = m_Input.ConfidenceLevel;
             oSelectedCapaContinuousOptions.IsBetweenWithinAnalysis = m_Input.IsBetweenWithinAnalysis;

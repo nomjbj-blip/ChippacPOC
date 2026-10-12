@@ -13,10 +13,6 @@ namespace MigrationTools.ESDA
         private System.Data.OracleClient.OracleConnection connSourceDb = null;
         private const int RK = 1;
 
-        //private readonly string m_ESDA_ConnectionString = "Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=10.144.251.226)(PORT=1521)))(CONNECT_DATA =(SERVICE_NAME=DMS)));User ID=DMSMGR;Password=DMSMGR;";
-        //private readonly string m_ANAMDB_ConnectionString = "Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=10.144.251.226)(PORT=1521)))(CONNECT_DATA =(SERVICE_NAME=DMS)));User ID=DMSMGR;Password=DMSMGR;";
-        //private readonly string m_IDB_ANAMIDB_ConnectionString = "Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=10.144.251.226)(PORT=1521)))(CONNECT_DATA =(SERVICE_NAME=DMS)));User ID=DMSMGR;Password=DMSMGR;";
-
         private readonly string m_ANAMDB_ConnectionString = "Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=10.147.13.13)(PORT=1521)))(CONNECT_DATA =(SERVICE_NAME=anamdb)));User ID=T_ESDA;Password=T_ESDA;";
         private readonly string m_IDB_ANAMIDB_ConnectionString = "Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST= 10.147.13.20)(PORT=1521)))(CONNECT_DATA =(SERVICE_NAME=ANAMIDB)));User ID=IDBMGRREAD;Password=IDBMGRREAD;";
         
@@ -165,8 +161,6 @@ namespace MigrationTools.ESDA
                     sr.Close();
                 }
 
-                //if(oRecipeFile != null && oRecipeFile.Exists)
-                //    oRecipeFile.Delete();
             }
 
         }
@@ -497,7 +491,6 @@ namespace MigrationTools.ESDA
                 strLocalFullPath = System.IO.Path.Combine(strLocalPathName, strFTPFileName);
 
                 strFTPFullPath = System.IO.Path.Combine(strFTPPath, strFTPDirctory).Replace(@"\", "/");
-                //oFTP.SetCurrentDir(strFTPPath);
                 oFTP.Down(strFTPFullPath, strLocalFullPath);
 
                 oRecipeFile = new FileInfo(strLocalFullPath);

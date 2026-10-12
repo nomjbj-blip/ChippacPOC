@@ -36,7 +36,6 @@ namespace DACrux.TEST.FileMonitor
         static int iProcessCount = 0;  // 기본 10개
         static int iRunProcessCount = 0;
         static List<string> WatcherForder = null;
-        //static List<string> ParsingList = null; // 큐에 파일을 중복으로 저장하지 않게 방지하는 코드가 있지만 추가되는 현상이 발생하므로 현재 파싱 중인 리스트를 비교하여 파싱여부를 확인한다.
         DACrux.TEST.BSL.ProbeAdmin oCustomer = null;
 
 
@@ -89,12 +88,6 @@ namespace DACrux.TEST.FileMonitor
 
                 #endregion
 
-                //log.WriteLog(string.Format("[{0, -15}]", "SERVICE"), "--------------------------------------------------", strLogPath, 0);
-                //log.WriteLog(string.Format("[{0, -15}]", "SERVICE"), string.Format("[{0, -15}] File Folder\t: {1}", "START", strPath), strLogPath, 0);
-                //log.WriteLog(string.Format("[{0, -15}]", "SERVICE"), string.Format(" {0, -15}  Work Folder\t: {1}", "", strExcutePath), strLogPath, 0);
-                //log.WriteLog(string.Format("[{0, -15}]", "SERVICE"), string.Format(" {0, -15}  Log Folder\t: {1}", "", strLogPath), strLogPath, 0);
-                //log.WriteLog(string.Format("[{0, -15}]", "SERVICE"), string.Format(" {0, -15}  Log Level\t: {1}", "", iLogLevel), strLogPath, 0);
-
                 #region [ Get AUTO_FLAG is 'Y' ]
 
                 oCustomer = new DACrux.TEST.BSL.ProbeAdmin();
@@ -106,7 +99,6 @@ namespace DACrux.TEST.FileMonitor
                 }
 
                 WatcherForder = new List<string>();
-                //ParsingList = new List<string>();
 
                 foreach (DataRow dr in dt.Rows)
                 {
@@ -325,7 +317,6 @@ namespace DACrux.TEST.FileMonitor
 
         private void AddFile(string file)
         {
-            //bool IsSecMap = false;
 
             // DB상에 AUTO FLAG가 Y인 폴더만 파일을 가져온다.
             string tempFile = file.Replace(strPath, "").TrimStart('\\');

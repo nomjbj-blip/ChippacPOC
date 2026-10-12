@@ -601,12 +601,10 @@ namespace DACrux.BStats
             int iRemainder;
 
             //반복수
-            //int i =0;
 
             int count1 = 1;
 
             // 규칙적인 값을 생성하는 부분
-            //for(int j=1; j<= defaultFactorCount; j++)
             for (int j = defaultFactorCount; j >= 1; j--)
             {
                 posCol = count1;
@@ -653,7 +651,6 @@ namespace DACrux.BStats
 
                         int temp = 0;
 
-                        //if (count == strDefi.Length) count = 0;
                         string str = strDefi[count];
 
                         for (int t = 0; t < str.Length; t++)

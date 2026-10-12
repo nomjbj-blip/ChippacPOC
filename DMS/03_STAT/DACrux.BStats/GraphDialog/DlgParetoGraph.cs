@@ -124,7 +124,6 @@ namespace DACrux.BStats.GraphDialog
             txtAxisYTitle.Text = graphInfo.AxisYTitle;
             cboDateTimeFormat.Text = graphInfo.DateTimeFormat.ToString();
             nudBarSize.Value = Convert.ToDecimal(graphInfo.BarSize);
-            //nudDecimalPlace.Value = Convert.ToDecimal(graphInfo.DecimalPlace);
             nudDecimalPlace.Value = 1;
             cboLabelAngle.Text = graphInfo.LabelAngleString;
             chkView3D.Checked = graphInfo.View3D;

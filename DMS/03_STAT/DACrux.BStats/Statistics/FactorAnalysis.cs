@@ -140,23 +140,6 @@ namespace DACrux.BStats
         string defineNames = string.Empty;
 
 
-        //string sAnalysisofVariance = Miracom.DACrux.Interface.ILanguages.getResourceString("STAT_DOE_FACTANAL_RESULT_TAB01");
-        //string sModelInformation = Miracom.DACrux.Interface.ILanguages.getResourceString("STAT_DOE_FACTANAL_RESULT_TAB02");
-        //string sMainEffect = Miracom.DACrux.Interface.ILanguages.getResourceString("STAT_DOE_FACTANAL_RESULT_TAB03");
-        //string sInteractionEffect = Miracom.DACrux.Interface.ILanguages.getResourceString("STAT_DOE_FACTANAL_RESULT_TAB04");
-        //string sSource = Miracom.DACrux.Interface.ILanguages.getResourceString("STAT_DOE_FACTANAL_RESULT_LBL01");
-        //string sDF = Miracom.DACrux.Interface.ILanguages.getResourceString("STAT_DOE_FACTANAL_RESULT_LBL02");
-        //string sSumofSquares = Miracom.DACrux.Interface.ILanguages.getResourceString("STAT_DOE_FACTANAL_RESULT_LBL03");
-        //string sMeanSquare = Miracom.DACrux.Interface.ILanguages.getResourceString("STAT_DOE_FACTANAL_RESULT_LBL04");
-        //string sFValue = Miracom.DACrux.Interface.ILanguages.getResourceString("STAT_DOE_FACTANAL_RESULT_LBL05");
-        //string sPValue = Miracom.DACrux.Interface.ILanguages.getResourceString("STAT_DOE_FACTANAL_RESULT_LBL06");
-        //string sRSquare = Miracom.DACrux.Interface.ILanguages.getResourceString("STAT_DOE_FACTANAL_RESULT_LBL07");
-        //string sAdjRSquare = Miracom.DACrux.Interface.ILanguages.getResourceString("STAT_DOE_FACTANAL_RESULT_LBL08");
-        //string sMSE = Miracom.DACrux.Interface.ILanguages.getResourceString("STAT_DOE_FACTANAL_RESULT_LBL09");
-        //string sFactor = Miracom.DACrux.Interface.ILanguages.getResourceString("STAT_DOE_FACTANAL_RESULT_LBL10");
-
-        //string sAnalysisofVariance = "AnalysisofVariance";
-        //string sModelInformation = "ModelInformation";
         string sMainEffect = "MainEffect";
         string sInteractionEffect = "InteractionEffect";
         string sSource = "Source";
@@ -170,17 +153,10 @@ namespace DACrux.BStats
         string sMSE = "MSE";
         string sFactor = "Factor";
 
-        //string	sMainEffect                    = Miracom.DACrux.Interface.ILanguages.getResourceString("STAT_DOE_FACTANAL_RESULT_LBL11"); 
-        //string	sFactor                        = Miracom.DACrux.Interface.ILanguages.getResourceString("STAT_DOE_FACTANAL_RESULT_LBL12"); 
-        //string	sInteractionEffect             = Miracom.DACrux.Interface.ILanguages.getResourceString("STAT_DOE_FACTANAL_RESULT_LBL13"); 
 
 
-
-
-        //int interactionIndex = -1;
 
         //결측치를 제거하기전 컬럼의 크기
-        //private int columnLength           = 0;
 
         /// <summary>
         /// AnalysisFactorial의 생성자
@@ -361,7 +337,6 @@ namespace DACrux.BStats
 
             for (int i = 0; i < this.analysisVarIndex.Length; i++)
             {
-                //Object[] array = alColumns[this.analysisVarIndex[i] ].ToArray();
                 Object[] array = alColumns[this.getIndex(dfOrgin, this.input.analysisVariables[i].ToString())].ToArray();
 
                 dblValue = new Double[array.Length];
@@ -373,13 +348,10 @@ namespace DACrux.BStats
                 dfNew.AddColumn(dfColValue);
             }
 
-            //Console.Out.WriteLine("=============================================================");
             for (int i = 0; i < this.analysisParamsVarIndex.Length; i++)
             {
-                //strFactor1 = (string[])alColumns[this.analysisParamsVarIndex[i] ].ToArray(System.Type.GetType("System.String"));
 
                 object[] objFactor1 = alColumns[this.getIndex(dfOrgin, this.input.analysisParams[i].ToString())].ToArray();
-                //bject [] objFactor1 = alColumns[this.analysisParamsVarIndex[i] ].ToArray();
 
                 strFactor1 = new string[objFactor1.Length];
 
@@ -391,8 +363,6 @@ namespace DACrux.BStats
 
                 dfColValue = null;
             }
-            //Console.Out.WriteLine("=============================================================");
-
 
             for (int i = 0; i < dfNew.Cols; i++)
             {
@@ -412,24 +382,6 @@ namespace DACrux.BStats
             for (int i = 0; i < alIndepFactors.Length; i++)
                 this.alIndepFactors[i] = new ArrayList(((DFColumn)dfNew[this.analysisParamsVarIndex[i]]).ToArray());
 
-
-            //			if(!this.isValidate(dfNew))
-            //			{
-            //				MessageBox.Show("결측치나 데이터 형태가 적절하지 않습니다.");
-            //				return null;
-            //			}
-            //
-            //			if(!this.isValidateTwoWayOrthogonalArrays(dfNew))
-            //			{
-            //				MessageBox.Show("2수준 직교배열표가 아닙니다.");
-            //				return null;
-            //			}
-            //
-            //			if(!this.isValidateOrthogonalArrays(dfNew))
-            //			{
-            //				MessageBox.Show("데이터의 형태가 직교배열표가 아닙니다.");
-            //				return null;
-            //			}
 
 
             this.Run(dfNew, input);
@@ -493,8 +445,6 @@ namespace DACrux.BStats
                 combi = new Combination(this.analysisParamsVarIndex.Length, 2);
 
                 alCombi = combi.GenerateCombiation();
-
-                //Console.Out.WriteLine(alCombi.Count);
 
                 for (int i = 0; i < alCombi.Count; i++)
                 {
@@ -597,10 +547,6 @@ namespace DACrux.BStats
             errorSumOfSqures = TotalSumofSqures - (StatsFunctions.NaNSum(VarianceSumOfSqures) + StatsFunctions.NaNSum(InteractionSumOfSqures));
             errorDF = dblValue.Length - VarianceSumOfSqures.Length - InteractionSumOfSqures.Length - 1;
             if (errorDF < 0) errorDF = 0;
-
-            //Console.Out.WriteLine("errorSumOfSqures = {0}",errorSumOfSqures);
-
-            //Console.Out.WriteLine("ErrorDF = {0}",errorDF);
 
 
 
@@ -1487,18 +1433,12 @@ namespace DACrux.BStats
 
                 DFColumn dfgCol = (DFColumn)df[this.input.analysisParams[i].ToString()];
 
-                //Console.Out.WriteLine("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-
-                //Console.Out.WriteLine(dfgCol.Name);
-
                 string tempNameOld = dfgCol[0].ToString();
                 string tempName = string.Empty;
 
                 for (int k = 0; k < dfgCol.Count; k++)
                 {
                     tempName = dfgCol[k].ToString();
-
-                    //Console.Out.WriteLine(tempName);
 
                     // 서브그룹 변수에 널이 있는 경우,.
                     if (tempName == "." || tempName.Equals(string.Empty))
@@ -1514,8 +1454,6 @@ namespace DACrux.BStats
 
 
                 }
-
-                //Console.Out.WriteLine("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
 
             }
 
@@ -1541,12 +1479,8 @@ namespace DACrux.BStats
                 alGroupName = new ArrayList();
                 alGroupSize = new ArrayList();
 
-                //df.SortRows(this.analysisParamsVarIndex[i]);
-
 
                 DFColumn dfgCol = (DFColumn)df[this.input.analysisParams[i].ToString()];
-
-                //DFColumn dfgCol =  (DFColumn)df[this.analysisParamsVarIndex[i]];	
 
                 ArrayList distVar = CountLevelOfVar(dfgCol.ToStringArray());
 
@@ -1554,7 +1488,6 @@ namespace DACrux.BStats
 
                 string tempNameOld = dfgCol[0].ToString();
                 string tempName = string.Empty;
-                //int tempSize       = 0;
 
                 for (int k = 0; k < dfgCol.Count; k++)
                 {
@@ -1568,8 +1501,6 @@ namespace DACrux.BStats
 
                 }
 
-                //Console.Out.WriteLine("컬럼의 구분의 크기들은 coutVars[0]= {0}",countVars[0]);
-                //Console.Out.WriteLine("컬럼의 구분의 크기들은 coutVars[1]= {0}",countVars[1]);
                 if (countVars[0] != countVars[1])
                 {
                     isEqual = false;
@@ -1599,11 +1530,7 @@ namespace DACrux.BStats
                 alGroupName = new ArrayList();
                 alGroupSize = new ArrayList();
 
-                //df.SortRows(this.analysisParamsVarIndex[i]);
-
                 DFColumn dfgCol = (DFColumn)df[this.input.analysisParams[i].ToString()];
-
-                //DFColumn dfgCol =  (DFColumn)df[this.analysisParamsVarIndex[i]];	
 
                 ArrayList distVar = CountLevelOfVar(dfgCol.ToStringArray());
 
@@ -1896,7 +1823,6 @@ namespace DACrux.BStats
                 return 0;
 
             DoubleVector variationY = dfCol.ToDoubleVector();
-            //double sumOfsqureY = StatsFunctions.NaNSumOfSquares(variationY);
             double sumOfsqureY = StatsFunctions.SumOfSquaredErrors(variationY);
 
             return sumOfsqureY;
@@ -1919,8 +1845,6 @@ namespace DACrux.BStats
             double sum_str2 = StatsFunctions.NaNSum(array2);
 
             double var = Math.Pow(sum_str1 - sum_str2, 2) / this.dblValue.Length;
-
-            //Console.Out.WriteLine("SSR 계산. sum_str1 {0}, sum_str2 {1}",sum_str1,sum_str2);
 
             return var;
 
@@ -2022,7 +1946,6 @@ namespace DACrux.BStats
 
             string colName = colsName[0] + "*" + colsName[1];
 
-            //Console.Out.WriteLine(colName);
             if (IsConfoundingInteraction(df, strArray))
             {
                 string[] names = df.ColumnNames;
@@ -2091,7 +2014,6 @@ namespace DACrux.BStats
 
             string colName = colsName[0] + "*" + colsName[1];
 
-            //Console.Out.WriteLine(colName);
             if (IsConfoundingInteraction(df, strArray))
             {
                 string[] names = df.ColumnNames;
@@ -2169,8 +2091,6 @@ namespace DACrux.BStats
                 {
                     if (((DFColumn)df[tmp]).Label.Equals(string.Empty))
                         ((DFColumn)df[tmp]).Label = ((DFColumn)df[tmp]).Name;
-                    //else
-                    //((DFColumn)df[tmp]).Label +=  "=" +  colName;
                 }
             }
             else
@@ -2361,7 +2281,6 @@ namespace DACrux.BStats
                     row = null;
                 }
 
-                //this.dsOutput.Tables.Add(table);
                 resultDataSet.Tables.Add(table);
 
                 table = null;
@@ -2491,10 +2410,8 @@ namespace DACrux.BStats
             if (a.Length == b.Length)
             {
                 bool check = true;
-                //Console.Out.WriteLine("======================== start  Confound Job  ========================");
                 for (int i = 0; i < length; i++)
                 {
-                    //Console.Out.WriteLine("{0} == {1}",a[i],b[i]);
 
                     if (a[i].Equals(b[i]))
                     {
@@ -2505,8 +2422,6 @@ namespace DACrux.BStats
                         check = false;
                     }
                 }
-
-                //Console.Out.WriteLine("======================== bool {0} ",check);
 
                 isEqaul = check;
             }

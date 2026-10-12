@@ -248,7 +248,6 @@ namespace FabTwoToMigrationTools
                 {
                     oCommand.CommandText = sQuery;
                     oCommand.CommandType = System.Data.CommandType.Text;
-                    //oCommand.ArrayBindCount = iBindCnt;
 
                     foreach (KeyValuePair<string, DataTableParameters> p in dicParams)
                     {

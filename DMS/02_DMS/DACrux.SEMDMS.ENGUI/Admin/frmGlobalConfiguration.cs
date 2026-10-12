@@ -121,15 +121,7 @@ namespace DACrux.SEMDMS.ENGUI
         {
             try
             {
-                //string strCategory = fpSpreadConfig.ActiveSheet.Cells[e.Row, (int)TQC_CONFIG.CATEGORY].Text;
-                //string strNAME = fpSpreadConfig.ActiveSheet.Cells[e.Row, (int)TQC_CONFIG.NAME].Text;
 
-                //gridProperty.DataSource = null;
-
-                //if(dtCategoryList == null || dtCategoryList.Rows.Count <=0 || dtCategoryList.Select(string.Format("CATEGORY = '{0}' AND NAME = '{1}'", strCategory, strNAME)).Length <= 0)
-                //    return;
-
-                //gridProperty.DataSource = dtCategoryList.Select(string.Format("CATEGORY = '{0}' AND NAME = '{1}'", strCategory, strNAME)).CopyToDataTable<DataRow>();
             }
             finally
             {

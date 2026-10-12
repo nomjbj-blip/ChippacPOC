@@ -17,17 +17,12 @@ namespace DACrux.BStats
         #region [ LANGUAGE ]
         string m_Space1 = "&nbsp;";
         string m_Space2 = "&nbsp;&nbsp;";
-        //string m_Space3 = "&nbsp;&nbsp;&nbsp;";
-        //string m_Space4 = "&nbsp;&nbsp;&nbsp;&nbsp;";
 
         private string m_ErrorColNameNotEqual = "Length of ColumnNames doesn't equal";
 
         #region Correlation
         string m_PearsonCorrelation = "Pearson correlation";
-        //string m_Pvalue = "P-Value";
         string m_Spearman = "Spearman's Rho";
-        //string m_RegressionEquation = "Regression Equation";
-        //string m_ScatterPlot = "ScatterPlot";
         #endregion
 
         #region CapaContinuous
@@ -1224,8 +1219,6 @@ namespace DACrux.BStats
             {
                 switch (oType)
                 {
-                    //case DACrux.BStats.Core.RegressionType.All:
-                    //    break;
                     case DACrux.BStats.Core.RegressionType.Stepwise:
                         strSubTitle = "Regression(stepwise) : ";
                         break;
@@ -1407,11 +1400,6 @@ namespace DACrux.BStats
 
         public void BodyOneWayANOVA(DACrux.BStats.Core.ResultAnova oResult, DACrux.ProjectManager.UI.GraphInformation[] oGraph)
         {
-            //oResult.TableforGraphs;
-            //oResult.TableofAnova;
-            //oResult.TableofRsquared;
-            //oResult.TableofStatistic;
-            //oResult.ErrorInformation;
 
             m_Sw.WriteLine("<!----------------------------- Contents Format 1  ----------------------------->");
             m_Sw.WriteLine("<TABLE border='1' cellspacing='0' bordercolor='#999999' bordercolordark='white' bordercolorlight='#999999' cellpadding = 10 width=700>");
@@ -1737,13 +1725,6 @@ namespace DACrux.BStats
         #region Taguchi
         public void BodyTaguchi(DataSet oResult, TaguchiAnalysisRule oRule, DACrux.ProjectManager.UI.GraphInformation[] oGraph)
         {
-            //string strSubTitle;
-            //string strHypothesis;
-            //string strEqual;
-            //string strCI;
-            //string strCriticalValue;
-            //string strTestResult;
-            //string strLevel;
 
             List<string> lstFactors = new List<string>();
             int iLevels = 0;

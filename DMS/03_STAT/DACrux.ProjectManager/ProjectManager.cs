@@ -13,7 +13,6 @@ using System.Data.OleDb;
 using DACrux.BStats;
 using DACrux.ProjectManager.UI;
 using DACrux.BStats.StatisticsInput;
-//using DACrux.ProjectManager.Database;
 
 namespace DACrux.ProjectManager
 {
@@ -365,7 +364,6 @@ namespace DACrux.ProjectManager
 
                     case "STAT_DESC_ANALYSIS":
                         NewStatAnalysis(StatType.DescriptiveAnalysis);
-                        //MessageBox.Show("You need license to perform this fuction.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         break;
 
                     case "STAT_HYPOTHESIS":
@@ -374,22 +372,18 @@ namespace DACrux.ProjectManager
 
                     case "STAT_CORRELATION":
                         NewStatAnalysis(StatType.CorrelationAnalysis);
-                        //MessageBox.Show("You need license to perform this fuction.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         break;
 
                     case "STAT_REGRESSION":
                         NewStatAnalysis(StatType.RegressionAnalysis);
-                        //MessageBox.Show("You need license to perform this fuction.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         break;
 
                     case "STAT_ANOVA":
                         NewStatAnalysis(StatType.ANOVA);
-                        //MessageBox.Show("You need license to perform this fuction.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         break;
 
                     case "STAT_CCONTINUOUS":
                         NewStatAnalysis(StatType.CpCpkAnalysis_Continuous);
-                        //MessageBox.Show("You need license to perform this fuction.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         break;
 
                     case "STAT_ATTRIBUTE":
@@ -411,10 +405,6 @@ namespace DACrux.ProjectManager
                     case "STAT_LIN_ACC":
                         MessageBox.Show("You need license to perform this fuction.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         break;
-
-                    //case "STAT_FACTOR_DESIGN":
-                    //    NewStatDesign(StatType.DOE_FactorialDesign);
-                    //    break;
 
                     case "STAT_FACTOR_ANALYSIS":
                         NewStatAnalysis(StatType.DOE_FactorialAnalysis);
@@ -543,17 +533,9 @@ namespace DACrux.ProjectManager
             {
                 Cursor = Cursors.WaitCursor;
 
-                //if (oActiveWorkSheet == null)
-                //    throw (new Exception("No Active WorkSheet exists."));
-
                 switch (statAnalysisType)
                 {
                     case StatType.DOE_FactorialDesign:
-                        //DACrux.BStats.StatDialog.DlgFactorialDesign dlg = new BStats.StatDialog.DlgFactorialDesign();
-                        //if (dlg.ShowDialog() == DialogResult.OK)
-                        //{
-                        //    NewWorkSheet(string.Format("DOE_{0}", DateTime.Now.ToString("MMddmmss")), dlg.FactorSheet,DataSourceType.External);
-                        //}
                         break;
                     case StatType.DOE_TaguchiDesign:
                         DACrux.BStats.StatDialog.DlgTaguchi dlgTaguchi = new BStats.StatDialog.DlgTaguchi();
@@ -860,7 +842,6 @@ namespace DACrux.ProjectManager
             }
             catch
             {
-                //ProcessCloseProject();
                 MessageBox.Show("An error occured while opening the file.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
@@ -890,7 +871,6 @@ namespace DACrux.ProjectManager
                     switch (extention)
                     {
                         case ".xls":
-                            //dataSource = getDataFromXLS(dlgImportDataFile.FileName, " ");
                             dataSource = LoadExcel(dlgImportDataFile.FileName, true);
                             break;
                         case ".csv":
@@ -918,32 +898,7 @@ namespace DACrux.ProjectManager
 
         private void ImportDatabaseSource()
         {
-            //DataTable dt = null;
-            //DlgImportDatabaseSource dlg;
 
-            //try
-            //{
-            //    dlg = new DlgImportDatabaseSource();
-
-            //    if (dlg.ShowDialog() == DialogResult.OK)
-            //    {
-            //        dt = dlg.ResultDatatable;
-            //    }
-
-            //    if (dt != null && dt.Rows.Count > 0)
-            //    {
-            //        NewWorkSheet("", dt, DataSourceType.External);
-            //        //dt = DACrux.ProjectManager.UI.Common.ConvertToDataViewCompatibleDataTable(dt);
-
-            //        //NewWorkSheet("", dt);
-
-            //        MessageBox.Show("Import successed.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            //    }
-            //}
-            //catch (System.Exception ex)
-            //{
-            //    MessageBox.Show(ex.Message, "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            //}
         }
 
         private void SaveProject()
@@ -1178,7 +1133,6 @@ namespace DACrux.ProjectManager
             XmlTextWriter xtw = null;
             string strEmpty = "NULL";
             byte[] arrByte = null;
-            //object obj = null;
 
             try
             {
@@ -1402,10 +1356,6 @@ namespace DACrux.ProjectManager
                             else if (strType == strStatType)
                             {
                                 statInfo = objTemp as StatInformation;
-                                //if (objTemp is StatInformation)
-                                //    statInfo = objTemp as StatInformation;
-                                //else
-                                //    statInfo = new StatInformation();
 
                                 analysis = new StatAnalysis(workSheet, statInfo);
                             }
@@ -1661,7 +1611,6 @@ namespace DACrux.ProjectManager
                     dr[i] = dt.Columns[i].ColumnName.Replace("TEMP_", "");
                 }
 
-                //dt.Rows.InsertAt(dr, 0);
             }
             catch (Exception ex)
             {
@@ -1891,7 +1840,6 @@ namespace DACrux.ProjectManager
             //    @"Provider=Microsoft.Jet.OLEDB.4.0;" +
             //    @"Data Source=" + strExcelFilename + ";" +
             //    @"Extended Properties=" + Convert.ToChar(34).ToString() +
-            //    @"Excel 8.0;" + strHDR + Convert.ToChar(34).ToString();
         }
 
         private string GetElementValue(XmlTextReader tr, string ElementName)
@@ -1955,7 +1903,6 @@ namespace DACrux.ProjectManager
         private void OnProjectCreated(Project project)
         {
             DrawTreeViewNode(project);
-            // DrawSomeOtherView(project);
         }
 
         private void OnWorkSheetAdded(WorkSheet workSheet)
@@ -1996,7 +1943,6 @@ namespace DACrux.ProjectManager
 
         private void OnAnalysisRenamed(string name)
         {
-            //tvExplorer.SelectedNode.Name = name;
         }
 
         #endregion

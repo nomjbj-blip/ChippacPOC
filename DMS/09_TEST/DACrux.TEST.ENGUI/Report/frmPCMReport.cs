@@ -466,7 +466,6 @@ namespace DACrux.TEST.ENGUI
             )
         {
             SheetView sheet = e.Sheet;
-            //DataTable dt = null;
             FilterColumn = e.Sheet.Columns[e.Column].Label;
             FilterValue = string.Equals(e.FilterString, "(All)") || string.Equals(e.FilterString, "(NonBlanks)") ? String.Empty : e.FilterString;
 
@@ -480,7 +479,6 @@ namespace DACrux.TEST.ENGUI
             AutoSortedColumnEventArgs e
             )
         {
-            //fpRawData_Sheet1.SetColumnAllowAutoSort(e.Column, 11, false);
         }
 
         //--
@@ -894,7 +892,6 @@ namespace DACrux.TEST.ENGUI
             cArea.AxisX.ScrollBar.Size = 17;
             cArea.AxisX.IntervalAutoMode = IntervalAutoMode.FixedCount;
             cArea.AxisX.Interval = (double)nudInterval.Value;
-            //cArea.AxisX.IntervalOffset = double.NaN;
             cArea.AxisX.IsLabelAutoFit = true;
 
             cArea.CursorX.AutoScroll = true;
@@ -910,7 +907,6 @@ namespace DACrux.TEST.ENGUI
             cArea.AxisY.MajorGrid.Enabled = false;
             cArea.AxisY.MajorTickMark.Enabled = false;
             cArea.AxisY.LabelStyle.Enabled = true;
-            //cArea.AxisY.LabelStyle.Format = GetFormat();
             cArea.AxisY.LabelStyle.Format = "{0:0." + String.Concat(Enumerable.Repeat("0", (int)decimalLength.Value)) + "}";
             cArea.AxisY.ScaleView.SmallScrollSize = double.NaN;
             cArea.AxisY.ScaleView.Zoomable = true;
@@ -1178,7 +1174,6 @@ namespace DACrux.TEST.ENGUI
 
             cArea.AxisX.IntervalAutoMode = IntervalAutoMode.FixedCount;
             cArea.AxisX.Interval = (double)nudInterval.Value;
-            //cArea.AxisX.IntervalOffset = 1;
             cArea.AxisX.IsLabelAutoFit = true;
 
             //--
@@ -1187,7 +1182,6 @@ namespace DACrux.TEST.ENGUI
             cArea.AxisY.MajorGrid.Enabled = false;
             cArea.AxisY.MajorTickMark.Enabled = false;
             cArea.AxisY.LabelStyle.Enabled = true;
-            //cArea.AxisY.LabelStyle.Format = GetFormat();
             cArea.AxisY.LabelStyle.Format = "{0:0." + String.Concat(Enumerable.Repeat("0", (int)decimalLength.Value)) + "}";
             cArea.AxisY.ScaleView.SmallScrollSize = double.NaN;
             cArea.AxisY.ScaleView.Zoomable = true;

@@ -402,10 +402,6 @@ namespace DACrux.BStats.StatDialog.DlgRegression_
                     m_lvEverymodel = true;
                     btnLeft_Initialmodel.Enabled = false;
                     btnRight_Initialmodel.Enabled = false;
-                    //btnLeft_Everymodel.Enabled = true;
-                    //btnRight_Everymodel.Enabled = true;
-                    //lblPredictorsIncludeinEverymodel.Enabled = true;
-                    //lvPredictorsinEveryModel.Enabled = true;
                 }
             }
             catch (Exception ex)
@@ -427,10 +423,6 @@ namespace DACrux.BStats.StatDialog.DlgRegression_
                     m_lvEverymodel = true;
                     btnLeft_Initialmodel.Enabled = false;
                     btnRight_Initialmodel.Enabled = false;
-                    //btnLeft_Everymodel.Enabled = true;
-                    //btnRight_Everymodel.Enabled = true;
-                    //lblPredictorsIncludeinEverymodel.Enabled = true;
-                    //lvPredictorsinEveryModel.Enabled = true;
                 }
             }
             catch (Exception ex)
@@ -451,10 +443,6 @@ namespace DACrux.BStats.StatDialog.DlgRegression_
                     m_lvEverymodel = false;
                     btnLeft_Initialmodel.Enabled = true;
                     btnRight_Initialmodel.Enabled = true;
-                    //btnLeft_Everymodel.Enabled = true;
-                    //btnRight_Everymodel.Enabled = true;
-                    //lblPredictorsIncludeinEverymodel.Enabled = true;
-                    //lvPredictorsinEveryModel.Enabled = true;
                 }
             }
             catch (Exception ex)
@@ -475,10 +463,6 @@ namespace DACrux.BStats.StatDialog.DlgRegression_
                     m_lvEverymodel = true;
                     btnLeft_Initialmodel.Enabled = false;
                     btnRight_Initialmodel.Enabled = false;
-                    //btnLeft_Everymodel.Enabled = false;
-                    //btnRight_Everymodel.Enabled = false;
-                    //lblPredictorsIncludeinEverymodel.Enabled = false;
-                    //lvPredictorsinEveryModel.Enabled = false;
                 }
             }
             catch (Exception ex)

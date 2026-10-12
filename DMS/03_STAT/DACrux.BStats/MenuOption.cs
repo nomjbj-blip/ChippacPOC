@@ -2722,16 +2722,12 @@ namespace DACrux.BStats
                     oReturn.ResultDisplayType = DACrux.BStats.Core.DisplayType.Percents;
 
 
-                //strItem = "Display - Percents";  // Display - Parts per millon에서 구현
-
                 strItem = "Display - Capability stats";
                 strValue = GetValue(dsXml, strMenuType, strMainMenu, strDialog, strDepth, strItem);
                 if (strValue == m_Yes)
                     oReturn.ResultStatisticType = DACrux.BStats.Core.StatisticType.Capability_stats;
                 else
                     oReturn.ResultStatisticType = DACrux.BStats.Core.StatisticType.Benchmark_Z;
-
-                //strItem = "Display - Benchmark Z"; // Display - Capability stats에서 구현
 
 
                 strItem = "Include confidence intervals";

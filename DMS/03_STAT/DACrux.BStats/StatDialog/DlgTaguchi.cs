@@ -250,11 +250,6 @@ namespace DACrux.BStats.StatDialog
         {
             //실험순서
  
-            //this.selectDesignTable(this.comboBox1.Text);
-			
-            //DACrux.Interface.FactorialDesign.Repeat = 1;
-            //DACrux.Interface.FactorialDesign.ExcuteOrder = Interface.eExcuteOrder.Standard;
-
             m_TaguchiSheet = new DataTable();
             int iLevel = int.Parse(m_strLevel);
             int iRun = int.Parse(m_strRun.Replace("L",""));
@@ -323,7 +318,6 @@ namespace DACrux.BStats.StatDialog
  
 
 			//실험순서
-            //m_TaguchiSheet.Columns.Add("Index");
 
             for (int i = 0; i < m_FactorInfos.Length; i++)
 			{
@@ -350,19 +344,11 @@ namespace DACrux.BStats.StatDialog
                         string[] strValues = m_FactorInfos[j - 1].LevelValue.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
                         _rows.Add(strValues[FactorModel[i, j]]);
                     }
-                    //else
-                    //{
-                    //    _rows.Add(FactorModel[i, j].ToString());
-                    //}
                 }
 
                 m_TaguchiSheet.Rows.Add(_rows.ToArray());
             }
 
-            //for (int i = 0; i < 50 - m_FactorInfos.Count; i++)
-            //{
-            //    m_TaguchiSheet.Columns.Add();
-            //}
         }
 
 
@@ -377,7 +363,6 @@ namespace DACrux.BStats.StatDialog
                 m_dtDesignList.Columns.Add("LEVEL3", typeof(int));
                 m_dtDesignList.Columns.Add("LEVEL4", typeof(int));
                 m_dtDesignList.Columns.Add("LEVEL5", typeof(int));
-                //dtDesignList.Columns.Add("LEVELM", typeof(int));  // 사용안함
 
                 m_dtDesignList.Rows.Add(new object[] { "단일-수준", "L4", 3, -1, -1, -1 });
                 m_dtDesignList.Rows.Add(new object[] { "단일-수준", "L8", 7, -1, -1, -1 });

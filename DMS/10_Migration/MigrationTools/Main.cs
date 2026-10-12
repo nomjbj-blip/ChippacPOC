@@ -49,7 +49,6 @@ namespace MigrationTools
                 TxtLog.Clear();
                 TxtErrorLog.Clear();
 
-                //MigrationUpload();
                 trMigrationUpload = new System.Threading.Thread(new System.Threading.ThreadStart(MigrationUpload));
                 trMigrationUpload.Start();
             }
@@ -75,10 +74,6 @@ namespace MigrationTools
                 sQuery.AppendLine("AND A.WAFER_SEQ = B.WAFER_SEQ ");
                 sQuery.AppendLine("AND B.LOT_SEQ = C.LOT_SEQ ");
                 sQuery.AppendLine(string.Format("AND A.ITIME BETWEEN TO_DATE('{0}', 'YYYY-MM-DD') AND TO_DATE('{1}', 'YYYY-MM-DD') ", dtFrom.Text, dtTo.Text));
-                //sQuery.AppendLine("AND C.LOT_NUMBER in( '9034400')");
-               // sQuery.AppendLine("AND A.SLOTID in ( 24)");
-                //sQuery.AppendLine("ORDER BY C.LOT_NUMBER");
-                //sQuery.AppendLine("and A.LEVEL_SEQ = 10161802");
 
                 if(!string.IsNullOrEmpty(TxtLotID.Text.Trim()))
                     sQuery.AppendLine(string.Format("AND C.LOT_NUMBER = '{0}' ", TxtLotID.Text.Trim()));
@@ -105,7 +100,6 @@ namespace MigrationTools
                 }
 
                 DACrux.Utility.FPSpreadUtil.InitSpread(fpSpread1);
-                //DACrux.Utility.FPSpreadUtil.SetSpreadData(dt, fpSpread1, 100, 0, false);
                 fpSpread1.DataSource = dt;
                 fpSpread1_Sheet1.ActiveSkin = FarPoint.Win.Spread.DefaultSkins.Classic2;
                 fpSpread1_Sheet1.OperationMode = FarPoint.Win.Spread.OperationMode.ExtendedSelect;
@@ -145,7 +139,6 @@ namespace MigrationTools
 
             MapInfo.MapInfo oMapinfo;
             MapInfo.Map oMap;
-            //MapInfo.MAP_SETUP oMapSetup;
             MapInfo.DEFECT_INFO oDefect;
 
             DACrux.SEMDMS.RO.DefectDefine oDefectDefine = null;
@@ -212,7 +205,6 @@ namespace MigrationTools
                     {
                         oMapinfo = new MapInfo.MapInfo();
                         oMap = new MapInfo.Map();
-                        //oMapSetup = new MapInfo.MAP_SETUP();
                         oDefect = new MapInfo.DEFECT_INFO();
 
                         oStartDt = DateTime.Now;
@@ -229,9 +221,6 @@ namespace MigrationTools
                         strMachine = dt.Rows[idx]["MACHINE"].ToString().Trim();
                         strArea = dt.Rows[idx]["AREA"].ToString().Trim();
 
-                        //UpdateTextBox(string.Format("Start Time : {0}\nLot ID : {1}", oStartDt, strLotID));
-                        //UpdateTextBox(string.Format("Wafer ID : {0}", strWaferID));
-
                         oTranDt = DateTime.ParseExact(dt.Rows[idx]["SYS_TIME"].ToString(), "yyyyMMddHHmmss", CultureInfo.InvariantCulture, DateTimeStyles.None);
 
 
@@ -240,28 +229,19 @@ namespace MigrationTools
                         {
                             oEsda = new ESDA.ESDA();
 
-                            //UpdateTextBox(string.Format("ESDA Recipe File 정보 가져오기."));
                             oEsda.fnFTPRecipe(strDevice, ref oMapinfo);
 
-                            //UpdateTextBox(string.Format("ESDA Map File 정보 가져오기."));
                             oEsda.fnFTPMap(strDevice, ref oMap);
 
-                            //UpdateTextBox(string.Format("ESDA MAP_SETUP Table 정보 가져 오기."));
-                            //oEsda.fnGetMapSetup(strDevice, ref oMapSetup);
-                            //UpdateTextBox(string.Format("ESDA T_ESDA_IDATA , T_ESDA_IMAGES Table 정보 가져 오기."));
                             oEsda.fnGetDefectList(dt.Rows[idx]["LEVEL_SEQ"].ToString().Trim(), ref oDefect);
 
                             //===========================================================================================================================
                             //Migration 시작
                             //===========================================================================================================================
 
-                            //UpdateTextBox(string.Format("Migration 시작"));
                             decimal dTemp = 0;
                             dPITCH_X = (decimal)oMapinfo.X_period * RK;
                             dPITCH_Y = (decimal)oMapinfo.Y_period * RK;
-
-                            //dOrignX = (decimal)(dPITCH_X * oMapSetup.TEST_X) + oMapSetup.ORIGIN_X; 
-                            //dOrignY = (decimal)(dPITCH_Y * oMapSetup.TEST_Y) + oMapSetup.ORIGIN_Y; 
 
                             if (decimal.TryParse(dt.Rows[idx]["SAMPLEX"].ToString().Trim(), out dTemp) == false)
                                 throw new Exception("SAMPLEX 변환 실패");
@@ -280,26 +260,16 @@ namespace MigrationTools
                             dOrignY = dSampleY % dPITCH_Y;
 
 
-                            //dTemp = MapSize - (oMapinfo.X_os * RK);
-                            //dOrignX = (((dTemp - (dTemp - (dPITCH_X * oMapinfo.Max_cols))) - MapEdgeMargine) / 2) + dPITCH_X;
-
-                            //dTemp = MapSize - (oMapinfo.Y_os * RK);
-                            //dOrignY = (((dTemp - (dTemp - (dPITCH_Y * oMapinfo.Max_rows))) - MapEdgeMargine) / 2) + dPITCH_Y;
-
                             //TQD_SETUP 확인 생성
-                            //UpdateTextBox(string.Format("TQD_SETUP 확인 생성"));
                             strSetupID = string.Format("{0}_{1}", strDevice, strLevelName);
                             SetupSeq = oDefectDefine.GetSetupInfo(strSetupID, dOrignXIndex.ToString(), dOrignYIndex.ToString());
                             if (SetupSeq < 0)
                             {
-                                //UpdateTextBox(string.Format("TQD_SETUP Data 생성 한다."));
                                 strDBData = new string[14];
                                 strDBData[0] = strSetupID;				                                    //SETUP_ID             VARCHAR(40) NOT NULL,
                                 strDBData[1] = strStepID;				                                    //STEP_ID              VARCHAR(40) NOT NULL,
                                 strDBData[2] = strTranTime;			                                        //SETUP_TIME           TIMESTAMP NOT NULL,
                                 strDBData[3] = "0";                                                         // oMapSetup.TEST_ANGLE.ToString(); Default Donw        //ANGLE                INTEGER NOT NULL DEFAULT 0,
-                                //strDBData[4] = oMapSetup.WAFER_SIZE == 0 ? "200000000" : oMapSetup.WAFER_SIZE.ToString();	   //WAFER_SIZE           INTEGER NOT NULL DEFAULT 300000000,
-                                //strDBData[5] = string.IsNullOrEmpty(oMapSetup.NOTCH_TYPE) ? "F" : oMapSetup.NOTCH_TYPE;//NOTCH_TYPE           CHAR(1) NOT NULL DEFAULT 'F',
                                 strDBData[4] = "200000";	   //WAFER_SIZE           INTEGER NOT NULL DEFAULT 300000000,
                                 strDBData[5] = "F";//NOTCH_TYPE           CHAR(1) NOT NULL DEFAULT 'F',
                                 strDBData[6] = dPITCH_X.ToString();			                //DIE_PITCH_X          INTEGER NOT NULL DEFAULT 0,
@@ -319,11 +289,9 @@ namespace MigrationTools
                             }
 
                             //TQD_SETUP_MAP 확인 생성
-                            //UpdateTextBox(string.Format("TQD_SETUP_MAP 확인 생성"));
                             if (oDefectDefine.GetSetupMapCount(SetupSeq) == 0)
                             {
                                 //Data 가 있는지 확인 하고 없으면 생성 한다.
-                                //UpdateTextBox(string.Format("TQD_SETUP_MAP 처리"));
                                 string[,] para = new string[oMap.TestDieInfo.Length, 4];
                                 for (int ir = 0; ir < oMap.TestDieInfo.Length; ir++)
                                 {
@@ -337,11 +305,9 @@ namespace MigrationTools
                             }
 
                             //TQD_PRODUCT 확인 생성
-                            //UpdateTextBox(string.Format("TQD_PRODUCT 확인 생성"));
                             dtTemp = oDefectDefine.GetProductInfo(strDevice);
                             if (dtTemp == null || dtTemp.Rows.Count <= 0)
                             {
-                                //UpdateTextBox(string.Format("TQD_PRODUCT Data 생성 한다."));
                                 strDBData = new string[14];
                                 strDBData[0] = strDevice;	//product
                                 strDBData[1] = DACrux.Base.GlobalVariable.Factory;	//facility
@@ -362,7 +328,6 @@ namespace MigrationTools
                             }
 
                             //TQD_LOT 확인 생성
-                            //UpdateTextBox(string.Format("TQD_LOT 확인 생성"));
                             strDBData = new string[3];
                             strDBData[0] = strLotID;  //LOT ID		
                             strDBData[1] = strDevice;	  //PRODUCT
@@ -373,7 +338,6 @@ namespace MigrationTools
                             //Data 가 있는지 확인 하고 없으면 생성 한다.
                             if (LotSeq < 0)
                             {
-                                //UpdateTextBox(string.Format("TQD_LOT Data 생성 한다."));
                                 oDefectDefine.CreateLotInfo(strDBData);
                                 LotSeq = oDefectDefine.GetLotSeq(strDBData);
 
@@ -382,7 +346,6 @@ namespace MigrationTools
                             }
 
                             //TQD_WAFER 확인 생성
-                            //UpdateTextBox(string.Format("TQD_WAFER 확인 생성"));
                             strDBData = new string[4];
                             strDBData[0] = LotSeq.ToString();		                        //	LOT_SEQ  
                             strDBData[1] = strWaferID;                                      //	WAFER_ID 
@@ -393,7 +356,6 @@ namespace MigrationTools
                             //Data 가 있는지 확인 하고 없으면 생성 한다.
                             if (WaferSeq < 0)
                             {
-                                //UpdateTextBox(string.Format("TQD_WAFER Data 생성 한다."));
                                 oDefectDefine.CreateWaferInfo(strDBData);
                                 WaferSeq = oDefectDefine.GetWaferSeq(strDBData);
 
@@ -407,7 +369,6 @@ namespace MigrationTools
                                 oDefectDD = (decimal)oDefect.DefectCount / decimal.Parse(strArea);
                             
                             //Step 정보 조회 및 생성
-                            //UpdateTextBox(string.Format("Step 정보 확인 생성"));
                             strDBData = new string[20];
                             strDBData[0] = "1";                                    //TEST
                             strDBData[1] = WaferSeq.ToString();                    //WAFER_SEQ
@@ -435,7 +396,6 @@ namespace MigrationTools
                             //Data 가 있는지 확인 하고 없으면 생성 한다.
                             if (StepSeq < 0)
                             {
-                                //UpdateTextBox(string.Format("TQD_STEP Data 생성 한다."));
 
                                 oDefectDefine.CreateStepInfo(strDBData);
                                 StepSeq = oDefectDefine.GetStepSeq(new string[] { strDBData[1], strDBData[2], strDBData[8], strDBData[0] });
@@ -446,16 +406,13 @@ namespace MigrationTools
                             }
 
                             //각각의 Sequence 를 Log 처리
-                            //UpdateTextBox(string.Format("SetupSeq : {0} / LotSeq : {1} / WaferSeq : {2} / StepSeq : {3}", SetupSeq, LotSeq, WaferSeq, StepSeq));
 
                             //TQD_DEFECT, TQD_IMAGES 확인 생성
                             //Data 가 있는지 확인 하고 없으면 생성 한다.
-                            //UpdateTextBox(string.Format("TQD_DEFECT, TQD_IMAGES 확인 생성"));
                             iImageCount = 0;
                             iClassifiedCnt = 0;
                             if (oDefect.DefectCount > 0 && oDefectDefine.GetDefectCount(WaferSeq.ToString(), StepSeq.ToString()) == 0)
                             {
-                                //UpdateTextBox(string.Format("TQD_DEFECT 처리"));
                                 string[,] para = new string[oDefect.DefectList.Length, 28];
                                 List<string[]> lsArr = new List<string[]>();
                                 for (int ir = 0; oDefect.DefectList.Length > ir; ir++)
@@ -543,7 +500,6 @@ namespace MigrationTools
                             }
 
                             //TQD_INSP_INFO 의 정보가 있는지 확인 후 없으면 저장 한다.
-                            //UpdateTextBox(string.Format("TQD_INSP_INFO 확인 생성"));
                             dtTemp = oDefectDefine.GetInspInfo(StepSeq.ToString());
 
                             if (dtTemp == null || dtTemp.Rows.Count <= 0)
@@ -618,7 +574,6 @@ namespace MigrationTools
             catch (Exception ex)
             {
                 UpdateTextBox(ex.Message);
-                //MessageBox.Show(ex.Message);
             }
             finally
             {
@@ -876,10 +831,8 @@ namespace MigrationTools
 
             StreamReader sr = null;
 
-            //DACrux.SEMDMS.RO.DefectDefine oDefectDefine = null;
             try
             {
-                //oDefectDefine = new DACrux.SEMDMS.RO.DefectDefine();
                 strVal = new string[9];
 
                 using (sr = new System.IO.StreamReader(oRecipe.FullName, System.Text.Encoding.Default))
@@ -941,7 +894,6 @@ namespace MigrationTools
                 }
 
                 //DRV_RECIPE 라는 Table 상에 File 내용 저장..
-               // oDefectDefine.RECIPE_CREATE(strVal);
 
                 return strVal;
 

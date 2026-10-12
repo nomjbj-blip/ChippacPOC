@@ -27,17 +27,12 @@ namespace DACrux.BStats.Statistics
         ///// <summary>
         ///// Result For Html File
         ///// </summary>
-        //private DACruxSet m_dsResult = null;
 
         ///// <summary>
         ///// Raw Data For Descriptive Statistics
         ///// </summary>
-        //private DACruxSet[] m_RawData = null;
 
         #region [ CHART INFO ]
-        //private GraphInformation[] m_Histogram = null;
-        //private int m_DescriptionHistogramH = 300;
-        //private int m_DescriptionHistogramW = 300;
         #endregion
 
         private DataTable m_DataSource;
@@ -59,9 +54,7 @@ namespace DACrux.BStats.Statistics
             m_SelectedCapaContinuous.HistoricalBetweenStd = oInput.HistoricalStdBetween;
             m_SelectedCapaContinuous.HistoricalMean = oInput.HistoricalMean;
             m_SelectedCapaContinuous.HistoricalWithinStd = oInput.HistoricalStdWithin;
-            //m_SelectedCapaContinuous.IsUseConstantForSubgroupSize = oInput.IsUseContantForSubgroupSize;
             m_SelectedCapaContinuous.LowerSpec = oInput.LSL;
-            //m_SelectedCapaContinuous.SubGroupSize = oInput.SubGroupSize;
             m_SelectedCapaContinuous.UpperSpec = oInput.USL;           
 
             #region Options
@@ -163,7 +156,6 @@ namespace DACrux.BStats.Statistics
             int iValueColumnsCnt;
             int iOrigRowCnt;
             int iOrigColCnt;
-            //int[] arrSortedVariables = null;
             try
             {
                 #region Input Check
@@ -198,7 +190,6 @@ namespace DACrux.BStats.Statistics
                     arrDataColumns = new int[iValueColumnsCnt];
                     dtOriginal.AcceptChanges();
                     dtReturn = dtOriginal.Copy();
-                    //arrSortedVariables = Array.Sort(arrVariables);
 
                     int iMapping = iValueColumnsCnt - 1;
                     for (int i = iOrigColCnt - 1; i > -1; i--)
@@ -268,17 +259,6 @@ namespace DACrux.BStats.Statistics
                             {
 
                                 #region 선택된 정보를 컬럼으로..
-                                //dtReturn.Columns.Add(strValueColumName, dtOriginal.Columns[iSingleDataColumnIndex].DataType);
-                                //for (int i = 0; i < iTempCnt; i++)
-                                //{
-                                //    if (!(i < dtReturn.Rows.Count))
-                                //    {
-                                //        dtReturn.Rows.Add(dtReturn.NewRow());
-                                //    }
-                                //    dtReturn.Rows[i][strValueColumName] = arrTemp[i][iSingleDataColumnIndex];
-                                //    dtOriginal.Rows.Remove(arrTemp[i]);
-                                //}
-                                //arrTempIndex.Add(iTemp);
                                 
                                 #endregion
 
@@ -308,7 +288,6 @@ namespace DACrux.BStats.Statistics
 
                         }
                         #region 선택된 정보를 컬럼으로..
-                        //arrDataColumns = arrTempIndex.ToArray();
                         #endregion
                         #region 선택된 정보를 행으로
                         arrDataColumns = new int[dtReturn.Columns.Count];

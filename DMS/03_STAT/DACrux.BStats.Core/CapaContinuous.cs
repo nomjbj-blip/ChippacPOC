@@ -37,8 +37,6 @@ namespace DACrux.BStats.Core
         ///// <summary>
         ///// array of all data
         ///// </summary>
-        //private double[] m_arrAllData;        
-
 
         #region Event
         public event Derror On_Error;
@@ -60,7 +58,6 @@ namespace DACrux.BStats.Core
             m_Columns = DataColumns;
             m_InputOption = InputOption;
             m_Result = new ResultCapaContinuous();
-            //m_arrAllData = GetAllData(m_Source, m_Columns, true);
             m_Result = Analysis(m_Source, m_Columns, m_InputOption);
         }
         #endregion
@@ -95,37 +92,6 @@ namespace DACrux.BStats.Core
 
         // 모든 Data를 하나의 Double 배열로...
 
-        //private double[] GetAllData(DataFrame dfSource, int[] DataColumns, bool bClean)
-        //{
-        //    double[] arrReturn;
-        //    List<double> arrTemp = null;
-        //    int iCnt;
-        //    int iRow;
-        //    try
-        //    {
-        //        if (DataColumns == null)
-        //            throw new ArgumentException("Argument(parameter) is null.");
-
-        //        iRow = dfSource.Rows;
-        //        iCnt = DataColumns.Length;
-        //        arrTemp = new List<double>();
-
-        //        for (int i = 0; i < iCnt; i++)
-        //        {
-        //            if(bClean)
-        //                arrTemp.AddRange(((IDFColumn)dfSource[DataColumns[i]]).Clean().ToDoubleArray());
-        //            else
-        //                arrTemp.AddRange(((IDFColumn)dfSource[DataColumns[i]]).ToDoubleArray());
-        //        }
-        //        arrReturn = arrTemp.ToArray();
-        //        return arrReturn;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw ex;
-        //    }
-        //}
-
         #endregion
 
         #region [ ANALYSIS ]
@@ -143,15 +109,12 @@ namespace DACrux.BStats.Core
             double dblLengthofMovingRange = double.NaN;
             int iRowCnt;
             int iDataColCnt;
-            //double dblAvgSubgroupSize;
-            //double[] m_arrAllData;
             double[] arrAllCleanData;
 
 
             #region degree of freedom
             int idfOverall;
 
-            //int idfBW;
             #endregion
 
 
@@ -383,9 +346,6 @@ namespace DACrux.BStats.Core
 
                     switch (oInputOption.Estimate.EstimationBetweenSubgroup)
                     {
-                        //case EstimationBetween.Average_moving_range:
-                        //    dblSigmaxbar = GetSigmaXbarAvg(dtSource, arrDataColumns, oInputOption.Estimate.MovingRangeofLength, oInputOption.Estimate.IsUseUnbiasingWithin);
-                        //    break;
                         case EstimationBetween.Median_moving_range:
                             dblSigmaxbar = GetSigmaXbarMedian(dtSource, arrDataColumns, oInputOption.Estimate.MovingRangeofLength, oInputOption.Estimate.IsUseUnbiasingWithin, out m_iSubgrpSize);
                             break;
@@ -404,11 +364,6 @@ namespace DACrux.BStats.Core
                 {
                     switch (oInputOption.Estimate.EstimationWithinSubgroup)
                     {
-                        //case EstimationWithin.Pooled_standard_deviation:
-                        //    {
-                        //        dblSigmaWithin = GetSigmaWithin_Pooled(dtSource, arrDataColumns, oInputOption.Estimate.IsUseUnbiasingWithin);
-                        //    }
-                        //    break;
                         case EstimationWithin.Rbar:
                             dblSigmaWithin = GetSigmaWithin_Rbar(dtSource, arrDataColumns);
                             break;
@@ -421,9 +376,6 @@ namespace DACrux.BStats.Core
                     }
                     switch (oInputOption.Estimate.EstimationBetweenSubgroup)
                     {
-                        //case EstimationBetween.Average_moving_range:
-                        //    dblSigmaxbar = GetSigmaXbarAvg(dtSource, arrDataColumns, oInputOption.Estimate.MovingRangeofLength, oInputOption.Estimate.IsUseUnbiasingWithin);  
-                        //    break;
                         case EstimationBetween.Median_moving_range:
                             dblSigmaxbar = GetSigmaXbarMedian(dtSource, arrDataColumns, oInputOption.Estimate.MovingRangeofLength, oInputOption.Estimate.IsUseUnbiasingWithin, out m_iSubgrpSize);
                             break;
@@ -747,19 +699,16 @@ namespace DACrux.BStats.Core
                 for (int i = 0; i < iRowCnt; i++)
                 {
                     List<double> arrTemp = new List<double>();
-                    //iNonNanColCnt = 0;
                     for (int j = 0; j < iColCnt; j++)
                     {
                         if (dt.Rows[i][arrColumns[j]] != DBNull.Value && dt.Rows[i][arrColumns[j]].ToString() != string.Empty && !double.IsNaN(Convert.ToDouble(dt.Rows[i][arrColumns[j]])))
                         {
                             arrTemp.Add(Convert.ToDouble(dt.Rows[i][arrColumns[j]]));
                         }
-                        //iNonNanColCnt++;
                     }
                     if (arrTemp.Count > 1)
                     {
                         dblTotalSS += StatsFunctions.SumOfSquaredErrors(arrTemp.ToArray());
-                        //dblTotalSS += StatsFunctions.SumOfSquares(arrTemp.ToArray());  //이거 뭔 차이야???
                         dblDegrees += (arrTemp.Count - 1);
                     }
                     arrTemp = null;
@@ -967,7 +916,6 @@ namespace DACrux.BStats.Core
                         if (iDataCnt < 2)
                             continue;
                         double dblC4 = GetC4((double)iDataCnt);
-                        //double dblC4 = ControlChartCoefficient.Getc4(iDataCnt);
                         double dblH = (dblC4 * dblC4) / (1 - (dblC4 * dblC4));
                         double dblSubgroupStd = StatsFunctions.StandardDeviation(arrDouble, BiasType.Unbiased);
 
@@ -1164,7 +1112,6 @@ namespace DACrux.BStats.Core
                     arrTemp = null;
                 }
 
-                //dblReturn = dblCumulative / (iValueCnt - iObservationsCnt + 1); 
                 dblReturn = dblCumulative / (double)(iRealValueCnt);
                 if (Unbiased)
                     return dblReturn / ConstantsTable.Getd2(iLengthMovingRange);

@@ -27,7 +27,6 @@ namespace DACrux.TEST.RO
             object obj = Activator.GetObject(typeof(DACrux.TEST.Interface.iProbeMapAnalysis),
                 strUrl + "/DACrux.TEST.BSL.ProbeMapAnalysis.bin");
             m_OBJ = obj as DACrux.TEST.Interface.iProbeMapAnalysis;
-            //System.Configuration.ConfigurationManager.GetSection("System.Diagnostics");
         }
 
         public DataSet GetWaferMap(long WaferSeq)
@@ -246,11 +245,6 @@ namespace DACrux.TEST.RO
         {
             return m_OBJ.GetWaferBinReport(WaferSeq, bWaferBase);
         }
-
-        //public System.Data.DataTable GetUserMapConfig(string strUserID, string strCategory = "")
-        //{
-        //    return m_OBJ.GetUserMapConfig(strUserID, strCategory);
-        //}
 
         public DataTable GetMapConfigWaferList(string strStartTime, string strEndTime, string strTestArea, string strDevice, string strProgram)
         {

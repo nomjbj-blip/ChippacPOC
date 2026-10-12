@@ -979,11 +979,8 @@ namespace DACrux.MapAnalysis.Control
                 switch (Dir)
                 {
                     case "LL":
-                        //IndexX = IndexX;
-                        //IndexY = IndexY;
                         break;
                     case "TL":
-                        //IndexX = IndexX;
                         IndexY = (ymax + ymin - IndexY);
                         break;
                     case "TR":
@@ -992,7 +989,6 @@ namespace DACrux.MapAnalysis.Control
                         break;
                     case "LR":
                         IndexX = (xmax + xmin - IndexX);
-                        //IndexY = IndexY;
                         break;
                 }
 

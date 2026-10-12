@@ -20,7 +20,6 @@ namespace DACrux.SEMDMS.KtoD
 		///	- 수정자 : 미라콤 임영신
 		///	- 수정일 : 2005-06-11
 		///	- 변경로그 : SampleTest의 배열 리스트를 Rotate.	
-		//public void RotateKLARF(ref KLARF_HEADER_TAG KData)
         public void RotateKLARF(ref KLARF_HEADER_TAG KData, ref ArrayList sampleTestPlan)
 		/// ====================================================================	
 		{
@@ -34,8 +33,6 @@ namespace DACrux.SEMDMS.KtoD
 			int recSY = -1;
 			int CtoXREL = 0;
 			int CtoYREL = 0;
-//			int CenterIndexX = 0;
-//			int CenterIndexY = 0;
 			double tempDoubleX = 0.0;
 			double tempDoubleY = 0.0;
 
@@ -129,13 +126,11 @@ namespace DACrux.SEMDMS.KtoD
 						if(KData.Defects[i].DValue[recX]<0)
 						{
 							KData.Defects[i].DValue[recX] += (int)(KData.DiePitchX * RK);
-							//KData.Defects[i].DValue[recIX] += -1;
 						}
 
 						if(KData.Defects[i].DValue[recY]<0)
 						{
 							KData.Defects[i].DValue[recY] += (int)(KData.DiePitchY * RK);
-							//KData.Defects[i].DValue[recIY] += -1;
 						}
 
 						/// Defect XSize YSize 계산
@@ -161,10 +156,6 @@ namespace DACrux.SEMDMS.KtoD
 						Rotate(Angle,ref testDieInfo[i].DX  ,ref testDieInfo[i].DY); 
 					}
 				}
-//				for(int i=0;i<KData.TestDieInfo.Length;i++)
-//				{
-//					Rotate(Angle,ref KData.TestDieInfo[i].DX  ,ref KData.TestDieInfo[i].DY); 
-//				}
 				/// ====================================================================
 				//전부 돌렸으므로 Notch는 0으로 맞춤
 				KData.OrientationMarkLocation = "DOWN";

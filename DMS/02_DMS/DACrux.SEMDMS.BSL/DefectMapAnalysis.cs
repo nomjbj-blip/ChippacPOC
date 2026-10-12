@@ -797,7 +797,6 @@ namespace DACrux.SEMDMS.BSL
         public DataTable GetDefectClassInfo()
         {
             TQD_DEFECT_TYPE obj = new TQD_DEFECT_TYPE();
-            //return obj.GetData("SELECT_CODE_NAME", null, null);
             return obj.SelectDefectCode();
         }
 
@@ -841,17 +840,6 @@ namespace DACrux.SEMDMS.BSL
 
             return String.Format(@"{0}\{1}", dt.Rows[0]["IMAGE_PATH"], dt.Rows[0]["IMAGE_FILENAME"]);
         }
-
-        //public Color GetDieBackColor(string factory, string userID)
-        //{
-        //    TQC_CONFIG_USER obj = new TQC_CONFIG_USER();
-        //    string colorStr = obj.SelectTqcConfigUser(factory, "WAFER_DIE_COLOR", "WAFER_MAP_BG", userID);
-
-        //    if (String.IsNullOrEmpty(colorStr))
-        //        return Color.Empty;
-
-        //    return ColorTranslator.FromHtml(String.Format("#{0}", colorStr));
-        //}
 
         public DataTable GetWaferInfo(long[] stepSeqArr)
         {
@@ -1148,7 +1136,6 @@ namespace DACrux.SEMDMS.BSL
                 oReview = new DMReview();
 
                 strSlotID = string.Format("{0:00}", iSlotID);
-                //strWaferID = string.Format("{0}-{1}", strLotID, strSlotID);
                 //=================================================================================================================================
                 //Wafer List 정보를 가져 온다.
                 //=================================================================================================================================

@@ -140,10 +140,8 @@ namespace DACrux.SEMDMS.DSL
                 this.Execute("CALL_UPDATE_STEP_SUM", null, new string[] { StepInfo[0] });
 
                 // 2) Dynamic Query
-                //this.Execute("CALL_UPDATE_STEP_SUM", new string[] { StepInfo[0] }, null);
 
                 // 3) Ful Dynamic Query
-                //this.Execute("CALL_UPDATE_STEP_SUM", new string[] { DynamicQuery }, null);
 			}
 			catch (Exception ex)
 			{

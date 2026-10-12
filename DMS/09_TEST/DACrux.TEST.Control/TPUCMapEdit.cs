@@ -27,12 +27,8 @@ namespace DACrux.TEST.Control
         public delegate string MapUpdate(object sender, object ChangeDies);
         public delegate bool MapCreate(object sender, object WaferIDs);
         public delegate DataTable GetMasterBinData(object sender, WaferInfoEventArgs e);
-        //public event MapSave OnMapSave;
-        //public event MapUpdate OnMapUpdate;
-        //public event MapCreate OnMapCreate;
         public event GetMasterBinData OnGetMasterBinData;
 
-       // private DataTable dtAVIImage = null;
         private string WAFER_SEQ = string.Empty;
         private string LOT_ID = string.Empty;
         private string PROGRAM = string.Empty;
@@ -278,24 +274,8 @@ namespace DACrux.TEST.Control
                     strAlterDevice = TxtDevice.Text;
 
                     //Base Wafer 가 체크 되어 있을 경우 Mark Die 에 대해서만 수정 한다.
-                    //if (chkBasicMap.Checked == true)
-                    //{
-                    //    oAlterDieList = new Base.DieList();
-                    //    foreach (DACrux.Base.Die oDie in m_ewMap.Dies)
-                    //    {
-                    //        // DieProp 이 2일 경우 Mark die
-                    //        if (oDie.DieProp == 2)
-                    //            oAlterDieList.Add(oDie);
-                    //    }
-                    //}
 
                     //0번 Bin 으로 초기화 한다.
-                    //for(int ir = 0; ir < oAlterDieList.Count; ir++)
-                    //{
-                    //    DACrux.Base.Die oAlterDie = oAlterDieList[ir];
-                    //    oAlterDie.BinNumber = 0;
-                    //    oAlterDieList[ir] = oAlterDie;
-                    //}
 
                     if (string.IsNullOrEmpty(TxtLotID.Text) == true)
                     {
@@ -658,7 +638,6 @@ namespace DACrux.TEST.Control
                 }
                 else
                 {
-                    //oImageFile = AVIImageMultiCapture();
                     //현재 영상에 대한 Image Capture 를 미리 한다.
 
                     if (string.IsNullOrEmpty(oImageFile) == false)
@@ -689,35 +668,6 @@ namespace DACrux.TEST.Control
                     oSocpeImages[oDieIndex] = oImageFile;
                 }
 
-                //if (oImageFile != null && oImageFile.Exists == true)
-                //{
-                //    m_ewMap.SelectScopeImageLocal = oImageFile.FullName;
-                //    m_ewMap.SelectScopeImage = oImageFile.Name;
-                //    m_ewMap.SelectScopeImagePath = DACrux.Utility.Util.FTPBackupPath(TESTAREA, "SCOPE", LOT_ID);
-
-                //    TxtSerialStatus.Text = string.Format("BinNum : {0}, Image Capture 완료 {1}", BinNum.Text, oImageFile.Name);
-                //}
-                //else
-                //{
-                //    TxtSerialStatus.Text = string.Format("BinNum : {0}, Image Capture 실패", BinNum.Text);
-                //}
-
-                //m_ewMap.SelectScopeImageLocal = string.Empty;
-                //m_ewMap.SelectScopeImage = string.Empty;
-                //m_ewMap.SelectScopeImagePath = string.Empty;
-                //if (oImageFile != null && oImageFile.Exists == true)
-                //{
-                //    m_ewMap.SelectScopeImageLocal = oImageFile.FullName;
-                //    m_ewMap.SelectScopeImage = oImageFile.Name;
-                //    m_ewMap.SelectScopeImagePath = DACrux.Utility.Util.FTPBackupPath(TESTAREA, "SCOPE", LOT_ID);
-
-                //    TxtSerialStatus.Text = string.Format("BinNum : {0}, Image Capture 완료 {1}", BinNum.Text, oImageFile.Name);
-                //}
-                //else
-                //{
-                //    TxtSerialStatus.Text = string.Format("BinNum : {0}, Image Capture 실패", BinNum.Text);
-                //}
-
                 m_ewMap.SelectKey = nSelectedKey;
                 m_ewMap.SelectKeyIn = afterLabel.Name;
             }
@@ -733,38 +683,7 @@ namespace DACrux.TEST.Control
             try
             {
                 return;
-                //if (string.IsNullOrEmpty(((TextBox)sender).Text.Trim()) == true)
-                //{
-                //    ((TextBox)sender).Text = string.Empty;
-                //    return;
-                //}
 
-                //int nInputBin = -1;
-
-                //if (int.TryParse(((TextBox)sender).Text, out nInputBin) == false)
-                //{
-                //    MessageBox.Show("Bin 번호를 입력하세요.", "Editer Map", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                //    ((TextBox)sender).Text = string.Empty;
-                //}
-                //else
-                //{
-                //    DataRow[] drBinInfo = m_dsMap.Tables["MASTER_BIN"].Select(string.Format("[BIN] = '{0}'", nInputBin));
-                //    if (drBinInfo.Length < 1)
-                //    {
-                //        MessageBox.Show(string.Format("Bin {0} 은/는 MES에 정의되어 있지 않습니다.", nInputBin), "Editer Map", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                //        ((TextBox)sender).Text = string.Empty;
-                //        return;
-                //    }
-
-                //    int nIndex = DACrux.Base.Convert.intParse(((TextBox)sender).Name.Replace("txtVal", ""));
-
-                //    m_ewMap.SetVIValue(nIndex, DACrux.Base.Convert.intParse(((TextBox)sender).Text));
-                //    m_ewMap.SetVIColor(DACrux.Base.Convert.intParse(((TextBox)sender).Text), ((TextBox)sender).BackColor);
-
-                //    System.Windows.Forms.Control[] ctrl = this.Controls.Find(string.Format("cbDesc{0}", nIndex), true);
-                //    if (ctrl.Length > 0)
-                //        ((ComboBox)ctrl[0]).Text = drBinInfo[0]["BIN_DESC"].ToString();
-                //}
             }
             catch (Exception ex)
             {
@@ -866,10 +785,8 @@ namespace DACrux.TEST.Control
             try
             {
                 if (((NumericUpDown)sender).Value == 0)
-                    //((TextBox)tpMapBalance.Controls[string.Format("txtVal{0}", ((NumericUpDown)sender).Name.Replace("txtCnt", ""))]).ReadOnly = false;
                     ((ComboBox)tpMapBalance.Controls[((NumericUpDown)sender).Name.Replace("txtCnt", "cbDesc")]).Enabled = true;
                 else
-                    //((TextBox)tpMapBalance.Controls[string.Format("txtVal{0}", ((NumericUpDown)sender).Name.Replace("txtCnt", ""))]).ReadOnly = true;
                     ((ComboBox)tpMapBalance.Controls[((NumericUpDown)sender).Name.Replace("txtCnt", "cbDesc")]).Enabled = false;
             }
             catch (Exception ex)
@@ -1148,41 +1065,7 @@ namespace DACrux.TEST.Control
             txtXIndex.Text = NewDie.IndexX.ToString();
             txtYIndex.Text = NewDie.IndexY.ToString();
             txtBin.Text = NewDie.BinNumber.ToString();
-            //m_ewMap.Focus();
-            //string strImagePath = string.Empty;
-            //try
-            //{
-            //    try
-            //    {
-            //        if (TESTAREA == "AVI" && dtAVIImage != null && dtAVIImage.Select(string.Format("X = {0} AND Y = {1}", NewDie.IndexX, NewDie.IndexY)).Length > 0)
-            //        {
-            //            DataRow[] drAVI = dtAVIImage.Select(string.Format("X = {0} AND Y = {1}", NewDie.IndexX, NewDie.IndexY));
-            //            foreach (DataRow dr in drAVI)
-            //            {
-            //                strImagePath = dr["IMAGE_PATH"].ToString();
-            //            }
-            //        }
 
-            //        tpuImageInfo1.ImageReflesh(
-            //                strImagePath,
-            //                NewDie.IndexX.ToString(),
-            //                NewDie.IndexY.ToString(),
-            //                NewDie.BinNumber.ToString(),
-            //                LOT_ID,
-            //                PROGRAM,
-            //                DEVICE);
-            //    }
-            //    catch (Exception) { }
-            //}
-            //catch (Exception ex)
-            //{
-            //    throw ex;
-            //}
-            //finally
-            //{
-            //    m_ewMap.Focus();
-            //    Application.DoEvents();
-            //}
         }
 
         private void m_ewMap_OnChangeDieBinNumber(object sender, Base.ChangeDieBinNumberInfo e)
@@ -1248,11 +1131,7 @@ namespace DACrux.TEST.Control
             if (!Double.TryParse(TxtEndX.Text.Replace(" ", String.Empty), out m_Xaxis) || !Double.TryParse(TxtEndY.Text.Replace(" ", String.Empty), out m_Yaxis))
                 return;
 
-            //m_Xaxis = m_Xaxis * 1000d;
-            //m_Yaxis = m_Yaxis * 1000d;
-
             m_ewMap.CalcShotNotifyAlignPoint(m_Xaxis, m_Yaxis);
-            //m_ewMap.CalcShotNotifyAlignPoint(m_Xaxis, m_Yaxis);
             bEndLocation = true;
         }
 
@@ -1261,12 +1140,7 @@ namespace DACrux.TEST.Control
             if (!Double.TryParse(TxtSetX.Text.Replace(" ", String.Empty), out m_Xaxis) || !Double.TryParse(TxtSetY.Text.Replace(" ", String.Empty), out m_Yaxis))
                 return;
 
-            //m_Xaxis = m_Xaxis * 1000d;
-            //m_Yaxis = m_Yaxis * 1000d;
-
             m_ewMap.SetFocusDieByShotNotify(m_Xaxis, m_Yaxis);
-            //m_ewMap.SetFocusDieByShotNotify(m_Xaxis, m_Yaxis);
-            //m_ewMap.Focus();
         }
 
         private void BtnConnect_Click(object sender, EventArgs e)
@@ -1401,7 +1275,6 @@ namespace DACrux.TEST.Control
 
                 m_Xaxis = m_Xaxis * 1000d;
                 m_Yaxis = m_Yaxis * 1000d;
-                //System.Diagnostics.Debug.WriteLine(String.Format("X:{0}, Y:{1}", valX, valY));
 
                 SP.DiscardInBuffer();
 
@@ -1415,40 +1288,6 @@ namespace DACrux.TEST.Control
             }
 
 
-            //string[] strValues = null;
-            //string strValue = string.Empty;
-
-            //try
-            //{
-            //    if (SP.IsOpen)
-            //    {
-            //        iCount++;
-            //        // X+    0.000 Y-   31.597
-            //        strValue = SP.ReadLine();
-            //        //Data 양이 많아 3건 정도를 걸러 낸다.
-            //        if (iCount > 3)
-            //        {
-            //            strValue = strValue.Trim().Replace("\r\n", "").Replace(" ", "").Trim();
-
-            //            strValues = strValue.Split(new string[] { "X", "Y" }, StringSplitOptions.RemoveEmptyEntries);
-            //            if (strValues.Length == 2)
-            //            {
-            //                if (double.TryParse(strValues[0], out m_Xaxis) == false)
-            //                    m_Xaxis = double.NaN;
-
-            //                if (double.TryParse(strValues[1], out m_Yaxis) == false)
-            //                    m_Yaxis = double.NaN;
-            //            }
-
-            //            SerialDieSelect(m_Xaxis, m_Yaxis);
-            //            //System.Diagnostics.Debug.WriteLine(strValue);
-            //            //System.Diagnostics.Debugss.WriteLine("--------------------------------------");
-            //            iCount = 0;
-            //        }
-                   
-            //    }
-            //}
-            //catch (Exception) { }
         }
 
         private void SerialDieSelect(double dXAxis, double dYAxis)
@@ -1466,9 +1305,7 @@ namespace DACrux.TEST.Control
             {
                 if (double.IsNaN(dXAxis) == false && double.IsNaN(dYAxis) == false && bEndLocation == true)
                 {
-                   // m_ewMap.FocusDiePassingCount = 5;
                     m_ewMap.SetFocusDieByShotNotify(dXAxis, dYAxis);
-                    //m_ewMap.Focus();
                 }
 
                 SeiralTextX(dXAxis.ToString());
@@ -1923,7 +1760,6 @@ namespace DACrux.TEST.Control
             BtnSerialDisConnect.Enabled = !bEnable;
             tpMapBalance.Enabled = bEnable;
             numPer.Enabled = bEnable;
-            //chkBasicMap.Enabled = bEnable;
         }
 
 

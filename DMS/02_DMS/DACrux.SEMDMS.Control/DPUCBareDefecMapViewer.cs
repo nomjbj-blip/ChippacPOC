@@ -22,7 +22,6 @@ namespace DACrux.SEMDMS.Control
 
         DataSet dsDefect = null;
         private DACrux.Map.DefectMap map;
-        //private SoftwareFX.ChartFX.Chart chart;
         private Panel MapPanel;
         private StatusStrip statusStrip1;
         private ToolStripStatusLabel ToolWaferDieLocation;
@@ -452,8 +451,6 @@ namespace DACrux.SEMDMS.Control
             {
                 ToolWaferDieLocation.Text = string.Format("X : {0} Y : {1}", NewDie.IndexX, NewDie.IndexY);
 
-                //DataRow[] dr = ((DataTable)fpSpreadDefect_Sheet.DataSource).Select(string.Format("XINDEX = '{0}' AND YINDEX = '{1}'", NewDie.IndexX, NewDie.IndexY));
-                //ToolParticles.Text = string.Format("Particles : {0}", dr.Length);
             }
             catch (Exception)
             {
@@ -680,8 +677,6 @@ namespace DACrux.SEMDMS.Control
                                 break;
                             //Inspection Defect Die Color
                             case "WAFER_MAP_DEFECT":
-                                //Defect 의 Index 는 bare Map 과 맞지 않아 헷갈릴수 있어 주석 처리.
-                                //map.DieDefectColor = crType;
                                 break;
                             //Wafer Border Line Color
                             case "WAFER_MAP_LINE":

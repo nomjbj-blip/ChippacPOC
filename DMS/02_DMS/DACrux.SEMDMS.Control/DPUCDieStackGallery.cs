@@ -426,16 +426,6 @@ namespace DACrux.SEMDMS.Control
                 df.CLUSTERNUMBER = DACrux.Base.Convert.intParse(dr["CLUSTERNUMBER"].ToString());
                 df.IMAGECOUNT = DACrux.Base.Convert.intParse(dr["IMAGECOUNT"].ToString());
                 df.ADDER = DACrux.Base.Convert.intParse(dr["ADDER"].ToString());
-                //df.ROUGHBINNUMBER = DACrux.Base.Convert.intParse(dr["ROUGHBINNUMBER"].ToString());
-                //df.FINEBINNUMBER = DACrux.Base.Convert.intParse(dr["FINEBINNUMBER"].ToString());
-                //df.REVIEWSAMPLE = DACrux.Base.Convert.intParse(dr["REVIEWSAMPLE"].ToString());
-                //df.FIRST_STEP = dr["FIRST_STEP"].ToString();
-                //df.RETICLE_REPEAT_ID = DACrux.Base.Convert.intParse(dr["RETICLE_REPEAT_ID"].ToString());
-                //df.DIE_REPEAT_ID = DACrux.Base.Convert.intParse(dr["DIE_REPEAT_ID"].ToString());
-                //df.MAN_OPT_CLASS = DACrux.Base.Convert.intParse(dr["MAN_OPT_CLASS"].ToString());
-                //df.AUTO_OPT_CLASS = DACrux.Base.Convert.intParse(dr["AUTO_OPT_CLASS"].ToString());
-                //df.MAN_SEM_CLASS = DACrux.Base.Convert.intParse(dr["MAN_SEM_CLASS"].ToString());
-                //df.AUTO_SEM_CLASS = DACrux.Base.Convert.intParse(dr["AUTO_SEM_CLASS"].ToString());
 
                 defectList.Add(df);
             }
@@ -545,8 +535,6 @@ namespace DACrux.SEMDMS.Control
             spread.SetData(controlList, colHeaderSorter, rowHeaderSorter);
             spread.RedrawAll();
 
-            //rdSetup.ClearChartData();
-            //rdSetup.ApplyClick();
         }
 
         /// <summary>
@@ -629,9 +617,6 @@ namespace DACrux.SEMDMS.Control
 
         private void CheckActiveControl()
         {
-            //bool allNone = cboColumn.Text == NONE && cboRow.Text == NONE;
-            //pnlColCount.Visible = allNone;
-            //pnlSize.Visible = !allNone;
             pnlColCount.Visible = true;
             pnlSize.Visible = !pnlColCount.Visible;
         }

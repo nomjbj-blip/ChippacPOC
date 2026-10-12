@@ -20,7 +20,6 @@ namespace DACrux.RPNet.Service
             InitializeComponent();
             m_oEventLog = new System.Diagnostics.EventLog();
             m_oEventLog.Source = "DACruxRPNet";
-            //m_oEventLog.Log = "DACruxRPNetServiceLog";
         }
 
         protected override void OnStart(string[] args)
@@ -34,10 +33,6 @@ namespace DACrux.RPNet.Service
             
                             // Event Log 
                 ///////////////////////////////////////////////////////////////////////////////////////////////
-                //if (!System.Diagnostics.EventLog.SourceExists(m_oEventLog.Source))
-                //{
-                //    System.Diagnostics.EventLog.CreateEventSource(m_oEventLog.Source, m_oEventLog.Log);
-                //}
                 m_oEventLog.WriteEntry("DACruxRPNet Service Started");
                 ///////////////////////////////////////////////////////////////////////////////////////////////
             }
@@ -58,10 +53,6 @@ namespace DACrux.RPNet.Service
             {
                 // Event Log 
                 ///////////////////////////////////////////////////////////////////////////////////////////////
-                //if (!System.Diagnostics.EventLog.SourceExists(m_oEventLog.Source))
-                //{
-                //    System.Diagnostics.EventLog.CreateEventSource(m_oEventLog.Source, m_oEventLog.Log);
-                //}
                 m_oEventLog.WriteEntry("DACruxRPNet Service Stoped!!!!");
                 ///////////////////////////////////////////////////////////////////////////////////////////////
             }

@@ -57,7 +57,6 @@ namespace DACrux.TEST.Interface
         void DeleteMapConfig(string strSequence, string strUser, string strcomment);
         DataSet GetCumWaferReport(long[] WaferSeqs);
         DataSet GetWaferBinReport(long[] WaferSeq, bool bWaferBase);
-        //System.Data.DataTable GetUserMapConfig(string strUserID, string strCategory = "");
         DataTable GetMapConfigWaferList(string strStartTime, string strEndTime, string strTestArea, string strDevice, string strProgram);
         void WaferMapConfigUpdate(string strWaferSeq, string strMapConfigSeq);
         System.Data.DataSet SelectParaReportData(long[] WaferSeqList);

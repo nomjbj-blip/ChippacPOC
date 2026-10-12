@@ -80,13 +80,6 @@ namespace Reload.IE
             if (procs.Length < 1)
             {
                 /// 동작중이 아닐 경우
-                //ProcessStartInfo psi = new ProcessStartInfo();
-                //psi.UseShellExecute = true;
-                //psi.FileName = @"C:\Program Files (x86)\Citrix\ICA Client\CDViewer.exe";
-                //psi.WorkingDirectory = Environment.CurrentDirectory;
-                //psi.Verb = "runas";
-                //psi.Arguments = "";
-                //Process.Start(psi);
             }
         }
 

@@ -1677,13 +1677,8 @@ namespace TestDataMigration_RemotingService
             try
             {
 
-                //int xcnt = xmax - xmin + 1;
-                //int ycnt = ymax - ymin + 1;
-
                 int xcnt = xmax;
                 int ycnt = ymax;
-
-                //wmargin = 97.5 / 100d;
 
                 double dDieSizeX = Math.Round(((wsize - edge * 2) * margin) / xcnt, 5);
                 double dDieSizeY = Math.Round(((wsize - edge * 2) * margin) / ycnt, 5);
@@ -1866,31 +1861,10 @@ namespace TestDataMigration_RemotingService
                     int tr = 0, maxtr = 10;
                     Oracle.ManagedDataAccess.Client.OracleException o;
 
-                    //do
-                    //{
-                    //    try
-                    //    {
                     oConnection.Open();
                     comm.ExecuteNonQuery();
                     return;
-                    //    }
-                    //    catch (Oracle.ManagedDataAccess.Client.OracleException oex)
-                    //    {
-                    //        o = oex;
-                    //        if (oex.Number == 904) //ex) "CK_POLY1": 부적합한 식별자
-                    //        {
-                    //            string tmp = comm.CommandText;
-                    //            string colName = oex.Message.Substring(oex.Message.IndexOf('"') + 1, oex.Message.LastIndexOf('"') - oex.Message.IndexOf('"') - 1);
-                    //            comm.CommandText = String.Format("ALTER TABLE {0} ADD {1} NUMBER", dt.TableName, colName);
-                    //            comm.ExecuteNonQuery();
-                    //            comm.CommandText = tmp;
-                    //        }
-                    //    }
-                    //}
-                    //while (tr++ < maxtr);
 
-                    //if (tr >= maxtr)
-                    //    throw o;
                 }
             }
         }

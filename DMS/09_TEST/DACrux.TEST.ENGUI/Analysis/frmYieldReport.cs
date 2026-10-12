@@ -50,7 +50,6 @@ namespace DACrux.TEST.ENGUI
 
         object DataFilterByStatisticalYield(string lot, string wafer)
         {
-            //DataRow[] dr = dtWafer.Select(string.Format("LOT_ID='{0}' AND SLOT_ID='{1}'", lot, wafer));
             DataRow[] dr = dtWafer.Select(string.Format("LOT_ID='{0}' AND WAFER_ID LIKE '%{0}-{1}'", lot, wafer));
             if (dr == null) return DBNull.Value;
             if (dr.Length == 0) return DBNull.Value;
@@ -347,8 +346,6 @@ namespace DACrux.TEST.ENGUI
                         chart1.Series[lot_ID].Points.AddY(dt.Rows[j][i]);
                         chart1.Series[lot_ID].Points[j - cnt].AxisLabel = Convert.ToString(dt.Columns[i]);
                     }
-                    //chart1.Series[lot_ID].ChartType = SeriesChartType.Point;
-                    //chart1.Series[lot_ID].ChartArea = "ChartArea2";
                     chart1.Series[lot_ID].Enabled = false;
                     chart1.Series[lot_ID].IsValueShownAsLabel = false;
 
@@ -457,7 +454,6 @@ namespace DACrux.TEST.ENGUI
                 oProbe = new RO.ProbeMapAnalysis();
                 dt = oProbe.GetYieldByDay(waferSeq);
                 DrawGraph(dt, "Day");
-                //chart.DataSource = dt;
                 fpSpread_Sheet.DataSource = dt;
             }
             catch (Exception ex)
@@ -471,7 +467,6 @@ namespace DACrux.TEST.ENGUI
                 dt = null;
             }
         }
-        //private DataPoint selectedDataPoint = null;
         private void chart1_MouseMove(object sender, MouseEventArgs e)
         {
             HitTestResult result = chart1.HitTest(e.X, e.Y);
@@ -504,9 +499,7 @@ namespace DACrux.TEST.ENGUI
                         "평균값: " + Math.Round(Stat.mean(value), 2) + "\n" +
                         "최대값: " + Stat.Max(value) + "\n" +
                         "최소값: " + Stat.Min(value);
-                        //"중앙값: " + (Stat.Max(value) - Stat.Min(value)) / 2;      
 
-                        // chart1.Series[SeriesPoint].BackHatchStyle = ChartHatchStyle.Percent70;
                     }
                     else
                     {
@@ -514,7 +507,6 @@ namespace DACrux.TEST.ENGUI
                         chart1.Series[SeriesPoint].Points[result.PointIndex].AxisLabel + "\n" +
                        "Values: " + Math.Round(chart1.Series[SeriesPoint].Points[result.PointIndex].YValues[0], 2);
 
-                        //chart1.Series[SeriesPoint].Points[result.PointIndex].BorderWidth = 3;
                         chart1.Series[SeriesPoint].Points[result.PointIndex].MarkerSize = 20;
                     }
                 }
@@ -551,16 +543,8 @@ namespace DACrux.TEST.ENGUI
         private DataPoint selectedDataPoint = null;
         private void chart1_MouseUp(object sender, MouseEventArgs e)
         {
-            //if (selectedDataPoint != null)
-            //{
-            //    selectedDataPoint.IsValueShownAsLabel = false;
-
-            //    selectedDataPoint = null;
-
-            //    chart1.Invalidate();
 
             chart1.Cursor = Cursors.Default;
-            //}
         }
 
         private void chart1_MouseDown(object sender, MouseEventArgs e)

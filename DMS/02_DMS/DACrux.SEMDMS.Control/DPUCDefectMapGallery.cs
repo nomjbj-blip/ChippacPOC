@@ -704,9 +704,6 @@ namespace DACrux.SEMDMS.Control
 
         private void CheckActiveControl()
         {
-            //bool allNone = cboColumn.Text == NONE && cboRow.Text == NONE;
-            //pnlColCount.Visible = allNone;
-            //pnlSize.Visible = !allNone;
             pnlColCount.Visible = true;
             pnlSize.Visible = !pnlColCount.Visible;
         }

@@ -177,7 +177,6 @@ namespace DACrux.BStats.GraphDialog
                 nudLSL.Value = Convert.ToDecimal(graphInfo.LSL);
 
             chkNormalLine.Checked = graphInfo.NormalLine;
-            //chkSpecLimit.Checked = graphInfo.SpecLimit;
             chkSpecLimit.Checked = false;
             chk3SigmaLine.Checked = graphInfo.View3SigmaLine;
             chkFrequence.Checked = graphInfo.Frequence;
@@ -202,43 +201,7 @@ namespace DACrux.BStats.GraphDialog
         }
 
         #region " DEPLICATED : Auto Spec Calculation "
-        //private void lvSeries_SelectedIndexChanged(object sender, EventArgs e)
-        //{
-        //    try
-        //    {
-        //        if (lvSeries.SelectedItems.Count > 0)
-        //        {
-        //            GraphInformation.ColumnInfoItem colInfo = (GraphInformation.ColumnInfoItem)htColumns[lvSeries.SelectedItems[0]];
 
-        //            if (colInfo.ColumnType != typeof(double))
-        //                return;
-
-        //            int iColIndex = colInfo.ColumnIndex;
-        //            int iRowCount = graphInfo.DataSource.Rows.Count;
-        //            double nTemp = 0;
-        //            double nMax = double.MinValue;
-        //            double nMin = double.MaxValue;
-        //            for (int i = 0; i < iRowCount; i++)
-        //            {
-        //                if (double.TryParse(graphInfo.DataSource.Rows[i][iColIndex].ToString(), out nTemp))
-        //                {
-        //                    if (nTemp > nMax)
-        //                        nMax = nTemp;
-
-        //                    if (nTemp < nMin)
-        //                        nMin = nTemp;
-        //                }
-        //            }
-
-        //            nudUSL.Value = Convert.ToDecimal(Math.Round(nMax - ((nMax - nMin) / 4), Convert.ToInt32(nudDecimalPlace.Value)));
-        //            nudLSL.Value = Convert.ToDecimal(Math.Round(nMin + ((nMax - nMin) / 4), Convert.ToInt32(nudDecimalPlace.Value)));
-        //        }
-        //    }
-        //    catch
-        //    {
-        //        MessageBox.Show("Invalid Data.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        //    }
-        //}
         #endregion
 
         #endregion

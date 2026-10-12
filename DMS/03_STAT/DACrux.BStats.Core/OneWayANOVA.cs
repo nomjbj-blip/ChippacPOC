@@ -27,8 +27,6 @@ namespace DACrux.BStats.Core
         string m_AdjRSquare = "Adj.R-Square";
         string m_RootMse = " Root(MS Error)";
         string m_Source = "Source";
-        //string m_Estimates = "Estimates";
-        //string m_StandardError = "StandardError";
         string m_Pvalue = "P-Value";
         string m_FittedValue = "Fitted value";
         string m_Residual = "Residual";
@@ -60,7 +58,6 @@ namespace DACrux.BStats.Core
         #region Message
         string m_ErrorData = "Source is null.";
         string m_ErrorDataLength = "Length of data is 0.";
-        //string m_ErrorDataNotEnough = "Not enough data in column.";
         string m_ErrorFewItems = "Too few items. \r\n Use 2 or more numeric columns.";
         string m_ErrorSystemValidRowIndices = "ValidRowIndices Info miss matching";
         string m_ErrorFewLevels = "There must be at least two levels.";
@@ -350,9 +347,6 @@ namespace DACrux.BStats.Core
                             }
                             else
                             {
-                                //arrMean.Add(double.NaN);
-                                //arrValue.Add(double.NaN);
-                                //arrResiduals.Add(double.NaN);
                             }
 
                         }
@@ -434,18 +428,6 @@ namespace DACrux.BStats.Core
                 strRs = Convert.ToString(Math.Round(dblRs, m_iDecimalOuter));
                 strAdjRs = Convert.ToString(Math.Round(dblAdjRs, m_iDecimalOuter));
                 strMSR = Convert.ToString(Math.Round(dblMSR, m_iDecimalOuter));
-                //if (double.IsInfinity(oAnova.RSquared))
-                //    strRs = "*";
-                //else
-                //    strRs = Convert.ToString(Math.Round(oAnova.RSquared, m_iDecimalOuter));
-                //if (double.IsInfinity(oAnova.AdjustedRsquared))
-                //    strAdjRs = "*";
-                //else
-                //    strAdjRs = Convert.ToString(Math.Round(oAnova.AdjustedRsquared, m_iDecimalOuter));
-                //if (double.IsInfinity(oAnova.MeanSquaredResidual))
-                //    strMSR = "*";
-                //else
-                //    strMSR = Convert.ToString(Math.Round(oAnova.MeanSquaredResidual, m_iDecimalOuter));
 
                 dtReturn.Rows.Add(new object[] { strRs, strAdjRs, strMSR });
                 dtReturn.AcceptChanges();
@@ -921,7 +903,6 @@ namespace DACrux.BStats.Core
                     if (!arrReturn.Contains(arrayB[i]))
                         arrReturn.Add(arrayB[i]);
                 }
-                //arrReturn.TrimExcess();
                 arrReturn.Sort();
                 return arrReturn.ToArray();
             }

@@ -248,7 +248,6 @@ namespace DACrux.TEST.ENGUI
                     else
                     {
                         //나머지는 선택 하지 못한다.
-                        //fpSpread1_Sheet1.Columns[iCol].CanFocus = false;
                     }
                 }
 
@@ -388,7 +387,6 @@ namespace DACrux.TEST.ENGUI
                 /// Color Depth ====================================================================
                 for (int i = 0; i <= m_strWaferSeqs.Length; i++)
                 {
-                    //m_wMap.SetColor(i, Color.Red, (255 / (m_strWaferSeqs.Length + 1)) * i);
 
                     Color oColor = Color.FromArgb((255 / (m_strWaferSeqs.Length + 1)) * i
                                    , 255
@@ -422,7 +420,6 @@ namespace DACrux.TEST.ENGUI
                         m_wMap.SetColor(ic, crColor);
                     }
 
-                    //m_wMap.SetItemCountColorList.Add(oItemColor);
                 }
 
                 //Redraw 시 마다 File 상에 저장 해놓고 Form Load 시 불러 온다.

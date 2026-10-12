@@ -49,7 +49,6 @@ namespace DACrux.SEMDMS.Control
         {
             InitializeComponent();
             SelectedDefects = new DefectList();
-            //DefectTypeInfo = new DefectTypeList();
             DATETIME_FORMAT = new string[] { "yyyyMMddHHmmss", "MM/dd/yy HH:mm:ss", "MM-dd-yy HH:mm:ss" };
             Gubun = new DefectGubun() { New = true, CarryOver = true, Cluster = true, Random = true };
         }
@@ -97,9 +96,6 @@ namespace DACrux.SEMDMS.Control
 
             //--
 
-            //this.dpucOption1.TabsControl[1].Visible = false;
-            //this.dpucOption1.TabsControl[2].Visible = false;
-
             //--
 
             //2019-07-11-정병주 : Defect Size / Defect Class 별로 X 축을 정의 한다.
@@ -134,7 +130,6 @@ namespace DACrux.SEMDMS.Control
             EventArgs e
             )
         {
-            //if (GetData())
             DrawChart();
         }
 
@@ -359,10 +354,6 @@ namespace DACrux.SEMDMS.Control
                 return;
 
             //Control Key 를 누르고 있을 경우 여러 Point 를 선택
-            //if (ModifierKeys != Keys.Shift || ModifierKeys != Keys.ShiftKey)
-            //{
-            //    SelectedDefects.Clear();
-            //}
 
             // Reset Data Point Attributes
             foreach (Series sVal in chart.Series)
@@ -1761,9 +1752,6 @@ namespace DACrux.SEMDMS.Control
                 cArea.AxisX.ScrollBar.IsPositionedInside = true;
                 cArea.AxisY.ScrollBar.LineColor = Color.Black;
                 cArea.AxisY.ScrollBar.Size = 17;
-                //cArea.AxisY.Interval = 1;
-                //cArea.AxisY.IntervalAutoMode = IntervalAutoMode.FixedCount;
-                //cArea.AxisY.IntervalOffset = 0.01;
                 cArea.AxisY.IntervalOffsetType = DateTimeIntervalType.Auto;
                 cArea.AxisY.IsLabelAutoFit = false;
                 cArea.CursorY.AutoScroll = true;
@@ -1846,9 +1834,6 @@ namespace DACrux.SEMDMS.Control
             dpucInformation1.DataSource = defects;
             dpucReclassify1.DataSource = null;
             InspectionInfos = dpucInformation1.InspectionInfos;
-
-            //DefectMapAnalysis oDefectMapAnal = new DefectMapAnalysis();
-            //DataTable dt = oDefectMapAnal.GetDefectClassInfo();
 
             DrawChart();
         }
@@ -2289,12 +2274,6 @@ namespace DACrux.SEMDMS.Control
             dt.Rows.Add(row);
 
             //--
-
-            //row = dt.NewRow();
-            //row["XVALUE"] = "DSIZE";
-            //row["KEY"] = "DEFECT_PERCENTS";
-            //row["VALUE"] = "Defect Percents";
-            //dt.Rows.Add(row);
 
 
             //--

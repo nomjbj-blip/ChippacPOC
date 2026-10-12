@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-//using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Data;
@@ -148,24 +147,6 @@ namespace DACrux.SEMDMS.FileMonitor
                     {
                         try
                         {
-                            //int idxProc = m_arrEquipName.IndexOf(m_dtEquipment.Rows[i]["EQUIP_ID"].ToString());
-                            //if (idxProc < 0)
-                            //{
-                            //    m_arrEquipName.Add(m_dtEquipment.Rows[i]["EQUIP_ID"].ToString());
-                            //    m_arrEquipProc.Add(new Process());
-                            //}
-                            //else
-                            //{
-                            //    if (m_arrEquipProc[idxProc].HasExited)
-                            //    {
-                            //        m_arrEquipName.RemoveAt(idxProc);
-                            //        m_arrEquipProc.RemoveAt(idxProc);
-
-                            //        m_arrEquipName.Add(m_dtEquipment.Rows[i]["EQUIP_ID"].ToString());
-                            //        m_arrEquipProc.Add(new Process());
-                            //    }
-                            //}
-
 
                             string strPath = m_dtEquipment.Rows[i]["RESULT_PATH"].ToString().Replace("/", @"\").Replace(@"\\", @"\");
                             string strBackup = m_dtEquipment.Rows[i]["BACKUP_PATH"].ToString().Replace("/", @"\").Replace(@"\\", @"\");

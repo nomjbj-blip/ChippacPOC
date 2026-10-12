@@ -14,7 +14,6 @@ namespace DACrux.TEST.DSL
             try
             {
                 connectID = System.Configuration.ConfigurationManager.AppSettings["TEST_CONNECT_ID"];
-                //connectID = "EMSMGR";
                 if (connectID.Equals(string.Empty))
                 {
                     throw new Exception("The connect ID nothing. Please, check app.config.");
@@ -402,7 +401,6 @@ namespace DACrux.TEST.DSL
 
             try
             {
-                //string[] dynamic = new string[] { string.Join(",", waferSeq) };
                 dt = this.GetDataTable("YIELD_REPORT_BY_DAY", new string[] { waferSeq }, null);
                 return dt;
             }
@@ -714,7 +712,6 @@ namespace DACrux.TEST.DSL
 
             try
             {
-                //string[] dynamic = new string[] { string.Join(",", waferSeq) };
                 dt = this.GetDataTable("YIELD_REPORT_BY_DAY", new string[] { string.Join(",", waferSeq) }, null);
                 return dt;
             }

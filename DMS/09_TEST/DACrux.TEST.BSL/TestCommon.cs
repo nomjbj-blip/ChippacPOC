@@ -54,7 +54,6 @@ namespace DACrux.TEST.BSL
             TQP_WAFER oWafer = null;
             TQP_DATA_TABLES oTables = null;
             TQP_PARASPEC oParams = null;
-            //T_PCM oPcm = null;
             TD_TABLE oTable = null;
 
             Dictionary<string, string> dicWafer = null;
@@ -875,19 +874,6 @@ namespace DACrux.TEST.BSL
             TQP_WAFER waf = new TQP_WAFER();
             TQP_FOI_DIE foi = new TQP_FOI_DIE();
 
-            //if (String.Equals(TEST_AREA, "AVI"))
-            //{
-            //    //AVI Map 의 경우 기존 Lot 및 Wafer 에 대한 정보를 삭제 하고 다시 만든다.
-            //    //Retest 에 대한 개념보다는 잘못 올린 File 에 대한 재 Upload 개념
-            //    //기존 Lot 및 Wafer 에 대한 정보를 가지고 온다.
-            //    lotSeq = lot.GetLotSeq(FACTORY, TEST_AREA, LOT_ID);
-
-            //    if (!String.IsNullOrEmpty(lotSeq))
-            //    {
-            //        lot.DeleteLot(lotSeq);
-            //        waf.DeleteWaferDataAVI(FACTORY, lotSeq, WAFER_ID);
-            //    }
-            //}
             lotSeq = lot.GetLotSeq(FACTORY, TEST_AREA, LOT_ID, PROGRAM);
 
             // LOT 데이터가 없는 경우 TQP_LOT 추가
@@ -926,10 +912,6 @@ namespace DACrux.TEST.BSL
                 probeCnt = Int32.Parse(wafDt.Rows[0]["PROBE_CNT"].ToString());
 
                 //Scope 의 경우 FOI 상의 Map 정보를 삭제 한다.
-                //if ((String.Equals(TEST_AREA, "AVI") && String.Equals(PROGRAM, "SCOPE")))
-                //{
-                //    foi.DeleteFOIDiesMulti(waferSeq);
-                //}
             }
             else // WAF 관련 데이터가 없는 경우
             {
@@ -979,115 +961,17 @@ namespace DACrux.TEST.BSL
         /// <summary>
         /// Rework 개념없이 Test 는 중복제거
         /// </summary>
-        //public void SaveWaferDataNotRework(
-        //    string FACTORY,
-        //    string TEST_AREA,
-        //    string DEVICE,
-        //    string DEVICE_ALIAS,
-        //    string LOT_ID,
-        //    string WAFER_ID,
-        //    string START_TIME,
-        //    string END_TIME,
-        //    int WAFER_DIAM,
-        //    string TESTER,
-        //    string PROBER,
-        //    string PROBE_CARD,
-        //    string OPERATOR,
-        //    string PROGRAM,
-        //    int PROGRAM_REV,
-        //    int START_QTY,
-        //    string VENDOR_ID,
-        //    int MAX_X,
-        //    int MAX_Y,
-        //    string WAF_FLAT,
-        //    string COMMENTS,
-        //    string PGMPATH,
-        //    string DATA_SOURCE,
-        //    string TFVERSION,
-        //    string PROBECARD_TOUCHDOWNS,
-        //    string SMSFAMILY_NAME,
-        //    int NUM_DIE,
-        //    out string lotSeq,
-        //    out string waferSeq
-        //    )
-        //{
-        //    int probeCnt;
-        //    DataTable wafDt;
 
         //    // LOT SEQ
-        //    TQP_LOT lot = new TQP_LOT();
-        //    TQP_WAFER waf = new TQP_WAFER();
-        //    TQP_LOT_SUM lot_sum = new TQP_LOT_SUM();
-        //    TQP_WAFER_SUM waf_sum = new TQP_WAFER_SUM();
-        //    TQP_FOI_DIE foi = new TQP_FOI_DIE();
 
         //    //Lot 정보는 없으면 생성 한다.
-        //    lotSeq = lot.GetAVILotSeq(FACTORY, TEST_AREA, LOT_ID, PROGRAM);
-        //    if (String.IsNullOrEmpty(lotSeq))
-        //    {
-        //        lotSeq = lot.GetNewLotSeq();
-        //        // LOT 데이터 INSERT OR UPDATE
-        //        lot.MergeData(
-        //            FACTORY,
-        //            lotSeq,
-        //            LOT_ID,
-        //            TEST_AREA,
-        //            PROGRAM,
-        //            DEVICE,
-        //            DEVICE_ALIAS,
-        //            START_TIME,
-        //            END_TIME,
-        //            WAFER_DIAM.ToString());
-        //    }
 
         //    //Wafer 관련 Data 중복 Data 는 삭제 한다.
         //    //Wafer 는 재 Upload 시 Retest 로 간주하지 않는다.
-        //    wafDt = waf.GetWaferInfo(FACTORY, lotSeq, WAFER_ID);
-        //    if (wafDt != null && wafDt.Rows.Count > 0)
-        //    {
-        //        waferSeq = wafDt.Rows[0]["WAFER_SEQ"].ToString();
-        //        foi.DeleteFOIDiesMulti(waferSeq);
-        //        waf.DeleteWaferData(waferSeq);
-        //        waf_sum.DeleteWaferData(waferSeq);
-        //    }
-
-        //    waferSeq = waf.SelectNextWaferSeq();
-        //    probeCnt = -1;
 
         //    // WAFER 데이터 INSERT OR UPDATE
-        //    waf.MergeData(
-        //        FACTORY,
-        //        waferSeq,
-        //        probeCnt.ToString(),
-        //        lotSeq,
-        //        WAFER_ID,
-        //        START_TIME,
-        //        END_TIME,
-        //        TESTER,
-        //        PROBER,
-        //        PROBE_CARD,
-        //        OPERATOR,
-        //        PROGRAM,
-        //        PROGRAM_REV.ToString(),
-        //        START_QTY.ToString(),
-        //        VENDOR_ID,
-        //        MAX_X.ToString(),
-        //        MAX_Y.ToString(),
-        //        WAF_FLAT,
-        //        COMMENTS,
-        //        LOT_ID,
-        //        PGMPATH,
-        //        DATA_SOURCE,
-        //        TFVERSION,
-        //        PROBECARD_TOUCHDOWNS,
-        //        SMSFAMILY_NAME,
-        //        NUM_DIE.ToString());
-
 
         //    // INSERT 인 경우 현재 데이터가 최신이 되도록 (PROBE_CNT=0) PROBE_CNT 값을 1씩 증가시킨다.
-        //    waf.IncreaseProbeCnt(FACTORY, lotSeq, WAFER_ID);
-
-        //}
 
         public DataTable GetLotInfo(string lotid)
         {
@@ -1487,127 +1371,23 @@ namespace DACrux.TEST.BSL
                 );
         }
 
-        //public void SummaryWaferData(
-        //   string waferSeq
-        //   )
-        //{
-        //    TQP_BINDESC oBinDesc = new TQP_BINDESC();
-        //    TD_TABLE oTdTable = new TD_TABLE();
-        //    TQP_WAFER oWafer = new TQP_WAFER();
-        //    TQP_WAFER_SUM oWaferSum = new TQP_WAFER_SUM();
-        //    TQP_PARASPEC oParaSpec = new TQP_PARASPEC();
+        //    //--
 
         //    //--
 
-        //    DataTable dtWafer = null;
-        //    DataTable dtWaferSum = null;
-
         //    //--
-
-        //    string ttable = string.Empty;
-        //    string[] gecBinCode = null;
-
-        //    //--
-
-        //    if (oWaferSum.GetIsWafer(waferSeq))
-        //        oWaferSum.DeleteWaferData(waferSeq);
 
         //    //--
 
         //    // Step 2. Summary Table 생성
-        //    DataTable dtNewWaferSum = EmptyWaferSumTable();
 
         //    //--
 
-        //    dtWafer = oWafer.GetWaferInfoByWSEQ(waferSeq);
-
         //    // Step 3. Summary Data 생성
-        //    foreach (DataRow row in dtWafer.Rows)
-        //    {
-        //        decimal dWaferSeq = decimal.Parse(row["WAFER_SEQ"].ToString());
-        //        string program = row["PROGRAM"].ToString();
-        //        string programRev = row["PROGRAM_REV"].ToString();
-
-        //        ttable = oParaSpec.GetBinTTable(
-        //                dWaferSeq
-        //                );
-
-        //        Dictionary<string, decimal> dic = null;
-        //        if (!String.IsNullOrEmpty(ttable))
-        //        {
-        //            dic = oTdTable.GetBinCount(
-        //                ttable, dWaferSeq
-        //                );
-        //        }
-
-        //        dtWaferSum = oWafer.GetWaferSummaryInfo(
-        //            dWaferSeq
-        //            );
-
-        //        if (dtWaferSum == null || dtWaferSum.Rows.Count == 0)
-        //            continue;
 
         //        //--
 
-        //        DataRow newWafer = dtNewWaferSum.NewRow();
-        //        newWafer["CUSTOMER"] = dtWaferSum.Rows[0]["CUSTOMER"];
-        //        newWafer["FACILITY"] = dtWaferSum.Rows[0]["FACILITY"];
-        //        newWafer["PRODUCT"] = dtWaferSum.Rows[0]["PRODUCT"];
-        //        newWafer["DEVICE_ALIAS"] = dtWaferSum.Rows[0]["DEVICE_ALIAS"];
-        //        newWafer["TESTAREA"] = dtWaferSum.Rows[0]["TESTAREA"];
-        //        newWafer["PROGRAM"] = dtWaferSum.Rows[0]["PROGRAM"];
-        //        newWafer["MOTHER_LOT_ID"] = dtWaferSum.Rows[0]["MOTHER_LOT_ID"];
-        //        newWafer["LOT_ID"] = dtWaferSum.Rows[0]["LOT_ID"];
-        //        newWafer["LOT_SEQ"] = dtWaferSum.Rows[0]["LOT_SEQ"];
-        //        newWafer["WAFER_ID"] = dtWaferSum.Rows[0]["WAFER_ID"];
-        //        newWafer["WAFER_SEQ"] = dtWaferSum.Rows[0]["WAFER_SEQ"];
-        //        newWafer["TESTER"] = dtWaferSum.Rows[0]["TESTER"];
-        //        newWafer["PROBE_CARD"] = dtWaferSum.Rows[0]["PROBE_CARD"];
-        //        newWafer["OPERATOR"] = dtWaferSum.Rows[0]["OPERATOR"];
-        //        newWafer["PROBE_CNT"] = dtWaferSum.Rows[0]["PROBE_CNT"];
-        //        newWafer["START_TIME"] = dtWaferSum.Rows[0]["START_TIME"];
-        //        newWafer["END_TIME"] = dtWaferSum.Rows[0]["END_TIME"];
-        //        newWafer["WAFER_CAT"] = dtWaferSum.Rows[0]["WAFER_CAT"];
-        //        newWafer["PROBE_CNT"] = dtWaferSum.Rows[0]["PROBE_CNT"];
-
-        //        if (dic != null)
-        //        {
-        //            double sum = 0, good = 0;
-
-        //            foreach (var item in dic)
-        //            {
-        //                if (gecBinCode == null || gecBinCode.Length <= 0)
-        //                {
-        //                    if (string.Equals(item.Key, DefaultGetBin))
-        //                        good += (int)item.Value;
-        //                }
-        //                else
-        //                {
-        //                    string key = Array.Find(
-        //                        gecBinCode,
-        //                        x => String.Equals(item.Key, x)
-        //                        );
-
-        //                    if (!string.IsNullOrEmpty(key))
-        //                        good += (int)item.Value;
-        //                }
-        //                newWafer[item.Key] = item.Value;
-        //                sum += (int)item.Value;
-        //            }
-
-        //            newWafer["TESTED_DIE"] = sum;
-        //            newWafer["YIELD"] = Math.Round(100 * good / sum, 2);
-        //        }
-
-        //        dtNewWaferSum.Rows.Add(newWafer);
-        //    }
-
         //    /// Step 4. TQP_WAFER_SUM 저장
-        //    if (dtNewWaferSum != null && dtNewWaferSum.Rows.Count > 0)
-        //        oWaferSum.CreateDataWafer(
-        //            dtNewWaferSum
-        //            );
-        //}
 
         //--------------------------------------------------------------------------------
 
@@ -2757,12 +2537,6 @@ namespace DACrux.TEST.BSL
                 //=================================================================================================================================
                 //Defect Map 정보를 가져 온다.
                 //=================================================================================================================================
-                //dtTemp = oDefect.GetData("SELECT_DEFECT_MULTI", new string[] { string.Join(",", arrStepSeq.ToArray()) }, null);
-                //if (dtTemp == null)
-                //    throw new Exception("정의된 Defect 정보가 없습니다. TQD_DEFECT Empty");
-
-                //dtTemp.TableName = "DEFECT_INFO";
-                //dsData.Tables.Add(dtTemp.Copy());
 
                 dtTemp = oTQD_COLORBYSIZE.SelectColorListByDefectSize(strUser);
                 if (dtTemp != null && dtTemp.Rows.Count > 0)

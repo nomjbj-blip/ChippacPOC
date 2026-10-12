@@ -94,7 +94,6 @@ namespace DACrux.SEMDMS.ENGUI
                     if (result == System.Windows.Forms.DialogResult.OK)
                     {
                         oSemConfig.InsertDefectSizeByColor(
-                            //DACrux.Base.GlobalVariable.UserID,
                             ConfigUserID,
                             sizeSeq,
                             grid.GetValue("SIZE_FROM").ToString(),
@@ -123,7 +122,6 @@ namespace DACrux.SEMDMS.ENGUI
                     if (result == System.Windows.Forms.DialogResult.OK)
                     {
                         oSemConfig.UpdateDefectSizeByColor(
-                            //DACrux.Base.GlobalVariable.UserID,
                             ConfigUserID,
                             sizeSeq,
                             grid.GetValue("SIZE_FROM").ToString(),
@@ -152,7 +150,6 @@ namespace DACrux.SEMDMS.ENGUI
                     if (result == System.Windows.Forms.DialogResult.OK)
                     {
                         oSemConfig.DeleteDefectSizeByColor(
-                            //DACrux.Base.GlobalVariable.UserID,
                             ConfigUserID,
                             sizeSeq
                             );

@@ -19,9 +19,6 @@ namespace DACrux.TEST.PCM.StatusService
             PROGRAM
         };
 
-        //public static readonly string TYPE_LOT = "LOT";
-        //public static readonly string TYPE_WAFER = "WAFER";
-        //public static readonly string STATUS_END = "END";
         public static readonly string DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
         public PCMStatusService()
@@ -88,9 +85,6 @@ namespace DACrux.TEST.PCM.StatusService
             }
 
             tst.UpdatePcmEquipInfo(infoList);
-
-            //if (infoList.Count > 0)
-            //    AppendServiceLog(ActionType.SUCCESS, infoList.ToString());
 
             WriteLog("UPDATE", String.Join(",", eqList));
         }

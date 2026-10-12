@@ -415,14 +415,8 @@ namespace DACrux.BStats.Core
                 {
                     m_Result.Nmissing = StatsFunctions.Count(idfCol) - StatsFunctions.Count(idfCleanCol);
                 }
-                //if (m_InputOption.IsNnonmissing)   //누적 수량 및 퍼센트, 누적 퍼센트를 밖에서 계산하기 위해서 수정했음
-                //{
                 m_Result.Nnonmissing = StatsFunctions.Count(idfCleanCol);
-                //}
-                //if (m_InputOption.IsNtotal)   //누적 수량 및 퍼센트, 누적 퍼센트를 밖에서 계산하기 위해서 수정했음
-                //{
                 m_Result.Ntotal = StatsFunctions.Count(idfCol);
-                //}
                 if (m_InputOption.IsPercent)
                 {
                     m_Result.Percent = Math.Round((double)100 * StatsFunctions.Count(idfCleanCol) / StatsFunctions.Count(idfCol), m_iDecimalOuter);
@@ -438,7 +432,6 @@ namespace DACrux.BStats.Core
 
                 if (m_InputOption.IsSum)
                 {
-                    //m_Result.Sum = StatsFunctions.Sum(idfCleanCol);  //소수점 문제로 인해 변경(있잖아요 왜..2진수로 표현할때 에러...)
                     m_Result.Sum = GetSum(idfCleanCol);
                 }
 

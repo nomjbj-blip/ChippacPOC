@@ -124,20 +124,6 @@ namespace DACrux.TEST.BSL
             }
         }
 
-        //public DataSet GetStepListByStepID(string TestArea, string StartTime, string EndTime, string LikeDevice, string LikeLot, string LikeWafer)
-        //{
-        //    T_DMS_INSP_INFO oDSL = null;
-        //    try
-        //    {
-        //        oDSL = new T_DMS_INSP_INFO();
-        //        return oDSL.GetStepListByStepID(TestArea, StartTime, EndTime, LikeDevice, LikeLot, LikeWafer);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw ex;
-        //    }
-        //}
-
         public DataTable GetTestAreaList()
         {
             T_AVI_TABLE oDSL = null;

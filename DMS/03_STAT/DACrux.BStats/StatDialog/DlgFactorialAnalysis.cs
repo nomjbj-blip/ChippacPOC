@@ -273,8 +273,6 @@ namespace DACrux.BStats.StatDialog
 		/// </summary>
 		private System.Windows.Forms.GroupBox groupBox1;
 
-        //Miracom.DACrux.Images.frmImage fmg = new Miracom.DACrux.Images.frmImage();
-
 
 		/// <summary>
 		/// DACrux 메인프레인 타이틀
@@ -300,7 +298,6 @@ namespace DACrux.BStats.StatDialog
 				if (c is ListView)
 				{
 					((ListView)c).Columns[0].Width = 150;
-                    //((ListView)c).SmallImageList = fmg.imageList1 ;
 				}
 			}
 		}
@@ -333,12 +330,6 @@ namespace DACrux.BStats.StatDialog
 			{
 				array= this.CountLevelOfVar(((DFColumn)dfTemp[i]).ToStringArray() );
 
-				//double temp = 0.0;
-
-				//for(int j=0; j < array.Count; j++)
-					//temp += Convert.ToDouble( array[j] );
-					
-				//if( array.Count == 2 && temp == 1.0)
 				if(array.Count == 2)
 					count++;
 					
@@ -382,12 +373,9 @@ namespace DACrux.BStats.StatDialog
 			}
 
 			listView1.Columns[0].Width = 150;
-            //listView1.SmallImageList = fmg.imageList1 ;
 			
-            //listView2.SmallImageList = fmg.imageList1 ; 
 			listView2.Columns[0].Width = 150;
 
-            //listView3.SmallImageList = fmg.imageList1 ;
 			listView3.Columns[0].Width = 150;
 
 			this.checkBox8.Enabled = false;
@@ -998,14 +986,12 @@ namespace DACrux.BStats.StatDialog
 
 			if (this.listView2.Items.Count < 1)
 			{
-                //MessageBox.Show(Miracom.DACrux.Interface.ILanguages.getResourceString("STAT_DOE_FACTANAL_DIALOG_MSG01"),this.strDACruxTitle, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 MessageBox.Show("STAT_DOE_FACTANAL_DIALOG_MSG01", this.strDACruxTitle, MessageBoxButtons.OK, MessageBoxIcon.Information);
 				return ;
 			}
 
 			if (this.listView3.Items.Count < 1)
 			{
-                //MessageBox.Show(Miracom.DACrux.Interface.ILanguages.getResourceString("STAT_DOE_FACTANAL_DIALOG_MSG02"),this.strDACruxTitle, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 MessageBox.Show("STAT_DOE_FACTANAL_DIALOG_MSG02", this.strDACruxTitle, MessageBoxButtons.OK, MessageBoxIcon.Information);
 				return ;
 
@@ -1088,13 +1074,6 @@ namespace DACrux.BStats.StatDialog
 					MessageBox.Show("STAT_DOE_FACTANAL_DIALOG_MSG04",this.strDACruxTitle, MessageBoxButtons.OK, MessageBoxIcon.Information);
 					return ;
 				}
-
-//			for( int i =0; i < this.listView1.SelectedItems.Count; i++)
-//			{
-//				ListViewItem item = new ListViewItem(this.listView1.SelectedItems[i].Text,(int)this.listView1.SelectedItems[i].Tag);
-//				item.Tag = this.listView1.SelectedItems[i].Tag;
-//				this.listView2.Items.Add(item);
-//			}
 
 			ListViewItem item = new ListViewItem(this.listView1.SelectedItems[0].Text,(string)this.listView1.SelectedItems[0].Tag);
 			item.Tag = this.listView1.SelectedItems[0].Tag;
@@ -1576,7 +1555,6 @@ namespace DACrux.BStats.StatDialog
 		/// <param name="e"></param>
 		private void DlgFactorialAnalysis_Load(object sender, System.EventArgs e)
 		{
-            //this.Icon = Icon.FromHandle( new Bitmap( fmg.imageList1.Images[Miracom.DACrux.Images.GetImage.FactorialAnalysis] ).GetHicon());
 		}
 
 		/// <summary>
@@ -1785,7 +1763,6 @@ namespace DACrux.BStats.StatDialog
 		private void fpSpread1_ColumnWidthChanged(object sender, FarPoint.Win.Spread.ColumnWidthChangedEventArgs e)
 		{
 
-			//fpSpread1_Sheet1.Columns[0].Width = 80;
 			fpSpread1_Sheet1.Columns[1].Width = 25;
 			fpSpread1_Sheet1.Columns[2].Width = 110;
 			fpSpread1_Sheet1.Columns[3].Width = 110;
@@ -1870,7 +1847,6 @@ namespace DACrux.BStats.StatDialog
 			this.m_Input.bAnovaAnalysis			= this.checkBox2.Checked;	
 			this.m_Input.bInteractionEffect      = this.checkBox9.Checked;
 			this.m_Input.bMainEffect				= this.checkBox3.Checked;	
-			//this.m_Input.bRegressionEquation		= this.checkBox10.Checked;	
 
 			this.m_Input.bInteractionDiagram     = this.checkBox8.Checked;
 			this.m_Input.bMainEffectDiagram      = this.checkBox6.Checked;

@@ -735,11 +735,6 @@ namespace DACrux.TEST.BSL
 
             //--
 
-            //dt = oWafer.GetData(
-            //    "SELECT_WAFER_INFO_07",
-            //    new string[] { string.Format("'{0}'", string.Join("','", testarea)), string.Format("'{0}'", string.Join("','", lots)) },
-            //    new string[] { dtStart.ToString("yyyyMMdd"), dtEnd.ToString("yyyyMMdd"), product, program }
-            //    );
             dt = oWafer.GetWaferInfo07(dtStart.ToString("yyyyMMdd"), dtEnd.ToString("yyyyMMdd"), testarea, product, program, lots);
             dt.TableName = "WAFER_INFO";
             ds.Tables.Add(dt);
@@ -747,7 +742,6 @@ namespace DACrux.TEST.BSL
             if (dt == null || dt.Rows.Count <= 0)
                 return null;
 
-            //dt = dt.Select("[PROBE_CNT] = '0'").CopyToDataTable<DataRow>();
             wafers = new String[dt.Rows.Count];
             for (int ir = 0; ir < dt.Rows.Count; ir++)
             {
@@ -896,7 +890,6 @@ namespace DACrux.TEST.BSL
             try
             {
                 oDSL = new TQP_BINDESC();
-                //oDSL.UpdateProgramBin(Program, BinInf);
                 oDSL.UpdateProgramBin(Program, BinInf);
             }
             catch (Exception ex)

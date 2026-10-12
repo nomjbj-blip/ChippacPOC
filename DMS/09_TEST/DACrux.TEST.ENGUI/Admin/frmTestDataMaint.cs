@@ -659,7 +659,6 @@ namespace DACrux.TEST.ENGUI
 
             // change history
             String newWaferId = String.Format("{0} ({1})", txtNewWaferID.Text, (int)nudProbeCnt.Value);
-            //InsertChangeHis(TranCategory.WAFER, TranType.UPDATE, 1, txtCurrWaferID.Text, txtNewWaferID.Text, userComment);
             InsertChangeHis(TranCategory.WAFER, TranType.UPDATE, 1, txtCurrWaferID.Text, newWaferId, userComment);
 
             ShowMessage("업데이트를 완료하였습니다.");

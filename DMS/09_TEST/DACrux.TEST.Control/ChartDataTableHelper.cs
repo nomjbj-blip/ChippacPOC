@@ -553,13 +553,6 @@ namespace DACrux.TEST.Control
 						// this sample assumes the same number of points in each
 						// series so always take from the zeroth series
 						int pointIndex = 0;
-                        //foreach(DataPoint pt in ChartObj.Series[0].Points)
-                        //{
-                        //    if(pt.XValue > min)
-                        //        break;
-
-                        //    pointIndex++;
-                        //}
 
 						bool TableLegendDrawn = false;
 
@@ -579,8 +572,6 @@ namespace DACrux.TEST.Control
 							// Convert relative coordinates to absolute coordinates.
 							point1 = e.ChartGraphics.GetAbsolutePoint(point1);
 							point2.X = point1.X;
-                            //point2.Y = ChartAreaBottomY - titleFontSize.Height;
-                            //point1.Y = pixelY;
                             point2.Y = ChartAreaBottomY - titleFontSize.Height + (AddTableHeader ? axisFont.Height : 0);
                             point1.Y = pixelY + (AddTableHeader ? axisFont.Height : 0);
 
@@ -606,23 +597,6 @@ namespace DACrux.TEST.Control
 									{
                                         // ¿øº»
 										// draw the series color box 
-                                        //e.ChartGraphics.Graphics.FillRectangle(new SolidBrush(ser.Color), 
-                                        //    x-10, row*(axisFont.Height)+(point1.Y), 10, axisFontSize.Height);
-
-                                        //e.ChartGraphics.Graphics.DrawRectangle(new Pen(borderColor),
-                                        //    x - 10, row * (axisFont.Height) + (point1.Y), 10, axisFontSize.Height);
-
-                                        //e.ChartGraphics.Graphics.FillRectangle(new SolidBrush(tableColor),
-                                        //    x,
-                                        //    row * (axisFont.Height) + (point1.Y),
-                                        //    width,
-                                        //    axisFontSize.Height);
-
-                                        //e.ChartGraphics.Graphics.DrawRectangle(new Pen(borderColor),
-                                        //    x,
-                                        //    row * (axisFont.Height) + (point1.Y),
-                                        //    width,
-                                        //    axisFontSize.Height); 
 
                                         e.ChartGraphics.Graphics.FillRectangle(new SolidBrush(ser.Color),
                                             rect.X, row * (axisFont.Height) + (point1.Y), 10, axisFontSize.Height);

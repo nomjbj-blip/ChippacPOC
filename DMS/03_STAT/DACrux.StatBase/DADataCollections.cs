@@ -670,9 +670,6 @@ namespace DACrux.StatBase
             decimal dblAcc = 0;
 
 
-            //decimal dblSigma;
-
-            //decimal dblAcc2 = 0;
             decimal dblSum2 = 0;
             int iSampleCNT = 0;
 

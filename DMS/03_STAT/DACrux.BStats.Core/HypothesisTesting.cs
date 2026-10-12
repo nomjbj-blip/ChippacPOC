@@ -34,13 +34,6 @@ namespace DACrux.BStats.Core
         string m_Difference = "Difference";
         #endregion
         #region Message
-        //private string m_ErrorSpec_Target = "Target is out of spec.";
-        //private string m_ErrorSpec_LSLmoreUSL = "LSL cannot be greater than USL";
-        //private string m_ErrorLengthofMovingRange = "Length of moving range must be between 2 and 100.";
-        //private string m_ErrorKsigma = "K Sigma must be positive natural number.";
-        //private string m_ErrorSubgroupsize = "More than half of Subgroup should be the same size.";
-        //private string m_ErrorArgumentContantForSubgroupSize = "Sub group size must be positive natural number.";
-        //private string m_ErrorStd0 = "Standard deviation is 0. Cannot analysis.";
         private string m_ErrorNotEnoughData = "Not enough data in column.";
 
         #endregion
@@ -300,7 +293,6 @@ namespace DACrux.BStats.Core
                         oReturn.P = Math.Round(oTest2P.P, m_iDecimalOuter);
                         oReturn.Statistic = Math.Round(oTest2P.Statistic, m_iDecimalOuter);
                         oReturn.StatisticName = "T-Value";
-                        //oReturn.EstimateForDifference = dblMeanD;
 
                         oReturn.LeftCriticalValue = Math.Round(oTest2P.LeftCriticalValue, m_iDecimalOuter);
                         oReturn.RightCriticalValue = Math.Round(oTest2P.RightCriticalValue, m_iDecimalOuter);

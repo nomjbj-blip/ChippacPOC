@@ -40,7 +40,6 @@ namespace DACrux.SEMDMS.Control
         DataTable dtSizeColor = null;
 
         DataSet dsDefect = null;
-        //DataTable dtDefectData = null;
         DataTable dtDefectCnt = null;
         DataTable dtIndexDefectsGroup = null;
         DataTable dtChartdata = null;
@@ -1601,7 +1600,6 @@ namespace DACrux.SEMDMS.Control
                 if (ModifierKeys == Keys.Shift || ModifierKeys == Keys.ShiftKey || result.PointIndex < 0)
                     return;
 
-                //SelectedDefects.Clear();
                 // Reset Data Point Attributes
                 foreach (DataPoint point in ChartDefect.Series[0].Points)
                 {
@@ -1614,7 +1612,6 @@ namespace DACrux.SEMDMS.Control
                 if (result.ChartElementType == ChartElementType.DataPoint || result.ChartElementType == ChartElementType.LegendItem)
                 {
                     // Set cursor type 
-                    //Cursor = Cursors.Hand;
 
                     // Find selected data point
                     DataPoint point = ChartDefect.Series[0].Points[result.PointIndex];
@@ -1776,7 +1773,6 @@ namespace DACrux.SEMDMS.Control
                 {
                     dgDefectCount.Rows[e.RowIndex].Cells[2].Value = ColorTranslator.ToHtml(ColorDLG.Color);
                     dgDefectCount.Rows[e.RowIndex].Cells[2].Style.BackColor = ColorDLG.Color;
-                    //dgDefectCount.Rows[e.RowIndex].DefaultCellStyle.BackColor = ColorDLG.Color;
                 }
             }
         }
@@ -2393,7 +2389,6 @@ namespace DACrux.SEMDMS.Control
             {
                 if (container == null) return;
 
-                //container.Height = container.Height + (container.Margin.Top + container.Margin.Bottom);
                 container.Height = container.Height + container.Margin.Top;
                 container.Width = imageList.Width - SystemInformation.VerticalScrollBarWidth - container.Margin.Left - container.Margin.Right;
                 imageList.Controls.Add(container);
@@ -2664,8 +2659,6 @@ namespace DACrux.SEMDMS.Control
                     //| System.Windows.Forms.DataVisualization.Charting.LabelAutoFitStyles.StaggeredLabels
                                                                     | System.Windows.Forms.DataVisualization.Charting.LabelAutoFitStyles.LabelsAngleStep90;
 
-                //ChartDefect.ChartAreas["Default"].AxisX.LabelStyle.Angle = 90;
-                //ChartDefect.ChartAreas["Default"].AxisX.LabelStyle.Font = new System.Drawing.Font("±¼¸²", 9);
                 ChartDefect.AntiAliasing = AntiAliasingStyles.All;
 
                 ChartDefect.ChartAreas["Default"].AxisX.MajorGrid.Enabled = false;

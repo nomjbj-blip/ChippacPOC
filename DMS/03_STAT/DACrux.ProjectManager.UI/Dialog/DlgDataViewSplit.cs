@@ -131,7 +131,6 @@ namespace DACrux.ProjectManager.UI.Dialog
             if (strRowNumbers.Length == 0)
             {
                 ErrMsg = "Not valid format.";
-                //ErrMsg = DACrux.Interface.ILanguages.getResourceString("DATASHEET_SUBSETWND_DIALOG_MSG05");
                 return false;
             }
 
@@ -143,7 +142,6 @@ namespace DACrux.ProjectManager.UI.Dialog
                 if (str.Trim().Length == 0)
                 {
                     ErrMsg = "Not valid format.";
-                    //ErrMsg = DACrux.Interface.ILanguages.getResourceString("DATASHEET_SUBSETWND_DIALOG_MSG05");
                     return false;
                 }
 
@@ -153,7 +151,6 @@ namespace DACrux.ProjectManager.UI.Dialog
                 if (arrNum.Length > 2)
                 {
                     ErrMsg = "Not valid format.";
-                    //ErrMsg = DACrux.Interface.ILanguages.getResourceString("DATASHEET_SUBSETWND_DIALOG_MSG06");
                     return false;
                 }
 
@@ -168,8 +165,6 @@ namespace DACrux.ProjectManager.UI.Dialog
                     catch
                     {
                         ErrMsg = "Not valid format.";
-                        //ErrMsg = DACrux.Interface.ILanguages.getResourceString("DATASHEET_SUBSETWND_DIALOG_MSG07");
-                        //ErrMsg = "Row Numbers에 정수가 아닌 문자가 있습니다." ;
                         return false;
                     }
                 }
@@ -182,7 +177,6 @@ namespace DACrux.ProjectManager.UI.Dialog
                     if (iTemp2 <= iTemp1)
                     {
                         ErrMsg = "Not valid format.";
-                        //ErrMsg = DACrux.Interface.ILanguages.getResourceString("DATASHEET_SUBSETWND_DIALOG_MSG08");
                         return false;
                     }
                 }
@@ -192,7 +186,6 @@ namespace DACrux.ProjectManager.UI.Dialog
                     if ((int)arrList[i] >= (int)arrList[i + 1])
                     {
                         ErrMsg = "Not valid format.";
-                        //ErrMsg = DACrux.Interface.ILanguages.getResourceString("DATASHEET_SUBSETWND_DIALOG_MSG09");
                         return false;
                     }
                 }
@@ -200,13 +193,11 @@ namespace DACrux.ProjectManager.UI.Dialog
                 if (Convert.ToInt32(arrList[0]) < 1)
                 {
                     ErrMsg = "Not valid format.";
-                    //ErrMsg = DACrux.Interface.ILanguages.getResourceString("DATASHEET_SUBSETWND_DIALOG_MSG10");
                     return false;
                 }
                 if (Convert.ToInt32(arrList[arrList.Count - 1]) > dataSource.Rows.Count)
                 {
                     ErrMsg = "Not valid format.";
-                    //ErrMsg = DACrux.Interface.ILanguages.getResourceString("DATASHEET_SUBSETWND_DIALOG_MSG11");
                     return false;
                 }
             }
@@ -224,14 +215,12 @@ namespace DACrux.ProjectManager.UI.Dialog
             if (!double.TryParse(objSampling.ToString(), out dbValue))
             {
                 ErrMsg = "Not valid format.";
-                //ErrMsg = DACrux.Interface.ILanguages.getResourceString("DATASHEET_SUBSETWND_DIALOG_MSG12");
                 return false;
             }
 
             if (dbValue <= 0)
             {
                 ErrMsg = "Specified value is too small.";
-                //ErrMsg = DACrux.Interface.ILanguages.getResourceString("DATASHEET_SUBSETWND_DIALOG_MSG13");
                 return false;
             }
 
@@ -247,13 +236,11 @@ namespace DACrux.ProjectManager.UI.Dialog
             if (iRowCount >= iSpreadRowCount)
             {
                 ErrMsg = "Specified row count is more than sheet row count.";
-                //ErrMsg = DACrux.Interface.ILanguages.getResourceString("DATASHEET_SUBSETWND_DIALOG_MSG14");
                 return false;
             }
             else if (iRowCount <= 0)
             {
                 ErrMsg = "Row count can not be a minus value.";
-                //ErrMsg = DACrux.Interface.ILanguages.getResourceString("DATASHEET_SUBSETWND_DIALOG_MSG15");
                 return false;
             }
 
@@ -357,7 +344,6 @@ namespace DACrux.ProjectManager.UI.Dialog
             dtSampling.AcceptChanges();
 
 
-            //Trace.WriteLine( "어레이 리스트 만들기 시작 : " + DateTime.Now.ToString() ) ;
             for (int i = 0; i < iSpreadRowCount; i++)
             {
                 DataRow dr = dtList.NewRow();
@@ -366,7 +352,6 @@ namespace DACrux.ProjectManager.UI.Dialog
             }
 
             Random random = new Random(unchecked((int)DateTime.Now.Ticks));
-            //Trace.WriteLine( "Random start : " + DateTime.Now.ToString() ) ;
 
             while (dtSampling.Rows.Count < iRealRowCount)
             {

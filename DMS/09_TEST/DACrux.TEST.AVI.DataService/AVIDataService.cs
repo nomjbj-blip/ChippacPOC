@@ -52,7 +52,6 @@ namespace DACrux.TEST.AVI.DataService
             foreach (DACrux.Data.Handler.HandlerAvi handler in handlerList)
             {
                 // 데이터 파싱 처리
-                //WriteLog("Step -", "Data Parsing Start");
 
                 //FAV 별로 AVI Parsing 부분이 상이 하여 분기 한다.
                 handler.FACTORY = Factory;
@@ -90,23 +89,19 @@ namespace DACrux.TEST.AVI.DataService
                         //////////////////////////////////////////////////////////////////////////////////////////////
                         //Step 01 : TQP_PRODUCT 확인 생성
                         //////////////////////////////////////////////////////////////////////////////////////////////
-                        //WriteLog("Step 01", "TQP_PRODUCT 확인 생성");
                         if (!String.IsNullOrEmpty(deviceAlias) && !String.Equals(deviceAlias, "NONE"))
                             oTest.InsertProductInfo(Factory, deviceAlias, deviceAlias);
 
                         //////////////////////////////////////////////////////////////////////////////////////////////
                         //Step 02 : TQP_PROGRAM 확인 생성
                         //////////////////////////////////////////////////////////////////////////////////////////////
-                        //WriteLog("Step 02", "TQP_PROGRAM 확인 생성");
 
                         //AVI 의 경우 Program Fix
                         oTest.InsertProgramInfo(Factory, TESTAREA, TESTAREA, TESTAREA);
-                        //oTest.InsertProgramInfo(Factory, parser.DEVICE, TESTAREA, deviceAlias);
 
                         //////////////////////////////////////////////////////////////////////////////////////////////
                         //Step 03 : TQP_WAFER 확인 생성
                         //////////////////////////////////////////////////////////////////////////////////////////////
-                        //WriteLog("Step 03", "TQP_WAFER 확인 생성");
                         oTest.SaveWaferData(
                             Factory,
                             TESTAREA,
@@ -143,7 +138,6 @@ namespace DACrux.TEST.AVI.DataService
                         //////////////////////////////////////////////////////////////////////////////////////////////
                         //Step 04 : TQP_FOI_DIE 확인 생성
                         //////////////////////////////////////////////////////////////////////////////////////////////
-                        //WriteLog("Step 04", "TQP_FOI_DIE 확인 생성");
 
                         //AVI Data 를 넣기 전에 Scope Data 가 있는지 확인 하고 있으면 Scope Bin Data 를 우선으로 Merge 한다.
                         dtScopeRaw = oTest.SelectScopeRawData(strLotID, strWaferID);
@@ -192,7 +186,6 @@ namespace DACrux.TEST.AVI.DataService
                                         oFile.Delete();
                                     }
 
-                                    //File.Delete(parser.DieList[iDie].IMAGE_BACKUP);
                                     oImage = oImage.CopyTo(parser.DieList[iDie].IMAGE_BACKUP, true);
                                     para[iDie, 8] = parser.FtpRelativePath.Substring(parser.FtpRelativePath.LastIndexOf("BACKUP/"));
                                     para[iDie, 10] = oImage.Name;
@@ -209,8 +202,6 @@ namespace DACrux.TEST.AVI.DataService
                                             }
                                         }
 
-                                        //oImage = new FileInfo(parser.DieList[iDie].IMAGE[0].FullName);
-                                        //oImage.Delete();
                                     }
                                 }
                             }
@@ -229,14 +220,12 @@ namespace DACrux.TEST.AVI.DataService
                                         oFile.Delete();
                                     }
 
-                                    //File.Delete(parser.DieList[iDie].THUMENAIL_BACKUP);
                                     oImage = oImage.CopyTo(parser.DieList[iDie].THUMENAIL_BACKUP, true);
                                     para[iDie, 9] = parser.FtpRelativePath.Substring(parser.FtpRelativePath.LastIndexOf("BACKUP/"));
                                     para[iDie, 11] = oImage.Name;
                                     //기존 Thumnail file 삭제
                                     oImage.IsReadOnly = false;
                                     oImage.Delete();
-                                    //File.Delete(parser.DieList[iDie].THUMENAIL);
                                 }
                             }
                         }
@@ -248,7 +237,6 @@ namespace DACrux.TEST.AVI.DataService
                         //////////////////////////////////////////////////////////////////////////////////////////////
                         //Step 05 : TQP_BINDESC 확인 생성
                         //////////////////////////////////////////////////////////////////////////////////////////////
-                        //WriteLog("Step 05", "TQP_FOI_DIE 확인 생성");
                         //TQP_BINDESC 에 정의되지 않을 경우 임의로 생성 해준다.
                         dtTemp = oTest.SelectFOIBinList(waferSeq);
                         foreach (DataRow dr in dtTemp.Rows)
@@ -257,13 +245,11 @@ namespace DACrux.TEST.AVI.DataService
                         //////////////////////////////////////////////////////////////////////////////////////////////
                         //Step 06 : TQP_WAFER_SUM 확인 생성
                         //////////////////////////////////////////////////////////////////////////////////////////////
-                        //WriteLog("Step 06", "TQP_WAFER_SUM 확인 생성");
                         oTest.SetAVIWaferSummary(waferSeq, lotSeq, strWaferID);
 
                         //////////////////////////////////////////////////////////////////////////////////////////////
                         //Step 07 : TQP_LOT_SUM 확인 생성
                         //////////////////////////////////////////////////////////////////////////////////////////////
-                        //WriteLog("Step 07", "TQP_LOT_SUM 확인 생성");
                         oTest.SetAVILotSummary(lotSeq);
 
                         StopWatch.Stop();

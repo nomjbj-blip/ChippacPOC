@@ -136,17 +136,7 @@ namespace DACrux.ProjectManager.UI
 
             
             chart.ChartAreas[chartReion].Area3DStyle.Enable3D = graphInfo.View3D;
-            //chart.ChartAreas[chartReion].Area3DStyle.IsRightAngleAxes = false;
-            //chart.ChartAreas[chartReion].Area3DStyle.Inclination = 10;
-            //chart.ChartAreas[chartReion].Area3DStyle.Rotation = 20;
-            //chart.ChartAreas[chartReion].Area3DStyle.LightStyle = LightStyle.Realistic;
-            //chart.ChartAreas[chartReion].Area3DStyle.Perspective = 20;
-            //chart.ChartAreas[chartReion].Area3DStyle.WallWidth = 1;
-            //chart.ChartAreas[chartReion].Area3DStyle.IsClustered = true;
 
-            //chart.ChartAreas[chartReion].AxisX.Interval = 1; //Default Is Auto
-
-           
             chart.Titles.Add(graphInfo.Name);
             chart.Titles[0].Font = new Font("Vedana", 11, FontStyle.Bold);
 
@@ -202,7 +192,6 @@ namespace DACrux.ProjectManager.UI
                 if (graphInfo.Type == GraphType.Histogram)
                 {
                     DrawHistogram(graphInfo);
-                    //return;
                 }
                 #endregion
                 else            
@@ -231,14 +220,6 @@ namespace DACrux.ProjectManager.UI
                             //데이터 테이블에 컬럼의 길이가 다를 때
                             for (int i = 0; i < graphInfo.DataSource.Rows.Count; i++)
                             {
-                                //foreach (DataColumn column in graphInfo.DataSource.Columns)
-                                //{
-                                //    if (graphInfo.DataSource.Rows[i].IsNull(column) == true)
-                                //    {
-                                //        int nullValue = Convert.ToInt32(graphInfo.DataSource.Rows[i - 1][column]);
-                                //        graphInfo.DataSource.Rows[i][column] = nullValue;
-                                //    }
-                                //}
                             }
                             if (graphInfo.Name.IndexOf("ANOVA") > -1)
                             {
@@ -399,20 +380,7 @@ namespace DACrux.ProjectManager.UI
                     chart.ChartAreas[graphInfo.ColumnInfoItems[i].ColumnName].AxisY.MajorTickMark.Enabled = false;
                     chart.ChartAreas[graphInfo.ColumnInfoItems[i].ColumnName].AxisY.MinorTickMark.Enabled = false;
 
-                    //chart.ChartAreas[graphInfo.ColumnInfoItems[i].ColumnName].AxisX2.MajorGrid.Enabled = false;
-                    //chart.ChartAreas[graphInfo.ColumnInfoItems[i].ColumnName].AxisX2.MinorGrid.Enabled = false;
-                    //chart.ChartAreas[graphInfo.ColumnInfoItems[i].ColumnName].AxisX2.MajorTickMark.Enabled = false;
-                    //chart.ChartAreas[graphInfo.ColumnInfoItems[i].ColumnName].AxisX2.MinorTickMark.Enabled = false;
-
-                    //chart.ChartAreas[graphInfo.ColumnInfoItems[i].ColumnName].AxisY2.MajorGrid.Enabled = false;
-                    //chart.ChartAreas[graphInfo.ColumnInfoItems[i].ColumnName].AxisY2.MinorGrid.Enabled = false;
-                    //chart.ChartAreas[graphInfo.ColumnInfoItems[i].ColumnName].AxisY2.MajorTickMark.Enabled = false;
-                    //chart.ChartAreas[graphInfo.ColumnInfoItems[i].ColumnName].AxisY2.MinorTickMark.Enabled = false;
-
-                    //chart.ChartAreas[graphInfo.ColumnInfoItems[i].ColumnName].AxisX.Enabled = AxisEnabled.True;
-                    //chart.ChartAreas[graphInfo.ColumnInfoItems[i].ColumnName].AxisX2.Enabled = AxisEnabled.False;
                     chart.ChartAreas[graphInfo.ColumnInfoItems[i].ColumnName].AxisY.Enabled = AxisEnabled.False;
-                    //chart.ChartAreas[graphInfo.ColumnInfoItems[i].ColumnName].AxisY2.Enabled = AxisEnabled.False;
 
                     // Set the alignment type
                     chart.ChartAreas[graphInfo.ColumnInfoItems[i].ColumnName].AlignWithChartArea = graphInfo.ColumnInfoItems[0].ColumnName; //첫번째것으로 통일
@@ -466,8 +434,6 @@ namespace DACrux.ProjectManager.UI
                     chart.ChartAreas[0].InnerPlotPosition.Y = 0;
                     chart.ChartAreas[0].InnerPlotPosition.Width = 85;
                     chart.ChartAreas[0].InnerPlotPosition.Height = 95;
-
-                    //chart.ChartAreas[chart.ChartAreas.Count-1].AxisY2.Enabled = AxisEnabled.True;
 
                     chart.Titles.Add(new Title(graphInfo.Title, Docking.Top));
                 }
@@ -541,7 +507,6 @@ namespace DACrux.ProjectManager.UI
                     Series series = (Series)e.ChartElement;
                     float avg_y = (float)e.ChartGraphics.GetPositionFromAxis(series.ChartArea, AxisName.Y, dAverage);
                     float avg_x = (float)e.ChartGraphics.GetPositionFromAxis(series.ChartArea, AxisName.X, 0);
-                    //float avg_x = chart.ChartAreas[series.ChartArea]..InnerPlotPosition.X;
                     float avg_x2 = chart.ChartAreas[series.ChartArea].Position.X + chart.ChartAreas[series.ChartArea].Position.Width;
 
                     PointF pos_1st = e.ChartGraphics.GetAbsolutePoint(new PointF(avg_x, avg_y));
@@ -638,11 +603,6 @@ namespace DACrux.ProjectManager.UI
 
                         if (DateTime.TryParse(strLabel, out dTemp))
                             strLabel = dTemp.ToString(graphInfo.DateTimeFormatString);
-                        //if (strLabel.Contains(" "))
-                        //{
-                        //    string[] splitPoint = strLabel.Split(' ');
-                        //    strLabel = splitPoint[0].Trim();
-                        //}
                         else
                             strLabel = string.Empty;
 
@@ -816,7 +776,6 @@ namespace DACrux.ProjectManager.UI
             chart.ChartAreas.Add("BoxPlot");
             ChartSet("BoxPlot");
             chart.Series.Add("BoxPlotSeries");
-            //chart.ChartAreas["BoxPlot"].AxisX.Interval = 1.0; // Default is Auto
             chart.ChartAreas["BoxPlot"].AxisX.Minimum = 0.0;
 
             try
@@ -947,9 +906,6 @@ namespace DACrux.ProjectManager.UI
                 chart.Series["BoxPlotSeries"].Font = new Font("Vedana", 8, FontStyle.Regular);
 
                 chart.Series["BoxPlotSeries"]["BoxPlotWhiskerPercentile"] = "0";
-                //chart.Series["BoxPlotSeries"]["BoxPlotPercentile"] = "25";
-                //chart.Series["BoxPlotSeries"]["MaxPixelPointWidth"] = "10";
-                //chart.Series["BoxPlotSeries"]["PixelPointWidth"] = "25";
 
                 for (int i = 1; i < arrAxisYItem.Length + 1; i++)
                 {
@@ -985,7 +941,6 @@ namespace DACrux.ProjectManager.UI
             chart.ChartAreas.Add("BoxPlot");
             ChartSet("BoxPlot");
             chart.Series.Add("BoxPlotSeries");
-            //chart.ChartAreas["BoxPlot"].AxisX.Interval = 1.0; // Default is Auto
             chart.ChartAreas["BoxPlot"].AxisX.Minimum = 0.0;
 
             try
@@ -1024,10 +979,6 @@ namespace DACrux.ProjectManager.UI
                     chart.Series[strBoxPlotSeries[j]].Enabled = false;
 
                     //// BoxPlot의 최대, 최소, 평균값
-                    //for (int i = 0; i < 3; i++)
-                    //{
-                    //    nTempsX[i] = j + 1;
-                    //}
 
                     staticPoint[j] = (graphInfo.CreatedInformation != string.Empty) ? arrAxisYItem[j].ColumnID : arrAxisYItem[j].ColumnName;
 
@@ -1037,10 +988,6 @@ namespace DACrux.ProjectManager.UI
                     }
 
 
-
-                    //nTempsY[0] = Math.Round(Convert.ToDouble(avgVal), 2);
-                    //nTempsY[1] = Math.Round(Convert.ToDouble(maxVal), 2);
-                    //nTempsY[2] = Math.Round(Convert.ToDouble(minVal), 2);
 
                     chart.Series[strBoxPlotSeriesPoint[j]].ChartType = SeriesChartType.Point;
                     chart.Series[strBoxPlotSeriesPoint[j]].MarkerSize = 2;
@@ -1082,11 +1029,6 @@ namespace DACrux.ProjectManager.UI
                 chart.Series["BoxPlotSeries"].IsVisibleInLegend = false;
                 chart.Series["BoxPlotSeries"].Font = new Font("Vedana", 8, FontStyle.Regular);
 
-                //chart.Series["BoxPlotSeries"]["BoxPlotWhiskerPercentile"] = "2";
-                //chart.Series["BoxPlotSeries"]["BoxPlotPercentile"] = "25";
-                //chart.Series["BoxPlotSeries"]["MaxPixelPointWidth"] = "10";
-                //chart.Series["BoxPlotSeries"]["PixelPointWidth"] = "25";
-
                 for (int i = 1; i < arrAxisYItem.Length + 1; i++)
                 {
                     double minXaxes = i - 0.5;
@@ -1121,7 +1063,6 @@ namespace DACrux.ProjectManager.UI
             chart.ChartAreas.Add("BoxPlot");
             ChartSet("BoxPlot");
             chart.Series.Add("BoxPlotSeries");
-            //chart.ChartAreas["BoxPlot"].AxisX.Interval = 1.0; // Default is Auto
             chart.ChartAreas["BoxPlot"].AxisX.Minimum = 0.0;
 
 
@@ -1256,7 +1197,6 @@ namespace DACrux.ProjectManager.UI
                 else
                 {
                     // Deleted By James Kwon 2014/10/16
-                    //graphInfo.SpecLimit = true;
                     if (double.IsNaN(graphInfo.USL))
                         spcHistogram.USL = DACrux.Base.StatGlobalVariable.DOUBLE_NULL_DATA;
                     else
@@ -1273,12 +1213,6 @@ namespace DACrux.ProjectManager.UI
                         spcHistogram.LSL = graphInfo.LSL;
                 }
 
-                //spcHistogram.Precision = graphInfo.DecimalPlaceX;
-                //spcHistogram.IsViewNormalLine = graphInfo.NormalLine;
-                //spcHistogram.IsViewSpecLimit = graphInfo.SpecLimit;
-                //spcHistogram.IsView3sLine = graphInfo.View3SigmaLine;
-                //spcHistogram.IsViewGridLine = graphInfo.GridLine;
-                //spcHistogram.IsViewBarFreqText = graphInfo.Frequence;
                 spcHistogram.Font = new Font("Vedana", 7, FontStyle.Regular);
 
                 if (graphInfo.Title == "")
@@ -1511,7 +1445,6 @@ namespace DACrux.ProjectManager.UI
                 chart.Series["Cummulated"].YAxisType = System.Windows.Forms.DataVisualization.Charting.AxisType.Secondary;
                 chart.ChartAreas["Pareto"].AxisY2.LabelStyle.Format = "{0:0.0}%";
                 chart.ChartAreas["Pareto"].AxisY2.MajorGrid.Enabled = false;
-                //chart.ChartAreas["Pareto"].AxisX.IntervalAutoMode = IntervalAutoMode.VariableCount;
                 chart.ChartAreas["Pareto"].AxisX.Interval = 1;
                 chart.Series["Percent"].Points.DataBindXY(dtPareto.Rows, "Label", dtPareto.Rows, "Percent");
                 chart.Series["Cummulated"].Points.DataBindXY(dtPareto.Rows, "Label", dtPareto.Rows, "CumPercent");
@@ -1541,8 +1474,6 @@ namespace DACrux.ProjectManager.UI
             List<string> lstLabel = new List<string>();
 
             DataTable dtTemp = graphInfo.DataSource.Copy();
-            //DataRow[] rows = null;
-            //DataRow row = null;
             double tempY = 0.0;
             double sumY = 0.0;
 
@@ -1550,37 +1481,8 @@ namespace DACrux.ProjectManager.UI
 
             int key = 0;
 
-            //if (graphInfo.Series.ColumnIndex > -1)
-            //{
             //    #region [ 나중에 기능 추가 : 시리즈가 지정되어 있고, Value가 하나만 지정되어 있는 경우 (CrossTabDataProvider) ]
-            //    strXColName = dtTemp.Columns[graphInfo.AxisX.ColumnIndex].ColumnName;
-            //    strSColName = dtTemp.Columns[graphInfo.Series.ColumnIndex].ColumnName;
-            //    strVColName = dtTemp.Columns[graphInfo.AxisY[0].ColumnIndex].ColumnName;
 
-            //    dtTemp.Columns.Add("KEY", typeof(int));
-            //    dtTemp.Columns.Add(strXColName, typeof(string));
-            //    dtTemp.Columns.Add(strSColName, typeof(string));
-            //    dtTemp.Columns.Add(strVColName, typeof(double));
-
-            //    while (dtTemp.Rows.Count > 0)
-            //    {
-            //        rows = dtTemp.Select(string.Format("{0} = '{1}'", strXColName, dtTemp.Rows[0][strXColName]));
-
-            //        for (int i = rows.Length - 1; i >= 0; i--)
-            //        {
-            //            row = dtTemp.NewRow();
-            //            row[strXColName] = rows[i][strXColName];
-            //            row[strSColName] = rows[i][strSColName];
-            //            row[strVColName] = rows[i][strVColName];
-
-            //            dtTemp.Rows.Add(row);
-            //            dtTemp.Rows.Remove(rows[i]);
-            //        }
-            //    }
-            //    #endregion
-            //}
-            //else
-            //{
             #region [ 시리즈가 미지정인 경우 ]
 
             #region [ Sort ]
@@ -1699,7 +1601,6 @@ namespace DACrux.ProjectManager.UI
                     chart.ChartAreas["Scatter"].AxisX.IsMarksNextToAxis = false;
                     chart.ChartAreas["Scatter"].AxisX.LineWidth = 4;
                     chart.ChartAreas["Scatter"].AxisX.LineColor = Color.CadetBlue;
-                    //chart.ChartAreas["Scatter"].AxisX.Interval = 1.0;   // Default is Auto
                   }
                   
                 //누적 확률 분포 곡선 
@@ -1760,9 +1661,6 @@ namespace DACrux.ProjectManager.UI
                   chart.Series[strSeriesName].XAxisType = AxisType.Primary;
 
                   // X축의 평균을 구해서 X축의 값을 설정
-                  //double xAvg = Math.Round(Convert.ToDouble(dtTemp.Compute("Avg([" + graphInfo.AxisX.ColumnName + "])", "")), 2);
-                  //chart.ChartAreas["Scatter"].AxisX.Minimum = xAvg - 5.0;
-                  //chart.ChartAreas["Scatter"].AxisX.Maximum = xAvg + 5.0;
                 
                   double xMin = Math.Round(Convert.ToDouble(dtTemp.Compute("Min([" + graphInfo.AxisX.ColumnName + "])", "")), 2);
                   double xMax = Math.Round(Convert.ToDouble(dtTemp.Compute("Max([" + graphInfo.AxisX.ColumnName + "])", "")), 2);
@@ -1770,9 +1668,6 @@ namespace DACrux.ProjectManager.UI
                   
                   chart.ChartAreas["Scatter"].AxisX.Minimum = xMin - xMargin;
                   chart.ChartAreas["Scatter"].AxisX.Maximum = xMax + xMargin;
-                  //chart.ChartAreas["Scatter"].AxisX.LabelAutoFitStyle = LabelAutoFitStyles.LabelsAngleStep90;
-                  //chart.ChartAreas["Scatter"].AxisX.LabelStyle.Angle = 45;
-                  //chart.ChartAreas["Scatter"].AxisX.IntervalAutoMode = IntervalAutoMode.VariableCount;
 
                   if (graphInfo.AxisY.Length > 0 && graphInfo.AxisY[0].ColumnName != null)
                   {
@@ -1845,7 +1740,6 @@ namespace DACrux.ProjectManager.UI
                     double yMargin = (yMax - yMin) * 0.05;
                     chart.ChartAreas["Scatter"].AxisY.Minimum = yMin - yMargin;
                     chart.ChartAreas["Scatter"].AxisY.Maximum = yMax + yMargin;
-                    //chart.ChartAreas["Scatter"].AxisY.Enabled = AxisEnabled.False;
                     double xMin = Math.Round(Convert.ToDouble(dtTemp.Compute("Min([" + graphInfo.AxisX.ColumnID + "])", "")), 2);
                     double xMax = Math.Round(Convert.ToDouble(dtTemp.Compute("Max([" + graphInfo.AxisX.ColumnID + "])", "")), 2);
                     double xmargin = (xMax - xMin) * 0.05;
@@ -1858,39 +1752,6 @@ namespace DACrux.ProjectManager.UI
             }
       
 
-            //#region [ Field Map Setting ]
-
-            //chart.DataSourceSettings.Fields.Clear();
-
-            //if (graphInfo.AxisX.ColumnType == typeof(string) || graphInfo.AxisX.ColumnType == typeof(DateTime))
-            //    chart.DataSourceSettings.Fields.Add(new FieldMap("KEY", FieldUsage.XValue));
-            //else
-            //    chart.DataSourceSettings.Fields.Add(new FieldMap(strXColName, FieldUsage.XValue));
-
-            //for (int i = 0; i < graphInfo.AxisY.Length; i++)
-            //    chart.DataSourceSettings.Fields.Add(new FieldMap(dtTemp.Columns[graphInfo.AxisY[i].ColumnIndex].ColumnName, FieldUsage.Value));
-
-            //#endregion
-
-            //#region [ DataBind ]
-
-            //chart.DataSourceSettings.DataSource = dtTemp;
-
-            //#endregion
-
-            //#region [ Label, Series Name Update ]
-
-            //if (graphInfo.AxisX.ColumnType == typeof(string) || graphInfo.AxisX.ColumnType == typeof(DateTime))
-            //{
-            //    for (int i = 0; i < lstLabel.Count; i++)
-            //        chart.AxisX.Labels[i + 1] = lstLabel[i];
-            //}
-
-            //for (int i = 0; i < graphInfo.AxisY.Length; i++)
-            //    chart.Series[i].Text = graphInfo.AxisY[i].ColumnName;
-
-            //#endregion
-        
 
 
         private void DataBindPie(GraphInformation graphInfo)
@@ -2152,11 +2013,6 @@ namespace DACrux.ProjectManager.UI
 
                         if (DateTime.TryParse(strLabel, out dTemp))
                             strLabel = dTemp.ToString(graphInfo.DateTimeFormatString);
-                            //if (strLabel.Contains(" "))
-                            //{
-                            //    string[] splitPoint = strLabel.Split(' ');
-                            //    strLabel = splitPoint[0].Trim();
-                            //}
                         else
                             strLabel = string.Empty;
 
@@ -2319,9 +2175,6 @@ namespace DACrux.ProjectManager.UI
                         for (int i = 0; i < lstLabel.Count; i++)
                         {
                             // Changed By James Kwon
-                            //if (graphInfo.Name.IndexOf("RegressionAnalysis") > -1)
-                            //    dValues[i] = Convert.ToDouble(lstValue[j][i]);
-                            //else
                                 dValues[i] = Convert.ToDouble(lstValue[i][j]);
                         }
                         chart.Series.Add(strSeriesName);
@@ -2342,10 +2195,6 @@ namespace DACrux.ProjectManager.UI
                         chart.ChartAreas["Line"].AxisX.LineWidth = 4;
                         chart.ChartAreas["Line"].AxisX.LineColor = Color.CadetBlue;
 
-                        //maxVal = graphInfo.DataSource.Compute("Max([" + strSeriesName + "])", "");
-                        //minVal = graphInfo.DataSource.Compute("Min([" + strSeriesName + "])", "");
-                        //stdVal = graphInfo.DataSource.Compute("StDev([" + strSeriesName + "])", "");
-
                         maxVal = dtTemp.Compute("Max([" + strSeriesName + "])", "");
                         minVal = dtTemp.Compute("Min([" + strSeriesName + "])", "");
                         stdVal = dtTemp.Compute("StDev([" + strSeriesName + "])", "");
@@ -2358,7 +2207,6 @@ namespace DACrux.ProjectManager.UI
                     }
                     chart.ChartAreas["Line"].AxisY.Maximum = dMax;
                     chart.ChartAreas["Line"].AxisY.Minimum = dMin;
-                    //chart.ChartAreas["Line"].AxisX.IsMarginVisible = true;
                 }
             }
             catch(Exception ex)
@@ -2369,68 +2217,7 @@ namespace DACrux.ProjectManager.UI
 
         private void DataBindGeneral(GraphInformation graphInfo)
         {
-            //double nTemp;
-            //object objTemp;
-            //DateTime dTemp;
-            //string strSeriesName;
 
-            //GraphInformation.ColumnInfoItem[] arrAxisYItem = graphInfo.AxisY;
-
-            //chart.Data.Series = arrAxisYItem.Length;
-            //chart.Data.Points = graphInfo.DataSource.Rows.Count;
-
-            //if (graphInfo.AxisX.ColumnType == typeof(DateTime))
-            //{
-            //    #region DATETIME
-            //    for (int i = 0; i < chart.Data.Points; i++)
-            //    {
-            //        objTemp = graphInfo.DataSource.Rows[i][graphInfo.AxisX.ColumnIndex];
-
-            //        if (objTemp != null && DateTime.TryParse(objTemp.ToString(), out dTemp))
-            //            chart.Data.Labels[i] = dTemp.ToString(graphInfo.DateTimeFormatString);
-            //        else
-            //            chart.Data.Labels[i] = string.Empty;
-
-            //        for (int j = 0; j < chart.Data.Series; j++)
-            //        {
-            //            if (double.TryParse(graphInfo.DataSource.Rows[i][arrAxisYItem[j].ColumnIndex].ToString(), out nTemp))
-            //                chart.Data[j, i] = nTemp;
-            //            else
-            //                chart.Data[j, i] = ChartFX.WinForms.DataValues.Hidden;
-            //        }
-            //    }
-            //    #endregion
-            //}
-            //else
-            //{
-            //    for (int i = 0; i < chart.Data.Points; i++)
-            //    {
-            //        objTemp = graphInfo.DataSource.Rows[i][graphInfo.AxisX.ColumnIndex];
-
-            //        if (objTemp != null)
-            //            chart.Data.Labels[i] = objTemp.ToString();
-            //        else
-            //            chart.Data.Labels[i] = string.Empty;
-
-            //        for (int j = 0; j < chart.Data.Series; j++)
-            //        {
-            //            if (double.TryParse(graphInfo.DataSource.Rows[i][arrAxisYItem[j].ColumnIndex].ToString(), out nTemp))
-            //                chart.Data[j, i] = nTemp;
-            //            else
-            //                chart.Data[j, i] = ChartFX.WinForms.DataValues.Hidden;
-            //        }
-            //    }
-            //}
-
-            //for (int i = 0; i < chart.Data.Series; i++)
-            //{
-            //    strSeriesName = arrAxisYItem[i].ColumnName;
-
-            //    if (strSeriesName == string.Empty)
-            //        strSeriesName = arrAxisYItem[i].ColumnID;
-
-            //    chart.Series[i].Text = strSeriesName;
-            //}
         }
 
         private void SetTitles(GraphInformation graphInfo)
@@ -2454,117 +2241,10 @@ namespace DACrux.ProjectManager.UI
                 {
                    
                 }
-                //    if (graphInfo.RegressionEquation)
-                //    {
-                //        #region Regression Info
-                //        StatisticFormula statRegression = new StatisticFormula();
-                //        statRegression.Chart = chart;
-                //        statRegression.LegendBox.Visible = false;
-                //        //statRegression.Studies.Add(Analysis.PearsonCorrelationCoefficient);  //상관계수
-                //        statRegression.Studies.Add(Analysis.RegressionLine);
-                //        statRegression.Studies.Add(Analysis.LinearRegressionM);
-                //        statRegression.Studies.Add(Analysis.LinearRegressionB);
                 //        #region 회귀선
-                //        StudyLine oRegline = (StudyLine)statRegression.Studies.Find(StudyType.Analysis, (int)Analysis.RegressionLine);
-                //        oRegline.Line.Color = Color.DarkGreen;
-                //        oRegline.Line.Width = 2;
-                //        oRegline.Line.Style = System.Drawing.Drawing2D.DashStyle.DashDotDot;
-                //        oRegline.Visible = true;
-                //        #endregion
-                //        double dblCoefficient = Math.Round(statRegression.Calculators[0].Get(Analysis.LinearRegressionM), 4);
-                //        double dblIntercept = Math.Round(statRegression.Calculators[0].Get(Analysis.LinearRegressionB), 4);
-                //        //double dblCorrelationCoefficient = statistics1.Calculators[0].Get(Analysis.PearsonCorrelationCoefficient);  //상관계수
-                //        string strRegressionEquation = chart.AxisY.Title.Text + " = " + dblIntercept.ToString() + ((dblCoefficient < 0) ? dblCoefficient.ToString() : "+" + dblCoefficient.ToString()) + chart.AxisX.Title.Text;
-                //        #endregion
 
-
-
-
-                //        if (graphInfo.Title != null && graphInfo.Title != string.Empty)
-                //        {
-                //            chart.Titles.Add(new TitleDockable());
-                //            chart.Titles[0].Text = graphInfo.Title;
-                //            chart.Titles[0].Font = new Font("Tahoma", 12);
-                //            chart.Titles[0].Alignment = StringAlignment.Center;
-                //        }
-
-                //        if (graphInfo.SubTitle != null && graphInfo.SubTitle != string.Empty)
-                //        {
-                //            if (graphInfo.Title == null || graphInfo.Title == string.Empty)
-                //            {
-                //                chart.Titles.Add(new TitleDockable());
-                //                chart.Titles[0].Text = graphInfo.SubTitle;
-                //                chart.Titles[0].Font = new Font("Tahoma", 12);
-                //                chart.Titles[0].Alignment = StringAlignment.Center;
-                //            }
-                //            else
-                //            {
-                //                chart.Titles.Add(new TitleDockable());
-                //                chart.Titles[1].Text = graphInfo.SubTitle;
-                //                chart.Titles[1].Font = new Font("Tahoma", 12);
-                //                chart.Titles[1].Alignment = StringAlignment.Center;
-                //            }
-                //        }
-                //        if (graphInfo.RegressionEquation)
-                //        {
-                //            #region Regression Info
-                //            Statistics statRegression = new Statistics();
-                //            statRegression.Chart = chart;
-                //            statRegression.LegendBox.Visible = false;
-                //            //statRegression.Studies.Add(Analysis.PearsonCorrelationCoefficient);  //상관계수
-                //            statRegression.Studies.Add(Analysis.RegressionLine);
-                //            statRegression.Studies.Add(Analysis.LinearRegressionM);
-                //            statRegression.Studies.Add(Analysis.LinearRegressionB);
                 //            #region 회귀선
-                //            StudyLine oRegline = (StudyLine)statRegression.Studies.Find(StudyType.Analysis, (int)Analysis.RegressionLine);
-                //            oRegline.Line.Color = Color.DarkGreen;
-                //            oRegline.Line.Width = 2;
-                //            oRegline.Line.Style = System.Drawing.Drawing2D.DashStyle.DashDotDot;
-                //            oRegline.Visible = true;
-                //            #endregion
-                //            double dblCoefficient = Math.Round(statRegression.Calculators[0].Get(Analysis.LinearRegressionM), 4);
-                //            double dblIntercept = Math.Round(statRegression.Calculators[0].Get(Analysis.LinearRegressionB), 4);
-                //            //double dblCorrelationCoefficient = statistics1.Calculators[0].Get(Analysis.PearsonCorrelationCoefficient);  //상관계수
-                //            string strRegressionEquation = chart.AxisY.Title.Text + " = " + dblIntercept.ToString() + ((dblCoefficient < 0) ? dblCoefficient.ToString() : "+" + dblCoefficient.ToString()) + chart.AxisX.Title.Text;
-                //            #endregion
 
-                //            if (graphInfo.Title == null || graphInfo.Title == string.Empty)
-                //            {
-                //                if (graphInfo.SubTitle == null || graphInfo.SubTitle == string.Empty)
-                //                {
-                //                    chart.Titles.Add(new TitleDockable());
-                //                    chart.Titles[0].Text = strRegressionEquation;
-                //                    chart.Titles[0].Font = new Font("Tahoma", 12);
-                //                    chart.Titles[0].Alignment = StringAlignment.Center;
-                //                }
-                //                else
-                //                {
-                //                    chart.Titles.Add(new TitleDockable());
-                //                    chart.Titles[1].Text = strRegressionEquation;
-                //                    chart.Titles[1].Font = new Font("Tahoma", 12);
-                //                    chart.Titles[1].Alignment = StringAlignment.Center;
-                //                }
-                //            }
-                //            else
-                //            {
-                //                if (graphInfo.SubTitle == null || graphInfo.SubTitle == string.Empty)
-                //                {
-                //                    chart.Titles.Add(new TitleDockable());
-                //                    chart.Titles[1].Text = strRegressionEquation;
-                //                    chart.Titles[1].Font = new Font("Tahoma", 12);
-                //                    chart.Titles[1].Alignment = StringAlignment.Center;
-                //                }
-                //                else
-                //                {
-                //                    chart.Titles.Add(new TitleDockable());
-                //                    chart.Titles[2].Text = strRegressionEquation;
-                //                    chart.Titles[2].Font = new Font("Tahoma", 12);
-                //                    chart.Titles[2].Alignment = StringAlignment.Center;
-                //                }
-                //            }
-                //        }
-                //    }
-                //}
             }
         
             catch (Exception ex)
@@ -2594,9 +2274,7 @@ namespace DACrux.ProjectManager.UI
                     spcHistogram.Font = new Font("Vedana", 7, FontStyle.Regular);
                     spcHistogram.SetBounds(0, 0, graphInfo.ImageSize.Width,graphInfo.ImageSize.Height);
                     spcHistogram.Update();
-                    //spcHistogram.IsXAxisAutoInterval = true;
                     
-
                     rect = (spcHistogram.DisplayRectangle);
                     bmp = new Bitmap(rect.Width, rect.Height);
 
@@ -2659,10 +2337,7 @@ namespace DACrux.ProjectManager.UI
                 SetCursor(oSubCtrl, oCursor);
                 oSubCtrl.Cursor = oCursor;
             }
-            //oControl.Cursor = oCursor;
         }
-
-        //#endregion
 
         #region " EVENT & DELEGATE "
 
@@ -2676,12 +2351,6 @@ namespace DACrux.ProjectManager.UI
         
         {
             //클립보드에 저장
-            //System.IO.MemoryStream stream = new System.IO.MemoryStream();
-            //chart.SaveImage(stream, System.Drawing.Imaging.ImageFormat.Bmp);
-            //Bitmap bmp = new Bitmap(stream);
-            //Clipboard.SetDataObject(bmp);
-            //MessageBox.Show("Image Copy On Clpboard!");
-
 
             //파일경로 저장
             FolderBrowserDialog dialog = new FolderBrowserDialog();
@@ -2724,33 +2393,7 @@ namespace DACrux.ProjectManager.UI
 
             chart.ChartAreas[Convert.ToString(graphInfo.Type)].AxisX.LabelStyle.Angle = graphInfo.LabelAngle;
 
-            //toolBtn3D.CheckState = (graphInfo.View3D) ? CheckState.Checked : CheckState.Unchecked;
-
             //// LabelPoint의 경사도를 지정합니다.
-            //if (graphInfo.Type == GraphType.Pareto)
-            //{
-            //    chart.Series["Percent"].SmartLabelStyle.Enabled = false;
-            //    chart.Series["Percent"].LabelAngle = angle;
-            //}
-            //else if (graphInfo.Type == GraphType.BoxPlot)
-            //{
-            //    for (int i = 2; chart.Series.Count > i; i++)
-            //    {
-            //        chart.Series[i].SmartLabelStyle.Enabled = false;
-            //        chart.Series[i].LabelAngle = angle;
-            //    }
-            //}
-            //else
-            //{
-            //    {
-            //        for (int j = 0; j < graphInfo.AxisY.Length; j++)
-            //        {
-            //            string strSeriesName = (graphInfo.AxisY[j].ColumnName == string.Empty) ? graphInfo.AxisY[j].ColumnID : graphInfo.AxisY[j].ColumnName;
-            //            chart.Series[j].SmartLabelStyle.Enabled = false;
-            //            chart.Series[j].LabelAngle = angle;
-            //        }
-            //    }
-            //}    
         }
 
         private void toolBtnLegendBox_Click(object sender, EventArgs e)
@@ -2802,20 +2445,13 @@ namespace DACrux.ProjectManager.UI
 
             if (toolBtnZoom.Checked)
             {
-                //if (graphInfo.Type == GraphType.BoxPlot)
-                //{
 
-                //}
-                //else
-                //{
                     chart.ChartAreas[Convert.ToString(graphInfo.Type)].AxisX.ScaleView.Zoom(0,2);
                     chart.ChartAreas[Convert.ToString(graphInfo.Type)].AxisX.ScaleView.Zoomable = true;
                     chart.ChartAreas[Convert.ToString(graphInfo.Type)].CursorX.AutoScroll = true;
                     chart.ChartAreas[Convert.ToString(graphInfo.Type)].AxisX.ScrollBar.LineColor = Color.Black;
                     chart.ChartAreas[Convert.ToString(graphInfo.Type)].AxisX.ScrollBar.Size = 17;                    
                     chart.ChartAreas[Convert.ToString(graphInfo.Type)].AxisX.ScaleView.SmallScrollSize = double.NaN;
-
-               // }
 
             }
             else
@@ -2865,73 +2501,6 @@ namespace DACrux.ProjectManager.UI
 
         #endregion
 
-
-        //protected override bool ProcessDialogKey(Keys keyData)
-        //{
-        //    // Avoid dialog processing of arrow keys
-        //    if (keyData == Keys.Left || keyData == Keys.Right)
-        //    {
-        //        return false;
-        //    }
-        //    return base.ProcessDialogKey(keyData);
-        //}
-
-        //private void chart_KeyDown(object sender, KeyEventArgs e)
-        //{
-        //    if (e.KeyCode == Keys.Right)
-        //    {
-        //        chart.ChartAreas[Convert.ToString(graphInfo.Type)].AxisX.ScaleView.Scroll(ScrollType.SmallIncrement);
-        //    }
-        //    else if (e.KeyCode == Keys.Left)
-        //    {
-        //        chart.ChartAreas[Convert.ToString(graphInfo.Type)].AxisX.ScaleView.Scroll(ScrollType.SmallDecrement);
-        //    }
-        //    else if (e.KeyCode == Keys.PageDown)
-        //    {
-        //        chart.ChartAreas[Convert.ToString(graphInfo.Type)].AxisX.ScaleView.Scroll(ScrollType.LargeIncrement);
-        //    }
-        //    else if (e.KeyCode == Keys.PageUp)
-        //    {
-        //        chart.ChartAreas[Convert.ToString(graphInfo.Type)].AxisX.ScaleView.Scroll(ScrollType.LargeDecrement);
-        //    }
-        //    else if (e.KeyCode == Keys.Home)
-        //    {
-        //        chart.ChartAreas[Convert.ToString(graphInfo.Type)].AxisX.ScaleView.Scroll(ScrollType.First);
-        //    }
-        //    else if (e.KeyCode == Keys.End)
-        //    {
-        //        chart.ChartAreas[Convert.ToString(graphInfo.Type)].AxisX.ScaleView.Scroll(ScrollType.Last);
-        //    }          
-        //}
-
-        //private void chart_Click(object sender, EventArgs e)
-        //{
-        //    chart.Focus();
-        //}
-
-        //Point ptStartPint;
-
-        //private void chart_MouseDown(object sender, MouseEventArgs e)
-        //{
-        //    if (e.Button == System.Windows.Forms.MouseButtons.Left)
-        //    {
-        //        ptStartPint = e.Location;
-        //    }
-        //}
-
-        //private void chart_MouseUp(object sender, MouseEventArgs e)
-        //{
-        //    if (e.Button == System.Windows.Forms.MouseButtons.Left)
-        //    {
-        //        Point ptEndPoint = e.Location;
-
-        //        if (toolBtnZoom.Checked)
-        //        {
-        //            chart.ChartAreas[Convert.ToString(graphInfo.Type)].AxisX.ScaleView.Zoom(ptStartPint.X, ptEndPoint.X);
-        //            chart.ChartAreas[Convert.ToString(graphInfo.Type)].AxisY.ScaleView.Zoom(ptStartPint.Y, ptEndPoint.Y);
-        //        }
-        //    }
-        //}
 
         private double calc_QUARTILE(double[] array, int iquart)
         {

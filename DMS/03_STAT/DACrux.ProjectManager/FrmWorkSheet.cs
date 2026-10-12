@@ -261,7 +261,6 @@ namespace DACrux.ProjectManager
 
         private void btnAnalysisView_Click(object sender, EventArgs e)
         {
-            //MessageBox.Show("You need a license.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
             uctlDataView.Visible = false;
             uctlAnalysisView.Visible = true;
             uctlGraphView.Visible = false;

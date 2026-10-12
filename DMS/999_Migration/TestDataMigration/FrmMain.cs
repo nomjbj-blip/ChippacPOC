@@ -88,7 +88,6 @@ namespace TestDataMigration
 
             string conn1 = _test.Sysdate();
             string conn2 = _mira.Sysdate();
-            //GetRemotingObject().Sysdate();
 
             MessageBox.Show(String.Format("접속테스트: \r\n - LEGACY:{0}\r\n - DACRUX:{1}", conn1, conn2));
 
@@ -229,7 +228,6 @@ namespace TestDataMigration
                         saveLotDt.Dispose();
                         
                         // @TQP_LOT_SUM, @TQP_WAFER_SUM
-                        //Summary(mLotSeq);
                         Thread.Sleep(10);
                         Application.DoEvents();
                     }
@@ -771,19 +769,7 @@ namespace TestDataMigration
                 paraDt.Dispose();
             }
 
-            //DataTable dt = _test.GetProgramMaxPpdSeq(Factory);
-
-            //foreach (DataRow row in dt.Rows)
-            //{
-            //    string ppdSeq = row["PPD_SEQ"].ToString();
-
-            //    DataTable paraDt = _test.GetProgramParameterByPpdSeq(Factory, ppdSeq);
-
             //    // 프로그램 별 파라미터 처리하기
-            //    paraDt.TableName = "TQP_PARASPEC";
-            //    _mira.InsertBulk(paraDt);
-            //    paraDt.Dispose();
-            //}
         }
 
         private void btnDATA_TABLES_Click(object sender, EventArgs e)

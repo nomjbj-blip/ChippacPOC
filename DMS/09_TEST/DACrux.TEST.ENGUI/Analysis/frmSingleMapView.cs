@@ -80,7 +80,6 @@ namespace DACrux.TEST.ENGUI
 
         private void tpucMapSelector1_OnSelectedDraw(object sender, DACrux.Base.TPWafer[] SelDatas)
         {
-           // DACrux.YMS.RO.SingleMapView oSingleMapView = null;
             mExcelSelDatas = null;
             this.Cursor = Cursors.WaitCursor;
 
@@ -92,31 +91,6 @@ namespace DACrux.TEST.ENGUI
 
                 mExcelSelDatas = SelDatas;
 
-                //oSingleMapView = new DACrux.YMS.RO.SingleMapView();
-                //DataSet ds = oSingleMapView.SelectWaferMapDrawData(SelDatas[0].WaferSeq
-                //                                                    , SelDatas[0].Testarea
-                //                                                    , SelDatas[0].CusDevice
-                //                                                    , SelDatas[0].Program
-                //                                                    , SelDatas[0].ProgramRev
-                //                                                    , DACrux.Base.GlobalVariable.UserID);
-
-                //if (ds != null && ds.Tables.Count > 0)
-                //{
-                //    //데이터를 유저컨트롤에 전달한 후 맵을 그린다.
-                //    if (tpucMapView1.DrawGradationDie == true)
-                //        tpucMapView1.DrawGradationDie = false;
-
-                //    tpucMapView1.DataSource = ds;
-                //    tpucMapView1.Draw();
-                //    m_sCurrentDrawWaferID = SelDatas[0].WaferID;
-                //}
-                //else
-                //{
-                //    //초기화
-                //    tpucMapView1.WaferClear();
-                //    throw new Exception("선택한 맵 데이터가 없습니다.");
-                   
-                //}
             }
             catch (Exception ex)
             {

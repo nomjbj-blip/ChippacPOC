@@ -280,8 +280,6 @@ namespace DACrux.SEMDMS.DSL
             DataTable dt = null;
             try
             {
-                //string[] str_step_seq = new string[step_seq.Length];
-                //for (int i = 0; i < str_step_seq.Length; i++) str_step_seq[i] = step_seq[i].ToString();
 
                 dt = this.GetDataTable("GET_INSP_INFO_MULTI_SEQ"
                     , new string[] { string.Join(",", step_seq) }

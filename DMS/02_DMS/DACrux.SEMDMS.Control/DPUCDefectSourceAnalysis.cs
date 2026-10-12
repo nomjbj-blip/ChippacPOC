@@ -1043,7 +1043,6 @@ namespace DACrux.SEMDMS.Control
             {
                 Series series = chart.Series.Add(result.StepID);
 
-                //series.SmartLabelStyle.Enabled = true;
                 series.BorderWidth = 2;
                 series.ChartType = SeriesChartType.StackedColumn;
                 series.IsValueShownAsLabel = true;
@@ -1056,7 +1055,6 @@ namespace DACrux.SEMDMS.Control
                 {
                     Series series = chart.Series.Add(MISSING + result.StepID);
 
-                    //series.SmartLabelStyle.Enabled = true;
                     series.BorderWidth = 2;
                     series.ChartType = SeriesChartType.StackedColumn;
                     series.IsValueShownAsLabel = true;
@@ -1179,8 +1177,6 @@ namespace DACrux.SEMDMS.Control
             chart.ChartAreas["Default"].AxisY.ScaleBreakStyle.CollapsibleSpaceThreshold = 10;
             chart.ChartAreas["Default"].AxisY.ScaleBreakStyle.StartFromZero = StartFromZero.Auto;
 
-            //chart.ChartAreas["Default"].AxisY.IntervalAutoMode = IntervalAutoMode.VariableCount;
-
             chart.ChartAreas["Default"].CursorX.IsUserSelectionEnabled = true;
             chart.ChartAreas["Default"].CursorY.IsUserSelectionEnabled = true;
 
@@ -1228,7 +1224,6 @@ namespace DACrux.SEMDMS.Control
             {
                 if (container == null) return;
 
-                //container.Height = container.Height + (container.Margin.Top + container.Margin.Bottom);
                 container.Height = container.Height + container.Margin.Top;
                 container.Width = ImageList.Width - SystemInformation.VerticalScrollBarWidth - container.Margin.Left - container.Margin.Right;
                 ImageList.Controls.Add(container);

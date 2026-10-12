@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Data;
-//using System.Transactions;
 using Miracom.Middleware;
 using System.Transactions;
 
@@ -132,10 +131,6 @@ namespace DACrux.TEST.DSL
         /// </summary>
         /// <param name="WaferSeq">WaferSeq</param>
         /// <returns>LOT_SEQ, PRODUCT, TESTAREA, PROGRAM, LOT_ID, MOTHER_LOT_ID, START_TIME, END_TIME, WIP_STATUS, WAFERS, WAFER_SEQ, LOT_SEQ_1, WAFER_ID, TESTER, OPERATOR,  PROBE_CNT, TESTED_DIE, START_TIME_1, END_TIME_1, WAFER_CAT, LOSS_DIE, ISP_INITEM, VISUAL_ITEM, ISP_OUTITEM</returns>
-        //public DataTable GetWaferInfo(long WaferSeq)
-        //{
-        //    return this.GetDataTable("GET_WAFER_INFO", null, new string[] { WaferSeq.ToString() });
-        //}
 
         public DataTable GetWaferInfoByWSEQ(
             string waferSeq
@@ -166,10 +161,6 @@ namespace DACrux.TEST.DSL
         /// </summary>
         /// <param name="WaferSeq">WaferSeq</param>
         /// <returns>LOT_SEQ, PRODUCT, TESTAREA, PROGRAM, LOT_ID, MOTHER_LOT_ID, START_TIME, END_TIME, WIP_STATUS, WAFERS, WAFER_SEQ, LOT_SEQ_1, WAFER_ID, TESTER, OPERATOR,  PROBE_CNT, TESTED_DIE, START_TIME_1, END_TIME_1, WAFER_CAT, LOSS_DIE, ISP_INITEM, VISUAL_ITEM, ISP_OUTITEM</returns>
-        //public DataTable GetWaferInfo(string Waferid)
-        //{
-        //    return this.GetDataTable("GET_WAFER_INFO [WID]", null, new string[] { Waferid });
-        //}
 
         public DataTable GetWaferList(DateTime stime, DateTime etime, string fieldOrder)
         {
@@ -191,79 +182,6 @@ namespace DACrux.TEST.DSL
                 throw ex;
             }
         }
-
-        //public DataTable GetStandardPCMReport(string PROGRAM, string WAFERSEQ)
-        //{
-
-        //    DataTable dtpara = null;
-        //    DataTable dt = null;
-
-        //    DataTable dtRet = null;
-
-        //    double Range = 0.0d;
-        //    double Gap = 0.0d;
-        //    int Pos = 0;
-        //    try
-        //    {
-        //        TQP_PARASPEC oParaSpec = new TQP_PARASPEC();
-        //        dtpara = oParaSpec.GetParaSpec(PROGRAM);
-
-        //        DataRow[] drs = dtpara.Select();
-
-        //        foreach (DataRow dr in drs)
-        //        {
-        //            dt = this.GetDataTable("GET_STDREPORT"
-        //                    , new string[]{utilParametric.REP( dr["ITEM"].ToString().ToUpper() ),
-        //                        utilParametric.REP( dr["ITEM"].ToString().ToUpper() ),
-        //                        utilParametric.REP( dr["ITEM"].ToString().ToUpper() ),
-        //                        utilParametric.REP( dr["ITEM"].ToString().ToUpper() ),
-        //                        PROGRAM,
-        //                        utilParametric.REP( dr["ITEM"].ToString().ToUpper() ),
-        //                                     PROGRAM,
-        //                        utilParametric.REP( dr["ITEM"].ToString().ToUpper() ),
-        //                                     PROGRAM,
-        //                        utilParametric.REP( dr["ITEM"].ToString().ToUpper() ),
-        //                                     PROGRAM,
-        //                        utilParametric.REP( dr["ITEM"].ToString().ToUpper() ),
-        //                                     PROGRAM,
-        //                        utilParametric.REP( dr["ITEM"].ToString().ToUpper() ),
-        //                                 PROGRAM}
-        //                , new string[] { PROGRAM, dr["ITEM"].ToString(), WAFERSEQ });
-
-        //            if (dtRet == null)
-        //            {
-        //                dtRet = dt.Copy();
-        //            }
-        //            else
-        //            {
-        //                if (dt != null && dt.Rows.Count > 0)
-        //                {
-        //                    Range = DACrux.Base.Convert.doubleParse(dt.Rows[0]["USL"].ToString()) - DACrux.Base.Convert.doubleParse(dt.Rows[0]["LSL"].ToString());
-        //                    Gap = Range / 20.0;
-        //                    Pos = (int)((DACrux.Base.Convert.doubleParse(dt.Rows[0]["AVGV"].ToString()) - DACrux.Base.Convert.doubleParse(dt.Rows[0]["LSL"].ToString())) / Gap);
-
-        //                    if (Pos > 0)
-        //                    {
-        //                        //dt.Rows[0]["VALUEPOS"] = string.Format("{0}O{1}", "<".PadRight(Pos,'-'),">".PadLeft(20-Pos,'-'));
-        //                        dt.Rows[0]["VALUEPOS"] = "                          ";
-        //                        dt.AcceptChanges();
-        //                    }
-        //                    dtRet.Rows.Add(dt.Rows[0].ItemArray);
-        //                }
-        //            }
-        //        }
-
-        //        return dtRet;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw ex;
-        //    }
-        //    finally
-        //    {
-        //        if (dt != null) dt.Dispose();
-        //    }
-        //}
 
         public void DeleteWaferData(string WaferSeq)
         {

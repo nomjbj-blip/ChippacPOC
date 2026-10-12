@@ -14,7 +14,6 @@ namespace DACrux.ProjectManager.UI
         StatType m_Type = StatType.None;
         string m_Title = string.Empty;        
         string m_ResultFilePath = string.Empty;
-        //List<string> lstImagePath = new List<string>();
         GraphInformation[] m_Graphinfomations = null;
 
         Hashtable htSerializationData = new Hashtable();
@@ -73,12 +72,6 @@ namespace DACrux.ProjectManager.UI
                 m_ResultFilePath = value;
             }
         }
-
-        //public List<string> ImagePathCollection
-        //{
-        //    get { return lstImagePath; }
-        //    set { lstImagePath = value; }
-        //}
 
         public Hashtable SerializationData
         {

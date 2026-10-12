@@ -236,127 +236,9 @@ namespace DACrux.TEST.ENGUI
 
         //--
 
-        //private void grid_CommandButtonClick(
-        //    object sender,
-        //    Framework.PropertyGrid.CommandEventArgs e
-        //    )
-        //{
-        //    ProbeAdmin obj = new ProbeAdmin();
-        //    string program = grid.GetValue(Enum.GetName(typeof(COLUMN), COLUMN.PROGRAM)).ToString();
-        //    string bin = grid.GetValue(Enum.GetName(typeof(COLUMN), COLUMN.BIN)).ToString();
-
-        //    bool exists = obj.ExistsBinInfo(
-        //        program,
-        //        bin
-        //        );
-        //    DialogResult result;
-        //    switch (e.Mode)
-        //    {
-        //        case Framework.PropertyGrid.CommandMode.Insert:
-        //            if (exists)
-        //            {
-        //                MessageBox.Show("해당 데이터가 이미 존재합니다.");
-        //                e.Cancel = true;
-        //                return;
-        //            }
-
         //            //--
 
-        //            result = MessageBox.Show("저장하시겠습니까?", "입력", MessageBoxButtons.OKCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1);
-        //            if (result == System.Windows.Forms.DialogResult.OK)
-        //            {
-        //                obj.InsertBinInfo(
-        //                    grid.GetDictionaryValue(),
-        //                    DACrux.Base.GlobalVariable.UserID
-        //                    );
-        //            }
-        //            else
-        //            {
-        //                e.Cancel = true;
-        //            }
-        //            break;
-        //        case Framework.PropertyGrid.CommandMode.Update:
-        //            if (!exists)
-        //            {
-        //                MessageBox.Show("업데이트할 데이터가 없습니다.");
-        //                e.Cancel = true;
-        //                return;
-        //            }
-
         //            //--
-
-        //            result = MessageBox.Show("변경하시겠습니까", "수정", MessageBoxButtons.OKCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1);
-        //            if (result == System.Windows.Forms.DialogResult.OK)
-        //            {
-        //                obj.UpdateBinInfo(
-        //                    grid.GetDictionaryValue(),
-        //                    DACrux.Base.GlobalVariable.UserID
-        //                    );
-        //            }
-        //            else
-        //            {
-        //                e.Cancel = true;
-        //            }
-        //            break;
-        //        case Framework.PropertyGrid.CommandMode.Delete:
-        //            if (!exists)
-        //            {
-        //                MessageBox.Show("삭제할 데이터가 없습니다.");
-        //                e.Cancel = true;
-        //                return;
-        //            }
-
-        //            result = MessageBox.Show("삭제하시겠습니까", "삭제", MessageBoxButtons.OKCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1);
-        //            if (result == System.Windows.Forms.DialogResult.OK)
-        //            {
-        //                obj.DeleteBinInfo(
-        //                    program,
-        //                    bin,
-        //                    DACrux.Base.GlobalVariable.UserID
-        //                    );
-        //            }
-        //            else
-        //            {
-        //                e.Cancel = true;
-        //            }
-        //            break;
-        //        case Framework.PropertyGrid.CommandMode.None:
-        //        default:
-        //            break;
-        //    }
-        //}
-
-        //private void grid_CommandComplete(
-        //    object sender,
-        //    Framework.PropertyGrid.CommandEventArgs e
-        //    )
-        //{
-        //    btnSearch.PerformClick();
-        //}
-
-        //private void grid_DropDownComboBox(
-        //    object sender,
-        //    Framework.PropertyGrid.DropDownComboBoxEventArgs e
-        //    )
-        //{
-        //    if (String.Equals(e.PropertyName, Enum.GetName(typeof(COLUMN), COLUMN.HIGH_GEC))
-        //        || String.Equals(e.PropertyName, Enum.GetName(typeof(COLUMN), COLUMN.DISPLAY)))
-        //    {
-        //        e.ComboBoxValueList.Add(Boolean.TrueString);
-        //        e.ComboBoxValueList.Add(Boolean.FalseString);
-        //    }
-        //}
-
-        //private void grid_StateChanged(
-        //    object sender,
-        //    Framework.PropertyGrid.StateChangedEventArgs e
-        //    )
-        //{
-        //    if (e.State == Framework.PropertyGrid.State.Insert)
-        //    {
-        //        grid.SetValue(Enum.GetName(typeof(COLUMN), COLUMN.PROGRAM), duclbProgram.SelectedValue.ToString());
-        //    }
-        //}
 
         private void pbBinColor_Click(
             object sender,
@@ -465,7 +347,6 @@ namespace DACrux.TEST.ENGUI
 
             if (dt != null)
             {
-                //grid.DataSource = dt;
                 SetColumnStyle();
                 SpreadBackColor();
             }
@@ -488,7 +369,6 @@ namespace DACrux.TEST.ENGUI
                     continue;
 
                 String[] values = new String[10];
-                //values[(int)COLUMN.EDITMODE] = fpsBinInfo_Sheet.Cells[rowIdx, (int)COLUMN.EDITMODE].Text;
                 values[(int)COLUMN.PROGRAM] = fpsBinInfo_Sheet.Cells[rowIdx, (int)COLUMN.PROGRAM].Text;
                 values[(int)COLUMN.BIN] = fpsBinInfo_Sheet.Cells[rowIdx, (int)COLUMN.BIN].Text;
                 values[(int)COLUMN.BIN_NAME] = fpsBinInfo_Sheet.Cells[rowIdx, (int)COLUMN.BIN_NAME].Text;
@@ -538,7 +418,6 @@ namespace DACrux.TEST.ENGUI
             fpsBinInfo_Sheet.Columns[(int)COLUMN.DISPLAY].CellType = comboCellType; // display
             fpsBinInfo_Sheet.Columns[(int)COLUMN.UPPER_LIMIT_CNT].CellType = numCellType; // upper limit count
             fpsBinInfo_Sheet.Columns[(int)COLUMN.LOWER_LIMIT_CNT].CellType = numCellType; // lower limit count
-            //fpsBinInfo_Sheet.Columns[(int)COLUMN.COLOR].CellType = colorCellType; // color
             fpsBinInfo_Sheet.Columns[(int)COLUMN.DESCRIPTION].CellType = txtCellType; // description
         }
 

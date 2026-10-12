@@ -21,7 +21,6 @@ namespace DACrux.SEMDMS.DSL
                     throw new Exception("The connect ID nothing. Please, check app.config.");
                 }
 
-                //this.InitQueryComponent(connectID, "DACrux.SEMDMS.DSL.TQD_SHOT.xml");
                 this.InitQueryComponent(connectID, "TQD_DEFECT.xml");
             }
             catch (Exception ex)

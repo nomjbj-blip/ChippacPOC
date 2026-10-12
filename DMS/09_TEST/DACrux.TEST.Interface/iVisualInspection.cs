@@ -25,17 +25,10 @@ namespace DACrux.TEST.Interface
         void UpdateReturnRawdata(string TABLE, string WAFER_SEQ);
         int GetOnlyVI(string PROGRAM, string WAFER_SEQ);
         void UpdateSummaryFTA(string WAFER_SEQ, int FTA);
-        //DataTable SelectAreaGroup(string TestArea);
-        //DataSet GetStepListByStepID(string TestArea, string StartTime, string EndTime, string LikeDevice, string LikeLot, string LikeWafer);
-        //DataSet GetStepListByStepIDRecent(string TestArea, string StartTime, string EndTime, string LikeDevice, string LikeLot, string LikeWafer);
-        //DataTable SelectDMSStepSeq(string LotID, string Product, string WaferID, string TestAera);
-        //void UpdateReturnRawdataDMS(string STEP_SEQ);
-        //void UpdateRawdataDMS(string VISUALINSP, string STEP_SEQ, string X, string Y);
         DataTable SelectLotSumByLotID(string LotID);
         DataTable SelectCustomerWithMapdef(string product);
         DataTable GetWaferListByAll(string lotId, string product, string testarea);
         DataTable GetWaferListByAll(string lotId, string product, string testarea, string WaferList);
-        //DataTable SelectProductByCusLotID(string CustRunId);
         DataTable GetIslot(string Device, string strTestArea, string TestProgram, string LotID);
         void CreateLot(string lotSeq,
                                 string Device,

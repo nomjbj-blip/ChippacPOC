@@ -607,7 +607,6 @@ namespace DACrux.ProjectManager.UI
                 this.fpSpread.Skin = FarPoint.Win.Spread.DefaultSpreadSkins.Classic;
                 FarPoint.Win.Spread.DefaultScrollBarRenderer defaultScrollBarRenderer1 = new FarPoint.Win.Spread.DefaultScrollBarRenderer();
                 FarPoint.Win.Spread.DefaultScrollBarRenderer defaultScrollBarRenderer2 = new FarPoint.Win.Spread.DefaultScrollBarRenderer();
-                //this.fpSpread.FocusRenderer = ((FarPoint.Win.Spread.IFocusIndicatorRenderer)(resources.GetObject("fpSpread.FocusRenderer")));
                 this.fpSpread.HorizontalScrollBar.Buttons = new FarPoint.Win.Spread.FpScrollBarButtonCollection("BackwardLineButton,ThumbTrack,ForwardLineButton");
                 this.fpSpread.HorizontalScrollBar.Name = "";
                 this.fpSpread.HorizontalScrollBar.Renderer = defaultScrollBarRenderer1;
@@ -1407,7 +1406,6 @@ namespace DACrux.ProjectManager.UI
         private void OnExportToExcel()
         {
             SaveFileDialog dlgSaveFile;
-            //DataTable dt;
 
             try
             {
@@ -1418,8 +1416,6 @@ namespace DACrux.ProjectManager.UI
                 
                 if(dlgSaveFile.ShowDialog() == DialogResult.OK && dlgSaveFile.FileName.Trim() != string.Empty)
                 {
-                    //dt = DataSource;
-                    //Microsoft.Office.Interop.Excel.WorksheetClass sheet = new Microsoft.Office.Interop.Excel.WorksheetClass();
                     Cursor = Cursors.WaitCursor;
 
                     fpSpread.SaveExcel(dlgSaveFile.FileName, FarPoint.Excel.ExcelSaveFlags.DataOnly);
@@ -1612,7 +1608,6 @@ namespace DACrux.ProjectManager.UI
 
             int endRowIndex = startRowIndex + rowCount - 1;
 
-            //fpSpread_Sheet.AddRows(startRowIndex, rowCount);
             DataTable dt = (DataTable)fpSpread_Sheet.DataSource;
             for (int i = startRowIndex; i < startRowIndex + rowCount; i++ )
                 dt.Rows.InsertAt(dt.NewRow(), i);
@@ -1636,8 +1631,6 @@ namespace DACrux.ProjectManager.UI
                     }
                 }
             }
-
-            //((DataTable)fpSpread_Sheet.DataSource).AcceptChanges();
 
             ClearSheetSelection();
             DrawSheetSelection(cr);

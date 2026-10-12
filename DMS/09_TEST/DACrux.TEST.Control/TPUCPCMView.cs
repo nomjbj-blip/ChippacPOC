@@ -270,12 +270,6 @@ namespace DACrux.TEST.Control
                     return;
 
                 container = new ucTrendChart(strParaName, strParaName, USL, LSL, ds);
-                //container.Title = strParaName;
-                //container.AxisPara = strParaName;
-                //container.DataSet = ds;
-                //container.USL = USL;
-                //container.LSL = LSL;
-                //container.DrawChart();
 
                 ControlAdd(container);
                 Application.DoEvents();
@@ -286,10 +280,7 @@ namespace DACrux.TEST.Control
             }
             finally
             {
-                //if (container != null)
-                //    container.Dispose();
 
-                //container = null;
             }
         }
 
@@ -362,7 +353,6 @@ namespace DACrux.TEST.Control
             DataTable dt = null;
             try
             {
-                // DACrux.Utility.Component.InitSpread(fpRawData);
 
                 fpRawData.ActiveSheet.Rows.Clear();
 
@@ -378,9 +368,6 @@ namespace DACrux.TEST.Control
 
                 fpRawData_Sheet1.DataSource = dt;
                 Utility.FPSpreadUtil.SetAutoColumnWidth(fpRawData_Sheet1);
-
-                //DACrux.Utility.Component.SetSpreadData(dt, fpRawData_Sheet1, 100);
-                //fpRawData_Sheet1.RowHeader.Columns[0].Width += 10;
 
 
             }
@@ -430,26 +417,7 @@ namespace DACrux.TEST.Control
                 if (dtWaferInfo == null || dtWaferInfo.Rows.Count < 1)
                 {
                     throw new Exception("정의된 Map Define 정보가 없습니다. ");
-                    //oWaferRecipe.FIRST_DIE_X = DACrux.Base.Convert.intParse(dtMapData.Compute("MIN([X])", "1=1").ToString());
-                    //oWaferRecipe.FIRST_DIE_Y = DACrux.Base.Convert.intParse(dtMapData.Compute("MIN([Y])", "1=1").ToString());
-                    //oWaferRecipe.DIE_INDEX_MIN_X = oWaferRecipe.FIRST_DIE_X;
-                    //oWaferRecipe.DIE_INDEX_MIN_Y = oWaferRecipe.FIRST_DIE_Y;
-                    //oWaferRecipe.DIE_INDEX_MAX_X = DACrux.Base.Convert.intParse(dtMapData.Compute("MAX([X])", "1=1").ToString());
-                    //oWaferRecipe.DIE_INDEX_MAX_Y = DACrux.Base.Convert.intParse(dtMapData.Compute("MAX([Y])", "1=1").ToString());
 
-                    //oWaferRecipe.NOTCH_TYPE = DACrux.Base.Notch.Flat;
-                    //oWaferRecipe.ANGLE = 0;
-                    //oWaferRecipe.XYDIR = DACrux.Base.XYDirection.LeftBottom;
-                    //m_nDisplayFaltAngle = 0;
-
-                    //if (nAngle != -1)
-                    //    oWaferRecipe.ANGLE = nAngle;
-
-                    //int nOffsetXIdx = 2;
-                    //int nOffsetYIdx = 2;
-
-                    //oWaferRecipe.DIE_SIZE_X = (oWaferRecipe.WAFER_SIZE) / (double)(oWaferRecipe.DIE_INDEX_MAX_X - oWaferRecipe.DIE_INDEX_MIN_X + nOffsetXIdx) * m_dMargin;
-                    //oWaferRecipe.DIE_SIZE_Y = (oWaferRecipe.WAFER_SIZE) / (double)(oWaferRecipe.DIE_INDEX_MAX_Y - oWaferRecipe.DIE_INDEX_MIN_Y + nOffsetYIdx) * m_dMargin;
                 }
                 else
                 {

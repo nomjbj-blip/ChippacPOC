@@ -144,8 +144,6 @@ namespace DACrux.SP.Common
 
         public event SectionBoundaryEntityChangedEventHandler SectionBoundaryEntityChanged;
 
-        //public virtual RegexEntity StartEntity { get; set; }
-        //public virtual RegexEntity EndEntity { get; set; }
     }
 
     [Serializable]

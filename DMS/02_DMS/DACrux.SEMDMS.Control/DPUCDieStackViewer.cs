@@ -223,8 +223,6 @@ namespace DACrux.SEMDMS.Control
                 
                 mmgDefectMap.FitSize();
 
-                //rdSetup.ClearChartData();
-                //rdSetup.ApplyClick();
             }
             finally
             {

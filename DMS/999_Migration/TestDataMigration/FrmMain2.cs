@@ -98,7 +98,6 @@ namespace TestDataMigration
 
             string conn1 = _test.Sysdate();
             string conn2 = _mira.Sysdate();
-            //GetRemotingObject().Sysdate();
 
             MessageBox.Show(String.Format("접속테스트: \r\n - LEGACY:{0}\r\n - DACRUX:{1}", conn1, conn2));
 
@@ -321,11 +320,6 @@ namespace TestDataMigration
                         decimal mWafSeq = _mira.NewWaferSeq();
 
                         //// Lot 당 최초 한번만 실행
-                        //if (i == 0)
-                        //{
-                        //    // @TD_테이블 필드 확인
-                        //    CheckTDTableField(tWafSeq);
-                        //}
 
                         // RAW 데이터 처리
                         foreach (DataRow tableRow in tableDt.Rows)
@@ -349,7 +343,6 @@ namespace TestDataMigration
 #if SYNC
                         ProcessRawData_async(info);
 #else
-                            //ThreadPool.QueueUserWorkItem(new WaitCallback(ProcessRawData_async), info);
 
                             Thread thread = new Thread(new ParameterizedThreadStart(ProcessRawData_async));
                             thread.IsBackground = true;
@@ -360,7 +353,6 @@ namespace TestDataMigration
 #if !SYNC
                     // RAW 데이터 처리가 완료될때까지 대기
                     _countdown.Wait();
-                    //Thread.Sleep(100);
 
                     _countdown.Dispose();
                     _semaphore.Dispose();
@@ -486,7 +478,6 @@ namespace TestDataMigration
                 _mira.DeleteOldTdData(mTableName, info.MiracomWafSeq);
 
                 _mira.ExecuteTable(schemaTable, dataList);
-                //GetRemotingObject().ExecuteTable(schemaTable, dataList);
                 schemaTable.Dispose();
                 dataList.Clear();
             }
@@ -1134,17 +1125,12 @@ namespace TestDataMigration
                     continue;
 
                 RegParaspecAsync(program);
-                //ThreadPool.QueueUserWorkItem(RegParaspecAsync, program);
-                //Thread thread = new Thread(new ParameterizedThreadStart(RegParaspecAsync));
-                //thread.IsBackground = true;
-                //thread.Start(program);
             }
         }
 
         private void RegParaspecAsync(object state)
         {
 #if !SYNC
-            //_semaphore.WaitOne();
 #endif
             try
             {
@@ -1232,7 +1218,6 @@ namespace TestDataMigration
             }
             finally
             {
-               // _semaphore.Release();
             }
         }
 
@@ -1318,7 +1303,6 @@ namespace TestDataMigration
             thread.IsBackground = true;
             thread.Start();
 
-            //ThreadPool.QueueUserWorkItem(ProcessSummary);
 #endif
         }
 
@@ -1346,15 +1330,11 @@ namespace TestDataMigration
                     foreach (DataRow lotRow in lotDt.Rows)
                     {
                         // LOT 단위
-                        //string lotID = lotRow["LOT_ID"].ToString();
-                        //string program = lotRow["PROGRAM"].ToString();
-                        //decimal tLotSeq = decimal.Parse(lotRow["OLD_LOT_SEQ"].ToString());
                         decimal mLotSeq = decimal.Parse(lotRow["LOT_SEQ"].ToString());
                         
 #if SYNC
                             Summary_async(mLotSeq);
 #else
-                        //ThreadPool.QueueUserWorkItem(Summary_async, mLotSeq);
 
                         Thread thread = new Thread(new ParameterizedThreadStart(Summary_async));
                         thread.IsBackground = true;
@@ -1515,7 +1495,6 @@ namespace TestDataMigration
             thread.IsBackground = true;
             thread.Start();
             
-            //ThreadPool.QueueUserWorkItem(new WaitCallback(UpdateXY), null);
 #endif
         }
 
@@ -1551,7 +1530,6 @@ namespace TestDataMigration
                     thread.IsBackground = true;
                     thread.Start(new object[] { date, lotRow });
 
-                    //ThreadPool.QueueUserWorkItem(new WaitCallback(UpdateLotXY_async), new object[] { date, lotRow });
 #endif
                 }
 
@@ -1962,19 +1940,6 @@ namespace TestDataMigration
                 }
             }
 
-            //using (var sw = File.CreateText(String.Format(@"c:\{0}.txt", program)))
-            //{
-            //    foreach (var mItem in mWaferSeqDic)
-            //    {
-            //        foreach (var tItem in tWaferSeqDic)
-            //        {
-            //            if (mItem.Value == tItem.Value)
-            //                sw.WriteLine(String.Format("{0},{1}\n", tItem.Key, mItem.Key));
-            //                //txtInsertWafSeq.AppendText(String.Format("{0},{1}\n", tItem.Key, mItem.Key));
-            //        }
-            //    }
-            //}
-            
 
             // 미라콤 td_data_tables 수정
             _mira.DeleteDataTables(program);

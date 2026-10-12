@@ -690,7 +690,6 @@ namespace DACrux.BStats.StatDialog
 
         private bool CheckColumns()
         {
-            //int[] arrVar = null;
             int iVarCnt;
             int iTemp;
             try
@@ -699,7 +698,6 @@ namespace DACrux.BStats.StatDialog
                 if (iVarCnt < 1)  //구분변수 없음
                     return true;
                 iTemp = ((DACrux.ProjectManager.UI.DataView.ColumnInfo)htColumns[lvByVar.Items[0]]).ValidRowIndex;
-                //iTemp = lstValidColumnInfo[((DACrux.ProjectManager.UI.DataView.ColumnInfo)htColumns[lvByVar.Items[0]]).ColumnIndex].ValidRowIndex;
                 for (int i = 0; i < iVarCnt; i++)
                 {
                     if (iTemp != ((DACrux.ProjectManager.UI.DataView.ColumnInfo)htColumns[lvByVar.Items[i]]).ValidRowIndex)
@@ -718,7 +716,6 @@ namespace DACrux.BStats.StatDialog
 
                 for (int i = 0; i < iVarCnt; i++)
                 {
-                    //arrVar[i] = ((DACrux.ProjectManager.UI.DataView.ColumnInfo)htColumns[lvVariables.Items[i]]).ColumnIndex;
                     if (iTemp != ((DACrux.ProjectManager.UI.DataView.ColumnInfo)htColumns[lvVariables.Items[i]]).ValidRowIndex)
                     {
                         MessageBox.Show(m_ErrorLength);

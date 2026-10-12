@@ -249,7 +249,6 @@ namespace DACrux.TEST.ENGUI
                  if (IsFtpConnect == false)
                      throw new Exception("FTP에 접속할 수 없습니다.");
 
-                 //string strFTPPath = "/EQUIP/FOI/AVI/TEST";
                  string strFTPPath = dtConfig.Rows[0]["MAIN_PATH"].ToString();
 
                 //Image File 먼저 Upload 후 Map File 을 Upload 한다.
@@ -275,41 +274,7 @@ namespace DACrux.TEST.ENGUI
                      Application.DoEvents();
                  }
 
-                //oFTP.SetCurrentDirectory(dtConfig.Rows[0]["MAIN_PATH"].ToString());
-                //using (DACrux.Utility.ServerCommunicationFtp oFTP = new Utility.ServerCommunicationFtp())
-                //{
-                //    oFTP.Server = dtConfig.Rows[0]["IP"].ToString();
-                //    oFTP.Port = DACrux.Base.Convert.intParse(dtConfig.Rows[0]["PORT"].ToString());
-                //    oFTP.UserID = dtConfig.Rows[0]["ID"].ToString();
-                //    oFTP.Password = dtConfig.Rows[0]["PASS"].ToString();
-                //    oFTP.ChmodValue = 777;
-
-                //    oFTP.SetCurrentDirectory("/EQUIP/FOI/AVI/TEST");
-                //    //oFTP.SetCurrentDirectory(dtConfig.Rows[0]["MAIN_PATH"].ToString());
-
                 //    //Image File 먼저 Upload 후 Map File 을 Upload 한다.
-                //    foreach (string strFile in lsImageFiles)
-                //    {
-                //        System.Threading.Thread.Sleep(20);
-                //        oFileInfo = new FileInfo(strFile);
-                //        oFileInfo.IsReadOnly = false;
-                //        oFTP.SendFile(oFileInfo.FullName, oFileInfo.Name);
-                //        iSuccess++;
-                //        MainForm.SetStatusMessage(string.Format("File을 Upload 하는 중입니다. ({0}/{1})", iSuccess, lsImageFiles.Count + lsMapFiles.Count));
-                //        Application.DoEvents();
-                //    }
-
-                //    foreach (string strFile in lsMapFiles)
-                //    {
-                //        System.Threading.Thread.Sleep(20);
-                //        oFileInfo = new FileInfo(strFile);
-                //        oFileInfo.IsReadOnly = false;
-                //        oFTP.SendFile(oFileInfo.FullName, oFileInfo.Name);
-                //        iSuccess++;
-                //        MainForm.SetStatusMessage(string.Format("File을 Upload 하는 중입니다. ({0}/{1})", iSuccess, lsImageFiles.Count + lsMapFiles.Count));
-                //        Application.DoEvents();
-                //    }
-                //}
 
                 MessageBox.Show("Upload 를 완료 하였습니다.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 lsFiles.Items.Clear();

@@ -18,10 +18,6 @@ namespace DACrux.BStats.Statistics
 
 
         #region Message
-        //private string m_ErrorArgumentEqual = "SingleDataColumnIndex equals SubgroupColumnIndex.";
-        //private string m_ErrorArgumentNoValueColumn = "Please select column for analysis.";
-        //private string m_ErrorArgumentContantForSubgroupSize = "Sub group size must be positive natural number.";
-        //private string m_ErrorSubgroupSizeContant = "Data rows Count must be greater than subgroup size contant.";
         #endregion
 
         private DACrux.BStats.Core.SelectedRegression m_SelectedRegression;
@@ -177,14 +173,11 @@ namespace DACrux.BStats.Statistics
                             arrReturn[i].ForceZero = false;
                             break;
                         case (strOrder):
-                            //arrReturn[i] = new GraphInformation(GraphType.Scatter);
                             arrReturn[i] = new GraphInformation(GraphType.Line);
                             arrReturn[i].Name = "Line(" + m_Input.Title + ")" + " : " + strOrder;
                             arrReturn[i].AddAxisY(new GraphInformation.ColumnInfoItem(0, null, dsSource.Tables[i].Columns[0].ColumnName, dsSource.Tables[i].Columns[0].DataType));
                             arrReturn[i].AxisX = new GraphInformation.ColumnInfoItem(1, null, dsSource.Tables[i].Columns[1].ColumnName, dsSource.Tables[i].Columns[1].DataType);
                             arrReturn[i].AxisXTitle = dsSource.Tables[i].Columns[1].ColumnName;
-                            //arrReturn[i].AxisYTitle = dsSource.Tables[i].Columns[0].ColumnName;
-                            //arrReturn[i].DecimalPlaceX = DataTableUtil.GetDecimalPlace(dsSource.Tables[i], 1);
                             arrReturn[i].DecimalPlace = DataTableUtil.GetDecimalPlace(dsSource.Tables[i]);
                             arrReturn[i].GridLine = false;
                             arrReturn[i].PointColor = System.Drawing.Color.Red;

@@ -276,7 +276,6 @@ namespace TestDataMigrationRemotingService
             sQuery.AppendLine("        MERGE_FLAG ");
             sQuery.AppendLine("   FROM LOT ");
             sQuery.AppendLine("  WHERE 1 = 1  ");
-            //sQuery.AppendLine("        AND FACILITY = :factory ");
             sQuery.AppendLine("        AND END_TIME >= TO_DATE(:starttime, 'YYYYMMDDHH24MISS') ");
             sQuery.AppendLine("        AND END_TIME <= TO_DATE(:endtime, 'YYYYMMDDHH24MISS') ");
 
@@ -330,7 +329,6 @@ namespace TestDataMigrationRemotingService
             sQuery.AppendLine("        SMS_ITEM_ID, ");
             sQuery.AppendLine("        FAMILY, ");
             sQuery.AppendLine("        DECODE(FACILITY, 'PROBE1', 'FAB2', 'FAB1') AS \"FACTORY\", ");
-            //sQuery.AppendLine("        SRCFAB, ");
             sQuery.AppendLine("        START_TIME, ");
             sQuery.AppendLine("        END_TIME, ");
             sQuery.AppendLine("        WAFER_DIAM, ");
@@ -338,7 +336,6 @@ namespace TestDataMigrationRemotingService
             sQuery.AppendLine("        MERGE_FLAG ");
             sQuery.AppendLine("   FROM LOT ");
             sQuery.AppendLine("  WHERE 1 = 1  ");
-            //sQuery.AppendLine("        AND FACILITY = :factory ");
             sQuery.AppendLine("        AND END_TIME >= TO_DATE(:starttime, 'YYYYMMDDHH24MISS') ");
             sQuery.AppendLine("        AND END_TIME < TO_DATE(:endtime, 'YYYYMMDDHH24MISS') ");
 
@@ -398,9 +395,6 @@ namespace TestDataMigrationRemotingService
             sQuery.AppendLine("        T2.START_TIME,");
             sQuery.AppendLine("        T2.END_TIME,");
             sQuery.AppendLine("        T2.LOAD_TIME,");
-            //sQuery.AppendLine("        TO_CHAR(T2.START_TIME, 'YYYYMMDDHH24MISS') AS \"START_TIME\", ");
-            //sQuery.AppendLine("        TO_CHAR(T2.END_TIME, 'YYYYMMDDHH24MISS') AS \"END_TIME\", ");
-            //sQuery.AppendLine("        TO_CHAR(T2.LOAD_TIME, 'YYYYMMDDHH24MISS') AS \"LOAD_TIME\", ");
             sQuery.AppendLine("        T2.TESTER, ");
             sQuery.AppendLine("        T2.PROBER, ");
             sQuery.AppendLine("        T2.PROBE_CARD, ");
@@ -427,7 +421,6 @@ namespace TestDataMigrationRemotingService
             sQuery.AppendLine("        T2.SCRIBE_LOT, ");
             sQuery.AppendLine("        T2.TEMP, ");
             sQuery.AppendLine("        T2.TEMP_TYPE, ");
-            //sQuery.AppendLine("        T2.TESTER_TYPE, ");
             sQuery.AppendLine("        T2.PGMPATH, ");
             sQuery.AppendLine("        T2.SPC_FLAG, ");
             sQuery.AppendLine("        T2.SPC_RULE, ");
@@ -472,7 +465,6 @@ namespace TestDataMigrationRemotingService
             sQuery.AppendLine("        T2.AC_DIE_CNT, ");
             sQuery.AppendLine("        T2.MOD_TIME, ");
             sQuery.AppendLine("        T2.PPD_SEQ ");
-            //sQuery.AppendLine("        T2.PDM_SEQ ");
             sQuery.AppendLine("  FROM LOT T1, WAFER T2");
             sQuery.AppendLine("  WHERE 1 = 1 ");
             sQuery.AppendLine("        AND T1.LOT_SEQ = T2.LOT_SEQ ");
@@ -481,7 +473,6 @@ namespace TestDataMigrationRemotingService
 
 
             // 임시로 probe_cnt > 0 인것만 처리 2019.11.25
-            //sQuery.AppendLine("        AND T2.PROBE_CNT = 0 ");
             sQuery.AppendLine("        AND T2.PROBE_CNT > 0 ");
 
 
@@ -625,7 +616,6 @@ namespace TestDataMigrationRemotingService
             sQuery.AppendLine("        SYSDATE UPDATE_TIME, ");// TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS') AS \"UPDATE_TIME\", ");
             sQuery.AppendLine("        'MIGRATION' AS \"UPDATE_USER\", ");
             sQuery.AppendLine(string.Format("        '{0}'||SUBSTR(TABLE_NAME,2) AS \"TABLE_NAME\", ", strTableName));
-            //sQuery.AppendLine(string.Format("        '{0}' || PROGRAM AS \"TABLE_NAME\", ", strTableName));
             sQuery.AppendLine("        0 AS \"DECIMAL_PLACES\", ");
             sQuery.AppendLine("        RUNTIME_DEFINED AS \"RUNTIME_DEFINED\", ");
             sQuery.AppendLine("        UOM, ");
@@ -698,7 +688,6 @@ namespace TestDataMigrationRemotingService
             sQuery.AppendLine("        SYSDATE UPDATE_TIME, ");// TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS') AS \"UPDATE_TIME\", ");
             sQuery.AppendLine("        'MIGRATION' AS \"UPDATE_USER\", ");
             sQuery.AppendLine(string.Format("        '{0}'||SUBSTR(TABLE_NAME,2) AS \"TABLE_NAME\", ", strTableName));
-            //sQuery.AppendLine(string.Format("        '{0}' || PROGRAM AS \"TABLE_NAME\", ", strTableName));
             sQuery.AppendLine("        0 AS \"DECIMAL_PLACES\", ");
             sQuery.AppendLine("        RUNTIME_DEFINED AS \"RUNTIME_DEFINED\", ");
             sQuery.AppendLine("        UOM, ");
@@ -812,17 +801,6 @@ SELECT PROGRAM FROM LOT
 
 
             //중복 오류 발생 TPSMGR.SYS_C0016790
-            //sQuery.AppendLine(" SELECT '' AS \"FACTORY\", ");
-            //sQuery.AppendLine("        PROGRAM, ");
-            //sQuery.AppendLine("        DENSE_RANK() OVER(PARTITION BY PDM_SEQ ORDER BY PDM_SEQ) AS \"PROGRAM_REV\", ");
-            //sQuery.AppendLine("        DIE_NUM, ");
-            //sQuery.AppendLine("        X,  ");
-            //sQuery.AppendLine("        Y,  ");
-            //sQuery.AppendLine("        TW_DIETYPE, ");
-            //sQuery.AppendLine("        DIETYPE_DESC ");
-            //sQuery.AppendLine("   FROM PROGRAM_DIEMAP ");
-            //sQuery.AppendLine("  WHERE 1 = 1 ");
-            //sQuery.AppendLine("    AND PROGRAM = :program ");
 
             //--
 

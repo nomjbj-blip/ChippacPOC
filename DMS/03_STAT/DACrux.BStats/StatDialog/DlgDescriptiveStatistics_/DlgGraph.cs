@@ -47,8 +47,6 @@ namespace DACrux.BStats.StatDialog.DlgDescriptiveAnalysis_
             this.btnOk.Text = m_Ok;
             this.btnCancel.Text = m_Cancel;
 
-            //this.btnOk.Click += new EventHandler(btnOk_Click);
-            //this.btnCancel.Click += new EventHandler(btnCancel_Click);
             this.chkHistogram.CheckedChanged += new EventHandler(chkHistogram_CheckedChanged);
         }
 

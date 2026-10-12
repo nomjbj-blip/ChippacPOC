@@ -269,7 +269,6 @@ namespace DACrux.SEMDMS.KtoD
                     /// +
 
                     ///[LOG]---------------------------------------------------------------------------------------
-                    //Logging.WriteLog(string.Format("[{0}][{1}]", iLineCount, strLine), "PROC", 5);
                     ///--------------------------------------------------------------------------------------------
 
                     ReadLine(strLine.Trim());
@@ -279,7 +278,6 @@ namespace DACrux.SEMDMS.KtoD
 
                         /// Update Start
                         ///============================================================================================
-                        //InsertNewInsp();						
                         PreInsertNewInsp();
                         int x = m_InspectionTest.Count;
                         for (int i = 0; i < m_InspectionTest.Count; i++)
@@ -312,10 +310,6 @@ namespace DACrux.SEMDMS.KtoD
                             UpdateUpdateLog(m_oPath.ResultEquipID, m_oPath.TransTimeUseDB, strEndTime, strEndTime, DataIntegrateType, "0000"
                             , m_lCurrentStepSeq, m_oPath.ResultFile, "No Error", m_oPath.BackupFile, m_iDefectCount, m_iTotalImageCount);
                             ///--------------------------------------------------------------------------------------------
-                            //							m_iDefectCount = 0;
-                            //							m_iTotalImageCount = 0;
-
-                            //UpdateStepSummary();
 
                             m_lCurrentStepSeq = -1;
                         }
@@ -379,8 +373,6 @@ namespace DACrux.SEMDMS.KtoD
                             stbWork.Append(strWorkA[i].Replace(" ", "_"));
                             stbWork.Replace('~', '_');
                             stbWork.Replace('!', '_');
-                            //stbWork.Replace('@','_');
-
 
                             /// (2004-11-12) TWI201에서 Image File 이름에 #,^가 삽입됨
                             ///              따라서, # 을 허용함.
@@ -394,7 +386,6 @@ namespace DACrux.SEMDMS.KtoD
                             stbWork.Replace('$', '_');
                             stbWork.Replace('%', '_');
                             //TWI201에서 Image File 이름에 #,^가 삽입됨(2004-11-12)
-                            //stbWork.Replace('^','_');		
                             stbWork.Replace('&', '_');
                             stbWork.Replace('*', '_');
                             stbWork.Replace('?', '_');
@@ -427,7 +418,6 @@ namespace DACrux.SEMDMS.KtoD
                 ///============================================================================================
                 strSplitResult = stbLine.ToString().Trim().Split(' ');
                 ///[LOG]---------------------------------------------------------------------------------------
-                //Logging.WriteLog(string.Format("Split된 Word [{0}]", stbLine.ToString().Trim().Replace(" ", "][")), "PROC", 5);
                 ///--------------------------------------------------------------------------------------------
                 return strSplitResult;
             }
@@ -569,7 +559,6 @@ namespace DACrux.SEMDMS.KtoD
                         ///
                         if (m_oKHeader.SummaryList == null || m_oKHeader.SummaryList.Length == 0)
                         {
-                            //InsertNewInsp();
                             if (InsertNewInsp() == -1)
                                 InsertNewInsp();
                         }
@@ -609,7 +598,6 @@ namespace DACrux.SEMDMS.KtoD
                         break;
                 }
 
-                //if(strLine.IndexOf(";")>0) m_strSubParse = "";
                 if (strLine.IndexOf(";") > 0)
                 {
                     if (m_strSubParse.Equals("SUMMARYLIST"))
@@ -676,8 +664,6 @@ namespace DACrux.SEMDMS.KtoD
         /// <param name="RLine"></param>
         private void PrsTIFFSPEC(string[] RLine)
         {
-            //	int iSpace = line.IndexOf(' ');
-            //	rt_value = line.Substring(i_space+1).Trim();
         }
         #endregion
 
@@ -704,7 +690,6 @@ namespace DACrux.SEMDMS.KtoD
                         m_oImgLoader.Dispose();
                     }
                     File.Delete(m_oKHeader.TiffFileName);
-                    //File.Move(m_oKHeader.TiffFileName,string.Format(@"{0}\{1}_{2}",m_oPath.ServicePath,RLine[1],m_oPath.TransTime));
                 }
 
                 // Image Load
@@ -744,84 +729,6 @@ namespace DACrux.SEMDMS.KtoD
                 m_oKHeader.InspectionStationID[2] = RLine[3];	//장비 ID			
 
                 #region 설비 ID를 FAB별로 변경적용시 예
-                //if (m_FAB.Equals("M10"))
-                //{
-                //    if (m_oKHeader.InspectionStationID[1].Equals("S9380"))
-                //    {
-                //        if (m_oKHeader.InspectionStationID[2].Equals("1"))
-                //        {
-                //            /// m_oKHeader.InspectionStationID[2] = "PCD101";
-                //            m_oKHeader.InspectionStationID[2] = "PCD103";
-                //        }
-                //        else if (m_oKHeader.InspectionStationID[2].Equals("2"))
-                //        {
-                //            m_oKHeader.InspectionStationID[2] = "PCD102";
-                //        }
-                //        else if (m_oKHeader.InspectionStationID[2].Equals("3"))
-                //        {
-                //            m_oKHeader.InspectionStationID[2] = "ECD601";
-                //        }
-                //        ///[LOG]---------------------------------------------------------------------------------------
-                //        Logging.WriteLog(string.Format("장비 Type이 'S9380' 이므로 장비 ID '{0}'을 '{1}'로 변경적용 하였습니다.", m_oKHeader.InspectionStationID[1], m_oKHeader.InspectionStationID[2]), "PROC", 0);
-                //        ///--------------------------------------------------------------------------------------------
-                //    }
-                //}
-                //if (m_FAB.Equals("M6"))		//M6
-                //{
-                //    string strDeviceID = m_oKHeader.InspectionStationID[2].ToUpper();
-                //    switch (strDeviceID)
-                //    {
-                //        case "E0570":
-                //            m_oKHeader.InspectionStationID[2] = "DPW301";
-                //            break;
-                //        case "AIT_CENTER":
-                //            m_oKHeader.InspectionStationID[2] = "DWI302";
-                //            break;
-                //        case "E0905":
-                //            m_oKHeader.InspectionStationID[2] = "TPW701";
-                //            break;
-                //        case "E0838":
-                //            m_oKHeader.InspectionStationID[2] = "EPW301";
-                //            break;
-                //        case "INSIGHT757":
-                //            m_oKHeader.InspectionStationID[2] = "TSV501";
-                //            break;
-                //        case "E1262":
-                //            m_oKHeader.InspectionStationID[2] = "EPW501";
-                //            break;
-                //        case "E0877":
-                //            m_oKHeader.InspectionStationID[2] = "PPW201";
-                //            break;
-                //        case "E0894":
-                //            m_oKHeader.InspectionStationID[2] = "PPW301";
-                //            break;
-                //        case "WINWIN50":
-                //            m_oKHeader.InspectionStationID[2] = "PPW302";
-                //            break;
-                //        case "9111":
-                //            m_oKHeader.InspectionStationID[2] = "TWI302";
-                //            break;
-                //        case "9012":
-                //            m_oKHeader.InspectionStationID[2] = "TWI801";
-                //            break;
-                //        case "E0847":
-                //            m_oKHeader.InspectionStationID[2] = "PPW120";
-                //            break;
-                //        case "E0978":
-                //            m_oKHeader.InspectionStationID[2] = "PPW110";
-                //            break;
-                //        case "9294":
-                //            m_oKHeader.InspectionStationID[2] = "EWI070";
-                //            break;
-                //        case "9346":
-                //            m_oKHeader.InspectionStationID[2] = "TWI010";
-                //            break;
-                //        default:
-                //            break;
-                //    }
-                //    ///[LOG]---------------------------------------------------------------------------------------
-                //    Logging.WriteLog(string.Format("장비 ID '{0}'을 '{1}'로 변경적용 하였습니다.", strDeviceID, m_oKHeader.InspectionStationID[2]), "PROC", 0);
-                //}
                 /// ====================================================================
                 #endregion
 
@@ -1258,7 +1165,6 @@ namespace DACrux.SEMDMS.KtoD
             try
             {
                 m_oKHeader.ClassLookup = int.Parse(RLine[1]);
-                //m_oKHeader.DefectClass = new string[m_oKHeader.ClassLookup];
                 m_oKHeader.DefectClass = new string[256];
             }
             catch (Exception ex)
@@ -1312,10 +1218,6 @@ namespace DACrux.SEMDMS.KtoD
                 ///	             에러를 무시한다.
 
                 //				///[LOG]---------------------------------------------------------------------------------------
-                //				Logging.WriteLog(string.Format("ClassLookUp Parsing Error [ERROR MSG : {0}]",ex.Message ),"ERROR",0);
-                //				Logging.WriteLog(string.Format("Error Message [{0}]",ex.Message ),"ERROR",1);
-                //				///--------------------------------------------------------------------------------------------			
-                //				throw this.ProcessErr(ex);
 
                 ///[LOG]---------------------------------------------------------------------------------------
                 Logging.WriteLog(string.Format("ClassLookUp Parsing Error [ERROR MSG : {0}]", ex.Message +
@@ -1646,7 +1548,6 @@ namespace DACrux.SEMDMS.KtoD
                             ///	- 수정자 : 미라콤 임영신
                             ///	- 수정일 : 2005-02-28
                             ///	- 변경로그 : AddIMAGE 함수에 Multi Tiff 유무 파라메터가 추가됨
-                            //AddIMAGE(new string[2]{RLine[i],RLine[i+1]});
                             AddIMAGE(new string[2] { RLine[i], RLine[i + 1] }, false);
                             /// ====================================================================
                             i++; i++;
@@ -1659,7 +1560,6 @@ namespace DACrux.SEMDMS.KtoD
                     ///	- 수정자 : 미라콤 임영신
                     ///	- 수정일 : 2005-02-28
                     ///	- 변경로그 : AddIMAGE 함수에 Multi Tiff 유무 파라메터가 추가됨
-                    //AddIMAGE(RLine);
                     AddIMAGE(RLine, true);
                     /// ====================================================================
                 }
@@ -1778,7 +1678,6 @@ namespace DACrux.SEMDMS.KtoD
         ///	- 수정자 : 미라콤 임영신
         ///	- 수정일 : 2005-02-28
         ///	- 변경로그 : Multi Tiff 유무 파라메터를 추가하여 변경함,AddDefect에서 이 메서드를 참조함
-        //public void AddIMAGE(string[] RLine)		
         public void AddIMAGE(string[] RLine, bool multiTiff)
         /// ====================================================================
         {
@@ -1800,7 +1699,6 @@ namespace DACrux.SEMDMS.KtoD
                 {
                     iImgDefectID = m_iDefectCount - 1;
 
-                    //strEquipPath	= string.Format(@"{0}\{1}",m_strLinkedPath,m_oKHeader.LotID);
                     strEquipPath = string.Format(@"{0}\{1}", m_strLinkedPath, m_oKHeader.InspectionStationID[2]);
                     strDatePath = string.Format(@"{0}\{1}", strEquipPath, DateTime.Now.ToString("yyyyMMdd"));
                     strLotPath = string.Format(@"{0}\{1}", strDatePath, m_oKHeader.LotID);
@@ -1841,7 +1739,6 @@ namespace DACrux.SEMDMS.KtoD
                         ///	- 수정자 : 미라콤 임영신
                         ///	- 수정일 : 2005-02-28
                         ///	- 변경로그 : Multi Tiff 처리하기 위해 기존 처리 주석 처리하고 경우에 따라 분기함
-                        //m_oImgLoader.SaveImage(m_oKHeader.Defects[iImgDefectID].IMAGENAME[imgIndex],int.Parse(RLine[1]),IMAGEFORMAT.JPG);
                         if (!multiTiff)
                         {
                             m_oImgLoader.SaveImage(m_oKHeader.Defects[iImgDefectID].IMAGENAME[imgIndex], int.Parse(RLine[1]), IMAGEFORMAT.JPG);
@@ -1888,7 +1785,6 @@ namespace DACrux.SEMDMS.KtoD
                 ///	- 수정일 : 2005-02-18
                 ///	- 변경로그 : tif 파일에 실제 이미지가 없는 경우 m_oImgLoader.SaveImage(..) 시 개체 오류로 전체 프로세스가 중단된다.
                 ///	             따라서 이미지를 로드하지 못하여 발생하는 에러를 throw 하지 않고 로깅만 한다.
-                //throw this.ProcessErr(ex);	
                 /// ====================================================================
             }
             finally
@@ -2212,7 +2108,6 @@ namespace DACrux.SEMDMS.KtoD
                 ///	- 수정자 : 미라콤 임영신
                 ///	- 수정일 : 2005-05-27
                 ///	- 변경로그 : 주석처리, SummaryList의 멀티 라인을 아래 코드로 인해 읽지 못하기 때문
-                //m_bMultiWaferCutLine = true;
 
                 // 멀티 SampleTestPlan 인써트를 위해 추가 2005.05.27. by 강혜경
                 double[] dbSummaryList = (double[])m_oKHeader.SummaryList.Clone();
@@ -2351,12 +2246,10 @@ namespace DACrux.SEMDMS.KtoD
                 Logging.WriteLog(string.Format("Product Upload Error [PRODUCT : {0}] [ERROR MSG : {1}]", m_oKHeader.DeviceID, ex.Message), "ERROR", 0);
                 Logging.WriteLog(string.Format("Error Message [{0}]", ex.Message), "ERROR", 1);
                 ///--------------------------------------------------------------------------------------------
-                //ContextUtil.SetAbort();
                 throw this.ProcessErr(ex);
             }
             finally
             {
-                //ContextUtil.SetComplete();
                 oYesProductTx.Dispose();
             }
 
@@ -2398,13 +2291,11 @@ namespace DACrux.SEMDMS.KtoD
                 Logging.WriteLog(string.Format("LotID Upload Error [LOTID : {0}] [ERROR MSG : {0}]", m_oKHeader.LotID, ex.Message), "ERROR", 0);
                 Logging.WriteLog(string.Format("Error Message [{0}]", ex.Message), "ERROR", 1);
                 ///--------------------------------------------------------------------------------------------
-                //ContextUtil.SetAbort();
                 throw this.ProcessErr(ex);
             }
 
             finally
             {
-                //ContextUtil.SetComplete();
                 oYesLotTx.Dispose();
             }
             return istatus;
@@ -2445,13 +2336,11 @@ namespace DACrux.SEMDMS.KtoD
                 Logging.WriteLog(string.Format("Wafer Upload Error [LOT_SEQ : {0}] [WAFERID : {0}] [ERROR MSG : {0}]", LotSeq, m_oKHeader.WaferID, ex.Message), "ERROR", 0);
                 Logging.WriteLog(string.Format("Error Message [{0}]", ex.Message), "ERROR", 1);
                 ///--------------------------------------------------------------------------------------------
-                //ContextUtil.SetAbort();
                 throw this.ProcessErr(ex);
             }
 
             finally
             {
-                //ContextUtil.SetComplete();
                 oYesWaferTx.Dispose();
             }
 
@@ -2529,28 +2418,6 @@ namespace DACrux.SEMDMS.KtoD
                 oYesSetupTx.Create(strDBData);
                 SetupSeq = oYesSetupTx.GetSetupSeq(strDBData);
 
-                //				SetupSeq = oYesSetupTx.GetSetupSeq(strDBData);				
-                //				if(SetupSeq == -1)	// -1 : 같은 Setup 정보가 없다 
-                //				{
-                //					oYesSetupTx.Create(strDBData);
-                //					SetupSeq = oYesSetupTx.GetSetupSeq(strDBData);
-                //				}
-                //				else
-                //				{
-                //					istatus = 1;
-                //				}
-
-                //				SetupSeq = oYesSetupTx.GetSetupSeq(m_oKHeader.SetupID);	
-                //				if(SetupSeq == -1)	// -1 : 같은 Setup 정보가 없다 
-                //				{
-                //					strDBData[2] = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"); 
-                //					oYesSetupTx.Create(strDBData);
-                //					SetupSeq = oYesSetupTx.GetSetupSeq(strDBData);
-                //				}
-                //				else
-                //				{
-                //					istatus = 1;
-                //				}
                 /// =========================================================================================================
             }
 
@@ -2560,13 +2427,11 @@ namespace DACrux.SEMDMS.KtoD
                 Logging.WriteLog(string.Format("SETUPID Upload Error [SETUPID : {0}] ", m_oKHeader.SetupID), "ERROR", 0);
                 Logging.WriteLog(string.Format("Error Message [{0}]", ex.Message), "ERROR", 1);
                 ///--------------------------------------------------------------------------------------------
-                //ContextUtil.SetAbort();
                 throw this.ProcessErr(ex);
             }
 
             finally
             {
-                //ContextUtil.SetComplete();
                 oYesSetupTx.Dispose();
             }
 
@@ -2584,12 +2449,6 @@ namespace DACrux.SEMDMS.KtoD
             ///	- 수정자 : 미라콤 임영신
             ///	- 수정일 : 2005-02-17
             ///	- 변경로그 : M10, EDB --> M6, M6HIS 로 변경, GetMESInfo() 로 대치
-            //			Miracom.YES.EDB.DSL.EDBTB_LOTHISTORY	oEdbLotHistory = null;	
-            //			DataSet oDS = null;
-            //			string strMainEQ	= string.Empty;
-            //			string strRoute		= string.Empty;
-            //			string strOper		= string.Empty;
-            //			string strReticleID = string.Empty;
             /// ====================================================================				
 
             /// Y2R에서 Data를 가져가기 위한 기준시간(즉,마지막으로 Data가 바뀐시간)을 넣어주기 위한 변수
@@ -2607,7 +2466,6 @@ namespace DACrux.SEMDMS.KtoD
                 ///	- 수정자 : 미라콤 임영신
                 ///	- 수정일 : 2005-02-17
                 ///	- 변경로그 : M10, EDB --> M6, M6HIS 로 변경 , GetMESInfo() 로 대치
-                //				oEdbLotHistory = new EDBTB_LOTHISTORY();
                 /// ====================================================================
                 strStatus = oCurrDt.ToString("yyyyMMddHHmmss");
 
@@ -2616,33 +2474,6 @@ namespace DACrux.SEMDMS.KtoD
                 ///	- 수정일 : 2005-02-17
                 ///	- 변경로그 : M10, EDB --> M6, M6HIS 로 변경 , GetMESInfo() 로 대치
                 ///	
-                //				try
-                //				{			
-                //					strMainEQ	= " ";
-                //					strRoute	= " ";
-                //					strOper		= " ";
-                //					oDS = oEdbLotHistory.Get(new string[] {m_oKHeader.LotID,m_oKHeader.FileTimestamp});
-                //					if(oDS.Tables[0].Rows.Count>0)
-                //					{
-                //						strMainEQ	= oDS.Tables[0].Rows[0]["MAIN_EQ"].ToString();
-                //						strRoute	= oDS.Tables[0].Rows[0]["ROUTE"].ToString();
-                //						strOper		= oDS.Tables[0].Rows[0]["MAIN_OPER"].ToString();
-                //						strReticleID= oDS.Tables[0].Rows[0]["RETICLE_ID"].ToString();
-                //						m_MainEq = strMainEQ; m_RTE = strRoute; m_Oper = strOper;
-                //					}
-                //		
-                //				}
-                //				catch(Exception ex)
-                //				{					
-                //					Logging.WriteLog("[Main EQ,Route,Oper를 가져오는중 Error이 발생하였습니다]","PROC",2);
-                //					
-                //				}				
-                //				finally
-                //				{
-                //					if(oEdbLotHistory != null) oEdbLotHistory.Dispose();
-                //					if(oDS !=null ) oDS.Dispose();
-                //									
-                //				}
                 /// ============================================================================================================= 수정 끝
 
                 string[] strDBData = new string[22];
@@ -2651,8 +2482,6 @@ namespace DACrux.SEMDMS.KtoD
                 strDBData[15] = "0";
                 strDBData[16] = "0";
 
-                //double[] summaryList = (double[])m_SummaryList[m_CurrentTestIndex];
-                //double[] testParametersList = (double[])m_TestParametersList[m_CurrentTestIndex];
                 double areaPerTest = (double)m_AreaPerTest[m_CurrentTestIndex];
 
                 for (int i = 0; i < m_oKHeader.SummarySpec.Length; i++)
@@ -2663,23 +2492,19 @@ namespace DACrux.SEMDMS.KtoD
                             break;
                         case "NDEFECT":
                             strDBData[15] = m_oKHeader.SummaryList[i].ToString();
-                            //strDBData[15] = summaryList[i].ToString();
                             break;
                         case "DEFDENSITY":
                             strDBData[17] = m_oKHeader.SummaryList[i].ToString();
-                            //strDBData[17] = summaryList[i].ToString();
                             break;
                         case "NDIE":
                             break;
                         case "NDEFDIE":
                             strDBData[14] = m_oKHeader.SummaryList[i].ToString();
-                            //strDBData[14] = summaryList[i].ToString();
                             break;
                     }
                 }
 
                 strDBData[0] = m_oKHeader.InspectionTest.ToString();
-                //strDBData[0] = summaryList[0].ToString();        
                 strDBData[1] = wafer_seq.ToString();
                 strDBData[2] = m_oKHeader.StepID;
                 strDBData[3] = m_oKHeader.Slot.ToString();
@@ -2692,13 +2517,10 @@ namespace DACrux.SEMDMS.KtoD
                 strDBData[10] = m_MainEq;		//strMainEQ;	//Main Eq							             
                 strDBData[11] = m_RTE;			//strRoute;		//Route					             
                 strDBData[12] = m_Oper;			//Oper;						             
-                //strDBData[13] = m_oKHeader.AreaPerTest.ToString();	
                 strDBData[13] = areaPerTest.ToString();
                 //strDBData[14] = 									             
                 //strDBData[15] =									             
-                //strDBData[16] = m_iTotalImageCount.ToString();
                 strDBData[16] = System.Convert.ToString(m_ImageCount[m_oKHeader.InspectionTest]) == string.Empty ? "0" : System.Convert.ToString(m_ImageCount[m_oKHeader.InspectionTest]);
-                //if(strDBData[17]==null) strDBData[17] = string.Format("{0:20,5}",(double.Parse(strDBData[15])/m_oKHeader.AreaPerTest));
                 if (strDBData[17] == null) strDBData[17] = string.Format("{0:20,5}", (double.Parse(strDBData[15]) / areaPerTest));
                 strDBData[18] = m_oPath.ResultFile;
                 strDBData[19] = m_oPath.ServiceFile;
@@ -2731,7 +2553,6 @@ namespace DACrux.SEMDMS.KtoD
                 Logging.WriteLog(string.Format("[INSERT	STEPPER_EQ         	: {0} ]", strDBData[21]), "PROC", 2);
                 ///--------------------------------------------------------------------------------------------				
 
-                //StepSeq = oYesStepTx.GetStepSeq(new string[] {strDBData[1],strDBData[5],strDBData[2],strDBData[8]}); ///WAFER_SEQ,INSPECTION_EQ,STEP_ID,RESULTTIMESTAMP
                 StepSeq = oYesStepTx.GetStepSeq(new string[] { strDBData[1], strDBData[2], strDBData[8], strDBData[0] }); ///WAFER_SEQ,INSPECTION_EQ,STEP_ID,RESULTTIMESTAMP,TEST
 
                 Logging.WriteLog(string.Format("[---INSERT Completed ------------------------------------]", strDBData[0]), "PROC", 2);
@@ -2740,7 +2561,6 @@ namespace DACrux.SEMDMS.KtoD
                 if (StepSeq == -1)
                 {
                     oYesStepTx.Create(strDBData);
-                    //StepSeq = oYesStepTx.GetStepSeq(new string[] {strDBData[1],strDBData[5],strDBData[2],strDBData[8]});
                     StepSeq = oYesStepTx.GetStepSeq(new string[] { strDBData[1], strDBData[2], strDBData[8], strDBData[0] });
 
                     StringBuilder InspectionParm = new StringBuilder();
@@ -2797,7 +2617,6 @@ namespace DACrux.SEMDMS.KtoD
 																		,""
 																		,strDBData[21]						//STEPPER_EQ
 																	});
-                    //ContextUtil.SetComplete();
                 }
                 else
                 {
@@ -2811,7 +2630,6 @@ namespace DACrux.SEMDMS.KtoD
                 Logging.WriteLog(string.Format("[---INSERT Error  STEP_ID : {0} ----------------------------]", m_oKHeader.StepID), "PROC", 0);
                 Logging.WriteLog(string.Format("Error Message [{0}]", ex.Message), "ERROR", 0);
                 ///--------------------------------------------------------------------------------------------
-                //ContextUtil.SetAbort();
                 throw this.ProcessErr(ex);
             }
             finally
@@ -2847,7 +2665,6 @@ namespace DACrux.SEMDMS.KtoD
 
                 strDBData[0] = m_oKHeader.InspectionStationID[2];	//REVIEW_EQ
                 strDBData[1] = m_oKHeader.FileTimestamp;			//FILETIMESTAMP                      
-                //strDBData[2] = m_iTotalImageCount.ToString();		//IMAGES   
                 strDBData[2] = System.Convert.ToString(m_ImageCount[m_oKHeader.InspectionTest]);     //IMAGES  
                 strDBData[3] = StepSeq.ToString();					//SLOT_ID    
 
@@ -2868,7 +2685,6 @@ namespace DACrux.SEMDMS.KtoD
                 strIFData[5] = "0";
                 strIFData[6] = "0";
                 strIFData[7] = "0";
-                //strIFData[8] = m_iTotalImageCount.ToString();
                 strIFData[8] = System.Convert.ToString(m_ImageCount[m_oKHeader.InspectionTest]);
                 strIFData[9] = "0";
                 strIFData[10] = StepSeq.ToString();
@@ -2883,13 +2699,11 @@ namespace DACrux.SEMDMS.KtoD
                 Logging.WriteLog(string.Format("STEPID Upload Error [STEPID : {0}] ", m_oKHeader.StepID), "ERROR", 0);
                 Logging.WriteLog(string.Format("Error Message [{0}]", ex.Message), "ERROR", 1);
                 ///--------------------------------------------------------------------------------------------
-                //ContextUtil.SetAbort();
                 throw this.ProcessErr(ex);
             }
 
             finally
             {
-                //ContextUtil.SetComplete();
                 oYesStepTx.Dispose();
             }
 
@@ -2909,12 +2723,10 @@ namespace DACrux.SEMDMS.KtoD
 
             try
             {
-                //INSERT INTO TQD_SCAN_SAMPLE(STEP_SEQ,TEST,INDEX_X,INDEX_Y) VALUES(?,?,?,?);
                 strQuery = new string[1];
                 oYesScanSampleTx = new DACrux.SEMDMS.DSL.TQD_SCAN_SAMPLE();
                 string[] strDBData = new string[4];
                 strDBData[0] = step_seq.ToString();			//SETUP_ID             VARCHAR(40) NOT NULL,
-                //strDBData[1] = m_oKHeader.InspectionTest.ToString();
                 string sQueryPrefix = string.Empty;
                 string sQueryValues = string.Empty;
 
@@ -2933,14 +2745,9 @@ namespace DACrux.SEMDMS.KtoD
                             iSampleTestPlanArrayListIndex = i;
                         }
                     }
-                    //DIEINFO_TAG[] testDieInfo = (DIEINFO_TAG[])m_SampleTestPlan[m_CurrentTestIndex];
                     testDieInfo = (DIEINFO_TAG[])m_SampleTestPlan[iSampleTestPlanArrayListIndex];
-                    //for(int i=0;m_oKHeader.TestDieInfo.Length>i;i++)					
                     for (int i = 0; i < testDieInfo.Length; i++)
                     {
-                        //							strDBData[1] = m_oKHeader.TestDieInfo[i].TEST.ToString();    //InspectionTest
-                        //							strDBData[2] = m_oKHeader.TestDieInfo[i].DX.ToString();	//INDEX_X				INTEGER NOT NULL
-                        //							strDBData[3] = m_oKHeader.TestDieInfo[i].DY.ToString();	//INDEX_Y				INTEGER NOT NULL,
 
                         strDBData[1] = testDieInfo[i].TEST.ToString();  //InspectionTest
                         strDBData[2] = testDieInfo[i].DX.ToString();	//INDEX_X				INTEGER NOT NULL
@@ -2948,7 +2755,6 @@ namespace DACrux.SEMDMS.KtoD
 
                         iBatchCnt += 1;
 
-                        //							if(iBatchCnt == m_iDefectInsertSum || i == m_oKHeader.TestDieInfo.Length-1)
                         if (iBatchCnt == m_iDefectInsertSum || i == testDieInfo.Length - 1)
                         {
                             sQueryValues += "("
@@ -2969,10 +2775,7 @@ namespace DACrux.SEMDMS.KtoD
                         strQuery[0] = "";
                         sQueryValues = "";
                     }
-                    //Logging.WriteLog(string.Format("X: {0} , Y: {1}",strDBData[2],strDBData[3] ),"PROC",0);
-                    //						oYesScanSampleTx.Create(strDBData);
                 }
-                //oYesScanSampleTx.Create(strQuery);
 
             }
             catch (Exception ex)
@@ -2981,12 +2784,10 @@ namespace DACrux.SEMDMS.KtoD
                 Logging.WriteLog(string.Format("ScanSample Upload Error [step_seq : {0}]", step_seq), "ERROR", 0);
                 Logging.WriteLog(string.Format("Error Message [{0}]", ex.Message), "ERROR", 1);
                 ///--------------------------------------------------------------------------------------------
-                //ContextUtil.SetAbort();
                 throw this.ProcessErr(ex);
             }
             finally
             {
-                //ContextUtil.SetComplete();
                 oYesScanSampleTx.Dispose();
             }
         }
@@ -3039,7 +2840,6 @@ namespace DACrux.SEMDMS.KtoD
                 Logging.WriteLog(string.Format("ScanSample Upload Error [setup_seq : {0}]", setup_seq), "ERROR", 0);
                 Logging.WriteLog(string.Format("Error Message [{0}]", ex.Message), "ERROR", 1);
                 ///--------------------------------------------------------------------------------------------
-                //ContextUtil.SetAbort();
                 throw this.ProcessErr(ex);
             }
             finally
@@ -3079,18 +2879,6 @@ namespace DACrux.SEMDMS.KtoD
                 strTTable = "TQD_DEFECT";
 
                 // 2013-09-11 YSIM Normal 한 방법으로 Data를 올린다.
-                //if (option == "IMPORT" || option == "CMD")
-                //{
-                //    bImport = true;				//Import방식을 이용하여  DB에 올린다.
-                //}
-                //else
-                //{
-                //    strTTable = string.Format("SESSION.{0}_{1}", EQUIP_ID, Environment.TickCount.ToString());
-                //    strTTable = strTTable.Replace("-", "");
-                //    oYesDefectTx.CreateTempTable(new string[] { strTTable });
-                //}
-
-
 
                 if (oYesDefectTx.GetDefectCount(strDBData) == 0)
                 {
@@ -3146,7 +2934,6 @@ namespace DACrux.SEMDMS.KtoD
                                 }
                             }
                             strDBData[0] = step_seq.ToString();
-                            //strDBData[1] = "0";									//트랜젝션 TEST를 위해 강제 Error 발생
                             strDBData[2] = wafer_seq.ToString();
                             strDBData[20] = "1";								//ADDER                INTEGER,
                             strDBData[21] = m_oKHeader.StepID;					//FIRST_STEP           VARCHAR(40),
@@ -3172,29 +2959,10 @@ namespace DACrux.SEMDMS.KtoD
                                 /// ===========================================================================
                                 /// 
 
-                                //							oYesDefectTx.Create(strTTable,strDBData);
-
                                 //2005/04/20 추가(김도경): 디펙 인서트 통쿼리에 대한 설정.
                                 iBatchCnt += 1;
 
-                                //							strBatchSqlValues += strBatchSql + "(";
-                                //							strBatchSqlValues += strDBData[0]+","+strDBData[1]+","+strDBData[2]+","+strDBData[3]+",";
-                                //							strBatchSqlValues += strDBData[4]+","+strDBData[5]+","+strDBData[6]+","+strDBData[7]+",";
-                                //							strBatchSqlValues += strDBData[8]+","+strDBData[9]+","+strDBData[10]+","+strDBData[11]+",";
-                                //							strBatchSqlValues += strDBData[12]+","+strDBData[13]+","+strDBData[14]+","+strDBData[15]+",";
-                                //							strBatchSqlValues += strDBData[16]+","+strDBData[17]+","+strDBData[18]+","+strDBData[19]+",";
-                                //							strBatchSqlValues += strDBData[20]+",'"+strDBData[21]+"',"+strDBData[22]+","+strDBData[23]+",";
-                                //							strBatchSqlValues += strDBData[24]+","+strDBData[25]+","+strDBData[26]+","+strDBData[27]+");";
-                                //							//Full Sql Insert Statements Query Logic
-                                //							if(iBatchCnt == m_iDefectInsertSum || i == m_iDefectCount-1)
-                                //							{
-                                //								iBatchCnt = 0;
-                                //								oYesDefectTx.Create(strBatchSqlValues);
-                                //								strBatchSqlValues = "";
-                                //							}
-
                                 //Values Appends Query Logic								
-                                //if(iBatchCnt == m_iDefectInsertSum || i == m_iDefectCount-1)
                                 if (iBatchCnt == m_iDefectInsertSum || iDefectCntIncr == iDefectCnt || i == m_iDefectCount - 1)
                                 {
                                     strBatchSqlValues += "(";
@@ -3263,13 +3031,11 @@ namespace DACrux.SEMDMS.KtoD
                             oYesDefectTx.MoveDefect(new string[] { strTTable }, new string[] { step_seq.ToString() });
                     }
 
-                    //oYesDefectTx.UpdateAdder(new String[3]{wafer_seq.ToString(),step_seq.ToString(),"20000" });
                 }
                 else
                 {
                     //	한번더 올리거나,Review를 했거나, 등등...
                 }
-                //ContextUtil.SetComplete();
             }
             catch (Exception ex)
             {
@@ -3277,7 +3043,6 @@ namespace DACrux.SEMDMS.KtoD
                 Logging.WriteLog(string.Format("DefectData Upload Error [DefectID : {0}]", iCurrDefectID), "ERROR", 0);
                 Logging.WriteLog(string.Format("Error Message [{0}]" + ex.StackTrace, ex.Message), "ERROR", 1);
                 ///--------------------------------------------------------------------------------------------
-                //ContextUtil.SetAbort();
                 throw this.ProcessErr(ex);
             }
 
@@ -3357,7 +3122,6 @@ namespace DACrux.SEMDMS.KtoD
 														"0","0","0","0","0","0","0","FSTSIL","0","0",
 														"0","0","0","0","0"};
 
-                //string[] strImage = new string[10] {step_seq.ToString(),"1","0","1",wafer_seq.ToString(),"JPG"," "," ","177.175.2.186"," "};
                 string[] strImage = new string[10] { step_seq.ToString(), "1", "0", "1", wafer_seq.ToString(), "JPG", " ", " ", "177.176.2.24", " " };
 
 
@@ -3408,7 +3172,6 @@ namespace DACrux.SEMDMS.KtoD
                     strDBData[27] = "0";								//AUTO_SEM_CLASS       INTEGER NOT NULL DEFAULT 0
 
                     iCurrDefectID = int.Parse(strDBData[1]);
-                    //DataCheck(ref strDBData); //TRF,KRF 일때 X,Y,XREL,YREL을 
 
                     ///==============================================================================
                     /// TQD_DEFECT-IMAGECOUNT에 기존 Data와 현재 들어갈 Image 개수를 합산한다.
@@ -3424,7 +3187,6 @@ namespace DACrux.SEMDMS.KtoD
                     if (strDBData[13] != "0" || strDBData[16] != "0" || strDBData[17] != "0" || strDBData[18] != "0" || strDBData[19] != "0")
                     {
                         //						Logging.WriteLog(string.Format("DefectData Update [DefectID:{0}][CLASSNUMBER:{1}][ROUGHBINNUMBER:{2}][FINEBINNUMBER:{3}][REVIEWSAMPLE:{4}][IMAGECOUNT:{5}]"
-                        //														,strDBData[1],strDBData[13],strDBData[16],strDBData[17],strDBData[18],strDBData[19]),"PROC",0);
 
                         iBatchCnt += 1;
                         if (iBatchCnt == 1000 || i == m_iDefectCount - 1)
@@ -3458,7 +3220,6 @@ namespace DACrux.SEMDMS.KtoD
                         oYesDefectTx.UpdateBatch(sUpdateDefectQuery);
                         sUpdateDefectQuery[0] = "";
                     }
-                    //Logging.WriteLog("DefectData Update Completed","PROC",0);
 
                     if (m_oKHeader.Defects[i].IMAGENAME != null)
                     {
@@ -3516,21 +3277,17 @@ namespace DACrux.SEMDMS.KtoD
                 Logging.WriteLog(string.Format("DefectData Update Error [DefectID : {0}]", iCurrDefectID), "ERROR", 0);
                 Logging.WriteLog(string.Format("Error Message [{0}]", ex.Message), "ERROR", 1);
                 ///--------------------------------------------------------------------------------------------
-                //ContextUtil.SetAbort();
 
                 /// ====================================================================
                 ///	- 수정자 : 미라콤 임영신
                 ///	- 수정일 : 2005-02-18
                 ///	- 변경로그 : tif 파일에 실제 이미지가 없는 경우 m_oImgLoader.GetThumeNail 에서 개체 오류로 전체 프로세스가 중단된다.
                 ///	             따라서 이미지를 로드하지 못하여 발생하는 에러를 throw 하지 않고 로깅만 한다.
-                //throw this.ProcessErr(ex);	
                 /// ====================================================================
             }
 
             finally
             {
-                //File.Delete(string.Format(@"{0}\{1}.csv",strWorkPath,m_strCsvFile));
-                //ContextUtil.SetComplete();
                 oYesDefectTx.Dispose();
                 oYesImageTx.Dispose();
             }
@@ -3547,14 +3304,12 @@ namespace DACrux.SEMDMS.KtoD
             ///	- 수정일 : 2005-03-10
             ///	- 변경로그 : 함수 추가 
             ///		MES의 MainEq,RTE,Oper,Reticle 정보를 가져온다.				
-            //GetMESInfo();
             /// ====================================================================
 
             /// ROTATE 3월 16일 추가 ================================================
             RotatePoint rp = new RotatePoint();
             try
             {
-                //rp.RotateKLARF(ref m_oKHeader); 
                 rp.RotateKLARF(ref m_oKHeader, ref m_SampleTestPlan);
             }
             catch
@@ -3565,7 +3320,6 @@ namespace DACrux.SEMDMS.KtoD
         }
 
         #region ■Step을 DB로 Insert함
-        //public void InsertNewInsp()
         public int InsertNewInsp()
         {
             int iReturn = 0;
@@ -3580,27 +3334,6 @@ namespace DACrux.SEMDMS.KtoD
             int iDefectCount = 0;
             try
             {
-                //				AccuracyCheck();
-                //
-                //				/// ====================================================================
-                //				///	- 수정자 : 미라콤 임영신
-                //				///	- 수정일 : 2005-03-10
-                //				///	- 변경로그 : 함수 추가 
-                //				///		MES의 MainEq,RTE,Oper,Reticle 정보를 가져온다.				
-                //				GetMESInfo();
-                //				/// ====================================================================
-                //		
-                //				/// ROTATE 3월 16일 추가 ================================================
-                //				RotatePoint rp = new RotatePoint();
-                //				try
-                //				{
-                //					rp.RotateKLARF(ref m_oKHeader);
-                //				}
-                //				catch
-                //				{
-                //					Logging.WriteLog("Rotate중 Error가 났습니다.이 Data는 정상 Data가 아니지만 Debug를 위해 Upload를 진행합니다.","PROC",0);
-                //				}
-                //				/// ========================================================================
 
                 TQD_STEP oYesStepTx = new TQD_STEP();
                 /// 
@@ -3612,12 +3345,10 @@ namespace DACrux.SEMDMS.KtoD
                 // STEP_SEQ 조건에 TEST 추가(2005.05.31 강혜경)
                 if (m_oKHeader.WaferID == null || m_oKHeader.WaferID.Length == 0 || m_oKHeader.WaferID.Length > 3)
                 {
-                    //oExistDs = oYesStepTx.GetExistInspSlot(new string[3] {m_oKHeader.LotID,m_oKHeader.Slot.ToString().PadLeft(2,'0'),m_oKHeader.ResultTimestamp});
                     dtExist = oYesStepTx.GetExistInspSlot(new string[4] { m_oKHeader.LotID, m_oKHeader.Slot.ToString().PadLeft(2, '0'), m_oKHeader.ResultTimestamp, m_oKHeader.InspectionTest.ToString() });
                 }
                 else
                 {
-                    //oExistDs = oYesStepTx.GetExistInspWaferID(new string[4] {m_oKHeader.LotID,m_oKHeader.WaferID,m_oKHeader.StepID,m_oKHeader.ResultTimestamp});
                     dtExist = oYesStepTx.GetExistInspWaferID(new string[5] { m_oKHeader.LotID, m_oKHeader.WaferID, m_oKHeader.StepID, m_oKHeader.ResultTimestamp.ToString(), m_oKHeader.InspectionTest.ToString() });
                 }
                 /// ==============================================================================================================================================================
@@ -3644,11 +3375,6 @@ namespace DACrux.SEMDMS.KtoD
                     /// Step (delete Step_seq)
                     /// Insert Step,insp_info,Defect,Image,step_sum
                     /// 
-                    //					Logging.WriteLog(strLog,"PROC",0);
-                    //					UpdateDataStep(lstep_seq);
-                    //					UpdateDataDefect(llot_seq,lwafer_seq,lstep_seq);					
-                    //					m_strDataIntegrate = "UPDATE";
-                    //					m_oKHeader.Defects.Initialize();
 
                     TQD_DEFECT oDefectCount = new TQD_DEFECT();
                     iDefectCount = oDefectCount.GetDefectCount(lstep_seq.ToString());
@@ -3659,7 +3385,6 @@ namespace DACrux.SEMDMS.KtoD
                         UpdateDataStep(lstep_seq);
                         UpdateDataDefect(llot_seq, lwafer_seq, lstep_seq);
                         m_strDataIntegrate = "UPDATE";
-                        //m_oKHeader.Defects.Initialize();
                     }
                     else
                     {
@@ -3736,7 +3461,6 @@ namespace DACrux.SEMDMS.KtoD
                     {
                         UploadDataStep(lwafer_seq, lsetup_seq, ref lstep_seq);
                         Logging.WriteLog("DB Upload Step", "PROC", 0);
-                        //UploadDataScanSample(lstep_seq);
                         UploadDataSetupMap(lsetup_seq);
                         Logging.WriteLog("DB Upload ScanSample", "PROC", 0);
 
@@ -3751,7 +3475,6 @@ namespace DACrux.SEMDMS.KtoD
                     {
                         UploadDataDefect(lwafer_seq, lstep_seq, m_oPath.UploadComand);
                         Logging.WriteLog("DB Upload Defect", "PROC", 0);
-                        //m_oKHeader.Defects.Initialize();
                     }
 
                     Logging.WriteLog(string.Format("[PRODUCT : {0}] [LOT : {1}] [WAFER : {2}] [STEP : {3} ] Upload 완료", m_oKHeader.DeviceID, m_oKHeader.LotID, m_oKHeader.WaferID, m_oKHeader.StepID), "PROC", 0);
@@ -3762,13 +3485,7 @@ namespace DACrux.SEMDMS.KtoD
                 {
                     StepSummary oStepSum = new StepSummary();
                     Logging.WriteLog(string.Format("STEP Summary Skip."), "PROC", 0);
-                    //oStepSum.RunStepSummary(lstep_seq);
-                    //Logging.WriteLog(string.Format("STEP Summary End"), "PROC", 0);
                     Logging.WriteLog(string.Format("DCOUNT Summary Skip."), "PROC", 0);
-                    //if (m_iDefectCount != 0)
-                    //    oStepSum.RunStepDCount(lstep_seq);
-                    //Logging.WriteLog(string.Format("DCOUNT Summary End"), "PROC", 0);
-
 
                     /// ====================================================================
                     ///   - 수정자 : 미라콤 임영신
@@ -3793,10 +3510,7 @@ namespace DACrux.SEMDMS.KtoD
                 try
                 {
                     Logging.WriteLog("[Check RDMS]", "PROC", 0);
-                    //Miracom.YES.RDMS.BSL.FilteringRDMS ftrRDMS = new Miracom.YES.RDMS.BSL.FilteringRDMS();
 
-                    //ftrRDMS.FindRD((int)lstep_seq);
-                    //ContextUtil.SetComplete();
                 }
                 catch (Exception ex)
                 {
@@ -3808,24 +3522,7 @@ namespace DACrux.SEMDMS.KtoD
                 try
                 {
                     Logging.WriteLog("[Check Interlock]", "PROC", 0);
-                    //Miracom.YES.InterLock.BSL.Check ChkInterLock = new Miracom.YES.InterLock.BSL.Check();
                     string strInterLockFlag = "";
-                    //switch (ChkInterLock.GetInterLockInfo(lstep_seq))
-                    //{
-                    //    case 0:
-                    //        break;
-                    //    case 1:
-                    //        strInterLockFlag = "CONTROL_LIMIT_OUT";
-                    //        Logging.WriteLog(string.Format("CONTROL Out !!!"), "PROC", 0);
-                    //        break;
-                    //    case 2:
-                    //        strInterLockFlag = "SPEC_LIMIT_OUT";
-                    //        ///SendMessage("LOT_HOLD");
-                    //        ///
-                    //        Logging.WriteLog(string.Format("SPEC Out [LOT HOLD] !!!"), "PROC", 0);
-
-                    //        break;
-                    //}
 
                     if (strInterLockFlag.Length > 0)
                     {
@@ -3863,7 +3560,6 @@ namespace DACrux.SEMDMS.KtoD
                         }
 
                         oYesInspInfo.UpdateInterlockFlag(lstep_seq, strInterLockFlag);
-                        //ContextUtil.SetComplete();
                         oYesInspInfo.Dispose();
                     }
                 }
@@ -3884,15 +3580,6 @@ namespace DACrux.SEMDMS.KtoD
                 {
                     if (m_iDefectCount != 0)
                     {
-                        //Miracom.YES.LIB.MapGen.MapGenerate.GenerateFormat(m_oPath.ProcessPath, lstep_seq.ToString(), 199, Miracom.YES.LIB.MapGen.MapGenerate.GenerateFormatEnum.JPEG);
-                        //Logging.WriteLog("[WAFER Map Create 성공]", "PROC", 0);
-                        //oYesMapImages.Create(new string[] {lstep_seq.ToString()
-                        //                                                     ,m_oKHeader.InspectionTest.ToString()
-                        //                                                     ,"JPEG"
-                        //                                                     ,"UNKNOWN"  
-                        //                                                     ,"UNKNOWN"
-                        //                                                     ,"UNKNOWN"
-                        //                                                     ,string.Format(@"{0}\{1}.JPG",m_oPath.ProcessPath,lstep_seq)});
 
                         Logging.WriteLog("[Upload to Database 성공]", "PROC", 0);
                     }
@@ -3911,8 +3598,6 @@ namespace DACrux.SEMDMS.KtoD
                 }
                 ///============================================================================================================
 
-
-                //ContextUtil.SetComplete();
 
                 oCurrentTime = DateTime.Now;
                 oFileWaitTime = oCurrentTime - m_oStartTime;
@@ -3935,8 +3620,6 @@ namespace DACrux.SEMDMS.KtoD
             {
                 Logging.WriteLog(ex.Message, "ERROR", 3);
                 Logging.WriteLog(string.Format("[PRODUCT : {0}] [LOT : {1}] [WAFER : {2}] [STEP : {3} ] Upload 실패", m_oKHeader.DeviceID, m_oKHeader.LotID, m_oKHeader.WaferID, m_oKHeader.StepID), "ERROR", 0);
-                //ContextUtil.SetAbort();
-                //throw this.ProcessErr(ex);
             }
             finally
             {
@@ -3979,32 +3662,18 @@ namespace DACrux.SEMDMS.KtoD
                 ///	- 수정일 : 2005-03-02
                 ///	- 변경로그 : DeviceID 를 무조건 LOTID  앞 3자리, 대문자로 처리함, 권택수 과장님과 협의완료
                 ///					        
-                //				if(m_oKHeader.DeviceID == null || m_oKHeader.DeviceID.Length == 0)
-                //				{
-                //					if(m_oKHeader.LotID.Length>=3)
-                //					{
-                //						m_oKHeader.DeviceID = m_oKHeader.LotID.Substring(0,3);
-                //					}
-                //					else
-                //					{
-                //						m_oKHeader.DeviceID = m_oKHeader.LotID;
-                //					}
-                //				}				
 
                 if (m_oKHeader.LotID.Length >= 3)
                 {
                     if (m_FAB.Equals("RND"))
                     {
-                        //m_oKHeader.DeviceID = m_oKHeader.LotID.Substring(0, 4).ToUpper();
                     }
                     else
                     {
-                        //m_oKHeader.DeviceID = m_oKHeader.LotID.Substring(0, 3).ToUpper();
                     }
                 }
                 else
                 {
-                    //m_oKHeader.DeviceID = m_oKHeader.LotID.ToUpper();
                 }
                 /// ====================================================================
 
@@ -4384,12 +4053,9 @@ namespace DACrux.SEMDMS.KtoD
                 oYesInspInfo.Delete(stepSeq.ToString());
                 oYesStep.Delete(stepSeq.ToString());
 
-                //ContextUtil.SetComplete();
             }
             catch (Exception ex)
             {
-                //ContextUtil.SetAbort();
-                //throw this.ProcessErr(ex);
                 string strLog = string.Format("Error:[TQD_STEP_SUM, TQD_INSP_INFO TQD_STEP의 {0}을 삭제하던 중 에러가 발생하였습니다:" + ex.Message, stepSeq);
                 Logging.WriteLog(strLog, "PROC", 0);
 

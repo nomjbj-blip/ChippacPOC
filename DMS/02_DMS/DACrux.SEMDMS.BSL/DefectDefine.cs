@@ -339,20 +339,6 @@ namespace DACrux.SEMDMS.BSL
 
         #region [TQD_IMAGES]
 
-        //public void CreateImages(string[] ImageInfo)
-        //{
-        //    DACrux.SEMDMS.DSL.TQD_IMAGES oTQD_IMAGES = null;
-        //    try
-        //    {
-        //        oTQD_IMAGES = new DACrux.SEMDMS.DSL.TQD_IMAGES();
-        //        oTQD_IMAGES.InsertData("CREATE_IMAGES", null, ImageInfo);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw ex;
-        //    }
-        //}
-
         #endregion
 
         #region [TQD_PRODUCT]

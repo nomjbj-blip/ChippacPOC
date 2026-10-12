@@ -584,10 +584,6 @@ namespace DACrux.TEST.ENGUI
             try
             {
                 m_wMap.SelDie(oIndex.X, oIndex.Y);
-                //m_wMap.SetSelectedDie(oIndex.X, oIndex.Y);
-                //m_wMap.Focus();
-                //m_wMap.SetFocusDie(oIndex.X, oIndex.Y);
-                //m_wMap.Focus();
                 m_wMap.Focus();
             }
             finally

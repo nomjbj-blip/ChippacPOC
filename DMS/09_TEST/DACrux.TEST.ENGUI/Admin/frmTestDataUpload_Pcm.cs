@@ -70,12 +70,6 @@ namespace DACrux.TEST.ENGUI
                 return;
             }
 
-            //if (pnlDataInput.Enabled && String.IsNullOrWhiteSpace(txtOperator.Text))
-            //{
-            //    ShowErrorMessage("OPERATOR 정보를 확인하세요.");
-            //    return;
-            //}
-
             if (String.IsNullOrWhiteSpace(txtUserComment.Text))
             {
                 ShowErrorMessage("내용을 입력하세요.");
@@ -110,12 +104,9 @@ namespace DACrux.TEST.ENGUI
             foreach (string fileName in FileNames)
             {
                 //  PCM인 경우 파일명에 ProbeCard, Operator 정보를 붙인다.
-                //string newFileName = DACrux.Data.Handler.HandlerPcm.GetUserUploadFileName(fileName, txtProbeCard.Text, txtOperator.Text);
                 string newFileName = DACrux.Data.Handler.HandlerPcm.GetUserUploadFileName(fileName, txtProbeCard.Text, String.Empty);
                 ftp.SendFile(fileName, System.IO.Path.GetFileName(newFileName));
             }
-
-            //ftp.DeleteFile("/EQUIP/TEST/PCM/AMPT44/test.txt");
 
             ShowMessage("전송이 완료되었습니다. 데이터 처리까지는 최대 수 분이 소요될 수 있습니다.");
             

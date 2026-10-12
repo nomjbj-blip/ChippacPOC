@@ -265,11 +265,9 @@ namespace DACrux.TEST.ENGUI
                     //--
 
                     dp = new DataPoint(new Series("YIELD"));
-                    //dp.Label = String.Format("{0}", y);
                     dp.Tag = String.Format("{0}", y);
                     dp.ToolTip = String.Format("{0} / {1} / {2}", strXValue, strSeries, y);
                     dp.BorderWidth = 2;
-                    //dp.Color = m_ColorSet[DACrux.Base.Convert.intParse(strBinNo)];
                     dp.SetValueXY(strXValue, y);
 
                     BinChart.Series["YIELD"].Points.Add(dp);
@@ -292,11 +290,9 @@ namespace DACrux.TEST.ENGUI
                     //--
 
                     dp = new DataPoint(new Series("YIELD_POINT"));
-                    //dp.Label = String.Format("{0}", y);
                     dp.Tag = String.Format("{0}", y);
                     dp.ToolTip = String.Format("{0} / {1} / {2}", strXValue, strSeries, y);
                     dp.BorderWidth = 2;
-                    //dp.Color = m_ColorSet[DACrux.Base.Convert.intParse(strBinNo)];
                     dp.SetValueXY(strXValue, y);
 
                     BinChart.Series["YIELD_POINT"].Points.Add(dp);

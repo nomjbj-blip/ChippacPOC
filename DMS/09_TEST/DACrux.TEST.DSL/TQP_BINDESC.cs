@@ -156,22 +156,6 @@ namespace DACrux.TEST.DSL
             }
         }
 
-        //public void UpdateProgramBin(string Program, string[,] BinInf)
-        //{
-        //    //DELETE_PROGRAM_BIN
-        //    try
-        //    {
-        //        this.Execute("UPDATE_PROGRAM_TEMP", null, new string[] { Program });
-        //        if (BinInf.Length > 0) this.ExecuteMultiple("CREATE_BIN", BinInf);
-        //        this.Execute("DELETE_TEMP_PROGRAM", null, null);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        this.Execute("DELETE_PROGRAM_BIN", null, new string[] { Program });	//Insert하던 새로운것을 삭제한다.
-        //        this.Execute("ROLLBACK_BINDESC_TEMP", null, new string[] { Program });	//"UPDATE_TEMP"를 원래의 Program Name으로 바꾼다
-        //        throw ex;
-        //    }
-        //}
         public int UpdateProgramBin(
             string program,
             string[,] sParam

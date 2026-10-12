@@ -6,7 +6,6 @@ using System.Windows.Forms;
 using DACrux.Base;
 using System.Data;
 using DACrux.SEMDMS.Control;
-//using Miracom.Common.Base;
 
 namespace DACrux.SEMDMS.ENGUI
 {

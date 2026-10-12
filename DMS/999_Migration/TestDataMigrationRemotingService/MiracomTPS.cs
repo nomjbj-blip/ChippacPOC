@@ -597,7 +597,6 @@ WHERE TABLE_NAME = '{0}'
 
         public void DropTable(string tableName)
         {
-            //ExecuteNonQuery(String.Format("CREATE TABLE {0}_BAK1911 AS SELECT * FROM {0}", tableName));
             ExecuteNonQuery(String.Format("ALTER TABLE TPSMGR.{0} DROP PRIMARY KEY CASCADE", tableName));
             ExecuteNonQuery(String.Format("DROP TABLE TPSMGR.{0} CASCADE CONSTRAINTS", tableName));
         }
@@ -1522,8 +1521,6 @@ WHERE LOT_SEQ IN ({0})", String.Join(",", lotSeqArr)));
                             }
                             catch (InvalidCastException)
                             {
-                                //if (dt.Columns[c].DataType == typeof(decimal))
-                                //    newRow[c] = Decimal.MaxValue;
 
                                 newRow[c] = reader.GetOracleValue(c).ToString();
                             }

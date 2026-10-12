@@ -299,16 +299,10 @@ namespace DACrux.SP.Common
                 if (formatType == FormatFileType.Formatter)
                 {
                     sampleFileNodes = node.SelectNodes("SAMPLE_FILE");
-                    //string tempFolderPath = Utility.CombinedPath(Application.StartupPath, "TEMP");
                     string strFileName = string.Empty;
                     foreach (XmlNode sampleFileNode in sampleFileNodes)
                     {
                         strFileName = sampleFileNode.Attributes["Name"].Value;
-
-                        //using (StreamWriter sw = new StreamWriter(Utility.CombinedPath(tempFolderPath, strFileName), false))
-                        //    sw.Write(sampleFileNode.InnerText);
-
-                        //SampleFiles.Add(strFileName, string.Empty);
 
                         SampleFiles.Add(strFileName, sampleFileNode.InnerText);
                         HanasampleFiles.Add(strFileName + "_HANA", sampleFileNode.InnerText);
@@ -338,10 +332,6 @@ namespace DACrux.SP.Common
                         entity.StreamMode = (StreamModeItem)Enum.Parse(typeof(StreamModeItem), entityNode.Attributes["StreamMode"].Value);
                     else
                         entity.StreamMode = StreamModeItem.None;
-                    //if (entityNode.Attributes["STP_X"].Value != null)
-                    //    entity.STP_X = int.Parse(entityNode.Attributes["STP_X"].Value.ToString());
-                    //if (entityNode.Attributes["STP_Y"].Value != null)
-                    //    entity.STP_X = int.Parse(entityNode.Attributes["STP_Y"].Value.ToString());
 
                     if (entityNode.Attributes["RowNum"] != null)
                         entity.RowNum = entityNode.Attributes["RowNum"].Value;
@@ -457,7 +447,6 @@ namespace DACrux.SP.Common
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex.Message);
-                    //Utility.ShowMessageBox(ex.Message, MessageBoxIcon.Error);
                     Tasks.Clear();
                 }
 
@@ -506,7 +495,6 @@ namespace DACrux.SP.Common
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex.Message);
-                    //Utility.ShowMessageBox(ex.Message, MessageBoxIcon.Error);
                     Scripts.Clear();
                 }
 
@@ -578,8 +566,6 @@ namespace DACrux.SP.Common
                 xtw.WriteAttributeString("PatternMode", PatternMode.ToString());
                 xtw.WriteAttributeString("TargetFileNamingRule", TargetFileNamingRule.ToString());
 
-                //if (encoding == null)
-                //    encoding = Encoding.UTF8;
                 xtw.WriteAttributeString("Encoding", encoding.ToString());
                 xtw.WriteAttributeString("CharCount", CharCount.ToString());
                 xtw.WriteAttributeString("BOTTOM", strBottom);
@@ -657,8 +643,6 @@ namespace DACrux.SP.Common
                         {
                             try
                             {
-                                //using (System.IO.StreamReader sr = new System.IO.StreamReader(Utility.CombinedPath(Application.StartupPath, "TEMP", pair.Key)))
-                                //    strContents = sr.ReadToEnd();
                             }
                             catch (Exception ex)
                             {
@@ -668,7 +652,6 @@ namespace DACrux.SP.Common
 
                             xtw.WriteStartElement("SAMPLE_FILE");
                             xtw.WriteAttributeString("Name", pair.Key);
-                            //xtw.WriteString(strContents);
                             xtw.WriteString(pair.Value);
                             xtw.WriteEndElement();
 

@@ -46,7 +46,6 @@ namespace DACrux.SP.Common
                     throw new ArgumentNullException("path");
 
                 _regex = new Regex(regexString, RegexOptions.Compiled | RegexOptions.Multiline);
-                //_regex = new Regex(regexString, RegexOptions.Compiled );
                 _startIndex = (startAt < 0) ? 0 : startAt;
                 _endIndex = (endAt < 0) ? BaseStream.Length - 1 : endAt;
 

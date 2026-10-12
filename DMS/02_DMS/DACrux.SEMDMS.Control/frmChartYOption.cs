@@ -34,25 +34,7 @@ namespace DACrux.SEMDMS.Control
 
         //--
 
-        //private void btnClose_Click(
-        //    object sender,
-        //    EventArgs e
-        //    )
-        //{
-        //    this.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-        //    this.Close();
-        //}
-
         //--
-
-        //private void btnOk_Click(
-        //    object sender,
-        //    EventArgs e
-        //    )
-        //{
-        //    this.DialogResult = System.Windows.Forms.DialogResult.OK;
-        //    this.Close();
-        //}
 
         #endregion [ Event Handler ]
 

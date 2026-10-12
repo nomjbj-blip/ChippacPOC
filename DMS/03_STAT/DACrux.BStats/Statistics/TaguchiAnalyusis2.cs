@@ -85,7 +85,6 @@ namespace DACrux.BStats.Statistics
         DataTable m_DataSource = null;
         DataTable m_dtDescResult = null;
         DataSet m_dsAnalysisResult = null;
-        //DataTable m_dtResult = null;
         string[] m_strArrPara = null;
         string[] m_strArrAnalysis = null;
         DACrux.BStats.StatisticsInput.inputTaguchi m_Input = null;
@@ -168,9 +167,6 @@ namespace DACrux.BStats.Statistics
         private GraphInformation[] GetGraphInfo()
         {
             #region Core의 Taguchi클래스 내의 Graph Title(클래스변수) 참고..
-            //const string strAverage = "평균의 주 효과 플롯(데이터 평균)";
-            //const string strSNRatio = "신호 대 잡음 비의 주 효과 플롯(데이터 평균)";
-            //const string strStdev = "표준 편차의 주 효과 플롯(데이터 평균)";
             #endregion
             try
             {

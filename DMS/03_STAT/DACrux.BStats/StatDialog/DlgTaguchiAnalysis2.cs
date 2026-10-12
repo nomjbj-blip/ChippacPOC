@@ -15,17 +15,13 @@ namespace DACrux.BStats.StatDialog
 
 
         #region [ LANGUAGE ]
-        //string m_Title = "Taguchi Statistics";
         #endregion
 
 
         #region [ EVENT ]
-        //public event DSelectedDescriptiveStatistics On_SelectedDescriptiveStatistics =  null;
         #endregion
 
         private inputTaguchi m_Input;
-
-        //private System.Collections.Hashtable htColumns = null;
 
         private List<DACrux.ProjectManager.UI.DataView.ColumnInfo> m_lstValidColumnInfo;
 
@@ -68,8 +64,6 @@ namespace DACrux.BStats.StatDialog
             m_Input.WorkSheet = strWorkSheet;
             m_Input.User = strUser;
             m_Input.ResultFilePath = strResultFilePath;
-            //SetSetting();
-            //InitDialog();
             SetColumnListView(m_lstValidColumnInfo);
         }
 

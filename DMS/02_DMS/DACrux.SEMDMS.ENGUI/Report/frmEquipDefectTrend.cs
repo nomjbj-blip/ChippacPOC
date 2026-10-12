@@ -124,7 +124,6 @@ namespace DACrux.SEMDMS.ENGUI
 
                 //Sheet 상에 Data Bind
                 DACrux.Utility.FPSpreadUtil.InitSpread(fpsCommon);
-                //fpsCommon.ActiveSheet.DataSource = dsData.Tables["RAW"];
                 DACrux.Utility.FPSpreadUtil.SetSpreadData(dsData.Tables["RAW"], fpsCommon_Sheet1);
                 fpsCommon.ActiveSheet.OperationMode = FarPoint.Win.Spread.OperationMode.Normal | FarPoint.Win.Spread.OperationMode.ReadOnly;
                 fpsCommon.ActiveSheet.SelectionPolicy = FarPoint.Win.Spread.Model.SelectionPolicy.MultiRange;
@@ -284,8 +283,6 @@ namespace DACrux.SEMDMS.ENGUI
                 //X 축 관련 속성
                 chartTrend.ChartAreas["Default"].AxisX.IsStartedFromZero = false;
                 chartTrend.ChartAreas["Default"].AxisX.IntervalAutoMode = IntervalAutoMode.FixedCount;
-                //chartTrend.ChartAreas["Default"].AxisX.Interval = 1;
-                //chartTrend.ChartAreas["Default"].AxisX.IntervalOffset = 1;
                 chartTrend.ChartAreas["Default"].AxisX.IsLabelAutoFit = true;
                 chartTrend.ChartAreas["Default"].AxisX.LabelAutoFitStyle = System.Windows.Forms.DataVisualization.Charting.LabelAutoFitStyles.IncreaseFont
                                                                     | System.Windows.Forms.DataVisualization.Charting.LabelAutoFitStyles.DecreaseFont
@@ -294,13 +291,10 @@ namespace DACrux.SEMDMS.ENGUI
 
 
                 chartTrend.ChartAreas["Default"].AxisX.LabelStyle.IsEndLabelVisible = true;
-                //chartTrend.ChartAreas["Default"].AxisX.Minimum = 0;
 
                 chartTrend.ChartAreas["Default"].AxisY.Maximum = dMaxValue + (int)(dMaxValue * 0.2);
-                //chartTrend.ChartAreas["Default"].AxisY.Minimum = 0;
                 chartTrend.ChartAreas["Default"].AxisY.Title = "[ea]";
                 chartTrend.ChartAreas["Default"].AxisY.TitleFont = new Font("굴림", 12, FontStyle.Bold);
-                //chartTrend.ChartAreas["Default"].AxisY.LabelStyle.Format = "{0.#}%";
 
                 nudInterval.Value = 0;
                 chartTrend.ApplyPaletteColors();

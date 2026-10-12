@@ -8,7 +8,6 @@ namespace DACrux.TEST.Interface
     public interface iDataSelect
     {
         DataTable GetLotList(string StartTime, string EndTime, string[] strFields, string[] strWhere, string strSort);
-        //DataTable GetWaferInfo(string WAFERSEQ);
         DataTable GetWaferList(DateTime stime, DateTime etime, string fieldOrder);
         DataTable GetWaferList(string StartTime, string EndTime, string[] strFields, string[] strWhere, string strSort);
         DataTable GetBinSum(string BINLIST, string WAFER_SEQ);
@@ -52,7 +51,6 @@ namespace DACrux.TEST.Interface
         /// <summary>
         /// 해당 WAFER의 PROGRAM 리스트를 가져옵니다.
         /// </summary>
-        //string[] GetProgramByWafer(string[] waferSeqArr);
         /// <summary>
         /// WAFER_SEQ에 대한 RAW DATA를 가져옵니다. 여러 테이블인 경우 모든 데이터를 가져옵니다.
         /// </summary>

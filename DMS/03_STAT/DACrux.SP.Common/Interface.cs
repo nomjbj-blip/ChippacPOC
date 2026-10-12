@@ -40,7 +40,6 @@ namespace DACrux.SP.Common
         ITask Excute(TaskRunningModeItem requestType);
         string CheckAndGetErrorMessage();
 
-        //event ItemRenamedEventHandler<Task> Renamed;
     }
 
     [Serializable]

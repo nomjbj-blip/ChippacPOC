@@ -220,57 +220,6 @@ namespace DACrux.SEMDMS.ENGUI
             row = dt.NewRow(); row["DISPLAY"] = "NEW DEFECT DIE"; row["VALUE"] = "T3.NEWDEFECTDIE"; dt.Rows.Add(row);
             row = dt.NewRow(); row["DISPLAY"] = "NEW RANDOM DIE"; row["VALUE"] = "T3.NEWRANDOMDIE"; dt.Rows.Add(row);
 
-            //row = dt.NewRow(); row["DISPLAY"] = "TOTALCLUSTER"; row["VALUE"] = "T3.TOTALCLUSTER"; dt.Rows.Add(row);
-            //row = dt.NewRow(); row["DISPLAY"] = "TOTAL0_5UM"; row["VALUE"] = "T3.TOTAL0_5UM"; dt.Rows.Add(row);
-            //row = dt.NewRow(); row["DISPLAY"] = "TOTAL0_7UM"; row["VALUE"] = "T3.TOTAL0_7UM"; dt.Rows.Add(row);
-            //row = dt.NewRow(); row["DISPLAY"] = "TOTAL1UM"; row["VALUE"] = "T3.TOTAL1UM"; dt.Rows.Add(row);
-            //row = dt.NewRow(); row["DISPLAY"] = "TOTAL2UM"; row["VALUE"] = "T3.TOTAL2UM"; dt.Rows.Add(row);
-            //row = dt.NewRow(); row["DISPLAY"] = "TOTAL3UM"; row["VALUE"] = "T3.TOTAL3UM"; dt.Rows.Add(row);
-            //row = dt.NewRow(); row["DISPLAY"] = "TOTAL4UM"; row["VALUE"] = "T3.TOTAL4UM"; dt.Rows.Add(row);
-            //row = dt.NewRow(); row["DISPLAY"] = "TOTAL5UM"; row["VALUE"] = "T3.TOTAL5UM"; dt.Rows.Add(row);
-            //row = dt.NewRow(); row["DISPLAY"] = "TOTAL6UM"; row["VALUE"] = "T3.TOTAL6UM"; dt.Rows.Add(row);
-            //row = dt.NewRow(); row["DISPLAY"] = "TOTAL7UM"; row["VALUE"] = "T3.TOTAL7UM"; dt.Rows.Add(row);
-            //row = dt.NewRow(); row["DISPLAY"] = "TOTALOS"; row["VALUE"] = "T3.TOTALOS"; dt.Rows.Add(row);
-            //row = dt.NewRow(); row["DISPLAY"] = "TOTALRANDOM0_5UM"; row["VALUE"] = "T3.TOTALRANDOM0_5UM"; dt.Rows.Add(row);
-            //row = dt.NewRow(); row["DISPLAY"] = "TOTALRANDOM0_7UM"; row["VALUE"] = "T3.TOTALRANDOM0_7UM"; dt.Rows.Add(row);
-            //row = dt.NewRow(); row["DISPLAY"] = "TOTALRANDOM1UM"; row["VALUE"] = "T3.TOTALRANDOM1UM"; dt.Rows.Add(row);
-            //row = dt.NewRow(); row["DISPLAY"] = "TOTALRANDOM2UM"; row["VALUE"] = "T3.TOTALRANDOM2UM"; dt.Rows.Add(row);
-            //row = dt.NewRow(); row["DISPLAY"] = "TOTALRANDOM3UM"; row["VALUE"] = "T3.TOTALRANDOM3UM"; dt.Rows.Add(row);
-            //row = dt.NewRow(); row["DISPLAY"] = "TOTALRANDOM4UM"; row["VALUE"] = "T3.TOTALRANDOM4UM"; dt.Rows.Add(row);
-            //row = dt.NewRow(); row["DISPLAY"] = "TOTALRANDOM5UM"; row["VALUE"] = "T3.TOTALRANDOM5UM"; dt.Rows.Add(row);
-            //row = dt.NewRow(); row["DISPLAY"] = "TOTALRANDOM6UM"; row["VALUE"] = "T3.TOTALRANDOM6UM"; dt.Rows.Add(row);
-            //row = dt.NewRow(); row["DISPLAY"] = "TOTALRANDOM7UM"; row["VALUE"] = "T3.TOTALRANDOM7UM"; dt.Rows.Add(row);
-            //row = dt.NewRow(); row["DISPLAY"] = "TOTALRANDOMOS"; row["VALUE"] = "T3.TOTALRANDOMOS"; dt.Rows.Add(row);
-            //row = dt.NewRow(); row["DISPLAY"] = "TOTALRETICLE"; row["VALUE"] = "T3.TOTALRETICLE"; dt.Rows.Add(row);
-            //row = dt.NewRow(); row["DISPLAY"] = "TOTALNONRETICLE"; row["VALUE"] = "T3.TOTALNONRETICLE"; dt.Rows.Add(row);
-            //row = dt.NewRow(); row["DISPLAY"] = "TOTALRANDOMRETICLE"; row["VALUE"] = "T3.TOTALRANDOMRETICLE"; dt.Rows.Add(row);
-            //row = dt.NewRow(); row["DISPLAY"] = "TOTALCLUSTERDIE"; row["VALUE"] = "T3.TOTALCLUSTERDIE"; dt.Rows.Add(row);
-            //row = dt.NewRow(); row["DISPLAY"] = "NEWCLUSTER"; row["VALUE"] = "T3.NEWCLUSTER"; dt.Rows.Add(row);
-            //row = dt.NewRow(); row["DISPLAY"] = "NEW0_5UM"; row["VALUE"] = "T3.NEW0_5UM"; dt.Rows.Add(row);
-            //row = dt.NewRow(); row["DISPLAY"] = "NEW0_7UM"; row["VALUE"] = "T3.NEW0_7UM"; dt.Rows.Add(row);
-            //row = dt.NewRow(); row["DISPLAY"] = "NEW1UM"; row["VALUE"] = "T3.NEW1UM"; dt.Rows.Add(row);
-            //row = dt.NewRow(); row["DISPLAY"] = "NEW2UM"; row["VALUE"] = "T3.NEW2UM"; dt.Rows.Add(row);
-            //row = dt.NewRow(); row["DISPLAY"] = "NEW3UM"; row["VALUE"] = "T3.NEW3UM"; dt.Rows.Add(row);
-            //row = dt.NewRow(); row["DISPLAY"] = "NEW4UM"; row["VALUE"] = "T3.NEW4UM"; dt.Rows.Add(row);
-            //row = dt.NewRow(); row["DISPLAY"] = "NEW5UM"; row["VALUE"] = "T3.NEW5UM"; dt.Rows.Add(row);
-            //row = dt.NewRow(); row["DISPLAY"] = "NEW6UM"; row["VALUE"] = "T3.NEW6UM"; dt.Rows.Add(row);
-            //row = dt.NewRow(); row["DISPLAY"] = "NEW7UM"; row["VALUE"] = "T3.NEW7UM"; dt.Rows.Add(row);
-            //row = dt.NewRow(); row["DISPLAY"] = "NEWOS"; row["VALUE"] = "T3.NEWOS"; dt.Rows.Add(row);
-            //row = dt.NewRow(); row["DISPLAY"] = "NEWRANDOM0_5UM"; row["VALUE"] = "T3.NEWRANDOM0_5UM"; dt.Rows.Add(row);
-            //row = dt.NewRow(); row["DISPLAY"] = "NEWRANDOM0_7UM"; row["VALUE"] = "T3.NEWRANDOM0_7UM"; dt.Rows.Add(row);
-            //row = dt.NewRow(); row["DISPLAY"] = "NEWRANDOM1UM"; row["VALUE"] = "T3.NEWRANDOM1UM"; dt.Rows.Add(row);
-            //row = dt.NewRow(); row["DISPLAY"] = "NEWRANDOM2UM"; row["VALUE"] = "T3.NEWRANDOM2UM"; dt.Rows.Add(row);
-            //row = dt.NewRow(); row["DISPLAY"] = "NEWRANDOM3UM"; row["VALUE"] = "T3.NEWRANDOM3UM"; dt.Rows.Add(row);
-            //row = dt.NewRow(); row["DISPLAY"] = "NEWRANDOM4UM"; row["VALUE"] = "T3.NEWRANDOM4UM"; dt.Rows.Add(row);
-            //row = dt.NewRow(); row["DISPLAY"] = "NEWRANDOM5UM"; row["VALUE"] = "T3.NEWRANDOM5UM"; dt.Rows.Add(row);
-            //row = dt.NewRow(); row["DISPLAY"] = "NEWRANDOM6UM"; row["VALUE"] = "T3.NEWRANDOM6UM"; dt.Rows.Add(row);
-            //row = dt.NewRow(); row["DISPLAY"] = "NEWRANDOM7UM"; row["VALUE"] = "T3.NEWRANDOM7UM"; dt.Rows.Add(row);
-            //row = dt.NewRow(); row["DISPLAY"] = "NEWRANDOMOS"; row["VALUE"] = "T3.NEWRANDOMOS"; dt.Rows.Add(row);
-            //row = dt.NewRow(); row["DISPLAY"] = "NEWRETICLE"; row["VALUE"] = "T3.NEWRETICLE"; dt.Rows.Add(row);
-            //row = dt.NewRow(); row["DISPLAY"] = "NEWNONRETICLE"; row["VALUE"] = "T3.NEWNONRETICLE"; dt.Rows.Add(row);
-            //row = dt.NewRow(); row["DISPLAY"] = "NEWRANDOMRETICLE"; row["VALUE"] = "T3.NEWRANDOMRETICLE"; dt.Rows.Add(row);
-            //row = dt.NewRow(); row["DISPLAY"] = "NEWCLUSTERDIE"; row["VALUE"] = "T3.NEWCLUSTERDIE"; dt.Rows.Add(row);
-
             SetBinding(dt, dlbXItems, 0, 1);
         }
 

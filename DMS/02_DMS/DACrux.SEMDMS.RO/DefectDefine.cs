@@ -129,18 +129,6 @@ namespace DACrux.SEMDMS.RO
 
         #region [TQD_IMAGES]
 
-        //public void CreateImages(string[] ImageInfo)
-        //{
-        //    try
-        //    {
-        //        m_OBJ.CreateImages(ImageInfo);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw ex;
-        //    }
-        //}
-
 
         #endregion
 

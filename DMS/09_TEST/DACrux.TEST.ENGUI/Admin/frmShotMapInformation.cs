@@ -206,8 +206,6 @@ namespace DACrux.TEST.ENGUI
                 map.ShotStartX = DACrux.Base.Convert.intParse(row["ST_START_X"].ToString());
                 map.ShotStartY = DACrux.Base.Convert.intParse(row["ST_START_Y"].ToString());
 
-                //m_wMap.DieCalculation(true);
-
                 DACrux.TEST.RO.ProbeMapAnalysis oMap = new DACrux.TEST.RO.ProbeMapAnalysis();
 
                 dtMap = oMap.SelectWaferShotMap(strMapID);

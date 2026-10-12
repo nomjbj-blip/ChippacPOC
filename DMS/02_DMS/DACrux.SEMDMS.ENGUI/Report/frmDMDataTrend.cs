@@ -291,7 +291,6 @@ namespace DACrux.SEMDMS.ENGUI
             chartArea.AxisY.MajorGrid.LineWidth = 1;
             chartArea.AxisY.MajorTickMark.Enabled = false;
             chartArea.AxisY.LabelStyle.Enabled = true;
-            //cArea.AxisY.LabelStyle.Format = GetFormat();
             chartArea.AxisY.LabelStyle.Format = "{0:0." + String.Concat(Enumerable.Repeat("0", (int)nudDecimalPlaces.Value)) + "}";
             chartArea.AxisY.ScaleView.SmallScrollSize = double.NaN;
             chartArea.AxisY.ScaleView.Zoomable = true;
@@ -516,9 +515,6 @@ namespace DACrux.SEMDMS.ENGUI
                         fpSpread1_Sheet1.Cells[(rowIdx - iRowSpanCnt) + 1, (int)ColumnIndex.PRODUCT].RowSpan = iRowSpanCnt;
                         fpSpread1_Sheet1.Cells[(rowIdx - iRowSpanCnt) + 1, (int)ColumnIndex.STEP_ID].RowSpan = iRowSpanCnt;
                         fpSpread1_Sheet1.Cells[(rowIdx - iRowSpanCnt) + 1, (int)ColumnIndex.INSPECTION_TIME].RowSpan = iRowSpanCnt;
-                        //fpSpread1_Sheet1.Cells[(rowIdx - iRowSpanCnt) + 1, (int)ColumnIndex.INSPECTOR].RowSpan = iRowSpanCnt;
-                        //fpSpread1_Sheet1.Cells[(rowIdx - iRowSpanCnt) + 1, (int)ColumnIndex.WAFER_ID].RowSpan = iRowSpanCnt;
-                        //fpSpread1_Sheet1.Cells[(rowIdx - iRowSpanCnt) + 1, (int)ColumnIndex.LOT_ID].RowSpan = iRowSpanCnt;
                     }
                 }
 

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Data;
-//using System.Transactions;
 using Miracom.Middleware;
 
 namespace DACrux.TEST.DSL

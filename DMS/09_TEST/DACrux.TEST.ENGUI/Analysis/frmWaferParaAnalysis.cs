@@ -67,22 +67,7 @@ namespace DACrux.TEST.ENGUI
             EventArgs e
             )
         {
-            //try
-            //{
-            //    if (fpSpread1.Sheets[0].RowCount <= 0)
-            //        return;
 
-            //    this.Cursor = Cursors.WaitCursor;
-            //    base.SendToStat((DataTable)fpSpread1.DataSource, cbParaItem.Text);
-            //}
-            //catch (Exception ex)
-            //{
-            //    DspError(ex);
-            //}
-            //finally
-            //{
-            //    this.Cursor = Cursors.Default;
-            //}
         }
 
 
@@ -212,9 +197,7 @@ namespace DACrux.TEST.ENGUI
                 series.SmartLabelStyle.Enabled = true;
                 series.MarkerSize = 6;
                 series.MarkerStyle = MarkerStyle.Circle;
-                //series.Color = Color.Blue;
                 series.BorderWidth = 2;
-                //chart1.Series.Add(series);
             }
 
             chart1.ChartAreas["Default"].AxisX.ScaleView.Zoomable = true;
@@ -270,7 +253,6 @@ namespace DACrux.TEST.ENGUI
             DACrux.Utility.Component.SetSpreadData(dtData, fpSpread1_Sheet1, 100, 0, true, false);
             DACrux.Utility.FPSpreadUtil.VisibleSpreadColumns(fpSpread1_Sheet1, new string[] { "WAFER_SEQ" }, false);
             DACrux.Utility.Component.SetColumnTypeNumber(ref fpSpread1, fpSpread1_Sheet1.ColumnCount - 1, 3);
-            //fpSpread1_Sheet1.RowHeader.Columns[0].Width += 10;
         }
 
         public void ExportExcel()

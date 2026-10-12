@@ -28,14 +28,10 @@ namespace DACrux.BStats.StatDialog
         string m_Ok = "&Ok";
         string m_Cancel = "Cancel";
 
-        //string m_ErrorDiff = "Use a single numeric constant(Test difference).";
         string m_ErrorOneMoreColumn = "Please select one or more column for analysis(1 sample)";
         string m_ErrorTwoMoreColumn = "Please select two or more column for analysis(2 sample)";
         string m_ErrorLengthPaired = "The following must be the same length";
 
-        //string m_QuestionMean = "평균을 입력하지 않으면 Data로 부터 산출된 평균을 검정에 사용합니다.";
-        //string m_QuestionMeanStd = "평균 또는 표준편차을 입력하지 않으면 Data로 부터 산출된 평균 또는 표준편차를 검정에 사용합니다.";
-        //string m_QuestionDifference = "두 그룹간의 차이를 입력하지 않으면 차이를 0으로 두고 검정합니다.";
         string m_QuestionMean = "If you do not input the mean, it will be calculated from data.";
         string m_QuestionMeanStd = "If you do not input the mean or standard deviation, it will be calculated from data.";
         string m_QuestionDifference = "If you do not input the difference, the difference will be zero.";
@@ -386,7 +382,6 @@ namespace DACrux.BStats.StatDialog
         void oDlgOneZ_On_SelectedMethods(SelectedHypothesisTestingMethods oSelected)
         {
             m_Input.Alternative = oSelected.Alternative;
-            //m_Input.TestingDifference = oSelected.TestingDifference;
             m_Input.TestingMean = oSelected.TestingMean;
             m_Input.TestingStd = oSelected.TestingStd;
             m_Input.ConfidenceLevel = oSelected.ConfidenceLevel;
@@ -396,8 +391,6 @@ namespace DACrux.BStats.StatDialog
         {
             m_Input.Alternative = oSelected.Alternative;
             m_Input.TestingDifference = oSelected.TestingDifference;
-            //m_Input.TestingMean = oSelected.TestingMean;
-            //m_Input.TestingStd = oSelected.TestingStd;
             m_Input.ConfidenceLevel = oSelected.ConfidenceLevel;
         }
 
@@ -405,17 +398,13 @@ namespace DACrux.BStats.StatDialog
         {
             m_Input.Alternative = oSelected.Alternative;
             m_Input.TestingDifference = oSelected.TestingDifference;
-            //m_Input.TestingMean = oSelected.TestingMean;
-            //m_Input.TestingStd = oSelected.TestingStd;
             m_Input.ConfidenceLevel = oSelected.ConfidenceLevel;
         }
 
         void oDlgOneT_On_SelectedMethods(SelectedHypothesisTestingMethods oSelected)
         {
             m_Input.Alternative = oSelected.Alternative;
-            //m_Input.TestingDifference = oSelected.TestingDifference;
             m_Input.TestingMean = oSelected.TestingMean;
-            //m_Input.TestingStd = oSelected.TestingStd;
             m_Input.ConfidenceLevel = oSelected.ConfidenceLevel;
         }
 
@@ -496,12 +485,6 @@ namespace DACrux.BStats.StatDialog
                 {
                     lvItem = new ListViewItem("");
 
-                    //if (lstColumnInfo[i].DataType == DataType.NUMBER)
-                    //    lvItem.ImageKey = "NUMBER";
-                    //else if (lstColumnInfo[i].DataType == DataType.TEXT)
-                    //    lvItem.ImageKey = "TEXT";
-                    //else if (lstColumnInfo[i].DataType == DataType.DATETIME)
-                    //    lvItem.ImageKey = "DATETIME";
                     // 숫자형 컬럼만 받도록 수정
 
                     if (lstColumnInfo[i].DataType == DataType.NUMBER)

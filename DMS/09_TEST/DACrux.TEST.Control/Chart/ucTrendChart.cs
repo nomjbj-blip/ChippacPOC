@@ -19,7 +19,6 @@ namespace DACrux.TEST.Control
         public double LSL { get; set; }
 
         DACrux.TEST.Control.PopUpAxisY oYAxis = null;
-        //System.Windows.Forms.DataVisualization.Charting.Cursor cursorx = null;
 
         public ucTrendChart()
         {
@@ -112,12 +111,7 @@ namespace DACrux.TEST.Control
 
                     chart.ChartAreas["Data Chart Area"].AxisX.IntervalType = System.Windows.Forms.DataVisualization.Charting.DateTimeIntervalType.Auto;
                     chart.ChartAreas["Data Chart Area"].AxisX.IntervalOffsetType = System.Windows.Forms.DataVisualization.Charting.DateTimeIntervalType.Auto;
-                    //chart.ChartAreas["Data Chart Area"].AxisX.Interval = 1;
-                    //chart.ChartAreas["Data Chart Area"].AxisX.LabelStyle.Format = "MM-dd HH:mm:ss";
 
-                    //chart.ChartAreas["Data Chart Area"].AxisY.IntervalType = IntervalAutoMode.VariableCount;
-                    //chart.ChartAreas["Data Chart Area"].AxisX.IntervalOffsetType = System.Windows.Forms.DataVisualization.Charting.DateTimeIntervalType.Auto;
-                    //chart.ChartAreas["Data Chart Area"].AxisX.Interval = 1;
                     chart.ChartAreas["Data Chart Area"].AxisY.LabelStyle.Format = "{#.#000}";
 
                     chart.ChartAreas["Data Chart Area"].AxisX.IsLabelAutoFit = true;
@@ -265,11 +259,6 @@ namespace DACrux.TEST.Control
                             continue;
 
                         chart.Series["DataSeries"].Points.AddXY(dtData.Rows[j]["DIE_NUM"], dtData.Rows[j][AxisPara]);
-                        //if (!string.IsNullOrEmpty(dtData.Rows[j]["RESULT"].ToString()))
-                        //{
-                        //    chart.Series["DataSeries"].Points[chart.Series["DataSeries"].Points.Count - 1].MarkerColor = Color.Red;
-                        //    chart.Series["DataSeries"].Points[chart.Series["DataSeries"].Points.Count - 1].MarkerBorderColor = Color.Red;
-                        //}
 
                         if (CheckTrend.Checked)
                         {
@@ -322,14 +311,7 @@ namespace DACrux.TEST.Control
                     chart.ChartAreas["Data Chart Area"].AxisY.Minimum = dChartMin;
                     chart.ChartAreas["Data Chart Area"].AxisY.Maximum = dChartMax;
 
-                    //cursorx = chart.ChartAreas["Data Chart Area"].CursorX;
-
                     //// Set cursor properties 
-                    //cursorx.LineWidth = 1;
-                    //cursorx.LineDashStyle = ChartDashStyle.Solid;
-                    //cursorx.LineColor = Color.Black;
-                    //cursorx.SelectionColor = Color.Yellow;
-                    //cursorx.IsUserEnabled = true;
 
                     //BoxPlot Draw
                     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -422,16 +404,6 @@ namespace DACrux.TEST.Control
 
         private void chart_KeyDown(object sender, KeyEventArgs e)
         {
-            //if (e.KeyCode == Keys.Right)
-            //{
-            //    // Set the new cursor position 
-            //    chart.ChartAreas["Box Chart Area"].CursorX.Position += chart.ChartAreas["Box Chart Area"].CursorX.Interval;
-            //}
-            //else if (e.KeyCode == Keys.Left)
-            //{
-            //    // Set the new cursor position 
-            //    chart.ChartAreas["Box Chart Area"].CursorX.Position -= chart.ChartAreas["Box Chart Area"].CursorX.Interval;
-            //}
         }
 
         private void yAxisMaxMinToolStripMenuItem_Click(object sender, EventArgs e)

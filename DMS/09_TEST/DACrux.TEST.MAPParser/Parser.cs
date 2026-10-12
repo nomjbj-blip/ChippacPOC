@@ -24,7 +24,6 @@ namespace DACrux.TEST.MAPParser
         string strWaferNOValue = string.Empty;
         string strBinCode = string.Empty;
         string strValue = string.Empty;
-        //string key = null;
         string oldProduct = "old";
         string oldRun = "old";
 
@@ -45,7 +44,6 @@ namespace DACrux.TEST.MAPParser
         DataRow drBinSort = null;
 
         int totalcount = 0;
-        //private bool checkRun = false;
 
         static Analysis oAnalysis = null;
         private readonly string strBin = "bin";
@@ -53,14 +51,12 @@ namespace DACrux.TEST.MAPParser
         private readonly string strRun = "Run_ID";
         private readonly string strProduct = "Product";
         private readonly string strFlat = "FlatZone";
-        //private readonly string strFN = "180";
         private readonly string strTotal = "Total";
         private readonly string strWaferNum = "Wafer_Num";
 
         private DateTime dtMakeTime = new DateTime();
         private DateTime dtStartTime = new DateTime();
         private DateTime dtEndTime = new DateTime();
-        //static private bool NonKey = false;
 
         static Log log = new Log();
         DACrux.TEST.DSL.TQP_PROGRAM oProgram = null;
@@ -169,7 +165,6 @@ namespace DACrux.TEST.MAPParser
                 if (!(argument.CusBin.Count == argument.HanaBin.Count))
                 {
                     // 같지 않을 경우 오류 출력 후 파싱을 종료합니다.
-                    //WriteLog(string.Format("[{0, 15}]", "PARSER"), string.Format("[{0, -15}] {1}", "PARSSING FAIL", "변환되어야 할 BIN의 수량이 다릅니다."), argument.LOGPath, 0);
                     throw new Exception(string.Format("{0} [{1}]", "고객사 Map의 Bin 수량과 변환될 HANA Map의 BIN 수량이 다릅니다.", argument.ResultPath));
                 }
 
@@ -203,8 +198,6 @@ namespace DACrux.TEST.MAPParser
                 ////    ParsingForSPCode(ref oAnalysis, ref argument);
                 ////    return;
                 ////}
-
-                //#endregion
 
                 #region [ Validation 체크 후 파싱 시작 ]
 
@@ -321,7 +314,6 @@ namespace DACrux.TEST.MAPParser
                             {
 
                                 string hbin = Utility.ConvertBin(strValue.Substring(start, oAnalysis.CharCount), argument.HanaBin, argument.CusBin);
-                                //string hbin = Utility.CusBinToHanaBin(strValue.Substring(start, oAnalysis.CharCount), argument.HanaBin, argument.CusBin);
                                 sbBin.Append(hbin);
                                 if (!hbin.Equals(".") && !hbin.Equals(" "))
                                 {
@@ -329,13 +321,10 @@ namespace DACrux.TEST.MAPParser
                                     drBinSort["DieID"] = DieID;
                                     drBinSort["Y"] = (binvaluecount == 0 ? binrowcount + 1 : (binrowcount % binvaluecount) + 1);
                                     drBinSort["X"] = (a / oAnalysis.CharCount) + 1;
-                                    //drBinSort["HBin"] = Utility.HanaBinToInt(hbin); //Utility.ConvertBin(strValue.Substring(start, oAnalysis.CharCount), argument.HanaBin, argument.CusBin);
                                     if (hbin == m_strGecBin)
                                     {
                                         goodcnt++;
-                                        //strNumBin = Utility.HanaBinToInt(hbin).ToString();
                                     }
-                                    //drBinSort["Bin"] = Utility.HanaBinToInt(hbin);
                                     drBinSort["CharBin"] = strValue.Substring(start, oAnalysis.CharCount);
                                     drBinSort["SITE"] = "0";
                                     drBinSort["VISUALINSP"] = "0";
@@ -355,7 +344,6 @@ namespace DACrux.TEST.MAPParser
                         {
                             oldProduct = strProductValue;
                             oldRun = strRunValue;
-                            //checkRun = true;
                         }
 
                         WriteLog("Convert START", strProductValue + "   /    " + strWaferValue.Replace("\n", "") + " : " + argument.ResultPath, argument.LOGPath, 2);
@@ -515,7 +503,6 @@ namespace DACrux.TEST.MAPParser
                         }
 
                         dtEndTime = DateTime.Now;
-                        //checkRun = false;
                         dtSort.Clear();
                         strWaferValue = null;
                         binvaluecount += (dtBin.Rows.Count / totalcount);
@@ -584,12 +571,9 @@ namespace DACrux.TEST.MAPParser
                 bUseDBPath = bool.Parse(System.Configuration.ConfigurationManager.AppSettings["UseDBPath"]);
 
                 Log.iLogLevel = iLogLevel;
-                //oMap = new EMS.DA.MAPParser.BSL.HanaMap();
             }
             catch (Exception)
             {
-                //WriteLog(string.Format("[{0, -15}]", "ERROR"), string.Format("[{0, -15}] {1} : {2}", "POSITION", "InitVariable", ex.Message), argument.LOGPath, 0);
-                //WriteLog(string.Format("[{0, -15}]", "ERROR"), string.Format(" {0, -15}  {1}", "", ex.ToString()), argument.LOGPath, 1);
             }
         }
 
@@ -659,20 +643,6 @@ namespace DACrux.TEST.MAPParser
 
                             dt.Reset();
                             dt = null;
-                            //dt = oHana.SelectBin(argValues.strMapseq);
-
-                            //if (dt == null)
-                            //{
-                            //    WriteLog(string.Format("[{0, 15}]", "PARSER"), string.Format("[{0, -15}] {1}", "PARSSING FAIL", "ParsingArgument : SelectBin"), argValues.LOGPath, 0);
-                            //    bResult = false;
-                            //    continue;
-                            //}
-
-                            //foreach (DataRow dr in dt.Rows)
-                            //{
-                            //    argValues.CusBin.Add(dr["FROMBIN"].ToString());
-                            //    argValues.HanaBin.Add(dr["HBIN"].ToString());
-                            //}
 
                             break;
                         case "-C":
@@ -707,10 +677,6 @@ namespace DACrux.TEST.MAPParser
                             // Convert Path
                             argValues.CNVPath = strArgs[i + 1].ToString().Replace("\"", "");
                             break;
-                        //case "-Q":
-                        //    // Queue Path
-                        //    argValues.QueuePath = strArgs[i + 1].ToString();
-                        //    break;
                     }
                 }
 
@@ -767,7 +733,6 @@ namespace DACrux.TEST.MAPParser
                 // 타겟 파일을 인코딩 형식으로 변환하여 저장합니다.
                 oAnalysis.SampleFiles.Add(argValues.ResultPath, Utility.ReadStringFromFile(argValues.ResultPath, oAnalysis.encoding));
                 strValue = oAnalysis.SampleFiles[argValues.ResultPath].Replace(Environment.NewLine, "\n").TrimStart('\n').TrimEnd('\n').Replace("\r", "");
-                //strValue = strValue.Replace(Environment.NewLine, "\n").TrimStart('\n').TrimEnd('\n').Replace("\r", "");
                 WriteLog(string.Format("[{0, 15}]", "PARSER"), string.Format("[{0, -15}] {1}", "ENCODING FILE", oAnalysis.encoding.ToString()), argValues.LOGPath, 2);
 
                 #endregion
@@ -779,10 +744,6 @@ namespace DACrux.TEST.MAPParser
                 // SPR 파일에 정의된 엔터티 별로 정규식을 적용하여 해당 데이터를 추출합니다.
                 for (int i = 0; i < oAnalysis.Entities.Count; i++)
                 {
-                    //if (argValues.strSPCode.ToUpper().Equals("N") &&
-                    //        (oAnalysis.Entities[i].ToString().ToUpper().Equals("BINCODE") ||
-                    //         oAnalysis.Entities[i].ToString().ToUpper().Equals("EOW")))
-                    //    continue;
 
                     if (oAnalysis.Entities[i].ToString().ToUpper().Equals("WAFER_ID") &&
                             string.IsNullOrEmpty(oAnalysis.Entities[strWafer].RegexString) &&
@@ -822,14 +783,6 @@ namespace DACrux.TEST.MAPParser
                     }
                     //HOON
                     // NOKEY 타지 않는다.
-                    //else if (string.IsNullOrEmpty(oAnalysis.Entities[i].RegexValueGroupName))
-                    //{
-                    //    //정규식이 없고 기본 값만 존재할 경우 강제로 WaferID의 위치를 집어 넣음
-                    //    oAnalysis.values.Add(oAnalysis.Entities[i].Name
-                    //                                   , GetCapturesNoKey(strValue
-                    //                                   , oAnalysis.Entities[strWafer].RegexString
-                    //                                   , oAnalysis.Entities[strWafer].RegexOption));
-                    //}
                     else
                     {
                         // 기본값만 존재 &&  WaferID가 없는 경우(특수한 경우 : RunID와 WaferNo의 조합으로 만듦)
@@ -1060,7 +1013,6 @@ namespace DACrux.TEST.MAPParser
                     foreach (string oldstring in temp)
                     {
                         if (String.IsNullOrEmpty(oldstring) == false)
-                            //strTargetContent = strTargetContent.Replace(oldstring, Regex.Replace(oldstring, "[\\.]? [\\.]?", "", regexOptions | RegexOptions.Compiled));
                             strTargetContent = strTargetContent.Replace(oldstring, Regex.Replace(oldstring, " ", "", regexOptions | RegexOptions.Compiled));
                     }
                 }
@@ -1113,7 +1065,6 @@ namespace DACrux.TEST.MAPParser
             for (int i = 0; i < matches.Count; i++)
                 lstCapture.Add(new Token() { Index = matches[i].Index, Length = -1 });
 
-            //NonKey = true;
             return lstCapture;
         }
 
@@ -1128,7 +1079,6 @@ namespace DACrux.TEST.MAPParser
                 int count = 0;
                 foreach (DataRow data in drSort)
                 {
-                    //GetWaferMapInfo(data);
                     #region [ 원본 삭제 예정 ]
                     switch (data[0].ToString().ToLower())
                     {
@@ -1231,7 +1181,6 @@ namespace DACrux.TEST.MAPParser
                     #endregion
                 }
                 WriteLog(string.Format("[{0, 15}]", "PARSER"), string.Format(" {0, -15}  {1}", "", "Bin Code 정의 완료"), argument.LOGPath, 2);
-                //WriteLog("Bin Code 정의 완료", argument.LOGPath, 2);
 
                 // 2012.02.29 삼성 메모리 형태의 신규맵의 추가로 인해 수정
                 if (string.IsNullOrEmpty(strWaferValue))
@@ -1269,7 +1218,6 @@ namespace DACrux.TEST.MAPParser
             try
             {
                 WriteLog(string.Format("[{0, 15}]", "PARSER"), string.Format(" {0, -15}  {1}", "", "Customer Map -> HanaMap 변환"), argument.LOGPath, 2);
-                //WriteLog("Customer Map -> HanaMap 변환", argument.LOGPath, 2);
                 for (int xCnt = 0; xCnt < SamsungBin.Rows.Count; xCnt++)
                 {
                     dr = dt.NewRow();
@@ -1343,7 +1291,6 @@ namespace DACrux.TEST.MAPParser
             StringBuilder Harder = new StringBuilder();
 
             DataView dv1 = new DataView();
-            //DataRow DbBinSort = null;
             string[] strBuilderArr = null;
             int dtCnti = 0;
 
@@ -1401,19 +1348,13 @@ namespace DACrux.TEST.MAPParser
                             if (strBuilderArr[i][j].ToString() == "1")
                                 Goodcnt++;
 
-                            //DbBinSort["Bin"] = Utility.ConvertHBin(strBuilderArr[i][j].ToString());
-                            //DbBinSort["Bin"] = Utility.HanaBinToInt(strBuilderArr[i][j].ToString());
-
-                            //strBuilderSecTempArrChar = strBuilderSecTempArr[i][SBST].ToString() + strBuilderSecTempArr[i][SBST + 1].ToString();
                             DbBinSort["CharBin"] = dv1[DieIDs - 1]["B"];
                             DbBinSort["CNVBin"] = dv1[DieIDs - 1]["B"];
                             DieIDs++;
 
                             dtSort.Rows.Add(DbBinSort);
                         }
-                        //SBST += 1;
                     }
-                    //SBST = 0;
                 }
 
                 string strRef = (Utility.ReferencePoint(strFlatValue, sbBin.ToString()))[0];
@@ -1435,22 +1376,9 @@ namespace DACrux.TEST.MAPParser
                 //----- INSERT----------------------------------------
                 dtStartTime = DateTime.Now;
                 WriteLog(string.Format("[{0, 15}]", "PARSER"), string.Format(" {0, -15}  {1}", "", "Convert & DB Insert START"), argument.LOGPath, 2);
-                //WriteLog("Convert & DB Insert START", argument.LOGPath, 2);
-                //string sLot_Seq = oMap.InsertMap(strProductValue, strWaferValue, strRunValue, strFlatValue, dtSort, /*checkRun*/true, strRef, strXCNT, strYCNT, strFN, strFF, DieNum, argument.strMapseq, argument.strCustCode, Goodcnt, argument.LOGPath);
                 dtEndTime = DateTime.Now;
 
-                //EMS.DA.MAPParser.BSL.Parser psr = new EMS.DA.MAPParser.BSL.Parser();
-                //if (psr.MapDuplicationCheck(sLot_Seq, strWaferValue))
-                //{
-                //    MoveFile("ERROR", argument.ResultPath, argument);
-                //    WriteLog(string.Format("[{0, 15}]", "PARSER"), string.Format(" {0, -15}  {1}", "Move the file", argument.ResultPath), argument.LOGPath, 2);
-                //    oMap.InsertMapResult(dtMakeTime, dtStartTime, dtEndTime, "N", StrWaferID, argument.DBData, argument.ResultPath.Substring(argument.ResultPath.LastIndexOf('\\') + 1), "MAP 수량이 기존 MAP과 다릅니다. 생산관리파트에 문의하시기 바랍니다");
-                //    throw new Exception("MAP 수량이 기존 MAP과 다릅니다. 생산관리파트에 문의하시기 바랍니다");
-                //}
-
-                //oMap.InsertMapResult(dtMakeTime, dtStartTime, dtEndTime, "Y", StrWaferID, argument.DBData, argument.ResultPath.Substring(argument.ResultPath.LastIndexOf('\\') + 1), "");
                 WriteLog(string.Format("[{0, 15}]", "PARSER"), string.Format(" {0, -15}  {1}", "", "Convert & Inser 완료"), argument.LOGPath, 2);
-                //WriteLog("Convert & Inser 완료", argument.LOGPath, 2);
                 StrWaferID = null;
 
 
@@ -1472,7 +1400,6 @@ namespace DACrux.TEST.MAPParser
             {
                 MoveFile("ERROR", argument.ResultPath, argument);
                 dtEndTime = DateTime.Now;
-                //oMap.InsertMapResult(dtMakeTime, dtStartTime, dtEndTime, "N", "", argument.DBData, argument.ResultPath.Substring(argument.ResultPath.LastIndexOf('\\') + 1), "Map format Is different.");
             }
             catch (Exception ex)
             {
@@ -1559,9 +1486,7 @@ namespace DACrux.TEST.MAPParser
                                     strWaferValue = strValue.Substring((int)data[1], (int)data[2]);
                                 else
                                 {
-                                    //count--;
                                 }
-                                //strWaferValue = oAnalysis.Entities[strWafer].DefaultValue;
                                 break;
                             case "run_id":
 
@@ -1611,7 +1536,6 @@ namespace DACrux.TEST.MAPParser
                                         .Replace(strTop, "TOP").Replace(strLeft, "LEFT");
                                 }
                                 else if ((int)data[2] > 0)
-                                    //strFlatValue = strValue.Substring((int)data[1], (int)data[2]);
                                     strFlatValue = (string.IsNullOrEmpty(strBottom) || string.IsNullOrEmpty(strRight) || string.IsNullOrEmpty(strLeft)
                                       || string.IsNullOrEmpty(strTop)) ? strValue.Substring((int)data[1], (int)data[2])
                                       : strValue.Substring((int)data[1], (int)data[2]).Replace(strBottom, "BOTTOM")
@@ -1677,7 +1601,6 @@ namespace DACrux.TEST.MAPParser
                             WriteLog("Error", "변수가 모두 매치되지 않았습니다", argument.LOGPath, 0);
                             return;
                         }
-                        //count = 0;
                         int goodcount = 0;
                         int DieID = 1;
                         for (int binrowcount = binvaluecount; binrowcount < (dtBin.Rows.Count / totalcount) + binvaluecount; binrowcount += oAnalysis.CharCount)
@@ -1686,11 +1609,9 @@ namespace DACrux.TEST.MAPParser
                                 break;
                             int start = (int)dtBin.Rows[binrowcount][1];
 
-                            //binvaluecount = 0;
                             for (int a = 0; a < (int)dtBin.Rows[binrowcount][2]; a++)
                             {
 
-                                //string hbin = Utility.ConvertBin(strValue.Substring(start, oAnalysis.CharCount), argument.HanaBin, argument.CusBin);
                                 string hbin = Utility.CusBinToHanaBin(strValue.Substring(start, oAnalysis.CharCount), argument.HanaBin, argument.CusBin);
                                 sbBin.Append(hbin);
                                 if (!hbin.Equals("."))
@@ -1702,10 +1623,6 @@ namespace DACrux.TEST.MAPParser
                                     drBinSort["HBin"] = hbin; // Utility.ConvertBin(strValue.Substring(start, oAnalysis.CharCount), argument.HanaBin, argument.CusBin);
                                     if (hbin == "1")
                                         goodcount++;
-                                    //drBinSort["Bin"] = strValue.Substring(start, 1);
-
-                                    //drBinSort["Bin"] = Utility.ConvertHBin(hbin);
-                                    //drBinSort["Bin"] = Utility.HanaBinToInt(hbin);
 
                                     drBinSort["CharBin"] = strValue.Substring(start, oAnalysis.CharCount);
                                     drBinSort["CNVBin"] = strValue.Substring(start, oAnalysis.CharCount);
@@ -1714,7 +1631,6 @@ namespace DACrux.TEST.MAPParser
 
                                 }
                                 start++;
-                                //binvaluecount++;
                             }
                             sbBin.Append(Environment.NewLine);
 
@@ -1726,7 +1642,6 @@ namespace DACrux.TEST.MAPParser
                         {
                             oldProduct = strProductValue;
                             oldRun = strRunValue;
-                            //checkRun = true;
                         }
                         WriteLog(strProductValue + "   /    " + strWaferValue.Replace("\n", "") + " : " + argument.ResultPath, "Convert START", argument.LOGPath, 2);
                         //하나맵으로 변환 -> 이동
@@ -1739,13 +1654,11 @@ namespace DACrux.TEST.MAPParser
                         WriteLog(strProductValue + "   /    " + strWaferValue.Replace("\n", "") + " : " + argument.ResultPath, "DB Insert START", argument.LOGPath, 2);
                         dtEndTime = DateTime.Now;
 
-                        //checkRun = false;
                         dtSort.Clear();
                         strWaferValue = null;
                         binvaluecount += (dtBin.Rows.Count / totalcount);
 
 
-                        //dtSort.ImportRow(data);
                     }
 
                 }
@@ -1870,12 +1783,8 @@ namespace DACrux.TEST.MAPParser
                         sWafer = "Wafer_Num";
                 }
 
-                //if ((strData.Length % oAnalysis.values["Wafer_ID"].Count) > 1)
                 if ((strData.Length % oAnalysis.values[sWafer].Count) > 1)
                     return string.Format("ERROR : (Line Count({0}) % {1} Count({2})) > 1", strData.Length, sWafer, oAnalysis.values[sWafer].Count);
-                //if ((oAnalysis.values[EntityString.bin.ToString()].Count % y > 0) && (oAnalysis.Entities[EntityString.Y.ToString()].RegexString != string.Empty))
-                //    return string.Format("ERROR : (Bin Count({0}) % Y({1})) > 0", oAnalysis.values[EntityString.bin.ToString()].Count, y);
-                //iOneWaferRowCNT = strData.Length / oAnalysis.values["Wafer_ID"].Count;
                 iOneWaferRowCNT = strData.Length / oAnalysis.values[sWafer].Count;
 
                 for (int row = 0; row < oAnalysis.Entities.Count; row++)
@@ -2000,7 +1909,6 @@ namespace DACrux.TEST.MAPParser
                 /// Map 부분
                 /// 
                 dt = new DataTable();
-                //ds.Tables.Add();
                 dt.Columns.Add(new DataColumn("X", System.Type.GetType("System.Int32")));
                 dt.Columns.Add(new DataColumn("Y", System.Type.GetType("System.Int32")));
                 dt.Columns.Add(new DataColumn("USECODE", System.Type.GetType("System.Int32")));

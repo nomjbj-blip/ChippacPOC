@@ -36,27 +36,6 @@ namespace DACrux.ProjectManager.UI.Dialog
 
         private void DlgDataViewInsertRemove_KeyDown(object sender, KeyEventArgs e)
         {
-            //switch (e.KeyCode)
-            //{
-            //    case Keys.L:
-            //        type = Type.CELLS;
-            //        rbtCells.Checked = true;
-            //        rbtRow.Checked = false;
-            //        rbtColumn.Checked = false;
-            //        break;
-            //    case Keys.R:
-            //        type = Type.ROW;
-            //        rbtCells.Checked = false;
-            //        rbtRow.Checked = true;
-            //        rbtColumn.Checked = false;
-            //        break;
-            //    case Keys.C:
-            //        type = Type.COLUMN;
-            //        rbtCells.Checked = false;
-            //        rbtRow.Checked = false;
-            //        rbtColumn.Checked = true;
-            //        break;
-            //}
         }
 
         private void btnOk_Click(object sender, EventArgs e)

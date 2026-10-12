@@ -3,7 +3,6 @@ using System.IO;
 using System.Data;
 using System.Globalization;
 using System.Text;
-//using DACrux.Component.Socket;
 
 namespace DACrux.SEMDMS.KtoD
 {
@@ -20,7 +19,6 @@ namespace DACrux.SEMDMS.KtoD
 		private static string m_strUpdateHistFile = string.Empty;
 		public static bool Opened = false;
 		private static string otmLogDttm = string.Empty;
-        //private static DACrux.Component.Socket.SocketClient m_scClient = null;
 
 		public Logging()
 		{
@@ -29,38 +27,10 @@ namespace DACrux.SEMDMS.KtoD
 
 		public static void SocketOpen(string host,int socketport)
 		{
-            //try
-            //{
-            //    m_scClient = new SocketClient();
-            //    m_scClient.Connect(host,socketport);
-            //}
-            //catch(Exception ex)
-            //{
-            //    if(m_scClient != null) m_scClient = null;
-            //    WriteLog(string.Format("Socket Open Error Message : {0}",ex.Message),"ERROR", 0);
-            //}
-            //finally
-            //{
-            //}
 		}
 
 		public static void SocketClose()
 		{
-            //try
-            //{
-            //    if(m_scClient != null)
-            //    {
-            //        m_scClient.Disconnect();
-            //        m_scClient = null;
-            //    }
-            //}
-            //catch(Exception ex)
-            //{
-            //    WriteLog(string.Format("Socket Closs Error Message : {0}",ex.Message),"ERROR", 0);
-            //}
-            //finally
-            //{
-            //}
 		}
 
 		public static void Start(string process_file , string updatehist_file,int loglevel)
@@ -153,17 +123,6 @@ namespace DACrux.SEMDMS.KtoD
 			StreamWriter swLog = null;
 			try
 			{
-                //if(m_scClient !=null && m_scClient.ServerOn && logType == "SENDDATA")
-                //{
-                //    try
-                //    {
-                //        m_scClient.SendData(log);
-                //    }
-                //    catch
-                //    {
-                //    }
-                //    return;
-                //}
 
 				switch(logType)
 				{
@@ -178,8 +137,6 @@ namespace DACrux.SEMDMS.KtoD
 
 				// 로그 파일이 비대하게 커지므로 history.log 파일만 로그남김
 				// 2005-03-30 수정
-//				if(loglevel == 0 && logType == "UPHIST")
-//				{
 					swLog  = new StreamWriter(strWorkFile,true,System.Text.Encoding.Default  );
 					if(writeTime)
 					{
@@ -191,7 +148,6 @@ namespace DACrux.SEMDMS.KtoD
 						swLog.WriteLine(" | {0}",log.PadLeft(dtLoggingTime.ToString("G",DateTimeFormatInfo.InvariantInfo).Length));
 						System.Console.WriteLine(" | {0}",log.PadLeft(dtLoggingTime.ToString("G",DateTimeFormatInfo.InvariantInfo).Length));
 					}
-//				}
 			}
 			catch
 			{
@@ -208,8 +164,6 @@ namespace DACrux.SEMDMS.KtoD
 		}
 		public static void End()
 		{
-            //if(m_scClient != null) m_scClient.Disconnect();
-			//WriteLog("###################################################################",false,"PROC",0);
 			Opened = false;
 		}
 		public static void SetLogLevel(int loglevel)

@@ -977,7 +977,6 @@ namespace DACrux.BStats.Core
                 m_dtDesignList.Columns.Add("LEVEL3", typeof(int));
                 m_dtDesignList.Columns.Add("LEVEL4", typeof(int));
                 m_dtDesignList.Columns.Add("LEVEL5", typeof(int));
-                //dtDesignList.Columns.Add("LEVELM", typeof(int));  // 사용안함
 
                 m_dtDesignList.Rows.Add(new object[] { "단일-수준", "L4", 3, -1, -1, -1 });
                 m_dtDesignList.Rows.Add(new object[] { "단일-수준", "L8", 7, -1, -1, -1 });

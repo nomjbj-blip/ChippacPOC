@@ -813,7 +813,6 @@ namespace DACrux.SEMDMS.Control
             ImageGalleryControl imageCtrl = null;
             if (fpsDefectImages_Sheet1.Cells[rowIdx, colIdx].CellType == null)
             {
-                //fpsDefectImages_Sheet1.Cells[rowIdx, colIdx].Locked = true;
                 string fileName = Path.GetFileNameWithoutExtension(defect.Images[imgID]);
                 imageCtrl = new ImageGalleryControl();
                 imageCtrl.SetImage(defect.Images[imgID]);

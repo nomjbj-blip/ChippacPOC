@@ -58,11 +58,7 @@ namespace DACrux.SEMDMS.ENGUI
             SetBinding(dlbTestArea, GetTestArea(), 0, 0);
 
             //Wafer No 정보 Fix
-            //SetBinding(dlbWaferNo, GetWaferNo(), 0, 0);
 
-            //GetDeviceTestArea();
-
-            //bLoad = true;
         }
 
         private void GetTrendData()
@@ -225,18 +221,6 @@ namespace DACrux.SEMDMS.ENGUI
             ExcelSheet sheet1 = new ExcelSheet();
             ExcelExportArgs e = new ExcelExportArgs();
 
-            //sheet1.SheetName = "Data";
-            //sheet1.Add(fpsCommon);
-            //e.SheetList.Add(sheet1);
-
-            //sheet1 = new ExcelSheet();
-            //sheet1.SheetName = "Chart";
-            //sheet1.Add(chartTrend);
-            //sheet1.Add();
-            //sheet1.Add(chartBox);
-            //e.SheetList.Add(sheet1);
-            
-            //ExcelExportManager.Export(e);
         }
 
         private void SetBinding(
@@ -801,8 +785,6 @@ namespace DACrux.SEMDMS.ENGUI
 
         private void dtStart_ValueChanged(object sender, EventArgs e)
         {
-            //if(bLoad)
-            //    GetDeviceTestArea();
         }
 
         private void legendList1_ShowLabelCheckedChanged(object sender, DataSelecter.ItemCheckedChangedEventArgs e)

@@ -211,7 +211,6 @@ namespace DACrux.TEST.DSL
             string ParaField)
         {
             if (VERSION.Length == 0) VERSION = "V1.0";
-            //object oResult = null;
 
             try
             {
@@ -231,21 +230,6 @@ namespace DACrux.TEST.DSL
                         this.ExecuteScalar("CREATE_PROGRAM_TABLE", new string[] { "TD_" + PROGRAM, ParaField }, null);
                     }
                     catch (Exception) { }
-                    //try
-                    //{
-                    //    this.ExecuteScalar("CREATE_INCUST_AOI_TABLE", new string[] { "T_INCUST_" + PROGRAM }, null);
-                    //}
-                    //catch (Exception) { }
-                    //try
-                    //{
-                    //    this.ExecuteScalar("CREATE_INCUST_AOI_TABLE", new string[] { "T_AOI_" + PROGRAM }, null);
-                    //}
-                    //catch (Exception) { }
-                    //try
-                    //{
-                    //    this.ExecuteScalar("CREATE_PNP_TABLE", new string[] { "T_PNP_" + PROGRAM }, null);
-                    //}
-                    //catch (Exception) { }
 
                     this.ExecuteScalar("CREATE_PROGRAM_TABLE_AVI", new string[] { "T_AVI_" + PROGRAM.Replace("-", "_") }, null);
 
@@ -255,26 +239,10 @@ namespace DACrux.TEST.DSL
                         this.Execute("CREATE_IDX01", new string[] { "TD_" + PROGRAM + "_", "TD_" + PROGRAM }, null);
                     }
                     catch (Exception) { }
-                    //try
-                    //{
-                    //    this.Execute("CREATE_IDX01", new string[] { "T_INCUST_" + PROGRAM + "_", "T_INCUST_" + PROGRAM }, null);
-                    //}
-                    //catch (Exception) { }
-                    //try
-                    //{
-                    //    this.Execute("CREATE_IDX01", new string[] { "T_AOI_" + PROGRAM + "_", "T_AOI_" + PROGRAM }, null);
-                    //}
-                    //catch (Exception) { }
-                    //try
-                    //{
-                    //    this.Execute("CREATE_IDX01", new string[] { "T_PNP_" + PROGRAM + "_", "T_PNP_" + PROGRAM }, null);
-                    //}
-                    //catch (Exception) { }
 
                     this.Execute("CREATE_AVI_IDX01", new string[] { "T_AVI_" + PROGRAM.Replace("-", "_") + "_", PROGRAM.Replace("-", "_") }, null);
                 }
 
-                //if (SiteCnt.Length == 0) SiteCnt = "null";
             }
             catch (Exception ex)
             {
@@ -415,7 +383,6 @@ namespace DACrux.TEST.DSL
             DataTable dt = null;
             try
             {
-                //dt = this.GetDataTable("GET_PCM_MAPDATA", new string[] { utilParametric.REP(PARA), utilParametric.REP(PROGRAM) }, new string[] { WaferSeq });
                 return dt;
             }
             catch (Exception ex)
@@ -447,7 +414,6 @@ namespace DACrux.TEST.DSL
             DataTable dt = null;
             try
             {
-                //dt = this.GetDataTable("GET_PARA_LIST", null, new string[] { utilParametric.REP(PROGRAM) });
                 return dt;
             }
             catch (Exception ex)

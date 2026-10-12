@@ -138,13 +138,6 @@ namespace DACrux.TEST.ENGUI
             {
                 this.Cursor = Cursors.WaitCursor;
 
-                //DACrux.Interface.iDACruxStatContainer IStat = (DACrux.Interface.iDACruxStatContainer)this.MdiParent;
-                //if (IStat != null) IStat.SendToStat((DataTable)fpSpread1.DataSource);
-                //else
-                //{
-                //    IStat = (DACrux.Interface.iDACruxStatContainer)this.ParentForm.MdiParent;
-                //    if (IStat != null) IStat.SendToStat((DataTable)fpSpread1.DataSource);
-                //}
             }
             catch (Exception ex)
             {
@@ -269,15 +262,12 @@ namespace DACrux.TEST.ENGUI
                 
                 for (int i = chartTrend.Series["DUT_YIELD"].Points.Count - 1; i >= 0; i--)
                 {
-                    //Color backColor = DACrux.Utility.Component.GetColor(i);
-                    //chartTrend.Series["DUT_YIELD"].Points[i].Color = backColor;
                     
                     string sTableName = chartTrend.Series["DUT_YIELD"].Points[i].AxisLabel;
                     int nIndex = dsDutData.Tables.IndexOf(sTableName);
                     int nTotalIdx = DACrux.Base.Convert.intParse(sTableName.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries)[1]) - 1;
 
                     chartTrend2.ChartAreas.Add(sTableName);
-                    //chartTrend2.ChartAreas[sTableName].BackColor = Color.FromArgb(100, backColor);
                     chartTrend2.ChartAreas[sTableName].BackGradientStyle = System.Windows.Forms.DataVisualization.Charting.GradientStyle.TopBottom;
                     chartTrend2.ChartAreas[sTableName].BorderColor = System.Drawing.Color.Black;
                     chartTrend2.ChartAreas[sTableName].BorderDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.Solid;

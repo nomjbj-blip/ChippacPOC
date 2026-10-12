@@ -115,7 +115,6 @@ namespace DACrux.TEST.BSL
                 if (rDT_WaferInfo != null && rDT_WaferInfo.Rows.Count > 0)
                 {
                     strTestArea = rDT_WaferInfo.Rows[0]["TESTAREA"].ToString();
-                    //strProduct = rDT_WaferInfo.Rows[0]["PRODUCT"].ToString();
                     strProduct = rDT_WaferInfo.Rows[0]["DEVICE_ALIAS"].ToString();
                     strProgram = rDT_WaferInfo.Rows[0]["PROGRAM"].ToString();
 
@@ -487,18 +486,12 @@ namespace DACrux.TEST.BSL
             TQP_PROGRAM oProgramDSL = null;
             TQP_BINDESC oBindescDSL = null;
             TQP_WAFER_SUM oDSLWaferSum = null;
-            //TQP_MERGERULE oMergeRule = null;
             TQP_PRODUCT oProduct = null;
             TQP_LOT_SUM oDSLLotSum = null;
-            //SEMDMS.DSL.T_DMS_INSP_INFO oInspInfo = null;
-
-            //DataSet ds = null;
-            //bool bUndefine = false;
 
             string strCustomer = null;
             string strProduct = null;
             string strTestArea = null;
-            //string strFormat = null;
             string strLotId = null;
             string strWaferIdForAVI = null;
             string strCopyFlag = null;
@@ -508,31 +501,8 @@ namespace DACrux.TEST.BSL
             //                =
             //@"SELECT *
             //FROM
-            //(
-            //    WITH RT AS (
-            //    SELECT A.*,
-            //           (DECODE(A.CUSTOMER, :customer, 1, 0)
-            //           + DECODE(A.PRODUCT, :product, 10, 0)
-            //           + DECODE(A.TESTAREA, :testarea, 20, 0)
-            //           + DECODE(A.FORMAT, :format, 30, 0)) AS NUM 
-            //        FROM TQP_BINDESC A
-            //        WHERE 1=1
-            //        AND A.CUSTOMER IN (' ', :customer)
-            //        AND A.PRODUCT IN (' ',  :product)
-            //        AND A.TESTAREA IN (' ', :testarea)
-            //        AND A.FORMAT IN (' ', :format)
-            //        )
-            //    SELECT * FROM RT
-            //    WHERE 1=1
-            //    AND NUM = (SELECT MAX(NUM) FROM RT)
-            //    ORDER BY BIN
-            //)";
 
-            //DataTable dtBinDesc = null;
-            //DataTable dtMergeBinDesc = null;
-            //DataTable dtMergeRule = null;
             DataTable dtProduct = null;
-            //DataTable dtDMSProduct = null;
 
             try
             {
@@ -564,8 +534,6 @@ namespace DACrux.TEST.BSL
                     strCustomer = dtProduct.Rows[0]["CUSTOMER"].ToString();
 
                     // Format 검색
-                    //dtDMSProduct = oInspInfo.SelectProduct(strLotId, strTestArea, strWaferIdForAVI);
-                    //strFormat = dtDMSProduct.Rows[0]["FORMAT"].ToString();
                 }
                 else
                 {
@@ -573,9 +541,7 @@ namespace DACrux.TEST.BSL
                     strLotId = dsWaferSum.Rows[0]["LOT_ID"].ToString();
                     strTestArea = dsWaferSum.Rows[0]["TESTAREA"].ToString();
                     strCustomer = dsWaferSum.Rows[0]["CUSTOMER"].ToString();
-                    //strCopyFlag = dsWaferSum.Tables[0].Rows[0]["COPY_DATA"].ToString();
                     strProduct = PROGRAM;
-                    //strFormat = " ";
                 }
 
                 // Get DB Table Name =========================================================================================
@@ -584,97 +550,25 @@ namespace DACrux.TEST.BSL
                 string Program = PROGRAM.ToUpper().Replace("-", "_").Replace(".", "_").Replace(" ", "");
                 if (strTestArea.Contains("MERGE"))
                 {
-                    //DataTable dtTestArea = oTestArea.SelectTestArea(strTestArea);
-                    //strTableName = dtTestArea.Rows[0]["SAVE_TABLE"].ToString().Replace("%", Program);
                 }
 
-                //else if (strTestArea != "PROBETEST" && strTestArea != "MULTIPROBE")
-                //    strTableName = string.Format("T_{0}_{1}", strTestArea, Program);
-                //else
                 strTableName = "TD_" + Program;
 
                 // Get Info By Dynamic Query =========================================================================
                 // MERGE, AOI(COPY), VI의 PROBETEST 는 이쪽을 사용
                 if (strTestArea.Contains("MERGE") || (strTestArea == "AOI" && strCopyFlag == "T"))//  || (strTestArea == "PROBETEST" && bVI))
                 {
-                    //string Dynamic_bindesc = string.Empty;
-                    //string Dynamic_total = string.Empty;
-
-                    //string TestArea = string.Empty;
-                    //string TestAreaDesc = string.Empty;
-
-                    //if (strTestArea == "AOI")
-                    //{
-                    //    DataTable dtLot = oDSLLotSum.SelectLotInfoByLotIDExcludeFinal(strLotId);
-                    //    strTestArea = dtLot.Rows[0]["TESTAREA"].ToString();
-                    //}
-
-                    //if (bVI)
-                    //    dtMergeRule = oMergeRule.SelectMergeRuleByRuleName(strCustomer, strProduct, "CP_MERGE");
-                    //else
-                    //dtMergeRule = oMergeRule.SelectMergeRuleByRuleName(strCustomer, strProduct, strTestArea);
-
-                    //if (dtMergeRule == null || dtMergeRule.Rows.Count < 1)
-                    //    throw new Exception(string.Format("MergeRule is not Exist strCustomer Customer : {0}, Product : {1}, TestArea : {2}", strCustomer, strProduct, strTestArea));
-
-                    //for (int i = 0; i < dtMergeRule.Rows.Count; i++)
-                    //{
-                    //    Dynamic_bindesc = DynamicQuery_BinDESC;
-
-                    //    TestArea = dtMergeRule.Rows[i]["RULE_VALUE"].ToString();
-                    //    DataTable dtTestArea = oTestArea.SelectAreaGroup(TestArea);
-                    //    TestAreaDesc = dtTestArea.Rows[0][0].ToString();
-                    //     Format
-                    //    DataTable dtWaferSumList = oDSLWaferSum.GetWaferInfoListByTestArea(TestArea, strLotId);
-                    //    if (TestAreaDesc != "AVI")
-                    //        strFormat = dtWaferSumList.Rows[0]["FORMAT"].ToString() == null ? " " : dtWaferSumList.Rows[0]["FORMAT"].ToString();
-                    //    else
-                    //        strFormat = " ";
-
-                    //    if (i > 0)
-                    //        Dynamic_total += "UNION \n";
-
-                    //    Dynamic_bindesc = Dynamic_bindesc.Replace(":customer", string.Format("'{0}'", strCustomer));
-                    //    Dynamic_bindesc = Dynamic_bindesc.Replace(":product", string.Format("'{0}'", strProduct));
-                    //    Dynamic_bindesc = Dynamic_bindesc.Replace(":testarea", string.Format("'{0}'", TestArea));
-                    //    Dynamic_bindesc = Dynamic_bindesc.Replace(":format", string.Format("'{0}'", strFormat));
-
-                    //    Dynamic_total += Dynamic_bindesc + "\n";
-                    //    Dynamic_total += "UNION \n";
 
                     //     VI input
-                    //    if (TestAreaDesc == "AVI")
-                    //        TestArea = "VI_AVI";
-                    //    else
-                    //        TestArea = "VI_" + TestArea;
-
-                    //    Dynamic_bindesc = DynamicQuery_BinDESC;
-
-                    //    Dynamic_bindesc = Dynamic_bindesc.Replace(":customer", string.Format("'{0}'", strCustomer));
-                    //    Dynamic_bindesc = Dynamic_bindesc.Replace(":product", string.Format("'{0}'", strProduct));
-                    //    Dynamic_bindesc = Dynamic_bindesc.Replace(":testarea", string.Format("'{0}'", TestArea));
-                    //    Dynamic_bindesc = Dynamic_bindesc.Replace(":format", "' '");
-
-                    //    Dynamic_total += Dynamic_bindesc + "\n";
-                    //}
-
-                    //ds = oProgramDSL.GetBinDistributionByAllBoth(Dynamic_total, strTableName, WaferSeq);
 
                     // ProbeTest 의 VI 는 해당 Wafer 에 쓰일 모든 BIN 과 COLOR를 가져온다.
-                    //if (strTestArea == "PROBETEST" && bVI)
-                    //{
-                    //    ds = oProgramDSL.GetBinDistributionForProbeVI(Dynamic_total);
-                    //}
                 }
                 else
                 {
                     // Get BinDesc Args ======================================================================================================
-                    //dtBinDesc = oCommon.SelectBinByAllAtOnce(ref strCustomer, ref strProduct, ref strTestArea, ref strFormat);
 
                     if (strTestAreaGroup == "AVI" && bVI)
                     {
-                        //
-                        //ds = oProgramDSL.getBinDistributionForAVI(strCustomer, strProduct, strTestArea, strFormat, strLotId, strWaferIdForAVI);
 
                     }
                     else
@@ -918,15 +812,6 @@ namespace DACrux.TEST.BSL
                 if (dtTemp == null || dtTemp.Rows.Count <= 0)
                     throw new Exception("Map Define 정보를 불러오지 못했습니다.");
 
-                //dtTemp = oMapDef.GetMapDef(strProduct);
-                //if (dtTemp == null || dtTemp.Rows.Count <= 0)
-                //{
-                //    //Map Define 정보가 없을 경우 Logic 으로 임의로 만들어 준다. 
-                //    dtTemp = dtMapDefine(iYmax, iXmax, iXmin, iYmin);
-                //    if (dtTemp == null || dtTemp.Rows.Count <= 0)
-                //        throw new Exception("Map Define 정보를 불러오지 못했습니다.");
-                //}
-
                 dtTemp.TableName = "RECIPE";
                 dsData.Tables.Add(dtTemp.Copy());
 
@@ -957,7 +842,6 @@ namespace DACrux.TEST.BSL
 
                             // GetDataTable 호출시 "산술 연산으로 인해 오버클로가 발생 되었습니다." 해당 메시지 발생
                             // GetDataTable_Numeric_IgnoreException로 수정
-                            //dtPara = oParaSepc.GetData("SELECT_PARA_NOT_EMPTY", new string[] { string.Join(",", lsItem.ToArray()), sQuery.ToString(), string.Join(",", lsItem.ToArray()) }, null);
                             dtPara = oParaSepc.GetParameterNotEmpty(lsItem.ToArray(), sQuery.ToString());
                             foreach (DataRow dr in dtPara.Rows)
                             {
@@ -979,7 +863,6 @@ namespace DACrux.TEST.BSL
                     {
                         // GetDataTable 호출시 "산술 연산으로 인해 오버클로가 발생 되었습니다." 해당 메시지 발생
                         // GetDataTable_Numeric_IgnoreException로 수정
-                        //dtPara = oParaSepc.GetData("SELECT_PARA_NOT_EMPTY", new string[] { string.Join(",", lsItem.ToArray()), sQuery.ToString(), string.Join(",", lsItem.ToArray()) }, null);
                         dtPara = oParaSepc.GetParameterNotEmpty(lsItem.ToArray(), sQuery.ToString());
                         foreach (DataRow dr in dtPara.Rows)
                         {
@@ -1142,20 +1025,10 @@ namespace DACrux.TEST.BSL
                 if (dtTemp == null || dtTemp.Rows.Count <= 0)
                     throw new Exception("Map Define 정보를 불러오지 못했습니다.");
 
-                //dtTemp = oMapDef.GetMapDef(strProduct);
-                //if (dtTemp == null || dtTemp.Rows.Count <= 0)
-                //{
-                //    //Map Define 정보가 없을 경우 Logic 으로 임의로 만들어 준다. 
-                //    dtTemp = dtMapDefine(iYmax, iXmax, iXmin, iYmin);
-                //    if (dtTemp == null || dtTemp.Rows.Count <= 0)
-                //        throw new Exception("Map Define 정보를 불러오지 못했습니다.");
-                //}
-
                 dtTemp.TableName = "RECIPE";
                 dsData.Tables.Add(dtTemp.Copy());
 
                 //Parameter 관련 정보를 가져온다.
-                //dtTemp = oParaSepc.GetData("SELECT_PARA_ITEM", null, new string[] { strProgram, WaferSeq.ToString() });
                 dtTemp = oParaSepc.GetParameterItemByMultiWafers(strProgram, WaferSeq);
                 if (dtTemp != null && dtTemp.Rows.Count > 0)
                 {
@@ -1182,7 +1055,6 @@ namespace DACrux.TEST.BSL
 
                             // GetDataTable 호출시 "산술 연산으로 인해 오버클로가 발생 되었습니다." 해당 메시지 발생
                             // GetDataTable_Numeric_IgnoreException로 수정
-                            //dtPara = oParaSepc.GetData("SELECT_PARA_NOT_EMPTY", new string[] { string.Join(",", lsItem.ToArray()), sQuery.ToString(), string.Join(",", lsItem.ToArray()) }, null);
                             dtPara = oParaSepc.GetParameterNotEmpty(lsItem.ToArray(), sQuery.ToString());
                             foreach (DataRow dr in dtPara.Rows)
                             {
@@ -1204,7 +1076,6 @@ namespace DACrux.TEST.BSL
                     {
                         // GetDataTable 호출시 "산술 연산으로 인해 오버클로가 발생 되었습니다." 해당 메시지 발생
                         // GetDataTable_Numeric_IgnoreException로 수정
-                        //dtPara = oParaSepc.GetData("SELECT_PARA_NOT_EMPTY", new string[] { string.Join(",", lsItem.ToArray()), sQuery.ToString(), string.Join(",", lsItem.ToArray()) }, null);
                         dtPara = oParaSepc.GetParameterNotEmpty(lsItem.ToArray(), sQuery.ToString());
                         foreach (DataRow dr in dtPara.Rows)
                         {
@@ -1313,9 +1184,6 @@ namespace DACrux.TEST.BSL
 
                 dtTemp.TableName = "BIN_INFO";
                 dsData.Tables.Add(dtTemp.Copy());
-
-                //if (strTestArea == "AVI")
-                //    throw new Exception("AVI 또는 Scope Map 은 해당 화면에서 사용할 수 없습니다.");
 
                 // Table 및 Colums 정보를 기준으로 Test Data 를 가져온다.
                 dtTemp = oProgram.GetData("GET_MAP_TABLES", null, new string[] { strProgram });
@@ -1626,7 +1494,6 @@ namespace DACrux.TEST.BSL
                 dtTable.Columns.Add(new DataColumn("FIRST_INDEX_Y", typeof(int)));
                 dtTable.Columns.Add(new DataColumn("EDGE_SIZE", typeof(decimal)));
                 dtTable.Columns.Add(new DataColumn("ANGLE", typeof(int)));
-                //dtTable.Columns.Add(new DataColumn("NETDIE", typeof(int)));
                 dtTable.Columns.Add(new DataColumn("NOTCH_TYPE", typeof(int)));
                 dtTable.Columns.Add(new DataColumn("DIE_INDEX_MIN_X", typeof(int)));
                 dtTable.Columns.Add(new DataColumn("DIE_INDEX_MAX_X", typeof(int)));
@@ -2061,18 +1928,14 @@ namespace DACrux.TEST.BSL
                     switch (strDir)
                     {
                         case "LL":
-                            //IndexX = IndexX;
-                            //IndexY = IndexY;
                             break;
                         case "TL":
                             if (rotate == 270 || rotate == 90)
                             {
-                                //IndexX = IndexX;
                                 IndexY = (xmax + xmin - IndexY);
                             }
                             else
                             {
-                                //IndexX = IndexX;
                                 IndexY = (ymax + ymin - IndexY);
                             }
                             break;
@@ -2092,12 +1955,10 @@ namespace DACrux.TEST.BSL
                             if (rotate == 270 || rotate == 90)
                             {
                                 IndexX = (ymax + ymin - IndexX);
-                                //IndexY = IndexY;
                             }
                             else
                             {
                                 IndexX = (xmax + xmin - IndexX);
-                                //IndexY = IndexY;
                             }
                             break;
                     }
@@ -2561,24 +2422,6 @@ namespace DACrux.TEST.BSL
         }
 
 
-        //public System.Data.DataTable GetUserMapConfig(string strUserID, string strCategory = "")
-        //{
-        //    TQD_CONFIG_USER oUserConfig = null;
-
-        //    try
-        //    {
-        //        oUserConfig = new TQD_CONFIG_USER();
-        //        //=================================================================================================================================
-        //        // 사용자별 Map User Config 정보를 가져 온다.
-        //        //=================================================================================================================================
-        //        return oUserConfig.GetData("SELECT_CONFIG_USER_03", null, new string[] { strUserID, strCategory });
-        //    }
-        //    finally
-        //    {
-
-        //    }
-        //}
-
         public DataTable GetMapConfigWaferList(string strStartTime, string strEndTime, string strTestArea, string strDevice, string strProgram)
         {
             TQP_WAFER_SUM oTQP_WAFER_SUM = new TQP_WAFER_SUM();
@@ -2722,18 +2565,14 @@ namespace DACrux.TEST.BSL
                             switch (OldDir)
                             {
                                 case "LL":
-                                    //IndexX = IndexX;
-                                    //IndexY = IndexY;
                                     break;
                                 case "TL":
                                     if (OldRotate == 270 || OldRotate == 90)
                                     {
-                                        //IndexX = IndexX;
                                         IndexY = (xmax + xmin - IndexY);
                                     }
                                     else
                                     {
-                                        //IndexX = IndexX;
                                         IndexY = (ymax + ymin - IndexY);
                                     }
                                     break;
@@ -2753,12 +2592,10 @@ namespace DACrux.TEST.BSL
                                     if (OldRotate == 270 || OldRotate == 90)
                                     {
                                         IndexX = (ymax + ymin - IndexX);
-                                        //IndexY = IndexY;
                                     }
                                     else
                                     {
                                         IndexX = (xmax + xmin - IndexX);
-                                        //IndexY = IndexY;
                                     }
                                     break;
                             }
@@ -2812,11 +2649,8 @@ namespace DACrux.TEST.BSL
                         switch (Dir)
                         {
                             case "LL":
-                                //IndexX = IndexX;
-                                //IndexY = IndexY;
                                 break;
                             case "TL":
-                                //IndexX = IndexX;
                                 IndexY = (ymax + ymin - IndexY);
                                 break;
                             case "TR":
@@ -2825,7 +2659,6 @@ namespace DACrux.TEST.BSL
                                 break;
                             case "LR":
                                 IndexX = (xmax + xmin - IndexX);
-                                //IndexY = IndexY;
                                 break;
                         }
 
@@ -3037,7 +2870,6 @@ namespace DACrux.TEST.BSL
 
                             // GetDataTable 호출시 "산술 연산으로 인해 오버클로가 발생 되었습니다." 해당 메시지 발생
                             // GetDataTable_Numeric_IgnoreException로 수정
-                            //dtPara = oParaSepc.GetData("SELECT_PARA_NOT_EMPTY", new string[] { string.Join(",", lsItem.ToArray()), sQuery.ToString(), string.Join(",", lsItem.ToArray()) }, null);
                             dtPara = oParaSepc.GetParameterNotEmpty(lsItem.ToArray(), sQuery.ToString());
                             foreach (DataRow dr in dtPara.Rows)
                             {
@@ -3059,7 +2891,6 @@ namespace DACrux.TEST.BSL
                     {
                         // GetDataTable 호출시 "산술 연산으로 인해 오버클로가 발생 되었습니다." 해당 메시지 발생
                         // GetDataTable_Numeric_IgnoreException로 수정
-                        //dtPara = oParaSepc.GetData("SELECT_PARA_NOT_EMPTY", new string[] { string.Join(",", lsItem.ToArray()), sQuery.ToString(), string.Join(",", lsItem.ToArray()) }, null);
                         dtPara = oParaSepc.GetParameterNotEmpty(lsItem.ToArray(), sQuery.ToString());
                         foreach (DataRow dr in dtPara.Rows)
                         {

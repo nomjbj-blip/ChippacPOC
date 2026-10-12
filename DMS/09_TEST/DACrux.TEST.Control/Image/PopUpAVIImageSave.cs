@@ -44,16 +44,6 @@ namespace DACrux.TEST.Control.Image
             }
 
 
-            //if (m_ModifyDies == null || m_ModifyDies.Count <= 0)
-            //    return;
-
-            //foreach (DACrux.Base.Die oDie in m_ModifyDies)
-            //{
-            //    DACrux.TEST.Control.Image.TPUAVIImage oForm =
-            //        new DACrux.TEST.Control.Image.TPUAVIImage(oDie.ScopeImageLocal, oDie.IndexX.ToString(), oDie.IndexY.ToString(), oDie.BinNumber.ToString());
-
-            //    ControlAdd(oForm);
-            //}
         }
 
         private void ControlAdd(DACrux.TEST.Control.Image.TPUAVIImage container)
@@ -92,7 +82,6 @@ namespace DACrux.TEST.Control.Image
                 if (m_ModifyDies == null || m_ModifyDies.Count <= 0)
                     return;
 
-                //DACrux.TEST.RO.DataSelect oData = new DACrux.TEST.RO.DataSelect();
                 ComConfiguration obj = new ComConfiguration();
                 DataTable dtConfig = obj.GetAVIImageFTPInfo();
                 if (dtConfig == null || dtConfig.Rows.Count <= 0)

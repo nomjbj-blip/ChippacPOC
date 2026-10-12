@@ -29,12 +29,9 @@ namespace DACrux.BStats.Core
         string m_AdjRSquare = "Adj.R-Square";
         string m_RootMse = " Root(MS Error)";
         string m_Source = "Source";
-        //string m_Estimates = "Estimates";
-        //string m_StandardError = "StandardError";
         string m_T = "T";
         string m_Pvalue = "P-Value";
         string m_ObsNumber = "OBS-No";
-        //string m_Response = "Response";
         string m_Predictors = "Predictors";
         string m_Fit = "Fit";
         string m_Residual = "Residual";
@@ -44,7 +41,6 @@ namespace DACrux.BStats.Core
         string m_CorrectedTotal = "Corrected Total";
         #region 계수에 대한 출력
         string m_CoefficientsTitle = "Table of Coefficients";
-        //string m_Constant = "Constant";
         string m_Coef = "Coef";
         string m_SECoef = "SE Coef";
         #endregion
@@ -467,7 +463,6 @@ namespace DACrux.BStats.Core
                     if (!arrReturn.Contains(arrayB[i]))
                         arrReturn.Add(arrayB[i]);
                 }
-                //arrReturn.TrimExcess();
                 arrReturn.Sort();
                 return arrReturn.ToArray();
             }
@@ -763,7 +758,6 @@ namespace DACrux.BStats.Core
                         dtTemp.AcceptChanges();
                         dsReturn.Tables.Add(dtTemp.Copy());
                     }
-                    //dtTemp.Dispose();
                     dtTemp = null;
                 }
                 if (oOption.IsGraphResidualsVsFittedValues)
@@ -814,7 +808,6 @@ namespace DACrux.BStats.Core
                 }
 
 
-                //dsReturn.Tables.Add(dtTemp.Copy());
                 return dsReturn;
             }
             catch (Exception ex)
@@ -964,7 +957,6 @@ namespace DACrux.BStats.Core
                     strMSR = "*";
                 else
                     strMSR = Convert.ToString(Math.Round(Math.Sqrt(oAnova.MeanSquaredResidual), m_iDecimalOuter));
-                    //strMSR = Convert.ToString(Math.Round(oAnova.MeanSquaredResidual, m_iDecimalOuter));
                 dtReturn.Rows.Add(new object[] {strRs, strAdjRs, strMSR });
                 dtReturn.AcceptChanges();
                 return dtReturn;
@@ -1007,7 +999,6 @@ namespace DACrux.BStats.Core
                     arrResult = dtObs.Select("[" + dtObs.Columns[0].ColumnName + "] = '" + ((int)(i + 1)).ToString() + "'");
                     if (arrResult.Length == 1)
                     {
-                        //dtReturn.Rows.Add(new object[] { arrResult[0][0], arrResponse[iObsRow], Math.Round(Convert.ToDouble(arrFit[iObsRow]), m_iDecimalOuter), Math.Round(Convert.ToDouble(arrResidual[iObsRow]), m_iDecimalOuter), Math.Round(Convert.ToDouble(arrResidual[iObsRow]) / dblDeNumCoeff, m_iDecimalOuter) });
                         if (double.IsInfinity(dblDeNumCoeff))
                             dtReturn.Rows.Add(new object[] { arrResult[0][0], dtOrgin.Rows[i][strResponse], Convert.ToDouble(arrFit[iObsRow]), Convert.ToDouble(arrResidual[iObsRow]), "*" });
                         else
@@ -1544,7 +1535,6 @@ namespace DACrux.BStats.Core
             DataFrame dfAllPredictors = null;
 
             LinearRegression lrNormal = null; //회귀분석
-            // LinearRegressionAnova anovaNormal = null;  //회귀분석에 대한 분산분석
 
             //new
             int iColCnt;  //Source's columns count
@@ -1799,7 +1789,6 @@ namespace DACrux.BStats.Core
         private ResultRegression RegressionAnalysis(DataTable dtSource, int iResponse, int[] arrPredictors, int[] arrMappingGraph, bool bIntercept, SelectedRegressionOptions oOption, DataTable dtObs, DataTable dtOrgin)
         {
             DataFrame df = null;
-            //DoubleMatrix dm = null;
 
             #region Result
             LinearRegression lrNormal = null; //회귀분석
@@ -1841,7 +1830,6 @@ namespace DACrux.BStats.Core
                 #endregion
 
                 df = new DataFrame(dtSource);
-                //dm = new DoubleMatrix(dtSource);
 
                 #region 필요없는 열 삭제
                 arrRemoveCols = new List<int>(iColCnt - (1 + iPredictorsCnt));
@@ -1877,11 +1865,7 @@ namespace DACrux.BStats.Core
                     arrResiduals[i] = Math.Round(arrResiduals[i], iResidualsDecimal);
                 arrPredictorsName = GetPredictorsName(dtSource, arrPredictors, bIntercept);
                 arrResponse = lrNormal.Observations.ToArray();
-                //arrFit = GetSumArray(arrResponse, arrResiduals);
                 arrFit = lrNormal.PredictedObservations(lrNormal.PredictorMatrix).ToArray();  //김현태 윗줄과 비해 볼것!!
-                //for (int i = 0; i < arrFit.Length; i++)
-                //    arrFit[i] = Math.Round(arrFit[i], iResponseDecimal);
-
 
                 oReturn = new ResultRegression();
                 
@@ -1909,7 +1893,6 @@ namespace DACrux.BStats.Core
         private void RegressionAnalysis(DataTable dtSource, string strResponse, string[] arrPredictors, bool bIntercept)
         {
             DataFrame df = null;
-            //DoubleMatrix dm = null;
 
             LinearRegression lrNormal = null; //회귀분석
             LinearRegressionAnova anovaNormal = null;  //회귀분석에 대한 분산분석
@@ -1937,7 +1920,6 @@ namespace DACrux.BStats.Core
                 #endregion
 
                 df = new DataFrame(dtSource);
-                //dm = new DoubleMatrix(dtSource);
 
                 #region 필요없는 열 삭제
                 arrRemoveCols = new List<int>(iColCnt - (1 + iPredictorsCnt));
@@ -1956,12 +1938,6 @@ namespace DACrux.BStats.Core
                 lrNormal = new LinearRegression(df, df.IndexOfColumn(strResponse), bIntercept);
                 anovaNormal = new LinearRegressionAnova(lrNormal);
                 #region TEST
-                /*
-                lrNormal.RemovePredictor(2);
-                lrNormal.RecalculateParameters();
-                lrNormal.AddPredictor(((IDFColumn)df[3]).ToDoubleVector());
-                lrNormal.RecalculateParameters();
-                 */
                 #endregion
 
             }

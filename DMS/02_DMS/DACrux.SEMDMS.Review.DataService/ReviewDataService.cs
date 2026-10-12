@@ -106,7 +106,6 @@ namespace DACrux.SEMDMS.Review.DataService
                             }
 
                             // TQD_DEFECT은 삭제하지 않고 계속 APPEND 한다.
-                            //oReview.DeleteDefectImage(stepseq, waferseq);
 
                             if (arr != null && arr.GetLength(0) > 0)
                             {

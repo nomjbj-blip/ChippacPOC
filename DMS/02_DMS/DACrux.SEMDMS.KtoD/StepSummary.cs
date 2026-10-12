@@ -70,12 +70,10 @@ namespace DACrux.SEMDMS.KtoD
 			catch(Exception ex)
 			{
 				Logging.WriteLog(string.Format("Defect Type Count Fail. [ERROR:{0}]",ex.Message),"PROC",0);
-				//ContextUtil.SetAbort();
 				throw this.ProcessErr(ex);
 			}
 			finally
 			{
-				//ContextUtil.SetComplete();
 				oYesDCount.Dispose();
 			}
 		}
@@ -183,7 +181,6 @@ namespace DACrux.SEMDMS.KtoD
 			{
 				Logging.WriteLog(ex.Message,"ERROR",3);
 				Logging.WriteLog(string.Format("EDB Send XML File Write Fail [ERROR:{0}].\n\r\t\tData Upload Success, this Error skip.",ex.Message),"PROC",0);
-				//throw this.ProcessErr(ex);  //Error 무시되어야 함
 			}
 			finally
 			{

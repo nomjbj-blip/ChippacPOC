@@ -106,7 +106,6 @@ namespace DACrux.SEMDMS.Inspection.DataService
                 //END: KLARITY 임시 로직 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
                 // 데이터 파싱 처리
-                //WriteLog("Step -", "Data Parsing Start");
                 handler.LogMethod = WriteLog;
                 handler.Run();
 
@@ -182,8 +181,6 @@ namespace DACrux.SEMDMS.Inspection.DataService
                             #region [Step 01 : TQD_SETUP 확인 생성]
 
                             // MAP 존재여부 및 저장 시에는 8자리로 변환한 STEP ID를 사용하지 않고 KLARF 파일에서 올라온 STEP ID를 사용한다. 2019.12.06 Taihi,Kim.
-                            //WriteLog("Step 01", "TQD_SETUP 확인 생성");
-                            //WriteLog("-", string.Format("SetupID : {0}, SetupTimestamp : {1}", parser.SetupID, parser.SetupTimestamp.ToString("yyyyMMddHHmmss")));
                             SetupSeq = oDefectDefine.GetSetupDuplicate(parser.SetupID, parser.StepID, parser.SetupTimestamp.ToString("yyyyMMddHHmmss"));
                             if (SetupSeq < 0)
                             {
@@ -207,13 +204,11 @@ namespace DACrux.SEMDMS.Inspection.DataService
                                 if (SetupSeq < 0)
                                     throw new Exception("TQD_SETUP 생성 실패");
                             }
-                            //WriteLog("Setup Seq", SetupSeq.ToString());
 
                             #endregion
 
                             #region [Step 02 : TQD_SETUP_MAP 확인 생성]
 
-                            //WriteLog("Step 02 ", "TQD_SETUP_MAP 확인 생성");
                             oIndex = new List<System.Drawing.Point>();
                             foreach (var oData in wafer.TestList)
                             {
@@ -241,8 +236,6 @@ namespace DACrux.SEMDMS.Inspection.DataService
 
                             #region [Step 03 : TQD_PRODUCT 확인 생성]
 
-                            //WriteLog("Step 03", "TQD_PRODUCT 확인 생성");
-                            //WriteLog("-", string.Format("DeviceID : {0}", parser.DeviceID));
                             dtTemp = oDefectDefine.GetProductInfo(parser.DeviceID);
                             if (dtTemp == null || dtTemp.Rows.Count <= 0)
                             {
@@ -268,8 +261,6 @@ namespace DACrux.SEMDMS.Inspection.DataService
 
                             #region [Step 04 : TQD_LOT 확인 생성]
 
-                            //WriteLog("Step 04", "TQD_LOT 확인 생성");
-                            //WriteLog("-", string.Format("LotID : {0}", parser.LotID));
                             strDBData = new string[Enum.GetNames(typeof(TQD_LOT)).Length];
                             strDBData[(int)TQD_LOT.LOT_ID] = parser.LotID;         //LOT ID		
                             strDBData[(int)TQD_LOT.PRODUCT] = parser.DeviceID;	   //PRODUCT
@@ -286,14 +277,11 @@ namespace DACrux.SEMDMS.Inspection.DataService
                                 if (LotSeq < 0)
                                     throw new Exception("TQD_LOT 생성 실패");
                             }
-                            //WriteLog("LotSeq", LotSeq.ToString());
 
                             #endregion
 
                             #region [Step 05 : TQD_WAFER 확인 생성]
                             //////////////////////////////////////////////////////////////////////////////////////////////
-                            //WriteLog("Step 05", "TQD_WAFER 확인 생성");
-                            //WriteLog("-", string.Format("WaferID : {0}, Slot : {1}", wafer.WaferID, wafer.Slot));
                             strDBData = new string[Enum.GetNames(typeof(TQD_WAFER)).Length];
                             strDBData[(int)TQD_WAFER.LOT_SEQ] = LotSeq.ToString();      // LOT_SEQ  
                             strDBData[(int)TQD_WAFER.WAFER_ID] = wafer.WaferID;         // WAFER_ID 
@@ -315,8 +303,6 @@ namespace DACrux.SEMDMS.Inspection.DataService
 
                             #region [Step 06 : TQD_STEP 확인 생성]
 
-                            //WriteLog("Step 06", "TQD_STEP 확인 생성");
-                            //WriteLog("-", string.Format("StepID : {0}, Equip : {1}, ResultTimestamp : {2}", strStepID, parser.Equip, parser.ResultTimestamp.ToString("yyyyMMddHHmmss")));
                             //Step 정보 조회 및 생성
                             strDBData = new string[Enum.GetNames(typeof(TQD_STEP)).Length];
                             strDBData[(int)TQD_STEP.TEST] = "1";                                                             //TEST
@@ -360,7 +346,6 @@ namespace DACrux.SEMDMS.Inspection.DataService
 
                             #region [Step 07 : TQD_DEFECT, TQD_IMAGES 확인 생성]
 
-                            //WriteLog("Step 07", "TQD_DEFECT, TQD_IMAGES 확인 생성");
                             //Data 존재 확인 후 없으면 생성 한다.
                             dtTemp = oDefectDefine.GetDefectDataCount(WaferSeq.ToString(), StepSeq.ToString());
                             if (dtTemp == null || dtTemp.Rows.Count <= 0)
@@ -467,8 +452,6 @@ namespace DACrux.SEMDMS.Inspection.DataService
                             #endregion
 
                             #region [Step 08 : TQD_INSP_INFO 의 정보가 있는지 확인 후 없으면 저장 한다. Key 값은 Step Seq 에 Test No 다.]
-
-                            //WriteLog("Step 08", "TQD_INSP_INFO 의 정보가 있는지 확인 후 없으면 저장 한다.");
 
                             foreach (var oData in wafer.TestList)
                             {

@@ -370,7 +370,6 @@ namespace DACrux.TEST.ENGUI
             if (dt.Rows.Count == 1)
                 dlbProgram.Text = dt.Rows[0]["PROGRAM"].ToString();
 
-            //dlbLot.SearchText = search;
         }
 
         //--
@@ -489,7 +488,6 @@ namespace DACrux.TEST.ENGUI
             EventArgs e
             )
         {
-            //btnView.PerformClick();
             DrawChartByWafer();
         }
 

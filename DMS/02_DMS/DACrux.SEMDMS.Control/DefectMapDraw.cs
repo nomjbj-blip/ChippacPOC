@@ -64,7 +64,6 @@ namespace DACrux.SEMDMS.Control
                 setupSeq = SetupSeq(stepSeq);
                 if (setupSeq == -1) return;
                 Recipe(setupSeq, map);
-                //ScanSample(stepSeq, map);
                 SetupMap(stepSeq, map);
                 DefectData(stepSeq, map);
                 oDefect = map.Defects;
@@ -119,8 +118,6 @@ namespace DACrux.SEMDMS.Control
                 if (stepSeq.Length == 1) setupSeq = SetupSeq(stepSeq[0]);
                 else setupSeq = SetupSeq(stepSeq[1]);
                 Recipe(setupSeq, map);
-                //if (stepSeq.Length == 1) ScanSample(stepSeq[0], map);
-                //else ScanSample(stepSeq[1], map);
 
                 if (stepSeq.Length == 1) SetupMap(stepSeq[0], map);
                 else SetupMap(stepSeq[1], map);
@@ -148,7 +145,6 @@ namespace DACrux.SEMDMS.Control
                 setupSeq = SetupSeq(stepSeq);
                 if (setupSeq == -1) return;
                 Recipe(setupSeq, map);
-                //ScanSample(stepSeq, map);
                 SetupMap(stepSeq, map);
                 DefectData(stepSeq, map, tolerance, ref defect, isShot, product, dieSizeX, dieSizeY);
                 map.WaferDrawMode = DACrux.Map.MapMode.Fit;
@@ -173,7 +169,6 @@ namespace DACrux.SEMDMS.Control
                 setupSeq = SetupSeq(stepSeq);
                 if (setupSeq == -1) return;
                 Recipe(setupSeq, map);
-                //ScanSample(stepSeq, map);
                 SetupMap(stepSeq, map);
                 DefectData(stepSeq, map, ref defect);
             }
@@ -851,7 +846,6 @@ namespace DACrux.SEMDMS.Control
 
         public static FileInfo fnFTPImageDownload(string strFTPDirctory)
         {
-            //DACrux.Utility.ServerCommunicationFtp oFTP = null;
             DACrux.Utility.HFtpClient oFTP = null;
             string strLocalFullPath = string.Empty;
 
@@ -884,13 +878,6 @@ namespace DACrux.SEMDMS.Control
 
                 string[] ArrImage = strFTPDirctory.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
 
-                //oFTP = new Utility.ServerCommunicationFtp();
-                //oFTP.Server = strFTPIP;
-                //oFTP.Port = DACrux.Base.Convert.intParse(strFTPPort);
-                //oFTP.UserID = strFTPID;
-                //oFTP.Password = strFTPPass;
-                //oFTP.ChmodValue = 777;
-
                 oFTP = new DACrux.Utility.HFtpClient(strFTPIP, DACrux.Base.Convert.intParse(strFTPPort), strFTPID, strFTPPass);
                 bool IsFtpConnect = oFTP.LoginTest();
                 if (IsFtpConnect == false)
@@ -904,7 +891,6 @@ namespace DACrux.SEMDMS.Control
                 strLocalFullPath = System.IO.Path.Combine(strLocalPathName, ArrImage[ArrImage.Length - 1].ToString());
                 strFTPFullPath = System.IO.Path.Combine(strFTPPath, strFTPDirctory).Replace(@"\", "/");
                 oFTP.Down(strFTPFullPath, strLocalFullPath);
-                //oFTP.ReceiveFile(strFTPFullPath, strLocalFullPath);
 
                 oDefectFile = new FileInfo(strLocalFullPath);
                 if (!oDefectFile.Exists)

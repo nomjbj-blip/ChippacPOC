@@ -251,47 +251,16 @@ namespace DACrux.TEST.ENGUI
             Utility.FPSpreadUtil.InitSpread(fpsParamSpec);
             Utility.FPSpreadUtil.SetSpreadData(dt, fpsParamSpec_Sheet);
             Utility.FPSpreadUtil.SetAutoColumnWidth(fpsParamSpec_Sheet);
-            //SetColumnStyle();
             grid.DataSource = dt;
         }
 
-        //private void SetColumnStyle()
-        //{
-        //    CheckBoxCellType chkCellType = new CheckBoxCellType();
-        //    chkCellType.ThreeState = true;
+        //    //--
 
         //    //--
 
-        //    ComboBoxCellType combDataTypeCellType = new ComboBoxCellType();
-        //    combDataTypeCellType.Items = new string[] { "NUMBER", "STRING" };
         //    //--
 
-        //    ComboBoxCellType combUomCellType = new ComboBoxCellType();
-        //    combUomCellType.Items = new string[] { " ", "㎀", "㎁", "㎂", "㎃", "A", "㎴", "㎵", "㎷", "V", "㎱", "㎲", "㎳", "s", "Ω", "㏁", "㎐", "㎑", "㎒", "㎓", "㎊", "㎋", "㎌" };
-
         //    //--
-
-        //    NumberCellType numCellType = new NumberCellType();
-        //    numCellType.DecimalPlaces = 0;
-
-        //    //--
-
-        //    TextCellType txtCellType = new TextCellType();
-
-        //    //--
-
-        //    int itmp = 0;
-
-        //    fpsParamSpec_Sheet.OperationMode = FarPoint.Win.Spread.OperationMode.SingleSelect;
-        //    fpsParamSpec_Sheet.Columns[(int)ColumnIndex.PARAM_NAME].CellType = txtCellType;
-        //    fpsParamSpec_Sheet.Columns[(int)ColumnIndex.USER_PROGRAM_NAME].CellType = txtCellType;
-        //    fpsParamSpec_Sheet.Columns[(int)ColumnIndex.PARAM_TYPE].CellType = combDataTypeCellType;
-        //    fpsParamSpec_Sheet.Columns[(int)ColumnIndex.PARAM_DESC].CellType = txtCellType;
-        //    fpsParamSpec_Sheet.Columns[(int)ColumnIndex.DECIMAL_PLACES].CellType = numCellType;
-        //    fpsParamSpec_Sheet.Columns[(int)ColumnIndex.RUNTIME_DEFIEND].CellType = numCellType;
-        //    fpsParamSpec_Sheet.Columns[(int)ColumnIndex.USE_FLAG].CellType = chkCellType;
-        //    fpsParamSpec_Sheet.Columns[(int)ColumnIndex.UOM].CellType = combUomCellType;
-        //}
 
         #endregion Method
 

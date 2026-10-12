@@ -50,7 +50,6 @@ namespace DACrux.BStats.GraphDialog
 
             graphInfo.View3D = false;
             // Changed By James Kwon 2014/10/16
-            //graphInfo.PointLabel = true;
             graphInfo.PointLabel = false;
             graphInfo.LabelAngle = 0;
 
@@ -132,7 +131,6 @@ namespace DACrux.BStats.GraphDialog
             nudDecimalPlace.Value = Convert.ToDecimal(graphInfo.DecimalPlace);
             cboLabelAngle.Text = graphInfo.LabelAngleString;
             chkView3D.Checked = graphInfo.View3D;
-            //chkSerLegBox.Checked = graphInfo.LegendBox;
             chkSerLegBox.Checked = true;
             chkPointLabel.Checked = graphInfo.PointLabel;
         }

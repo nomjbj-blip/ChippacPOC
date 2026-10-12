@@ -243,7 +243,6 @@ namespace DACrux.TEST.BSL
             }
 
             TD_TABLE tbl = new TD_TABLE();
-            //DataTable dtRaw = tbl.GetAllRawData(new string[] { waferSeq });
             DataSet ds = tbl.GetTableSchema(factory, programName, waferSeq);
 
             // 해당 WAFER_SEQ 로 데이터가 존재하는 경우 삭제 처리

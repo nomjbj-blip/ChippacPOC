@@ -18,7 +18,6 @@ namespace DACrux.TEST.ENGUI
         private DataTable dtTestMapData = null;    //전제 Test Bin
         private DataTable dtBinDefectList = null;  //Bin 별 Defect 정의
         private DataTable dtWaferIndexList = null; //Filter 된 Test Bin
-        //private DataTable dtDefectList = null;     //전체 Defect List
         private DataSet dsTestWaferMap = null;
         private DataSet dsDefectWafer = null;
         private DefectList defectList = null;
@@ -558,7 +557,6 @@ namespace DACrux.TEST.ENGUI
         {
             List<string> oList = new List<string>();
             DataTable dtWaferIndexListShift = null;
-            //DataTable dtTestMapDataShift = null;
 
             try
             {
@@ -1195,13 +1193,11 @@ namespace DACrux.TEST.ENGUI
                     if (oList != null && oList.Count > 0)
                     {
                         //dtTestMapData 는 DB에서 조회한 데이터, dtWaferIndexList 는 Shfit 정보
-                        //drDefectBin = dtTestMapData.Select(string.Format("X = {0} AND Y = {1} AND BIN IN ({2})", d.XINDEX, d.YINDEX, string.Join(",", oList.ToArray())));
                         drDefectBin = dtWaferIndexList.Select(string.Format("X = {0} AND Y = {1} AND BIN IN ({2})", d.XINDEX, d.YINDEX, string.Join(",", oList.ToArray())));
                     }
                     else
                     {
                         //dtTestMapData 는 DB에서 조회한 데이터, dtWaferIndexList 는 Shfit 정보
-                        //drDefectBin = dtTestMapData.Select(string.Format("X = {0} AND Y = {1}", d.XINDEX, d.YINDEX));
                         drDefectBin = dtWaferIndexList.Select(string.Format("X = {0} AND Y = {1}", d.XINDEX, d.YINDEX));
                     }
 
@@ -1235,15 +1231,12 @@ namespace DACrux.TEST.ENGUI
             DataRow[] drsDefects = null;
 
             //전체 Wafer Bin 중 Good Bin 이 아닌 Data
-            //if (dtWaferIndexList.Select(string.Format("BIN NOT IN ({0})", string.Join(",", iGoodBin))).Length <= 0)
             if (dtWaferIndexList == null || dtWaferIndexList.Rows.Count <= 0)
             {
                 defectviedie = double.NaN;
                 failBinDie = double.NaN;
                 return double.NaN;
             }
-
-            //defectviedie = dtWaferIndexList.Select(string.Format("BIN NOT IN ({0})", string.Join(",", iGoodBin))).Length;
 
             //Fail Bin 중  Defect 이 있는 Die
 
@@ -1303,7 +1296,6 @@ namespace DACrux.TEST.ENGUI
             {
                 if (container == null) return;
 
-                //container.Height = container.Height + (container.Margin.Top + container.Margin.Bottom);
                 container.Height = container.Height + container.Margin.Top;
                 container.Width = ImageList.Width - SystemInformation.VerticalScrollBarWidth - container.Margin.Left - container.Margin.Right;
                 ImageList.Controls.Add(container);

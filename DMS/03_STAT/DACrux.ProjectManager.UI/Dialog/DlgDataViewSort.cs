@@ -258,11 +258,6 @@ namespace DACrux.ProjectManager.UI.Dialog
                 lvRight.SelectedItems[0].ImageIndex = 0;
 
             // Sort 모드 변경시 자동으로 다음 항목 넘어가기
-            //if (lvRight.SelectedItems[0].Index < lvRight.Items.Count - 1)
-            //{
-            //    lvRight.Items[lvRight.SelectedItems[0].Index+1].Focused = true;
-            //    lvRight.Items[lvRight.SelectedItems[0].Index+1].Selected = true;
-            //}
         }
 
         public string SortResult = null;

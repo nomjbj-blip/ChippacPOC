@@ -186,7 +186,6 @@ namespace DACrux.SEMDMS.DSL
 
                     //dt = this.GetDataTable("GET_DEFECT_IMAGE_OF_STEP_DEFECTID"
                     //                        , new string[] { Miracom.Middleware.Helper.ConvertList(defectids, false) }
-                    //                        , new string[] { step_seq.ToString() });
                 }
                 return dt;
             }

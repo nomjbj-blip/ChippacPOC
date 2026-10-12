@@ -54,7 +54,6 @@ namespace DACrux.MapAnalysis.Control
         private string PROGRAM = string.Empty;
         private string DEVICE = string.Empty;
         private string TESTAREA = string.Empty;
-        //private bool m_IsMapToMap = false;
         private readonly string DIENUM = "DIE_NUM";
 
         public List<BinColor> mBinColor
@@ -175,11 +174,6 @@ namespace DACrux.MapAnalysis.Control
         }
         //[Browsable(false)]
         //[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        //public bool IsMapToMap
-        //{
-        //    set { m_wMap.DieDefaultColor = value; }
-        //    get { return m_wMap.DieDefaultColor; }
-        //}
 
         #region [ Bin Chart Option ]
 
@@ -655,7 +649,6 @@ namespace DACrux.MapAnalysis.Control
 
         private void m_wMap_OnChangeCurrentDie(object sender, DACrux.Base.Die NewDie)
         {
-            //DataRow[] drAVI = null;
             try
             {
                 txtXIndex.Text = NewDie.IndexX.ToString();
@@ -688,31 +681,7 @@ namespace DACrux.MapAnalysis.Control
                     txtDieNum.Text = string.Empty;
                 }
 
-                //if (AVIImageList.Controls.Count > 0)
-                //    AVIImageList.Controls.Clear();
-
                 ////Map Data 에 IMAGE_PATH Columns 정보가 있을 경우 AVI Map 으로 처리 한다.
-                //try
-                //{
-                //    if (TESTAREA == "AVI" && dtAVIImage != null && dtAVIImage.Select(string.Format("X = {0} AND Y = {1}", NewDie.IndexX, NewDie.IndexY)).Length > 0)
-                //    {
-                //        drAVI = dtAVIImage.Select(string.Format("X = {0} AND Y = {1}", NewDie.IndexX, NewDie.IndexY));
-                //        foreach (DataRow dr in drAVI)
-                //        {
-                //            DACrux.TEST.Control.TPUImageInfo oForm = new TEST.Control.TPUImageInfo(
-                //                dr["IMAGE_PATH"].ToString(),
-                //                txtXIndex.Text,
-                //                txtYIndex.Text,
-                //                txtBin.Text,
-                //                LOT_ID,
-                //                PROGRAM,
-                //                DEVICE);
-                //            ControlAdd(oForm);
-                //        }
-
-                //    }
-                //}
-                //catch (Exception) { }
 
             }
             catch (Exception ex)
@@ -751,10 +720,6 @@ namespace DACrux.MapAnalysis.Control
             try
             {
                 m_wMap.SelDie(oIndex.X, oIndex.Y);
-                //m_wMap.SetSelectedDie(oIndex.X, oIndex.Y);
-                //m_wMap.Focus();
-                //m_wMap.SetFocusDie(oIndex.X, oIndex.Y);
-                //m_wMap.Focus();
                 m_wMap.Focus();
             }
             finally
@@ -795,8 +760,6 @@ namespace DACrux.MapAnalysis.Control
                     return;
 
                 this.Cursor = Cursors.WaitCursor;
-
-                //if (m_wMap.DisplayDieValue.ToString().ToUpper() != "BIN") return;
 
                 HitTestResult result = BinTrendChart.HitTest(e.X, e.Y);
                 if (result.ChartElementType == ChartElementType.DataPoint)
@@ -844,14 +807,11 @@ namespace DACrux.MapAnalysis.Control
 
         private void btnMapCreate_Click(object sender, EventArgs e)
         {
-            //RO.T_PRB oPrb = null;
             string strFile = string.Empty;
 
             try
             {
                 // 파일 변환 로직 완료되면 기능 오픈예정
-                // oPrb = new RO.T_PRB();
-                // strFile = oPrb.CreateMapFile(m_DS.Tables["MAPDATA"], mapInfoProduct);
 
                 if (m_dsMap != null && m_dsMap.Tables["MAPDATA"] != null && m_dsMap.Tables["MAPDATA"].Rows.Count > 0)
                 {
@@ -919,10 +879,7 @@ namespace DACrux.MapAnalysis.Control
                 //INDEX를 통해서 값을 넣어준다. 처음에 조회시에 체크박스 Tag에 값을 넣어두었음
                 string[] strBinNum = ((string)chkboxSelBin.Tag).Split(',');
                 string strSelBinNum = string.Empty;
-                //chkboxSelBin.CheckedItems.CopyTo(strSelBin, 0);
 
-
-                //object ia = chkboxSelBin.GetItemChecked(i);
                 for (int i = 0; i < chkboxSelBin.Items.Count; i++)
                 {
                     if (chkboxSelBin.GetItemChecked(i))
@@ -1273,22 +1230,6 @@ namespace DACrux.MapAnalysis.Control
                 if (m_dsMap.Tables.IndexOf("PARA_LIST") > -1 && m_dsMap.Tables["PARA_LIST"].Select(string.Format("PARAM_NAME = '{0}'", strParaItem)).Length > 0)
                     dbUpper = Convert.ToDouble(m_dsMap.Tables["PARA_LIST"].Select(string.Format("PARAM_NAME = '{0}'", strParaItem))[0]["MAX"]);
 
-                //if (string.IsNullOrEmpty(dr[0]["LSL"].ToString()) == true)
-                //{
-                //    if (m_dsMap.Tables.IndexOf("PARA_LIST") > -1 && m_dsMap.Tables["PARA_LIST"].Select(string.Format("PARAM_NAME = '{0}'", strParaItem)).Length > 0)
-                //        dbLower = Convert.ToDouble(m_dsMap.Tables["PARA_LIST"].Select(string.Format("PARAM_NAME = '{0}'", strParaItem))[0]["MIN"]);
-                //}
-                //else
-                //    dbLower = DACrux.Base.Convert.doubleParse(dr[0]["LSL"].ToString());
-
-                //if (string.IsNullOrEmpty(dr[0]["USL"].ToString()) == true)
-                //{
-                //    if (m_dsMap.Tables.IndexOf("PARA_LIST") > -1 && m_dsMap.Tables["PARA_LIST"].Select(string.Format("PARAM_NAME = '{0}'", strParaItem)).Length > 0)
-                //        dbUpper = Convert.ToDouble(m_dsMap.Tables["PARA_LIST"].Select(string.Format("PARAM_NAME = '{0}'", strParaItem))[0]["MAX"]);
-                //}
-                //else
-                //    dbUpper = DACrux.Base.Convert.doubleParse(dr[0]["USL"].ToString());
-
 
                 //==================================================================================
 
@@ -1472,20 +1413,8 @@ namespace DACrux.MapAnalysis.Control
 
                     if (ShowZonalChart == true)
                     {
-                        //if(thZonal != null && thZonal.IsAlive)
-                        //{
-                        //    while (thZonal.IsAlive)
-                        //    {
-                        //        thZonal.Abort();
-                        //    }
-                        //}
 
-                        //thZonal = new System.Threading.Thread(() => DrawZonalMap(m_dsMap));
-                        //thZonal.Start();
                         DrawZonalMap(m_dsMap);
-                        //System.Threading.ThreadPool.QueueUserWorkItem(new System.Threading.WaitCallback(DrawZonalMap), m_dsMap);
-                        //System.Threading.Thread thZonal = new System.Threading.Thread(() => DrawZonalMap(m_dsMap, oWaferRecipe));
-                        //thZonal.Start();
                     }
                 }
                 else
@@ -1708,7 +1637,6 @@ namespace DACrux.MapAnalysis.Control
             int iTemp = 0;
             try
             {
-                //m_wMap.ResetSelectedDie();
                 m_wMap.DieClear();
 
                 if (dsMap.Tables.IndexOf("MAPDATA") < 0 || dsMap.Tables["MAPDATA"] == null)
@@ -1717,10 +1645,6 @@ namespace DACrux.MapAnalysis.Control
                 m_wMap.SetWaferRecipe(oWaferRecipe);
                 m_wMap.AngleOffSet = (360 - oWaferRecipe.ANGLE) % 360;
                 m_wMap.DataSource = dsMap.Tables["MAPDATA"];
-                //m_wMap.InkingDieAdd();
-                //m_wMap.ParametricColumn = "DIE_NUM";
-                //m_wMap.DisplayDieValue = Base.DieDisplayValue.PCMValue;
-                //m_wMap.VisibleDieValue = true;
 
                 //Shot 관련 정보확인 및 Draw
                 m_wMap.VisibleShot = false;
@@ -1898,17 +1822,9 @@ namespace DACrux.MapAnalysis.Control
                         txtSelYield.Text = Math.Round(Convert.ToDouble(dsMap.Tables["BINSUM"].Compute("SUM([CNT])", "[PF] = 'P'")) / (double)dsMap.Tables["MAPDATA"].Rows.Count * 100.0, 2).ToString();
 
                     m_sZonalGoodBins = string.Empty;
-                    //DataRow[] drGoodRow = dsMap.Tables["BINSUM"].Select("[PF] = 'P'");
-                    //for (int i = 0; i < drGoodRow.Length; i++)
-                    //{
-                    //    m_sZonalGoodBins += string.Format(",{0}", drGoodRow[i]["BIN"].ToString());
-                    //}
                 }
 
                 //AVI Image List 를 미리 Local 에 저장해 놓는다.
-                //AVIImageGetList(dsMap.Tables["MAPDATA"]);
-                //thImage = new System.Threading.Thread(() => AVIImageGetList(dsMap.Tables["MAPDATA"]));
-                //thImage.Start();
             }
             catch (Exception ex)
             {
@@ -1942,7 +1858,6 @@ namespace DACrux.MapAnalysis.Control
             catch (Exception)
             {
                 m_wcZonal.DieClear();
-                //throw ex;
             }
             finally
             {
@@ -1964,7 +1879,6 @@ namespace DACrux.MapAnalysis.Control
                 //Image 를 가져오는데 문제가 생기더라도 Map 을 보여주는데는 이상이 없어야 한다.
                 try
                 {
-                    //DACrux.TEST.Control.AVIImage oAVI = new TEST.Control.AVIImage();
                     dtTemp = dtList.Select("IMAGE_PATH <> ''").CopyToDataTable<DataRow>();
                     dtAVIImage = AVIFTPFileDownload(dtTemp, this.Name);
                 }
@@ -1975,7 +1889,6 @@ namespace DACrux.MapAnalysis.Control
         private DataTable AVIFTPFileDownload(DataTable FileList, string ModuleName)
         {
             DACrux.Utility.HFtpClient oFTP = null;
-            //DACrux.Utility.ServerCommunicationFtp oFTP = null;
             string strLocalFullPath = string.Empty;
 
             string strFTPFullPath = string.Empty;
@@ -1985,14 +1898,12 @@ namespace DACrux.MapAnalysis.Control
             string strFTPPort = string.Empty;
             string strFTPID = string.Empty;
             string strFTPPass = string.Empty;
-            //string strFTPMainPath = string.Empty;
 
             FileInfo oImageFile = null;
             DirectoryInfo oDirectory = null;
 
             DataTable dtResult = null;
 
-            //DACrux.TEST.RO.DataSelect oData = null;
             ComConfiguration obj = null;
 
             try
@@ -2009,7 +1920,6 @@ namespace DACrux.MapAnalysis.Control
                 dtResult.Columns.Add(new DataColumn("THUMB_PATH", typeof(string)));
                 dtResult.AcceptChanges();
 
-                //oData = new RO.DataSelect();
                 obj = new ComConfiguration();
                 DataTable dtConfig = obj.GetAVIImageFTPInfo();
                 if (dtConfig == null || dtConfig.Rows.Count <= 0)
@@ -2019,7 +1929,6 @@ namespace DACrux.MapAnalysis.Control
                 strFTPPort = dtConfig.Rows[0]["PORT"].ToString();
                 strFTPID = dtConfig.Rows[0]["ID"].ToString();
                 strFTPPass = dtConfig.Rows[0]["PASS"].ToString();
-                //strFTPMainPath = dtConfig.Rows[0]["MAIN_PATH"].ToString();
 
                 //Local Directory 삭제 후 생성 (쓰레기 Data 는 미리 삭제..)
                 strLocalPathName = System.IO.Path.Combine(Environment.CurrentDirectory, "AVI", ModuleName);
@@ -2033,13 +1942,6 @@ namespace DACrux.MapAnalysis.Control
                 bool IsFtpConnect = oFTP.LoginTest();
                 if (IsFtpConnect == false)
                     throw new Exception("FTP에 접속할 수 없습니다.");
-
-                //oFTP = new Utility.ServerCommunicationFtp();
-                //oFTP.Server = strFTPIP;
-                //oFTP.Port = DACrux.Base.Convert.intParse(strFTPPort);
-                //oFTP.UserID = strFTPID;
-                //oFTP.Password = strFTPPass;
-                //oFTP.ChmodValue = 777;
 
                 //Image 및 Thumb File 을 Download 받는다.
                 string strFileName = string.Empty;
@@ -2062,7 +1964,6 @@ namespace DACrux.MapAnalysis.Control
                     else
                         strFTPFullPath = System.IO.Path.Combine("BACKUP/", strFilePath, strFileName).Replace("\\", "/");
 
-                    //oFTP.ReceiveFile(strFTPFullPath, strLocalFullPath);
                     oFTP.Down(strFTPFullPath, strLocalFullPath);
                     oImageFile = new FileInfo(strLocalFullPath);
                     if (!oImageFile.Exists)
@@ -2071,20 +1972,6 @@ namespace DACrux.MapAnalysis.Control
                     drNew["IMAGE_PATH"] = strLocalFullPath;
 
                     //Thumb File Name 가져 오는 부분
-                    //if (string.IsNullOrEmpty(FileList.Rows[f]["THUMB_FILENAME"].ToString()) == false)
-                    //{
-                    //    strFileName = FileList.Rows[f]["THUMB_FILENAME"].ToString();
-                    //    strFilePath = FileList.Rows[f]["THUMB_PATH"].ToString();
-                    //    strLocalFullPath = System.IO.Path.Combine(strLocalPathName, strFileName);
-                    //    strFTPFullPath = System.IO.Path.Combine(strFilePath, strFileName).Replace("\\", "/");
-                    //    //oFTP.ReceiveFile(strFTPFullPath, strLocalFullPath); 
-                    //    oFTP.Down(strFTPFullPath, strLocalFullPath);
-                    //    oImageFile = new FileInfo(strLocalFullPath);
-                    //    if (!oImageFile.Exists)
-                    //        throw new Exception("AVI Image File을 Download 하였으나 존재 하지 않습니다.");
-
-                    //    drNew["THUMB_PATH"] = strLocalFullPath;
-                    //}
 
                     dtResult.Rows.Add(drNew);
                 }
@@ -2128,7 +2015,6 @@ namespace DACrux.MapAnalysis.Control
                 }
 
                 BinTrendChart.ChartAreas[0].CursorX.Interval = 1;
-                //BinTrendChart.ChartAreas[0].CursorX.IsUserEnabled = true;
                 BinTrendChart.ChartAreas[0].CursorX.IsUserSelectionEnabled = true;
                 BinTrendChart.ChartAreas[0].AxisX.Maximum = dtBinSum.Rows.Count;
                 BinTrendChart.ChartAreas[0].AxisX.ScaleView.Zoomable = true;
@@ -2143,13 +2029,6 @@ namespace DACrux.MapAnalysis.Control
                 BinTrendChart.Series.Add("Count");
                 BinTrendChart.Series["Count"].IsValueShownAsLabel = true;
                 BinTrendChart.Series["Count"].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Column;
-                //BinTrendChart.Series["Count"].YAxisType = AxisType.Primary;
-                //BinTrendChart.Series["Count"].IsXValueIndexed = true;
-                //BinTrendChart.Series["Count"].MarkerStyle = System.Windows.Forms.DataVisualization.Charting.MarkerStyle.Circle;
-                //BinTrendChart.Series["Count"].MarkerSize = 1;
-                //BinTrendChart.Series["Count"].BorderWidth = 2;
-                //BinTrendChart.Series["Count"].SmartLabelStyle.Enabled = true;
-                //BinTrendChart.Series["Count"].Points.DataBind(dtBinSum.Rows, sXField, "CNT", string.Format("AxisLabel={0}", sXField));
                 for (int i = 0; i < dtBinSum.Rows.Count; i++)
                 {
                     BinTrendChart.Series["Count"].Points.AddXY(dtBinSum.Rows[i][sXField].ToString(), dtBinSum.Rows[i]["CNT"].ToString());
@@ -2162,9 +2041,6 @@ namespace DACrux.MapAnalysis.Control
                         BinTrendChart.Series["Count"].Points[BinTrendChart.Series["Count"].Points.Count - 1].Color = m_lstBinColor[iIndex].color;
                     }
                 }
-
-                //for (int i = 0; i < BinTrendChart.Series["Count"].Points.Count; i++)
-                //    BinTrendChart.Series["Count"].Points[i].Color = m_lstBinColor[i].color;
 
                 if (m_bShowDataGrid == true)
                 {
@@ -2215,11 +2091,6 @@ namespace DACrux.MapAnalysis.Control
 
                     string sBinName = dtBinSum.Rows[i][sDisplayCol].ToString().PadLeft(3, ' ');
                     //  string.Format '-' 에서 '/'로 변경합니다.
-                    //if (string.IsNullOrEmpty(dtBinSum.Rows[i]["BIN_NAME"].ToString()) == false)
-                    //    sBinName = string.Format("{0} / {1}", sBinName, dtBinSum.Rows[i]["BIN_NAME"].ToString());
-
-                    //if (sDisplayCol == "BIN_CHAR")
-                    //    sBinName += "\t[BIN CHAR]";
 
                     chkboxSelBin.Items.Add(string.Format("{0} / {1} ( {2} , {3}% )", sBinName
                                                                 , dtBinSum.Rows[i]["BIN_NAME"].ToString().PadRight(10, ' ')
@@ -2227,7 +2098,6 @@ namespace DACrux.MapAnalysis.Control
                                                                 , Math.Round(DACrux.Base.Convert.doubleParse(dtBinSum.Rows[i]["CNT"].ToString()) / dbTotal * 100, 1).ToString().PadLeft(3, ' ')));
 
 
-                    //chkboxSelBin.Items.Add(sBinName);
                     strBinList[i + 1] = dtBinSum.Rows[i]["BIN"].ToString();
 
                     if (Array.IndexOf(strOldSelBin, dtBinSum.Rows[i][sDisplayCol].ToString()) > -1) chkboxSelBin.SetItemChecked(i + 1, true);
@@ -2291,8 +2161,6 @@ namespace DACrux.MapAnalysis.Control
                 {
                     strItemName = dtTemp.Rows[i]["PARAM_NAME"].ToString();
 
-                    //if (strItemName != "X" && strItemName != "Y" && strItemName != "WAFER_SEQ" && strItemName != "BIN")
-                    //    lsParaList.Items.Add(strItemName);
                     if (!String.Equals(strItemName, "WAFER_SEQ") && !String.Equals(strItemName, "BIN"))
                         lsParaList.Items.Add(strItemName);
                 }
@@ -2310,7 +2178,6 @@ namespace DACrux.MapAnalysis.Control
             DataTable dt = null;
             try
             {
-                // DACrux.Utility.Component.InitSpread(fpRawData);
 
                 fpRawData.ActiveSheet.Rows.Clear();
 
@@ -2424,7 +2291,6 @@ namespace DACrux.MapAnalysis.Control
         {
             try
             {
-                //btnTestDataDraw_Click(null, null);
                 btnTestDataDraw.PerformClick();
 
                 if (lsParaList.Items.Count <= 0 || lsParaList.SelectedItems.Count <= 0)
@@ -2479,7 +2345,6 @@ namespace DACrux.MapAnalysis.Control
 
         private void ChkValue_CheckedChanged(object sender, EventArgs e)
         {
-            //btnTestDataDraw_Click(null, null);
             btnTestDataDraw.PerformClick();
         }
 
@@ -2546,15 +2411,6 @@ namespace DACrux.MapAnalysis.Control
             e.SheetList.Add(sheet);
             e.SheetList[e.SheetList.Count - 1].SheetName = "AVI Image";
 
-            //DataGridView WaferMapGrid = m_wMap.ToDataGridView();
-            //if (WaferMapGrid != null)
-            //{
-            //    sheet = new DACrux.Utility.ExcelSheet();
-            //    sheet.Add(WaferMapGrid);
-            //    e.SheetList.Add(sheet);
-            //    e.SheetList[e.SheetList.Count - 1].SheetName = "GridMap";
-            //}
-
             DACrux.Utility.ExcelExportManager.Export(e);
         }
 
@@ -2565,36 +2421,7 @@ namespace DACrux.MapAnalysis.Control
             if (MessageBox.Show("AVI 전체 Image 를 가져오겠습니까?", "Information", MessageBoxButtons.OKCancel, MessageBoxIcon.Information) == DialogResult.OK)
             {
                 fnAVIMapGathering(null);
-                //try
-                //{
-                //    fnAVIMapGathering(null);
-                //    if (dtAVIImage == null || dtAVIImage.Rows.Count <= 0)
-                //    {
-                //        MessageBox.Show("AVI Image 정보가 없습니다.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                //        return;
-                //    }
 
-                //    if (AVIImageList.Controls.Count > 0)
-                //        AVIImageList.Controls.Clear();
-
-                //    DataRow[] drAVI = dtAVIImage.Select("1 = 1");
-                //    foreach (DataRow dr in drAVI)
-                //    {
-                //        DACrux.TEST.Control.TPUImageInfo oForm = new TEST.Control.TPUImageInfo(
-                //            dr["IMAGE_PATH"].ToString(),
-                //            dr["X"].ToString(),
-                //            dr["Y"].ToString(),
-                //            dr["BIN"].ToString(),
-                //            LOT_ID,
-                //            PROGRAM,
-                //            DEVICE);
-                //        ControlAdd(oForm);
-                //    }
-                //}
-                //catch (Exception ex)
-                //{
-                //    MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                //}
             }
 
         }

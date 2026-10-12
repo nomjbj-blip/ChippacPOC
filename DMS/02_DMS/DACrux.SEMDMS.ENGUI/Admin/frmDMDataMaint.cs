@@ -174,7 +174,6 @@ namespace DACrux.SEMDMS.ENGUI
                 fpSpreadWafer.ActiveSheet.Columns[(int)WAFER.WAFER_ID].BackColor = Color.Empty;
 
                 //변경 항목 외에는 수정 가능 하지 못하게 한다.
-                //fpSpreadWafer.ActiveSheet.Columns[(int)WAFER.WAFER_ID].Locked = true;
                 fpSpreadWafer.ActiveSheet.Columns[(int)WAFER.RESULTTIMESTAMP].Locked = true;
                 fpSpreadWafer.ActiveSheet.Columns[(int)WAFER.DEFECTS].Locked = true;
                 fpSpreadWafer.ActiveSheet.Columns[(int)WAFER.CLASSIFIED_DEFECTS].Locked = true;

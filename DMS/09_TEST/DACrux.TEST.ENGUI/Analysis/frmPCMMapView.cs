@@ -43,7 +43,6 @@ namespace DACrux.TEST.ENGUI
                 else
                 {
                     //초기화
-                    //tpucMapView1.WaferClear();
                     throw new Exception("선택한 맵 데이터가 없습니다.");
 
                 }

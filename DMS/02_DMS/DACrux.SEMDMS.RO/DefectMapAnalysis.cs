@@ -46,18 +46,6 @@ namespace DACrux.SEMDMS.RO
             return m_OBJ.GetStepList(start, end, fieldsort, where, sort);
         }
 
-        //public System.Data.DataTable GetScanSample(long step_seq)
-        //{
-        //    try
-        //    {
-        //        return m_OBJ.GetScanSample(step_seq);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw ex;
-        //    }
-        //}
-
         public System.Data.DataTable GetSetupMap(long Setup_seq)
         {
             return m_OBJ.GetSetupMap(Setup_seq);
@@ -104,10 +92,6 @@ namespace DACrux.SEMDMS.RO
             for (int x = 0; x < xLen; x++)
                 headers.Add(arr[0, x].ToString(), x);
 
-            //bool containsImagePath = headers.ContainsKey("IMAGE_PATH");
-            //bool containsRepeatXRel = headers.ContainsKey("REPEAT_XREL");
-            //bool containsRepeatYRel = headers.ContainsKey("REPEAT_YREL");
-
             for (int y = 1; y < yLen; y++)
             {
                 Defect defect = new Defect();
@@ -128,18 +112,8 @@ namespace DACrux.SEMDMS.RO
                 defect.CLASSNUMBER = DACrux.Base.Convert.intParse(GetData(arr, headers, "CLASSNUMBER", y));
                 defect.TEST = DACrux.Base.Convert.intParse(GetData(arr, headers, "TEST", y));
                 defect.CLUSTERNUMBER = DACrux.Base.Convert.intParse(GetData(arr, headers, "CLUSTERNUMBER", y));
-                //defect.ROUGHBINNUMBER = DACrux.Base.Convert.intParse(GetData(arr, headers, "ROUGHBINNUMBER", y));
-                //defect.FINEBINNUMBER = DACrux.Base.Convert.intParse(GetData(arr, headers, "FINEBINNUMBER", y));
-                //defect.REVIEWSAMPLE = DACrux.Base.Convert.intParse(GetData(arr, headers, "REVIEWSAMPLE", y));
                 defect.IMAGECOUNT = DACrux.Base.Convert.intParse(GetData(arr, headers, "IMAGECOUNT", y));
                 defect.ADDER = DACrux.Base.Convert.intParse(GetData(arr, headers, "ADDER", y));
-                //defect.FIRST_STEP = GetData(arr, headers, "FIRST_STEP", y);
-                //defect.RETICLE_REPEAT_ID = DACrux.Base.Convert.intParse(GetData(arr, headers, "RETICLE_REPEAT_ID", y));
-                //defect.DIE_REPEAT_ID = DACrux.Base.Convert.intParse(GetData(arr, headers, "DIE_REPEAT_ID", y));
-                //defect.MAN_OPT_CLASS = DACrux.Base.Convert.intParse(GetData(arr, headers, "MAN_OPT_CLASS", y));
-                //defect.AUTO_OPT_CLASS = DACrux.Base.Convert.intParse(GetData(arr, headers, "AUTO_OPT_CLASS", y));
-                //defect.MAN_SEM_CLASS = DACrux.Base.Convert.intParse(GetData(arr, headers, "MAN_SEM_CLASS", y));
-                //defect.AUTO_SEM_CLASS = DACrux.Base.Convert.intParse(GetData(arr, headers, "AUTO_SEM_CLASS", y));
 
                 defects.Add(defect);
             }
@@ -153,10 +127,6 @@ namespace DACrux.SEMDMS.RO
 
             if (dt == null || dt.Rows.Count == 0)
                 return defects;
-
-            //bool containsImagePath = dt.Columns.Contains("IMAGE_PATH");
-            //bool containsRepeatXRel = dt.Columns.Contains("REPEAT_XREL");
-            //bool containsRepeatYRel = dt.Columns.Contains("REPEAT_YREL");
 
             foreach (DataRow r in dt.Rows)
             {
@@ -172,35 +142,15 @@ namespace DACrux.SEMDMS.RO
                 defect.YINDEX = DACrux.Base.Convert.intParse(r["YINDEX"].ToString());
                 defect.XSIZE = DACrux.Base.Convert.doubleParse(r["XSIZE"].ToString());
                 defect.YSIZE = DACrux.Base.Convert.doubleParse(r["YSIZE"].ToString());
-                //defect.DEFECTAREA = DACrux.Base.Convert.doubleParse(r["DEFECTAREA"].ToString());
                 defect.DSIZE = DACrux.Base.Convert.doubleParse(r["DSIZE"].ToString());
                 defect.CLASSNUMBER = DACrux.Base.Convert.intParse(r["CLASSNUMBER"].ToString());
                 defect.TEST = DACrux.Base.Convert.intParse(r["TEST"].ToString());
                 defect.CLUSTERNUMBER = DACrux.Base.Convert.intParse(r["CLUSTERNUMBER"].ToString());
-                //defect.ROUGHBINNUMBER = DACrux.Base.Convert.intParse(r["ROUGHBINNUMBER"].ToString());
-                //defect.FINEBINNUMBER = DACrux.Base.Convert.intParse(r["FINEBINNUMBER"].ToString());
-                //defect.REVIEWSAMPLE = DACrux.Base.Convert.intParse(r["REVIEWSAMPLE"].ToString());
                 defect.IMAGECOUNT = DACrux.Base.Convert.intParse(r["IMAGECOUNT"].ToString());
                 defect.ADDER = DACrux.Base.Convert.intParse(r["ADDER"].ToString());
-                //defect.FIRST_STEP = r["FIRST_STEP"].ToString();
-                //defect.RETICLE_REPEAT_ID = DACrux.Base.Convert.intParse(r["RETICLE_REPEAT_ID"].ToString());
-                //defect.DIE_REPEAT_ID = DACrux.Base.Convert.intParse(r["DIE_REPEAT_ID"].ToString());
-                //defect.MAN_OPT_CLASS = DACrux.Base.Convert.intParse(r["MAN_OPT_CLASS"].ToString());
-                //defect.AUTO_OPT_CLASS = DACrux.Base.Convert.intParse(r["AUTO_OPT_CLASS"].ToString());
-                //defect.MAN_SEM_CLASS = DACrux.Base.Convert.intParse(r["MAN_SEM_CLASS"].ToString());
-                //defect.AUTO_SEM_CLASS = DACrux.Base.Convert.intParse(r["AUTO_SEM_CLASS"].ToString());
-
-                //if (containsImagePath && r["IMAGE_PATH"] != DBNull.Value)
-                //{
-                //    defect.IMAGEURL = string.Format("{0}/{1}", r["IMAGE_PATH"].ToString().Trim(), r["IMAGE_FILENAME"].ToString().Trim()).Trim();
-                //}
 
                 //try catch 로 하면 속도가 너무 느리다.. 
-                //if (containsRepeatXRel)
-                //    defect.REPEAT_XREL = DACrux.Base.Convert.intParse(r["REPEAT_XREL"].ToString());
 
-                //if (containsRepeatYRel)
-                //    defect.REPEAT_YREL = DACrux.Base.Convert.intParse(r["REPEAT_YREL"].ToString());
                 defects.Add(defect);
             }
 
@@ -446,7 +396,6 @@ namespace DACrux.SEMDMS.RO
                 //--
 
                 defect.Images.Add(DACrux.Base.Convert.intParse(r["IMAGE_ID"].ToString()), String.Format("{0}/{1}", r["THUMB_PATH"], r["THUMB_FILENAME"]));
-                //defect.IMAGECOUNT = DACrux.Base.Convert.intParse(r["IMAGECOUNT"].ToString());
                 defect.IMAGECOUNT = defect.Images.Count;
 
                 //--
@@ -486,11 +435,6 @@ namespace DACrux.SEMDMS.RO
         {
             return m_OBJ.SetRemoveDefectImageList(steps, Params, userId, ipAddr);
         }
-
-        //public Color GetDieBackColor(string factory, string userID)
-        //{
-        //    return m_OBJ.GetDieBackColor(factory, userID);
-        //}
 
         public DataTable GetWaferInfo(long[] stepSeqArr)
         {
@@ -543,8 +487,6 @@ namespace DACrux.SEMDMS.RO
 
             return dt;
 
-            //byte[] bytes = m_OBJ.GetDefectMapViewer_Defects(step_seqs, bAdder);
-            //return DACrux.Base.Util.CompressedBytesToObject(bytes) as DataTable;
         }
 
         public Defect[] GetDefectMapViewer_DefectArray(long[] step_seqs, bool bAdder = false)
@@ -599,18 +541,8 @@ namespace DACrux.SEMDMS.RO
                 defect.CLASSNUMBER = DACrux.Base.Convert.intParse(GetData(arr, headers, "CLASSNUMBER", y));
                 defect.TEST = DACrux.Base.Convert.intParse(GetData(arr, headers, "TEST", y));
                 defect.CLUSTERNUMBER = DACrux.Base.Convert.intParse(GetData(arr, headers, "CLUSTERNUMBER", y));
-                //defect.ROUGHBINNUMBER = DACrux.Base.Convert.intParse(GetData(arr, headers, "ROUGHBINNUMBER", y));
-                //defect.FINEBINNUMBER = DACrux.Base.Convert.intParse(GetData(arr, headers, "FINEBINNUMBER", y));
-                //defect.REVIEWSAMPLE = DACrux.Base.Convert.intParse(GetData(arr, headers, "REVIEWSAMPLE", y));
                 defect.IMAGECOUNT = DACrux.Base.Convert.intParse(GetData(arr, headers, "IMAGECOUNT", y));
                 defect.ADDER = DACrux.Base.Convert.intParse(GetData(arr, headers, "ADDER", y));
-                //defect.FIRST_STEP = GetData(arr, headers, "FIRST_STEP", y);
-                //defect.RETICLE_REPEAT_ID = DACrux.Base.Convert.intParse(GetData(arr, headers, "RETICLE_REPEAT_ID", y));
-                //defect.DIE_REPEAT_ID = DACrux.Base.Convert.intParse(GetData(arr, headers, "DIE_REPEAT_ID", y));
-                //defect.MAN_OPT_CLASS = DACrux.Base.Convert.intParse(GetData(arr, headers, "MAN_OPT_CLASS", y));
-                //defect.AUTO_OPT_CLASS = DACrux.Base.Convert.intParse(GetData(arr, headers, "AUTO_OPT_CLASS", y));
-                //defect.MAN_SEM_CLASS = DACrux.Base.Convert.intParse(GetData(arr, headers, "MAN_SEM_CLASS", y));
-                //defect.AUTO_SEM_CLASS = DACrux.Base.Convert.intParse(GetData(arr, headers, "AUTO_SEM_CLASS", y));
 
                 defect.WAFER_ID = waferDic[defect.STEP_SEQ];
                 defect.STEP_ID = stepDic[defect.STEP_SEQ];

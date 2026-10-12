@@ -1209,64 +1209,8 @@ namespace DACrux.SEMDMS.ENGUI
 
         private void fpsCommon_CellDoubleClick(object sender, FarPoint.Win.Spread.CellClickEventArgs e)
         {
-            //try
-            //{
-            //    MainForm.SetStatusMessage("상세 정보를 출력 중입니다.");
-
-            //    string strTagName = string.Empty;
-            //    string strFilter = string.Empty;
-            //    DataTable dtFilter = null;
-
-            //    fpsWaferDetail.ActiveSheet.DataSource = null;
-            //    fpsWaferDetail.ActiveSheet.Rows.Clear();
-            //    fpsWaferDetail.ActiveSheet.Columns.Clear();
-            //    fpsWaferDetail.ActiveSheet.ColumnHeader.Columns.Clear();
-            //    fpsWaferDetail.ActiveSheet.OperationMode = FarPoint.Win.Spread.OperationMode.Normal | FarPoint.Win.Spread.OperationMode.ReadOnly;
-
-            //    if (TabItem.SelectedIndex != 1 || fpsCommon_Sheet1.Columns[e.Column].Tag == null)
-            //        return;
-
-            //    strTagName = fpsCommon_Sheet1.Columns[e.Column].Tag.ToString();
-
-            //    if (string.IsNullOrEmpty(strTagName) == true || strTagName.Split(new string[] { "_" }, StringSplitOptions.RemoveEmptyEntries).Length != 2)
-            //        return;
-
-            //    for (int ic = 0; ic < dtHeader.Columns.Count; ic++)
-            //    {
-            //        if (ic == 0)
-            //        {
-            //            strFilter += string.Format(" {0} = '{1}' ", fpsCommon_Sheet1.Columns[ic].Label, fpsCommon_Sheet1.Cells[e.Row, ic].Value.ToString());
-            //        }
-            //        else
-            //        {
-            //            strFilter += string.Format(" AND {0} = '{1}' ", fpsCommon_Sheet1.Columns[ic].Label, fpsCommon_Sheet1.Cells[e.Row, ic].Value.ToString());
-            //        }
-            //    }
-
-            //    string[] TagArr = strTagName.Split(new string[] { "_" }, StringSplitOptions.RemoveEmptyEntries);
-            //    strFilter += string.Format("AND SECTION = '{0}' AND SLOT_NO = {1}", TagArr[0], TagArr[1]);
-
-            //    if (dtLotList.Select(strFilter).Length <= 0)
-            //        return;
-
-            //    dtFilter = dtLotList.Select(strFilter).CopyToDataTable<DataRow>();
-            //    if (dtFilter == null || dtFilter.Rows.Count <= 0)
-            //        return;
-
-            //    pnDetail.Visible = true;
 
             //    //Step 01 :  Group Column 생성
-            //    fpsWaferDetail.ActiveSheet.DataSource = dtFilter;
-            //    Application.DoEvents();
-            //}
-            //catch (Exception ex)
-            //{
-            //    MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            //}
-            //finally
-            //{
-            //    MainForm.SetStatusMessage(null);
-            //}
         }
 
         private void BtnDetailView_Click(object sender, EventArgs e)
