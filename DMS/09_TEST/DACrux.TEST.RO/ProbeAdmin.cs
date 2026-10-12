@@ -5,17 +5,7 @@
 --  (Copyright ⓒ 2014 Miracom Inc. All Rights Reserved | Confidential)
 --
 --  Program Id      : ProbeAdmin.cs
---  Creator         : YoungShin Lim (YSIM)
---  Create Date     : 2013.01.14
---  Description     : DACrux/SPC EDC DataSource Setup UI 
---  History         : Created by YSIM at 2013.01.14
- * ********************************************************************************************************
- * 2014 년 DACrux V4 History Reset
- * 2015 년 DACrux V5 History Start
- * 2015-04-21 : YSLEE
-    1. SelectProductInfo(string product) : 신규생성, 해당 Product가 존재하는 지 유무 체크
-    2. UpdateProductInfo01(string FACILITY, string CUSTOMER_ID, string CUSTOMER_NAME, string CUSTPROD, string MAPID, string PRODUCT) : 신규생성, 현재 존재하는 Product 데이터 업데이트
-    3. UpdateDeleteFlag(string DELETE_FLAG, string PRODUCT) : 신규생성, 현재 존재하는 Product 삭제(실제로 DELETE_FLAG = 'Y'만 변경
+--  Description     : Probe 기준정보(Product / Program / Bin / Map 정의) 관리 RO 
 ----------------------------------------------------------------------------------------------------------*/
 using System;
 using System.Collections.Generic;

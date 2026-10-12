@@ -407,7 +407,6 @@ namespace DACrux.TEST.DSL
 
         /// <summary>
         /// YSIM 
-        /// 2015-04-16
         /// Wafer Creation Function
         /// </summary>
         /// <param name="lLotSeq">LOT_SEQ [Key : TESTAREA,PRODUCT,PROGRAM]</param>

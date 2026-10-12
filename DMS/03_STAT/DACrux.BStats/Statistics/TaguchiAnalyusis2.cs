@@ -78,7 +78,6 @@ namespace DACrux.BStats.Statistics
     }
 
     /// <summary>
-    /// YSIM 2014-11-05
     /// </summary>
     public class TaguchiAnalyusis2
     {

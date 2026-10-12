@@ -98,7 +98,7 @@ namespace DACrux.SEMDMS.Control
 
             //--
 
-            //2019-07-11-정병주 : Defect Size / Defect Class 별로 X 축을 정의 한다.
+            // Defect Size / Defect Class 별로 X 축을 정의 한다.
             DefectMapAnalysis oDMapAnalysis = new DefectMapAnalysis();
             dicSizeColor = oDMapAnalysis.GetDefectSizeColor(GlobalVariable.UserID);
             dtSizeInfo = oDMapAnalysis.SelectColorByDefectSize(GlobalVariable.UserID);

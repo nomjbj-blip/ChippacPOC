@@ -618,7 +618,6 @@ namespace DACrux.TEST.DSL
         #endregion
 
         /// <summary>
-        /// add date: 2019.05.30
         /// UI: Setup by Parameter Spec 
         /// Testarea 별, Device에 대한 Program Infor
         /// </summary>

@@ -7,7 +7,6 @@ namespace DACrux.SEMDMS.TFF2KLA
 {
     /// <summary>
     /// TFF to KLARF 변환기
-    /// 2019.07.01. Taihi,Kim.
     /// </summary>
     class Program
     {

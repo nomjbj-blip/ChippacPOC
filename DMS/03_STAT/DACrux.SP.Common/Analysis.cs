@@ -71,7 +71,7 @@ namespace DACrux.SP.Common
         {
             get { return sampleFiles; }
         }
-        //하나마이크론 샘플 변환용 함수
+        //샘플 파일 변환용 함수
         private Dictionary<string, string> HanasampleFiles = new Dictionary<string, string>();
         public Dictionary<string, string> HanaSampleFiles
         {

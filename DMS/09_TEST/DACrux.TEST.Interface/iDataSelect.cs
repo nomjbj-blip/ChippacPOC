@@ -15,7 +15,7 @@ namespace DACrux.TEST.Interface
         DataTable GetWaferInfo(long[] WaferSeq);
         DataTable GetWaferInfo();
        
-        #region 동부하이텍
+        #region TEST Wafer 목록 / 조회 조건
 
         DataTable GetTESTWaferList(string StartTime, string EndTime, string[] strWhere, string strSort, bool TimeNotCheck, bool LastTest);
 

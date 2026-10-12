@@ -105,7 +105,7 @@ namespace DACrux.SEMDMS.Control
             Dictionary<string, DefectInfo> dic = new Dictionary<string, DefectInfo>();
             List<string> valList = new List<string>();
 
-            // None / None 인 경우 Defect가 없는 Wafer 표현을 위해 로직 추가 2019.12.01 Taihi,Kim.
+            // None / None 인 경우 Defect가 없는 Wafer 표현을 위해 로직 추가
             if (appendEmptyWafer && dpWaferArr != null)
             {
                 foreach (var wafer in dpWaferArr)

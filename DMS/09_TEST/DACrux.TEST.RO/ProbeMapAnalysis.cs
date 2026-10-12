@@ -167,7 +167,7 @@ namespace DACrux.TEST.RO
         }
 
 
-        #region [동부 하이텍 추가]
+        #region Wafer Map 그리기 / Map 설정
 
         public DataSet SelectWaferMapDrawData(long WaferSeq)
         {

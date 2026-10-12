@@ -486,7 +486,7 @@ namespace DACrux.SEMDMS.Control
                     Defect[] sampleDefectArr = GetSampleDefectList(DefectList.GetDefectArray(stepSeq), count);
                     tmp.Wafers[0].SetDefect(sampleDefectArr);
 
-                    // Setup Map의 Angle이 0이 아니면 Review 설비에서 작업이 가능하도록 원래 각도로 돌려서 데이터를 내려준다. 2019.11.25 Taihi,Kim.
+                    // Setup Map의 Angle이 0이 아니면 Review 설비에서 작업이 가능하도록 원래 각도로 돌려서 데이터를 내려준다.
                     if (info.StepInfo.Angle > 0)
                     {
                         tmp.RotateAndRecalculate(info.StepInfo.Angle, DieIndexSort.LowerLeftToCenter);

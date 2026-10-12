@@ -1487,7 +1487,7 @@ namespace TestDataMigration_RemotingService
                     dicParams
                     );
 
-                //2019-05-10-정병주 : 프로시저를 실행 한다.
+                // 프로시저를 실행 한다.
 
                 sQuery.Clear();
                 sQuery.AppendLine(" CALL TPSMGR.PROC_CREATE_TQP_WAFER_SUM(:TESTAREA, :PRODUCT, :PROGRAM, :WAFER_SEQ, :GEC_BIN) ");

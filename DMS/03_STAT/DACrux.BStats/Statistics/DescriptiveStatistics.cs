@@ -637,7 +637,6 @@ namespace DACrux.BStats.Statistics
                     arrReturn[i].ImagePath = GetFileName(m_Input.ResultFilePath) + "RawDataPlot" + DateTime.Now.ToString("yyyyMMddHHmmss") + "-" + i.ToString() + ".jpg";
                     arrReturn[i].ImageSize = new System.Drawing.Size(m_DescriptionBoxplotW, GetBoxPlotH(22, m_DescriptionHistogramH));
 
-                    //OLD YSIM 2014-10-14
 
                     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 

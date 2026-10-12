@@ -371,7 +371,7 @@ namespace DACrux.SEMDMS.BSL
             return obj.GetDefectImagePath01(stepSeqArr);
         }
 
-        #region DB 하이텍
+        #region Defect Image / Reclassify
 
         public DataTable GetDefectImages(
             long[] steps

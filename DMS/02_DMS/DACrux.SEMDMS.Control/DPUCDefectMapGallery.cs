@@ -455,7 +455,7 @@ namespace DACrux.SEMDMS.Control
 
                 Draw(defectList);
 
-                // Link 를 통하지 않고 직접 조회하는 경우만 New defects only 기능이 활성화 되도록 한다. 2019.12.21 Taihi,Kim.
+                // Link 를 통하지 않고 직접 조회하는 경우만 New defects only 기능이 활성화 되도록 한다.
                 chkNewDefectsOnly.Enabled = true;
             }
             finally
@@ -581,7 +581,7 @@ namespace DACrux.SEMDMS.Control
                         }
                     }
 
-                    // 정보 표현을 위해 추가 2019.12.01 Taihi,Kim.
+                    // 정보 표현을 위해 추가
                     if (list.Count == 0)
                     {
                         Defect defect = new Defect();

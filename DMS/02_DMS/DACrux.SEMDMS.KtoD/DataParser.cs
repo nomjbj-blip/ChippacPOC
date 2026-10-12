@@ -4,14 +4,8 @@
 --  지적재산권 침해에 해당됩니다.
 --  (Copyright ⓒ 2014 Miracom Inc. All Rights Reserved | Confidential)
 --
---  Program Id      : DACruxMain.cs
---  Creator         : YoungShin Lim (YSIM)
---  Create Date     : 2014.11.14
---  Description     : DACrux V5 Main Frame
---  History         : Created by YSIM at 2014.11.14
- * ********************************************************************************************************
- * 2014 년 DACrux V4 History Reset
- * 2015 년 DACrux V5 History Start
+--  Program Id      : DataParser.cs
+--  Description     : KtoD 결과 파일 Parsing
  ----------------------------------------------------------------------------------------------------------*/
 
 using System;

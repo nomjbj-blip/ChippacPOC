@@ -15,7 +15,7 @@ using DACrux.Data.Handler;
 namespace DACrux.SEMDMS.Inspection.PreConvertingService
 {
     /*
-     * DB하이텍 DM 데이터 파일 PRE-CONVERTING SERVICE 2019.08.24 Taihi,Kim.
+     * DM 데이터 파일 PRE-CONVERTING SERVICE
      * 
      * 1) TFF 파일인 경우 TFF2KLA 를 통해 KLARF 파일로 변환한다.
      * 2) 여러 WAFER 데이터가 하나의 파일로 업로드 되는 경우 REVIEW 장비에서 테스트가 가능하도록 각각의 WAFER 단위의 KLARF 파일로 변환
@@ -247,7 +247,7 @@ namespace DACrux.SEMDMS.Inspection.PreConvertingService
             {
                 proc = Process.Start(start);
 
-                // TFF2KLA 프로세스 응답 없는 경우 처리 2019.12.04 Taihi,Kim.
+                // TFF2KLA 프로세스 응답 없는 경우 처리
                 if (!proc.WaitForExit(TFF2KLA_MAX_TIMEOUT))
                     throw new Exception("TFF2KLA 변환 중 응답 없음 발생. 해당 파일은 다음 주기에 처리 예정 입니다." + targetFile);
             }

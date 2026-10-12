@@ -7,8 +7,6 @@ using System.Text;
 namespace DACrux.SEMDMS.KtoD
 {
 	/// <summary>
-	/// 작성일 : 글쎄...
-	/// 작성자 : 임영신
 	/// 내  용 : Log를 남기는 놈
 	/// </summary>
 	public class Logging
@@ -136,7 +134,6 @@ namespace DACrux.SEMDMS.KtoD
 				}
 
 				// 로그 파일이 비대하게 커지므로 history.log 파일만 로그남김
-				// 2005-03-30 수정
 					swLog  = new StreamWriter(strWorkFile,true,System.Text.Encoding.Default  );
 					if(writeTime)
 					{

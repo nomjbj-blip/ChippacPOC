@@ -216,7 +216,6 @@ namespace DACrux.TEST.DSL
             }
         }
         /// <summary>
-        /// YSIM 2015-0-16
         /// => 수정
         /// </summary>
         /// <param name="Product">AVI는 Product 별 Table에 저장</param>
@@ -236,7 +235,6 @@ namespace DACrux.TEST.DSL
             }
         }
         /// <summary>
-        /// YSIM 2015-0-16
         /// => Override Function 추가 
         ///    여러개의 Data를 한번에 처리하는 함수
         /// </summary>
@@ -258,7 +256,6 @@ namespace DACrux.TEST.DSL
         }
 
         /// <summary>
-        /// YSIM 2015-04-16
         /// => 1개씩 Update
         /// </summary>
         /// <param name="Product">AVI는 Product 별 Table에 저장</param>
@@ -279,7 +276,6 @@ namespace DACrux.TEST.DSL
         }
 
         /// <summary>
-        /// YSIM 2015-04-16
         /// => 여러개 동시에 Update
         /// </summary>
         /// <param name="Product">AVI는 Product 별 Table에 저장</param>

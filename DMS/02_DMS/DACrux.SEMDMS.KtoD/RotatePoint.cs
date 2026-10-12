@@ -17,9 +17,7 @@ namespace DACrux.SEMDMS.KtoD
 
 		}
 		/// ====================================================================
-		///	- 수정자 : 미라콤 임영신
-		///	- 수정일 : 2005-06-11
-		///	- 변경로그 : SampleTest의 배열 리스트를 Rotate.	
+		///	SampleTest의 배열 리스트를 Rotate.	
         public void RotateKLARF(ref KLARF_HEADER_TAG KData, ref ArrayList sampleTestPlan)
 		/// ====================================================================	
 		{
@@ -144,9 +142,7 @@ namespace DACrux.SEMDMS.KtoD
 				/// Die 좌표도 삼각함수를 이용하여 돌리면 됨
 				
 				/// ====================================================================
-				///	- 수정자 : 미라콤 임영신
-				///	- 수정일 : 2005-06-11
-				///	- 변경로그 : SampleTest의 배열 리스트를 Rotate.	
+				///	SampleTest의 배열 리스트를 Rotate.	
 				for(int z = 0; z < sampleTestPlan.Count; z++)
 				{
 					DIEINFO_TAG[] testDieInfo = (DIEINFO_TAG[])sampleTestPlan[z];

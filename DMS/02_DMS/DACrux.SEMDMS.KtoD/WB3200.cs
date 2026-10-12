@@ -366,10 +366,10 @@ namespace DACrux.SEMDMS.KtoD
                             stbWork.Replace('~', '_');
                             stbWork.Replace('!', '_');
 
-                            /// (2004-11-12) TWI201에서 Image File 이름에 #,^가 삽입됨
+                            /// TWI201에서 Image File 이름에 #,^가 삽입됨
                             ///              따라서, # 을 허용함.
                             ///              
-                            /// (2004-12-22) # 이 삽입된 Path는 Http로 Service할 수 없음
+                            /// # 이 삽입된 Path는 Http로 Service할 수 없음
                             ///              따라서, 원래대로 다시 '_' 로 대치함
                             /// 
 
@@ -377,7 +377,7 @@ namespace DACrux.SEMDMS.KtoD
 
                             stbWork.Replace('$', '_');
                             stbWork.Replace('%', '_');
-                            //TWI201에서 Image File 이름에 #,^가 삽입됨(2004-11-12)
+                            //TWI201에서 Image File 이름에 #,^가 삽입됨
                             stbWork.Replace('&', '_');
                             stbWork.Replace('*', '_');
                             stbWork.Replace('?', '_');
@@ -1157,9 +1157,7 @@ namespace DACrux.SEMDMS.KtoD
             catch (Exception ex)
             {
                 /// ====================================================================
-                ///	- 수정자 : 미라콤 임영신
-                ///	- 수정일 : 2005-02-18
-                ///	- 변경로그 : ClassLookup의 갯수가 모자라는 경우, 넘치는 경우, 중간에 빠지는 경우, 순서가 바뀌는 경우등
+                ///	ClassLookup의 갯수가 모자라는 경우, 넘치는 경우, 중간에 빠지는 경우, 순서가 바뀌는 경우등
                 ///	             에러를 무시한다.
 
                 //				///[LOG]---------------------------------------------------------------------------------------
@@ -1193,7 +1191,7 @@ namespace DACrux.SEMDMS.KtoD
             try
             {
                 m_oKHeader.InspectionTest = int.Parse(RLine[1]);
-                // 멀티 SampleTestPlan 인써트를 위해 추가 2005.05.27. by 강혜경
+                // 멀티 SampleTestPlan 인써트를 위해 추가
                 m_InspectionTest.Add(m_oKHeader.InspectionTest);
             }
             catch (Exception ex)
@@ -1240,9 +1238,7 @@ namespace DACrux.SEMDMS.KtoD
             try
             {
                 /// ====================================================================
-                ///	- 수정자 : 미라콤 임영신
-                ///	- 수정일 : 2005-02-18
-                ///	- 변경로그 : M6 Klarf file 에 줄바꿈이 있는 경우에 대비하여 추가함
+                ///	M6 Klarf file 에 줄바꿈이 있는 경우에 대비하여 추가함
                 if (RLine.Length == 1)
                     return;
                 /// ====================================================================
@@ -1285,7 +1281,7 @@ namespace DACrux.SEMDMS.KtoD
             try
             {
                 m_oKHeader.AreaPerTest = double.Parse(RLine[1]);
-                // 멀티 SampleTestPlan 인써트를 위해 추가 2005.05.27. by 강혜경
+                // 멀티 SampleTestPlan 인써트를 위해 추가
                 m_AreaPerTest.Add(m_oKHeader.AreaPerTest);
             }
             catch (Exception ex)
@@ -1535,9 +1531,7 @@ namespace DACrux.SEMDMS.KtoD
 
         #region ■ AFTER : Image 이름과 Directory 관리방안 변경으로 함수 변경 2005-01-07일
         /// ====================================================================
-        ///	- 수정자 : 미라콤 임영신
-        ///	- 수정일 : 2005-02-28
-        ///	- 변경로그 : Multi Tiff 유무 파라메터를 추가하여 변경함,AddDefect에서 이 메서드를 참조함
+        ///	Multi Tiff 유무 파라메터를 추가하여 변경함,AddDefect에서 이 메서드를 참조함
         public void AddIMAGE(string ImgFileName, int DefectIdx)
         /// ====================================================================
         {
@@ -1679,7 +1673,7 @@ namespace DACrux.SEMDMS.KtoD
                         m_oKHeader.TestParametersList[iIdx++] = double.Parse(RLine[i]);
                     }
                 }
-                // 멀티 SampleTestPlan 인써트를 위해 추가 2005.05.27. by 강혜경
+                // 멀티 SampleTestPlan 인써트를 위해 추가
                 double[] dbTestParametersList = (double[])m_oKHeader.TestParametersList.Clone();
                 m_TestParametersList.Add(dbTestParametersList);
             }
@@ -1900,11 +1894,9 @@ namespace DACrux.SEMDMS.KtoD
                     }
                 }
                 /// ====================================================================
-                ///	- 수정자 : 미라콤 임영신
-                ///	- 수정일 : 2005-05-27
-                ///	- 변경로그 : 주석처리, SummaryList의 멀티 라인을 아래 코드로 인해 읽지 못하기 때문
+                ///	주석처리, SummaryList의 멀티 라인을 아래 코드로 인해 읽지 못하기 때문
 
-                // 멀티 SampleTestPlan 인써트를 위해 추가 2005.05.27. by 강혜경
+                // 멀티 SampleTestPlan 인써트를 위해 추가
                 double[] dbSummaryList = (double[])m_oKHeader.SummaryList.Clone();
                 m_SummaryList.Add(dbSummaryList);
                 /// ====================================================================
@@ -2196,9 +2188,7 @@ namespace DACrux.SEMDMS.KtoD
                 strDBData[11] = iOriginY.ToString();			//ORIGIN_Y             INTEGER NOT NULL DEFAULT 0
 
                 /// =========================================================================================================
-                ///	- 수정자 : 미라콤 임영신
-                ///	- 수정일 : 2005-02-18
-                ///	- 변경로그 : M6, Klarf file Spec에 SetupID의 SetupTime이 없는 경우 기존 M10 소스 막고 조건문 추가
+                ///	M6, Klarf file Spec에 SetupID의 SetupTime이 없는 경우 기존 M10 소스 막고 조건문 추가
                 ///	             Setup_ID를 조회하여 
                 ///						존재하지 않으면 현재 시간으로 대치하여 인써트하고
                 ///						존재하면 인써트 하지 않는다.
@@ -2248,9 +2238,7 @@ namespace DACrux.SEMDMS.KtoD
                 oYesStepTx = new DACrux.SEMDMS.DSL.TQD_STEP();
                 oYesStepInfo = new DACrux.SEMDMS.DSL.TQD_INSP_INFO();
                 /// ====================================================================
-                ///	- 수정자 : 미라콤 임영신
-                ///	- 수정일 : 2005-02-17
-                ///	- 변경로그 : M10, EDB --> M6, M6HIS 로 변경 , GetMESInfo() 로 대치
+                ///	M10, EDB --> M6, M6HIS 로 변경 , GetMESInfo() 로 대치
                 /// ====================================================================
                 strStatus = oCurrDt.ToString("yyyyMMddHHmmss");
 
@@ -2600,7 +2588,7 @@ namespace DACrux.SEMDMS.KtoD
 														"0","0","0","0","0"};
                 strTTable = "TQD_DEFECT";
 
-                // 2013-09-11 YSIM Normal 한 방법으로 Data를 올린다.
+                // Normal 한 방법으로 Data를 올린다.
 
                 if (oYesDefectTx.GetDefectCount(strDBData) == 0)
                 {
@@ -2976,9 +2964,7 @@ namespace DACrux.SEMDMS.KtoD
                 Logging.WriteLog(string.Format("Error Message [{0}]", ex.Message), "ERROR", 1);
                 ///--------------------------------------------------------------------------------------------
                 /// ====================================================================
-                ///	- 수정자 : 미라콤 임영신
-                ///	- 수정일 : 2005-02-18
-                ///	- 변경로그 : tif 파일에 실제 이미지가 없는 경우 m_oImgLoader.GetThumeNail 에서 개체 오류로 전체 프로세스가 중단된다.
+                ///	tif 파일에 실제 이미지가 없는 경우 m_oImgLoader.GetThumeNail 에서 개체 오류로 전체 프로세스가 중단된다.
                 ///	             따라서 이미지를 로드하지 못하여 발생하는 에러를 throw 하지 않고 로깅만 한다.
                 /// ====================================================================
             }
@@ -2996,9 +2982,7 @@ namespace DACrux.SEMDMS.KtoD
             AccuracyCheck();
 
             /// ====================================================================
-            ///	- 수정자 : 미라콤 임영신
-            ///	- 수정일 : 2005-03-10
-            ///	- 변경로그 : 함수 추가 
+            ///	함수 추가 
             ///		MES의 MainEq,RTE,Oper,Reticle 정보를 가져온다.				
             /// ====================================================================
 
@@ -3038,7 +3022,7 @@ namespace DACrux.SEMDMS.KtoD
                 /// 3. Wafer ID 길이가 3자리 이상일때(3자리를 용서하는 이유 @)
                 /// ==============================================================================================================================================================
 
-                // STEP_SEQ 조건에 TEST 추가(2005.05.31 강혜경)
+                // STEP_SEQ 조건에 TEST 추가
                 if (m_oKHeader.WaferID == null || m_oKHeader.WaferID.Length == 0 || m_oKHeader.WaferID.Length > 3)
                 {
                     dtExist = oYesStepTx.GetExistInspSlot(new string[4] { m_oKHeader.LotID, m_oKHeader.Slot.ToString().PadLeft(2, '0'), m_oKHeader.ResultTimestamp, m_oKHeader.InspectionTest.ToString() });
@@ -3059,9 +3043,7 @@ namespace DACrux.SEMDMS.KtoD
                     lsetup_seq = long.Parse(dtExist.Rows[0]["SETUP_SEQ"].ToString());
                     lstep_seq = long.Parse(dtExist.Rows[0]["STEP_SEQ"].ToString());
                     /// ====================================================================
-                    ///	- 수정자 : 미라콤 임영신
-                    ///	- 수정일 : 2005-03-12
-                    ///	- 변경로그 :  아래 로직을 추가함
+                    ///	아래 로직을 추가함
                     ///	Step까지는 존재하고(WAFER,STEP)
                     /// Defect 의 갯수가 존재 하지 않는다.(Defect 갯수가 0)
                     /// TQD_DEFECT에서 Step_seq를 기준으로 Defect을 Count해야함
@@ -3187,9 +3169,7 @@ namespace DACrux.SEMDMS.KtoD
 
 
                     /// ====================================================================
-                    ///   - 수정자 : 미라콤 임영신
-                    ///   - 수정일 : 2005-02-17
-                    ///   - 변경로그 : M10만 있는 기능이므로 분기 처리함
+                    ///   M10만 있는 기능이므로 분기 처리함
                     /// 
                     if (m_FAB.Equals("M10"))
                     {
@@ -3356,9 +3336,7 @@ namespace DACrux.SEMDMS.KtoD
             try
             {
                 /// ====================================================================
-                ///	- 수정자 : 미라콤 임영신
-                ///	- 수정일 : 2005-03-02
-                ///	- 변경로그 : DeviceID 를 무조건 LOTID  앞 3자리, 대문자로 처리함, 권택수 과장님과 협의완료
+                ///	DeviceID 를 무조건 LOTID  앞 3자리, 대문자로 처리함, 권택수 과장님과 협의완료
                 ///					
 
                 if (m_oKHeader.LotID.Length >= 3)

@@ -658,7 +658,7 @@ namespace DACrux.TEST.BSL
         }
 
 
-        #region [동부 하이텍 추가]
+        #region Wafer Map 그리기 / Map 설정
 
         /// <summary>
         /// TEST Map Draw 쿼리

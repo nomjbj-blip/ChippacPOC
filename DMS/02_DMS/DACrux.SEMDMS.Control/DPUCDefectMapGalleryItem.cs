@@ -30,7 +30,7 @@ namespace DACrux.SEMDMS.Control
 
         private void label1_MouseWheel(object sender, MouseEventArgs e)
         {
-            // Ctrl + Mouse Wheel 시 X축 Font 크기 조정 2019.12.01 Taihi,Kim.
+            // Ctrl + Mouse Wheel 시 X축 Font 크기 조정
             if (System.Windows.Forms.Control.ModifierKeys == System.Windows.Forms.Keys.Control)
             {
                 System.Drawing.Font currFont = label1.Font;

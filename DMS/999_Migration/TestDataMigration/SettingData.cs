@@ -12,7 +12,6 @@ namespace TestDataMigration
     /// <summary>
     /// 값을 파일로 저장하고 로드할 수 있는 클래스 입니다.<para />
     /// 파일 저장 위치는 내문서 이며, 하위 경로로 저장하려면 파일명 앞에 경로명을 같이 입력합니다.<para />
-    /// 2019.07.21 Taihi,Kim.
     /// </summary>
     public class SettingData
     {

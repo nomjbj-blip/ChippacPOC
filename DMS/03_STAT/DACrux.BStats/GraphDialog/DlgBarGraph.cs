@@ -49,7 +49,6 @@ namespace DACrux.BStats.GraphDialog
             graphInfo.DataSource = dataSource;
 
             graphInfo.View3D = false;
-            // Changed By James Kwon 2014/10/16
             graphInfo.PointLabel = false;
             graphInfo.LabelAngle = 0;
 

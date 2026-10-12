@@ -69,7 +69,7 @@ namespace DACrux.BStats.GraphDialog
             this.Text = graphInfo.Type.ToString() + " Graph";
             lblSample.Text = graphInfo.Type.ToString() + " Graph Sample";
 
-            //2014-11-04-정병주 : Default 값을 1로 Setting 한다.(STEMCO 요청 사항)
+            // Default 값을 1로 Setting 한다.
             graphInfo.DecimalPlaceX = 1;
 
             lvColumns.SmallImageList = imlColumnType;

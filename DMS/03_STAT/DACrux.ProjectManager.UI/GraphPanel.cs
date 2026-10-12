@@ -1196,7 +1196,6 @@ namespace DACrux.ProjectManager.UI
                     graphInfo.SpecLimit = false;
                 else
                 {
-                    // Deleted By James Kwon 2014/10/16
                     if (double.IsNaN(graphInfo.USL))
                         spcHistogram.USL = DACrux.Base.StatGlobalVariable.DOUBLE_NULL_DATA;
                     else

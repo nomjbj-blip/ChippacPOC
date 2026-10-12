@@ -81,13 +81,13 @@ namespace DACrux.SEMDMS.Inspection.DataService
                     break;
 
                 // KLARITY 임시 로직 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                // 설비 별로 임시로 데이터 및 원본 이미지 파일을 복사해야 할 경우 2019.10.24
+                // 설비 별로 임시로 데이터 및 원본 이미지 파일을 복사해야 할 경우
                 /*
                 if (!String.IsNullOrWhiteSpace(handler.EquipInfo.Grp01))
                 {
                     try
                     {
-                        // LOTEND*.trf 파일이 남아 있는 경우 복사한다. 이 파일 없으면 review 파일을 못 만든다고 함. 한동은 수석 요청 2019.10.27
+                        // LOTEND*.trf 파일이 남아 있는 경우 복사한다. 이 파일 없으면 review 파일을 못 만든다고 함.
                         foreach (string file in Directory.GetFiles(Path.Combine(DataPath, handler.EquipInfo.EquipID), "LOTEND*.trf"))
                         {
                             // 복사 후에는 trf 파일을 삭제한다.
@@ -110,7 +110,7 @@ namespace DACrux.SEMDMS.Inspection.DataService
                 handler.Run();
 
                 //
-                // 일반 KLARF 파일과 TRF KLARF 파일을 따로 처리한다. 2019.11.04 Taihi,Kim.
+                // 일반 KLARF 파일과 TRF KLARF 파일을 따로 처리한다.
                 //
                 foreach (DACrux.Data.Parser.Klarf.ParserKlarf parser in handler.ParserList)
                 {
@@ -180,7 +180,7 @@ namespace DACrux.SEMDMS.Inspection.DataService
 
                             #region [Step 01 : TQD_SETUP 확인 생성]
 
-                            // MAP 존재여부 및 저장 시에는 8자리로 변환한 STEP ID를 사용하지 않고 KLARF 파일에서 올라온 STEP ID를 사용한다. 2019.12.06 Taihi,Kim.
+                            // MAP 존재여부 및 저장 시에는 8자리로 변환한 STEP ID를 사용하지 않고 KLARF 파일에서 올라온 STEP ID를 사용한다.
                             SetupSeq = oDefectDefine.GetSetupDuplicate(parser.SetupID, parser.StepID, parser.SetupTimestamp.ToString("yyyyMMddHHmmss"));
                             if (SetupSeq < 0)
                             {
@@ -592,14 +592,14 @@ namespace DACrux.SEMDMS.Inspection.DataService
                         }
 
                         // KLARITY 임시 로직 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                        // 설비 별로 임시로 데이터 및 원본 이미지 파일을 복사해야 할 경우 2019.10.24
+                        // 설비 별로 임시로 데이터 및 원본 이미지 파일을 복사해야 할 경우
                         if (!String.IsNullOrWhiteSpace(handler.EquipInfo.Grp01))
                         {
                             try
                             {
                                 handler.AddtionalCopy(parser, handler.EquipInfo.Grp01);
 
-                                /*// 해당 LOT ID로 .trf 파일이 있는 경우 복사한다. 이 파일 없으면 review 파일을 못 만든다고 함. 한동은 수석 요청 2019.10.27
+                                /*// 해당 LOT ID로 .trf 파일이 있는 경우 복사한다. 이 파일 없으면 review 파일을 못 만든다고 함.
                                 foreach (string file in Directory.GetFiles(parser.DirectoryName, "LOTEND*.trf"))
                                 {
                                     if (DACrux.Data.Parser.ParsingUtil.FileToString(file).Contains(String.Format("LotID \"{0}\";", parser.LotID)))
@@ -686,7 +686,7 @@ namespace DACrux.SEMDMS.Inspection.DataService
                 }
 
                 //
-                // 일반 KLARF 파일과 TRF KLARF 파일을 따로 처리한다. 2019.11.04 Taihi,Kim.
+                // 일반 KLARF 파일과 TRF KLARF 파일을 따로 처리한다.
                 //
                 foreach (DACrux.Data.Parser.Klarf.ParserKlarf parser in handler.ParserList)
                 {
@@ -797,7 +797,7 @@ namespace DACrux.SEMDMS.Inspection.DataService
 
                         //
                         // LOTEND 파일 때 Review 파일을 생성하도록 설정된 경우 (CMF07=Y) 
-                        // 같은 LOT, EQUIP, ResultTimestamp 데이터를 모아 Review 설비로 파일을 내려줄 수 있도록 한다. 2019.11.24 Taihi,Kim.
+                        // 같은 LOT, EQUIP, ResultTimestamp 데이터를 모아 Review 설비로 파일을 내려줄 수 있도록 한다.
                         //
                         if (handler.IsTrfKlarfLotEndFile(parser.FileName) && !String.IsNullOrEmpty(handler.ReviewCopyPath) && handler.EquipInfo.IsCreateReviewFileAtLotEnd())
                         {
@@ -815,7 +815,7 @@ namespace DACrux.SEMDMS.Inspection.DataService
 
                                     ParserKlarf tmp = new ParserKlarf(defectArr, info);
 
-                                    // Setup Map의 Angle이 0이 아니면 Review 설비에서 작업이 가능하도록 원래 각도로 돌려서 데이터를 내려준다. 2019.11.25 Taihi,Kim.
+                                    // Setup Map의 Angle이 0이 아니면 Review 설비에서 작업이 가능하도록 원래 각도로 돌려서 데이터를 내려준다.
                                     if (info.StepInfo.Angle > 0)
                                     {
                                         tmp.RotateAndRecalculate(info.StepInfo.Angle, DieIndexSort.LowerLeftToCenter);
@@ -864,7 +864,7 @@ namespace DACrux.SEMDMS.Inspection.DataService
                         }
 
                         // KLARITY 임시 로직 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                        // 설비 별로 임시로 데이터 및 원본 이미지 파일을 복사해야 할 경우 2019.10.24
+                        // 설비 별로 임시로 데이터 및 원본 이미지 파일을 복사해야 할 경우
                         if (!String.IsNullOrWhiteSpace(handler.EquipInfo.Grp01))
                         {
                             try

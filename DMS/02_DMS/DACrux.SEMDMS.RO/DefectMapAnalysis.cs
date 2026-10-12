@@ -285,7 +285,7 @@ namespace DACrux.SEMDMS.RO
             return m_OBJ.GetStepInfoOverlay(lotId, waferId);
         }
 
-        #region 동부 하이텍
+        #region Defect Map / Image / Reclassify
 
         public System.Data.DataTable GetColorByDefectType(
             )

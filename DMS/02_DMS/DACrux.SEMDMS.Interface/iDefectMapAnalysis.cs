@@ -63,7 +63,7 @@ namespace DACrux.SEMDMS.Interface
         DataTable GetInspInfo02(long[] stepSeqArr);
         DataTable GetDefectImagePath01(long[] stepSeqArr);
 
-        #region DB 하이텍 
+        #region Defect Map / Image / Reclassify
         
         System.Data.DataTable GetColorByDefectType();
         DataSet GetDMSStepWaferList(string start, string end, string[] wheres, bool TimeNotCheck, bool bLastInspection);

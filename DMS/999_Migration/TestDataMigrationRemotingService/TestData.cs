@@ -472,7 +472,7 @@ namespace TestDataMigrationRemotingService
             sQuery.AppendLine("        AND T1.LOT_SEQ = :lotseq ");
 
 
-            // 임시로 probe_cnt > 0 인것만 처리 2019.11.25
+            // 임시로 probe_cnt > 0 인것만 처리
             sQuery.AppendLine("        AND T2.PROBE_CNT > 0 ");
 
 

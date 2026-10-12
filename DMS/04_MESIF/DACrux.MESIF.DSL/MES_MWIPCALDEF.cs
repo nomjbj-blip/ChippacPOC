@@ -5,13 +5,7 @@
 --  (Copyright ⓒ 2014 Miracom Inc. All Rights Reserved | Confidential)
 --
 --  Program Id      : MES_MWIPCALDEF.cs
---  Creator         : YoungShin Lim (YSIM)
---  Create Date     : 2015.4.3
 --  Description     : DACrux V5 MES IF DSL Class
---  History         : Created by YSIM at 2015.4.3
- * ********************************************************************************************************
- * 2014 년 DACrux V4 History Reset
- * 
  ----------------------------------------------------------------------------------------------------------*/
 using System;
 

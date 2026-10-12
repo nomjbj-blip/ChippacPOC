@@ -10,7 +10,6 @@ namespace DACrux.TEST.Interface
     {
         DataSet GetWaferMap(long WaferSeq);
 
-        // 2015-04-22
         DataSet GetWaferMap(string TestArea, string Product, string Program, string LotID, string WaferID, int ProbeCnt, bool IsMaxOper = false);
 
         DataTable GetBinDistribution(string program, long waferSeq);
@@ -40,7 +39,7 @@ namespace DACrux.TEST.Interface
         long InsertLot(string FACILITY, string TESTAREA, string PRODUCT, string PROGRAM, string LOTID, string FABLOT, string START_TIME, string END_TIME);
         long InsertWafer(string LOT_SEQ, string WAFER_ID, string TESTER, string OPERATOR, string TESTED_DIE, string START_TIME, string LOSS_DIE);
 
-        #region [동부 하이텍 추가]
+        #region Wafer Map 그리기 / Map 설정
 
         DataSet SelectWaferMapDrawData(long WaferSeq);
         DataSet SelectWaferMapDrawData(long[] WaferSeq);

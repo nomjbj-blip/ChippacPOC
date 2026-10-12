@@ -980,7 +980,7 @@ namespace DACrux.SEMDMS.Control
                     ));
             }
 
-            // Shot Start Index 재조정 2019.12.26 Taihi,Kim.
+            // Shot Start Index 재조정
             DefectMapDraw.ReadjustShotStartIndex(map);
 
             map.SetInfomation(DefectMapDraw.GetMapDescription(map.Defects));

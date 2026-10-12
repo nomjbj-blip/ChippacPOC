@@ -180,7 +180,7 @@ namespace DACrux.TEST.MAPParser
                 RegexAnalysis(argument);
                 WriteLog(string.Format("[{0, 15}]", "PARSER"), string.Format(" {0, -15}  {1}", "", "Regex Analysis Complete"), argument.LOGPath, 1);
 
-                //2011-11-23-이태훈 변수에 값채우기
+                // 변수에 값채우기
                 strBottom = oAnalysis.strBottom == "" ? "BOTTOM" : oAnalysis.strBottom;
                 strRight = oAnalysis.strRight == "" ? "RIGHT" : oAnalysis.strRight;
                 strLeft = oAnalysis.strLeft == "" ? "LEFT" : oAnalysis.strLeft;
@@ -1162,7 +1162,7 @@ namespace DACrux.TEST.MAPParser
                             break;
 
 
-                        // 2012.02.29 삼성 메모리 형태의 신규맵의 추가로 인해 수정
+                        // 메모리 형태 신규 맵 추가로 수정
                         case "run_id":
                             count += 1;
                             if ((int)data[2] > 0)
@@ -1182,7 +1182,7 @@ namespace DACrux.TEST.MAPParser
                 }
                 WriteLog(string.Format("[{0, 15}]", "PARSER"), string.Format(" {0, -15}  {1}", "", "Bin Code 정의 완료"), argument.LOGPath, 2);
 
-                // 2012.02.29 삼성 메모리 형태의 신규맵의 추가로 인해 수정
+                // 메모리 형태 신규 맵 추가로 수정
                 if (string.IsNullOrEmpty(strWaferValue))
                 {
                     if (string.IsNullOrEmpty(strRunValue) == false && string.IsNullOrEmpty(strWaferNOValue) == false)
