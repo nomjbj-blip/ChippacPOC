@@ -46,9 +46,6 @@ namespace DACrux.BStats.Core
         #endregion
 
         #region " CREATOR "
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="Source"></param>
         /// <param name="DataColumns">하나의 Row가 하나의 Lot에 대한 Value임</param>
         /// <param name="InputOption"></param>
@@ -1579,9 +1576,6 @@ namespace DACrux.BStats.Core
         }
 
 
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="LSL"></param>
         /// <param name="USL"></param>
         /// <param name="Target"></param>

@@ -28,9 +28,6 @@ namespace DACrux.BStats
         #region " METHOD "
 
         #region [ Create XML File ]
-        /// <summary>
-        /// 
-        /// </summary>
         private void CreateMenuOptionXMLFile()
         {
             DataSet dsXml = null;

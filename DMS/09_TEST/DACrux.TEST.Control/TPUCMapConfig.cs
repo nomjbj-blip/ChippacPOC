@@ -1012,6 +1012,12 @@ namespace DACrux.MapAnalysis.Control
         /// Wafer를 시계방향으로 회전합니다.
         /// </summary>
         /// <param name="clockwiseAngle">시계방향회전각도 : 0,90,180,270</param>
+        /// <param name="xmin"></param>
+        /// <param name="xmax"></param>
+        /// <param name="ymin"></param>
+        /// <param name="ymax"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
         public void Rotate(int clockwiseAngle, int xmin, int xmax, int ymin, int ymax, ref int x, ref int y)
         {
             if (clockwiseAngle == 0)

@@ -616,9 +616,6 @@ namespace DACrux.TEST.BSL
             return median;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="values"></param>
         /// <param name="divisor">divisor 의 값에 의해서 Population 과 Sample로 나뉨</param>
         /// Population: values.count() 
@@ -984,7 +981,7 @@ namespace DACrux.TEST.BSL
         /// <summary>
         /// Lot ID 7자리로 확인 후 없으면 6자리로 확인 한다.
         /// </summary>
-        /// <param name="lotid"></param>
+        /// <param name="LOT_ID"></param>
         /// <returns></returns>
         public string GetLotStatusInfo(string LOT_ID)
         {
@@ -1755,12 +1752,15 @@ namespace DACrux.TEST.BSL
         /// Scope Data 저장 시 사용
         /// </summary>
         /// <param name="strWaferSeq"></param>
-        /// <param name="DiesList"></param>
+        /// <param name="oDiesList"></param>
         /// <param name="iTotalDies"></param>
         /// <param name="iINDEX_XMAX"></param>
         /// <param name="iINDEX_YMAX"></param>
         /// <param name="strUser"></param>
-        /// <param name="strFTPPath"></param>
+        /// <param name="bAlterInfo"></param>
+        /// <param name="strAlterLotID"></param>
+        /// <param name="strAlterWaferID"></param>
+        /// <param name="oTestImageList"></param>
         public void ScopeDataSet(string strWaferSeq, DACrux.Base.DieList oDiesList, int iTotalDies, int iINDEX_XMAX, int iINDEX_YMAX, string strUser, bool bAlterInfo, string strAlterLotID, string strAlterWaferID, DACrux.Base.TestImageList oTestImageList)
         {
             DACrux.TEST.BSL.TestCommon oTest = new DACrux.TEST.BSL.TestCommon();
@@ -1930,6 +1930,7 @@ namespace DACrux.TEST.BSL
         /// <param name="iTotalDies"></param>
         /// <param name="iINDEX_XMAX"></param>
         /// <param name="iINDEX_YMAX"></param>
+        /// <param name="oTestImageList"></param>
         public void ScopeNewLotDataSet(string strFactory, string strUser, string strAlterLotID, string strAlterWaferID, string AlterDevice, DACrux.Base.DieList oDiesList, int iTotalDies, int iINDEX_XMAX, int iINDEX_YMAX, DACrux.Base.TestImageList oTestImageList)
         {
             DACrux.TEST.BSL.TestCommon oTest = new DACrux.TEST.BSL.TestCommon();

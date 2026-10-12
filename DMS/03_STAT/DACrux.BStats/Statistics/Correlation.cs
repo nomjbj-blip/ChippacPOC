@@ -88,7 +88,7 @@ namespace DACrux.BStats.Statistics
         /// <summary>
         /// 최종결과인 html file의 경로를 받아서 경로와 확장자가 제거된 파일이름만 돌려준다.
         /// </summary>
-        /// <param name="strFullFilePath"></param>
+        /// <param name="strFullName"></param>
         /// <returns></returns>
         private string GetFileName(string strFullName)
         {

@@ -73,7 +73,6 @@ namespace DACrux.TEST.ENGUI
             // 이 호출은 Windows.Forms Form 디자이너에 필요합니다.
             InitializeComponent();
 
-            // TODO: InitializeComponent를 호출한 다음 초기화 작업을 추가합니다.
 
         }
 

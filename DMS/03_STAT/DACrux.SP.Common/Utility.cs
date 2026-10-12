@@ -122,9 +122,8 @@ namespace DACrux.SP.Common
         /// Gets DistinctTable
         /// </summary>
         /// <param name="dtSource">datatable</param>
-        /// <param name="columnName">column name</param>
-        /// <param name="distinct">distinct flag</param>
         /// <param name="sortType">sorting type</param>
+        /// <param name="columnNames">column name</param>
         /// <returns>result</returns>
         public static DataTable GetDistinctTable(DataTable dtSource, SortTypes sortType, params string[] columnNames)
         {

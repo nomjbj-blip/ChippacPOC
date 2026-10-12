@@ -1448,6 +1448,8 @@ namespace DACrux.TEST.BSL
         /// <summary>
         /// 정의된 Map Define 이 없을 경우 정의 해준다.
         /// </summary>
+        /// <param name="strDevice"></param>
+        /// <param name="strTESTAREA"></param>
         /// <param name="iYmax"></param>
         /// <param name="iXmax"></param>
         /// <param name="iXmin"></param>
@@ -2721,6 +2723,12 @@ namespace DACrux.TEST.BSL
         /// Wafer를 시계방향으로 회전합니다.
         /// </summary>
         /// <param name="clockwiseAngle">시계방향회전각도 : 0,90,180,270</param>
+        /// <param name="xmin"></param>
+        /// <param name="xmax"></param>
+        /// <param name="ymin"></param>
+        /// <param name="ymax"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
         public void Rotate(int clockwiseAngle, int xmin, int xmax, int ymin, int ymax, ref int x, ref int y)
         {
             if (clockwiseAngle == 0)

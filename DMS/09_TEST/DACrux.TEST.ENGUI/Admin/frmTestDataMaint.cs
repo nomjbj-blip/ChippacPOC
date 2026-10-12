@@ -600,7 +600,6 @@ namespace DACrux.TEST.ENGUI
             if (!ShowUserCommentPopup(String.Format("해당 Lot ID를 '{0}' 로 변경하시겠습니까?", txtNewWaferLotID.Text), out userComment))
                 return;
 
-            // TODO
             RO.TestDataMaint obj = new RO.TestDataMaint();
             obj.UpdateWaferLotID(GlobalVariable.Factory, txtCurrWaferLotSeq.Text, txtCurrWaferSeq.Text, txtNewWaferLotID.Text);
 
@@ -653,7 +652,6 @@ namespace DACrux.TEST.ENGUI
             if (!ShowUserCommentPopup(String.Format("해당 Wafer ID를 '{0}' 로 변경하시겠습니까?", txtNewWaferID.Text), out userComment))
                 return;
 
-            // TODO
             RO.TestDataMaint obj = new RO.TestDataMaint();
             obj.UpdateWaferID(txtCurrWaferSeq.Text, txtNewWaferID.Text, (int)nudProbeCnt.Value);
 
@@ -699,7 +697,6 @@ namespace DACrux.TEST.ENGUI
             if (!ShowUserCommentPopup(String.Format("해당 WAFER 에 대한 PROGRAM 명을 '{0}' 로 변경하시겠습니까?", txtNewWafProgram.Text), out userComment))
                 return;
 
-            // TODO
             RO.TestDataMaint obj = new RO.TestDataMaint();
             obj.UpdateWaferProgram(GlobalVariable.Factory, txtCurrLotSeq.Text, txtCurrWaferSeq.Text, txtNewWafProgram.Text);
 
@@ -802,7 +799,6 @@ namespace DACrux.TEST.ENGUI
             if (!ShowUserCommentPopup(String.Format("Lot ID를 '{0}' 로 변경하시겠습니까?", txtNewLotID.Text), out userComment))
                 return;
 
-            // TODO
             RO.TestDataMaint obj = new RO.TestDataMaint();
             obj.UpdateLotID(txtCurrLotSeq.Text, txtNewLotID.Text);
 
@@ -847,7 +843,6 @@ namespace DACrux.TEST.ENGUI
             if (!ShowUserCommentPopup(String.Format("PROGRAM 명을 '{0}' 로 변경하시겠습니까?", txtNewLotProgram.Text), out userComment))
                 return;
 
-            // TODO
             RO.TestDataMaint obj = new RO.TestDataMaint();
             obj.UpdateLotProgram(GlobalVariable.Factory, txtCurrLotSeq.Text, txtCurrLotProgram.Text, txtNewLotProgram.Text);
 

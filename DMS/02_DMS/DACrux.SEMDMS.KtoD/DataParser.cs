@@ -634,7 +634,8 @@ namespace DACrux.SEMDMS.KtoD
         /// - 작  성  자 : 미라콤 임영신<br>
         /// - 주요변경로그<br>
         /// </Summary>
-        /// <param name="KFileName">KLARF File Name</param>
+        /// <param name="ArgValues"></param>
+        /// <param name="retArgValues"></param>
         /// <returns>TargetFilePath</returns>		
         static void ParsingArgument(string[] ArgValues, ref DACrux.Base.ARGUMENT_TAG retArgValues)
         {

@@ -129,7 +129,7 @@ namespace DACrux.TEST.DSL
         /// 주어진 Wafer Seq에 의해 Wafer 정보를 조회한다.
         /// LOT_SEQ, PRODUCT, TESTAREA, PROGRAM, LOT_ID, MOTHER_LOT_ID, START_TIME, END_TIME, WIP_STATUS, WAFERS, WAFER_SEQ, LOT_SEQ_1, WAFER_ID, TESTER, OPERATOR,  PROBE_CNT, TESTED_DIE, START_TIME_1, END_TIME_1, WAFER_CAT, LOSS_DIE, ISP_INITEM, VISUAL_ITEM, ISP_OUTITEM
         /// </summary>
-        /// <param name="WaferSeq">WaferSeq</param>
+        /// <param name="waferSeq">WaferSeq</param>
         /// <returns>LOT_SEQ, PRODUCT, TESTAREA, PROGRAM, LOT_ID, MOTHER_LOT_ID, START_TIME, END_TIME, WIP_STATUS, WAFERS, WAFER_SEQ, LOT_SEQ_1, WAFER_ID, TESTER, OPERATOR,  PROBE_CNT, TESTED_DIE, START_TIME_1, END_TIME_1, WAFER_CAT, LOSS_DIE, ISP_INITEM, VISUAL_ITEM, ISP_OUTITEM</returns>
 
         public DataTable GetWaferInfoByWSEQ(
@@ -159,7 +159,9 @@ namespace DACrux.TEST.DSL
         /// 주어진 Wafer ID 에 의해 Wafer 정보를 조회한다.
         /// LOT_SEQ, PRODUCT, TESTAREA, PROGRAM, LOT_ID, MOTHER_LOT_ID, START_TIME, END_TIME, WIP_STATUS, WAFERS, WAFER_SEQ, LOT_SEQ_1, WAFER_ID, TESTER, OPERATOR,  PROBE_CNT, TESTED_DIE, START_TIME_1, END_TIME_1, WAFER_CAT, LOSS_DIE, ISP_INITEM, VISUAL_ITEM, ISP_OUTITEM
         /// </summary>
-        /// <param name="WaferSeq">WaferSeq</param>
+        /// <param name="stime"></param>
+        /// <param name="etime"></param>
+        /// <param name="fieldOrder"></param>
         /// <returns>LOT_SEQ, PRODUCT, TESTAREA, PROGRAM, LOT_ID, MOTHER_LOT_ID, START_TIME, END_TIME, WIP_STATUS, WAFERS, WAFER_SEQ, LOT_SEQ_1, WAFER_ID, TESTER, OPERATOR,  PROBE_CNT, TESTED_DIE, START_TIME_1, END_TIME_1, WAFER_CAT, LOSS_DIE, ISP_INITEM, VISUAL_ITEM, ISP_OUTITEM</returns>
 
         public DataTable GetWaferList(DateTime stime, DateTime etime, string fieldOrder)
@@ -409,6 +411,7 @@ namespace DACrux.TEST.DSL
         /// YSIM 
         /// Wafer Creation Function
         /// </summary>
+        /// <param name="strFactory"></param>
         /// <param name="lLotSeq">LOT_SEQ [Key : TESTAREA,PRODUCT,PROGRAM]</param>
         /// <param name="WaferID">Unique Wafer ID</param>
         /// <param name="Slot">Slot Number [Default : -1]</param>

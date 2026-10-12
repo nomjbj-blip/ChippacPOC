@@ -191,7 +191,7 @@ namespace DACrux.BStats.Statistics
         /// <summary>
         /// 최종결과인 html file의 경로를 받아서 경로와 확장자가 제거된 파일이름만 돌려준다.
         /// </summary>
-        /// <param name="strFullFilePath"></param>
+        /// <param name="strFullName"></param>
         /// <returns></returns>
         private string GetFileName(string strFullName)
         {
@@ -362,12 +362,6 @@ namespace DACrux.BStats.Statistics
         
         #region [Chart]
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="iRowHeight"></param>
-        /// <param name="iHistogramHeight"></param>
-        /// <returns></returns>
         private int GetBoxPlotH(int iRowHeight, int iHistogramHeight)
         {
             int iRowCnt;
@@ -1214,6 +1208,7 @@ namespace DACrux.BStats.Statistics
         ///// </summary>
         ///// <param name="Source">Source DataTable</param>
         ///// <param name="SelectedColumn">Source DataTable내에서 최종적으로 선택할 Column Index</param>
+        /// <param name="ValidRowIndex"></param>
         ///// <param name="GroupColumns">return될 DataTable에서 Column을 구분지을 Source DataTable에서의 Column Index</param>
         ///// <param name="Filter">filterExpression(행을 필터링하기 위한 조건)</param>
         ///// <returns>DataSet내의 Table에서 Column Name은 Group화하는 Columns 값 조합(없으면 SelectedColumn의 ColumnName)의 하나이며, DataTable TableName은 SelectedColumn의 ColumnName + m_Separator + Group화하는 Column Name + "=" + Group화하는 Column Value 의 조합, DataTable NameSpace는 SelectedColumn의 ColumnName</returns>

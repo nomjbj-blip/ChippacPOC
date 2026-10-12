@@ -4,9 +4,6 @@ using CenterSpace.NMath.Stats;
 
 namespace DACrux.BStats.Core
 {
-    /// <summary>
-    ///
-    /// </summary>
     public class DescriptiveStatistics
     {
         #region " MEMBER FIELD "
@@ -31,11 +28,6 @@ namespace DACrux.BStats.Core
         #endregion
 
         #region " CREATOR "
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="Source"></param>
-        /// <param name="ColumnIndex"></param>
         public DescriptiveStatistics(DataTable Source, int ColumnIndex, SelectedStatistics InputOption)
         {
             try
@@ -123,9 +115,6 @@ namespace DACrux.BStats.Core
         #endregion
 
         #region [ MSSD ]
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="idfCleanColumn">Clean IDFColumn</param>
         /// <returns></returns>
         private double GetMSSD(IDFColumn idfCleanColumn)
@@ -155,11 +144,6 @@ namespace DACrux.BStats.Core
         #endregion
 
         #region [ Method For Count of Mode Value ]
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="Value"></param>
-        /// <returns></returns>
         private bool GetMode(double Value)
         {
             try
@@ -174,11 +158,6 @@ namespace DACrux.BStats.Core
         #endregion
 
         #region [ Standard Error of Mean ]
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="idfCleanColumn"></param>
-        /// <returns></returns>
         private double GetMeanSE(IDFColumn idfCleanColumn)
         {
             double dblReturn;

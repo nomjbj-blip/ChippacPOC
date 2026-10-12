@@ -216,10 +216,9 @@ namespace DACrux.TEST.Control
         ///                                  | PivotRows[3]   |               |               |             |
         ///                                  | ...            |               |               |             |
         /// </summary>
-        /// <param name="sourceDr">Data Rows</param>
+        /// <param name="sourceDt">Data Rows</param>
         /// <param name="sTargetRows">Pivot 기준 컬럼 데이타</param>
         /// <param name="sPivotRows">행으로 변환될 컬럼</param>
-        /// <param name="sPivotRowsName">행으로 변환될 컬럼들의 컬럼명</param>
         /// <param name="sPivotCols">열로 변환될 컬럼</param>
         /// <returns></returns>
         public static DataTable TablePivot(DataTable sourceDt, string[] sTargetRows, string[] sPivotRows, string[] sPivotCols)
@@ -487,7 +486,7 @@ namespace DACrux.TEST.Control
         /// 소스 데이타를 특정 컬럼 기준으로 컬럼으로 확장 후 데이타를 확장컬럼에 넣어서 반환해줌. 
         /// 추가 : 나머지 컬럼은 모두 삭제
         /// </summary>
-        /// <param name="sourceTb"> 변환 될 데이타 테이블</param>
+        /// <param name="sourceDr"> 변환 될 데이타 테이블</param>
         /// <param name="sBaseColumnName"> 컬럼변경 데이타를 가진 컬럼명</param>
         /// <param name="sBaseHeaderColumnName"> 컬럼에 대한 헤더컬럼.</param>
         /// <param name="RotColumnName"> 옮겨질 데이타. </param>
@@ -579,10 +578,10 @@ namespace DACrux.TEST.Control
         /// 소스 데이타를 특정 컬럼의 요소로 모두 바인딩한다.
         /// 추가 : 나머지 컬럼은 모두 삭제.
         /// </summary>
-        /// <param name="sourceTb"> 변환 될 데이타 테이블</param>
+        /// <param name="sourceDt"> 변환 될 데이타 테이블</param>
         /// <param name="sBaseColumnName"> 컬럼변경 데이타를 가진 컬럼명</param>
-        /// <param name="sBaseHeaderColumnName"> 컬럼에 대한 헤더컬럼.</param>
-        /// <param name="RotColumnName"> 옮겨질 데이타. </param>
+        /// <param name="sTargetColumnName"></param>
+        /// <param name="sDefultValueColumn"></param>
         /// <returns></returns>
         public static DataTable ConvertTable(DataTable sourceDt, string[] sBaseColumnName, string sTargetColumnName, string sDefultValueColumn)
         {

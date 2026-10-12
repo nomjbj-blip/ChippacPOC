@@ -25,7 +25,6 @@ namespace DACrux.RPNet.Service
         protected override void OnStart(string[] args)
         {
             try{
-                // TODO: 여기에 서비스를 시작하는 코드를 추가합니다.
                 string strCfgPath = Path.GetDirectoryName(Environment.CommandLine.Replace("\"", ""))
                              + "\\" + System.Configuration.ConfigurationManager.AppSettings["RPNetRemoteService"].ToString();
                 RemotingConfiguration.Configure(strCfgPath, false);

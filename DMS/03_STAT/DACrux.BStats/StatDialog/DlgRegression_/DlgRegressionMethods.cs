@@ -41,9 +41,6 @@ namespace DACrux.BStats.StatDialog.DlgRegression_
         #endregion
 
         #region " CREATOR "
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="oSelected"></param>
         /// <param name="lstColumnInfo">설명변수로 선택된 리스트만</param>
         public DlgRegressionMethods(SelectedRegressionMethods oSelected, List<DACrux.ProjectManager.UI.DataView.ColumnInfo> lstColumnInfo)

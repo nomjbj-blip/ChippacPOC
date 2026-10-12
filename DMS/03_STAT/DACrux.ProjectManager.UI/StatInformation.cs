@@ -22,9 +22,6 @@ namespace DACrux.ProjectManager.UI
 
         #region " PROPERTY "
 
-        /// <summary>
-        /// 
-        /// </summary>
         public GraphInformation[] GraphInformations
         {
             get

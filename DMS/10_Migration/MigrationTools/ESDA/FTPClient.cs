@@ -50,6 +50,8 @@ namespace MigrationTools.ESDA
         /// <param name="port">Port 번호</param>
         /// <param name="user">User ID</param>
         /// <param name="pw">User Password</param>
+        /// <param name="bUsePassive"></param>
+        /// <param name="bKeepAlive"></param>
         public HFtpClient(string ip, int port, string user, string pw, bool bUsePassive = true, bool bKeepAlive = true)
         {
             m_ip = ip;
@@ -534,7 +536,7 @@ namespace MigrationTools.ESDA
         /// <summary>
         /// 파일을 지운다
         /// </summary>
-        /// <param name="remoteFile">지우고자하는 파일, ftp 에 있는 파일</param>
+        /// <param name="remoteFolder">지우고자 하는 폴더, ftp 에 있는 폴더</param>
         public void DeleteFolder(string remoteFolder)
         {
             FtpWebRequest ftp = null;

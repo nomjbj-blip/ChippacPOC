@@ -51,7 +51,6 @@ namespace DACrux.SEMDMS.Control
             //
             InitializeComponent();
             //
-            // TODO: InitializeComponent를 호출한 다음 생성자 코드를 추가합니다.
             //
         }
 

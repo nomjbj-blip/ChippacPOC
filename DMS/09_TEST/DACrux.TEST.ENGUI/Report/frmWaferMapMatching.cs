@@ -782,6 +782,12 @@ namespace DACrux.TEST.ENGUI
         /// Wafer를 시계방향으로 회전합니다.
         /// </summary>
         /// <param name="clockwiseAngle">시계방향회전각도 : 0,90,180,270</param>
+        /// <param name="xmin"></param>
+        /// <param name="xmax"></param>
+        /// <param name="ymin"></param>
+        /// <param name="ymax"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
         public void Rotate(int clockwiseAngle, int xmin, int xmax, int ymin, int ymax, ref int x, ref int y)
         {
             if (clockwiseAngle == 0)
@@ -1096,7 +1102,7 @@ namespace DACrux.TEST.ENGUI
         /// <summary>
         /// Defect Data 기준 Map 상에 Draw 한다.
         /// </summary>
-        /// <param name="dt"></param>
+        /// <param name="defects"></param>
         /// <param name="dtTestMapRecipe"></param>
         /// <param name="dtDMMapRecipe"></param>
         private void DrawDefect(DefectList defects, DataTable dtTestMapRecipe, DataTable dtDMMapRecipe)

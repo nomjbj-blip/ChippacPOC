@@ -26,9 +26,6 @@ namespace DACrux.BStats.StatisticsInput
 
         #region " PROPERTY "
 
-        /// <summary>
-        /// 
-        /// </summary>
         public GraphInformation[] GraphInformations
         {
             get

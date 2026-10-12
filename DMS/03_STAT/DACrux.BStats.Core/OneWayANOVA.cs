@@ -257,17 +257,12 @@ namespace DACrux.BStats.Core
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="dsSource"></param>
         /// <param name="bSigleColumn">하나의 컬럼에 Value가 있는 형태인지.</param>
-        /// <param name="arrSelectedColumns">여러 컬럼에 Value가 있는 형태인 경우에 그래프를 그리려고 선택한 컬럼명 목록</param>
         /// <param name="bBoxPlot"></param>
         /// <param name="bGraphHistogramResiduals"></param>
         /// <param name="bGraphProbabilityPlotResiduals"></param>
         /// <param name="bGraphResidualsVsFittedValues"></param>
-        /// <param name="bGraphResidualsVSOrder"></param>
         /// <returns></returns>
         private DataSet GetTableforGraphs(DataSet dsSource, bool bSigleColumn, bool bBoxPlot, bool bGraphHistogramResiduals, bool bGraphProbabilityPlotResiduals, bool bGraphResidualsVsFittedValues)
         {
@@ -439,9 +434,6 @@ namespace DACrux.BStats.Core
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="dsSource">dsSource내의 DataTable은 Column(숫자형)이 하나만 존재해야함.</param>
         /// <returns></returns>
         private DataTable GetTableofStatistic(DataSet dsSource)

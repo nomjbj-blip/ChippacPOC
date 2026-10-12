@@ -13,7 +13,9 @@ namespace DACrux.SEMDMS.Interface
         /// </summary>
         /// <param name="factory"></param>
         /// <param name="fromdate"></param>
-        /// <param name="bFlag">true = 'LOT', false = 'WAFER'</param>
+        /// <param name="todate"></param>
+        /// <param name="bTypeFlag">true = 'LOT', false = 'WAFER'</param>
+        /// <param name="bAreaFlag"></param>
         /// <returns></returns>
         DataSet GetInspectionLotOrWaferCnt(string factory, string fromdate, string todate, bool bTypeFlag, bool bAreaFlag);
 

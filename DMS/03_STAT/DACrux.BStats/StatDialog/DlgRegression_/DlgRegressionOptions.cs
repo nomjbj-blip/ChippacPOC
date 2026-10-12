@@ -37,9 +37,6 @@ namespace DACrux.BStats.StatDialog.DlgRegression_
 
 
         #region " CREATOR "
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="oSelected"></param>
         /// <param name="lstColumnInfo">종속변수와 설명변수로 선택된 모든 변수 목록</param>
         public DlgRegressionOptions(SelectedRegressionOptions oSelected, List<DACrux.ProjectManager.UI.DataView.ColumnInfo> lstColumnInfo)

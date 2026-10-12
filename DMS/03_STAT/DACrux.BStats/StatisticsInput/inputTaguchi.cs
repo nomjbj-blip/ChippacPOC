@@ -85,6 +85,7 @@ namespace DACrux.BStats.StatisticsInput
         /// </summary>
         /// <param name="Title"></param>
         /// <param name="ResultFilePath"></param>
+        /// <param name="Factors"></param>
         public inputTaguchi(string Title, string ResultFilePath, FactorInfo[] Factors)
         {
             this.FactorInfos = Factors;

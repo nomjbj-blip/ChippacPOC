@@ -77,8 +77,6 @@ namespace DACrux.BStats.Statistics
         }
     }
 
-    /// <summary>
-    /// </summary>
     public class TaguchiAnalyusis2
     {
         DataTable m_DataSource = null;

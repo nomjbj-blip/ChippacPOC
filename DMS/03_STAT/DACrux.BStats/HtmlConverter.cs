@@ -6,9 +6,6 @@ using System.IO;
 
 namespace DACrux.BStats
 {
-    /// <summary>
-    /// 
-    /// </summary>
     public class HtmlConverter
     {
 
@@ -330,6 +327,9 @@ namespace DACrux.BStats
         /// <param name="IsSeries">Series구분 변수가 있는지</param>
         /// <param name="iStartRow"></param>
         /// <param name="iEndRow"></param>
+        /// <param name="arrHistogramPath"></param>
+        /// <param name="strBoxPlotPath"></param>
+        /// <param name="strRawDataPlotPath"></param>
         private void UnitTable(DataTable dtSource, bool IsSeries, int iStartRow, int iEndRow, string[] arrHistogramPath, string strBoxPlotPath, string strRawDataPlotPath)
         {
             int iColCnt;

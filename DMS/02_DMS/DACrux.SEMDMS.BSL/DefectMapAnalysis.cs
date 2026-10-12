@@ -608,6 +608,7 @@ namespace DACrux.SEMDMS.BSL
         /// Bare 및 다른 Map 을 기준으로 die 를 Add 할 수 있다.
         /// </summary>
         /// <param name="step_seqs"></param>
+        /// <param name="strMapID"></param>
         /// <returns></returns>
         public DataSet GetBareDefectMapViewer(long[] step_seqs, string strMapID)
         {
@@ -720,7 +721,7 @@ namespace DACrux.SEMDMS.BSL
         /// Data 가 없을 경우 null Return
         /// Like 로 가져와서 data Table 에서 확인 한다.
         /// </summary>
-        /// <param name="lotid"></param>
+        /// <param name="LOT_ID"></param>
         /// <returns></returns>
         public DataTable GetLotStatusInfo(string LOT_ID)
         {
@@ -959,6 +960,7 @@ namespace DACrux.SEMDMS.BSL
         /// 기존 Data Set 을 각각 정보들로 나눔.
         /// </summary>
         /// <param name="step_seqs"></param>
+        /// <param name="bAdder"></param>
         /// <returns></returns>
         public byte[] GetDefectMapViewer_Defects(long[] step_seqs, bool bAdder)
         {
@@ -1015,6 +1017,7 @@ namespace DACrux.SEMDMS.BSL
         /// 기존 Data Set 을 각각 정보들로 나눔.
         /// </summary>
         /// <param name="step_seqs"></param>
+        /// <param name="bAdder"></param>
         /// <returns></returns>
         public List<object[]> GetDefectMapViewer_Defects2(long[] step_seqs, bool bAdder)
         {
@@ -1088,10 +1091,14 @@ namespace DACrux.SEMDMS.BSL
         /// Wafer 별로 기준정보를 Update 한다.
         /// </summary>
         /// <param name="strStepSeq"></param>
+        /// <param name="strWaferID"></param>
         /// <param name="strLotID"></param>
         /// <param name="iSlotID"></param>
         /// <param name="strStepID"></param>
         /// <param name="strProduct"></param>
+        /// <param name="strUser"></param>
+        /// <param name="strComment"></param>
+        /// <param name="strLocalIP"></param>
         public void SetDMMaintDataUpdateWafer(string strStepSeq, string strWaferID, string strLotID, int iSlotID, string strStepID, string strProduct, string strUser, string strComment, string strLocalIP)
         {
             DataTable dtWaferInfo = null;

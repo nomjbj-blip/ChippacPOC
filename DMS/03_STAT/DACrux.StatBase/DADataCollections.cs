@@ -657,8 +657,7 @@ namespace DACrux.StatBase
         /// 통계량을 계산해주는 메소드(Target이 중심이 아닐경우 Cpm만 돌려줌.)
         /// 상세  설명: Data dt와 [USL, Target, LSL]string array을 받아서 [sigma, TotalCount , n, Min, Max, Avg, Cp, K,   Cpk, Cpu, Cpl, Cpm, Ucl, Lcl]string array 반환<br/>
         /// </summary>
-        /// <param name="dr"> 2차원(직사각형)으로 된 그룹구분 없는 Data Rows</param>
-        /// <param name="arrInput">[USL, Target, LSL]의 string Array</param>
+        /// <param name="ReCal"></param>
         public void CalDescriptive(bool ReCal = false)
         {
             int iRowsCNT = 0;

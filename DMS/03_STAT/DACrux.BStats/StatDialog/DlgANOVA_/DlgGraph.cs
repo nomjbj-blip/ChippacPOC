@@ -25,10 +25,6 @@ namespace DACrux.BStats.StatDialog.DlgANOVA_
 
 
         #region " CREATOR "
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="oSelected"></param>
         public DlgGraph(SelectedAnovaGraph oSelected)
         {
             InitializeComponent();

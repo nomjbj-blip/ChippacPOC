@@ -262,7 +262,7 @@ namespace DACrux.TEST.Control
         /// - 주요변경로그
         /// </summary>
         /// <param name="visible">엑셀 보이기 여부</param>
-        /// <param name="sheetsCount">생성할 엑셀시트 수</param>
+        /// <param name="sheetCounts">생성할 엑셀시트 수</param>
         /// <returns></returns>
         public Excel._Workbook fnGetExcelWorkbook(bool visible, int sheetCounts)
         {
@@ -948,8 +948,10 @@ namespace DACrux.TEST.Control
         /// - 주요변경로그
         /// </summary>
         /// <param name="oChartInst"></param>
+        /// <param name="oRangeXValue"></param>
         /// <param name="oRangeValue"></param>
         /// <param name="sChartName"></param>
+        /// <param name="sSeriesName"></param>
         public void fnChardWizard(Excel._Chart oChartInst, Excel.Range oRangeXValue, Excel.Range oRangeValue, string sChartName, string sSeriesName)
         {
             Excel.Series oSeries = null;
@@ -1185,8 +1187,10 @@ namespace DACrux.TEST.Control
         /// - 주요변경로그
         /// </summary>
         /// <param name="oChartInst"></param>
+        /// <param name="oRangeXValue"></param>
         /// <param name="oRangeValue"></param>
-        /// <param name="sChartName"></param>
+        /// <param name="sSeriesName"></param>
+        /// <param name="iSeriesIndex"></param>
         public void fnSetChardAddSeries(Excel._Chart oChartInst, Excel.Range oRangeXValue, Excel.Range oRangeValue, string sSeriesName, int iSeriesIndex)
         {
             Excel.SeriesCollection oSeriesCollection = null;
@@ -1331,6 +1335,7 @@ namespace DACrux.TEST.Control
         /// <param name="Spread_Start_Row">출력해줄 Spread의 시작 로우 Index</param>
         /// <param name="Spread_Start_Col">출력해줄 Spread의 시작 컬럼 index</param>
         /// <param name="removeHeaderColumn">엑셀의 첫번째 로우를 삭제 하여 임포트 할것인가 설정 true= 삭제,false = 그냥둠</param>
+        /// <param name="i_Col_Cnt"></param>
         /// <returns></returns>
         public static bool ExcelToSpread(object obj, string ExcelName, int Excel_Start_Row, int Excel_Start_Col, int Spread_Start_Row, int Spread_Start_Col, bool removeHeaderColumn, int i_Col_Cnt)
         {

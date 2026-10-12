@@ -3323,7 +3323,6 @@ namespace DACrux.SEMDMS.KtoD
                 }
                 /// ==============================================================================================================================================================
 
-                /// oExistDs = oYesStepTx.GetExistInspWaferID(new string[4] {m_oKHeader.LotID,m_oKHeader.WaferID,m_oKHeader.StepID,m_oKHeader.ResultTimestamp});
 
                 if (dtExist.Rows.Count > 0)
                 {

@@ -87,9 +87,6 @@ namespace DACrux.BStats.StatDialog
         #endregion
 
         #region " PROPERTY "
-        /// <summary>
-        /// 
-        /// </summary>
         public StatInformation StatInfo
         {
             get
