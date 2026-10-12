@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!--
-  TQP_GDS_CHAIN_VER: Chain 저장 내용(이름 / 색상 / 탐색 옵션 / 상태). 2026-10-06 Claude CLAUDE-024 추가.
-  사용자 결정으로 버전 이력을 두지 않는다. VERSION_NO는 항상 1이고 다시 저장하면 지우고 새로 만든다(DRAFT -> 확정 시 READY).
+  TQP_GDS_CHAIN_VER: Chain 저장 내용(이름 / 색상 / 탐색 옵션 / 상태). 2026-10-06 추가.
+  결정으로 버전 이력을 두지 않는다. VERSION_NO는 항상 1이고 다시 저장하면 지우고 새로 만든다(DRAFT -> 확정 시 READY).
   격자 크기는 소수점 문자열을 NLS와 무관하게 TO_NUMBER로 받는다.
 -->
 <queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">

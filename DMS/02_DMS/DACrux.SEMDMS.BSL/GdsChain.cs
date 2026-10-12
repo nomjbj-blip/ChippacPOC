@@ -10,8 +10,8 @@ namespace DACrux.SEMDMS.BSL
 {
     /// <summary>
     /// GDS Chain 저장 / 조회 / 삭제의 업무 검증과 DSL 호출을 담당한다.
-    /// 설계: 문서/2026-10-06_GDS_Chain_DB저장_설계.md 10.1절 (CLAUDE-024)
-    /// 2026-10-06 사용자 결정: 버전 이력 없음(VERSION_NO = 1, 다시 저장하면 이전 내용을 지우고 새로 저장) / 삭제는 실제 삭제.
+    /// 설계: 문서/2026-10-06_GDS_Chain_DB저장_설계.md 10.1절
+    /// 2026-10-06 결정: 버전 이력 없음(VERSION_NO = 1, 다시 저장하면 이전 내용을 지우고 새로 저장) / 삭제는 실제 삭제.
     /// 기존 GdsMapImport와 같이 문장마다 자동 Commit이다. 저장 도중 끊기면 VERSION_STATUS = DRAFT로 남고,
     /// 화면은 이를 "저장 미완료"로 보여 주며 다시 저장하면 처음부터 저장한다.
     /// </summary>

@@ -1,5 +1,5 @@
-﻿# GDS Map DB 저장 - Device 1:1 / 기존 데이터 삭제 후 재등록 검증 스크립트 (CLAUDE-017)
-# 목적: 2026-10-02 사용자 결정(리비전 관리 없음, Factory + Device당 Map 1개, 기존 데이터는 사용자가 삭제 후 재등록)에 맞춰
+﻿# GDS Map DB 저장 - Device 1:1 / 기존 데이터 삭제 후 재등록 검증 스크립트
+# 목적: 2026-10-02 결정(리비전 관리 없음, Factory + Device당 Map 1개, 기존 데이터는 사용자가 삭제 후 재등록)에 맞춰
 #       101_ServerBin(또는 -BinDir)의 BSL GdsMapImport가 기존 데이터 조회 / 중복 시작 거부 / 저장 / 확정 / 삭제(전 테이블) / 재등록 /
 #       중지(취소)를 올바르게 처리하는지 아주 작은 합성 데이터(LAYER 1 / SOURCE 1 / PLACED 1)로 확인한다.
 #       Service를 띄우지 않고 BSL을 직접 호출한다. DB 접속은 BSL -> DSL -> Miracom.Middleware 경로다.

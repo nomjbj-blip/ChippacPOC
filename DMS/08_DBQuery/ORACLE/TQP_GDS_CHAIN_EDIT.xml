@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!--
-  TQP_GDS_CHAIN_EDIT: Chain 수동 편집 기록. 2026-10-06 Claude CLAUDE-024 추가.
+  TQP_GDS_CHAIN_EDIT: Chain 수동 편집 기록. 2026-10-06 추가.
   ADD = 수동 추가, EXCLUDE = 수동 제외(최종 MEMBER에는 없음). 다시 불러와 재탐색할 때 엔지니어 결정을 재적용하는 데 쓴다.
   메모리에 편집 순서가 없으므로 EDIT_SEQ는 ADD -> EXCLUDE 순서로 1부터 매긴다. BATCH_EDIT_SEQ는 1차에서 NULL.
 -->

@@ -1,4 +1,4 @@
--- 2026-10-07 Claude CLAUDE-029: E-Test 파일 중복 기준 변경 (사용자 지시)
+-- 2026-10-07: E-Test 파일 중복 기준 변경 (요청)
 -- "디바이스 기준으로 중복 저장 가능. 결과 data 는 wafer 별 / Lot 별로 생성되므로 디바이스는 중복 허용, 중복 방지는 wafer id 기준으로 우선 정의.
 --  wafer 의 slot No 가 없으므로 사용자가 입력할 수 있도록 한다."
 -- 변경 전: UNIQUE (FACTORY, DEVICE_ID, LOT_ID, SLOT_NO, TEST_PROGRAM, TEST_TIME)

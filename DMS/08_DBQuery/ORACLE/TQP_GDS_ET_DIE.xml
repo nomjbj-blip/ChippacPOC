@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!--
-  TQP_GDS_ET_DIE: E-Test Die 정보 (파일 행 단위). 2026-10-07 Claude CLAUDE-029 추가.
+  TQP_GDS_ET_DIE: E-Test Die 정보 (파일 행 단위). 2026-10-07 추가.
   좌표는 파일 원본 (X, Y) 그대로. 숫자 빈 값은 VarChar + TO_NUMBER 로 받아 NULL 로 저장한다.
 -->
 <queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">

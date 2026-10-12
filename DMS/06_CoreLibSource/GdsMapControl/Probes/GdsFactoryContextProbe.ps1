@@ -1,4 +1,4 @@
-﻿# GDS 화면 Factory 기준 검증 스크립트 (2026-10-07 사용자 지시: Factory는 DACrux.Base.GlobalVariable.Factory 사용, 화면 Factory 선택 제거)
+﻿# GDS 화면 Factory 기준 검증 스크립트 (2026-10-07 요청: Factory는 DACrux.Base.GlobalVariable.Factory 사용, 화면 Factory 선택 제거)
 # 목적: GdsMap이 DACrux가 로드한 DACrux.Base의 GlobalVariable.Factory를 그대로 읽는지(DmsHostContext),
 #       View 화면 Device 목록이 그 Factory의 Map만 보여 주는지, Factory 입력 컨트롤이 없어졌는지 확인한다.
 #       Device 목록은 BSL GetMapDeviceList(직접 호출)로 채우고 화면은 띄우지 않는다. DB를 바꾸지 않는다(조회만).
@@ -22,7 +22,7 @@ foreach ($d in 'Oracle.ManagedDataAccess', 'Miracom.Middleware', 'DACrux.Base') 
     $p = Join-Path $serverBin "$d.dll"; if (Test-Path $p) { [void][Reflection.Assembly]::LoadFrom($p) }
 }
 foreach ($d in 'DACrux.SEMDMS.Interface', 'DACrux.SEMDMS.DSL', 'DACrux.SEMDMS.BSL') { [void][Reflection.Assembly]::LoadFrom((Join-Path $BinDir "$d.dll")) }
-$probeDir = Join-Path $env:TEMP 'claude\gdsfactoryprobe'
+$probeDir = Join-Path $env:TEMP 'chippac\gdsfactoryprobe'
 New-Item -ItemType Directory -Force $probeDir | Out-Null
 Copy-Item $GdsExe (Join-Path $probeDir 'NexplantQMS.GdsMap.dll') -Force
 foreach ($d in 'OpenTK.dll', 'OpenTK.GLControl.dll') { Copy-Item (Join-Path (Split-Path $GdsExe) $d) $probeDir -Force }

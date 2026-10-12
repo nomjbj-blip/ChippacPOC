@@ -6,7 +6,7 @@ namespace DACrux.SEMDMS.DSL
 {
     /// <summary>
     /// TQP_GDS_CHAIN_LAYER의 Oracle XML 쿼리를 호출하는 DB 접근 클래스다.
-    /// Chain 탐색 Layer 목록을 담당한다. (CLAUDE-024)
+    /// Chain 탐색 Layer 목록을 담당한다.
     /// </summary>
     public class TQP_GDS_CHAIN_LAYER : Miracom.Middleware.QueryComponent
     {

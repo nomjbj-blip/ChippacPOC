@@ -8,7 +8,7 @@ namespace DACrux.SEMDMS.Interface
     /// <summary>
     /// 엔지니어가 화면에서 올린 KLARF 파일(+ Defect 이미지)을 기존 DMS 자동 적재(Inspection.DataService)와 같은
     /// TQD_* 테이블 / 같은 값 규칙으로 저장하는 원격 호출 계약이다. 저장된 데이터는 기존 Defect 조회 화면에서 그대로 조회된다.
-    /// 설계: 문서/2026-10-07_KLARF_Upload_DB적재_설계.md (CLAUDE-031, F08)
+    /// 설계: 문서/2026-10-07_KLARF_Upload_DB적재_설계.md (F08)
     /// 호출 순서: BeginUpload(KLARF 받기 + 서버 파싱 미리보기) -> AddImage x N(이미지 파일마다 1회) -> CommitUpload(저장)
     ///            중간에 그만두면 CancelUpload. 서버 작업 폴더는 Commit / Cancel 때 지우고, 남은 폴더는 하루 뒤 BeginUpload 가 정리한다.
     /// 기존 DataService 와 같이 문장마다 자동 Commit 이다. Wafer 저장 중 오류가 나면 이번에 새로 만든 STEP 의 행을 지우고 오류를 돌려준다.

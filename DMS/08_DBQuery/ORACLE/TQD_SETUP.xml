@@ -184,7 +184,7 @@ AND SETUP_TIME = TO_DATE(:SETUP_TIME,'YYYY-MM-DD HH24:MI:SS')]]></commandtext>
             <param direction="Input" dbtype="VarChar2" size="40" value="SETUP_TIME">:SETUP_TIME</param>
         </parameters>
     </query>
-    <!-- 2026-10-07 CLAUDE-031 (F08 KLARF 업로드) 추가: 기존 CREATE_SETUP_INFO / SELECT_ORIGIN_INDEX 는 :setup_id 를 size 40 으로 바인딩해
+    <!-- 2026-10-07 (F08 KLARF 업로드) 추가: 기존 CREATE_SETUP_INFO / SELECT_ORIGIN_INDEX 는 :setup_id 를 size 40 으로 바인딩해
          40자 넘는 SetupID 가 오류 없이 잘린다(실측). TQD_SETUP.SETUP_ID 를 128 로 확대(D2)했으므로 업로드는 size 128 쿼리를 쓴다. 기존 쿼리는 그대로 둔다. -->
     <query statement="Select" queryid="SELECT_SETUP_SEQ_KLARF_UPLOAD" commandtype="Text" description="KLARF 업로드 Setup Seq 조회 (SETUP_ID 128)" commandtimeout="60">
         <commandtext><![CDATA[SELECT SETUP_SEQ FROM TQD_SETUP

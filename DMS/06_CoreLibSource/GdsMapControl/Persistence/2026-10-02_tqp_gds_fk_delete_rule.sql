@@ -1,4 +1,4 @@
--- DMSMGR: GDS Map FK 삭제 규칙 조정 (CLAUDE-017, 2026-10-02)
+-- DMSMGR: GDS Map FK 삭제 규칙 조정 (2026-10-02)
 -- 문제: 2026-10-02_tqp_gds_schema_device.sql에서 모든 FK를 ON DELETE CASCADE로 만들었더니,
 --       큰 테이블 사이 FK(SOURCE -> PLACED, PLACED -> CHAIN_MEMBER / CHAIN_EDIT 등)에서 부모 행마다 내부 DELETE가 실행되어
 --       샘플 1 Device(SOURCE 636,970 / PLACED 605,080) 삭제가 10분을 넘겼다(latch: shared pool 대기).

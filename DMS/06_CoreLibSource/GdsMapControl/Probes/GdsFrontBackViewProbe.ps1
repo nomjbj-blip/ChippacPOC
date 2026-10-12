@@ -1,4 +1,4 @@
-﻿# GDS Map View Front / Back 보기 전환 검증 스크립트 (CLAUDE-030, 설계: 문서/2026-10-07_GDS_FrontBack_전환_설계.md 4 / 5.2절)
+﻿# GDS Map View Front / Back 보기 전환 검증 스크립트 (설계: 문서/2026-10-07_GDS_FrontBack_전환_설계.md 4 / 5.2절)
 # 목적: DB는 저장 기준(FRONT) 1벌이고 View에서 로직으로 Back을 보여 주는 방식이 맞게 동작하는지 확인한다.
 #       1) GdsSideTransform: 두 번 반전 = 원본(비트), 반전 X = -X, NeedsMirror 규칙
 #       2) Back 보기(DB 도형 반전)에서 Chain 탐색 도형 ID 집합 = Front 보기 탐색 집합
@@ -27,7 +27,7 @@ foreach ($d in 'Oracle.ManagedDataAccess', 'Miracom.Middleware', 'DACrux.Base', 
     $p = Join-Path $serverBin "$d.dll"; if (Test-Path $p) { [void][Reflection.Assembly]::LoadFrom($p) }
 }
 [void][Reflection.Assembly]::LoadFrom((Join-Path $dms '100_ClientBin\DACrux.SEMDMS.RO.dll'))
-$probeDir = Join-Path $env:TEMP 'claude\gdsfrontbackprobe'
+$probeDir = Join-Path $env:TEMP 'chippac\gdsfrontbackprobe'
 New-Item -ItemType Directory -Force $probeDir | Out-Null
 Copy-Item $GdsExe (Join-Path $probeDir 'NexplantQMS.GdsMap.dll') -Force
 foreach ($d in 'OpenTK.dll', 'OpenTK.GLControl.dll') { Copy-Item (Join-Path (Split-Path $GdsExe) $d) $probeDir -Force }

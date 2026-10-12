@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!--
-  TQP_GDS_CHAIN_RULE: Chain 후보 탐색의 Layer 연결 규칙(두 Layer + 허용 오차). 2026-10-06 Claude CLAUDE-024 추가.
+  TQP_GDS_CHAIN_RULE: Chain 후보 탐색의 Layer 연결 규칙(두 Layer + 허용 오차). 2026-10-06 추가.
   FIRST_LAYER_ID <= SECOND_LAYER_ID (DB CHECK). 허용 오차 double은 G17 문자열 + TO_BINARY_DOUBLE로 받는다.
 -->
 <queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">

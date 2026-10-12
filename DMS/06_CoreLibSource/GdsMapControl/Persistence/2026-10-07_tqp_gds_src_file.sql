@@ -1,9 +1,9 @@
--- 2026-10-07 Claude CLAUDE-029: E-Test 결과 파일 기준 정보 테이블 TQP_GDS_SRC_FILE
+-- 2026-10-07: E-Test 결과 파일 기준 정보 테이블 TQP_GDS_SRC_FILE
 -- 설계: 문서/2026-10-07_ETest_결과파일_Parsing_DB설계.md 9절
--- 범위: E-Test 결과 파일만 (KLARF 는 다른 세션에서 다룬다). 측정값 / Die / Limit 은 나중 설계.
+-- 범위: E-Test 결과 파일만 (KLARF 는 별도 작업). 측정값 / Die / Limit 은 나중 설계.
 -- 한 행 = E-Test 파일 1개. 기준 정보는 파일명에서 읽은 값을 그대로 넣는다.
 -- WAFER_ID 는 LOT_ID + '-' + 2자리 SLOT_NO 가상 컬럼이다 (R1). INSERT / UPDATE 문에 넣지 않는다 (ORA-54013).
--- 적용: 미적용 (로컬 docker oracle19c DMSMGR 적용은 사용자 승인 후). 고객 DB 적용 여부는 별도 확인.
+-- 적용: 미적용 (로컬 docker oracle19c DMSMGR 적용은 승인 후). 고객 DB 적용 여부는 별도 확인.
 
 WHENEVER SQLERROR EXIT SQL.SQLCODE ROLLBACK
 SET ECHO OFF FEEDBACK ON

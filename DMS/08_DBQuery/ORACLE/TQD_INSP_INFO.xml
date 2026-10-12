@@ -1932,7 +1932,7 @@ ORDER BY A.STEP_ID, A.WAFER_ID ]]></commandtext>
             <param direction="Input" dbtype="VarChar" size="0" value="LOT_ID">:LOT_ID</param>
         </parameters>
     </query>
-    <!-- 2026-10-07 CLAUDE-031 (F08 KLARF 업로드) 추가: TQD_INSP_INFO.SUMMARY_FLAG 는 NOT NULL(기본값 없음)인데 기존 CREATE_INSP_INFO_PARSE 는 이 컬럼을 넣지 않아
+    <!-- 2026-10-07 (F08 KLARF 업로드) 추가: TQD_INSP_INFO.SUMMARY_FLAG 는 NOT NULL(기본값 없음)인데 기존 CREATE_INSP_INFO_PARSE 는 이 컬럼을 넣지 않아
          ORA-01400 이 난다(Probe 실측). 같은 INSERT 에 기존 81행과 같은 값 ' '(공백 1자)만 더한 업로드용 쿼리. 기존 쿼리는 그대로 둔다. -->
     <query statement="Insert" queryid="CREATE_INSP_INFO_KLARF_UPLOAD" description="KLARF 업로드 INSP_INFO 생성 (CREATE_INSP_INFO_PARSE + SUMMARY_FLAG)" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[INSERT INTO TQD_INSP_INFO

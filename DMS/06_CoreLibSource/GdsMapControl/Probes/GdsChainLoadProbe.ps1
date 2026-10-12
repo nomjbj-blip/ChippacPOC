@@ -1,4 +1,4 @@
-﻿# GDS Map View 화면 DB Chain 불러오기 왕복 검증 스크립트 (CLAUDE-026 3단계, 설계: 문서/2026-10-06_GDS_Map_화면역할_재정의_설계.md 4.3절)
+﻿# GDS Map View 화면 DB Chain 불러오기 왕복 검증 스크립트 (3단계, 설계: 문서/2026-10-06_GDS_Map_화면역할_재정의_설계.md 4.3절)
 # 목적: DB 도형으로 실제 탐색한 Chain을 BSL GdsChain으로 저장(INPUT / TRACE / 수동 추가 MANUAL / 수동 제외 EXCLUDE)한 뒤,
 #       View 화면의 복원 코드(CreateChainFromDb, private)를 리플렉션으로 호출해 화면 Chain을 만들고,
 #       저장 행 생성 코드(BuildChainSaveData)가 다시 만든 Member / 편집 행이 처음 저장한 행과 같은지(왕복 일치) 확인한다.
@@ -24,7 +24,7 @@ foreach ($d in 'Oracle.ManagedDataAccess', 'Miracom.Middleware', 'DACrux.Base', 
     $p = Join-Path $serverBin "$d.dll"; if (Test-Path $p) { [void][Reflection.Assembly]::LoadFrom($p) }
 }
 [void][Reflection.Assembly]::LoadFrom((Join-Path $dms '100_ClientBin\DACrux.SEMDMS.RO.dll'))
-$probeDir = Join-Path $env:TEMP 'claude\gdschainloadprobe'
+$probeDir = Join-Path $env:TEMP 'chippac\gdschainloadprobe'
 New-Item -ItemType Directory -Force $probeDir | Out-Null
 Copy-Item $GdsExe (Join-Path $probeDir 'NexplantQMS.GdsMap.dll') -Force
 foreach ($d in 'OpenTK.dll', 'OpenTK.GLControl.dll') { Copy-Item (Join-Path (Split-Path $GdsExe) $d) $probeDir -Force }

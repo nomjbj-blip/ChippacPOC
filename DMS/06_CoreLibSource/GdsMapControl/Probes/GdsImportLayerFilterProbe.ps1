@@ -1,4 +1,4 @@
-﻿# GDS Map DB 저장 / 화면에 표시된 Layer만 저장 검증 스크립트 (CLAUDE-021, 설계 21절)
+﻿# GDS Map DB 저장 / 화면에 표시된 Layer만 저장 검증 스크립트 (설계 21절)
 # 목적: 실제 GDS를 파싱 -> GdsMapControl로 Flatten -> 일부 Layer만 선택해 화면 저장과 같은 오버로드
 #       (CountSourceRows / BuildSourceBatches / VisitPlacedElements에 Layer 조건)로 LAYER / SOURCE / PLACED를 저장하고 확정까지 확인한다.
 #       확인: 필터 건수 < 전체 건수 / SREF·AREF 원본 행은 모두 유지 / 저장 SOURCE ID가 전체 저장 때와 같은 ID·내용(순번 유지)
@@ -32,7 +32,7 @@ foreach ($d in 'Oracle.ManagedDataAccess', 'Miracom.Middleware', 'DACrux.SEMDMS.
     [void][Reflection.Assembly]::LoadFrom((Join-Path $serverBin "$d.dll"))
 }
 # Add-Type(CodeDom)은 .exe를 참조로 받지 못하므로 시험용 임시 폴더에 같은 어셈블리를 .dll 이름으로 복사해 참조 / 로드한다.
-$probeDir = Join-Path $env:TEMP 'claude\gdslayerfilterprobe'
+$probeDir = Join-Path $env:TEMP 'chippac\gdslayerfilterprobe'
 New-Item -ItemType Directory -Force $probeDir | Out-Null
 Copy-Item $gdsExe (Join-Path $probeDir 'NexplantQMS.GdsMap.dll') -Force
 foreach ($d in 'OpenTK.dll', 'OpenTK.GLControl.dll') { Copy-Item (Join-Path (Split-Path $gdsExe) $d) $probeDir -Force }

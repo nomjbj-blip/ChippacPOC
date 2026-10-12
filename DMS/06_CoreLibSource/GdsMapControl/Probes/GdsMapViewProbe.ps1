@@ -1,8 +1,8 @@
-﻿# GDS Map 조회 서비스 검증 스크립트 (CLAUDE-014 작성 / CLAUDE-018 Factory + Device 키로 변경)
+﻿# GDS Map 조회 서비스 검증 스크립트 (작성 / Factory + Device 키로 변경)
 # 목적: DACrux.SEMDMS.BSL.GdsMapView(읽기 전용 조회 서비스)를 Service 없이 같은 프로세스에서 직접 호출해
 #       Device / Map 정보 / Layer 목록과 PLACED 키 순서 페이지 조회가 누락 / 중복 없이 끝까지 읽히는지 확인한다.
 #       한 페이지 DataTable의 Remoting 직렬화 크기(XML 기본 / Binary)도 함께 측정한다(조회 설계 7~8절).
-#       2026-10-02 리비전 관리 제거(CLAUDE-017)로 Map은 Factory + Device당 1개다.
+#       2026-10-02 리비전 관리 제거로 Map은 Factory + Device당 1개다.
 # 대상: DACrux.SEMDMS.Service.exe.config의 DMS_CONNECT_ID(DMSMGR) -> 레지스트리 Middleware 연결 (로컬 docker 시험 DB)
 # 선행: READY Map이 1건 이상 있어야 한다(없으면 GdsMapDbRestoreProbe.ps1이 PROBE / VIEW_PROBE로 저장한다).
 # 결과: 조회는 DB를 바꾸지 않는다. 단, DRAFT 거부 확인용으로 FACTORY=PROBE / DEVICE_ID=VIEW_DRAFT DRAFT Map 1건을 만든다(실행마다 지우고 다시 만듦).

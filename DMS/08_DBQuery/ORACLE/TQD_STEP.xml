@@ -462,7 +462,7 @@ SELECT DISTINCT T4.BIN
    AND T1.WAFER_SEQ IN (??)
    AND T1.STEP_ID IN (??)]]></commandtext>
     </query>
-    <!-- 2026-10-07 CLAUDE-031 (F08 KLARF 업로드) 추가: 업로드 데이터 삭제 전에 STEP 이 업로드로 만든 행인지(COMMENT 'UPLOAD;' 시작) 확인한다. -->
+    <!-- 2026-10-07 (F08 KLARF 업로드) 추가: 업로드 데이터 삭제 전에 STEP 이 업로드로 만든 행인지(COMMENT 'UPLOAD;' 시작) 확인한다. -->
     <query statement="Select" queryid="SELECT_STEP_KLARF_UPLOAD" commandtype="Text" description="KLARF 업로드 STEP 확인 (STEP_SEQ / WAFER_SEQ / COMMENT)" commandtimeout="60">
         <commandtext><![CDATA[SELECT STEP_SEQ, WAFER_SEQ, STEP_ID, "COMMENT" AS STEP_COMMENT
 FROM TQD_STEP
@@ -473,7 +473,7 @@ AND WAFER_SEQ = :wafer_seq]]></commandtext>
             <param direction="Input" dbtype="VarChar2" size="40" value="wafer_seq">:wafer_seq</param>
         </parameters>
     </query>
-    <!-- 2026-10-07 CLAUDE-031 (F08 KLARF 업로드 2단계) 추가: 업로드 이미지 저장 후 TQD_STEP.IMAGES 를 TQD_IMAGES 건수로 맞춘다.
+    <!-- 2026-10-07 (F08 KLARF 업로드 2단계) 추가: 업로드 이미지 저장 후 TQD_STEP.IMAGES 를 TQD_IMAGES 건수로 맞춘다.
          기존 UPDATE_STEP[REVIEW_PARSER] 는 REVIEW_EQ / REVIEW_FILE* 까지 덮어써서 쓰지 않는다. -->
     <query statement="Update" queryid="UPDATE_STEP_IMAGES_KLARF_UPLOAD" commandtype="Text" description="KLARF 업로드 STEP 이미지 수 갱신" commandtimeout="60">
         <commandtext><![CDATA[UPDATE TQD_STEP T1

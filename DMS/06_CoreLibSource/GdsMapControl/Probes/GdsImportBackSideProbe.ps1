@@ -1,4 +1,4 @@
-﻿# GDS Map Back side(좌우 반전) 저장 검증 스크립트 (CLAUDE-027, 설계: 문서/2026-10-06_GDS_반전_BackSide_설계.md 8절)
+﻿# GDS Map Back side(좌우 반전) 저장 검증 스크립트 (설계: 문서/2026-10-06_GDS_반전_BackSide_설계.md 8절)
 # 목적: Setup 화면 DB 저장과 같은 경로(VisitPlacedElements(layer, mirrorX) / GdsMapPlacedRowBuilder / BSL GdsMapImport)로
 #       Back side 저장을 실행하고 확인한다.
 #       1) 반전 좌표 = GDS 원점 기준 X' = -X(비트 일치), Y / 도형 수 / 좌표 수 동일, Bounds = (-MaxX, MinY, -MinX, MaxY)
@@ -34,7 +34,7 @@ $bslDll = Join-Path $BslDir 'DACrux.SEMDMS.BSL.dll'
 [void][Reflection.Assembly]::LoadFrom($bslDll)
 Write-Host "BSL: $bslDll"
 [void][Reflection.Assembly]::LoadFrom((Join-Path $dms '100_ClientBin\DACrux.SEMDMS.RO.dll'))
-$probeDir = Join-Path $env:TEMP 'claude\gdsbacksideprobe'
+$probeDir = Join-Path $env:TEMP 'chippac\gdsbacksideprobe'
 New-Item -ItemType Directory -Force $probeDir | Out-Null
 Copy-Item $GdsExe (Join-Path $probeDir 'NexplantQMS.GdsMap.dll') -Force
 foreach ($d in 'OpenTK.dll', 'OpenTK.GLControl.dll') { Copy-Item (Join-Path (Split-Path $GdsExe) $d) $probeDir -Force }

@@ -185,7 +185,7 @@ namespace DACrux.SEMDMS.BSL
             if (lastInsp && dt != null)
             {
                 // 마지막 검사(RN = 1)만 남긴다. 해당 행이 없으면 CopyToDataTable 이 예외를 내므로
-                // 같은 컬럼 구조의 빈 테이블을 돌려준다. (2026-10-08 CLAUDE-035: 조건이 || 라 항상 참이던 문제)
+                // 같은 컬럼 구조의 빈 테이블을 돌려준다. (2026-10-08: 조건이 || 라 항상 참이던 문제)
                 DataRow[] rows = dt.Select("[RN] = 1");
                 dt = rows.Length > 0 ? rows.CopyToDataTable<DataRow>() : dt.Clone();
             }

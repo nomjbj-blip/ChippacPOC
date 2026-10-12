@@ -59,7 +59,7 @@ namespace DACrux.SEMDMS.Control
                     );
 
                 // 이미지 다운로드만 백그라운드 스레드에서 한다. 앱 종료를 막지 않도록 IsBackground 로 둔다.
-                // 화면 표시는 ShowImage 에서 UI 스레드로 넘긴다. (2026-10-08 CLAUDE-036)
+                // 화면 표시는 ShowImage 에서 UI 스레드로 넘긴다. (2026-10-08)
                 System.Threading.Thread.Sleep(10);
                 System.Threading.Thread trd = new System.Threading.Thread(new System.Threading.ThreadStart(DrawImage));
                 trd.IsBackground = true;
@@ -122,7 +122,7 @@ namespace DACrux.SEMDMS.Control
         /// <summary>
         /// 다운로드 스레드에서 만든 이미지를 UI 스레드에서 표시한다.
         /// 컨트롤이 이미 해제되었으면(한 번도 표시되지 않은 이미지) 이미지 / 스트림을 바로 해제한다.
-        /// 표시된 이미지는 이미지 팝업이 계속 그릴 수 있으므로 컨트롤 해제 때 직접 해제하지 않고 GC 에 맡긴다. (2026-10-08 CLAUDE-036)
+        /// 표시된 이미지는 이미지 팝업이 계속 그릴 수 있으므로 컨트롤 해제 때 직접 해제하지 않고 GC 에 맡긴다. (2026-10-08)
         /// </summary>
         private void ShowImage(Image image, MemoryStream stream)
         {

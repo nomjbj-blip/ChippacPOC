@@ -91,7 +91,7 @@ namespace DACrux.SEMDMS.Control
                 return;
 
             // 스크롤 틱마다 실행되므로 ImageAttributes / Graphics 를 바로 해제하고, 이전 결과 Bitmap 도 해제한다.
-            // (2026-10-08 CLAUDE-036: 트랙바를 끌면 틱마다 이미지 크기만큼 GDI 객체가 쌓이던 문제)
+            // (2026-10-08: 트랙바를 끌면 틱마다 이미지 크기만큼 GDI 객체가 쌓이던 문제)
             ColorMatrix colorMatrix = new ColorMatrix(colorMatrixElements);
             Bitmap bm_dest = new Bitmap(Convert.ToInt32(_img.Width), Convert.ToInt32(_img.Height));
 
@@ -144,7 +144,7 @@ namespace DACrux.SEMDMS.Control
             Bitmap oBitMap = AdjustGamma(m_OriginDefectImg, (float)GammatrackBar.Value);
             DefectImg = oBitMap;
 
-            // 이전 감마 / 밝기 결과는 이 컨트롤이 만든 Bitmap 이므로 해제한다. (CLAUDE-036)
+            // 이전 감마 / 밝기 결과는 이 컨트롤이 만든 Bitmap 이므로 해제한다.
             ReleaseOwnedImage(oldDefect);
             if (oldDisplayed != oldDefect)
                 ReleaseOwnedImage(oldDisplayed);
@@ -198,7 +198,7 @@ namespace DACrux.SEMDMS.Control
         /// <summary>
         /// 밝기 / 감마 조정으로 이 컨트롤이 만든 이미지를 해제한다.
         /// 원본(m_OriginDefectImg, 호출한 쪽 소유)과 지금 표시 중인 이미지는 해제하지 않는다.
-        /// 팝업이 열려 있으면 팝업이 그 이미지를 그리고 있을 수 있으므로 해제하지 않는다. (2026-10-08 CLAUDE-036)
+        /// 팝업이 열려 있으면 팝업이 그 이미지를 그리고 있을 수 있으므로 해제하지 않는다. (2026-10-08)
         /// </summary>
         private void ReleaseOwnedImage(Image image)
         {

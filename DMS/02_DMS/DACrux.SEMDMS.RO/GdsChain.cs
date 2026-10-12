@@ -5,7 +5,7 @@ using System.Data;
 
 namespace DACrux.SEMDMS.RO
 {
-    /// <summary>기존 DMS 원격 호출 방식으로 GDS Chain 저장 / 조회 / 삭제 서비스를 화면에 제공한다. (CLAUDE-024)</summary>
+    /// <summary>기존 DMS 원격 호출 방식으로 GDS Chain 저장 / 조회 / 삭제 서비스를 화면에 제공한다.</summary>
     public class GdsChain
     {
         DACrux.SEMDMS.Interface.iGdsChain m_OBJ;

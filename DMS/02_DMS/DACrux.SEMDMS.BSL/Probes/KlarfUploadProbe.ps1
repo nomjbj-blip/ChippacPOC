@@ -1,4 +1,4 @@
-﻿# KLARF 업로드 / DB 적재 검증 스크립트 (CLAUDE-031, F08 구현 1~2단계)
+﻿# KLARF 업로드 / DB 적재 검증 스크립트 (F08 구현 1~2단계)
 # 목적: BSL KlarfUpload 가 고객 샘플 KLARF(XD106.02) + Defect 이미지 15장을 기존 TQD_* 와 이미지 저장소에 저장하고,
 #       기존 Defect 조회 화면이 쓰는 BSL 함수로 그대로 조회되는지 확인한다.
 #  1) 입력 검증 (항목 수 / 경로가 섞인 파일 이름 / 잘못된 업로드 키)
@@ -179,7 +179,7 @@ function Commit-Checked($key, $overwrite, $label) {
 $bytes = [IO.File]::ReadAllBytes($sample)
 $lot = 'PFIC_RH-HS2615_C4BUMP'
 $setupIdFull = 'ROOT-CAI-OMM_Hybrid-OMM_Hybrid_C4Bump_Silterra'
-$storeFolder = Join-Path $imageRoot ((Get-Date).ToString('yyyyMMdd') + "\$lot")   # 저장일 yyyyMMdd \ Lot (2026-10-07 사용자 지시)
+$storeFolder = Join-Path $imageRoot ((Get-Date).ToString('yyyyMMdd') + "\$lot")   # 저장일 yyyyMMdd \ Lot (2026-10-07 요청)
 $expectedRel = ($storeFolder.Substring([IO.Path]::GetPathRoot($storeFolder).Length)).Replace('\', '/')
 
 # ---- 1) 입력 검증 ----

@@ -6,7 +6,7 @@ namespace DACrux.SEMDMS.DSL
 {
     /// <summary>
     /// TQP_GDS_ET_ITEM의 Oracle XML 쿼리를 호출하는 DB 접근 클래스다.
-    /// E-Test 측정 항목 마스터(Device 단위)를 담당한다. (CLAUDE-029)
+    /// E-Test 측정 항목 마스터(Device 단위)를 담당한다.
     /// </summary>
     public class TQP_GDS_ET_ITEM : Miracom.Middleware.QueryComponent
     {

@@ -5,7 +5,7 @@ using System.Data;
 
 namespace DACrux.SEMDMS.RO
 {
-    /// <summary>기존 DMS 원격 호출 방식으로 KLARF 업로드 / DB 적재 서비스를 화면에 제공한다. (CLAUDE-031, F08)</summary>
+    /// <summary>기존 DMS 원격 호출 방식으로 KLARF 업로드 / DB 적재 서비스를 화면에 제공한다. (F08)</summary>
     public class KlarfUpload
     {
         DACrux.SEMDMS.Interface.iKlarfUpload m_OBJ;

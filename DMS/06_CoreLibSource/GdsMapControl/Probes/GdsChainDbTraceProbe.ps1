@@ -1,4 +1,4 @@
-﻿# GDS Map View 화면의 Chain 탐색 전제 검증 스크립트 (CLAUDE-026 1단계, 설계: 문서/2026-10-06_GDS_Map_화면역할_재정의_설계.md 3절)
+﻿# GDS Map View 화면의 Chain 탐색 전제 검증 스크립트 (1단계, 설계: 문서/2026-10-06_GDS_Map_화면역할_재정의_설계.md 3절)
 # 목적: Chain 설정을 View(DB 도형) 화면으로 옮겨도 탐색 결과가 같은지 확인한다.
 #       같은 GDS를 (1) 파일 Flatten(ShowStructure)과 (2) DB 페이지 조회 + ShowPlacedElements로 각각 그린 뒤
 #       같은 Input / Layer / 격자로 TraceChainCandidate를 실행해 방문 / 후보 도형 ID 집합을 비교한다.
@@ -28,7 +28,7 @@ foreach ($d in 'Oracle.ManagedDataAccess', 'Miracom.Middleware', 'DACrux.Base', 
 }
 # RO(화면 참조)는 ClientBin에서 로드한다. 이 Probe는 RO를 호출하지 않지만 Form 형식 로드에 필요하다.
 foreach ($d in 'DACrux.SEMDMS.RO') { [void][Reflection.Assembly]::LoadFrom((Join-Path $dms "100_ClientBin\$d.dll")) }
-$probeDir = Join-Path $env:TEMP 'claude\gdschaindbtraceprobe'
+$probeDir = Join-Path $env:TEMP 'chippac\gdschaindbtraceprobe'
 New-Item -ItemType Directory -Force $probeDir | Out-Null
 Copy-Item $GdsExe (Join-Path $probeDir 'NexplantQMS.GdsMap.dll') -Force
 foreach ($d in 'OpenTK.dll', 'OpenTK.GLControl.dll') { Copy-Item (Join-Path (Split-Path $GdsExe) $d) $probeDir -Force }

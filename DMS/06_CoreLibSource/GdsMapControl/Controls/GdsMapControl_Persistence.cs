@@ -192,7 +192,7 @@ namespace NexplantQMS.GdsMap
             };
         }
 
-        /// <summary>GDS 원점 기준 좌우 반전(X' = -X) 사본. 변환식은 GdsSideTransform 한 곳에 둔다(CLAUDE-030).</summary>
+        /// <summary>GDS 원점 기준 좌우 반전(X' = -X) 사본. 변환식은 GdsSideTransform 한 곳에 둔다.</summary>
         internal static GPoint[] MirrorPoints(GPoint[] points)
         {
             return GdsSideTransform.MirrorPoints(points);

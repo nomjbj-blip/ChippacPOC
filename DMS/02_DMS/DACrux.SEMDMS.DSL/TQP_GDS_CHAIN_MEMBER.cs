@@ -6,7 +6,7 @@ namespace DACrux.SEMDMS.DSL
 {
     /// <summary>
     /// TQP_GDS_CHAIN_MEMBER의 Oracle XML 쿼리를 호출하는 DB 접근 클래스다.
-    /// Chain 최종 포함 도형(INPUT / OUTPUT / MEMBER)을 담당한다. (CLAUDE-024)
+    /// Chain 최종 포함 도형(INPUT / OUTPUT / MEMBER)을 담당한다.
     /// </summary>
     public class TQP_GDS_CHAIN_MEMBER : Miracom.Middleware.QueryComponent
     {

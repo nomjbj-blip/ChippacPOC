@@ -1,5 +1,5 @@
 -- DMSMGR: GDS Map / Chain 스키마 키 전환 (GUID VARCHAR2(36) -> 시퀀스 NUMBER *_SEQ)
--- 작성: 2026-10-02 Claude (CLAUDE-011) / 사용자 결정: "기존 방식과 동일하게 시퀀스 형태, 개발자가 확인 가능하도록"
+-- 작성: 2026-10-02 / 결정: "기존 방식과 동일하게 시퀀스 형태, 개발자가 확인 가능하도록"
 -- 기준: 기존 DMS의 STEP_SEQ / LOT_SEQ 처럼 키 컬럼 NUMBER + 같은 이름의 SEQUENCE(START 1 / INCREMENT 1 / CACHE 20)
 -- 키 변경: MAP_REVISION_ID -> MAP_REV_SEQ, JOB_ID -> IMPORT_JOB_SEQ, CHAIN_ID -> CHAIN_SEQ, BATCH_EDIT_ID -> BATCH_EDIT_SEQ
 -- 나머지 컬럼 / 제약 / 인덱스는 2026-10-02 로컬 DB(감사 컬럼 변경 반영 후)에서 DBMS_METADATA로 추출한 정의 그대로다.

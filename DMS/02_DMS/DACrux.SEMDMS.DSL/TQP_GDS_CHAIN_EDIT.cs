@@ -6,7 +6,7 @@ namespace DACrux.SEMDMS.DSL
 {
     /// <summary>
     /// TQP_GDS_CHAIN_EDIT의 Oracle XML 쿼리를 호출하는 DB 접근 클래스다.
-    /// Chain 수동 편집 기록(ADD / EXCLUDE)을 담당한다. (CLAUDE-024)
+    /// Chain 수동 편집 기록(ADD / EXCLUDE)을 담당한다.
     /// </summary>
     public class TQP_GDS_CHAIN_EDIT : Miracom.Middleware.QueryComponent
     {

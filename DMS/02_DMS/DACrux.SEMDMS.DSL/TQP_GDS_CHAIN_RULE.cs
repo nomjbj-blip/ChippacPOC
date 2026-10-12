@@ -6,7 +6,7 @@ namespace DACrux.SEMDMS.DSL
 {
     /// <summary>
     /// TQP_GDS_CHAIN_RULE의 Oracle XML 쿼리를 호출하는 DB 접근 클래스다.
-    /// Chain Layer 연결 규칙(두 Layer + 허용 오차)을 담당한다. (CLAUDE-024)
+    /// Chain Layer 연결 규칙(두 Layer + 허용 오차)을 담당한다.
     /// </summary>
     public class TQP_GDS_CHAIN_RULE : Miracom.Middleware.QueryComponent
     {

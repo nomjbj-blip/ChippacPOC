@@ -131,7 +131,7 @@
   </ItemGroup>
   <ItemGroup>
     <!-- DACrux.BStats 는 솔루션 밖 프로젝트이고 NMath(미설치 경로) 참조 때문에 이 환경에서 빌드되지 않는다.
-         이미 빌드된 DLL 을 코어 출력 폴더에서 참조한다. (2026-10-08 CLAUDE-040) -->
+         이미 빌드된 DLL 을 코어 출력 폴더에서 참조한다. (2026-10-08) -->
     <Reference Include="DACrux.BStats">
       <HintPath>..\..\71_CoreLib\DACrux.BStats.dll</HintPath>
     </Reference>

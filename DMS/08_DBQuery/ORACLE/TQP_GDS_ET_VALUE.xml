@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!--
-  TQP_GDS_ET_VALUE: E-Test 측정값 (Die x 항목 1행). 2026-10-07 Claude CLAUDE-029 추가.
+  TQP_GDS_ET_VALUE: E-Test 측정값 (Die x 항목 1행). 2026-10-07 추가.
   double 은 G17 문자열 + TO_BINARY_DOUBLE (Middleware dbtype="Double" 은 15자리 반올림이라 쓰지 않음).
   VALUE_STATUS V 숫자 / N 미측정(-) / E 빈 값. N / E 는 MEAS_VALUE 빈 문자열 -> NULL (CHECK 제약으로 검사).
 -->

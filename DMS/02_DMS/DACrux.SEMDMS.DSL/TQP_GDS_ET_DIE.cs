@@ -6,7 +6,7 @@ namespace DACrux.SEMDMS.DSL
 {
     /// <summary>
     /// TQP_GDS_ET_DIE의 Oracle XML 쿼리를 호출하는 DB 접근 클래스다.
-    /// E-Test Die 정보(파일 행 단위)를 담당한다. (CLAUDE-029)
+    /// E-Test Die 정보(파일 행 단위)를 담당한다.
     /// </summary>
     public class TQP_GDS_ET_DIE : Miracom.Middleware.QueryComponent
     {

@@ -15,7 +15,7 @@ namespace DACrux.SEMDMS.BSL
 {
     /// <summary>
     /// 엔지니어가 화면에서 올린 KLARF 를 기존 DMS 자동 적재(Inspection.DataService)와 같은 TQD_* 테이블 / 같은 값 규칙으로 저장한다.
-    /// 설계: 문서/2026-10-07_KLARF_Upload_DB적재_설계.md (CLAUDE-031, F08)
+    /// 설계: 문서/2026-10-07_KLARF_Upload_DB적재_설계.md (F08)
     ///
     /// 만든 이유: 기존 자동 적재는 설비 폴더 감시 서비스라 화면에서 바로 올릴 수 없고, 고객 샘플(XD106.02)은 기존 규칙
     ///            (SetupID 40자 / Step ID 8자리 규칙 / 이미지가 하위 폴더)으로는 저장되지 않는다.
@@ -27,7 +27,7 @@ namespace DACrux.SEMDMS.BSL
     ///    분류 기준 선택(D3: 기본 RoughBin -> CLASSNUMBER), 같은 키가 있으면 삭제 후 재등록(D1).
     ///  - 기존 DataService 처럼 문장마다 자동 Commit 이다. Wafer 저장 중 오류가 나면 이번에 새로 만든 STEP 의 행을 지운다.
     ///    SETUP / PRODUCT / LOT / WAFER 는 다른 STEP 이 함께 쓰는 행이라 남겨 두고 다음 저장에서 재사용한다.
-    /// 이미지(구현 2단계, 사용자 결정 D4 = FTP 상대 경로): Service 설정 KLARF_IMAGE_ROOT(FTP 가 공개하는 폴더 아래) \ yyyyMMdd(저장일) \ {LotID} 에
+    /// 이미지(구현 2단계, 결정 D4 = FTP 상대 경로): Service 설정 KLARF_IMAGE_ROOT(FTP 가 공개하는 폴더 아래) \ yyyyMMdd(저장일) \ {LotID} 에
     ///   KLARF 원본 / 이미지 원본 / 썸네일(thumb_)을 저장하고(HandlerInsp.Backup 과 같은 함수), DB 에는 드라이브 루트를 뺀 '/' 상대 경로
     ///   (Handler.GetImageRelativePath 와 같은 규칙)를 넣는다. 화면은 TQC_CONFIG DEFECT_FTP 의 MAIN_PATH + 이 경로로 받는다.
     /// </summary>
@@ -646,7 +646,7 @@ namespace DACrux.SEMDMS.BSL
 
         /// <summary>
         /// KLARF 원본과 이미지 원본 / 썸네일을 KLARF_IMAGE_ROOT \ yyyyMMdd(저장일) \ {LotID} 에 저장한다(HandlerInsp.Backup 187~219행과 같은 함수 사용).
-        /// 폴더 형식은 2026-10-07 사용자 지시(예: D:\FTP\SCK\20261007\Lot). 같은 Wafer 를 다른 날 다시 올리면 새 날짜 폴더에 저장되고 DB 경로도 그 폴더를 가리킨다.
+        /// 폴더 형식은 2026-10-07 요청(예: D:\FTP\SCK\20261007\Lot). 같은 Wafer 를 다른 날 다시 올리면 새 날짜 폴더에 저장되고 DB 경로도 그 폴더를 가리킨다.
         /// 설정이 없을 때: 이미지가 없으면 저장소 없이 진행(INSP_FILEPATH ' '), 이미지가 있으면 DB 저장 전에 오류로 멈춘다(이미지 없는 데이터가 생기지 않게).
         /// </summary>
         private static ImageStore SaveFilesToImageStore(ParserKlarf parser, string klarfPath)
@@ -663,7 +663,7 @@ namespace DACrux.SEMDMS.BSL
             if (!Path.IsPathRooted(root))
                 throw new Exception("이미지 저장소 설정(KLARF_IMAGE_ROOT)은 절대 경로여야 합니다: " + root);
 
-            // 2026-10-07 사용자 지시: 저장 폴더 = KLARF_IMAGE_ROOT \ yyyyMMdd(저장한 날짜) \ LotID  (예: D:\FTP\SCK\20261007\PFIC_RH-HS2615_C4BUMP)
+            // 2026-10-07 요청: 저장 폴더 = KLARF_IMAGE_ROOT \ yyyyMMdd(저장한 날짜) \ LotID  (예: D:\FTP\SCK\20261007\PFIC_RH-HS2615_C4BUMP)
             // 기존 자동 적재의 yyyy\MM\dd(검사일자) 대신 업로드한 날짜를 쓴다. 폴더 이름에 쓸 수 없는 문자는 '_' 로 바꾼다.
             store.Folder = Path.Combine(Path.Combine(root.Trim(), DateTime.Now.ToString("yyyyMMdd", CultureInfo.InvariantCulture)), SafeFolderName(parser.LotID));
             // Handler.GetImageRelativePath 와 같은 규칙: 드라이브 루트를 떼고 '\' -> '/'

@@ -1359,7 +1359,7 @@ namespace DACrux.TEST.Control
         private void SP_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
             // 시리얼 수신 스레드에서 실행된다. 여기서 예외가 나가면 전역 처리기가 잡지 못해 클라이언트가 종료되므로
-            // 프레임이 깨지거나 포트가 닫히는 경우를 모두 잡는다. (2026-10-08 CLAUDE-036)
+            // 프레임이 깨지거나 포트가 닫히는 경우를 모두 잡는다. (2026-10-08)
             try
             {
                 if (!SP.IsOpen)

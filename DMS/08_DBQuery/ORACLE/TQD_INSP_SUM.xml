@@ -169,7 +169,7 @@ ORDER BY ??]]></commandtext>
             <param direction="Input" dbtype="VarChar2" size="40" value="toDate">:toDate</param>
         </parameters>
     </query>
-    <!-- 2026-10-07 CLAUDE-031 (F08 KLARF 업로드) 추가: 재등록(D1) / 저장 실패 정리 때 해당 STEP 의 요약 행을 지운다. -->
+    <!-- 2026-10-07 (F08 KLARF 업로드) 추가: 재등록(D1) / 저장 실패 정리 때 해당 STEP 의 요약 행을 지운다. -->
     <query statement="Delete" queryid="DELETE_INSP_SUM_KLARF_UPLOAD" commandtype="Text" description="KLARF 업로드 재등록 / 실패 정리용 STEP 요약 삭제" commandtimeout="60">
         <commandtext><![CDATA[DELETE FROM TQD_INSP_SUM
 WHERE STEP_SEQ = :step_seq]]></commandtext>

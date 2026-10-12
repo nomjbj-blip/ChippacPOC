@@ -21,7 +21,7 @@ SELECT :factory, :device_id, :layer_id, :color_argb, :display_name FROM DUAL
             <param direction="Input" dbtype="Number" size="0">:chk_layer_id</param>
         </parameters>
     </query>
-    <query statement="Select" queryid="SELECT_LAYER_WITH_COUNT" commandtype="Text" description="조회 화면: Device Layer 목록 + Layer별 배치 도형 수 / 좌표 수 (2026-10-02 CLAUDE-018 키 FACTORY + DEVICE_ID)" commandtimeout="600">
+    <query statement="Select" queryid="SELECT_LAYER_WITH_COUNT" commandtype="Text" description="조회 화면: Device Layer 목록 + Layer별 배치 도형 수 / 좌표 수 (2026-10-02 키 FACTORY + DEVICE_ID)" commandtimeout="600">
         <commandtext><![CDATA[SELECT L.LAYER_ID, L.COLOR_ARGB, L.DISPLAY_NAME,
        NVL(P.PLACED_COUNT, 0) AS PLACED_COUNT,
        NVL(P.POINT_COUNT, 0) AS POINT_COUNT

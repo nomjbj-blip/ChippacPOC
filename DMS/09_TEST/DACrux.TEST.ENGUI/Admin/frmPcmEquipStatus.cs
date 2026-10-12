@@ -217,7 +217,7 @@ namespace DACrux.TEST.ENGUI
                     for (int r = 0; r < dt.Rows.Count; r++)
                     {
                         // 찾은 행(r)의 값을 넣는다. 예전 코드는 dt.Rows[i] 를 넣어 장비 순서가 바뀌면 다른 장비 상태가 표시됐다.
-                        // EQUIP_ID 가 DBNull 이어도 캐스트 예외가 나지 않게 Convert.ToString 을 쓴다. (2026-10-08 CLAUDE-035)
+                        // EQUIP_ID 가 DBNull 이어도 캐스트 예외가 나지 않게 Convert.ToString 을 쓴다. (2026-10-08)
                         if (equipID == System.Convert.ToString(dt.Rows[r][(int)Col.EQUIP_ID]))
                         {
                             source.Rows[i].ItemArray = dt.Rows[r].ItemArray;

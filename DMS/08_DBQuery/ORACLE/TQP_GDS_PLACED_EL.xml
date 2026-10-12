@@ -158,7 +158,7 @@ SELECT :factory, :device_id, :placed_element_id, :source_element_id, :layer_id, 
             <param direction="Input" dbtype="VarChar" size="1024">:placed_element_id</param>
         </parameters>
     </query>
-    <!-- 조회 화면(GdsMapView): Device의 Layer별 키 순서 페이지 조회. OFFSET 대신 이전 페이지 마지막 ID 다음부터 읽어 IX_GDS_PLACED_LAYER 범위 스캔을 쓴다. 2026-10-02 CLAUDE-018 키 FACTORY + DEVICE_ID -->
+    <!-- 조회 화면(GdsMapView): Device의 Layer별 키 순서 페이지 조회. OFFSET 대신 이전 페이지 마지막 ID 다음부터 읽어 IX_GDS_PLACED_LAYER 범위 스캔을 쓴다. 2026-10-02 키 FACTORY + DEVICE_ID -->
     <query statement="Select" queryid="SELECT_PLACED_EL_PAGE_FIRST" commandtype="Text" description="조회 화면: Layer의 첫 페이지 (빈 문자열은 Oracle에서 NULL이라 첫 페이지를 별도 쿼리로 둔다)" commandtimeout="600">
         <commandtext><![CDATA[SELECT * FROM (
         SELECT PLACED_ELEMENT_ID, SOURCE_ELEMENT_ID, LAYER_ID, DATA_TYPE, ELEMENT_TYPE,
@@ -199,7 +199,7 @@ SELECT :factory, :device_id, :placed_element_id, :source_element_id, :layer_id, 
             <param direction="Input" dbtype="Number" size="0">:max_rows</param>
         </parameters>
     </query>
-    <query statement="Select" queryid="SELECT_PLACED_TEXT_INDEX" commandtype="Text" description="조회 화면 Label 검색 색인: Device의 TEXT 도형 전체(Layer 무관) ID / Layer / TEXTTYPE / 값 / 위치 (2026-10-07 CLAUDE-032)" commandtimeout="600">
+    <query statement="Select" queryid="SELECT_PLACED_TEXT_INDEX" commandtype="Text" description="조회 화면 Label 검색 색인: Device의 TEXT 도형 전체(Layer 무관) ID / Layer / TEXTTYPE / 값 / 위치 (2026-10-07)" commandtimeout="600">
         <commandtext><![CDATA[SELECT PLACED_ELEMENT_ID, LAYER_ID, TEXT_TYPE,
        DBMS_LOB.SUBSTR(TEXT_VALUE, 1000, 1) AS TEXT_VALUE,
        MIN_X, MIN_Y

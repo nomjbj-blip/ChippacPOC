@@ -196,7 +196,7 @@ namespace DACrux.SEMDMS.BSL
 
             // 데이터 INSERT
             // 알람 이력을 먼저 남긴다. 이 메서드는 Inspection DataService 적재 중(Wafer 데이터 커밋 후)에 호출되므로
-            // 메일 실패가 이력 누락이나 파일 오류 처리로 번지지 않게 한다. (2026-10-08 CLAUDE-035)
+            // 메일 실패가 이력 누락이나 파일 오류 처리로 번지지 않게 한다. (2026-10-08)
             TQD_ALARM_DATA obj = new TQD_ALARM_DATA();
             obj.InsertAlarmData(factory, defectType, product, stepId, equipId, stepSeq, lower, target, upper, alarmYN, alarmType, count, notiUser);
 

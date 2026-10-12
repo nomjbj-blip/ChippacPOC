@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!--
-  TQP_GDS_CHAIN_LAYER: Chain 후보 탐색에 사용한 Layer 목록. 2026-10-06 Claude CLAUDE-024 추가.
+  TQP_GDS_CHAIN_LAYER: Chain 후보 탐색에 사용한 Layer 목록. 2026-10-06 추가.
   LAYER_ID는 TQP_GDS_LAYER FK다. Map을 Layer 필터로 저장할 때 뺀 Layer는 저장할 수 없다(화면이 먼저 검사).
 -->
 <queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">

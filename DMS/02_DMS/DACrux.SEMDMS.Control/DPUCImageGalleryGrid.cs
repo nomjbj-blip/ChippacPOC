@@ -643,7 +643,7 @@ namespace DACrux.SEMDMS.Control
                 return;
 
             // FTP 응답 스트림은 바로 닫는다. 닫지 않으면 FtpWebRequest 연결(호스트당 기본 2개)이 고갈되어
-            // 이후 썸네일 / 팝업 다운로드가 타임아웃까지 멈춘다. 이미지는 메모리 사본에서 만든다. (2026-10-08 CLAUDE-036)
+            // 이후 썸네일 / 팝업 다운로드가 타임아웃까지 멈춘다. 이미지는 메모리 사본에서 만든다. (2026-10-08)
             MemoryStream imageStream = new MemoryStream();
             using (Stream stream = DefectMapDraw.fnFTPGetStream(imagePath))
             {

@@ -101,7 +101,7 @@ namespace DACrux.TEST.ENGUI
             }
             catch (Exception ex)
             {
-                // 작업 스레드에서 다시 던지면 처리기가 없어 클라이언트 프로세스가 종료된다. 기록만 하고 끝낸다. (2026-10-08 CLAUDE-036)
+                // 작업 스레드에서 다시 던지면 처리기가 없어 클라이언트 프로세스가 종료된다. 기록만 하고 끝낸다. (2026-10-08)
                 System.Diagnostics.Trace.TraceError("TPUCGallery.CreateMap 실패: {0}", ex);
             }
             finally
@@ -283,7 +283,7 @@ namespace DACrux.TEST.ENGUI
         }
 
         /// <summary>
-        /// 열 수 콤보 값. 입력 가능한 콤보라 0 이나 문자가 들어오면 0 으로 나누기가 나므로 최소 1 로 맞춘다. (2026-10-08 CLAUDE-036)
+        /// 열 수 콤보 값. 입력 가능한 콤보라 0 이나 문자가 들어오면 0 으로 나누기가 나므로 최소 1 로 맞춘다. (2026-10-08)
         /// </summary>
         private int GetColumnCount()
         {
@@ -297,7 +297,7 @@ namespace DACrux.TEST.ENGUI
 
             isDrawing = true;
 
-            // 작업 스레드에서 실행된다. 예외가 나가면 프로세스가 종료되고 isDrawing 이 true 로 남으므로 잡고 복원한다. (CLAUDE-036)
+            // 작업 스레드에서 실행된다. 예외가 나가면 프로세스가 종료되고 isDrawing 이 true 로 남으므로 잡고 복원한다.
             try
             {
                 labelStatus.Text = "Draw Map";
@@ -494,7 +494,7 @@ namespace DACrux.TEST.ENGUI
             }
             finally
             {
-                // 예외가 나도 상태를 복원한다. 예전에는 endDrawMap 이 false 로 남아 이후 Draw() 가 계속 바로 return 했다. (CLAUDE-036)
+                // 예외가 나도 상태를 복원한다. 예전에는 endDrawMap 이 false 로 남아 이후 Draw() 가 계속 바로 return 했다.
                 threadStop = false;
                 endDrawMap = true;
             }

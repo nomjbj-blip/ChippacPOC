@@ -1,5 +1,5 @@
 -- DMSMGR: GDS Map / Chain 스키마 - 리비전 관리 제거, Factory + Device(제품) 1:1
--- 작성: 2026-10-02 Claude (CLAUDE-017) / 사용자 결정: "리비전 관리 하지 말자. factory, 제품에 1:1로 종속",
+-- 작성: 2026-10-02 / 결정: "리비전 관리 하지 말자. factory, 제품에 1:1로 종속",
 --       "키를 Factory + Device로 변경", "기존 데이터가 있으면 삭제 후 재등록만"
 -- 변경 요약
 --  - 헤더 TQP_GDS_MAP_REV -> TQP_GDS_MAP (PK FACTORY + DEVICE_ID, 상태 DRAFT / READY, REVISION_CODE 없음)

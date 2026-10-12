@@ -1899,7 +1899,7 @@ namespace DACrux.SEMDMS.Control
 
             try
             {
-                // 빈 곳을 클릭하면 null 이 넘어온다. 아래 AddRange / oDefect.Length 에서 예외가 나지 않게 빈 배열로 바꾼다. (CLAUDE-036)
+                // 빈 곳을 클릭하면 null 이 넘어온다. 아래 AddRange / oDefect.Length 에서 예외가 나지 않게 빈 배열로 바꾼다.
                 if (oDefect == null)
                     oDefect = new DACrux.Base.Defect[0];
 
@@ -1928,7 +1928,7 @@ namespace DACrux.SEMDMS.Control
 
                 if (imageList.Controls.Count > 0)
                 {
-                    // Clear 만 하면 제거된 DPUCDefectInfo(이미지 / 창 핸들)가 해제되지 않아 Defect 를 선택할 때마다 핸들이 쌓인다. (2026-10-08 CLAUDE-036)
+                    // Clear 만 하면 제거된 DPUCDefectInfo(이미지 / 창 핸들)가 해제되지 않아 Defect 를 선택할 때마다 핸들이 쌓인다. (2026-10-08)
                     while (imageList.Controls.Count > 0)
                         imageList.Controls[0].Dispose();
                 }
@@ -2282,7 +2282,7 @@ namespace DACrux.SEMDMS.Control
         private void GetDefectImagePathAsync(object state)
         {
             // ThreadPool 콜백이다. 여기서 처리되지 않은 예외(원격 호출 실패 등)는 클라이언트 프로세스를 종료시키므로
-            // 모든 예외를 잡아 상태 표시줄에만 알린다. (2026-10-08 CLAUDE-036)
+            // 모든 예외를 잡아 상태 표시줄에만 알린다. (2026-10-08)
             try
             {
                 long[] stepSeqArr = state as long[];

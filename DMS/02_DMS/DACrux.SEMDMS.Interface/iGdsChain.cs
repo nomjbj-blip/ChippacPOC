@@ -7,8 +7,8 @@ namespace DACrux.SEMDMS.Interface
 {
     /// <summary>
     /// GDS Map Setup 화면에서 만든 Chain을 DB에 저장 / 조회 / 삭제하는 원격 호출 계약이다.
-    /// 설계: 문서/2026-10-06_GDS_Chain_DB저장_설계.md 10.1절 (CLAUDE-024)
-    /// 2026-10-06 사용자 결정: 버전 이력 없음(VERSION_NO는 항상 1, 저장 = 덮어쓰기) / 삭제는 실제 삭제.
+    /// 설계: 문서/2026-10-06_GDS_Chain_DB저장_설계.md 10.1절
+    /// 2026-10-06 결정: 버전 이력 없음(VERSION_NO는 항상 1, 저장 = 덮어쓰기) / 삭제는 실제 삭제.
     /// 저장 순서: BeginChainSave(헤더 / Layer / 규칙, 기존 내용 삭제) -> CreateChainMemberBatch / CreateChainEditBatch -> CompleteChainSave
     /// 문장마다 자동 Commit이며, 확정 전에는 VERSION_STATUS = DRAFT로 남아 "저장 미완료"로 구분한다.
     /// </summary>

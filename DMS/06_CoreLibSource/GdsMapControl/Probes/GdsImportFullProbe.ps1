@@ -1,9 +1,9 @@
-﻿# GDS Map DB 저장 구현 4단계 검증 스크립트 (CLAUDE-009)
+﻿# GDS Map DB 저장 구현 4단계 검증 스크립트
 # 목적: 실제 GDS 한 개를 파싱 -> GdsMapControl로 Flatten -> 저장 작업 시작 -> LAYER / SOURCE / PLACED 배치 저장 -> 완료 확정까지
 #       전체 흐름을 BSL GdsMapImport로 실행하고, 건수 / 좌표 재조회 / 확정 상태 / 건수 불일치 감지를 확인한다.
 #       Service를 띄우지 않고 같은 프로세스에서 BSL을 직접 호출한다. DB 접속은 BSL -> DSL -> Miracom.Middleware 경로다.
 # 대상: DACrux.SEMDMS.Service.exe.config의 DMS_CONNECT_ID(DMSMGR) -> 레지스트리 Middleware 연결 (로컬 docker 시험 DB)
-# 결과(CLAUDE-017, Device 1:1): FACTORY=PROBE / DEVICE_ID=FULL_PROBE 의 READY Map 1건(샘플 기준 SOURCE 약 64만 / PLACED 약 60만 행)이 남고,
+# 결과(Device 1:1): FACTORY=PROBE / DEVICE_ID=FULL_PROBE 의 READY Map 1건(샘플 기준 SOURCE 약 64만 / PLACED 약 60만 행)이 남고,
 #       시작 전에 같은 Device의 기존 데이터를 삭제한다. 불일치 확인용 FULLMIS_PROBE는 마지막에 삭제한다. (아래 원래 문구)
 # 이전:
 #       불일치 확인용 DRAFT 개정본 1건이 남는다.
@@ -29,7 +29,7 @@ foreach ($d in 'Oracle.ManagedDataAccess', 'Miracom.Middleware', 'DACrux.SEMDMS.
     [void][Reflection.Assembly]::LoadFrom((Join-Path $serverBin "$d.dll"))
 }
 # Add-Type(CodeDom)은 .exe를 참조로 받지 못하므로 시험용 임시 폴더에 같은 어셈블리를 .dll 이름으로 복사해 참조 / 로드한다.
-$probeDir = Join-Path $env:TEMP 'claude\gdsfullprobe'
+$probeDir = Join-Path $env:TEMP 'chippac\gdsfullprobe'
 New-Item -ItemType Directory -Force $probeDir | Out-Null
 Copy-Item $gdsExe (Join-Path $probeDir 'NexplantQMS.GdsMap.dll') -Force
 foreach ($d in 'OpenTK.dll', 'OpenTK.GLControl.dll') { Copy-Item (Join-Path (Split-Path $gdsExe) $d) $probeDir -Force }

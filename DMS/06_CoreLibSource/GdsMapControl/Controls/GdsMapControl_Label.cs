@@ -78,7 +78,7 @@ namespace NexplantQMS.GdsMap
 				AssignAvailableSpace(row.OrderBy(label => label.Position.X).ToList(), true);
 			foreach (var column in _textLabels.GroupBy(label => new { label.LayerId, label.Position.X }))
 				AssignAvailableSpace(column.OrderBy(label => label.Position.Y).ToList(), false);
-			// 2026-10-07 CLAUDE-032 사용자 결정 A: 한쪽 방향에만 이웃이 있으면 그 간격을 다른 방향 제한에도 쓴다.
+			// 2026-10-07 결정 A: 한쪽 방향에만 이웃이 있으면 그 간격을 다른 방향 제한에도 쓴다.
 			// 이웃이 없는 방향은 화면 크기가 제한이 되어 확대할수록 최대 글꼴(64px)까지 커지기 때문이다(예: C4DC_HBM0_N_FH).
 			foreach (var label in _textLabels)
 			{

@@ -6,7 +6,7 @@ using System.Windows.Forms;
 namespace DACrux.SEMDMS.ENGUI
 {
     /// <summary>
-    /// 탐색기 형식(파일 열기 창과 같은 모양)으로 폴더를 고르는 창. (CLAUDE-031, 사용자 요청 2026-10-07)
+    /// 탐색기 형식(파일 열기 창과 같은 모양)으로 폴더를 고르는 창. (요청 2026-10-07)
     /// 왜: .NET 4.0 의 FolderBrowserDialog 는 옛 트리 형식이라 깊은 폴더를 찾기 어렵다.
     /// 방법: Windows 의 공용 파일 대화상자(IFileOpenDialog, Vista 이후)를 FOS_PICKFOLDERS(폴더 선택) 옵션으로 연다.
     ///       COM 생성 / 표시가 실패하는 환경이면 기존 FolderBrowserDialog 로 대신 연다.

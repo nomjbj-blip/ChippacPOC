@@ -6,7 +6,7 @@ namespace DACrux.SEMDMS.DSL
 {
     /// <summary>
     /// TQP_GDS_CHAIN_VER의 Oracle XML 쿼리를 호출하는 DB 접근 클래스다.
-    /// Chain 저장 내용(이름 / 색상 / 탐색 옵션 / 상태). 2026-10-06 사용자 결정으로 VERSION_NO는 항상 1(덮어쓰기)이다. (CLAUDE-024)
+    /// Chain 저장 내용(이름 / 색상 / 탐색 옵션 / 상태). 2026-10-06 결정으로 VERSION_NO는 항상 1(덮어쓰기)이다.
     /// </summary>
     public class TQP_GDS_CHAIN_VER : Miracom.Middleware.QueryComponent
     {

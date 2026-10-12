@@ -218,13 +218,13 @@ namespace DACrux.TEST.BSL
 
             // TD 테이블 목록 가져오기
             // SELECT_TABLE_BY_WAFER 는 TQP_WAFER 의 PROGRAM 으로 찾으므로 WAFER 행을 지우기 전에 조회한다.
-            // (2026-10-08 CLAUDE-035: 삭제 후 조회해서 목록이 항상 비고 TD 데이터 / LOT SUM 이 정리되지 않던 문제)
+            // (2026-10-08: 삭제 후 조회해서 목록이 항상 비고 TD 데이터 / LOT SUM 이 정리되지 않던 문제)
             TQP_DATA_TABLES tbl = new TQP_DATA_TABLES();
             string[] tableNames = tbl.GetTableNameByWafer(waferSeq);
 
             waf.DeleteWaferData(waferSeq);
 
-            // (2026-10-08 CLAUDE-035: TQP_WAFER 를 두 번 지우고 TQP_WAFER_SUM 은 남기던 문제)
+            // (2026-10-08: TQP_WAFER 를 두 번 지우고 TQP_WAFER_SUM 은 남기던 문제)
             TQP_WAFER_SUM sum = new TQP_WAFER_SUM();
             sum.DeleteWaferData(waferSeq);
 

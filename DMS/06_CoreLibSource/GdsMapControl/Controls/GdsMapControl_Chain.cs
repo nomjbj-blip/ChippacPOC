@@ -326,7 +326,7 @@ namespace NexplantQMS.GdsMap
         /// <summary>
         /// 같은 Map을 다른 Layer 조합으로 다시 그린 뒤, 화면 Chain이 가진 도형 ID를 새 도형에 다시 연결한다.
         /// 탐색 캐시는 탐색한 Layer만 채우므로, 다시 그린 지도의 모든 Boundary / Path를 ID로 등록해 Chain 외곽선 / 단자 표시가 바로 되게 한다.
-        /// 호출 전 ResetChainSetupOverlay로 이전 도형 참조를 지운다. (2026-10-06 CLAUDE-026 2단계)
+        /// 호출 전 ResetChainSetupOverlay로 이전 도형 참조를 지운다. (2026-10-06 2단계)
         /// </summary>
         public void RebuildChainTraceItems()
         {
@@ -340,7 +340,7 @@ namespace NexplantQMS.GdsMap
 
         /// <summary>
         /// DB에서 불러온 Chain의 Input / Output 도형 ID로 단자 후보를 만든다(클릭 선택과 같은 형식).
-        /// RebuildChainTraceItems 뒤에 호출한다. 지금 지도에 없는 ID(미조회 Layer)는 null. (2026-10-06 CLAUDE-026 3단계)
+        /// RebuildChainTraceItems 뒤에 호출한다. 지금 지도에 없는 ID(미조회 Layer)는 null. (2026-10-06 3단계)
         /// </summary>
         public ChainElementCandidate GetChainElementCandidate(string placedElementId)
         {
