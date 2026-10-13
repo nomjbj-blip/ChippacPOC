@@ -39,7 +39,7 @@ AND INPUT_TIME < to_date(:todate, 'YYYYMMDD')
 ??
 ORDER BY INPUT_TIME DESC]]></commandtext>
         <parameters>
-            <param direction="Input" dbtype="VarChar2" size="40" value="FAB1">:FACTORY</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="SCK">:FACTORY</param>
             <param direction="Input" dbtype="VarChar2" size="40" value="fromdate">:fromdate</param>
             <param direction="Input" dbtype="VarChar2" size="40" value="todate">:todate</param>
         </parameters>

@@ -36,7 +36,7 @@ INSERT INTO TQP_CHANGE_HIS (
     :USER_COMMENT
 )]]></commandtext>
         <parameters>
-            <param direction="Input" dbtype="VarChar2" size="0" value="FAB1">:FACTORY</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="SCK">:FACTORY</param>
             <param direction="Input" dbtype="VarChar2" size="0" value="PARAMETRIC">:TESTAREA</param>
             <param direction="Input" dbtype="VarChar2" size="0" value="PR01">:PRODUCT</param>
             <param direction="Input" dbtype="VarChar2" size="0" value="PROG001">:PROGRAM</param>
@@ -64,7 +64,7 @@ WHERE FACTORY = :FACTORY AND TESTAREA = :TESTAREA
 AND TRAN_KEY >= :FROM_DATE AND TRAN_KEY <= :TO_DATE
 ORDER BY TRAN_KEY DESC]]></commandtext>
         <parameters>
-            <param direction="Input" dbtype="VarChar2" size="40" value="FAB1">:FACTORY</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="SCK">:FACTORY</param>
             <param direction="Input" dbtype="VarChar2" size="40" value="PARAMETRIC">:TESTAREA</param>
             <param direction="Input" dbtype="VarChar2" size="40" value="20190901">:FROM_DATE</param>
             <param direction="Input" dbtype="VarChar2" size="40" value="20190910">:TO_DATE</param>

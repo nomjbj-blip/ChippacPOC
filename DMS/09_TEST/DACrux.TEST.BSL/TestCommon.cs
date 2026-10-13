@@ -1298,7 +1298,8 @@ namespace DACrux.TEST.BSL
 
                     // TQP_MAPDEF 테이블에 ShotMap 에 대한 정보가 존재할 경우 
                     // NETDIE로 YIELD를 계산, 값이 존재하지 않는 경우에는 TestDie로 계산한다.
-                    if (String.Equals(factory, "FAB2") && !String.IsNullOrEmpty(dtWaferSum.Rows[0]["NETDIE"].ToString()))
+                    // Factory 를 SCK 하나로 합치면서 FAB2 에만 적용하던 계산을 모든 Wafer 에 적용 (2026-10-13)
+                    if (!String.IsNullOrEmpty(dtWaferSum.Rows[0]["NETDIE"].ToString()))
                     {
                         netDie = DACrux.Base.Convert.doubleParse(dtWaferSum.Rows[0]["NETDIE"].ToString());
                         if (netDie / totalDie > 1.5 || totalDie / netDie > 1.5)

@@ -1838,7 +1838,7 @@ WHERE 1=1
    AND SLOT_ID = :slot_id
    AND STEP_ID = :step_id]]></commandtext>
         <parameters>
-            <param direction="Input" dbtype="VarChar2" size="40" value="FAB2">:factory</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="SCK">:factory</param>
             <param direction="Input" dbtype="VarChar2" size="40" value="2010-01-01 00:00:00">:fromtime</param>
             <param direction="Input" dbtype="VarChar2" size="40" value="2010-01-01 00:00:00">:totime</param>
             <param direction="Input" dbtype="VarChar2" size="40" value="1234">:lot_id</param>

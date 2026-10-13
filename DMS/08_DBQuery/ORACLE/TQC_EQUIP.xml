@@ -292,7 +292,7 @@ AND A.OPER = 'PARAMETRIC'
 AND A.EQUIP_ID NOT IN ('AMPTSVR', 'AMPTKVR')
 ORDER BY A.EQUIP_ID]]></commandtext>
         <parameters>
-            <param direction="Input" dbtype="VarChar2" size="40" value="FAB2">:FACTORY</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="SCK">:FACTORY</param>
         </parameters>
     </query>
     <query statement="Update" queryid="UPDATE_DATA_02" commandtype="Text" commandtimeout="60">

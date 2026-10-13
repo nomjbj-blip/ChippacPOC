@@ -523,7 +523,7 @@ SELECT DISTINCT DECODE(T3.PRODUCT, NULL, T1.DEVICE_ALIAS, T3.PRODUCT) AS PRODUCT
    AND T2.PROBE_CNT = 0
  ORDER BY WAFER_ID]]></commandtext>
         <parameters>
-            <param direction="Input" dbtype="VarChar2" size="40" value="FAB1">:factory</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="SCK">:factory</param>
             <param direction="Input" dbtype="VarChar2" size="40" value="9056551">:lotid</param>
         </parameters>
     </query>
