@@ -3,6 +3,8 @@
 작성: 2026-10-07 Claude (CLAUDE-029) / 상태: **2026-10-12 Parameter 단위 Spec + Chain 묶기 / Setup Chain 으로 찾기 구현 완료 (12 · 14 · 15절이 우선, 13절 대표 Chain 은 15절로 대체)** — 4 ~ 11절은 이전 설계
 
 > 2026-10-14 후속 설계 (CLAUDE-086): [E-Test Para Setup](2026-10-14_ETest_Para_Setup_설계.md) — 결과 파일 Header 를 Parameter 로 등록하는 화면 분리 + **대표 Chain 등록**(단자 이름 묶음, 13절 개념을 다시 씀) ↔ GDS Chain 1:1 연결. 결정(P6 / P8)되면 Spec 은 등록 Parameter 에만 두고, 15절 Chain 묶기 / Setup Chain 으로 찾기는 대표 Chain 으로 대체한다.
+>
+> **2026-10-14 반영 (CLAUDE-090 4단계)**: Spec 키 = 등록 Parameter 저장 이름(예 `RESISTANCE_IFORCE_8P0MA_TSVDC_TR_FH`, 헤더 원문도 받아 바꿈), Spec 은 등록 Parameter 에만(FK). Spec 목록 = 등록 Parameter 기준 + 대표 Chain / GDS Chain 열, [Spec 표 붙여넣기] 는 없는 Parameter 를 Spec 표 출처로 먼저 등록. 15절 Chain 묶기 / Setup Chain 으로 찾기(탭 / 서비스 / `TQP_GDS_ET_CHAIN_GROUP`)는 삭제하고 Para Setup [대표 Chain] 탭 + 인계 API `GetEtChainSpecInfo`(GDS 연결 기준)로 옮겼다. 12 · 15절의 키 / 묶음 설명은 이전 기준이다.
 
 사용자 지시 (2026-10-07): "Para 에 대한 Limit 설정 화면을 만들자. 현재까지 내용 확인해서 설계안 도출"
 선행: [E-Test Parsing / DB 설계](2026-10-07_ETest_결과파일_Parsing_DB설계.md) (9 ~ 12절 구현 완료, 3.3절 Limit 참고안)

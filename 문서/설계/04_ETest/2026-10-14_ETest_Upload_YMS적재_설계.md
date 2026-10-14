@@ -16,7 +16,7 @@
 선행 문서:
 - [E-Test Upload 재설계](2026-10-13_ETest_Upload_재설계.md) 9절: 확정 설계, 구현 대기. **이 문서는 9절에 YMS 적재를 더한다.**
 - [E-Test YMS 화면 연계 검토](2026-10-14_ETest_YMS_화면연계_검토.md): YMS 11개 화면 가능 여부 / TESTAREA 비교.
-- [Die 좌표 대응 설계](2026-10-13_Die좌표_대응_Setup_설계.md) 9절: `DieCoordinateMapper`.
+- [Die 좌표 대응 설계](../03_KLARF_Map/2026-10-13_Die좌표_대응_Setup_설계.md) 9절: `DieCoordinateMapper`.
 
 ---
 

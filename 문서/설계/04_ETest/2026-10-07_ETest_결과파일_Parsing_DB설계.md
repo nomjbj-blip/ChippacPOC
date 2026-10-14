@@ -401,7 +401,7 @@ Die 안 좌표 (XREL / YREL) 도 같은 90도 회전이 필요하다 (KLARF Die 
 
 결정 (2026-10-07 사용자): R1 Lot + Slot 을 붙인 WAFER_ID 를 만든다 / R3 DEVICE_ID 는 `TQP_GDS_MAP.DEVICE_ID` 와 같은 값 체계 / 테이블명 앞에 GDS (`TQP_GDS_SRC_FILE`) / RAW_ 컬럼 없음 / 한 행 = 파일 1개 / E-Test 만.
 
-DDL: [`2026-10-07_tqp_gds_src_file.sql`](../DMS/06_CoreLibSource/GdsMapControl/Persistence/2026-10-07_tqp_gds_src_file.sql) (시퀀스 `SRC_FILE_SEQ` / 테이블 1 / UNIQUE 1 / 인덱스 1). **2026-10-07 로컬 docker oracle19c DMSMGR 적용 (사용자 승인 "진행")**. 확인: PK / UNIQUE / CHECK ENABLED, WAFER_ID 가상 컬럼 (샘플 값 INSERT -> `RH-HS2615-02`), 같은 키 재INSERT ORA-00001, WAFER_ID 직접 INSERT ORA-54013, SLOT 100 ORA-02290, 시험 행은 ROLLBACK (0행).
+DDL: [`2026-10-07_tqp_gds_src_file.sql`](../../../DMS/06_CoreLibSource/GdsMapControl/Persistence/2026-10-07_tqp_gds_src_file.sql) (시퀀스 `SRC_FILE_SEQ` / 테이블 1 / UNIQUE 1 / 인덱스 1). **2026-10-07 로컬 docker oracle19c DMSMGR 적용 (사용자 승인 "진행")**. 확인: PK / UNIQUE / CHECK ENABLED, WAFER_ID 가상 컬럼 (샘플 값 INSERT -> `RH-HS2615-02`), 같은 키 재INSERT ORA-00001, WAFER_ID 직접 INSERT ORA-54013, SLOT 100 ORA-02290, 시험 행은 ROLLBACK (0행).
 
 ### 9.1 TQP_GDS_SRC_FILE
 
@@ -444,7 +444,7 @@ E-Test 측정 항목 / Die / 측정값 / Limit 테이블은 나중 설계에서 
 
 ## 10. E-Test 결과 Data 설계 (측정 항목 / Die / 측정값)
 
-2026-10-07 사용자 "진행" 으로 이어서 설계. DDL 초안: [`2026-10-07_tqp_gds_et_result.sql`](../DMS/06_CoreLibSource/GdsMapControl/Persistence/2026-10-07_tqp_gds_et_result.sql) — **2026-10-07 로컬 docker oracle19c DMSMGR 적용 (사용자 승인 "진행")**: 테이블 변경 1 / 생성 3 / 시퀀스 1 / 인덱스 4 / 주석 14, 제약 전부 ENABLED. ROLLBACK 시험: LOAD_STATUS 기본 LOADING / 측정값 PK 중복 ORA-00001 / V 인데 값 NULL ORA-02290 / 같은 Die 좌표 ORA-00001 / 파일 삭제 시 Die·측정값 CASCADE 삭제, 항목은 남음 / ROLLBACK 후 4개 테이블 0행. 3.2 ~ 3.6절 참고안을 이 절로 대체한다. Limit (판정 기준) 은 Limit 설정 화면과 함께 나중에 설계한다 (3.3절 참고안 유지).
+2026-10-07 사용자 "진행" 으로 이어서 설계. DDL 초안: [`2026-10-07_tqp_gds_et_result.sql`](../../../DMS/06_CoreLibSource/GdsMapControl/Persistence/2026-10-07_tqp_gds_et_result.sql) — **2026-10-07 로컬 docker oracle19c DMSMGR 적용 (사용자 승인 "진행")**: 테이블 변경 1 / 생성 3 / 시퀀스 1 / 인덱스 4 / 주석 14, 제약 전부 ENABLED. ROLLBACK 시험: LOAD_STATUS 기본 LOADING / 측정값 PK 중복 ORA-00001 / V 인데 값 NULL ORA-02290 / 같은 Die 좌표 ORA-00001 / 파일 삭제 시 Die·측정값 CASCADE 삭제, 항목은 남음 / ROLLBACK 후 4개 테이블 0행. 3.2 ~ 3.6절 참고안을 이 절로 대체한다. Limit (판정 기준) 은 Limit 설정 화면과 함께 나중에 설계한다 (3.3절 참고안 유지).
 
 ### 10.1 관계
 
@@ -620,7 +620,7 @@ DMS > E-Test 결과 업로드 화면 아래 **등록된 E-Test 파일 목록에�
 | WAFER_ID | Lot + '-' + 2자리 Slot (가상 컬럼) | 같음. 화면에 저장될 WAFER_ID 를 미리 보여 준다 |
 | 같은 Wafer 재업로드 | 같은 시험 일시일 때만 질문 | 시험 일시 / Device 가 달라도 같은 WAFER_ID 면 "기존 삭제 후 재등록" 질문 (기존 Device / 시험 일시 표시) |
 
-- DDL: [`2026-10-07_tqp_gds_src_file_uq_wafer.sql`](../DMS/06_CoreLibSource/GdsMapControl/Persistence/2026-10-07_tqp_gds_src_file_uq_wafer.sql) — 로컬 DB 적용 (적용 전 WAFER_ID 중복 0, 기존 1건 SCK / OMM_Hybrid / RH-HS2615-02 유지).
+- DDL: [`2026-10-07_tqp_gds_src_file_uq_wafer.sql`](../../../DMS/06_CoreLibSource/GdsMapControl/Persistence/2026-10-07_tqp_gds_src_file_uq_wafer.sql) — 로컬 DB 적용 (적용 전 WAFER_ID 중복 0, 기존 1건 SCK / OMM_Hybrid / RH-HS2615-02 유지).
 - 서비스: `GetEtFileByKey` 키가 3항목 (Factory / Lot / Slot) 으로 바뀜, 새 쿼리 `SELECT_SRC_FILE_BY_WAFER`. 이전 `SELECT_SRC_FILE_BY_KEY` 는 배포 전 BSL 호환용으로 그대로 둔다 (Service 가 08_DBQuery XML 을 바로 읽기 때문).
 - 파서: 파일명 Wafer 가 `{Lot}-{숫자}` 가 아니어도 중단하지 않는다 (SlotNo = 0 -> 사용자 입력).
 - 시험 값은 Lot / Slot 만으로 정해지므로, 같은 Wafer 의 재시험 파일을 함께 보관해야 하면 키 재정의 필요 ("우선 정의").
@@ -753,5 +753,5 @@ CAI_OMM_ATV_A0_TSVET_20260902141031_U9-HS2633_U9-HS2633-01$Silterra$
 | 6 Chain 연결 | GDS Chain 은 Input 값의 Chain 을 대표로 둔다 -> Spec 설정 시 2개 Chain 을 묶는 기능. 이어서 "대표 chain 보다는 그냥 묶는 기능, Setup 된 Chain 에서 찾으면 묶인 Chain 의 Limit 등 정보를 전부 찾는다" | [Limit 설계](2026-10-07_ETest_Limit_설정_설계.md) 15절 (TQP_GDS_ET_CHAIN_GROUP, 13절 대표 Chain 은 대체) |
 | 7 이전 데이터 | **A. 삭제하고 새 규칙으로 다시 올림** | 로컬 DB: SCK / OMM_Hybrid 파일 번호 25(규칙 1) 삭제 + 고아가 된 OMM_Hybrid 측정 항목 2,755행 삭제 -> 같은 샘플을 업로드 화면과 같은 순서(18항목)로 다시 저장: **파일 번호 94 / SCK / Device OMM / WAFER_ID RH-HS2615-02 / TSVET / 규칙 2 / READY / Die 24 (Pass 20 / Fail 4) / 측정값 66,120 ('-' 17)**. 등록자는 이전과 같은 ADMIN |
 | 8 DB 시간 | **A. 그대로 두고 고객 DB(KST)에서만 확인** | 로컬 docker DB 는 UTC(PC 보다 9시간 늦음). 코드 / 쿼리는 SYSDATE 그대로, 고객 DB 에서 등록 시각만 확인 |
-| 5 | $Silterra$ 의미 | 2026-10-13 회의록으로 정리: 파일에 Silterra Die 만 있다는 표시 (FT 는 Silterra 만 측정해 생략). Die# 대응은 [Die 좌표 Setup 설계](2026-10-13_Die좌표_대응_Setup_설계.md) (CLAUDE-081) |
+| 5 | $Silterra$ 의미 | 2026-10-13 회의록으로 정리: 파일에 Silterra Die 만 있다는 표시 (FT 는 Silterra 만 측정해 생략). Die# 대응은 [Die 좌표 Setup 설계](../03_KLARF_Map/2026-10-13_Die좌표_대응_Setup_설계.md) (CLAUDE-081) |
 | 8(측정 종류) | 다른 측정 종류 Spec | 답변 대기 (지금 상태 유지) |

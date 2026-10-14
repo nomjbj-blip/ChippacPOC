@@ -113,7 +113,7 @@ Oracle DDL에서는 GUID를 `VARCHAR2(36 BYTE)`, 수량을 `NUMBER`, 월드 좌�
 | `CHAIN_LAYER_RULE` | `TQP_GDS_CHAIN_RULE` |
 | `CHAIN_ELEMENT_EDIT` | `TQP_GDS_CHAIN_EDIT` |
 
-적용 파일은 [Map DDL](../GdsMapControl/Persistence/2026-10-01_tqp_gds_map_schema.sql)과 [Chain DDL](../GdsMapControl/Persistence/2026-10-01_tqp_gds_chain_schema.sql)이다. [검증 SQL](../GdsMapControl/Persistence/2026-10-01_tqp_gds_verify.sql)에서 신규 테이블 13개, PK 13개, FK 18개, Unique 제약 4개, 인덱스 23개 모두 활성/유효함을 확인했다. 기존 `TQP_GDS_` 외 `TQP_` 테이블은 24개이며 새 테이블 13개의 행 수는 모두 0이다. `PATH_TYPE`과 `POINTS_BIN` 컬럼도 확인했다.
+적용 파일은 [Map DDL](../../../GdsMapControl/Persistence/2026-10-01_tqp_gds_map_schema.sql)과 [Chain DDL](../../../GdsMapControl/Persistence/2026-10-01_tqp_gds_chain_schema.sql)이다. [검증 SQL](../../../GdsMapControl/Persistence/2026-10-01_tqp_gds_verify.sql)에서 신규 테이블 13개, PK 13개, FK 18개, Unique 제약 4개, 인덱스 23개 모두 활성/유효함을 확인했다. 기존 `TQP_GDS_` 외 `TQP_` 테이블은 24개이며 새 테이블 13개의 행 수는 모두 0이다. `PATH_TYPE`과 `POINTS_BIN` 컬럼도 확인했다.
 
 이 단계는 **빈 스키마 생성**까지다. Chain의 필수 Input 1개, Map/Chain READY 상태 전환, Device 마스터 대응, Source 원본 바이너리 형식, 대량 적재 및 DB 단독 화면 복원은 Service 구현과 함께 검증해야 한다. 확정 전에는 이 DDL을 다시 실행하지 않는다.
 
@@ -121,8 +121,8 @@ Oracle DDL에서는 GUID를 `VARCHAR2(36 BYTE)`, 수량을 `NUMBER`, 월드 좌�
 
 `DMSMGR`의 기존 `TQP_` 테이블 24개를 조회했다. `CREATE_TIME DATE`는 5개, `UPDATE_TIME DATE`는 6개 테이블에 있고, `CREATE_USER/UPDATE_USER`는 대부분 `VARCHAR2(30 BYTE)`이다. `TQP_MAPDEF`만 생성 쪽에 `INSERT_TIME/INSERT_USER`를 쓴다. 따라서 신규 `TQP_GDS_*`에는 다수의 기존 테이블과 같은 `CREATE_TIME/CREATE_USER/UPDATE_TIME/UPDATE_USER`를 사용한다. `CREATE_TIME`은 `SYSDATE` 기본값, 사용자 ID는 30바이트다. `COMMIT_TIME`과 `RETIRE_TIME`은 일반 수정 시각과 다른 이벤트 시각이라 별도로 남겼다. `CHAIN_STATUS`는 삭제 플래그가 아니라 `ACTIVE/RETIRED` 상태이므로 `DELETE_FLAG`로 바꾸지 않았다.
 
-기존 신규 테이블 13개가 모두 0건인 것을 확인한 뒤, [감사 컬럼 변경 SQL](../GdsMapControl/Persistence/2026-10-01_tqp_gds_audit_migration.sql)을 적용했다. 실행 중 이미 `NOT NULL`인 컬럼에 같은 제약을 재지정한 구문이 Oracle에서 거부되어, 앞의 Map Revision 컬럼명 2개가 변경된 상태에서 중단되었다. 구문을 고친 후 [이어서 적용한 SQL](../GdsMapControl/Persistence/2026-10-01_tqp_gds_audit_migration_resume.sql)로 나머지를 완료했다. 이후 [사용자 ID 길이 변경 SQL](../GdsMapControl/Persistence/2026-10-01_tqp_gds_audit_user_length.sql)로 30 `CHAR`를 기존 업무 테이블과 같은 30 `BYTE`로 맞췄다. 이 세 파일은 적용 이력이며 재실행하지 않는다. 신규 설치용 Map/Chain CREATE 스크립트도 최종 컬럼 정의로 수정했으나 이미 만든 테이블에는 다시 실행하지 않는다.
+기존 신규 테이블 13개가 모두 0건인 것을 확인한 뒤, [감사 컬럼 변경 SQL](../../../GdsMapControl/Persistence/2026-10-01_tqp_gds_audit_migration.sql)을 적용했다. 실행 중 이미 `NOT NULL`인 컬럼에 같은 제약을 재지정한 구문이 Oracle에서 거부되어, 앞의 Map Revision 컬럼명 2개가 변경된 상태에서 중단되었다. 구문을 고친 후 [이어서 적용한 SQL](../../../GdsMapControl/Persistence/2026-10-01_tqp_gds_audit_migration_resume.sql)로 나머지를 완료했다. 이후 [사용자 ID 길이 변경 SQL](../../../GdsMapControl/Persistence/2026-10-01_tqp_gds_audit_user_length.sql)로 30 `CHAR`를 기존 업무 테이블과 같은 30 `BYTE`로 맞췄다. 이 세 파일은 적용 이력이며 재실행하지 않는다. 신규 설치용 Map/Chain CREATE 스크립트도 최종 컬럼 정의로 수정했으나 이미 만든 테이블에는 다시 실행하지 않는다.
 
 `UPDATE_TIME`은 DB의 `DEFAULT`만으로 매 UPDATE마다 자동 변경되지 않는다. 향후 Service의 상태 전환/현재 버전 변경 트랜잭션에서 `UPDATE_USER`와 함께 명시적으로 기록한다. 불변 대량 도형 행에는 행마다 감사 컬럼을 추가하지 않았다.
 
-[감사 컬럼 조회 SQL](../GdsMapControl/Persistence/2026-10-01_tqp_audit_columns.sql)과 [변경 후 검증 SQL](../GdsMapControl/Persistence/2026-10-01_tqp_gds_audit_verify.sql)로 최종 확인했다. 신규 테이블 13개 / 기존 `TQP_` 테이블 24개, 신규 감사 시각 `DATE` 컬럼 13개 / 30 `BYTE` 사용자 컬럼 11개 / 이전 `_AT`, `_BY` 이름 0개다. 신규 테이블의 PK 13개 / FK 18개 / UNIQUE 4개는 모두 `ENABLED/VALIDATED`이고, 인덱스는 모두 `VALID`다. 신규 테이블 행 수는 계속 0개다.
+[감사 컬럼 조회 SQL](../../../GdsMapControl/Persistence/2026-10-01_tqp_audit_columns.sql)과 [변경 후 검증 SQL](../../../GdsMapControl/Persistence/2026-10-01_tqp_gds_audit_verify.sql)로 최종 확인했다. 신규 테이블 13개 / 기존 `TQP_` 테이블 24개, 신규 감사 시각 `DATE` 컬럼 13개 / 30 `BYTE` 사용자 컬럼 11개 / 이전 `_AT`, `_BY` 이름 0개다. 신규 테이블의 PK 13개 / FK 18개 / UNIQUE 4개는 모두 `ENABLED/VALIDATED`이고, 인덱스는 모두 `VALID`다. 신규 테이블 행 수는 계속 0개다.

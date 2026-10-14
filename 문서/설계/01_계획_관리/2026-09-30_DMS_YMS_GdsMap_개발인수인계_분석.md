@@ -2,7 +2,7 @@
 
 - 작성일: 2026-09-30 (Claude Code 분석)
 - 목적: Codex로 진행 중인 개발을 이어서 할 수 있도록 현재 구조와 진행 상태, 남은 작업을 정리한다.
-- 관련 문서: `문서/2026-09-23_Chain_Setup_기능_컨셉안.md` (Chain 설계와 구현 이력 17.1~17.44절), `문서/NexplantQMS_DMSYMS_Function_List_v2_20260914.xlsx`, `문서/GDS TABLE.xlsx`
+- 관련 문서: `문서/설계/02_GDS/2026-09-23_Chain_Setup_기능_컨셉안.md` (Chain 설계와 구현 이력 17.1~17.44절), `문서/자료/01_고객자료/NexplantQMS_DMSYMS_Function_List_v2_20260914.xlsx`, `문서/자료/01_고객자료/GDS TABLE.xlsx`
 
 ---
 

@@ -29,7 +29,7 @@
 | 기존 이미지 행 | 로컬 `TQD_IMAGES` 427건의 IMAGE_PATH 가 `C:/QMSClient/INSP_BACKUP/2019/05/20/195J64` 같은 **절대 경로** / THUMB 동일 / UPLOAD='INSP' | 같은 DB 데이터 조회 |
 | 이미지 열기 | (a) Map Viewer 이미지 목록: `fnFTPImageDownload` = `TQC_CONFIG DEFECT_FTP`(MAIN_PATH) + IMAGE_PATH 를 FTP 로 받음. (b) Image Gallery 썸네일 / 팝업: `fnFTPGetStream` 이 **DB 경로를 그대로** `WebRequest.Create` (260223 Chris 변경) | `02_DMS/DACrux.SEMDMS.Control/DefectMapDraw.cs:805~926` |
 | 로컬 FTP 설정 | `DEFECT_FTP` IP 172.16.15.100 / MAIN_PATH `/%2f/` (POC PC 에서 접속 가능 여부 미확인) | 로컬 DB `TQC_CONFIG` |
-| 다른 설계와의 관계 | E-Test 설계(CLAUDE-029)는 KLARF 가 `TQD_LOT.LOT_ID / TQD_WAFER(SLOT)` 에 적재된다는 전제로 연결 키(Lot 핵심 + Slot)를 잡았다 | `문서/2026-10-07_ETest_결과파일_Parsing_DB설계.md` 8절 |
+| 다른 설계와의 관계 | E-Test 설계(CLAUDE-029)는 KLARF 가 `TQD_LOT.LOT_ID / TQD_WAFER(SLOT)` 에 적재된다는 전제로 연결 키(Lot 핵심 + Slot)를 잡았다 | `문서/설계/04_ETest/2026-10-07_ETest_결과파일_Parsing_DB설계.md` 8절 |
 
 ### 2.1 미커밋 변경 (이번 설계에서 수정하지 않음)
 
