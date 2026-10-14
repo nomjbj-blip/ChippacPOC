@@ -1,0 +1,27 @@
+﻿{
+    "id":  "02",
+    "name":  "ReadOnly_RedCheck",
+    "scenarios":  [
+
+                  ],
+    "status":  "FAIL",
+    "exitCode":  1,
+    "timedOut":  false,
+    "durationMs":  2767,
+    "started":  "2026-10-12 09:33:14",
+    "command":  "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\probes\\KlarfUploadReadOnlyProbe.ps1\" -RedCheck",
+    "workingDir":  "D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\probes",
+    "keys":  {
+                 "STEP_SEQ":  "501",
+                 "WAFER_SEQ":  "282",
+                 "STEP_COMMENT":  "UPLOAD;USER=ADMIN;FILE=XD106.02;RAW_WAFER_ID=XD106.02;CLASS_SRC=ROUGHBIN",
+                 "IMAGE_ROWS":  "15",
+                 "KLARF_UPLOAD_READ_ONLY_PROBE":  "FAIL (1 / 11)"
+             },
+    "passLines":  10,
+    "failLines":  [
+                      "FAIL / Defect 16 건(GetDefectData, 원본 KLARF) / 15"
+                  ],
+    "stdout":  "02_ReadOnly_RedCheck.stdout.txt",
+    "stderr":  "02_ReadOnly_RedCheck.stderr.txt"
+}

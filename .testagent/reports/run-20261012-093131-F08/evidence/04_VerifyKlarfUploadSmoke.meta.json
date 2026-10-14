@@ -1,0 +1,26 @@
+﻿{
+    "id":  "04",
+    "name":  "VerifyKlarfUploadSmoke",
+    "scenarios":  [
+                      "SCN-09"
+                  ],
+    "status":  "PASS_PARTIAL",
+    "exitCode":  0,
+    "timedOut":  false,
+    "durationMs":  10804,
+    "started":  "2026-10-12 09:34:31",
+    "command":  "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\DMS\\02_DMS\\DACrux.SEMDMS.ENGUI\\Verification\\Verify-KlarfUpload.ps1\"",
+    "workingDir":  "D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\DMS\\02_DMS\\DACrux.SEMDMS.ENGUI\\Verification",
+    "keys":  {
+                 "KLARF_UPLOAD_FORM_SMOKE":  "PASS (읽기 검사만, 저장 검사는 사용자 데이터 보호로 건너뜀)"
+             },
+    "passLines":  18,
+    "failLines":  [
+
+                  ],
+    "skipLines":  [
+                      "SKIP: 저장 검사(5~7) 건너뜀 - 사용자 데이터 보호"
+                  ],
+    "stdout":  "04_VerifyKlarfUploadSmoke.stdout.txt",
+    "stderr":  "04_VerifyKlarfUploadSmoke.stderr.txt"
+}

@@ -28,7 +28,6 @@ D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\71_CoreLib\DACrux
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\71_CoreLib\DACrux.ProjectManager.pdb
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\03_STAT\DACrux.ProjectManager\obj\Debug\DACrux.ProjectManager.csproj.AssemblyReference.cache
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\03_STAT\DACrux.ProjectManager\obj\Debug\DACrux.ProjectManager.Config.resources
-D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\03_STAT\DACrux.ProjectManager\obj\Debug\DACrux.ProjectManager.FrmConfig.resources
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\03_STAT\DACrux.ProjectManager\obj\Debug\DACrux.ProjectManager.frmWorkSheet.resources
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\03_STAT\DACrux.ProjectManager\obj\Debug\DACrux.ProjectManager.Properties.Resources.resources
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\03_STAT\DACrux.ProjectManager\obj\Debug\DACrux.ProjectManager.ProjectManager.resources

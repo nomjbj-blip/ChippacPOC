@@ -1,0 +1,179 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TQP_GDS_ET_REP_CHAIN: E-Test 단자(Chain) 이름 -> 대표 Chain (사용자가 이름을 입력해 묶음). 2026-10-14.
+  설계: 문서/2026-10-14_ETest_Para_Setup_설계.md 4.3절 / 6절.
+  DEVICE_ID 는 GDS 대표 Device(예 U9). E-Test Device(예 OMM)는 TQP_GDS_MAP_SUB_DEVICE 의 Sub Device 와 같은 이름 Device 로 찾는다.
+  등록 Parameter = TQP_GDS_ET_ITEM 에서 TEST_PROGRAM 이 있는 행.
+  Spec 은 새 키(ITEM_NAME = 변환 이름)와 예전 키(헤더 원문 대문자)를 둘 다 본다. Limit 화면을 새 키로 바꾸기 전까지의 호환이다.
+  같은 :이름 을 두 번 쓰지 않는다(Middleware 는 순서대로 바인딩) -> f1 / f2 ... 처럼 이름을 나눴다.
+-->
+<queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Select" queryid="SELECT_ET_TERMINAL_LIST" commandtype="Text" description="Para Setup 대표 Chain 탭: 단자 목록 (Sub Device 등록 Parameter 의 단자 1 / 2 + 대표 Chain, 대표 Chain 에만 남은 단자 포함)" commandtimeout="120">
+        <commandtext><![CDATA[WITH D AS (SELECT UPPER(SUB_DEVICE_ID) AS DEVICE_KEY FROM TQP_GDS_MAP_SUB_DEVICE WHERE FACTORY = :f1 AND DEVICE_ID = :g1
+           UNION
+           SELECT UPPER(:g2) FROM DUAL),
+T AS (SELECT I.FACTORY, I.DEVICE_ID, I.TEST_PROGRAM, I.ITEM_NAME, I.HEADER_TEXT, I.ET_ITEM_SEQ, I.CHAIN_TYPE,
+             I.CHAIN_NAME AS TERMINAL_NAME, I.FORCE_LEG AS FORCE_LEG
+        FROM TQP_GDS_ET_ITEM I
+       WHERE I.FACTORY = :f2 AND I.TEST_PROGRAM IS NOT NULL AND I.USE_FLAG = 'Y'
+         AND UPPER(I.DEVICE_ID) IN (SELECT DEVICE_KEY FROM D)
+      UNION ALL
+      SELECT I.FACTORY, I.DEVICE_ID, I.TEST_PROGRAM, I.ITEM_NAME, I.HEADER_TEXT, I.ET_ITEM_SEQ, I.CHAIN_TYPE,
+             I.CHAIN_NAME2, I.FORCE_LEG2
+        FROM TQP_GDS_ET_ITEM I
+       WHERE I.FACTORY = :f3 AND I.TEST_PROGRAM IS NOT NULL AND I.USE_FLAG = 'Y' AND I.CHAIN_NAME2 IS NOT NULL
+         AND UPPER(I.DEVICE_ID) IN (SELECT DEVICE_KEY FROM D)),
+P AS (SELECT TERMINAL_NAME, LISTAGG(TEST_PROGRAM, ', ') WITHIN GROUP (ORDER BY TEST_PROGRAM) AS TEST_PROGRAMS
+        FROM (SELECT DISTINCT TERMINAL_NAME, TEST_PROGRAM FROM T)
+       GROUP BY TERMINAL_NAME),
+A AS (SELECT T.TERMINAL_NAME, MAX(T.FORCE_LEG) AS FORCE_LEG, MAX(T.CHAIN_TYPE) AS CHAIN_TYPE,
+             COUNT(DISTINCT T.ET_ITEM_SEQ) AS PARA_COUNT,
+             COUNT(DISTINCT CASE WHEN SN.ITEM_NAME IS NOT NULL OR SO.ITEM_NAME IS NOT NULL THEN T.ET_ITEM_SEQ END) AS SPEC_COUNT
+        FROM T
+        LEFT JOIN TQP_GDS_ET_LIMIT SN ON SN.FACTORY = T.FACTORY AND SN.DEVICE_ID = T.DEVICE_ID AND SN.TEST_PROGRAM = T.TEST_PROGRAM AND SN.ITEM_NAME = T.ITEM_NAME
+        LEFT JOIN TQP_GDS_ET_LIMIT SO ON SO.FACTORY = T.FACTORY AND SO.DEVICE_ID = T.DEVICE_ID AND SO.TEST_PROGRAM = T.TEST_PROGRAM AND SO.ITEM_NAME = UPPER(T.HEADER_TEXT)
+       GROUP BY T.TERMINAL_NAME),
+R AS (SELECT TERMINAL_NAME, REP_CHAIN_NAME, REMARK,
+             NVL(UPDATE_USER, CREATE_USER) AS UPDATE_USER, NVL(UPDATE_TIME, CREATE_TIME) AS UPDATE_TIME
+        FROM TQP_GDS_ET_REP_CHAIN
+       WHERE FACTORY = :f4 AND DEVICE_ID = :g3)
+SELECT NVL(A.TERMINAL_NAME, R.TERMINAL_NAME) AS TERMINAL_NAME, A.FORCE_LEG, A.CHAIN_TYPE, P.TEST_PROGRAMS,
+       NVL(A.PARA_COUNT, 0) AS PARA_COUNT, NVL(A.SPEC_COUNT, 0) AS SPEC_COUNT,
+       R.REP_CHAIN_NAME, R.REMARK, R.UPDATE_USER, R.UPDATE_TIME
+  FROM A
+  FULL OUTER JOIN R ON R.TERMINAL_NAME = A.TERMINAL_NAME
+  LEFT JOIN P ON P.TERMINAL_NAME = A.TERMINAL_NAME
+ ORDER BY NVL(A.TERMINAL_NAME, R.TERMINAL_NAME)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="120">:f1</param>
+            <param direction="Input" dbtype="VarChar" size="200">:g1</param>
+            <param direction="Input" dbtype="VarChar" size="200">:g2</param>
+            <param direction="Input" dbtype="VarChar" size="120">:f2</param>
+            <param direction="Input" dbtype="VarChar" size="120">:f3</param>
+            <param direction="Input" dbtype="VarChar" size="120">:f4</param>
+            <param direction="Input" dbtype="VarChar" size="200">:g3</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ET_REP_CHAIN_MEMBER_LIST" commandtype="Text" description="GDS 대표 Device 의 대표 Chain 구성 단자 전체" commandtimeout="60">
+        <commandtext><![CDATA[SELECT TERMINAL_NAME, REP_CHAIN_NAME, REMARK,
+       NVL(UPDATE_USER, CREATE_USER) AS UPDATE_USER, NVL(UPDATE_TIME, CREATE_TIME) AS UPDATE_TIME
+  FROM TQP_GDS_ET_REP_CHAIN
+ WHERE FACTORY = :factory
+   AND DEVICE_ID = :device_id
+ ORDER BY REP_CHAIN_NAME, TERMINAL_NAME]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="120">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="200">:device_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ET_GDS_SETUP_CHAIN" commandtype="Text" description="GDS 대표 Device 의 Setup Chain (ACTIVE + 현재 READY 버전)" commandtimeout="60">
+        <commandtext><![CDATA[SELECT C.CHAIN_SEQ, C.CHAIN_CODE, V.CHAIN_NAME
+  FROM TQP_GDS_CHAIN C
+  JOIN TQP_GDS_CHAIN_VER V ON V.FACTORY = C.FACTORY AND V.DEVICE_ID = C.DEVICE_ID AND V.CHAIN_SEQ = C.CHAIN_SEQ AND V.IS_CURRENT = 1
+ WHERE C.FACTORY = :factory
+   AND C.DEVICE_ID = :device_id
+   AND C.CHAIN_STATUS = 'ACTIVE'
+   AND V.VERSION_STATUS = 'READY'
+ ORDER BY V.CHAIN_NAME, C.CHAIN_CODE]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="120">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="200">:device_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ET_PARA_BY_REP_CHAIN" commandtype="Text" description="대표 Chain 의 단자가 단자 1 / 2 로 들어간 모든 공정 등록 Parameter + Spec" commandtimeout="120">
+        <commandtext><![CDATA[WITH D AS (SELECT UPPER(SUB_DEVICE_ID) AS DEVICE_KEY FROM TQP_GDS_MAP_SUB_DEVICE WHERE FACTORY = :f1 AND DEVICE_ID = :g1
+           UNION
+           SELECT UPPER(:g2) FROM DUAL),
+M AS (SELECT TERMINAL_NAME FROM TQP_GDS_ET_REP_CHAIN WHERE FACTORY = :f2 AND DEVICE_ID = :g3 AND REP_CHAIN_NAME = :rep_chain_name)
+SELECT I.DEVICE_ID, I.TEST_PROGRAM, I.ITEM_NAME, I.HEADER_TEXT, I.CHAIN_NAME, I.CHAIN_NAME2,
+       CASE WHEN M1.TERMINAL_NAME IS NOT NULL AND M2.TERMINAL_NAME IS NOT NULL THEN '1,2'
+            WHEN M1.TERMINAL_NAME IS NOT NULL THEN '1' ELSE '2' END AS MATCH_POSITION,
+       I.UNIT, I.USE_FLAG,
+       CASE WHEN SN.ITEM_NAME IS NOT NULL OR SO.ITEM_NAME IS NOT NULL THEN 'Y' ELSE 'N' END AS HAS_SPEC,
+       CASE WHEN SN.ITEM_NAME IS NOT NULL THEN SN.LOWER_LIMIT ELSE SO.LOWER_LIMIT END AS LOWER_LIMIT,
+       CASE WHEN SN.ITEM_NAME IS NOT NULL THEN SN.UPPER_LIMIT ELSE SO.UPPER_LIMIT END AS UPPER_LIMIT,
+       CASE WHEN SN.ITEM_NAME IS NOT NULL THEN SN.ENABLE_FLAG ELSE SO.ENABLE_FLAG END AS ENABLE_FLAG,
+       CASE WHEN SN.ITEM_NAME IS NOT NULL THEN SN.SPEC_TEXT ELSE SO.SPEC_TEXT END AS SPEC_TEXT
+  FROM TQP_GDS_ET_ITEM I
+  LEFT JOIN M M1 ON M1.TERMINAL_NAME = I.CHAIN_NAME
+  LEFT JOIN M M2 ON M2.TERMINAL_NAME = I.CHAIN_NAME2
+  LEFT JOIN TQP_GDS_ET_LIMIT SN ON SN.FACTORY = I.FACTORY AND SN.DEVICE_ID = I.DEVICE_ID AND SN.TEST_PROGRAM = I.TEST_PROGRAM AND SN.ITEM_NAME = I.ITEM_NAME
+  LEFT JOIN TQP_GDS_ET_LIMIT SO ON SO.FACTORY = I.FACTORY AND SO.DEVICE_ID = I.DEVICE_ID AND SO.TEST_PROGRAM = I.TEST_PROGRAM AND SO.ITEM_NAME = UPPER(I.HEADER_TEXT)
+ WHERE I.FACTORY = :f3
+   AND I.TEST_PROGRAM IS NOT NULL
+   AND UPPER(I.DEVICE_ID) IN (SELECT DEVICE_KEY FROM D)
+   AND (M1.TERMINAL_NAME IS NOT NULL OR M2.TERMINAL_NAME IS NOT NULL)
+ ORDER BY I.TEST_PROGRAM, I.DISPLAY_ORDER, I.ITEM_NAME]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="120">:f1</param>
+            <param direction="Input" dbtype="VarChar" size="200">:g1</param>
+            <param direction="Input" dbtype="VarChar" size="200">:g2</param>
+            <param direction="Input" dbtype="VarChar" size="120">:f2</param>
+            <param direction="Input" dbtype="VarChar" size="200">:g3</param>
+            <param direction="Input" dbtype="VarChar" size="256">:rep_chain_name</param>
+            <param direction="Input" dbtype="VarChar" size="120">:f3</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="MERGE_ET_REP_CHAIN" commandtype="Text" description="단자를 대표 Chain 에 넣는다 (다른 대표에 있으면 옮김, InsertExecuteMultiple)" commandtimeout="60">
+        <commandtext><![CDATA[MERGE INTO TQP_GDS_ET_REP_CHAIN T
+USING (SELECT :factory AS FACTORY,
+              :device_id AS DEVICE_ID,
+              :terminal_name AS TERMINAL_NAME,
+              :rep_chain_name AS REP_CHAIN_NAME,
+              :update_user AS UPDATE_USER
+         FROM DUAL) S
+   ON (T.FACTORY = S.FACTORY AND T.DEVICE_ID = S.DEVICE_ID AND T.TERMINAL_NAME = S.TERMINAL_NAME)
+ WHEN MATCHED THEN UPDATE SET
+      T.REP_CHAIN_NAME = S.REP_CHAIN_NAME,
+      T.UPDATE_USER = S.UPDATE_USER,
+      T.UPDATE_TIME = SYSDATE
+ WHEN NOT MATCHED THEN INSERT
+      (FACTORY, DEVICE_ID, TERMINAL_NAME, REP_CHAIN_NAME, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+      VALUES (S.FACTORY, S.DEVICE_ID, S.TERMINAL_NAME, S.REP_CHAIN_NAME, S.UPDATE_USER, SYSDATE, S.UPDATE_USER, SYSDATE)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="120">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="200">:device_id</param>
+            <param direction="Input" dbtype="VarChar" size="256">:terminal_name</param>
+            <param direction="Input" dbtype="VarChar" size="256">:rep_chain_name</param>
+            <param direction="Input" dbtype="VarChar" size="30">:update_user</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_ET_REP_CHAIN_NAME" commandtype="Text" description="대표 Chain 이름 바꾸기 (구성 단자 전체)" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_GDS_ET_REP_CHAIN
+   SET REP_CHAIN_NAME = :new_name,
+       UPDATE_USER = :update_user,
+       UPDATE_TIME = SYSDATE
+ WHERE FACTORY = :factory
+   AND DEVICE_ID = :device_id
+   AND REP_CHAIN_NAME = :old_name]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="256">:new_name</param>
+            <param direction="Input" dbtype="VarChar" size="30">:update_user</param>
+            <param direction="Input" dbtype="VarChar" size="120">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="200">:device_id</param>
+            <param direction="Input" dbtype="VarChar" size="256">:old_name</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_ET_REP_CHAIN_MEMBER" commandtype="Text" description="단자 1개를 대표 Chain 에서 뺀다" commandtimeout="60">
+        <commandtext><![CDATA[DELETE FROM TQP_GDS_ET_REP_CHAIN
+ WHERE FACTORY = :factory
+   AND DEVICE_ID = :device_id
+   AND TERMINAL_NAME = :terminal_name]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="120">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="200">:device_id</param>
+            <param direction="Input" dbtype="VarChar" size="256">:terminal_name</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_ET_REP_CHAIN" commandtype="Text" description="대표 Chain 삭제 (구성 단자 전체)" commandtimeout="60">
+        <commandtext><![CDATA[DELETE FROM TQP_GDS_ET_REP_CHAIN
+ WHERE FACTORY = :factory
+   AND DEVICE_ID = :device_id
+   AND REP_CHAIN_NAME = :rep_chain_name]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="120">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="200">:device_id</param>
+            <param direction="Input" dbtype="VarChar" size="256">:rep_chain_name</param>
+        </parameters>
+    </query>
+</queryxml>

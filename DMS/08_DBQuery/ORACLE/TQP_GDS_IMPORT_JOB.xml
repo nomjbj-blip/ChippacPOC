@@ -6,7 +6,6 @@
     FACTORY,
     DEVICE_ID,
     JOB_STATUS,
-    EXPECTED_SOURCE_COUNT,
     EXPECTED_PLACED_COUNT,
     EXPECTED_POINT_COUNT,
     CREATE_USER,
@@ -16,7 +15,6 @@ VALUES
     :factory,
     :device_id,
     'UPLOADING',
-    :expected_source_count,
     :expected_placed_count,
     :expected_point_count,
     :create_user,
@@ -25,7 +23,6 @@ VALUES
             <param direction="Input" dbtype="Number" size="0">:import_job_seq</param>
             <param direction="Input" dbtype="VarChar" size="30">:factory</param>
             <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
-            <param direction="Input" dbtype="Number" size="0">:expected_source_count</param>
             <param direction="Input" dbtype="Number" size="0">:expected_placed_count</param>
             <param direction="Input" dbtype="Number" size="0">:expected_point_count</param>
             <param direction="Input" dbtype="VarChar" size="30">:create_user</param>
@@ -37,8 +34,8 @@ VALUES
     </query>
     <query statement="Select" queryid="SELECT_IMPORT_JOB" commandtype="Text" description="GDS Map 저장 작업 조회 (작업 번호)" commandtimeout="60">
         <commandtext><![CDATA[SELECT IMPORT_JOB_SEQ, FACTORY, DEVICE_ID, JOB_STATUS,
-       EXPECTED_SOURCE_COUNT, EXPECTED_PLACED_COUNT, EXPECTED_POINT_COUNT,
-       RECEIVED_SOURCE_COUNT, RECEIVED_PLACED_COUNT, RECEIVED_POINT_COUNT
+       EXPECTED_PLACED_COUNT, EXPECTED_POINT_COUNT,
+       RECEIVED_PLACED_COUNT, RECEIVED_POINT_COUNT
   FROM TQP_GDS_IMPORT_JOB
  WHERE IMPORT_JOB_SEQ = :import_job_seq]]></commandtext>
         <parameters>
@@ -47,8 +44,8 @@ VALUES
     </query>
     <query statement="Select" queryid="SELECT_IMPORT_JOB_BY_MAP" commandtype="Text" description="GDS Map 저장 작업 조회 (Factory / Device)" commandtimeout="60">
         <commandtext><![CDATA[SELECT IMPORT_JOB_SEQ, FACTORY, DEVICE_ID, JOB_STATUS,
-       EXPECTED_SOURCE_COUNT, EXPECTED_PLACED_COUNT, EXPECTED_POINT_COUNT,
-       RECEIVED_SOURCE_COUNT, RECEIVED_PLACED_COUNT, RECEIVED_POINT_COUNT
+       EXPECTED_PLACED_COUNT, EXPECTED_POINT_COUNT,
+       RECEIVED_PLACED_COUNT, RECEIVED_POINT_COUNT
   FROM TQP_GDS_IMPORT_JOB
  WHERE FACTORY = :factory
    AND DEVICE_ID = :device_id]]></commandtext>
@@ -59,15 +56,13 @@ VALUES
     </query>
     <query statement="Update" queryid="UPDATE_IMPORT_JOB_RECEIVED" commandtype="Text" description="배치 저장 후 수신 건수 누적 (UPLOADING 작업만)" commandtimeout="60">
         <commandtext><![CDATA[UPDATE TQP_GDS_IMPORT_JOB
-   SET RECEIVED_SOURCE_COUNT = RECEIVED_SOURCE_COUNT + :received_source,
-       RECEIVED_PLACED_COUNT = RECEIVED_PLACED_COUNT + :received_placed,
+   SET RECEIVED_PLACED_COUNT = RECEIVED_PLACED_COUNT + :received_placed,
        RECEIVED_POINT_COUNT = RECEIVED_POINT_COUNT + :received_point,
        UPDATE_USER = :update_user,
        UPDATE_TIME = SYSDATE
  WHERE IMPORT_JOB_SEQ = :import_job_seq
    AND JOB_STATUS = 'UPLOADING' ]]></commandtext>
         <parameters>
-            <param direction="Input" dbtype="Number" size="0">:received_source</param>
             <param direction="Input" dbtype="Number" size="0">:received_placed</param>
             <param direction="Input" dbtype="Number" size="0">:received_point</param>
             <param direction="Input" dbtype="VarChar" size="30">:update_user</param>
@@ -77,7 +72,6 @@ VALUES
     <query statement="Update" queryid="UPDATE_IMPORT_JOB_READY" commandtype="Text" description="완료 확정: DB에서 다시 센 건수로 수신 건수를 맞추고 READY로 변경 (UPLOADING 작업만)" commandtimeout="60">
         <commandtext><![CDATA[UPDATE TQP_GDS_IMPORT_JOB
    SET JOB_STATUS = 'READY',
-       RECEIVED_SOURCE_COUNT = :received_source,
        RECEIVED_PLACED_COUNT = :received_placed,
        RECEIVED_POINT_COUNT = :received_point,
        UPDATE_USER = :update_user,
@@ -85,7 +79,6 @@ VALUES
  WHERE IMPORT_JOB_SEQ = :import_job_seq
    AND JOB_STATUS = 'UPLOADING' ]]></commandtext>
         <parameters>
-            <param direction="Input" dbtype="Number" size="0">:received_source</param>
             <param direction="Input" dbtype="Number" size="0">:received_placed</param>
             <param direction="Input" dbtype="Number" size="0">:received_point</param>
             <param direction="Input" dbtype="VarChar" size="30">:update_user</param>

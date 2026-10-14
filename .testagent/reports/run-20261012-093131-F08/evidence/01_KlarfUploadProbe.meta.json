@@ -1,0 +1,23 @@
+﻿{
+    "id":  "01",
+    "name":  "KlarfUploadProbe",
+    "scenarios":  [
+                      "SCN-01,SCN-02,SCN-03,SCN-04,SCN-05,SCN-08"
+                  ],
+    "status":  "SKIPPED",
+    "exitCode":  2,
+    "timedOut":  false,
+    "durationMs":  2821,
+    "started":  "2026-10-12 09:31:33",
+    "command":  "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\DMS\\02_DMS\\DACrux.SEMDMS.BSL\\Probes\\KlarfUploadProbe.ps1\"",
+    "workingDir":  "D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\DMS\\02_DMS\\DACrux.SEMDMS.BSL\\Probes",
+    "keys":  {
+                 "KLARF_UPLOAD_PROBE":  "SKIPPED (사용자 데이터 보호)"
+             },
+    "passLines":  3,
+    "failLines":  [
+
+                  ],
+    "stdout":  "01_KlarfUploadProbe.stdout.txt",
+    "stderr":  "01_KlarfUploadProbe.stderr.txt"
+}

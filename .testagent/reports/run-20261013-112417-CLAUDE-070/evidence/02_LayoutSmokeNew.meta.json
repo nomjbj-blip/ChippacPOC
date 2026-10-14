@@ -1,0 +1,27 @@
+﻿{
+    "id":  "02",
+    "name":  "LayoutSmokeNew",
+    "scenarios":  [
+                      "SCN-02",
+                      "SCN-04"
+                  ],
+    "status":  "FAIL",
+    "exitCode":  1,
+    "timedOut":  false,
+    "durationMs":  786,
+    "started":  "2026-10-13 11:24:59",
+    "command":  "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\DMS\\06_CoreLibSource\\GdsMapControl\\Probes\\GdsViewLayoutSmoke.ps1\" -GdsExe C:\\Users\\USER\\AppData\\Local\\Temp\\ChippacBuild\\CLAUDE-070_112459\\NexplantQMS.GdsMap.exe -OutDir C:\\Users\\USER\\AppData\\Local\\Temp\\ChippacBuild\\CLAUDE-070_112459\\png",
+    "workingDir":  "D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\DMS\\06_CoreLibSource\\GdsMapControl\\Probes",
+    "keys":  {
+
+             },
+    "passLines":  0,
+    "failLines":  [
+
+                  ],
+    "skipLines":  [
+
+                  ],
+    "stdout":  "02_LayoutSmokeNew.stdout.txt",
+    "stderr":  "02_LayoutSmokeNew.stderr.txt"
+}

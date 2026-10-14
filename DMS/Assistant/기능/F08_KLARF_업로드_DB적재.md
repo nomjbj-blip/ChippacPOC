@@ -65,6 +65,22 @@ frmKlarfUpload (신규, SEMDMS.ENGUI/DefectMapAnalysis)
 - 이미지 폴더 선택은 탐색기 형식 창(`FolderPickerDialog.cs`, IFileOpenDialog 폴더 선택 모드, 실패 시 기존 창). 이미지 폴더 자동 찾기는 사용자가 화면 코드에서 뺐다(2026-10-07) -> [폴더 선택]으로 직접 지정.
 - Probe / Smoke 는 샘플 Wafer 에 사용자가 올린 데이터(STEP COMMENT USER 가 PROBE / SMOKE 아님)가 있으면 바꾸지 않고 종료 코드 2 로 멈춘다(재등록으로 사용자 데이터를 지운 사고 후 추가).
 
+### 화면 재배치 (2026-10-08 CLAUDE-048)
+
+- [분석] 버튼 / 처리 기록 없음. [파일 선택] / [폴더 선택] 을 누르면 바로 읽는다(입력란은 읽기 전용).
+- 위: 파일 묶음 + 저장 값 묶음 + 큰 [DB 저장], 그 아래 KLARF 요약 한 줄, 본문: Wafer Map | Wafer 목록 + KLARF Defect Grid(저장 Class / 분류명 / 이미지 여부 / 좌표 / Bin, 선택 = Map 강조, 더블클릭 = 이미지 열기).
+- 버튼 아이콘: `DMS/11_Resource/ByModule/POC/BTN_*.png`(make_button_icons.ps1, 메뉴 아이콘과 같은 그림 방식) 를 `frmKlarfUpload.resx` 가 파일 참조.
+
+- Map Setup 확인(2026-10-13): Product(기본 KLARF DeviceID)에 `TQP_MAPDEF`(FACTORY + MAPID) Map 이 없으면 미리보기 INVALID / 저장 ERROR. Map Define 또는 File Map Setup 에서 Map ID = Device 로 먼저 등록해야 한다.
+- **Map Setup 기준 저장 (2026-10-13 CLAUDE-083, 사용자 결정)**: Defect 조회 화면은 Map Setup(`TQP_MAPDEF` / `TQP_USEMAP`, Map ID = Device) Map 을 그대로 보이고 KLARF 는 Defect 정보만 쓴다. KLARF 검사 Die(SampleTestPlan) / Pitch 로 Map 을 만들지 않는다.
+  - `TQD_SETUP_MAP` = Test 마다 Map Setup 사용 Die(USECODE 1) 전체 (LeftBottom 번호). `TQD_SETUP` 의 WAFER_SIZE / DIE_PITCH / DIE_ORIGIN / ORIGIN = Map Setup 값. 새 `TQD_PRODUCT` NETDIE = Map 사용 Die 수. `TQD_INSP_INFO.INSPECTED_DIE` 는 실제 검사 Die 수 그대로.
+  - 번호 변환: Map Setup 저장 방향(XY_DIRECTION) -> LeftBottom 은 File Map Setup 과 같은 식(`KlarfMapRule.FromDirection` / `StoredMapLayout.ToLeftBottomOrigin`, BSL 은 TEST.ENGUI 를 참조 못 해 `KlarfUpload` 안에 같은 식). 파싱 뒤 Defect / 검사 Die 번호를 Map Setup 원점으로 옮긴다 (OMM_Hybrid 는 KLARF 원점과 같은 (7, 5) 라 변화 없음).
+  - 같은 Setup(SETUP_ID + STEP_ID + SETUP_TIME)이 예전 규칙으로 있으면 저장할 때 Setup 값 UPDATE / Setup Map 지우고 다시 넣음 (재업로드 시 교체). 이 Setup 을 쓰는 다른 STEP 도 같이 바뀐다.
+  - 미리보기 / 결과 표: `MAP_DIES`(저장할 Die 수), `MAP_NOTE`(Pitch / 원점 다름, Map 밖 검사 Die / Defect 수, MESSAGE 에도 표시). Map 이 없거나 삭제 / 단위(um 아님) / XY 방향 오류 / 사용 Die 0 이면 INVALID.
+  - 쿼리 추가: `TQD_SETUP.xml` UPDATE_SETUP_INFO_KLARF_UPLOAD / `TQD_SETUP_MAP.xml` DELETE_SETUP_MAP_KLARF_UPLOAD. DSL `DeleteData` / `UpdateData` 는 내부가 GetDataTable 이라 `*NonQuery` 사용.
+  - 참고: 기존 메뉴 Defect Bare Map View(`GetBareDefectMapViewer`)도 Map Setup Map + Defect 개념이지만 Die 를 `TQP_MAPDEF_DIE` 에서만 읽고(File Map Setup 은 TQP_USEMAP 저장, OMM_Hybrid 0행) 원점 번호를 저장값 그대로 써 OMM_Hybrid 에는 맞지 않는다 (화면 미확인). 사용자 결정: 일반 Defect Map View 를 쓰고 업로드에서 맞춘다.
+  - 검증: `02_DMS/DACrux.SEMDMS.BSL/Probes/KlarfUploadSetupMapProbe.ps1` -> `KLARF_SETUPMAP_PROBE=PASS (18)` (TEMP BSL). **DMS 화면 확인 완료** (2026-10-13 사용자 재업로드: XD106.02 / HS2617B_TBDB, Setup Map 76). 이미 올린 데이터는 덮어쓰기 재업로드 때만 바뀐다(건너뜀이면 그대로).
+
 ## 설계만 된 부분과 미완료
 
 - 이미지 화면 표시: Map Viewer 이미지 목록은 FTP(`TQC_CONFIG DEFECT_FTP`) 경유라 POC PC FTP 환경 결정 필요. `KLARF_IMAGE_ROOT` 는 FTP 루트(MAIN_PATH `/%2f/` = 드라이브 루트) 아래여야 한다.

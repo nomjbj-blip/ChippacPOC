@@ -85,9 +85,9 @@
     <Compile Include="TQP_GDS_IMPORT_JOB.cs" />
     <Compile Include="TQP_GDS_IMPORT_BATCH.cs" />
     <Compile Include="TQP_GDS_LAYER.cs" />
-    <Compile Include="TQP_GDS_SOURCE_EL.cs" />
     <Compile Include="TQP_GDS_PLACED_EL.cs" />
     <Compile Include="TQP_GDS_MAP.cs" />
+    <Compile Include="TQP_GDS_MAP_SUB_DEVICE.cs" />
     <Compile Include="TQP_GDS_CHAIN.cs" />
     <Compile Include="TQP_GDS_CHAIN_VER.cs" />
     <Compile Include="TQP_GDS_CHAIN_MEMBER.cs" />
@@ -96,6 +96,10 @@
     <Compile Include="TQP_GDS_ET_DIE.cs" />
     <Compile Include="TQP_GDS_ET_VALUE.cs" />
     <Compile Include="TQP_GDS_ET_LIMIT.cs" />
+    <Compile Include="TQP_GDS_ET_CHAIN_GROUP.cs" />
+    <Compile Include="TQP_GDS_ET_REP_CHAIN.cs" />
+    <Compile Include="TQP_GDS_ET_CHAIN_LINK.cs" />
+    <Compile Include="TQP_GDS_ET_YMS.cs" />
     <Compile Include="TQP_GDS_CHAIN_LAYER.cs" />
     <Compile Include="TQP_GDS_CHAIN_RULE.cs" />
     <Compile Include="TQP_GDS_CHAIN_EDIT.cs" />

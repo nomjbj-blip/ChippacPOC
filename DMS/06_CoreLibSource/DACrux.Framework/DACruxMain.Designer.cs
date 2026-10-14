@@ -30,19 +30,6 @@ namespace DACrux.Framework
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            Infragistics.Win.UltraWinStatusBar.UltraStatusPanel ultraStatusPanel1 = new Infragistics.Win.UltraWinStatusBar.UltraStatusPanel();
-            Infragistics.Win.UltraWinStatusBar.UltraStatusPanel ultraStatusPanel2 = new Infragistics.Win.UltraWinStatusBar.UltraStatusPanel();
-            Infragistics.Win.UltraWinStatusBar.UltraStatusPanel ultraStatusPanel3 = new Infragistics.Win.UltraWinStatusBar.UltraStatusPanel();
-            Infragistics.Win.UltraWinStatusBar.UltraStatusPanel ultraStatusPanel4 = new Infragistics.Win.UltraWinStatusBar.UltraStatusPanel();
-            Infragistics.Win.UltraWinStatusBar.UltraStatusPanel ultraStatusPanel5 = new Infragistics.Win.UltraWinStatusBar.UltraStatusPanel();
-            Infragistics.Win.UltraWinStatusBar.UltraStatusPanel ultraStatusPanel6 = new Infragistics.Win.UltraWinStatusBar.UltraStatusPanel();
-            Infragistics.Win.Appearance appearance1 = new Infragistics.Win.Appearance();
-            Infragistics.Win.UltraWinDock.DockAreaPane dockAreaPane1 = new Infragistics.Win.UltraWinDock.DockAreaPane(Infragistics.Win.UltraWinDock.DockedLocation.DockedLeft, new System.Guid("a4957fdf-1f23-42a0-9b2d-d6da5ce9242d"));
-            Infragistics.Win.UltraWinDock.DockableControlPane dockableControlPane1 = new Infragistics.Win.UltraWinDock.DockableControlPane(new System.Guid("dc15ee87-9a98-4c89-89a3-818f4d783a31"), new System.Guid("00000000-0000-0000-0000-000000000000"), -1, new System.Guid("a4957fdf-1f23-42a0-9b2d-d6da5ce9242d"), -1);
-            Infragistics.Win.UltraWinDock.DockableControlPane dockableControlPane2 = new Infragistics.Win.UltraWinDock.DockableControlPane(new System.Guid("42cdc76a-6021-4bb3-a1e4-5562a6e97a85"), new System.Guid("00000000-0000-0000-0000-000000000000"), -1, new System.Guid("a4957fdf-1f23-42a0-9b2d-d6da5ce9242d"), -1);
-            Infragistics.Win.UltraWinDock.DockAreaPane dockAreaPane2 = new Infragistics.Win.UltraWinDock.DockAreaPane(Infragistics.Win.UltraWinDock.DockedLocation.DockedLeft, new System.Guid("979486bd-d722-4ae9-b333-2a8131b6a6db"));
-            Infragistics.Win.UltraWinDock.DockableControlPane dockableControlPane3 = new Infragistics.Win.UltraWinDock.DockableControlPane(new System.Guid("b0da64b9-f773-44c4-99f0-d2cc038486c5"), new System.Guid("00000000-0000-0000-0000-000000000000"), -1, new System.Guid("979486bd-d722-4ae9-b333-2a8131b6a6db"), -1);
-            Infragistics.Win.UltraWinDock.DockableControlPane dockableControlPane4 = new Infragistics.Win.UltraWinDock.DockableControlPane(new System.Guid("a4cc97f2-d77b-4868-8678-db36f7178281"), new System.Guid("00000000-0000-0000-0000-000000000000"), -1, new System.Guid("979486bd-d722-4ae9-b333-2a8131b6a6db"), -1);
             Infragistics.Win.UltraWinToolbars.MdiWindowListTool mdiWindowListTool4 = new Infragistics.Win.UltraWinToolbars.MdiWindowListTool("MNU_WINDOWS_MDI_WINDOWS_LIST");
             Infragistics.Win.UltraWinToolbars.RibbonTab ribbonTab1 = new Infragistics.Win.UltraWinToolbars.RibbonTab("MNU_FILE");
             Infragistics.Win.UltraWinToolbars.RibbonGroup ribbonGroup1 = new Infragistics.Win.UltraWinToolbars.RibbonGroup("RBN_FILE");
@@ -62,11 +49,25 @@ namespace DACrux.Framework
             Infragistics.Win.UltraWinToolbars.StateButtonTool stateButtonTool2 = new Infragistics.Win.UltraWinToolbars.StateButtonTool("MNU_WINDOWS_TAB_VIEW", "");
             Infragistics.Win.UltraWinToolbars.StateButtonTool stateButtonTool4 = new Infragistics.Win.UltraWinToolbars.StateButtonTool("MNU_WINDOWS_PROJECT_EXPLORER", "");
             Infragistics.Win.UltraWinToolbars.MdiWindowListTool mdiWindowListTool3 = new Infragistics.Win.UltraWinToolbars.MdiWindowListTool("MDIWindowListTool1");
+            Infragistics.Win.UltraWinStatusBar.UltraStatusPanel ultraStatusPanel1 = new Infragistics.Win.UltraWinStatusBar.UltraStatusPanel();
+            Infragistics.Win.UltraWinStatusBar.UltraStatusPanel ultraStatusPanel2 = new Infragistics.Win.UltraWinStatusBar.UltraStatusPanel();
+            Infragistics.Win.UltraWinStatusBar.UltraStatusPanel ultraStatusPanel3 = new Infragistics.Win.UltraWinStatusBar.UltraStatusPanel();
+            Infragistics.Win.UltraWinStatusBar.UltraStatusPanel ultraStatusPanel4 = new Infragistics.Win.UltraWinStatusBar.UltraStatusPanel();
+            Infragistics.Win.UltraWinStatusBar.UltraStatusPanel ultraStatusPanel5 = new Infragistics.Win.UltraWinStatusBar.UltraStatusPanel();
+            Infragistics.Win.UltraWinStatusBar.UltraStatusPanel ultraStatusPanel6 = new Infragistics.Win.UltraWinStatusBar.UltraStatusPanel();
+            Infragistics.Win.Appearance appearance1 = new Infragistics.Win.Appearance();
+            Infragistics.Win.UltraWinDock.DockAreaPane dockAreaPane1 = new Infragistics.Win.UltraWinDock.DockAreaPane(Infragistics.Win.UltraWinDock.DockedLocation.DockedLeft, new System.Guid("a4957fdf-1f23-42a0-9b2d-d6da5ce9242d"));
+            Infragistics.Win.UltraWinDock.DockableControlPane dockableControlPane1 = new Infragistics.Win.UltraWinDock.DockableControlPane(new System.Guid("dc15ee87-9a98-4c89-89a3-818f4d783a31"), new System.Guid("00000000-0000-0000-0000-000000000000"), -1, new System.Guid("a4957fdf-1f23-42a0-9b2d-d6da5ce9242d"), -1);
+            Infragistics.Win.UltraWinDock.DockableControlPane dockableControlPane2 = new Infragistics.Win.UltraWinDock.DockableControlPane(new System.Guid("42cdc76a-6021-4bb3-a1e4-5562a6e97a85"), new System.Guid("00000000-0000-0000-0000-000000000000"), -1, new System.Guid("a4957fdf-1f23-42a0-9b2d-d6da5ce9242d"), -1);
+            Infragistics.Win.UltraWinDock.DockAreaPane dockAreaPane2 = new Infragistics.Win.UltraWinDock.DockAreaPane(Infragistics.Win.UltraWinDock.DockedLocation.DockedLeft, new System.Guid("979486bd-d722-4ae9-b333-2a8131b6a6db"));
+            Infragistics.Win.UltraWinDock.DockableControlPane dockableControlPane3 = new Infragistics.Win.UltraWinDock.DockableControlPane(new System.Guid("b0da64b9-f773-44c4-99f0-d2cc038486c5"), new System.Guid("00000000-0000-0000-0000-000000000000"), -1, new System.Guid("979486bd-d722-4ae9-b333-2a8131b6a6db"), -1);
+            Infragistics.Win.UltraWinDock.DockableControlPane dockableControlPane4 = new Infragistics.Win.UltraWinDock.DockableControlPane(new System.Guid("a4cc97f2-d77b-4868-8678-db36f7178281"), new System.Guid("00000000-0000-0000-0000-000000000000"), -1, new System.Guid("979486bd-d722-4ae9-b333-2a8131b6a6db"), -1);
             this.ducLotGroup = new DACrux.Framework.Controls.DUCLotGroup();
             this.MD_STAT_ProjectManager = new DACrux.ProjectManager.ProjectManager();
             this.plTESTSearch = new System.Windows.Forms.Panel();
             this.plDMSearch = new System.Windows.Forms.Panel();
             this._frmDCMain_Toolbars_Dock_Area_Top = new Infragistics.Win.UltraWinToolbars.UltraToolbarsDockArea();
+            this.utbManager = new Infragistics.Win.UltraWinToolbars.UltraToolbarsManager(this.components);
             this._frmDCMain_Toolbars_Dock_Area_Bottom = new Infragistics.Win.UltraWinToolbars.UltraToolbarsDockArea();
             this._frmDCMain_Toolbars_Dock_Area_Left = new Infragistics.Win.UltraWinToolbars.UltraToolbarsDockArea();
             this._frmDCMain_Toolbars_Dock_Area_Right = new Infragistics.Win.UltraWinToolbars.UltraToolbarsDockArea();
@@ -84,7 +85,7 @@ namespace DACrux.Framework
             this.utMDIMain = new Infragistics.Win.UltraWinTabbedMdi.UltraTabbedMdiManager(this.components);
             this.windowDockingArea1 = new Infragistics.Win.UltraWinDock.WindowDockingArea();
             this.windowDockingArea2 = new Infragistics.Win.UltraWinDock.WindowDockingArea();
-            this.utbManager = new Infragistics.Win.UltraWinToolbars.UltraToolbarsManager(this.components);
+            ((System.ComponentModel.ISupportInitialize)(this.utbManager)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.utsMain)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.udmMain)).BeginInit();
             this.dockableWindow2.SuspendLayout();
@@ -94,14 +95,14 @@ namespace DACrux.Framework
             ((System.ComponentModel.ISupportInitialize)(this.utMDIMain)).BeginInit();
             this.windowDockingArea1.SuspendLayout();
             this.windowDockingArea2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.utbManager)).BeginInit();
             this.SuspendLayout();
             // 
             // ducLotGroup
             // 
-            this.ducLotGroup.Location = new System.Drawing.Point(0, 20);
+            this.ducLotGroup.Location = new System.Drawing.Point(0, 30);
+            this.ducLotGroup.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.ducLotGroup.Name = "ducLotGroup";
-            this.ducLotGroup.Size = new System.Drawing.Size(255, 427);
+            this.ducLotGroup.Size = new System.Drawing.Size(364, 640);
             this.ducLotGroup.TabIndex = 31;
             // 
             // MD_STAT_ProjectManager
@@ -109,25 +110,28 @@ namespace DACrux.Framework
             this.MD_STAT_ProjectManager.DefaultDataSheetColumnCount = 20;
             this.MD_STAT_ProjectManager.DefaultDataSheetRowCount = 51;
             this.MD_STAT_ProjectManager.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.MD_STAT_ProjectManager.Location = new System.Drawing.Point(0, 20);
+            this.MD_STAT_ProjectManager.Location = new System.Drawing.Point(0, 30);
+            this.MD_STAT_ProjectManager.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.MD_STAT_ProjectManager.Name = "MD_STAT_ProjectManager";
-            this.MD_STAT_ProjectManager.Size = new System.Drawing.Size(255, 427);
+            this.MD_STAT_ProjectManager.Size = new System.Drawing.Size(364, 640);
             this.MD_STAT_ProjectManager.TabIndex = 38;
             // 
             // plTESTSearch
             // 
             this.plTESTSearch.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.plTESTSearch.Location = new System.Drawing.Point(0, 20);
+            this.plTESTSearch.Location = new System.Drawing.Point(0, 30);
+            this.plTESTSearch.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.plTESTSearch.Name = "plTESTSearch";
-            this.plTESTSearch.Size = new System.Drawing.Size(394, 403);
+            this.plTESTSearch.Size = new System.Drawing.Size(563, 604);
             this.plTESTSearch.TabIndex = 45;
             // 
             // plDMSearch
             // 
             this.plDMSearch.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.plDMSearch.Location = new System.Drawing.Point(0, 20);
+            this.plDMSearch.Location = new System.Drawing.Point(0, 30);
+            this.plDMSearch.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.plDMSearch.Name = "plDMSearch";
-            this.plDMSearch.Size = new System.Drawing.Size(394, 427);
+            this.plDMSearch.Size = new System.Drawing.Size(563, 640);
             this.plDMSearch.TabIndex = 46;
             // 
             // _frmDCMain_Toolbars_Dock_Area_Top
@@ -137,238 +141,10 @@ namespace DACrux.Framework
             this._frmDCMain_Toolbars_Dock_Area_Top.DockedPosition = Infragistics.Win.UltraWinToolbars.DockedPosition.Top;
             this._frmDCMain_Toolbars_Dock_Area_Top.ForeColor = System.Drawing.SystemColors.ControlText;
             this._frmDCMain_Toolbars_Dock_Area_Top.Location = new System.Drawing.Point(0, 0);
+            this._frmDCMain_Toolbars_Dock_Area_Top.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this._frmDCMain_Toolbars_Dock_Area_Top.Name = "_frmDCMain_Toolbars_Dock_Area_Top";
-            this._frmDCMain_Toolbars_Dock_Area_Top.Size = new System.Drawing.Size(819, 21);
+            this._frmDCMain_Toolbars_Dock_Area_Top.Size = new System.Drawing.Size(1170, 30);
             this._frmDCMain_Toolbars_Dock_Area_Top.ToolbarsManager = this.utbManager;
-            // 
-            // _frmDCMain_Toolbars_Dock_Area_Bottom
-            // 
-            this._frmDCMain_Toolbars_Dock_Area_Bottom.AccessibleRole = System.Windows.Forms.AccessibleRole.Grouping;
-            this._frmDCMain_Toolbars_Dock_Area_Bottom.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(223)))), ((int)(((byte)(233)))), ((int)(((byte)(245)))));
-            this._frmDCMain_Toolbars_Dock_Area_Bottom.DockedPosition = Infragistics.Win.UltraWinToolbars.DockedPosition.Bottom;
-            this._frmDCMain_Toolbars_Dock_Area_Bottom.ForeColor = System.Drawing.SystemColors.ControlText;
-            this._frmDCMain_Toolbars_Dock_Area_Bottom.Location = new System.Drawing.Point(0, 468);
-            this._frmDCMain_Toolbars_Dock_Area_Bottom.Name = "_frmDCMain_Toolbars_Dock_Area_Bottom";
-            this._frmDCMain_Toolbars_Dock_Area_Bottom.Size = new System.Drawing.Size(819, 0);
-            this._frmDCMain_Toolbars_Dock_Area_Bottom.ToolbarsManager = this.utbManager;
-            // 
-            // _frmDCMain_Toolbars_Dock_Area_Left
-            // 
-            this._frmDCMain_Toolbars_Dock_Area_Left.AccessibleRole = System.Windows.Forms.AccessibleRole.Grouping;
-            this._frmDCMain_Toolbars_Dock_Area_Left.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(223)))), ((int)(((byte)(233)))), ((int)(((byte)(245)))));
-            this._frmDCMain_Toolbars_Dock_Area_Left.DockedPosition = Infragistics.Win.UltraWinToolbars.DockedPosition.Left;
-            this._frmDCMain_Toolbars_Dock_Area_Left.ForeColor = System.Drawing.SystemColors.ControlText;
-            this._frmDCMain_Toolbars_Dock_Area_Left.Location = new System.Drawing.Point(0, 21);
-            this._frmDCMain_Toolbars_Dock_Area_Left.Name = "_frmDCMain_Toolbars_Dock_Area_Left";
-            this._frmDCMain_Toolbars_Dock_Area_Left.Size = new System.Drawing.Size(0, 447);
-            this._frmDCMain_Toolbars_Dock_Area_Left.ToolbarsManager = this.utbManager;
-            // 
-            // _frmDCMain_Toolbars_Dock_Area_Right
-            // 
-            this._frmDCMain_Toolbars_Dock_Area_Right.AccessibleRole = System.Windows.Forms.AccessibleRole.Grouping;
-            this._frmDCMain_Toolbars_Dock_Area_Right.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(223)))), ((int)(((byte)(233)))), ((int)(((byte)(245)))));
-            this._frmDCMain_Toolbars_Dock_Area_Right.DockedPosition = Infragistics.Win.UltraWinToolbars.DockedPosition.Right;
-            this._frmDCMain_Toolbars_Dock_Area_Right.ForeColor = System.Drawing.SystemColors.ControlText;
-            this._frmDCMain_Toolbars_Dock_Area_Right.Location = new System.Drawing.Point(819, 21);
-            this._frmDCMain_Toolbars_Dock_Area_Right.Name = "_frmDCMain_Toolbars_Dock_Area_Right";
-            this._frmDCMain_Toolbars_Dock_Area_Right.Size = new System.Drawing.Size(0, 447);
-            this._frmDCMain_Toolbars_Dock_Area_Right.ToolbarsManager = this.utbManager;
-            // 
-            // utsMain
-            // 
-            this.utsMain.Location = new System.Drawing.Point(0, 468);
-            this.utsMain.Name = "utsMain";
-            ultraStatusPanel1.ProgressBarInfo.Style = Infragistics.Win.UltraWinProgressBar.ProgressBarStyle.Office2007Continuous;
-            ultraStatusPanel1.Style = Infragistics.Win.UltraWinStatusBar.PanelStyle.Progress;
-            ultraStatusPanel1.Visible = false;
-            ultraStatusPanel2.Style = Infragistics.Win.UltraWinStatusBar.PanelStyle.AutoStatusText;
-            ultraStatusPanel2.Width = 200;
-            ultraStatusPanel3.SizingMode = Infragistics.Win.UltraWinStatusBar.PanelSizingMode.Spring;
-            ultraStatusPanel3.Style = Infragistics.Win.UltraWinStatusBar.PanelStyle.Marquee;
-            ultraStatusPanel4.Width = 200;
-            ultraStatusPanel5.MinWidth = 50;
-            ultraStatusPanel5.Width = 200;
-            appearance1.TextHAlignAsString = "Center";
-            appearance1.ThemedElementAlpha = Infragistics.Win.Alpha.Transparent;
-            ultraStatusPanel6.Appearance = appearance1;
-            ultraStatusPanel6.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
-            ultraStatusPanel6.MinWidth = 150;
-            ultraStatusPanel6.Style = Infragistics.Win.UltraWinStatusBar.PanelStyle.Time;
-            ultraStatusPanel6.Width = 150;
-            this.utsMain.Panels.AddRange(new Infragistics.Win.UltraWinStatusBar.UltraStatusPanel[] {
-            ultraStatusPanel1,
-            ultraStatusPanel2,
-            ultraStatusPanel3,
-            ultraStatusPanel4,
-            ultraStatusPanel5,
-            ultraStatusPanel6});
-            this.utsMain.Size = new System.Drawing.Size(819, 23);
-            this.utsMain.TabIndex = 20;
-            this.utsMain.Text = "ultraStatusBar1";
-            this.utsMain.ViewStyle = Infragistics.Win.UltraWinStatusBar.ViewStyle.VisualStudio2005;
-            // 
-            // udmMain
-            // 
-            this.udmMain.AnimationSpeed = Infragistics.Win.UltraWinDock.AnimationSpeed.StandardSpeedPlus5;
-            this.udmMain.AutoHideDelay = 100;
-            this.udmMain.CompressUnpinnedTabs = false;
-            dockAreaPane1.ChildPaneStyle = Infragistics.Win.UltraWinDock.ChildPaneStyle.TabGroup;
-            dockAreaPane1.DockedBefore = new System.Guid("979486bd-d722-4ae9-b333-2a8131b6a6db");
-            dockableControlPane1.Closed = true;
-            dockableControlPane1.Control = this.ducLotGroup;
-            dockableControlPane1.OriginalControlBounds = new System.Drawing.Rectangle(153, 99, 208, 384);
-            dockableControlPane1.Size = new System.Drawing.Size(100, 100);
-            dockableControlPane1.Text = "Lot Group";
-            dockableControlPane2.Closed = true;
-            dockableControlPane2.Control = this.MD_STAT_ProjectManager;
-            dockableControlPane2.Key = "PROJECT_MANAGER";
-            dockableControlPane2.OriginalControlBounds = new System.Drawing.Rectangle(405, 167, 293, 202);
-            dockableControlPane2.Size = new System.Drawing.Size(100, 100);
-            dockableControlPane2.Text = "Project Manager";
-            dockAreaPane1.Panes.AddRange(new Infragistics.Win.UltraWinDock.DockablePaneBase[] {
-            dockableControlPane1,
-            dockableControlPane2});
-            dockAreaPane1.SelectedTabIndex = 1;
-            dockAreaPane1.Size = new System.Drawing.Size(179, 447);
-            dockAreaPane2.ChildPaneStyle = Infragistics.Win.UltraWinDock.ChildPaneStyle.TabGroup;
-            dockableControlPane3.Closed = true;
-            dockableControlPane3.Control = this.plTESTSearch;
-            dockableControlPane3.FlyoutSize = new System.Drawing.Size(255, -1);
-            dockableControlPane3.Key = "TEST";
-            dockableControlPane3.OriginalControlBounds = new System.Drawing.Rectangle(47, 50, 234, 397);
-            dockableControlPane3.Size = new System.Drawing.Size(100, 100);
-            dockableControlPane3.Text = "TESTSearch";
-            dockableControlPane4.Closed = true;
-            dockableControlPane4.Control = this.plDMSearch;
-            dockableControlPane4.FlyoutSize = new System.Drawing.Size(255, -1);
-            dockableControlPane4.Key = "DM";
-            dockableControlPane4.OriginalControlBounds = new System.Drawing.Rectangle(395, 50, 234, 397);
-            dockableControlPane4.Size = new System.Drawing.Size(100, 100);
-            dockableControlPane4.Text = "DMSearch";
-            dockAreaPane2.Panes.AddRange(new Infragistics.Win.UltraWinDock.DockablePaneBase[] {
-            dockableControlPane3,
-            dockableControlPane4});
-            dockAreaPane2.SelectedTabIndex = 1;
-            dockAreaPane2.Size = new System.Drawing.Size(394, 447);
-            this.udmMain.DockAreas.AddRange(new Infragistics.Win.UltraWinDock.DockAreaPane[] {
-            dockAreaPane1,
-            dockAreaPane2});
-            this.udmMain.HostControl = this;
-            this.udmMain.ShowCloseButton = false;
-            this.udmMain.WindowStyle = Infragistics.Win.UltraWinDock.WindowStyle.VisualStudio2008;
-            // 
-            // _DACruxMainUnpinnedTabAreaLeft
-            // 
-            this._DACruxMainUnpinnedTabAreaLeft.Dock = System.Windows.Forms.DockStyle.Left;
-            this._DACruxMainUnpinnedTabAreaLeft.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this._DACruxMainUnpinnedTabAreaLeft.Location = new System.Drawing.Point(0, 21);
-            this._DACruxMainUnpinnedTabAreaLeft.Name = "_DACruxMainUnpinnedTabAreaLeft";
-            this._DACruxMainUnpinnedTabAreaLeft.Owner = this.udmMain;
-            this._DACruxMainUnpinnedTabAreaLeft.Size = new System.Drawing.Size(0, 447);
-            this._DACruxMainUnpinnedTabAreaLeft.TabIndex = 21;
-            // 
-            // _DACruxMainUnpinnedTabAreaRight
-            // 
-            this._DACruxMainUnpinnedTabAreaRight.Dock = System.Windows.Forms.DockStyle.Right;
-            this._DACruxMainUnpinnedTabAreaRight.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this._DACruxMainUnpinnedTabAreaRight.Location = new System.Drawing.Point(819, 21);
-            this._DACruxMainUnpinnedTabAreaRight.Name = "_DACruxMainUnpinnedTabAreaRight";
-            this._DACruxMainUnpinnedTabAreaRight.Owner = this.udmMain;
-            this._DACruxMainUnpinnedTabAreaRight.Size = new System.Drawing.Size(0, 447);
-            this._DACruxMainUnpinnedTabAreaRight.TabIndex = 22;
-            // 
-            // _DACruxMainUnpinnedTabAreaTop
-            // 
-            this._DACruxMainUnpinnedTabAreaTop.Dock = System.Windows.Forms.DockStyle.Top;
-            this._DACruxMainUnpinnedTabAreaTop.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this._DACruxMainUnpinnedTabAreaTop.Location = new System.Drawing.Point(0, 21);
-            this._DACruxMainUnpinnedTabAreaTop.Name = "_DACruxMainUnpinnedTabAreaTop";
-            this._DACruxMainUnpinnedTabAreaTop.Owner = this.udmMain;
-            this._DACruxMainUnpinnedTabAreaTop.Size = new System.Drawing.Size(819, 0);
-            this._DACruxMainUnpinnedTabAreaTop.TabIndex = 23;
-            // 
-            // _DACruxMainUnpinnedTabAreaBottom
-            // 
-            this._DACruxMainUnpinnedTabAreaBottom.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this._DACruxMainUnpinnedTabAreaBottom.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this._DACruxMainUnpinnedTabAreaBottom.Location = new System.Drawing.Point(0, 468);
-            this._DACruxMainUnpinnedTabAreaBottom.Name = "_DACruxMainUnpinnedTabAreaBottom";
-            this._DACruxMainUnpinnedTabAreaBottom.Owner = this.udmMain;
-            this._DACruxMainUnpinnedTabAreaBottom.Size = new System.Drawing.Size(819, 0);
-            this._DACruxMainUnpinnedTabAreaBottom.TabIndex = 24;
-            // 
-            // _DACruxMainAutoHideControl
-            // 
-            this._DACruxMainAutoHideControl.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this._DACruxMainAutoHideControl.Location = new System.Drawing.Point(22, 21);
-            this._DACruxMainAutoHideControl.Name = "_DACruxMainAutoHideControl";
-            this._DACruxMainAutoHideControl.Owner = this.udmMain;
-            this._DACruxMainAutoHideControl.Size = new System.Drawing.Size(60, 447);
-            this._DACruxMainAutoHideControl.TabIndex = 25;
-            // 
-            // dockableWindow2
-            // 
-            this.dockableWindow2.Controls.Add(this.plDMSearch);
-            this.dockableWindow2.Location = new System.Drawing.Point(-10000, 0);
-            this.dockableWindow2.Name = "dockableWindow2";
-            this.dockableWindow2.Owner = this.udmMain;
-            this.dockableWindow2.Size = new System.Drawing.Size(255, 447);
-            this.dockableWindow2.TabIndex = 55;
-            // 
-            // dockableWindow4
-            // 
-            this.dockableWindow4.Controls.Add(this.plTESTSearch);
-            this.dockableWindow4.Location = new System.Drawing.Point(-10000, 0);
-            this.dockableWindow4.Name = "dockableWindow4";
-            this.dockableWindow4.Owner = this.udmMain;
-            this.dockableWindow4.Size = new System.Drawing.Size(255, 447);
-            this.dockableWindow4.TabIndex = 54;
-            // 
-            // dockableWindow1
-            // 
-            this.dockableWindow1.Controls.Add(this.MD_STAT_ProjectManager);
-            this.dockableWindow1.Location = new System.Drawing.Point(-10000, 0);
-            this.dockableWindow1.Name = "dockableWindow1";
-            this.dockableWindow1.Owner = this.udmMain;
-            this.dockableWindow1.Size = new System.Drawing.Size(394, 423);
-            this.dockableWindow1.TabIndex = 53;
-            // 
-            // dockableWindow3
-            // 
-            this.dockableWindow3.Controls.Add(this.ducLotGroup);
-            this.dockableWindow3.Location = new System.Drawing.Point(-10000, 0);
-            this.dockableWindow3.Name = "dockableWindow3";
-            this.dockableWindow3.Owner = this.udmMain;
-            this.dockableWindow3.Size = new System.Drawing.Size(394, 447);
-            this.dockableWindow3.TabIndex = 52;
-            // 
-            // utMDIMain
-            // 
-            this.utMDIMain.MdiParent = this;
-            // 
-            // windowDockingArea1
-            // 
-            this.windowDockingArea1.Controls.Add(this.dockableWindow3);
-            this.windowDockingArea1.Controls.Add(this.dockableWindow1);
-            this.windowDockingArea1.Dock = System.Windows.Forms.DockStyle.Left;
-            this.windowDockingArea1.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.windowDockingArea1.Location = new System.Drawing.Point(0, 21);
-            this.windowDockingArea1.Name = "windowDockingArea1";
-            this.windowDockingArea1.Owner = this.udmMain;
-            this.windowDockingArea1.Size = new System.Drawing.Size(184, 447);
-            this.windowDockingArea1.TabIndex = 32;
-            // 
-            // windowDockingArea2
-            // 
-            this.windowDockingArea2.Controls.Add(this.dockableWindow4);
-            this.windowDockingArea2.Controls.Add(this.dockableWindow2);
-            this.windowDockingArea2.Dock = System.Windows.Forms.DockStyle.Left;
-            this.windowDockingArea2.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.windowDockingArea2.Location = new System.Drawing.Point(0, 21);
-            this.windowDockingArea2.Name = "windowDockingArea2";
-            this.windowDockingArea2.Owner = this.udmMain;
-            this.windowDockingArea2.Size = new System.Drawing.Size(399, 447);
-            this.windowDockingArea2.TabIndex = 47;
             // 
             // utbManager
             // 
@@ -431,12 +207,256 @@ namespace DACrux.Framework
             mdiWindowListTool3});
             this.utbManager.ToolClick += new Infragistics.Win.UltraWinToolbars.ToolClickEventHandler(this.utbManager_ToolClick);
             // 
+            // _frmDCMain_Toolbars_Dock_Area_Bottom
+            // 
+            this._frmDCMain_Toolbars_Dock_Area_Bottom.AccessibleRole = System.Windows.Forms.AccessibleRole.Grouping;
+            this._frmDCMain_Toolbars_Dock_Area_Bottom.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(223)))), ((int)(((byte)(233)))), ((int)(((byte)(245)))));
+            this._frmDCMain_Toolbars_Dock_Area_Bottom.DockedPosition = Infragistics.Win.UltraWinToolbars.DockedPosition.Bottom;
+            this._frmDCMain_Toolbars_Dock_Area_Bottom.ForeColor = System.Drawing.SystemColors.ControlText;
+            this._frmDCMain_Toolbars_Dock_Area_Bottom.Location = new System.Drawing.Point(0, 702);
+            this._frmDCMain_Toolbars_Dock_Area_Bottom.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this._frmDCMain_Toolbars_Dock_Area_Bottom.Name = "_frmDCMain_Toolbars_Dock_Area_Bottom";
+            this._frmDCMain_Toolbars_Dock_Area_Bottom.Size = new System.Drawing.Size(1170, 0);
+            this._frmDCMain_Toolbars_Dock_Area_Bottom.ToolbarsManager = this.utbManager;
+            // 
+            // _frmDCMain_Toolbars_Dock_Area_Left
+            // 
+            this._frmDCMain_Toolbars_Dock_Area_Left.AccessibleRole = System.Windows.Forms.AccessibleRole.Grouping;
+            this._frmDCMain_Toolbars_Dock_Area_Left.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(223)))), ((int)(((byte)(233)))), ((int)(((byte)(245)))));
+            this._frmDCMain_Toolbars_Dock_Area_Left.DockedPosition = Infragistics.Win.UltraWinToolbars.DockedPosition.Left;
+            this._frmDCMain_Toolbars_Dock_Area_Left.ForeColor = System.Drawing.SystemColors.ControlText;
+            this._frmDCMain_Toolbars_Dock_Area_Left.Location = new System.Drawing.Point(0, 30);
+            this._frmDCMain_Toolbars_Dock_Area_Left.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this._frmDCMain_Toolbars_Dock_Area_Left.Name = "_frmDCMain_Toolbars_Dock_Area_Left";
+            this._frmDCMain_Toolbars_Dock_Area_Left.Size = new System.Drawing.Size(0, 672);
+            this._frmDCMain_Toolbars_Dock_Area_Left.ToolbarsManager = this.utbManager;
+            // 
+            // _frmDCMain_Toolbars_Dock_Area_Right
+            // 
+            this._frmDCMain_Toolbars_Dock_Area_Right.AccessibleRole = System.Windows.Forms.AccessibleRole.Grouping;
+            this._frmDCMain_Toolbars_Dock_Area_Right.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(223)))), ((int)(((byte)(233)))), ((int)(((byte)(245)))));
+            this._frmDCMain_Toolbars_Dock_Area_Right.DockedPosition = Infragistics.Win.UltraWinToolbars.DockedPosition.Right;
+            this._frmDCMain_Toolbars_Dock_Area_Right.ForeColor = System.Drawing.SystemColors.ControlText;
+            this._frmDCMain_Toolbars_Dock_Area_Right.Location = new System.Drawing.Point(1170, 30);
+            this._frmDCMain_Toolbars_Dock_Area_Right.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this._frmDCMain_Toolbars_Dock_Area_Right.Name = "_frmDCMain_Toolbars_Dock_Area_Right";
+            this._frmDCMain_Toolbars_Dock_Area_Right.Size = new System.Drawing.Size(0, 672);
+            this._frmDCMain_Toolbars_Dock_Area_Right.ToolbarsManager = this.utbManager;
+            // 
+            // utsMain
+            // 
+            this.utsMain.Location = new System.Drawing.Point(0, 702);
+            this.utsMain.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.utsMain.Name = "utsMain";
+            ultraStatusPanel1.ProgressBarInfo.Style = Infragistics.Win.UltraWinProgressBar.ProgressBarStyle.Office2007Continuous;
+            ultraStatusPanel1.Style = Infragistics.Win.UltraWinStatusBar.PanelStyle.Progress;
+            ultraStatusPanel1.Visible = false;
+            ultraStatusPanel2.Style = Infragistics.Win.UltraWinStatusBar.PanelStyle.AutoStatusText;
+            ultraStatusPanel2.Width = 200;
+            ultraStatusPanel3.SizingMode = Infragistics.Win.UltraWinStatusBar.PanelSizingMode.Spring;
+            ultraStatusPanel3.Style = Infragistics.Win.UltraWinStatusBar.PanelStyle.Marquee;
+            ultraStatusPanel4.Width = 200;
+            ultraStatusPanel5.MinWidth = 50;
+            ultraStatusPanel5.Width = 200;
+            appearance1.TextHAlignAsString = "Center";
+            appearance1.ThemedElementAlpha = Infragistics.Win.Alpha.Transparent;
+            ultraStatusPanel6.Appearance = appearance1;
+            ultraStatusPanel6.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+            ultraStatusPanel6.MinWidth = 150;
+            ultraStatusPanel6.Style = Infragistics.Win.UltraWinStatusBar.PanelStyle.Time;
+            ultraStatusPanel6.Width = 150;
+            this.utsMain.Panels.AddRange(new Infragistics.Win.UltraWinStatusBar.UltraStatusPanel[] {
+            ultraStatusPanel1,
+            ultraStatusPanel2,
+            ultraStatusPanel3,
+            ultraStatusPanel4,
+            ultraStatusPanel5,
+            ultraStatusPanel6});
+            this.utsMain.Size = new System.Drawing.Size(1170, 34);
+            this.utsMain.TabIndex = 20;
+            this.utsMain.Text = "ultraStatusBar1";
+            this.utsMain.ViewStyle = Infragistics.Win.UltraWinStatusBar.ViewStyle.VisualStudio2005;
+            // 
+            // udmMain
+            // 
+            this.udmMain.AnimationSpeed = Infragistics.Win.UltraWinDock.AnimationSpeed.StandardSpeedPlus5;
+            this.udmMain.AutoHideDelay = 100;
+            this.udmMain.CompressUnpinnedTabs = false;
+            dockAreaPane1.ChildPaneStyle = Infragistics.Win.UltraWinDock.ChildPaneStyle.TabGroup;
+            dockAreaPane1.DockedBefore = new System.Guid("979486bd-d722-4ae9-b333-2a8131b6a6db");
+            dockableControlPane1.Closed = true;
+            dockableControlPane1.Control = this.ducLotGroup;
+            dockableControlPane1.OriginalControlBounds = new System.Drawing.Rectangle(153, 99, 208, 384);
+            dockableControlPane1.Size = new System.Drawing.Size(100, 100);
+            dockableControlPane1.Text = "Lot Group";
+            dockableControlPane2.Closed = true;
+            dockableControlPane2.Control = this.MD_STAT_ProjectManager;
+            dockableControlPane2.Key = "PROJECT_MANAGER";
+            dockableControlPane2.OriginalControlBounds = new System.Drawing.Rectangle(405, 167, 293, 202);
+            dockableControlPane2.Size = new System.Drawing.Size(100, 100);
+            dockableControlPane2.Text = "Project Manager";
+            dockAreaPane1.Panes.AddRange(new Infragistics.Win.UltraWinDock.DockablePaneBase[] {
+            dockableControlPane1,
+            dockableControlPane2});
+            dockAreaPane1.SelectedTabIndex = 1;
+            dockAreaPane1.Size = new System.Drawing.Size(179, 447);
+            dockAreaPane2.ChildPaneStyle = Infragistics.Win.UltraWinDock.ChildPaneStyle.TabGroup;
+            dockableControlPane3.Closed = true;
+            dockableControlPane3.Control = this.plTESTSearch;
+            dockableControlPane3.FlyoutSize = new System.Drawing.Size(255, -1);
+            dockableControlPane3.Key = "TEST";
+            dockableControlPane3.OriginalControlBounds = new System.Drawing.Rectangle(47, 50, 234, 397);
+            dockableControlPane3.Size = new System.Drawing.Size(100, 100);
+            dockableControlPane3.Text = "TESTSearch";
+            dockableControlPane4.Closed = true;
+            dockableControlPane4.Control = this.plDMSearch;
+            dockableControlPane4.FlyoutSize = new System.Drawing.Size(255, -1);
+            dockableControlPane4.Key = "DM";
+            dockableControlPane4.OriginalControlBounds = new System.Drawing.Rectangle(395, 50, 234, 397);
+            dockableControlPane4.Size = new System.Drawing.Size(100, 100);
+            dockableControlPane4.Text = "DMSearch";
+            dockAreaPane2.Panes.AddRange(new Infragistics.Win.UltraWinDock.DockablePaneBase[] {
+            dockableControlPane3,
+            dockableControlPane4});
+            dockAreaPane2.SelectedTabIndex = 1;
+            dockAreaPane2.Size = new System.Drawing.Size(394, 447);
+            this.udmMain.DockAreas.AddRange(new Infragistics.Win.UltraWinDock.DockAreaPane[] {
+            dockAreaPane1,
+            dockAreaPane2});
+            this.udmMain.HostControl = this;
+            this.udmMain.ShowCloseButton = false;
+            this.udmMain.WindowStyle = Infragistics.Win.UltraWinDock.WindowStyle.VisualStudio2008;
+            // 
+            // _DACruxMainUnpinnedTabAreaLeft
+            // 
+            this._DACruxMainUnpinnedTabAreaLeft.Dock = System.Windows.Forms.DockStyle.Left;
+            this._DACruxMainUnpinnedTabAreaLeft.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this._DACruxMainUnpinnedTabAreaLeft.Location = new System.Drawing.Point(0, 30);
+            this._DACruxMainUnpinnedTabAreaLeft.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this._DACruxMainUnpinnedTabAreaLeft.Name = "_DACruxMainUnpinnedTabAreaLeft";
+            this._DACruxMainUnpinnedTabAreaLeft.Owner = this.udmMain;
+            this._DACruxMainUnpinnedTabAreaLeft.Size = new System.Drawing.Size(0, 672);
+            this._DACruxMainUnpinnedTabAreaLeft.TabIndex = 21;
+            // 
+            // _DACruxMainUnpinnedTabAreaRight
+            // 
+            this._DACruxMainUnpinnedTabAreaRight.Dock = System.Windows.Forms.DockStyle.Right;
+            this._DACruxMainUnpinnedTabAreaRight.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this._DACruxMainUnpinnedTabAreaRight.Location = new System.Drawing.Point(1170, 30);
+            this._DACruxMainUnpinnedTabAreaRight.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this._DACruxMainUnpinnedTabAreaRight.Name = "_DACruxMainUnpinnedTabAreaRight";
+            this._DACruxMainUnpinnedTabAreaRight.Owner = this.udmMain;
+            this._DACruxMainUnpinnedTabAreaRight.Size = new System.Drawing.Size(0, 672);
+            this._DACruxMainUnpinnedTabAreaRight.TabIndex = 22;
+            // 
+            // _DACruxMainUnpinnedTabAreaTop
+            // 
+            this._DACruxMainUnpinnedTabAreaTop.Dock = System.Windows.Forms.DockStyle.Top;
+            this._DACruxMainUnpinnedTabAreaTop.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this._DACruxMainUnpinnedTabAreaTop.Location = new System.Drawing.Point(0, 30);
+            this._DACruxMainUnpinnedTabAreaTop.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this._DACruxMainUnpinnedTabAreaTop.Name = "_DACruxMainUnpinnedTabAreaTop";
+            this._DACruxMainUnpinnedTabAreaTop.Owner = this.udmMain;
+            this._DACruxMainUnpinnedTabAreaTop.Size = new System.Drawing.Size(1170, 0);
+            this._DACruxMainUnpinnedTabAreaTop.TabIndex = 23;
+            // 
+            // _DACruxMainUnpinnedTabAreaBottom
+            // 
+            this._DACruxMainUnpinnedTabAreaBottom.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this._DACruxMainUnpinnedTabAreaBottom.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this._DACruxMainUnpinnedTabAreaBottom.Location = new System.Drawing.Point(0, 702);
+            this._DACruxMainUnpinnedTabAreaBottom.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this._DACruxMainUnpinnedTabAreaBottom.Name = "_DACruxMainUnpinnedTabAreaBottom";
+            this._DACruxMainUnpinnedTabAreaBottom.Owner = this.udmMain;
+            this._DACruxMainUnpinnedTabAreaBottom.Size = new System.Drawing.Size(1170, 0);
+            this._DACruxMainUnpinnedTabAreaBottom.TabIndex = 24;
+            // 
+            // _DACruxMainAutoHideControl
+            // 
+            this._DACruxMainAutoHideControl.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this._DACruxMainAutoHideControl.Location = new System.Drawing.Point(31, 32);
+            this._DACruxMainAutoHideControl.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this._DACruxMainAutoHideControl.Name = "_DACruxMainAutoHideControl";
+            this._DACruxMainAutoHideControl.Owner = this.udmMain;
+            this._DACruxMainAutoHideControl.Size = new System.Drawing.Size(86, 670);
+            this._DACruxMainAutoHideControl.TabIndex = 25;
+            // 
+            // dockableWindow2
+            // 
+            this.dockableWindow2.Controls.Add(this.ducLotGroup);
+            this.dockableWindow2.Location = new System.Drawing.Point(-14286, 0);
+            this.dockableWindow2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.dockableWindow2.Name = "dockableWindow2";
+            this.dockableWindow2.Owner = this.udmMain;
+            this.dockableWindow2.Size = new System.Drawing.Size(364, 670);
+            this.dockableWindow2.TabIndex = 52;
+            // 
+            // dockableWindow4
+            // 
+            this.dockableWindow4.Controls.Add(this.MD_STAT_ProjectManager);
+            this.dockableWindow4.Location = new System.Drawing.Point(-14286, 0);
+            this.dockableWindow4.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.dockableWindow4.Name = "dockableWindow4";
+            this.dockableWindow4.Owner = this.udmMain;
+            this.dockableWindow4.Size = new System.Drawing.Size(364, 670);
+            this.dockableWindow4.TabIndex = 53;
+            // 
+            // dockableWindow1
+            // 
+            this.dockableWindow1.Controls.Add(this.plTESTSearch);
+            this.dockableWindow1.Location = new System.Drawing.Point(-14286, 0);
+            this.dockableWindow1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.dockableWindow1.Name = "dockableWindow1";
+            this.dockableWindow1.Owner = this.udmMain;
+            this.dockableWindow1.Size = new System.Drawing.Size(563, 634);
+            this.dockableWindow1.TabIndex = 54;
+            // 
+            // dockableWindow3
+            // 
+            this.dockableWindow3.Controls.Add(this.plDMSearch);
+            this.dockableWindow3.Location = new System.Drawing.Point(-14286, 0);
+            this.dockableWindow3.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.dockableWindow3.Name = "dockableWindow3";
+            this.dockableWindow3.Owner = this.udmMain;
+            this.dockableWindow3.Size = new System.Drawing.Size(563, 670);
+            this.dockableWindow3.TabIndex = 55;
+            // 
+            // utMDIMain
+            // 
+            this.utMDIMain.MdiParent = this;
+            // 
+            // windowDockingArea1
+            // 
+            this.windowDockingArea1.Controls.Add(this.dockableWindow2);
+            this.windowDockingArea1.Controls.Add(this.dockableWindow4);
+            this.windowDockingArea1.Dock = System.Windows.Forms.DockStyle.Left;
+            this.windowDockingArea1.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.windowDockingArea1.Location = new System.Drawing.Point(0, 32);
+            this.windowDockingArea1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.windowDockingArea1.Name = "windowDockingArea1";
+            this.windowDockingArea1.Owner = this.udmMain;
+            this.windowDockingArea1.Size = new System.Drawing.Size(184, 447);
+            this.windowDockingArea1.TabIndex = 32;
+            // 
+            // windowDockingArea2
+            // 
+            this.windowDockingArea2.Controls.Add(this.dockableWindow1);
+            this.windowDockingArea2.Controls.Add(this.dockableWindow3);
+            this.windowDockingArea2.Dock = System.Windows.Forms.DockStyle.Left;
+            this.windowDockingArea2.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.windowDockingArea2.Location = new System.Drawing.Point(0, 32);
+            this.windowDockingArea2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.windowDockingArea2.Name = "windowDockingArea2";
+            this.windowDockingArea2.Owner = this.udmMain;
+            this.windowDockingArea2.Size = new System.Drawing.Size(399, 447);
+            this.windowDockingArea2.TabIndex = 47;
+            // 
             // DACruxMain
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.ClientSize = new System.Drawing.Size(819, 491);
+            this.ClientSize = new System.Drawing.Size(1170, 736);
             this.Controls.Add(this._DACruxMainAutoHideControl);
             this.Controls.Add(this.windowDockingArea1);
             this.Controls.Add(this.windowDockingArea2);
@@ -450,12 +470,14 @@ namespace DACrux.Framework
             this.Controls.Add(this.utsMain);
             this.Controls.Add(this._frmDCMain_Toolbars_Dock_Area_Top);
             this.IsMdiContainer = true;
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "DACruxMain";
             this.Text = "DACrux Framework Main Form";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.DACruxMain_FormClosing);
             this.Load += new System.EventHandler(this.frmDCMain_Load);
             this.MdiChildActivate += new System.EventHandler(this.DACruxMain_MdiChildActivate);
+            ((System.ComponentModel.ISupportInitialize)(this.utbManager)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.utsMain)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.udmMain)).EndInit();
             this.dockableWindow2.ResumeLayout(false);
@@ -465,7 +487,6 @@ namespace DACrux.Framework
             ((System.ComponentModel.ISupportInitialize)(this.utMDIMain)).EndInit();
             this.windowDockingArea1.ResumeLayout(false);
             this.windowDockingArea2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.utbManager)).EndInit();
             this.ResumeLayout(false);
 
         }

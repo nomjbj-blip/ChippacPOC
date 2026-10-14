@@ -109,3 +109,15 @@ SOURCE 전송 계약과 ID를 정리한 뒤 Layer -> Source -> Placed 순서의 
 **2026-10-06 저장 기준 Front / Back side(CLAUDE-027):** GDS 원본은 Front side. Setup DB 저장 시 콤보로 Back side(기본)를 고르면 PLACED 좌표를 GDS 원점 기준 좌우 반전(X' = -X)해 저장하고 `TQP_GDS_MAP.VIEW_SIDE`에 BACK 기록. SOURCE는 항상 원본. Device당 하나의 기준(바꾸려면 삭제 후 재등록). [GDS 반전 설계](../../../문서/2026-10-06_GDS_반전_BackSide_설계.md) 8~9절.
 
 **2026-10-07 Front / Back 보기 전환(CLAUDE-030, 최신 기준 - 10-06 저장 기준 콤보 대체):** Setup 저장은 항상 원본(Front). View에서 [보기 기준 Front / Back]을 골라 화면에서 좌우 반전(X' = -X, `GdsSideTransform`)해 보여 준다. DB / Chain은 1벌(저장 기준 좌표), Chain Marker만 저장 / 불러오기 / 전환 때 변환. 로컬 DB의 기존 GDS 데이터는 전부 삭제됨. [Front / Back 전환 설계](../../../문서/2026-10-07_GDS_FrontBack_전환_설계.md).
+
+**2026-10-08 GDS_SHA256 컬럼 제거(CLAUDE-041, 사용자 결정 "1"):** CLAUDE-028(계산 제거 / NULL 허용)의 후속으로 `TQP_GDS_MAP.GDS_SHA256` 컬럼을 DROP(`Persistence/2026-10-08_tqp_gds_map_drop_sha.sql`, 로컬 DB 적용). `TQP_GDS_MAP.xml` SELECT_MAP_INFO / CREATE_MAP에서 제거, BSL `BeginMapImport`는 SHA 검사 삭제. `ImportInfo[4]`는 이미 배포된 화면 / Probe와 순서를 맞추려고 자리만 남기고 값을 무시한다(계약 길이 11 / 12 그대로). 같은 도면 판단은 파일 이름 / 등록 시각 / 건수로 한다.
+
+**2026-10-08 조회 화면 Map 전체 삭제(CLAUDE-042, 사용자 지시 "삭제 기능 넣어줘. 실제 DB도 삭제" -> "GDS Map 전체 삭제"):** GDS Map 조회 조건 줄 오른쪽 끝 [Map 삭제](DACrux 호스트 모드에서만 표시). 선택 Device의 Map 정보를 다시 읽어(상태 무관, 저장이 끊긴 DRAFT도 삭제 가능) 상태 / 파일 / 등록 / 건수와 "Chain 설정도 함께 삭제, 되돌릴 수 없음", 미저장 Chain 변경 수를 보여 주고 확인(기본 [아니오]) -> 기존 서비스 `GdsMapImport.DeleteMap`(서버 수정 없음, FK CASCADE) -> 화면 도면 / Chain / Label 색인 비우기 -> Device 목록 다시 읽기. 조회 / Chain 저장 중에는 실행하지 않는다.
+
+## 대표 Device / Sub Device (2026-10-12 CLAUDE-055)
+
+- GDS Map 이 있는 Device = 대표(예: `U9`). 다른 데이터의 Device 이름(KLARF Product `OMM_Hybrid`, E-Test `OMM`)을 GDS Map 조회 화면 [Sub Device]에서 수동 등록한다(`TQP_GDS_MAP_SUB_DEVICE`, FK 없음 - Map 재등록 후에도 유지).
+- 찾기: `GdsMapView.GetMapDeviceBySub(factory, 이름)` = Sub 등록 -> 같은 이름 READY Map 순, 대소문자 무시. KLARF 연관 분석이 사용 중, E-Test 는 연결 예정.
+- 설계 / 검증: `문서/2026-10-12_GDS_대표Device_SubDevice_설계.md` (Probe 17/17, Smoke 11/11, 배포 대기).
+
+**2026-10-12 원본 행 테이블 제거(CLAUDE-061, 최신 기준):** `TQP_GDS_SOURCE_EL`은 저장할 때만 쓰고 조회하는 곳이 없어 제거한다. 저장 흐름 = 시작 -> LAYER -> PLACED -> 확정. PLACED의 `SOURCE_ELEMENT_ID` 컬럼은 남김(FK / 인덱스만 제거). 저장 작업의 원본 건수 컬럼 / Map 헤더 `SOURCE_PAYLOAD_VERSION` 도 제거. `BeginMapImport` ImportInfo[8]은 자리만 남기고 무시. DDL `Persistence/2026-10-12_tqp_gds_source_el_drop.sql`.

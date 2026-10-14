@@ -76,3 +76,12 @@ DMS 호스트 모드에서 상단에 Factory / Device / Revision 입력과 `DB �
 **2026-10-07 Label 검색(CLAUDE-032):** View 화면 조회 조건 아래 Label 검색 줄. [Label 검색 설계](../../../문서/2026-10-07_GDS_Label_검색_설계.md) 9절.
 
 **2026-10-07 Label 크기 보정(CLAUDE-032 결정 A):** 한쪽 방향에만 이웃 TEXT가 있는 Label은 그 간격을 다른 방향 제한에도 사용(`CalculateTextLabelDisplayAreas`). 이웃 없는 방향이 화면 크기 제한이 되어 확대 시 64px까지 커지던 문제(예: `C4DC_HBM0_N_FH`) 수정.
+
+## GDS Map 조회 화면 레이아웃 (2026-10-12 CLAUDE-056)
+
+- 위 도구 막대 한 줄 / Chain 작업 줄(도면 조회 뒤) / 오른쪽 탭 [Chain] [Layer] / 도면 우클릭 메뉴. Map 정보 Label 제거(Device 콤보 툴팁).
+- 상세: `문서/2026-10-02_GDS_Map_조회화면_설계.md` 16절.
+- 2026-10-12 CLAUDE-057: Label 검색 포함 고정(콤보 제거) / 우클릭 = 전체 보기만 / Output 지정 숨김 / 경로 추가·제외 오른쪽 끝 / 성능 확인용 표시 제거 (설계 16.1절).
+- 2026-10-13 CLAUDE-071: 상태 문구는 아래 상태 줄 한 곳(Chain 안내 줄 / Label 결과 글자 제거), 계산·확인용 값 제거, Chain 목록 색 코드 대신 색 견본 (설계 17절).
+
+**2026-10-13 Setup Layer 목록 체크는 더블클릭(CLAUDE-080):** GDS Map Setup Layer 목록은 한 번 클릭 = 선택만, 더블클릭 = 체크 토글. [전체 체크] / [전체 미체크] / 우클릭 색 변경 대상 선택은 그대로. Smoke `GdsChainListDoubleClickSmoke.ps1`.

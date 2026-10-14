@@ -23,11 +23,10 @@ namespace NexplantQMS.GdsMap
                 map.Mode = GdsMapControl.ViewMode.View;
             map.Cursor = _chainEditMode == ChainEditMode.None ? Cursors.SizeAll : Cursors.Cross;
             UpdateChainSelectionButtons();
-            _lblChainSetupStatus.Text = _chainEditMode == ChainEditMode.None
-                ? FormatEditedConnectivity().TrimStart(' ', '/') + " / 경로 편집 종료"
-                    + FormatChainManualCounts()
-                : (_chainEditMode == ChainEditMode.Add ? "경로 추가" : "경로 제외")
-                    + " 중 / 지도 객체를 클릭하세요. 같은 버튼 또는 Esc로 종료합니다.";
+            SetChainStatus(_chainEditMode == ChainEditMode.None
+                ? "경로 편집을 마쳤습니다." + FormatConnectivityWarning()
+                : (_chainEditMode == ChainEditMode.Add ? "경로에 더할" : "경로에서 뺄")
+                    + " 도형을 지도에서 클릭하세요. 같은 버튼이나 Esc 로 끝냅니다.");
         }
 
         /// <summary>현재 클릭 위치의 체크된 Layer 객체만 제시하고 겹친 객체는 메뉴에서 구분한다.</summary>
@@ -43,7 +42,7 @@ namespace NexplantQMS.GdsMap
                 .ToList();
             if (candidates.Count == 0)
             {
-                _lblChainSetupStatus.Text = "클릭 위치에 체크된 Layer의 BOUNDARY/PATH가 없습니다.";
+                SetChainStatus("클릭한 위치에 고를 수 있는 도형이 없습니다. 켜져 있는 Layer 의 도형만 고를 수 있습니다.");
                 return;
             }
             if (candidates.Count == 1)
@@ -118,10 +117,9 @@ namespace NexplantQMS.GdsMap
                 if (wasIncluded != isIncluded) changed++;
             }
             ShowEditedChainCandidate();
-            _lblChainSetupStatus.Text = FormatEditedConnectivity().TrimStart(' ', '/') + " / "
-                + (_chainEditMode == ChainEditMode.Add ? "추가 " : "제외 ")
-                + changed + "개 / 단자 보호 " + protectedCount + "개"
-                + FormatChainManualCounts();
+            SetChainStatus("도형 " + changed + "개를 " + (_chainEditMode == ChainEditMode.Add ? "더했습니다." : "뺐습니다.")
+                + (protectedCount > 0 ? " Input / Output 도형은 뺄 수 없습니다." : "")
+                + FormatConnectivityWarning());
         }
 
         /// <summary>현재 자동 추적 결과에서 화면 후보로 표시할 키를 모은다.</summary>
@@ -150,18 +148,12 @@ namespace NexplantQMS.GdsMap
             RefreshChainDisplay();
         }
 
-        /// <summary>현재 수동 보정 수를 상태 문구에 덧붙인다.</summary>
-        private string FormatChainManualCounts()
-        {
-            return " / 수동 추가 " + _chainManualAdded.Count + "개 / 수동 제외 "
-                + _chainManualExcluded.Count + "개";
-        }
-
         /// <summary>
-        /// 최종 후보의 실제 도형 연결을 다시 검사해 수동 편집으로 끊긴 경로와 고립 객체를 알린다.
-        /// 현재 Layer 밖의 보정 객체가 있으면 성공으로 오인하지 않게 검사 불가를 표시한다.
+        /// 최종 후보의 실제 도형 연결을 다시 검사해, 끊긴 곳이 있을 때만 경고 한 문장을 돌려준다(이상 없으면 빈 문자열).
+        /// 연결 유지 / 수동 추가·제외 누계 같은 확인용 값은 보이지 않는다 (2026-10-13).
+        /// 현재 Layer 로 검사할 수 없으면 화면에는 알리지 않고 진단 로그만 남긴다.
         /// </summary>
-        private string FormatEditedConnectivity()
+        private string FormatConnectivityWarning()
         {
             if (_chainLastTraceResult == null)
                 return string.Empty;
@@ -171,18 +163,15 @@ namespace NexplantQMS.GdsMap
                     GetEditedChainKeys(), _chainInputSelections.Keys, _chainOutputSelections.Keys,
                     _activeChain.LayerIds, _chainLayerRules, _applyChainLayerRules,
                     (double)_numChainCellSize.Value);
-                if (_chainOutputSelections.Count == 0)
-                    return check.DisconnectedKeys.Count == 0
-                        ? " / Input에서 후보 객체 연결 유지 / Output 미지정"
-                        : " / 단절 객체 " + check.DisconnectedKeys.Count + "개 / Output 미지정";
-                return check.IsConnected
-                    ? " / 도형 연결 유지(전기적 확인 필요)"
-                    : " / 연결 검증 필요: Output " + check.ReachedOutputCount + "/"
-                        + check.TotalOutputCount + ", 단절 객체 " + check.DisconnectedKeys.Count + "개";
+                if (_chainOutputSelections.Count > 0 && !check.IsConnected)
+                    return " Output 까지 이어지지 않습니다. 지도에서 확인하세요.";
+                return check.DisconnectedKeys.Count == 0 ? string.Empty
+                    : " Input 과 이어지지 않는 도형 " + check.DisconnectedKeys.Count + "개가 있습니다. 지도에서 확인하세요.";
             }
             catch (ArgumentException ex)
             {
-                return " / 연결 검사 불가: " + ex.Message;
+                System.Diagnostics.Trace.TraceWarning("Chain 연결 검사 생략: {0}", ex.Message);
+                return string.Empty;
             }
         }
     }

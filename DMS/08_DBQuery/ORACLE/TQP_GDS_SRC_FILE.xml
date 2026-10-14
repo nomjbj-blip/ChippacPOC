@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!--
-  TQP_GDS_SRC_FILE: E-Test 결과 파일 기준 정보 (한 행 = 파일 1개). 2026-10-07 Claude CLAUDE-029 추가.
+  TQP_GDS_SRC_FILE: E-Test 결과 파일 기준 정보 (한 행 = 파일 1개). 2026-10-07 추가.
   설계: 문서/2026-10-07_ETest_결과파일_Parsing_DB설계.md 9절 / 10절.
   WAFER_ID 는 LOT_ID + '-' + 2자리 SLOT_NO 가상 컬럼이라 INSERT / UPDATE 에 넣지 않는다 (ORA-54013).
   TEST_TIME 은 yyyyMMddHHmmss 문자열 + TO_DATE. LOAD_STATUS 는 LOADING 으로 만들고 CompleteEtFile 이 건수 확인 후 READY 로 바꾼다.
@@ -63,10 +63,85 @@ VALUES
             <param direction="Input" dbtype="VarChar" size="30">:update_user</param>
         </parameters>
     </query>
+    <query statement="Insert" queryid="CREATE_SRC_FILE_V2" commandtype="Text" description="E-Test 파일 헤더 생성 - 파일명 8칸 규칙 (2026-10-12 PARSE_RULE_VER 2: Customer / File Device / Wafer Type / Wafer Rev / Lot-Wafer No / Fab, FILE_PREFIX 는 채우지 않음, VIEW_SIDE BACK)" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_GDS_SRC_FILE
+    (SRC_FILE_SEQ,
+    FILE_NAME,
+    FACTORY,
+    DEVICE_ID,
+    LOT_ID,
+    SLOT_NO,
+    TEST_PROGRAM,
+    TEST_TIME,
+    SHEET_NAME,
+    DIE_COUNT,
+    ITEM_COUNT,
+    CUSTOMER,
+    FILE_DEVICE,
+    WAFER_TYPE,
+    WAFER_REV,
+    LOT_WAFER_NO,
+    FAB_NAME,
+    PARSE_RULE_VER,
+    VIEW_SIDE,
+    LOAD_STATUS,
+    CREATE_USER,
+    CREATE_TIME,
+    UPDATE_USER,
+    UPDATE_TIME)
+VALUES
+    (:src_file_seq,
+    :file_name,
+    :factory,
+    :device_id,
+    :lot_id,
+    :slot_no,
+    :test_program,
+    TO_DATE(:test_time, 'YYYYMMDDHH24MISS'),
+    :sheet_name,
+    :die_count,
+    :item_count,
+    :customer,
+    :file_device,
+    :wafer_type,
+    :wafer_rev,
+    :lot_wafer_no,
+    :fab_name,
+    2,
+    'BACK',
+    'LOADING',
+    :create_user,
+    SYSDATE,
+    :update_user,
+    SYSDATE)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:src_file_seq</param>
+            <param direction="Input" dbtype="VarChar" size="1040">:file_name</param>
+            <param direction="Input" dbtype="VarChar" size="120">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="200">:device_id</param>
+            <param direction="Input" dbtype="VarChar" size="200">:lot_id</param>
+            <param direction="Input" dbtype="Number" size="0">:slot_no</param>
+            <param direction="Input" dbtype="VarChar" size="200">:test_program</param>
+            <param direction="Input" dbtype="VarChar" size="14">:test_time</param>
+            <param direction="Input" dbtype="VarChar" size="200">:sheet_name</param>
+            <param direction="Input" dbtype="Number" size="0">:die_count</param>
+            <param direction="Input" dbtype="Number" size="0">:item_count</param>
+            <param direction="Input" dbtype="VarChar" size="120">:customer</param>
+            <param direction="Input" dbtype="VarChar" size="200">:file_device</param>
+            <param direction="Input" dbtype="VarChar" size="120">:wafer_type</param>
+            <param direction="Input" dbtype="VarChar" size="80">:wafer_rev</param>
+            <param direction="Input" dbtype="VarChar" size="240">:lot_wafer_no</param>
+            <param direction="Input" dbtype="VarChar" size="200">:fab_name</param>
+            <param direction="Input" dbtype="VarChar" size="30">:create_user</param>
+            <param direction="Input" dbtype="VarChar" size="30">:update_user</param>
+        </parameters>
+    </query>
     <query statement="Select" queryid="SELECT_SRC_FILE" commandtype="Text" description="E-Test 파일 1건 조회 (파일 번호)" commandtimeout="60">
         <commandtext><![CDATA[SELECT SRC_FILE_SEQ, FILE_NAME, FACTORY, DEVICE_ID, LOT_ID, SLOT_NO, WAFER_ID, TEST_PROGRAM,
        TO_CHAR(TEST_TIME, 'YYYYMMDDHH24MISS') AS TEST_TIME, FILE_PREFIX, SHEET_NAME,
-       DIE_COUNT, ITEM_COUNT, VALUE_COUNT, LOAD_STATUS, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME
+       DIE_COUNT, ITEM_COUNT, VALUE_COUNT, LOAD_STATUS, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME,
+       CUSTOMER, FILE_DEVICE, WAFER_TYPE, WAFER_REV, LOT_WAFER_NO, FAB_NAME,
+       PASS_DIE_COUNT, FAIL_DIE_COUNT, NOT_TESTED_COUNT, PARSE_RULE_VER, VIEW_SIDE
   FROM TQP_GDS_SRC_FILE
  WHERE SRC_FILE_SEQ = :src_file_seq]]></commandtext>
         <parameters>
@@ -91,7 +166,7 @@ VALUES
             <param direction="Input" dbtype="VarChar" size="14">:test_time</param>
         </parameters>
     </query>
-    <query statement="Select" queryid="SELECT_SRC_FILE_BY_WAFER" commandtype="Text" description="같은 Wafer 파일 존재 확인 (UNIQUE 키: Factory / WAFER_ID = Lot + '-' + 2자리 Slot. 2026-10-07 사용자 지시로 Device / 시험 일시는 키에서 제외)" commandtimeout="60">
+    <query statement="Select" queryid="SELECT_SRC_FILE_BY_WAFER" commandtype="Text" description="같은 Wafer 파일 존재 확인 (UNIQUE 키: Factory / WAFER_ID = Lot + '-' + 2자리 Slot. 2026-10-07 기준 Device / 시험 일시는 키에서 제외)" commandtimeout="60">
         <commandtext><![CDATA[SELECT SRC_FILE_SEQ, FILE_NAME, DEVICE_ID, WAFER_ID, TEST_PROGRAM, TO_CHAR(TEST_TIME, 'YYYYMMDDHH24MISS') AS TEST_TIME,
        LOAD_STATUS, DIE_COUNT, ITEM_COUNT, VALUE_COUNT, CREATE_USER, CREATE_TIME
   FROM TQP_GDS_SRC_FILE
@@ -102,9 +177,23 @@ VALUES
             <param direction="Input" dbtype="VarChar" size="240">:wafer_id</param>
         </parameters>
     </query>
+    <query statement="Select" queryid="SELECT_SRC_FILE_BY_WAFER_TEST" commandtype="Text" description="같은 Wafer + 같은 공정 파일 존재 확인 (UNIQUE 키: Factory / WAFER_ID / TEST_PROGRAM = 공정 TSVET·COWET·FT, 2026-10-12)" commandtimeout="60">
+        <commandtext><![CDATA[SELECT SRC_FILE_SEQ, FILE_NAME, DEVICE_ID, WAFER_ID, TEST_PROGRAM, TO_CHAR(TEST_TIME, 'YYYYMMDDHH24MISS') AS TEST_TIME,
+       LOAD_STATUS, DIE_COUNT, ITEM_COUNT, VALUE_COUNT, CREATE_USER, CREATE_TIME
+  FROM TQP_GDS_SRC_FILE
+ WHERE FACTORY = :factory
+   AND WAFER_ID = :wafer_id
+   AND TEST_PROGRAM = :test_program]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="120">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="240">:wafer_id</param>
+            <param direction="Input" dbtype="VarChar" size="200">:test_program</param>
+        </parameters>
+    </query>
     <query statement="Select" queryid="SELECT_SRC_FILE_LIST" commandtype="Text" description="Device 의 E-Test 파일 목록 (최근 시험 순)" commandtimeout="60">
         <commandtext><![CDATA[SELECT SRC_FILE_SEQ, FILE_NAME, LOT_ID, SLOT_NO, WAFER_ID, TEST_PROGRAM,
-       TO_CHAR(TEST_TIME, 'YYYYMMDDHH24MISS') AS TEST_TIME, DIE_COUNT, ITEM_COUNT, VALUE_COUNT, LOAD_STATUS,
+       TO_CHAR(TEST_TIME, 'YYYYMMDDHH24MISS') AS TEST_TIME, CUSTOMER, FILE_DEVICE, WAFER_TYPE, WAFER_REV, FAB_NAME,
+       DIE_COUNT, PASS_DIE_COUNT, FAIL_DIE_COUNT, ITEM_COUNT, VALUE_COUNT, NOT_TESTED_COUNT, LOAD_STATUS,
        CREATE_USER, CREATE_TIME
   FROM TQP_GDS_SRC_FILE
  WHERE FACTORY = :factory
@@ -125,6 +214,26 @@ VALUES
    AND LOAD_STATUS = 'LOADING']]></commandtext>
         <parameters>
             <param direction="Input" dbtype="Number" size="0">:value_count</param>
+            <param direction="Input" dbtype="VarChar" size="30">:update_user</param>
+            <param direction="Input" dbtype="Number" size="0">:src_file_seq</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_SRC_FILE_READY_V2" commandtype="Text" description="저장 확정: 건수 확인 후 LOADING -> READY + 파일 요약 (Pass / Fail Die 수, 미측정 셀 수, 2026-10-12)" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_GDS_SRC_FILE
+   SET LOAD_STATUS = 'READY',
+       VALUE_COUNT = :value_count,
+       PASS_DIE_COUNT = :pass_die_count,
+       FAIL_DIE_COUNT = :fail_die_count,
+       NOT_TESTED_COUNT = :not_tested_count,
+       UPDATE_USER = :update_user,
+       UPDATE_TIME = SYSDATE
+ WHERE SRC_FILE_SEQ = :src_file_seq
+   AND LOAD_STATUS = 'LOADING']]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:value_count</param>
+            <param direction="Input" dbtype="Number" size="0">:pass_die_count</param>
+            <param direction="Input" dbtype="Number" size="0">:fail_die_count</param>
+            <param direction="Input" dbtype="Number" size="0">:not_tested_count</param>
             <param direction="Input" dbtype="VarChar" size="30">:update_user</param>
             <param direction="Input" dbtype="Number" size="0">:src_file_seq</param>
         </parameters>

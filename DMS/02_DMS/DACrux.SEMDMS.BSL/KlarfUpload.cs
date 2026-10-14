@@ -23,8 +23,12 @@ namespace DACrux.SEMDMS.BSL
     ///  - 파싱은 기존 Parser(ParserKlarf / ParserKlarf_18)를 그대로 쓰고, 저장은 기존 DefectDefine public 함수를 같은 프로세스에서 호출한다.
     ///    순서와 계산은 InspectionDataService.cs Step 1~12 와 같다(Step 13 Alarm 메일은 하지 않음).
     ///  - DataService 와 의도적으로 다른 점(설계 6.2절): Step ID 8자리 규칙 / LotID 앞 'A' 제거(FAB1 규칙) 미적용,
-    ///    ANGLE 은 Parser 각도, SETUP_MAP 은 Test 마다 그 Test 의 SampleTestPlan, SetupID 는 size 128 쿼리(기존 쿼리는 40자로 잘림),
+    ///    ANGLE 은 Parser 각도, SetupID 는 size 128 쿼리(기존 쿼리는 40자로 잘림),
     ///    분류 기준 선택(D3: 기본 RoughBin -> CLASSNUMBER), 같은 키가 있으면 삭제 후 재등록(D1).
+    ///  - Map 은 Map Setup(TQP_MAPDEF / TQP_USEMAP, Map ID = Device) 기준으로 저장한다 (2026-10-13).
+    ///    SETUP_MAP = Map Setup 사용 Die 전체(Test 마다 같은 목록), SETUP 의 Wafer 크기 / Pitch / 원점 = Map Setup 값,
+    ///    Defect Die 번호는 Map Setup 원점에 맞춰 옮긴다. KLARF 에서는 Defect 정보만 쓰고 검사 Die(SampleTestPlan)로 Map 을 만들지 않는다.
+    ///    같은 Setup 이 이미 있고 값 / Die 가 Map Setup 과 다르면 저장할 때 Map Setup 값으로 바꾼다 (재업로드 시 교체).
     ///  - 기존 DataService 처럼 문장마다 자동 Commit 이다. Wafer 저장 중 오류가 나면 이번에 새로 만든 STEP 의 행을 지운다.
     ///    SETUP / PRODUCT / LOT / WAFER 는 다른 STEP 이 함께 쓰는 행이라 남겨 두고 다음 저장에서 재사용한다.
     /// 이미지(구현 2단계, 결정 D4 = FTP 상대 경로): Service 설정 KLARF_IMAGE_ROOT(FTP 가 공개하는 폴더 아래) \ yyyyMMdd(저장일) \ {LotID} 에
@@ -104,10 +108,11 @@ namespace DACrux.SEMDMS.BSL
                 File.WriteAllLines(Path.Combine(dir, InfoFileName), setting.ToArray(), Encoding.UTF8);
 
                 ParserKlarf parser = ParseKlarf(Path.Combine(dir, setting.FileName));
+                SetupMapLayout map = LoadSetupMapAndAlign(setting, parser);
                 DataTable result = CreateResultTable(key);
                 Dictionary<int, string> rawIds = ReadRawWaferIds(Path.Combine(dir, setting.FileName));
                 foreach (Wafer wafer in parser.Wafers)
-                    result.Rows.Add(BuildWaferRow(result, setting, parser, wafer, rawIds, true));
+                    result.Rows.Add(BuildWaferRow(result, setting, parser, wafer, rawIds, true, map));
                 return result;
             }
             catch
@@ -153,6 +158,7 @@ namespace DACrux.SEMDMS.BSL
 
                 string klarfPath = Path.Combine(dir, setting.FileName);
                 parser = ParseKlarf(klarfPath);
+                SetupMapLayout map = LoadSetupMapAndAlign(setting, parser);
                 Dictionary<int, string> rawIds = ReadRawWaferIds(klarfPath);
 
                 // 이미지 / KLARF 원본을 저장소로 먼저 복사한다(파일 1벌을 Wafer 들이 함께 쓴다). 실패하면 DB 저장 전에 멈춘다.
@@ -161,10 +167,10 @@ namespace DACrux.SEMDMS.BSL
                 DataTable result = CreateResultTable(strUploadKey);
                 foreach (Wafer wafer in parser.Wafers)
                 {
-                    DataRow row = BuildWaferRow(result, setting, parser, wafer, rawIds, false);
+                    DataRow row = BuildWaferRow(result, setting, parser, wafer, rawIds, false, map);
                     row["IMAGE_PATH"] = store.RelativePath;
                     result.Rows.Add(row);
-                    SaveWafer(setting, parser, wafer, row, overwrite, store);
+                    SaveWafer(setting, parser, wafer, row, overwrite, store, map);
                 }
                 return result;
             }
@@ -222,7 +228,8 @@ namespace DACrux.SEMDMS.BSL
         ///            -> 6 STEP -> 7 DEFECT(분류 기준 / New Defect) -> 8 INSP_INFO -> 9 TEST_ORDER -> 11 IMAGECOUNT -> 12 INSP_SUM
         /// 오류: 새로 만든 STEP 의 행을 지우고 row.RESULT = ERROR 로 남긴다(예외를 밖으로 던지지 않음).
         /// </summary>
-        private void SaveWafer(UploadSetting setting, ParserKlarf parser, Wafer wafer, DataRow row, bool overwrite, ImageStore store)
+        /// <param name="map">Map Setup 기준값. BuildWaferRow 가 Map 이 없거나 값이 잘못되면 INVALID 로 막으므로 여기서는 사용할 수 있는 값이다.</param>
+        private void SaveWafer(UploadSetting setting, ParserKlarf parser, Wafer wafer, DataRow row, bool overwrite, ImageStore store, SetupMapLayout map)
         {
             DateTime started = DateTime.Now;
             DefectDefine oDefectDefine = new DefectDefine();
@@ -258,7 +265,9 @@ namespace DACrux.SEMDMS.BSL
                     row["DELETED_STEP_SEQ"] = existingStep;
                 }
 
-                #region [Step 01 : TQD_SETUP 확인 생성 (SETUP_ID size 128 쿼리)]
+                #region [Step 01 : TQD_SETUP 확인 생성 / Map Setup 값으로 맞춤 (SETUP_ID size 128 쿼리)]
+                // Wafer 크기 / Pitch / 원점은 Map Setup 값이다 (2026-10-13). Defect 조회 화면이 이 값으로 Die 위치를 그린다.
+                // DIE_ORIGIN 은 Map Setup 원점 번호다. LoadSetupMapAndAlign 이 Defect / 검사 Die 번호를 이 원점 기준으로 옮겨 두었다.
                 TQD_SETUP oTQD_SETUP = new TQD_SETUP();
                 setupSeq = SelectSetupSeq(oTQD_SETUP, parser.SetupID, parser.StepID, setupTime);
                 if (setupSeq < 0)
@@ -268,46 +277,52 @@ namespace DACrux.SEMDMS.BSL
                         parser.StepID,                                    // STEP_ID (DataService 와 같이 KLARF StepID 원문)
                         setupTime,                                        // SETUP_TIME
                         Num(parser.GetAngle()),                           // ANGLE (Parser 각도, 설계 6.2절)
-                        Num(parser.SampleSize * 1000),                    // WAFER_SIZE (um)
+                        Num(map.WaferSize),                               // WAFER_SIZE (um, Map Setup)
                         "N",                                              // NOTCH_TYPE (DataService 와 같음)
-                        Num(parser.DiePitchX),                            // DIE_PITCH_X
-                        Num(parser.DiePitchY),                            // DIE_PITCH_Y
-                        Num(wafer.DieOriginX),                            // DIE_ORIGIN_X (좌하단 (1,1) 기준으로 옮긴 양)
-                        Num(wafer.DieOriginY),                            // DIE_ORIGIN_Y
-                        Num(wafer.SampleCenterLocationX),                 // ORIGIN_X
-                        Num(wafer.SampleCenterLocationY) });              // ORIGIN_Y
+                        Num(map.PitchX),                                  // DIE_PITCH_X (Map Setup CHIP_SIZE_X)
+                        Num(map.PitchY),                                  // DIE_PITCH_Y (Map Setup CHIP_SIZE_Y)
+                        Num(map.OriginIndex.X),                           // DIE_ORIGIN_X (Map Setup 원점, LeftBottom 번호)
+                        Num(map.OriginIndex.Y),                           // DIE_ORIGIN_Y
+                        Num(map.OriginX),                                 // ORIGIN_X (Map Setup 원점 um)
+                        Num(map.OriginY) });                              // ORIGIN_Y
                     setupSeq = SelectSetupSeq(oTQD_SETUP, parser.SetupID, parser.StepID, setupTime);
                     if (setupSeq < 0)
                         throw new Exception("TQD_SETUP 생성 실패");
                 }
+                else if (!SetupMatchesMap(oTQD_SETUP, setupSeq, map))
+                {
+                    // 같은 Setup 이 예전 규칙(KLARF 값)으로 저장되어 있으면 Map Setup 값으로 바꾼다 (재업로드 시 교체, 2026-10-13 결정).
+                    oTQD_SETUP.UpdateDataNonQuery("UPDATE_SETUP_INFO_KLARF_UPLOAD", null, new string[] {
+                        Num(map.WaferSize), Num(map.PitchX), Num(map.PitchY), Num(map.OriginIndex.X), Num(map.OriginIndex.Y),
+                        Num(map.OriginX), Num(map.OriginY), setupSeq.ToString(CultureInfo.InvariantCulture) });
+                }
                 row["SETUP_SEQ"] = setupSeq;
                 #endregion
 
-                #region [Step 02 : TQD_SETUP_MAP 확인 생성 (Test 마다 그 Test 의 SampleTestPlan)]
-                // DataService 는 여러 Test 를 합친 목록(oIndex[ir])으로 배열을 만들어 Test 가 2개 이상이면 어긋날 수 있다. 업로드는 Test 별 계획을 그대로 쓴다.
-                List<Point> allDies = new List<Point>();
+                #region [Step 02 : TQD_SETUP_MAP 확인 생성 / 교체 (Test 마다 Map Setup 사용 Die 전체)]
+                // Defect 조회 화면은 이 목록을 Die 로 그린다. KLARF 검사 Die(SampleTestPlan)가 아니라 Map Setup 사용 Die 를 넣어
+                // Map Setup 모양 그대로 보이게 한다 (2026-10-13). 같은 Test 에 다른 목록이 이미 있으면 지우고 다시 넣는다.
                 foreach (InspectionTest test in wafer.TestList)
                 {
-                    List<Point> testDies = new List<Point>();
-                    foreach (Point pt in test.SampleTestPlan)
-                    {
-                        if (!testDies.Contains(pt)) testDies.Add(pt);
-                        if (!allDies.Contains(pt)) allDies.Add(pt);
-                    }
-
-                    DataTable dtMap = oDefectDefine.GetSetupTestData(setupSeq.ToString(CultureInfo.InvariantCulture), test.TestNo.ToString(CultureInfo.InvariantCulture));
+                    string strTest = test.TestNo.ToString(CultureInfo.InvariantCulture);
+                    DataTable dtMap = oDefectDefine.GetSetupTestData(setupSeq.ToString(CultureInfo.InvariantCulture), strTest);
                     bool exists = dtMap != null && dtMap.Rows.Count > 0;
+                    bool same = exists && SetupMapMatches(dtMap, map);
                     if (dtMap != null) dtMap.Dispose();
-                    if (exists || testDies.Count == 0)
+                    if (same)
                         continue;
 
-                    string[,] para = new string[testDies.Count, 4];
-                    for (int i = 0; i < testDies.Count; i++)
+                    TQD_SETUP_MAP oTQD_SETUP_MAP = new TQD_SETUP_MAP();
+                    if (exists)
+                        oTQD_SETUP_MAP.DeleteDataNonQuery("DELETE_SETUP_MAP_KLARF_UPLOAD", null, new string[] { setupSeq.ToString(CultureInfo.InvariantCulture), strTest });
+
+                    string[,] para = new string[map.Dies.Count, 4];
+                    for (int i = 0; i < map.Dies.Count; i++)
                     {
                         para[i, 0] = setupSeq.ToString(CultureInfo.InvariantCulture);
-                        para[i, 1] = test.TestNo.ToString(CultureInfo.InvariantCulture);
-                        para[i, 2] = testDies[i].X.ToString(CultureInfo.InvariantCulture);
-                        para[i, 3] = testDies[i].Y.ToString(CultureInfo.InvariantCulture);
+                        para[i, 1] = strTest;
+                        para[i, 2] = map.Dies[i].X.ToString(CultureInfo.InvariantCulture);
+                        para[i, 3] = map.Dies[i].Y.ToString(CultureInfo.InvariantCulture);
                     }
                     oDefectDefine.CreateSetupMap(para);
                 }
@@ -323,16 +338,16 @@ namespace DACrux.SEMDMS.BSL
                         product,                                          // PRODUCT
                         setting.Factory,                                  // FACILITY (로그인 Factory)
                         "NONE",                                           // TECHNOLOGY
-                        allDies.Count.ToString(CultureInfo.InvariantCulture), // NETDIE (DataService 와 같이 검사 Die 수)
-                        Num(parser.SampleSize * 1000),                    // WAFER_SIZE
+                        map.Dies.Count.ToString(CultureInfo.InvariantCulture), // NETDIE (Map Setup 사용 Die 수)
+                        Num(map.WaferSize),                               // WAFER_SIZE (Map Setup)
                         Num(parser.GetAngle()),                           // ANGLE
                         "N",                                              // NOTCH_TYPE
-                        Num(parser.DiePitchX),                            // DIE_PITCH_X
-                        Num(parser.DiePitchY),                            // DIE_PITCH_Y
-                        Num(wafer.DieOriginX),                            // DIE_ORIGIN_X
-                        Num(wafer.DieOriginY),                            // DIE_ORIGIN_Y
-                        Num(wafer.SampleCenterLocationX),                 // ORIGIN_X
-                        Num(wafer.SampleCenterLocationY),                 // ORIGIN_Y
+                        Num(map.PitchX),                                  // DIE_PITCH_X (Map Setup)
+                        Num(map.PitchY),                                  // DIE_PITCH_Y
+                        Num(map.OriginIndex.X),                           // DIE_ORIGIN_X
+                        Num(map.OriginIndex.Y),                           // DIE_ORIGIN_Y
+                        Num(map.OriginX),                                 // ORIGIN_X
+                        Num(map.OriginY),                                 // ORIGIN_Y
                         "Upload" });                                      // DESCRIPTION
                 }
                 #endregion
@@ -516,7 +531,8 @@ namespace DACrux.SEMDMS.BSL
                 // Step 12 : TQD_INSP_SUM 생성
                 oDefectDefine.CreateInspSum(stepSeq.ToString(CultureInfo.InvariantCulture));
 
-                SetResult(row, "SAVED", row["DELETED_STEP_SEQ"] == DBNull.Value ? "" : "기존 STEP_SEQ " + row["DELETED_STEP_SEQ"] + " 삭제 후 재등록", started);
+                SetResult(row, "SAVED", JoinMessage(row["DELETED_STEP_SEQ"] == DBNull.Value ? "" : "기존 STEP_SEQ " + row["DELETED_STEP_SEQ"] + " 삭제 후 재등록",
+                    row["MAP_NOTE"].ToString()), started);
             }
             catch (Exception ex)
             {
@@ -828,9 +844,10 @@ namespace DACrux.SEMDMS.BSL
         {
             DataTable dt = new DataTable("KLARF_UPLOAD");
             foreach (string col in new string[] { "UPLOAD_KEY", "FILE_NAME", "FILE_VERSION", "RAW_WAFER_ID", "WAFER_ID", "LOT_ID", "PRODUCT", "STEP_ID",
-                                                  "SETUP_ID", "SETUP_TIME", "RESULTTIMESTAMP", "EQUIP", "CLASS_SOURCE", "IMAGE_NAMES", "IMAGE_PATH", "RESULT", "MESSAGE" })
+                                                  "SETUP_ID", "SETUP_TIME", "RESULTTIMESTAMP", "EQUIP", "CLASS_SOURCE", "IMAGE_NAMES", "IMAGE_PATH", "RESULT", "MESSAGE", "MAP_NOTE" })
                 dt.Columns.Add(col, typeof(string));
-            foreach (string col in new string[] { "SLOT_ID", "TEST_COUNT", "INSPECTED_DIE", "DEFECTS", "IMAGE_FILES", "SAVED_IMAGES", "ANGLE", "DIE_ORIGIN_X", "DIE_ORIGIN_Y" })
+            // MAP_DIES = Map Setup 사용 Die 수(SETUP_MAP 저장 수), MAP_NOTE = Map Setup 과 KLARF 가 다른 점 (2026-10-13)
+            foreach (string col in new string[] { "SLOT_ID", "TEST_COUNT", "INSPECTED_DIE", "DEFECTS", "IMAGE_FILES", "SAVED_IMAGES", "ANGLE", "DIE_ORIGIN_X", "DIE_ORIGIN_Y", "MAP_DIES" })
                 dt.Columns.Add(col, typeof(int));
             foreach (string col in new string[] { "EXIST_STEP_SEQ", "DELETED_STEP_SEQ", "STEP_SEQ", "WAFER_SEQ", "SETUP_SEQ", "ELAPSED_MS" })
                 dt.Columns.Add(col, typeof(long));
@@ -842,12 +859,14 @@ namespace DACrux.SEMDMS.BSL
         /// <summary>
         /// Wafer 1장의 저장 예정 값을 만든다. 화면 입력(Product / Step ID / 설비)이 비면 KLARF 값을 쓴다.
         /// 길이 / 필수 값 검사에 걸리면 RESULT = INVALID 로 표시하고 Commit 에서 저장하지 않는다.
+        /// Map Setup 이 없거나 쓸 수 없으면 INVALID, KLARF 와 다른 점(Pitch / 원점 / Map 밖 Die)은 MESSAGE 에 참고로 남긴다.
         /// </summary>
-        private static DataRow BuildWaferRow(DataTable table, UploadSetting setting, ParserKlarf parser, Wafer wafer, Dictionary<int, string> rawIds, bool checkExisting)
+        /// <param name="map">LoadSetupMapAndAlign 결과. null = Map Setup 없음</param>
+        private static DataRow BuildWaferRow(DataTable table, UploadSetting setting, ParserKlarf parser, Wafer wafer, Dictionary<int, string> rawIds, bool checkExisting, SetupMapLayout map)
         {
             DataRow row = table.NewRow();
             string rawId;
-            string product = setting.Product.Length > 0 ? setting.Product : Trim(parser.DeviceID);
+            string product = ResolveProduct(setting, parser);
             string stepId = setting.StepId.Length > 0 ? setting.StepId : Trim(parser.StepID);
             string equip = setting.Equip.Length > 0 ? setting.Equip : Trim(parser.Equip);
 
@@ -887,8 +906,10 @@ namespace DACrux.SEMDMS.BSL
             row["IMAGE_FILES"] = imageNames.Count;
             row["IMAGE_NAMES"] = String.Join(";", imageNames.ToArray());
             row["ANGLE"] = parser.GetAngle();
-            row["DIE_ORIGIN_X"] = (int)wafer.DieOriginX;
-            row["DIE_ORIGIN_Y"] = (int)wafer.DieOriginY;
+            // 저장할 원점 번호: Map Setup 이 있으면 Map Setup 원점(Die 번호도 이 값으로 옮겨져 있음), 없으면 Parser 값
+            bool mapUsable = map != null && map.Error.Length == 0;
+            row["DIE_ORIGIN_X"] = mapUsable ? map.OriginIndex.X : (int)wafer.DieOriginX;
+            row["DIE_ORIGIN_Y"] = mapUsable ? map.OriginIndex.Y : (int)wafer.DieOriginY;
             row["ORIGIN_FROM_DB"] = parser.MapOriginFromDB;
 
             List<string> errors = new List<string>();
@@ -901,6 +922,16 @@ namespace DACrux.SEMDMS.BSL
             CheckLength(errors, "설비", equip, IdColumnLength);
             if (wafer.TestList.Count == 0 || dies.Count == 0)
                 errors.Add("검사 Die(SampleTestPlan)가 없습니다.");
+            // Device(Product)에 Setup 된 Map(TQP_MAPDEF / TQP_USEMAP, Factory + MAPID = Product)이 없거나 쓸 수 없으면 저장하지 않는다 (2026-10-13)
+            // 업로드는 이 Map 으로 SETUP / SETUP_MAP 을 만들고 Defect 조회 화면이 그대로 그리므로, Map 없이 저장할 수 없다.
+            if (product.Length > 0 && map == null)
+                errors.Add(String.Format("Device {0} 의 Map 이 없습니다 (Factory {1}). Map Setup(Map Define / File Map Setup)에서 먼저 등록하세요.", product, setting.Factory));
+            else if (map != null && map.Error.Length > 0)
+                errors.Add(String.Format("Device {0} 의 Map Setup 을 쓸 수 없습니다: {1}", product, map.Error));
+
+            string mapNote = map != null && map.Error.Length == 0 ? BuildMapNote(parser, wafer, dies, map) : "";
+            row["MAP_DIES"] = map != null && map.Error.Length == 0 ? map.Dies.Count : 0;
+            row["MAP_NOTE"] = mapNote;
 
             if (errors.Count > 0)
             {
@@ -910,7 +941,7 @@ namespace DACrux.SEMDMS.BSL
             else
             {
                 row["RESULT"] = "READY";
-                row["MESSAGE"] = "";
+                row["MESSAGE"] = mapNote;
                 if (checkExisting)
                 {
                     long waferSeq;
@@ -921,12 +952,265 @@ namespace DACrux.SEMDMS.BSL
                         row["EXIST_STEP_SEQ"] = existing;
                         row["WAFER_SEQ"] = waferSeq;
                         row["RESULT"] = "EXISTS";
-                        row["MESSAGE"] = "이미 등록됨 (STEP_SEQ " + existing + ")";
+                        row["MESSAGE"] = JoinMessage("이미 등록됨 (STEP_SEQ " + existing + ")", mapNote);
                     }
                 }
             }
             return row;
         }
+
+        /// <summary>화면 입력 Product 가 비면 KLARF DeviceID 를 쓴다. BuildWaferRow 와 Map Setup 조회가 같은 값을 쓰도록 한 곳에 둔다.</summary>
+        private static string ResolveProduct(UploadSetting setting, ParserKlarf parser)
+        {
+            return setting.Product.Length > 0 ? setting.Product : Trim(parser.DeviceID);
+        }
+
+        private static string JoinMessage(string first, string second)
+        {
+            if (String.IsNullOrEmpty(second)) return first;
+            if (String.IsNullOrEmpty(first)) return second;
+            return first + " / " + second;
+        }
+
+        #region [Map Setup 기준 Map (2026-10-13)]
+
+        /// <summary>
+        /// Map Setup(TQP_MAPDEF + TQP_USEMAP)에 등록된 Device Map 을 업로드 저장 기준값으로 바꾼 것.
+        /// 만든 이유: Defect 조회 화면(Defect Map Viewer 등)은 TQD_SETUP / TQD_SETUP_MAP 으로 Die 를 그린다. KLARF 검사 Die(SampleTestPlan)를
+        ///   그대로 넣으면 검사한 Die 만 보이고 KLARF Pitch 로 계산한 모양이 되므로, Map Setup 의 사용 Die / Pitch / 원점을 넣고 KLARF 는 Defect 만 쓴다.
+        /// 번호: Map Setup 은 XY_DIRECTION 방향 번호로 저장되고 Defect 조회 화면은 LeftBottom 번호를 쓴다.
+        ///   File Map Setup / Wafer Map 조회 화면과 같은 식(TEST.ENGUI KlarfMapRule.FromDirection / StoredMapLayout.ToLeftBottomOrigin)으로 바꾼다.
+        ///   BSL 은 TEST.ENGUI 를 참조할 수 없어 같은 식을 여기에 둔다 (FromStored / ToLeftBottomOrigin).
+        /// </summary>
+        private class SetupMapLayout
+        {
+            public string MapId = "";
+            /// <summary>쓸 수 없는 Map 이면 이유. 빈 문자열이면 사용 가능.</summary>
+            public string Error = "";
+            /// <summary>WAFER_SIZE (um).</summary>
+            public double WaferSize;
+            /// <summary>CHIP_SIZE_X / Y (um). Die Pitch 로 저장한다.</summary>
+            public double PitchX;
+            public double PitchY;
+            /// <summary>원점 (um). GET_MAPDEF 가 Y 를 CHIP_SIZE_Y - ORIGIN_MICRO_Y 로 돌려준 값으로 KLARF SampleCenterLocation 과 같은 기준이다.</summary>
+            public double OriginX;
+            public double OriginY;
+            /// <summary>원점 Die 번호 (LeftBottom). KLARF 원본 (0,0) Die 가 이 번호가 되도록 Defect 번호를 옮긴다.</summary>
+            public Point OriginIndex;
+            /// <summary>사용 Die (USECODE 1) LeftBottom 번호. SETUP_MAP 에 그대로 넣는다.</summary>
+            public List<Point> Dies = new List<Point>();
+            public HashSet<Point> DieSet = new HashSet<Point>();
+        }
+
+        /// <summary>
+        /// Map Setup 을 읽고, 쓸 수 있으면 모든 Wafer 의 Die 번호(SampleTestPlan / Defect)를 Map Setup 원점 기준으로 옮긴다.
+        /// 왜: Parser 는 저장된 Setup 원점 또는 WaferDieCalculator 계산값으로 번호를 옮긴다. Map Setup 원점과 다르면 Defect 가 다른 Die 에 그려진다.
+        /// Product 가 비었거나 Map 이 없으면 null (BuildWaferRow 가 INVALID 로 표시).
+        /// </summary>
+        private static SetupMapLayout LoadSetupMapAndAlign(UploadSetting setting, ParserKlarf parser)
+        {
+            string product = ResolveProduct(setting, parser);
+            if (product.Length == 0)
+                return null;
+            SetupMapLayout map = LoadSetupMap(setting.Factory, product);
+            if (map == null || map.Error.Length > 0)
+                return map;
+
+            foreach (Wafer wafer in parser.Wafers)
+            {
+                // Wafer.DieOriginX / Y 는 Parser 안에서만 바꿀 수 있어(internal set) 그대로 두고 번호만 옮긴다.
+                // 그래서 이 함수는 파싱 1번에 1번만 부른다. 이후 원점은 wafer.DieOriginX 가 아니라 map.OriginIndex 를 쓴다.
+                int dx = map.OriginIndex.X - (int)wafer.DieOriginX;
+                int dy = map.OriginIndex.Y - (int)wafer.DieOriginY;
+                if (dx != 0 || dy != 0)
+                    wafer.AddIndex(dx, dy);
+            }
+            return map;
+        }
+
+        /// <summary>
+        /// Map Setup 1건을 읽는다. 기존 TEST DSL 의 GetMapDef(GET_MAPDEF) / GetDies(SELECT_USEMAP_ALLDIE) 를 그대로 쓰고,
+        /// 두 쿼리가 MAPID 로만 찾으므로 Factory 는 여기서 거른다.
+        /// 흐름: 정의 행 찾기(Factory / 삭제 아님) -> 값 단위 확인 -> XY 방향 -> 원점 번호 LeftBottom 변환 -> 사용 Die 번호 변환
+        /// </summary>
+        private static SetupMapLayout LoadSetupMap(string factory, string mapId)
+        {
+            DataTable dtDef = null;
+            DataTable dtDies = null;
+            try
+            {
+                dtDef = new DACrux.TEST.DSL.TQP_MAPDEF().GetMapDef(mapId);
+                DataRow def = null;
+                bool deleted = false;
+                if (dtDef != null)
+                {
+                    foreach (DataRow r in dtDef.Rows)
+                    {
+                        if (!String.Equals(Trim(r["FACTORY"].ToString()), factory, StringComparison.OrdinalIgnoreCase))
+                            continue;
+                        if (r["DELETE_FLAG"].ToString() == "Y") { deleted = true; continue; }
+                        def = r;
+                        break;
+                    }
+                }
+                if (def == null && !deleted)
+                    return null;
+
+                SetupMapLayout map = new SetupMapLayout();
+                map.MapId = mapId;
+                if (def == null)
+                {
+                    map.Error = "삭제된 Map 입니다 (DELETE_FLAG = Y)";
+                    return map;
+                }
+
+                map.WaferSize = MapNumber(def, "WAFER_SIZE");
+                map.PitchX = MapNumber(def, "CHIP_SIZE_X");
+                map.PitchY = MapNumber(def, "CHIP_SIZE_Y");
+                map.OriginX = MapNumber(def, "ORIGIN_MICRO_X");
+                map.OriginY = MapNumber(def, "ORIGIN_MICRO_Y");
+                // 단위 확인: um 저장이 기준이다 (StoredMapLayout 과 같은 경계). mm 로 들어간 Map 은 Die 수가 맞지 않아 저장하지 않는다.
+                if (map.WaferSize < 1000)
+                    map.Error = "WAFER_SIZE 가 um 값이 아닙니다 (" + Num(map.WaferSize) + ")";
+                else if (map.PitchX < 10 || map.PitchY < 10)
+                    map.Error = "CHIP_SIZE 가 um 값이 아닙니다 (" + Num(map.PitchX) + " x " + Num(map.PitchY) + ")";
+
+                int dir = (int)MapNumber(def, "XY_DIRECTION");
+                if (map.Error.Length == 0 && !Enum.IsDefined(typeof(XYDirection), dir))
+                    map.Error = "XY_DIRECTION 값이 올바르지 않습니다 (" + dir + ")";
+                if (map.Error.Length > 0)
+                    return map;
+
+                XYDirection direction = (XYDirection)dir;
+                int sumX = (int)MapNumber(def, "DIE_INDEX_MIN_X") + (int)MapNumber(def, "DIE_INDEX_MAX_X");
+                int sumY = (int)MapNumber(def, "DIE_INDEX_MIN_Y") + (int)MapNumber(def, "DIE_INDEX_MAX_Y");
+                map.OriginIndex = ToLeftBottomOrigin(direction,
+                    new Point((int)MapNumber(def, "ORIGIN_INDEX_X"), (int)MapNumber(def, "ORIGIN_INDEX_Y")), sumX, sumY);
+
+                dtDies = new DACrux.TEST.DSL.TQP_USEMAP().GetDies(mapId);
+                if (dtDies != null)
+                {
+                    foreach (DataRow r in dtDies.Rows)
+                    {
+                        if (!String.Equals(Trim(r["FACTORY"].ToString()), factory, StringComparison.OrdinalIgnoreCase))
+                            continue;
+                        if ((int)MapNumber(r, "USECODE") != 1)
+                            continue;
+                        Point lb = FromStored(new Point((int)MapNumber(r, "X"), (int)MapNumber(r, "Y")), direction, sumX, sumY);
+                        if (map.DieSet.Add(lb))
+                            map.Dies.Add(lb);
+                    }
+                }
+                if (map.Dies.Count == 0)
+                    map.Error = "사용 Die(USECODE 1)가 없습니다";
+                return map;
+            }
+            finally
+            {
+                if (dtDef != null) dtDef.Dispose();
+                if (dtDies != null) dtDies.Dispose();
+            }
+        }
+
+        /// <summary>저장 방향 번호 -> LeftBottom 번호. Right 계열은 X, Top 계열은 Y 를 저장 범위(MIN + MAX) 안에서 뒤집는다 (KlarfMapRule.FromDirection 과 같음).</summary>
+        private static Point FromStored(Point stored, XYDirection direction, int sumX, int sumY)
+        {
+            int x = stored.X;
+            int y = stored.Y;
+            if (direction == XYDirection.RightBottom || direction == XYDirection.RightTop)
+                x = sumX - x;
+            if (direction == XYDirection.LeftTop || direction == XYDirection.RightTop)
+                y = sumY - y;
+            return new Point(x, y);
+        }
+
+        /// <summary>
+        /// 저장 원점 번호 -> LeftBottom 원점 번호 (StoredMapLayout.ToLeftBottomOrigin 과 같음).
+        /// 저장값은 기존 WaferMap.AddDie 의 방향별 원점 모서리 차이를 맞춘 KlarfMapRule.MapOriginIndex 결과이므로 그 식을 거꾸로 푼다.
+        /// </summary>
+        private static Point ToLeftBottomOrigin(XYDirection direction, Point stored, int sumX, int sumY)
+        {
+            switch (direction)
+            {
+                case XYDirection.LeftTop:
+                    return new Point(stored.X + 1, sumY - stored.Y);
+                case XYDirection.RightTop:
+                    return new Point(sumX - stored.X, sumY - stored.Y);
+                case XYDirection.RightBottom:
+                    return new Point(sumX - stored.X, stored.Y);
+                default:
+                    return stored;
+            }
+        }
+
+        private static double MapNumber(DataRow row, string column)
+        {
+            if (!row.Table.Columns.Contains(column) || row.IsNull(column))
+                return 0;
+            return System.Convert.ToDouble(row[column], CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>
+        /// Map Setup 과 KLARF 가 다른 점을 한 줄로 만든다 (저장은 막지 않음). 비어 있으면 같다.
+        /// Pitch 가 다르면 KLARF XREL 이 KLARF Pitch 기준이라 Defect 가 Die 안에서 조금 밀릴 수 있다 (F05 Pitch 설정과 같은 제한).
+        /// Map 밖 검사 Die / Defect 는 Defect 조회 화면에서 Die 없이 보이거나 빠질 수 있다.
+        /// </summary>
+        private static string BuildMapNote(ParserKlarf parser, Wafer wafer, List<Point> inspectedDies, SetupMapLayout map)
+        {
+            List<string> notes = new List<string>();
+            if (Math.Abs(parser.DiePitchX - map.PitchX) > 0.001 || Math.Abs(parser.DiePitchY - map.PitchY) > 0.001)
+                notes.Add(String.Format(CultureInfo.InvariantCulture, "Pitch 다름 (KLARF {0} x {1} / Map {2} x {3})", parser.DiePitchX, parser.DiePitchY, map.PitchX, map.PitchY));
+            if (Math.Abs(wafer.SampleCenterLocationX - map.OriginX) > 1 || Math.Abs(wafer.SampleCenterLocationY - map.OriginY) > 1)
+                notes.Add(String.Format(CultureInfo.InvariantCulture, "원점 다름 (KLARF {0} / {1}, Map {2} / {3} um)",
+                    wafer.SampleCenterLocationX, wafer.SampleCenterLocationY, map.OriginX, map.OriginY));
+            int outDies = 0;
+            foreach (Point pt in inspectedDies)
+                if (!map.DieSet.Contains(pt)) outDies++;
+            if (outDies > 0)
+                notes.Add("Map 밖 검사 Die " + outDies);
+            int outDefects = 0;
+            foreach (Defect d in wafer.DefectList)
+                if (!map.DieSet.Contains(new Point(d.XINDEX, d.YINDEX))) outDefects++;
+            if (outDefects > 0)
+                notes.Add("Map 밖 Defect " + outDefects);
+            return notes.Count == 0 ? "" : "Map Setup 참고: " + String.Join(", ", notes.ToArray());
+        }
+
+        /// <summary>저장된 Setup 의 Wafer 크기 / Pitch / 원점이 Map Setup 값과 같은지 (기존 GET_SETUP 쿼리).</summary>
+        private static bool SetupMatchesMap(TQD_SETUP oTQD_SETUP, long setupSeq, SetupMapLayout map)
+        {
+            DataTable dt = oTQD_SETUP.GetData("GET_SETUP", null, new string[] { setupSeq.ToString(CultureInfo.InvariantCulture) });
+            try
+            {
+                if (dt == null || dt.Rows.Count == 0)
+                    return false;
+                DataRow r = dt.Rows[0];
+                return Same(MapNumber(r, "WAFER_SIZE"), map.WaferSize)
+                    && Same(MapNumber(r, "DIE_PITCH_X"), map.PitchX) && Same(MapNumber(r, "DIE_PITCH_Y"), map.PitchY)
+                    && Same(MapNumber(r, "DIE_ORIGIN_X"), map.OriginIndex.X) && Same(MapNumber(r, "DIE_ORIGIN_Y"), map.OriginIndex.Y)
+                    && Same(MapNumber(r, "ORIGIN_X"), map.OriginX) && Same(MapNumber(r, "ORIGIN_Y"), map.OriginY);
+            }
+            finally
+            {
+                if (dt != null) dt.Dispose();
+            }
+        }
+
+        /// <summary>Setup Map 의 Test 1개 Die 목록이 Map Setup 사용 Die 와 같은지 (개수 + 모든 번호).</summary>
+        private static bool SetupMapMatches(DataTable dtMap, SetupMapLayout map)
+        {
+            HashSet<Point> stored = new HashSet<Point>();
+            foreach (DataRow r in dtMap.Rows)
+                stored.Add(new Point((int)MapNumber(r, "INDEX_X"), (int)MapNumber(r, "INDEX_Y")));
+            return stored.Count == dtMap.Rows.Count && stored.SetEquals(map.DieSet);
+        }
+
+        private static bool Same(double a, double b)
+        {
+            return Math.Abs(a - b) < 0.0005;
+        }
+
+        #endregion
 
         /// <summary>
         /// 원본 WaferID(Parser 가 DMS 규칙으로 바꾸기 전 값)를 Slot 별로 읽는다. frmKlarfFileViewer.ReadRawWaferIds 와 같은 방식이며

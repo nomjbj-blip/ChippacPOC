@@ -16,3 +16,7 @@ D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\06_CoreLibSource\
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\06_CoreLibSource\DACrux.Base\obj\Debug\DACrux.Base.csproj.CoreCompileInputs.cache
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\06_CoreLibSource\DACrux.Base\obj\Debug\DACrux.Base.dll
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\06_CoreLibSource\DACrux.Base\obj\Debug\DACrux.Base.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\71_CoreLib\DACrux.Base.dll
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\71_CoreLib\DACrux.Base.pdb
+C:\Users\USER\AppData\Local\Temp\chippac_testbsl\DACrux.Base.dll
+C:\Users\USER\AppData\Local\Temp\chippac_testbsl\DACrux.Base.pdb

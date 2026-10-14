@@ -11,7 +11,7 @@ namespace DACrux.SEMDMS.BSL
     /// <summary>
     /// GDS Map 전체 도형 DB 저장(Import)의 업무 검증과 DSL 호출을 담당한다.
     /// 설계: 문서/2026-10-02_GDS_Map_DB저장_설계.md 4절 / 20절.
-    /// 2026-10-02 사용자 결정으로 리비전을 관리하지 않는다. Map은 Factory + Device(제품)당 1개(TQP_GDS_MAP)이고,
+    /// 리비전을 관리하지 않는다(2026-10-02). Map은 Factory + Device(제품)당 1개(TQP_GDS_MAP)이고,
     /// 기존 데이터가 있으면 화면이 사용자에게 묻고 DeleteMap으로 지운 뒤 다시 등록한다.
     /// 저장 작업(IMPORT_JOB)은 Device당 1건이며 작업 번호(IMPORT_JOB_SEQ)는 시퀀스다.
     /// </summary>
@@ -33,8 +33,8 @@ namespace DACrux.SEMDMS.BSL
 
         /// <summary>
         /// Device의 GDS 데이터를 모두 삭제한다(기존 데이터 삭제 후 재등록).
-        /// 처리 순서: CHAIN(하위 Chain 테이블은 FK CASCADE) -> PLACED_EL -> SOURCE_EL -> 헤더 TQP_GDS_MAP(LAYER / IMPORT_JOB -> IMPORT_BATCH는 FK CASCADE).
-        /// 큰 테이블 사이 FK(SOURCE -> PLACED, PLACED -> CHAIN_MEMBER / EDIT 등)는 CASCADE가 아니다. 부모 행마다 내부 DELETE가 돌아
+        /// 처리 순서: CHAIN(하위 Chain 테이블은 FK CASCADE) -> PLACED_EL -> 헤더 TQP_GDS_MAP(LAYER / IMPORT_JOB -> IMPORT_BATCH는 FK CASCADE).
+        /// 큰 테이블 사이 FK(PLACED -> CHAIN_MEMBER / EDIT 등)는 CASCADE가 아니다. 부모 행마다 내부 DELETE가 돌아
         /// 샘플 1 Device 삭제가 10분을 넘긴 측정 결과 때문에 자식부터 직접 지우도록 바꿨다(2026-10-02_tqp_gds_fk_delete_rule.sql).
         /// 문장마다 자동 Commit이라 중간에 끊기면 일부만 지워질 수 있지만, 같은 함수를 다시 부르면 남은 데이터를 마저 지운다.
         /// 반환: 지운 배치 도형 수
@@ -47,9 +47,86 @@ namespace DACrux.SEMDMS.BSL
             string[] aKey = new string[] { strCleanFactory, strCleanDevice };
             new DACrux.SEMDMS.DSL.TQP_GDS_CHAIN().DeleteDataNonQuery("DELETE_CHAIN", null, aKey);
             int iPlaced = new DACrux.SEMDMS.DSL.TQP_GDS_PLACED_EL().DeleteDataNonQuery("DELETE_PLACED_EL", null, aKey);
-            new DACrux.SEMDMS.DSL.TQP_GDS_SOURCE_EL().DeleteDataNonQuery("DELETE_SOURCE_EL", null, aKey);
             new DACrux.SEMDMS.DSL.TQP_GDS_MAP().DeleteDataNonQuery("DELETE_MAP", null, aKey);
             return iPlaced;
+        }
+
+        #endregion
+
+        #region [TQP_GDS_MAP_SUB_DEVICE]
+
+        /// <summary>
+        /// 대표 Device의 Sub Device 목록을 통째로 바꾼다(2026-10-12).
+        /// 처리: 입력 검증 -> 대표 Map 확인 -> 입력 정리(빈 값 / 대표 자신 제외, 대소문자만 다른 중복 오류)
+        ///       -> 다른 대표에 등록된 Sub / 다른 Map의 대표 Device 이름 오류 -> 기존 삭제 -> 일괄 등록(InsertExecuteMultiple 1회).
+        /// 검사를 모두 끝낸 뒤 지우므로 검사 오류로 기존 설정이 사라지지 않는다. 반환: 저장한 Sub 수
+        /// </summary>
+        public int SaveSubDeviceList(string strFactory, string strDeviceID, string[] aSubDeviceIDs, string[] aRemarks, string strUpdateUser)
+        {
+            string strFac = Required(strFactory, "Factory", 30);
+            string strDevice = Required(strDeviceID, "Device ID", 50);
+            string strUser = Required(strUpdateUser, "Update User", 30);
+            if (aSubDeviceIDs == null) aSubDeviceIDs = new string[0];
+            if (aRemarks != null && aRemarks.Length != aSubDeviceIDs.Length)
+                throw new ArgumentException("Sub Device 와 비고 개수가 다릅니다.", "aRemarks");
+
+            DataTable dtMap = GetMapInfo(strFac, strDevice);
+            if (dtMap.Rows.Count == 0)
+                throw new InvalidOperationException("대표 Device 의 GDS Map 이 없습니다: " + strFac + " / " + strDevice);
+            strDevice = dtMap.Rows[0]["DEVICE_ID"].ToString();
+
+            // 입력 정리: 대표 자신은 언제나 포함이라 저장하지 않는다.
+            var lstSub = new List<string[]>();
+            var setUpper = new HashSet<string>(StringComparer.Ordinal);
+            for (int i = 0; i < aSubDeviceIDs.Length; i++)
+            {
+                string strSub = aSubDeviceIDs[i] == null ? string.Empty : aSubDeviceIDs[i].Trim();
+                if (strSub.Length == 0 || string.Equals(strSub, strDevice, StringComparison.OrdinalIgnoreCase)) continue;
+                Required(strSub, "Sub Device ID", 50);
+                string strRemark = aRemarks == null || aRemarks[i] == null ? string.Empty : aRemarks[i].Trim();
+                if (strRemark.Length > 200) throw new ArgumentException("비고는 200자 이하여야 합니다: " + strSub, "aRemarks");
+                if (!setUpper.Add(strSub.ToUpperInvariant()))
+                    throw new ArgumentException("Sub Device 가 중복되었습니다(대소문자 무시): " + strSub, "aSubDeviceIDs");
+                lstSub.Add(new string[] { strSub, strRemark });
+            }
+
+            // 다른 대표에 이미 등록된 Sub 확인
+            var lstConflict = new List<string>();
+            DataTable dtAll = new DACrux.SEMDMS.DSL.TQP_GDS_MAP_SUB_DEVICE().GetData("SELECT_SUB_DEVICE_FACTORY", null, new string[] { strFac });
+            foreach (DataRow row in dtAll.Rows)
+            {
+                string strOwner = row["DEVICE_ID"].ToString();
+                if (strOwner == strDevice) continue;
+                string strSub = row["SUB_DEVICE_ID"].ToString();
+                if (setUpper.Contains(strSub.ToUpperInvariant()))
+                    lstConflict.Add(strSub + " (대표 " + strOwner + ")");
+            }
+            // 다른 Map 의 대표 Device 이름이면 어느 Map 을 쓸지 모호해진다.
+            DataTable dtMaps = new DACrux.SEMDMS.DSL.TQP_GDS_MAP().GetData("SELECT_MAP_DEVICE_LIST", null, null);
+            foreach (DataRow row in dtMaps.Rows)
+            {
+                if (row["FACTORY"].ToString() != strFac) continue;
+                string strMapDevice = row["DEVICE_ID"].ToString();
+                if (strMapDevice != strDevice && setUpper.Contains(strMapDevice.ToUpperInvariant()))
+                    lstConflict.Add(strMapDevice + " (자기 GDS Map 이 있는 대표 Device)");
+            }
+            if (lstConflict.Count > 0)
+                throw new InvalidOperationException("다른 대표에 쓰이는 이름이라 저장할 수 없습니다: " + string.Join(", ", lstConflict.ToArray()));
+
+            DACrux.SEMDMS.DSL.TQP_GDS_MAP_SUB_DEVICE oSub = new DACrux.SEMDMS.DSL.TQP_GDS_MAP_SUB_DEVICE();
+            oSub.DeleteDataNonQuery("DELETE_SUB_DEVICE_BY_MAP", null, new string[] { strFac, strDevice });
+            if (lstSub.Count == 0) return 0;
+            string[,] aParas = new string[lstSub.Count, 5];
+            for (int i = 0; i < lstSub.Count; i++)
+            {
+                aParas[i, 0] = strFac;
+                aParas[i, 1] = lstSub[i][0];
+                aParas[i, 2] = strDevice;
+                aParas[i, 3] = lstSub[i][1];
+                aParas[i, 4] = strUser;
+            }
+            oSub.InsertExecuteMultiple("CREATE_SUB_DEVICE", aParas);
+            return lstSub.Count;
         }
 
         #endregion
@@ -58,9 +135,9 @@ namespace DACrux.SEMDMS.BSL
 
         /// <summary>
         /// 저장을 시작한다. Device에 기존 Map이 있으면 거부한다(화면이 먼저 사용자에게 묻고 DeleteMap을 호출해야 한다).
-        /// ImportInfo 순서: 0 Factory / 1 Device ID / 2 Top Structure / 3 GDS 파일 이름 / 4 GDS SHA-256(선택, 빈 값이면 NULL) /
-        /// 5 User Unit / 6 Database Unit / 7 Create User / 8 예상 SOURCE 수 / 9 예상 PLACED 수 / 10 예상 좌표 수
-        /// [11 저장 기준 VIEW_SIDE: FRONT / BACK] - 2026-10-06 CLAUDE-027 추가. 11개로 부르면 FRONT(기존 호출 / Probe 호환).
+        /// ImportInfo 순서: 0 Factory / 1 Device ID / 2 Top Structure / 3 GDS 파일 이름 / 4 사용 안 함(예전 GDS SHA-256 자리, 2026-10-08 컬럼 제거로 무시) /
+        /// 5 User Unit / 6 Database Unit / 7 Create User / 8 사용 안 함(예전 원본 행 수 자리, 2026-10-12 원본 행 테이블 제거) / 9 예상 PLACED 수 / 10 예상 좌표 수
+        /// [11 저장 기준 VIEW_SIDE: FRONT / BACK] (2026-10-06 추가). 11개로 부르면 FRONT(기존 호출 / Probe 호환).
         ///   BACK = 화면이 PLACED 좌표를 GDS 원점 기준 좌우 반전(X' = -X)해 보낸다는 기록이다. 서버는 좌표를 바꾸지 않는다.
         /// 처리: 입력 검증 -> 기존 Map 확인 -> TQP_GDS_MAP(DRAFT) 생성 -> 저장 작업(UPLOADING) 생성 -> 작업 1행 반환
         /// </summary>
@@ -73,23 +150,13 @@ namespace DACrux.SEMDMS.BSL
             string strTop = Required(ImportInfo[2], "Top Structure", 1024);
             string strFileName = ImportInfo[3] == null ? string.Empty : ImportInfo[3].Trim();
             if (strFileName.Length > 260) strFileName = strFileName.Substring(strFileName.Length - 260);
-            // GDS SHA-256 은 선택 항목이다 (2026-10-06 CLAUDE-028, 사용자 지시로 화면 계산 제거, 컬럼 NULL 허용).
-            // 비어 있으면 빈 문자열을 넘겨 NULL 로 저장되고, 값이 오면 이전 호출 / Probe 호환을 위해 형식을 검사한다.
-            string strSha256 = ImportInfo[4] == null ? string.Empty : ImportInfo[4].Trim().ToUpperInvariant();
-            if (strSha256.Length > 0)
-            {
-                if (strSha256.Length != 64)
-                    throw new ArgumentException("GDS SHA-256은 64자리 16진수여야 합니다.", "ImportInfo");
-                foreach (char ch in strSha256)
-                    if (!Uri.IsHexDigit(ch))
-                        throw new ArgumentException("GDS SHA-256은 64자리 16진수여야 합니다.", "ImportInfo");
-            }
+            // ImportInfo[4](예전 GDS SHA-256 자리, 2026-10-08 컬럼 제거)와 ImportInfo[8](예전 원본 행 수 자리, 2026-10-12 원본 행 테이블 제거)은 사용하지 않는다.
+            // 항목 위치를 당기면 이미 배포된 화면 / Probe와 순서가 어긋나므로 자리는 남기고 값이 와도 무시한다.
             double dUserUnit = ParseUnit(ImportInfo[5], "User Unit");
             double dDatabaseUnit = ParseUnit(ImportInfo[6], "Database Unit");
             if (double.IsNaN(dUserUnit) || double.IsNaN(dDatabaseUnit) || dUserUnit <= 0 || dDatabaseUnit <= 0 || double.IsInfinity(dUserUnit) || double.IsInfinity(dDatabaseUnit))
                 throw new ArgumentException("GDS 좌표 단위는 0보다 큰 유한한 숫자여야 합니다.", "ImportInfo");
             string strCreateUser = Required(ImportInfo[7], "Create User", 30);
-            long lExpectedSource = ParseCount(ImportInfo[8], "예상 SOURCE 수");
             long lExpectedPlaced = ParseCount(ImportInfo[9], "예상 PLACED 수");
             long lExpectedPoint = ParseCount(ImportInfo[10], "예상 좌표 수");
             string strViewSide = ImportInfo.Length == 12 && ImportInfo[11] != null ? ImportInfo[11].Trim().ToUpperInvariant() : "FRONT";
@@ -112,12 +179,12 @@ namespace DACrux.SEMDMS.BSL
 
             DACrux.SEMDMS.DSL.TQP_GDS_MAP oTQP_GDS_MAP = new DACrux.SEMDMS.DSL.TQP_GDS_MAP();
             int iRows = oTQP_GDS_MAP.InsertDataNonQuery("CREATE_MAP", null, new string[] {
-                strFactory, strDevice, strTop, strFileName, strSha256,
+                strFactory, strDevice, strTop, strFileName,
                 dUserUnit.ToString("G17", CultureInfo.InvariantCulture), dDatabaseUnit.ToString("G17", CultureInfo.InvariantCulture),
                 strViewSide, strCreateUser });
             if (iRows != 1)
                 throw new DataException("GDS Map 헤더가 한 건 생성되지 않았습니다.");
-            string strImportJobSeq = CreateImportJob(strFactory, strDevice, lExpectedSource, lExpectedPlaced, lExpectedPoint, strCreateUser);
+            string strImportJobSeq = CreateImportJob(strFactory, strDevice, lExpectedPlaced, lExpectedPoint, strCreateUser);
             return GetImportJob(strImportJobSeq);
         }
 
@@ -142,7 +209,7 @@ namespace DACrux.SEMDMS.BSL
         /// 저장 완료 확정.
         /// 처리 흐름:
         ///  1) 작업 조회. 이미 READY면 Map 헤더만 READY로 맞추고 끝낸다(앞선 호출에서 헤더 변경 전에 끊긴 경우).
-        ///  2) DB에서 SOURCE 수 / PLACED 수 / 좌표 수 합계를 다시 센다. 배치 저장은 Bulk Insert만 하므로(배치 기록 없음) 이 DB 건수가 유일한 확인이다.
+        ///  2) DB에서 PLACED 수 / 좌표 수 합계를 다시 센다. 배치 저장은 Bulk Insert만 하므로(배치 기록 없음) 이 DB 건수가 유일한 확인이다.
         ///  3) (2026-10-06 삭제) 배치 번호 확인은 배치 기록을 남기지 않게 되어 하지 않는다.
         ///  4) 예상 건수와 모두 같으면 작업 READY(수신 건수를 DB 값으로 맞춤) -> Map 헤더 READY. 다르면 UPLOADING 그대로 두고 MISMATCH 반환.
         /// </summary>
@@ -159,36 +226,34 @@ namespace DACrux.SEMDMS.BSL
                 string strStatus = drJob["JOB_STATUS"].ToString();
                 string strFactory = drJob["FACTORY"].ToString();
                 string strDevice = drJob["DEVICE_ID"].ToString();
-                long lExpectedSource = DACrux.Base.Convert.longParse(drJob["EXPECTED_SOURCE_COUNT"].ToString());
                 long lExpectedPlaced = DACrux.Base.Convert.longParse(drJob["EXPECTED_PLACED_COUNT"].ToString());
                 long lExpectedPoint = DACrux.Base.Convert.longParse(drJob["EXPECTED_POINT_COUNT"].ToString());
 
                 if (string.Equals(strStatus, "READY", StringComparison.Ordinal))
                 {
                     SetMapReady(strFactory, strDevice, strUser);
-                    return CompleteResult("OK", "READY", lExpectedSource, -1, lExpectedPlaced, -1, lExpectedPoint, -1, "이미 확정된 저장 작업입니다.");
+                    return CompleteResult("OK", "READY", lExpectedPlaced, -1, lExpectedPoint, -1, "이미 확정된 저장 작업입니다.");
                 }
                 if (!string.Equals(strStatus, "UPLOADING", StringComparison.Ordinal))
                     throw new InvalidOperationException("저장 작업이 " + strStatus + " 상태라서 확정할 수 없습니다.");
 
-                long lDbSource, lDbPlaced, lDbPoint;
-                CountMapRows(strFactory, strDevice, out lDbSource, out lDbPlaced, out lDbPoint);
+                long lDbPlaced, lDbPoint;
+                CountMapRows(strFactory, strDevice, out lDbPlaced, out lDbPoint);
                 StringBuilder sbMessage = new StringBuilder();
-                if (lDbSource != lExpectedSource) sbMessage.Append("SOURCE 건수 불일치 / ");
                 if (lDbPlaced != lExpectedPlaced) sbMessage.Append("PLACED 건수 불일치 / ");
                 if (lDbPoint != lExpectedPoint) sbMessage.Append("좌표 수 불일치 / ");
                 if (sbMessage.Length > 0)
-                    return CompleteResult("MISMATCH", strStatus, lExpectedSource, lDbSource, lExpectedPlaced, lDbPlaced,
+                    return CompleteResult("MISMATCH", strStatus, lExpectedPlaced, lDbPlaced,
                         lExpectedPoint, lDbPoint, sbMessage.ToString().TrimEnd(' ', '/'));
 
                 DACrux.SEMDMS.DSL.TQP_GDS_IMPORT_JOB oTQP_GDS_IMPORT_JOB = new DACrux.SEMDMS.DSL.TQP_GDS_IMPORT_JOB();
                 int iRows = oTQP_GDS_IMPORT_JOB.UpdateDataNonQuery("UPDATE_IMPORT_JOB_READY", null, new string[] {
-                    lDbSource.ToString(CultureInfo.InvariantCulture), lDbPlaced.ToString(CultureInfo.InvariantCulture),
+                    lDbPlaced.ToString(CultureInfo.InvariantCulture),
                     lDbPoint.ToString(CultureInfo.InvariantCulture), strUser, strImportJobSeq });
                 if (iRows != 1)
                     throw new InvalidOperationException("저장 작업 상태가 바뀌어 확정하지 못했습니다. 다시 조회하세요.");
                 SetMapReady(strFactory, strDevice, strUser);
-                return CompleteResult("OK", "READY", lExpectedSource, lDbSource, lExpectedPlaced, lDbPlaced, lExpectedPoint, lDbPoint, "저장이 확정되었습니다.");
+                return CompleteResult("OK", "READY", lExpectedPlaced, lDbPlaced, lExpectedPoint, lDbPoint, "저장이 확정되었습니다.");
             }
             finally
             {
@@ -204,47 +269,41 @@ namespace DACrux.SEMDMS.BSL
             oTQP_GDS_MAP.UpdateDataNonQuery("UPDATE_MAP_READY", null, new string[] { strUser, strFactory, strDevice });
         }
 
-        /// <summary>Device의 SOURCE 수 / PLACED 수 / 좌표 수 합계를 DB에서 센다.</summary>
-        private void CountMapRows(string strFactory, string strDevice, out long lSource, out long lPlaced, out long lPoint)
+        /// <summary>Device의 PLACED 수 / 좌표 수 합계를 DB에서 센다.</summary>
+        private void CountMapRows(string strFactory, string strDevice, out long lPlaced, out long lPoint)
         {
-            DataTable dtSource = null;
             DataTable dtPlaced = null;
             try
             {
                 string[] aKey = new string[] { strFactory, strDevice };
-                dtSource = new DACrux.SEMDMS.DSL.TQP_GDS_SOURCE_EL().GetData("SELECT_SOURCE_EL_COUNT", null, aKey);
                 dtPlaced = new DACrux.SEMDMS.DSL.TQP_GDS_PLACED_EL().GetData("SELECT_PLACED_EL_COUNT", null, aKey);
-                lSource = DACrux.Base.Convert.longParse(dtSource.Rows[0]["SOURCE_COUNT"].ToString());
                 lPlaced = DACrux.Base.Convert.longParse(dtPlaced.Rows[0]["PLACED_COUNT"].ToString());
                 lPoint = DACrux.Base.Convert.longParse(dtPlaced.Rows[0]["POINT_COUNT"].ToString());
             }
             finally
             {
-                if (dtSource != null) dtSource.Dispose();
                 if (dtPlaced != null) dtPlaced.Dispose();
             }
         }
 
         /// <summary>CompleteMapImport 반환 1행을 만든다. DB 값을 세지 않은 경우 -1이다.</summary>
-        private static DataTable CompleteResult(string strResult, string strJobStatus, long lExpectedSource, long lDbSource,
+        private static DataTable CompleteResult(string strResult, string strJobStatus,
             long lExpectedPlaced, long lDbPlaced, long lExpectedPoint, long lDbPoint, string strMessage)
         {
             DataTable dt = new DataTable("COMPLETE_RESULT");
             dt.Columns.Add("RESULT", typeof(string));
             dt.Columns.Add("JOB_STATUS", typeof(string));
-            dt.Columns.Add("EXPECTED_SOURCE", typeof(long));
-            dt.Columns.Add("DB_SOURCE", typeof(long));
             dt.Columns.Add("EXPECTED_PLACED", typeof(long));
             dt.Columns.Add("DB_PLACED", typeof(long));
             dt.Columns.Add("EXPECTED_POINT", typeof(long));
             dt.Columns.Add("DB_POINT", typeof(long));
             dt.Columns.Add("MESSAGE", typeof(string));
-            dt.Rows.Add(strResult, strJobStatus, lExpectedSource, lDbSource, lExpectedPlaced, lDbPlaced, lExpectedPoint, lDbPoint, strMessage);
+            dt.Rows.Add(strResult, strJobStatus, lExpectedPlaced, lDbPlaced, lExpectedPoint, lDbPoint, strMessage);
             return dt;
         }
 
         /// <summary>Device에 UPLOADING 저장 작업 1건을 만든다. Device당 작업은 1건만 허용된다(DB Unique). 작업 번호는 시퀀스로 채번한다.</summary>
-        private string CreateImportJob(string strFactory, string strDevice, long lExpectedSource, long lExpectedPlaced, long lExpectedPoint, string strUser)
+        private string CreateImportJob(string strFactory, string strDevice, long lExpectedPlaced, long lExpectedPoint, string strUser)
         {
             DACrux.SEMDMS.DSL.TQP_GDS_IMPORT_JOB oTQP_GDS_IMPORT_JOB = new DACrux.SEMDMS.DSL.TQP_GDS_IMPORT_JOB();
             DataTable dtSeq = oTQP_GDS_IMPORT_JOB.GetData("SELECT_NEXT_IMPORT_JOB_SEQ", null, null);
@@ -252,7 +311,6 @@ namespace DACrux.SEMDMS.BSL
             dtSeq.Dispose();
             int iRows = oTQP_GDS_IMPORT_JOB.InsertDataNonQuery("CREATE_IMPORT_JOB", null, new string[] {
                 strImportJobSeq, strFactory, strDevice,
-                lExpectedSource.ToString(CultureInfo.InvariantCulture),
                 lExpectedPlaced.ToString(CultureInfo.InvariantCulture),
                 lExpectedPoint.ToString(CultureInfo.InvariantCulture),
                 strUser, strUser });
@@ -305,64 +363,10 @@ namespace DACrux.SEMDMS.BSL
 
         #endregion
 
-        #region [TQP_GDS_SOURCE_EL]
-
-        /// <summary>
-        /// 원본 Grid 행 배치 하나를 저장한다. DefectDefine.CreateDefect와 같은 Bulk Insert 방식이다(2026-10-06 사용자 지시).
-        /// 처리 흐름:
-        ///  1) 작업 상태 확인(Map 키) / 배열 크기 확인. 행 검증 / 해시 / 배치 기록은 하지 않는다(클라이언트 GdsMapSourceRowBuilder가 만든 행을 그대로 믿는다).
-        ///  2) Payload 2,000바이트(16진수 4,000자) 이하 행: CREATE_SOURCE_EL_MULTI를 InsertExecuteMultiple로 한 번에 저장.
-        ///  3) 2,000바이트 초과 행: BLOB이 필요하므로 CREATE_SOURCE_EL을 InsertDataObject(Execute1)로 한 건씩 저장.
-        ///  중간에 실패하면 이어서 저장하지 않고 삭제 후 다시 등록한다. 건수는 CompleteMapImport가 DB에서 확인한다.
-        /// </summary>
-        public int CreateSourceBatch(string strImportJobSeq, long lBatchNo, string[,] aParas, string strUpdateUser)
-        {
-            string[] aMapKey = GetUploadingMapKey(strImportJobSeq);
-            CheckBatchParas(aParas, 9, lBatchNo);
-            int iRows = aParas.GetLength(0);
-            List<int> lstSmall = new List<int>(iRows);
-            List<int> lstLarge = new List<int>();
-            for (int i = 0; i < iRows; i++)
-            {
-                if (aParas[i, 8].Length <= MaxMultiHexLength) lstSmall.Add(i);
-                else lstLarge.Add(i);
-            }
-
-            DACrux.SEMDMS.DSL.TQP_GDS_SOURCE_EL oTQP_GDS_SOURCE_EL = new DACrux.SEMDMS.DSL.TQP_GDS_SOURCE_EL();
-            if (lstSmall.Count > 0)
-            {
-                string[,] aSource = new string[lstSmall.Count, 11];
-                for (int k = 0; k < lstSmall.Count; k++)
-                {
-                    int i = lstSmall[k];
-                    aSource[k, 0] = aMapKey[0];
-                    aSource[k, 1] = aMapKey[1];
-                    for (int c = 0; c < 9; c++)
-                        aSource[k, c + 2] = aParas[i, c];
-                }
-                oTQP_GDS_SOURCE_EL.InsertExecuteMultiple("CREATE_SOURCE_EL_MULTI", aSource);
-            }
-            foreach (int i in lstLarge)
-                InsertSourceOne(oTQP_GDS_SOURCE_EL, aMapKey, aParas, i);
-            return iRows;
-        }
-
-        /// <summary>원본 행 한 건을 BLOB(byte[])으로 저장한다. 같은 키가 이미 있으면 DB에서 건너뛴다.</summary>
-        private void InsertSourceOne(DACrux.SEMDMS.DSL.TQP_GDS_SOURCE_EL oTQP_GDS_SOURCE_EL, string[] aMapKey, string[,] aParas, int i)
-        {
-            oTQP_GDS_SOURCE_EL.InsertDataObject("CREATE_SOURCE_EL", new object[] {
-                aMapKey[0], aMapKey[1], aParas[i, 0], aParas[i, 1], DACrux.Base.Convert.longParse(aParas[i, 2]), aParas[i, 3],
-                ParseInt(aParas[i, 4], "LAYER_ID"), ParseInt(aParas[i, 5], "DATA_TYPE"), ParseInt(aParas[i, 6], "PARSER_DUPLICATE"),
-                ParseInt(aParas[i, 7], "SOURCE_PAYLOAD_VERSION"), HexToBytes(aParas[i, 8]),
-                aMapKey[0], aMapKey[1], aParas[i, 0] });
-        }
-
-        #endregion
-
         #region [TQP_GDS_PLACED_EL]
 
         /// <summary>
-        /// 화면 배치 도형 배치 하나를 저장한다. 처리 흐름은 CreateSourceBatch와 같다(DefectDefine.CreateDefect 방식 Bulk Insert).
+        /// 화면 배치 도형 배치 하나를 저장한다. DefectDefine.CreateDefect와 같은 Bulk Insert 방식이다.
         ///  - 좌표 2,000바이트(16진수 4,000자) 이하이고 TEXT가 4,000바이트 이하인 행: CREATE_PLACED_EL_MULTI + InsertExecuteMultiple 1회.
         ///  - 그 밖의 행(큰 좌표 / 긴 TEXT): CREATE_PLACED_EL + InsertDataObject(BLOB / CLOB) 한 건씩.
         ///  빈 값은 클라이언트 GdsMapPlacedRowBuilder가 null로 보낸다.

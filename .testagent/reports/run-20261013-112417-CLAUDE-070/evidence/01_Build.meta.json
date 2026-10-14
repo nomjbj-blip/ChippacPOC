@@ -1,0 +1,26 @@
+﻿{
+    "id":  "01",
+    "name":  "Build",
+    "scenarios":  [
+                      "SCN-01"
+                  ],
+    "status":  "FAIL",
+    "exitCode":  1,
+    "timedOut":  false,
+    "durationMs":  809,
+    "started":  "2026-10-13 11:24:59",
+    "command":  "C:\\Program Files\\Microsoft Visual Studio\\2022\\Professional\\MSBuild\\Current\\Bin\\MSBuild.exe \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\DMS\\06_CoreLibSource\\GdsMapControl\\NexplantQMS.GdsMap.csproj\" -t:Build -p:Configuration=Debug -v:minimal -nologo -p:OutputPath=C:\\Users\\USER\\AppData\\Local\\Temp\\ChippacBuild\\CLAUDE-070_112459\\ -p:IntermediateOutputPath=C:\\Users\\USER\\AppData\\Local\\Temp\\ChippacBuild\\CLAUDE-070_112459\\obj\\",
+    "workingDir":  "D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\DMS\\06_CoreLibSource\\GdsMapControl",
+    "keys":  {
+
+             },
+    "passLines":  0,
+    "failLines":  [
+
+                  ],
+    "skipLines":  [
+
+                  ],
+    "stdout":  "01_Build.stdout.txt",
+    "stderr":  "01_Build.stderr.txt"
+}

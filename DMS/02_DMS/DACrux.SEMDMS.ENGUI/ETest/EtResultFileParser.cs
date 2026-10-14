@@ -10,21 +10,32 @@ namespace DACrux.SEMDMS.ENGUI
 {
     /// <summary>
     /// E-Test 결과 파일(xlsx) 1개를 읽은 결과. 배열 열 순서는 서버 iGdsEtResult 계약과 같다.
-    /// 설계: 문서/2026-10-07_ETest_결과파일_Parsing_DB설계.md 9.2절 / 10.2절 (CLAUDE-029)
+    /// 설계: 문서/2026-10-07_ETest_결과파일_Parsing_DB설계.md 9.2절 / 10.2절
     /// </summary>
     public class EtResultFile
     {
         public string FilePath;
         public string FileName;
-        /// <summary>파일명 앞부분 원문 (예: CAI_OMM_ATV_A0)</summary>
+        /// <summary>파일명 1~4칸을 이은 원문 (예: CAI_OMM_ATV_A0). 2026-10-12부터 저장하지 않고 화면 참고용으로만 둔다.</summary>
         public string FilePrefix;
-        /// <summary>시험 프로그램 (예: TSVET)</summary>
+        /// <summary>파일명 1칸 Customer (예: CAI)</summary>
+        public string Customer;
+        /// <summary>파일명 2칸 Device 원문 (예: OMM). DMS DEVICE_ID 와 별개이며 사용자가 DEVICE_ID 를 따로 고른다.</summary>
+        public string FileDevice;
+        /// <summary>파일명 3칸 Wafer Type (예: ATV)</summary>
+        public string WaferType;
+        /// <summary>파일명 4칸 Wafer Rev (예: A0)</summary>
+        public string WaferRev;
+        /// <summary>파일명 5칸 Test Type (예: TSVET). DB 컬럼 TEST_PROGRAM.</summary>
         public string TestProgram;
-        /// <summary>시험 일시 yyyyMMddHHmmss</summary>
+        /// <summary>파일명 6칸 Test Date yyyyMMddHHmmss</summary>
         public string TestTime;
+        /// <summary>파일명 7칸 Lot (예: U9-HS2633)</summary>
         public string LotId;
-        /// <summary>파일명 Wafer 원문 (예: RH-HS2615-02). DB WAFER_ID는 Lot + 사용자 입력 Slot으로 만든다.</summary>
+        /// <summary>파일명 8칸 Lot-Wafer No 원문 (예: U9-HS2633-01). DB WAFER_ID는 Lot + 사용자 입력 Slot으로 만든다.</summary>
         public string WaferId;
+        /// <summary>파일명 끝 $...$ 꼬리표 (예: Silterra, Wafer 제조 Fab 으로 추정). 없으면 빈 문자열.</summary>
+        public string FabName;
         /// <summary>파일명에서 얻은 Slot 기본값(1~99). 얻지 못하면 0이고 화면에서 사용자가 입력한다.</summary>
         public int SlotNo;
         public string SheetName;
@@ -50,7 +61,8 @@ namespace DACrux.SEMDMS.ENGUI
     /// <summary>
     /// E-Test 결과 xlsx를 읽어 서버 저장 형식으로 바꾼다. 규칙을 하나라도 어기면 InvalidDataException으로 중단한다(일부만 저장하지 않음).
     /// 처리 흐름:
-    ///  1) 파일명을 뒤에서부터 나눈다: 마지막 = Wafer / 그 앞 = Lot / 14자리 일시 / 시험 프로그램 / 나머지 = 접두어. Wafer가 {Lot}-{숫자}면 Slot 기본값으로 쓴다(최종 Slot은 사용자 입력).
+    ///  1) 파일명 규칙(2026-10-12): [Customer]_[Device]_[Wafer Type]_[Wafer Rev]_[Test Type]_[Test Date]_[Lot]_[Lot-Wafer No]$Fab$
+    ///     끝의 $Fab$ 를 떼고 _ 로 나눠 정확히 8칸이어야 한다. Lot-Wafer No 가 {Lot}-{숫자}면 Slot 기본값으로 쓴다(최종 Slot은 사용자 입력).
     ///  2) 시트 DUT Summary를 연다. Excel이 파일을 열고 있어도 읽도록 공유 읽기 스트림을 쓴다.
     ///  3) 1행에서 고정 열은 이름으로 찾고, @가 들어간 열은 측정 항목으로 본다. 헤더는 {PARA}[={조건}]@{Chain}[:{Chain2}]로 나눈다.
     ///  4) A열이 Test Number / Unit인 행과 #숫자 Die 행을 찾는다. Upper / Lower Limit 행은 읽지 않는다(Limit은 별도 설정 화면).
@@ -60,7 +72,19 @@ namespace DACrux.SEMDMS.ENGUI
     {
         public const string DataSheetName = "DUT Summary";
 
+        /// <summary>
+        /// 측정 헤더 정리: 연속 공백 1칸 / 끝 '#번호' 제거(FT: "...@TSVDC_HBM_C_P_FH #717"). 대소문자는 그대로 둔다.
+        /// 헤더 원문을 그대로 항목명으로 쓰고 '#번호' 만 지운다 (2026-10-12). Spec(EtSpecTable / 서버 BSL)도 같은 규칙 + 대문자로 비교한다.
+        /// </summary>
+        public static string NormalizeHeader(string header)
+        {
+            string clean = SpaceRegex.Replace(header ?? string.Empty, " ").Trim();
+            return HeaderSuffixRegex.Replace(clean, string.Empty).Trim();
+        }
+
         private static readonly Regex HeaderRegex = new Regex(@"^(?<para>[^=@]+)(?:=(?<cond>[^@]+))?@(?<c1>[^:]+)(?::(?<c2>.+))?$", RegexOptions.Compiled);
+        private static readonly Regex HeaderSuffixRegex = new Regex(@"\s*#\S*\s*$", RegexOptions.Compiled);
+        private static readonly Regex SpaceRegex = new Regex(@"\s+", RegexOptions.Compiled);
         private static readonly Regex DutRegex = new Regex(@"^#(?<no>\d+)$", RegexOptions.Compiled);
         private static readonly Regex XyRegex = new Regex(@"^\(\s*(?<x>-?\d+)\s*,\s*(?<y>-?\d+)\s*\)$", RegexOptions.Compiled);
         private static readonly Regex NumberRegex = new Regex(@"-?\d+", RegexOptions.Compiled);
@@ -87,31 +111,57 @@ namespace DACrux.SEMDMS.ENGUI
             return result;
         }
 
-        /// <summary>파일명 기준 정보(Lot / Slot / 시험 프로그램 / 일시 / 접두어)를 채운다.</summary>
+        /// <summary>파일명 규칙 (2026-10-12 사용자 제공). 화면 메시지에도 그대로 보여 준다.</summary>
+        public const string FileNameRule = "[Customer]_[Device]_[Wafer Type]_[Wafer Rev]_[Test Type]_[Test Date]_[Lot]_[Lot-Wafer No]$Fab$";
+
+        /// <summary>파일명 끝의 $꼬리표$ (예: $Silterra$)</summary>
+        private static readonly Regex FabTagRegex = new Regex(@"^(?<base>.*?)(?:\$(?<fab>[^$]+)\$)?$", RegexOptions.Compiled);
+
+        /// <summary>Lot-Wafer No 끝의 Slot 번호 (예: U9-HS2633-01 -> 01, HS2606-02 -> 02)</summary>
+        private static readonly Regex SlotSuffixRegex = new Regex(@"-(?<slot>\d{1,2})$", RegexOptions.Compiled);
+
+        /// <summary>
+        /// 파일명 기준 정보를 채운다 (2026-10-12 8칸 규칙).
+        /// 처리 흐름: 확장자 제거 -> 끝의 $Fab$ 분리 -> _ 로 나눠 정확히 8칸 검사 -> 칸별 값 / Test Date 14자리 / 빈 칸 검사 -> Slot 기본값.
+        /// 이전 규칙(뒤에서부터 분해)은 칸 수를 보지 않아 $Silterra$ 가 Lot-Wafer No 에 붙고 Slot 기본값을 못 얻었다.
+        /// </summary>
         public static void ParseFileName(EtResultFile result)
         {
             string name = Path.GetFileNameWithoutExtension(result.FileName);
-            string[] tokens = name.Split('_');
-            if (tokens.Length < 5)
-                throw new InvalidDataException("파일명 형식이 다릅니다(접두어_시험프로그램_일시_Lot_Wafer): " + result.FileName);
-            int last = tokens.Length - 1;
-            result.WaferId = tokens[last];
-            result.LotId = tokens[last - 1];
-            result.TestTime = tokens[last - 2];
-            result.TestProgram = tokens[last - 3];
-            result.FilePrefix = string.Join("_", tokens, 0, last - 3);
+            Match tag = FabTagRegex.Match(name);
+            string body = tag.Groups["base"].Value;
+            result.FabName = tag.Groups["fab"].Success ? tag.Groups["fab"].Value.Trim() : string.Empty;
+            string[] tokens = body.Split('_');
+            if (tokens.Length != 8)
+                throw new InvalidDataException("파일명 형식이 다릅니다. _ 로 나눈 칸이 " + tokens.Length + "개입니다(8개여야 함).\r\n규칙: " + FileNameRule + "\r\n파일: " + result.FileName);
+            string[] names = { "Customer", "Device", "Wafer Type", "Wafer Rev", "Test Type", "Test Date", "Lot", "Lot-Wafer No" };
+            for (int i = 0; i < tokens.Length; i++)
+            {
+                tokens[i] = tokens[i].Trim();
+                if (tokens[i].Length == 0)
+                    throw new InvalidDataException("파일명의 " + names[i] + " 칸이 비어 있습니다.\r\n규칙: " + FileNameRule + "\r\n파일: " + result.FileName);
+            }
+            result.Customer = tokens[0];
+            result.FileDevice = tokens[1];
+            result.WaferType = tokens[2];
+            result.WaferRev = tokens[3];
+            result.TestProgram = tokens[4];
+            result.TestTime = tokens[5];
+            result.LotId = tokens[6];
+            result.WaferId = tokens[7];
+            result.FilePrefix = string.Join("_", tokens, 0, 4);
 
             DateTime time;
             if (!DateTime.TryParseExact(result.TestTime, "yyyyMMddHHmmss", CultureInfo.InvariantCulture, DateTimeStyles.None, out time))
-                throw new InvalidDataException("파일명의 시험 일시가 14자리(yyyyMMddHHmmss)가 아닙니다: " + result.TestTime);
-            if (result.LotId.Length == 0 || result.TestProgram.Length == 0)
-                throw new InvalidDataException("파일명에서 Lot / 시험 프로그램을 찾지 못했습니다: " + result.FileName);
-            // Slot 번호는 파일에 정식 항목이 없어 화면에서 사용자가 입력한다(2026-10-07 사용자 지시).
-            // 파일명 Wafer가 '{Lot}-{숫자}' 형식이면 그 숫자를 입력 기본값으로만 쓰고, 아니면 0(입력 필요)으로 둔다.
-            string slotText = result.WaferId.StartsWith(result.LotId + "-", StringComparison.Ordinal)
-                ? result.WaferId.Substring(result.LotId.Length + 1) : string.Empty;
+                throw new InvalidDataException("파일명의 Test Date 가 14자리(yyyyMMddHHmmss)가 아닙니다: " + result.TestTime);
+            // Slot 번호는 파일에 정식 항목이 없어 화면에서 사용자가 입력한다 (2026-10-07).
+            // Lot-Wafer No 끝의 '-숫자'를 입력 기본값으로만 쓴다. 고객 예시(2026-10-12 메일)에서 COWET / FT 는 Lot RH-HS2606 / Lot-Wafer No HS2606-02 처럼
+            // 앞부분이 Lot 과 달라 '{Lot}-{숫자}' 로만 보면 기본값을 못 얻었다. 끝에 숫자가 없으면 0(입력 필요) + 경고.
+            Match slotMatch = SlotSuffixRegex.Match(result.WaferId);
             int slot;
-            result.SlotNo = slotText.Length > 0 && slotText.All(char.IsDigit) && int.TryParse(slotText, out slot) && slot >= 1 && slot <= 99 ? slot : 0;
+            result.SlotNo = slotMatch.Success && int.TryParse(slotMatch.Groups["slot"].Value, out slot) && slot >= 1 && slot <= 99 ? slot : 0;
+            if (result.SlotNo == 0)
+                result.Warnings.Add("Lot-Wafer No(" + result.WaferId + ") 끝에 '-숫자(1~99)'가 없어 Slot 기본값을 정하지 못했습니다. Slot No 를 입력하세요.");
         }
 
         /// <summary>시트 내용을 읽는다.</summary>
@@ -160,7 +210,7 @@ namespace DACrux.SEMDMS.ENGUI
             for (int k = 0; k < measureCols.Count; k++)
             {
                 int c = measureCols[k];
-                string header = Text(sheet.Cell(1, c));
+                string header = NormalizeHeader(Text(sheet.Cell(1, c)));
                 Match m = HeaderRegex.Match(header);
                 if (!m.Success || !headerNames.Add(header))
                 {

@@ -77,8 +77,21 @@ namespace NexplantQMS.GdsMap.Persistence
                     writer.Write(point.Y);
                 }
                 writer.Flush();
-                return GdsMapSourceRowBuilder.ToHex(stream.ToArray());
+                return ToHex(stream.ToArray());
             }
+        }
+
+        /// <summary>바이트 배열을 대문자 16진수 문자열로 바꾼다(서버 HexToBytes / Oracle HEXTORAW 입력).</summary>
+        public static string ToHex(byte[] bytes)
+        {
+            const string digits = "0123456789ABCDEF";
+            var chars = new char[bytes.Length * 2];
+            for (int i = 0; i < bytes.Length; i++)
+            {
+                chars[i * 2] = digits[bytes[i] >> 4];
+                chars[i * 2 + 1] = digits[bytes[i] & 0x0F];
+            }
+            return new string(chars);
         }
 
         /// <summary>double을 되돌렸을 때 같은 값이 되는 G17 문자열로 바꾼다. .NET Framework의 "R"은 일부 값에서 왕복이 보장되지 않는다.</summary>

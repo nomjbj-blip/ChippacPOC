@@ -104,6 +104,37 @@ namespace DACrux.TEST.ENGUI
             return new Point(x, y);
         }
 
+        /// <summary>Flat Zone 위치 콤보 항목 (화면 표시 순서).</summary>
+        public static readonly string[] FlatZoneNames = { "Bottom", "Top", "Left", "Right" };
+
+        /// <summary>
+        /// Flat Zone 위치 -> Map 컨트롤 NotchAngle (2026-10-13).
+        /// 기존 WaferMap.UseDie / Notch 영역 계산 기준: 0 = 아래, 90 = 왼쪽, 180 = 위, 270 = 오른쪽.
+        /// KLARF OrientationMarkLocation (DOWN 0 / LEFT 90 / UP 180 / RIGHT 270) 과 같고, TQP_MAPDEF.ANGLE 에 그대로 저장된다.
+        /// </summary>
+        public static int FlatZoneToAngle(string flatZone)
+        {
+            switch (flatZone)
+            {
+                case "Left": return 90;
+                case "Top": return 180;
+                case "Right": return 270;
+                default: return 0;
+            }
+        }
+
+        /// <summary>NotchAngle -> Flat Zone 위치. 0 / 90 / 180 / 270 이 아니면 Bottom.</summary>
+        public static string AngleToFlatZone(int angle)
+        {
+            switch (((angle % 360) + 360) % 360)
+            {
+                case 90: return "Left";
+                case 180: return "Top";
+                case 270: return "Right";
+                default: return "Bottom";
+            }
+        }
+
         /// <summary>선택한 XY 방향의 번호를 LeftBottom 인덱스로 되돌린다. (ToDirection 과 같은 계산)</summary>
         public static Point FromDirection(Point directionIndex, XYDirection direction, KlarfMapGrid grid)
         {

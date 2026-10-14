@@ -32,3 +32,5 @@ C:\Users\USER\AppData\Local\Temp\GdsMapViewBuild\DACrux.Data.Parser.dll
 C:\Users\USER\AppData\Local\Temp\GdsMapViewBuild\DACrux.Data.Parser.pdb
 C:\Users\USER\AppData\Local\Temp\GdsMapView018Build\DACrux.Data.Parser.dll
 C:\Users\USER\AppData\Local\Temp\GdsMapView018Build\DACrux.Data.Parser.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\71_CoreLib\DACrux.Data.Parser.dll
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\71_CoreLib\DACrux.Data.Parser.pdb

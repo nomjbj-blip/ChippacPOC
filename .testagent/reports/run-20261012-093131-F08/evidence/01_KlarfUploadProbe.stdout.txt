@@ -1,0 +1,8 @@
+﻿BSL: D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\101_ServerBin\DACrux.SEMDMS.BSL.dll
+Sample: D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\SampleFile\26_10_06 Sample File\XD106.02
+Image root: C:\Users\USER\AppData\Local\Temp\ChippacKlarfUploadProbe\DMS_FTP\KLARF_UPLOAD
+PASS / 입력 항목 수 부족 -> 거부 / UploadInfo 는 7개 항목이어야 합니다. (Factory / User / 파일명 / Product / Step ID / 설비 / 분류 기준)
+PASS / 경로가 섞인 파일 이름 -> 거부 / KLARF 파일 이름 에 경로나 사용할 수 없는 문자가 있습니다: ..\XD106.02
+PASS / 잘못된 업로드 키 -> 거부 / 업로드 키 형식이 올바르지 않습니다.
+STOP: 사용자가 올린 데이터가 있습니다 (STEP_SEQ 501, UPLOAD;USER=ADMIN;FILE=XD106.02;RAW_WAFER_ID=XD106.02;CLASS_SRC=ROUGHBIN). Probe 는 재등록으로 이 데이터를 지우므로 실행하지 않습니다.
+KLARF_UPLOAD_PROBE=SKIPPED (사용자 데이터 보호)

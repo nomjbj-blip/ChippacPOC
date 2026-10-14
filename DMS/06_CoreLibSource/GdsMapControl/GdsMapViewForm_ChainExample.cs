@@ -52,7 +52,7 @@ namespace NexplantQMS.GdsMap
                 .ToList();
             if (candidates.Count == 0)
             {
-                _lblChainSetupStatus.Text = "이 위치에 선택 가능한 현재 Chain 객체가 없습니다. Input/Output은 예시에서 보호합니다.";
+                SetChainStatus("클릭한 위치에 이 Chain 의 도형이 없습니다. Input / Output 도형은 예시로 고를 수 없습니다.");
                 return;
             }
             if (candidates.Count == 1)
@@ -102,10 +102,10 @@ namespace NexplantQMS.GdsMap
         /// <summary>예시 지정 진행 상태를 알려 주되 현재 Chain의 경로 결과는 바꾸지 않는다.</summary>
         private void ShowChainExampleStatus()
         {
-            _lblChainSetupStatus.Text = "예시 묶음 " + _chainExampleKeys.Count + "개 Element / "
-                + (_chainExampleSelecting
-                    ? "현재 Chain의 도형을 클릭하세요. 다시 클릭하면 해제됩니다."
-                    : "지정 종료. 버튼을 누르면 이어서 수정할 수 있습니다.");
+            SetChainStatus(_chainExampleSelecting
+                ? "예시로 쓸 도형을 지도에서 클릭하세요. 다시 클릭하면 빠집니다. 다 고르면 [예시 묶음 지정]을 다시 누르세요."
+                : _chainExampleKeys.Count == 0 ? "예시 묶음 지정을 마쳤습니다. 고른 도형이 없습니다."
+                : "예시 묶음 지정을 마쳤습니다. [유사 묶음 찾기]를 누르세요.");
         }
 
         /// <summary>Chain/Layer/경로가 바뀌면 이전 예시 Key가 새 화면에 섞이지 않도록 초기화한다.</summary>
@@ -142,7 +142,7 @@ namespace NexplantQMS.GdsMap
             int generation = ++_chainSimilarGeneration;
             _chainSimilarSearching = true;
             UpdateChainSelectionButtons();
-            _lblChainSetupStatus.Text = "현재 Chain에서 유사 묶음을 찾는 중입니다.";
+            SetChainStatus("유사 묶음을 찾는 중입니다.");
             try
             {
                 IList<ChainSimilarGroup> found = await Task.Run(() =>
@@ -155,9 +155,9 @@ namespace NexplantQMS.GdsMap
                 FillChainSimilarList(found);
                 int protectedCount = found.Count(group => group.IsProtected);
                 int ambiguousCount = found.Count(group => group.IsAmbiguous);
-                _lblChainSetupStatus.Text = "유사 묶음 " + found.Count + "개 / 보호 "
-                    + protectedCount + "개 / 검토 필요 " + ambiguousCount
-                    + "개 / 녹색 일반, 주황 단자 보호, 빨강 검토 필요, 자주색 예시";
+                // 보호 / 검토 필요 수와 색 범례는 상태 줄에 쓰지 않는다. 묶음별 상태는 오른쪽 유사 묶음 목록에 있다 (2026-10-13).
+                SetChainStatus(found.Count == 0 ? "비슷한 묶음을 찾지 못했습니다."
+                    : "유사 묶음 " + found.Count + "개를 찾았습니다. 오른쪽 목록에서 뺄 묶음을 체크하고 [체크 묶음 제외]를 누르세요.");
             }
             catch (OperationCanceledException)
             {
@@ -166,7 +166,7 @@ namespace NexplantQMS.GdsMap
             catch (Exception ex)
             {
                 if (generation == _chainSimilarGeneration)
-                    _lblChainSetupStatus.Text = "유사 묶음 찾기 실패: " + ex.Message;
+                    SetChainStatus("유사 묶음 찾기 실패: " + ex.Message);
             }
             finally
             {

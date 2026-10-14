@@ -50,8 +50,8 @@ namespace DACrux.SEMDMS.Control
             try
             {
                  _isBinding = true;
-                numShotArrayX.Value = GlobalShotInfo.ArrayX;
-                numShotArrayY.Value = GlobalShotInfo.ArrayY;
+                numShotArrayX.Value = ToShotArray(GlobalShotInfo.ArrayX);
+                numShotArrayY.Value = ToShotArray(GlobalShotInfo.ArrayY);
                 numShotStartX.Value = GlobalShotInfo.StartX;
                 numShotStartY.Value = GlobalShotInfo.StartY;
             }
@@ -166,13 +166,13 @@ namespace DACrux.SEMDMS.Control
                 {
                     if (!chk1X1.Checked)
                     {
-                        numShotArrayX.Value = map.ShotArrayX;
-                        numShotArrayY.Value = map.ShotArrayY;
+                        numShotArrayX.Value = ToShotArray(map.ShotArrayX);
+                        numShotArrayY.Value = ToShotArray(map.ShotArrayY);
                     }
                     else
                     {
-                        _prevArray.X = map.ShotArrayX;
-                        _prevArray.Y = map.ShotArrayY;
+                        _prevArray.X = ToShotArray(map.ShotArrayX);
+                        _prevArray.Y = ToShotArray(map.ShotArrayY);
                     }
 
                     numShotStartX.Value = map.ShotStartX;
@@ -304,6 +304,15 @@ namespace DACrux.SEMDMS.Control
 
         Point _prevArray;
 
+        /// <summary>
+        /// Shot 미설정 Map 은 Shot 배열이 0 으로 저장되어 있어 그대로 넣으면 Shot 배열 입력(최소값 1)에서 예외가 난다.
+        /// 입력과 이전 값 보관에 넣기 전에 1 미만은 기본값 1 로 맞춘다. (2026-10-13)
+        /// </summary>
+        private static int ToShotArray(int value)
+        {
+            return Math.Max(1, value);
+        }
+
         private void chk1X1_CheckedChanged(object sender, EventArgs e)
         {
             if (chk1X1.Checked)
@@ -314,8 +323,8 @@ namespace DACrux.SEMDMS.Control
             }
             else
             {
-                numShotArrayX.Value = _prevArray.X;
-                numShotArrayY.Value = _prevArray.Y;
+                numShotArrayX.Value = ToShotArray(_prevArray.X);
+                numShotArrayY.Value = ToShotArray(_prevArray.Y);
             }
 
             SetValueToMap();
@@ -414,9 +423,9 @@ namespace DACrux.SEMDMS.Control
             set 
             {
                 if (!chk1X1.Checked)
-                    numShotArrayX.Value = value;
+                    numShotArrayX.Value = ToShotArray(value);
                 else
-                    _prevArray.X = value;
+                    _prevArray.X = ToShotArray(value);
             }
         }
 
@@ -430,9 +439,9 @@ namespace DACrux.SEMDMS.Control
             set
             {
                 if (!chk1X1.Checked)
-                    numShotArrayY.Value = value;
+                    numShotArrayY.Value = ToShotArray(value);
                 else
-                    _prevArray.Y = value;
+                    _prevArray.Y = ToShotArray(value);
             }
         }
 

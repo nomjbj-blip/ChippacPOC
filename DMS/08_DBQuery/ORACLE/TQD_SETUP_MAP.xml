@@ -53,4 +53,13 @@ WHERE SETUP_SEQ = :setup_seq
             <param direction="Input" dbtype="VarChar2" size="40" value="test">:test</param>
         </parameters>
     </query>
+    <query statement="Delete" queryid="DELETE_SETUP_MAP_KLARF_UPLOAD" commandtype="Text" description="KLARF 업로드 Setup Map 교체 전 Test 1개의 Die 삭제" commandtimeout="60">
+        <commandtext><![CDATA[DELETE FROM TQD_SETUP_MAP
+WHERE SETUP_SEQ = :setup_seq
+AND TEST = :test]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar2" size="40" value="setup_seq">:setup_seq</param>
+            <param direction="Input" dbtype="VarChar2" size="40" value="test">:test</param>
+        </parameters>
+    </query>
 </queryxml>

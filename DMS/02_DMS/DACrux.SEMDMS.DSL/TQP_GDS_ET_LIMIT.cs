@@ -6,7 +6,7 @@ namespace DACrux.SEMDMS.DSL
 {
     /// <summary>
     /// TQP_GDS_ET_LIMIT의 Oracle XML 쿼리를 호출하는 DB 접근 클래스다.
-    /// E-Test Para Limit(Device 단위, Para 대문자)을 담당한다. (CLAUDE-029)
+    /// E-Test Spec(Device + 공정 + Parameter 헤더 전체, 대문자)을 담당한다. (2026-10-12 Parameter 단위로 변경)
     /// </summary>
     public class TQP_GDS_ET_LIMIT : Miracom.Middleware.QueryComponent
     {

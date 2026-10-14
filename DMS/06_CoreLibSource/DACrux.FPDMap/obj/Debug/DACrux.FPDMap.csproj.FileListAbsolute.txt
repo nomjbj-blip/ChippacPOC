@@ -55,3 +55,6 @@ D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\06_CoreLibSource\
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\06_CoreLibSource\DACrux.FPDMap\obj\Debug\DACrux.F.6D13BC7E.Up2Date
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\06_CoreLibSource\DACrux.FPDMap\obj\Debug\DACrux.FPDMap.dll
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\06_CoreLibSource\DACrux.FPDMap\obj\Debug\DACrux.FPDMap.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\71_CoreLib\DACrux.FPDMap.XML
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\71_CoreLib\DACrux.FPDMap.dll
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\71_CoreLib\DACrux.FPDMap.pdb

@@ -1,0 +1,105 @@
+﻿[
+    {
+        "id":  "01",
+        "name":  "KlarfUploadProbe",
+        "scenarios":  [
+                          "SCN-01,SCN-02,SCN-03,SCN-04,SCN-05,SCN-08"
+                      ],
+        "status":  "SKIPPED",
+        "exitCode":  2,
+        "timedOut":  false,
+        "durationMs":  2821,
+        "started":  "2026-10-12 09:31:33",
+        "command":  "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\DMS\\02_DMS\\DACrux.SEMDMS.BSL\\Probes\\KlarfUploadProbe.ps1\"",
+        "workingDir":  "D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\DMS\\02_DMS\\DACrux.SEMDMS.BSL\\Probes",
+        "keys":  {
+                     "KLARF_UPLOAD_PROBE":  "SKIPPED (사용자 데이터 보호)"
+                 },
+        "passLines":  3,
+        "failLines":  [
+
+                      ],
+        "stdout":  "01_KlarfUploadProbe.stdout.txt",
+        "stderr":  "01_KlarfUploadProbe.stderr.txt"
+    },
+    {
+        "id":  "02",
+        "name":  "ReadOnly_RedCheck",
+        "scenarios":  [
+
+                      ],
+        "status":  "FAIL",
+        "exitCode":  1,
+        "timedOut":  false,
+        "durationMs":  2767,
+        "started":  "2026-10-12 09:33:14",
+        "command":  "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\probes\\KlarfUploadReadOnlyProbe.ps1\" -RedCheck",
+        "workingDir":  "D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\probes",
+        "keys":  {
+                     "STEP_SEQ":  "501",
+                     "WAFER_SEQ":  "282",
+                     "STEP_COMMENT":  "UPLOAD;USER=ADMIN;FILE=XD106.02;RAW_WAFER_ID=XD106.02;CLASS_SRC=ROUGHBIN",
+                     "IMAGE_ROWS":  "15",
+                     "KLARF_UPLOAD_READ_ONLY_PROBE":  "FAIL (1 / 11)"
+                 },
+        "passLines":  10,
+        "failLines":  [
+                          "FAIL / Defect 16 건(GetDefectData, 원본 KLARF) / 15"
+                      ],
+        "stdout":  "02_ReadOnly_RedCheck.stdout.txt",
+        "stderr":  "02_ReadOnly_RedCheck.stderr.txt"
+    },
+    {
+        "id":  "03",
+        "name":  "KlarfUploadReadOnlyProbe",
+        "scenarios":  [
+                          "SCN-01,SCN-05"
+                      ],
+        "status":  "PASS",
+        "exitCode":  0,
+        "timedOut":  false,
+        "durationMs":  2672,
+        "started":  "2026-10-12 09:33:18",
+        "command":  "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\probes\\KlarfUploadReadOnlyProbe.ps1\"",
+        "workingDir":  "D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\probes",
+        "keys":  {
+                     "STEP_SEQ":  "501",
+                     "WAFER_SEQ":  "282",
+                     "STEP_COMMENT":  "UPLOAD;USER=ADMIN;FILE=XD106.02;RAW_WAFER_ID=XD106.02;CLASS_SRC=ROUGHBIN",
+                     "IMAGE_ROWS":  "15",
+                     "KLARF_UPLOAD_READ_ONLY_PROBE":  "PASS (11)"
+                 },
+        "passLines":  11,
+        "failLines":  [
+
+                      ],
+        "stdout":  "03_KlarfUploadReadOnlyProbe.stdout.txt",
+        "stderr":  "03_KlarfUploadReadOnlyProbe.stderr.txt"
+    },
+    {
+        "id":  "04",
+        "name":  "VerifyKlarfUploadSmoke",
+        "scenarios":  [
+                          "SCN-09"
+                      ],
+        "status":  "PASS_PARTIAL",
+        "exitCode":  0,
+        "timedOut":  false,
+        "durationMs":  10804,
+        "started":  "2026-10-12 09:34:31",
+        "command":  "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\DMS\\02_DMS\\DACrux.SEMDMS.ENGUI\\Verification\\Verify-KlarfUpload.ps1\"",
+        "workingDir":  "D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\DMS\\02_DMS\\DACrux.SEMDMS.ENGUI\\Verification",
+        "keys":  {
+                     "KLARF_UPLOAD_FORM_SMOKE":  "PASS (읽기 검사만, 저장 검사는 사용자 데이터 보호로 건너뜀)"
+                 },
+        "passLines":  18,
+        "failLines":  [
+
+                      ],
+        "skipLines":  [
+                          "SKIP: 저장 검사(5~7) 건너뜀 - 사용자 데이터 보호"
+                      ],
+        "stdout":  "04_VerifyKlarfUploadSmoke.stdout.txt",
+        "stderr":  "04_VerifyKlarfUploadSmoke.stderr.txt"
+    }
+]

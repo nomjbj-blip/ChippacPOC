@@ -1,0 +1,3 @@
+# SCN-05 삭제한 이름 참조 (Probe 제외) 2026-10-13 11:26:10
+COUNT=0
+map.ContextMenuStrip 대입: 0

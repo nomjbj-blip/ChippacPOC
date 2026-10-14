@@ -19,3 +19,5 @@ D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\06_CoreLibSource\
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\06_CoreLibSource\DACrux.Framework.RO\obj\Debug\DACrux.F.8099BF7F.Up2Date
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\06_CoreLibSource\DACrux.Framework.RO\obj\Debug\DACrux.Framework.RO.dll
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\06_CoreLibSource\DACrux.Framework.RO\obj\Debug\DACrux.Framework.RO.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\71_CoreLib\DACrux.Framework.RO.dll
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\71_CoreLib\DACrux.Framework.RO.pdb

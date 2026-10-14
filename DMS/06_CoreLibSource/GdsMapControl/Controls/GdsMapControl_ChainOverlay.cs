@@ -54,6 +54,9 @@ namespace NexplantQMS.GdsMap
         private bool _chainOverlayGpuDirty;
         private GPoint? _chainOverlayWorkAreaFirstPoint;
         private GPoint? _chainOverlayWorkAreaSecondPoint;
+        /// <summary>유사 묶음 찾기 결과 색(상태 구분 없이 하나) / 결과 목록에서 고른 행 색.</summary>
+        private static readonly Color ChainSimilarFoundColor = Color.White;
+        private static readonly Color ChainSimilarSelectedColor = Color.Cyan;
 
         /// <summary>Map과 같은 정점 배열 배치를 쓰되 마지막 값에 분기 점선의 선분 내 거리를 보관한다.</summary>
         private struct ChainOverlayVertex
@@ -176,7 +179,7 @@ namespace NexplantQMS.GdsMap
             Invalidate();
         }
 
-        /// <summary>현재 Chain 안에서 찾은 묶음을 일반/단자 보호/검토 필요 색으로 미리 보여 준다.</summary>
+        /// <summary>현재 Chain 안에서 찾은 묶음을 흰색으로 미리 보여 준다. (일반/단자 보호/검토 필요 목록은 그대로 따로 받는다)</summary>
         public void SetChainSimilarPreview(IEnumerable<ChainTraceElement> ready,
             IEnumerable<ChainTraceElement> protectedElements,
             IEnumerable<ChainTraceElement> ambiguous)
@@ -188,7 +191,7 @@ namespace NexplantQMS.GdsMap
             Invalidate();
         }
 
-        /// <summary>결과 목록의 현재 행을 흰색 외곽선으로 표시해 다른 검색 결과와 구별한다.</summary>
+        /// <summary>결과 목록의 현재 행을 Cyan 외곽선으로 표시해 다른 검색 결과(흰색)와 구별한다.</summary>
         public void SetChainSimilarSelected(IEnumerable<ChainTraceElement> elements)
         {
             _chainSimilarSelected = (elements ?? Enumerable.Empty<ChainTraceElement>()).ToList();
@@ -209,10 +212,12 @@ namespace NexplantQMS.GdsMap
             // 겹침/분기는 현재 후보의 상태 표시이므로 Chain Visible과 독립적으로 그린다.
             AppendChainOverlayElements(_chainOverlayOverlaps, Color.DeepSkyBlue, false, false);
             AppendChainOverlayElements(_chainOverlayBranches, Color.OrangeRed, true, false);
-            AppendChainOverlayElements(_chainSimilarReady, Color.LimeGreen, false, true);
-            AppendChainOverlayElements(_chainSimilarProtected, Color.Orange, false, true);
-            AppendChainOverlayElements(_chainSimilarAmbiguous, Color.Red, false, true);
-            AppendChainOverlayElements(_chainSimilarSelected, Color.White, false, true);
+            // 2026-10-12 요청: 유사 묶음 찾기 결과는 상태(일치 / 단자 보호 / 검토 필요)와 관계없이 흰색 하나로 그린다.
+            // 상태는 유사 묶음 목록 글자로 구분한다. 목록에서 고른 행은 흰색과 겹치지 않게 Cyan으로 바꿨다.
+            AppendChainOverlayElements(_chainSimilarReady, ChainSimilarFoundColor, false, true);
+            AppendChainOverlayElements(_chainSimilarProtected, ChainSimilarFoundColor, false, true);
+            AppendChainOverlayElements(_chainSimilarAmbiguous, ChainSimilarFoundColor, false, true);
+            AppendChainOverlayElements(_chainSimilarSelected, ChainSimilarSelectedColor, false, true);
             AppendChainOverlayElements(_chainExampleElements, Color.Magenta, false, true);
             _chainOverlayGpuDirty = true;
         }

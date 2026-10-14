@@ -1,0 +1,230 @@
+{
+  "main": {
+    "id": "2f3bb1c371486f51",
+    "type": "split",
+    "children": [
+      {
+        "id": "0edb286a09aff91d",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "e3356f3beebc1de1",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "브리핑/2026-10-14_아침브리핑.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "2026-10-14_아침브리핑"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "95c96e36613440a8",
+    "type": "split",
+    "children": [
+      {
+        "id": "6d12c1032b3b4792",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "1fd1217e67b76cc2",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-folder-closed",
+              "title": "파일 탐색기"
+            }
+          },
+          {
+            "id": "f1b035ab0588a0f7",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "검색"
+            }
+          },
+          {
+            "id": "5ab3c7b9f5bdf0be",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-bookmark",
+              "title": "북마크"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 393.5
+  },
+  "right": {
+    "id": "14f0a65a49a41eef",
+    "type": "split",
+    "children": [
+      {
+        "id": "04b02cd3dca22e2b",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "d50a044037cce0d8",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "GdsMapControl/GdsMapControl_파싱부터_첫화면까지_성능설계.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "백링크"
+            }
+          },
+          {
+            "id": "a54c7c7f5bf06df7",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "GdsMapControl/GdsMapControl_파싱부터_첫화면까지_성능설계.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "나가는 링크"
+            }
+          },
+          {
+            "id": "76071bc76765ede9",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "태그"
+            }
+          },
+          {
+            "id": "79bf8fc6f081d158",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "모든 속성"
+            }
+          },
+          {
+            "id": "9b9462e7ae019029",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "GdsMapControl/GdsMapControl_파싱부터_첫화면까지_성능설계.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "개요"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:빠른 전환기 열기": false,
+      "graph:그래프 뷰 열기": false,
+      "canvas:새 캔버스 만들기": false,
+      "daily-notes:오늘의 일일 노트 열기": false,
+      "templates:템플릿 삽입": false,
+      "command-palette:명령어 팔레트 열기": false,
+      "bases:새 베이스 생성하기": false
+    }
+  },
+  "active": "e3356f3beebc1de1",
+  "lastOpenFiles": [
+    "DMS/Assistant/빌드_검증_가이드.md.tmp.16200.2265c400c066",
+    "DMS/Assistant/빌드_검증_가이드.md.tmp.16200.fb424c51f81e",
+    "DMS/Assistant/작업_현황.md.tmp.16200.c703b59816f2",
+    "문서/2026-10-14_ETest_Upload_YMS적재_설계.md.tmp.16200.dbee366b5181",
+    "문서/2026-10-14_ETest_Upload_YMS적재_설계.md.tmp.16200.e1d74df2c525",
+    "DMS/06_CoreLibSource/GdsMapControl/Probes/EtYmsPublishProbe.ps1.tmp.16200.e94ecaacdf9a",
+    "DMS/06_CoreLibSource/GdsMapControl/Probes/EtYmsPublishProbe.ps1.tmp.16200.d397c1c2e42d",
+    "DMS/06_CoreLibSource/GdsMapControl/Probes/EtYmsPublishProbe.ps1.tmp.16200.b5e4ab407f1a",
+    "DMS/06_CoreLibSource/GdsMapControl/Probes/EtYmsPublishProbe.ps1.tmp.16200.5fa74f6b6f7a",
+    "DMS/06_CoreLibSource/GdsMapControl/Probes/EtYmsPublishProbe.ps1.tmp.16200.c196d0d8d54a",
+    "DMS/Assistant/작업_현황.md.tmp.35364.050c9322b22e",
+    "문서/2026-10-14_클라이언트_설치파일_설계.md",
+    "문서/2026-10-14_POC_License_설계.md",
+    "문서/2026-10-14_ETest_Upload_YMS적재_설계.md",
+    "브리핑/2026-10-14_아침브리핑.md",
+    "브리핑/POC_완료_체크리스트.md",
+    "브리핑/_수집/2026-10-14_수집.md",
+    "문서/2026-10-14_ETest_Para_Setup_설계.md",
+    "브리핑/README.md",
+    "GdsMapControl/GdsMapControl_파싱부터_첫화면까지_성능설계.md",
+    "문서/2026-10-12_GDS_대표Device_SubDevice_설계.md",
+    "SampleFile/ETestParsing/README.md",
+    "GdsMapControl/GdsMapControl_성능개선_우선순위.md",
+    "DMS/11_Resource/ByModule/POC/BTN_DIE_DETAIL_16.png",
+    "DMS/11_Resource/ByModule/POC/BTN_DIE_DETAIL_24.png",
+    "DMS/11_Resource/ByModule/POC/BTN_DIE_DETAIL_32.png",
+    "DMS/11_Resource/ByModule/POC/BTN_DIE_DETAIL_48.png",
+    "DMS/11_Resource/ByModule/POC/BTN_GDS_ANALYZE_16.png",
+    "DMS/11_Resource/ByModule/POC/BTN_GDS_ANALYZE_24.png",
+    "DMS/11_Resource/ByModule/POC/BTN_GDS_ANALYZE_32.png",
+    "DMS/11_Resource/ByModule/POC/BTN_GDS_ANALYZE_48.png",
+    "GdsMapControl/GdsMap_소스분석.md",
+    "회의록/README.md",
+    "프로젝트_문서/2000.분석단계/MIRACOM_KLAF file/WaferMap.bmp",
+    "프로젝트_문서/2000.분석단계/MIRACOM_KLAF file/Map.png",
+    "문서/2026-09-23_Chain_Setup_기능_컨셉안.md"
+  ]
+}

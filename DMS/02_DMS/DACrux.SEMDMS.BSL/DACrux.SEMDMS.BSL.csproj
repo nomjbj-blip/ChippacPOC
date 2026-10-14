@@ -85,7 +85,11 @@
     <Compile Include="GdsMapView.cs" />
     <Compile Include="GdsChain.cs" />
     <Compile Include="GdsEtResult.cs" />
+    <Compile Include="GdsEtResult_Para.cs" />
+    <Compile Include="EtYmsPublisher.cs" />
     <Compile Include="KlarfUpload.cs" />
+    <Compile Include="GdsKlarfAnalysis.cs" />
+    <Compile Include="GdsKlarfMatchEngine.cs" />
     <Compile Include="DefectMapAnalysis.cs" />
     <Compile Include="DMReport.cs" />
     <Compile Include="DMReview.cs" />
@@ -131,6 +135,10 @@
     <ProjectReference Include="..\..\09_TEST\DACrux.TEST.DSL\DACrux.TEST.DSL.csproj">
       <Project>{E3DE4096-AB0A-4E08-A95A-0E363F990F65}</Project>
       <Name>DACrux.TEST.DSL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\09_TEST\DACrux.TEST.BSL\DACrux.TEST.BSL.csproj">
+      <Project>{EF396296-6E9D-48F1-8B74-B7918BA1389A}</Project>
+      <Name>DACrux.TEST.BSL</Name>
     </ProjectReference>
     <ProjectReference Include="..\DACrux.SEMDMS.DSL\DACrux.SEMDMS.DSL.csproj">
       <Project>{DAA12975-5F3F-4B7F-870C-C95E36F21FD1}</Project>

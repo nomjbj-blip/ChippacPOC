@@ -25,3 +25,5 @@ C:\Users\USER\AppData\Local\Temp\GdsMapView018Build\DACrux.SEMDMS.DSL.dll
 C:\Users\USER\AppData\Local\Temp\GdsMapView018Build\DACrux.SEMDMS.DSL.pdb
 C:\Users\USER\AppData\Local\Temp\claude\semdmsbuild\DACrux.SEMDMS.DSL.dll
 C:\Users\USER\AppData\Local\Temp\claude\semdmsbuild\DACrux.SEMDMS.DSL.pdb
+C:\Users\USER\AppData\Local\Temp\chippac_testbsl\DACrux.SEMDMS.DSL.dll
+C:\Users\USER\AppData\Local\Temp\chippac_testbsl\DACrux.SEMDMS.DSL.pdb

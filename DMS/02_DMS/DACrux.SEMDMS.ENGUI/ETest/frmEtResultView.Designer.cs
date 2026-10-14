@@ -1,6 +1,6 @@
 ﻿namespace DACrux.SEMDMS.ENGUI
 {
-    // E-Test 업로드 데이터 조회 창의 컨트롤과 배치를 정의한다. 조회 / 거르기 동작은 본문 파일(frmEtResultView.cs)에서 처리한다. (CLAUDE-029)
+    // E-Test 업로드 데이터 조회 창의 컨트롤과 배치를 정의한다. 조회 / 거르기 동작은 본문 파일(frmEtResultView.cs)에서 처리한다.
     partial class frmEtResultView
     {
         private System.ComponentModel.IContainer components = null;
@@ -13,7 +13,7 @@
         }
 
         /// <summary>
-        /// 위: 파일 정보 / 거르기(Para / Chain 포함 / 미측정 있는 항목만 / 표시 건수).
+        /// 위: 파일 정보 / 거르기(Para / Chain 포함 / '-' 있는 항목만 / 표시 건수).
         /// 왼쪽: Die 목록(더블클릭하면 오른쪽 표가 그 Die 열로 이동), 오른쪽: 측정값 표(행 = 측정 항목, 열 = Die).
         /// </summary>
         private void InitializeComponent()
@@ -44,7 +44,7 @@
             this.lblInfo.Location = new System.Drawing.Point(0, 0);
             this.lblInfo.Name = "lblInfo";
             this.lblInfo.Padding = new System.Windows.Forms.Padding(8, 6, 8, 0);
-            this.lblInfo.Size = new System.Drawing.Size(1200, 44);
+            this.lblInfo.Size = new System.Drawing.Size(1200, 60);
             this.lblInfo.TabIndex = 0;
             this.lblInfo.Text = "조회 중...";
             //
@@ -57,7 +57,7 @@
             this.filterBar.Controls.Add(this.chkNotTested);
             this.filterBar.Controls.Add(this.lblCount);
             this.filterBar.Dock = System.Windows.Forms.DockStyle.Top;
-            this.filterBar.Location = new System.Drawing.Point(0, 44);
+            this.filterBar.Location = new System.Drawing.Point(0, 60);
             this.filterBar.Name = "filterBar";
             this.filterBar.Size = new System.Drawing.Size(1200, 34);
             this.filterBar.TabIndex = 1;
@@ -105,7 +105,7 @@
             this.chkNotTested.Name = "chkNotTested";
             this.chkNotTested.Size = new System.Drawing.Size(144, 16);
             this.chkNotTested.TabIndex = 4;
-            this.chkNotTested.Text = "미측정 있는 항목만";
+            this.chkNotTested.Text = "'-' 있는 항목만";
             this.chkNotTested.UseVisualStyleBackColor = true;
             this.chkNotTested.CheckedChanged += new System.EventHandler(this.Filter_Changed);
             //
@@ -120,7 +120,7 @@
             // splitMain
             //
             this.splitMain.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitMain.Location = new System.Drawing.Point(0, 78);
+            this.splitMain.Location = new System.Drawing.Point(0, 94);
             this.splitMain.Name = "splitMain";
             //
             // splitMain.Panel1
@@ -130,7 +130,7 @@
             // splitMain.Panel2
             //
             this.splitMain.Panel2.Controls.Add(this.dgvValue);
-            this.splitMain.Size = new System.Drawing.Size(1200, 672);
+            this.splitMain.Size = new System.Drawing.Size(1200, 656);
             this.splitMain.SplitterDistance = 430;
             this.splitMain.TabIndex = 2;
             //

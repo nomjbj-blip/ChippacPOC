@@ -25,3 +25,5 @@ D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\06_CoreLibSource\
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\06_CoreLibSource\DACrux.Framework.Server\obj\Debug\DACrux.F.E7A032FA.Up2Date
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\06_CoreLibSource\DACrux.Framework.Server\obj\Debug\DACrux.Framework.Server.dll
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\06_CoreLibSource\DACrux.Framework.Server\obj\Debug\DACrux.Framework.Server.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\71_CoreLib\DACrux.Framework.Server.dll
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\71_CoreLib\DACrux.Framework.Server.pdb

@@ -5,7 +5,7 @@ SampleType WAFER;
 ResultTimestamp 06-05-26 12:01:42;
 LotID "PFIC_RH-HS2615_C4Bump";
 SampleSize 1 300;
-DeviceID "Hybrid_OMM";
+DeviceID "OMM_Hybrid";
 SetupID "ROOT-CAI-OMM_Hybrid-OMM_Hybrid_C4Bump_Silterra" 05-26-26 11:39:00;
 StepID "OMM_Hybrid_C4Bump_Silterra";
 SampleOrientationMarkType NOTCH;

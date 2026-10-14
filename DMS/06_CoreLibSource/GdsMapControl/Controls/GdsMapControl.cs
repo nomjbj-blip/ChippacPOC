@@ -113,7 +113,6 @@ namespace NexplantQMS.GdsMap
 		[DefaultValue(typeof(ViewMode), "View")]
 		private ViewMode _mode = ViewMode.View;
 
-		private ContextMenuStrip _contextMenu;
 		private bool _showOriginCross = true;
 
 		// OpenGL Resources
@@ -170,9 +169,14 @@ namespace NexplantQMS.GdsMap
 			}
 		";
 
+		/// <summary>
+		/// 지도 우클릭 메뉴는 두지 않는다. 2026-10-12 요청로 단계적으로 뺐다.
+		///  -: 보기 모드 / 선택 모드(선택 결과를 쓰는 화면 없음), 선택 해제(Chain 강조와 어긋남) 제거
+		///  -: 전체 보기(Zoom to Fit) 제거, 원점 십자가 표시는 각 화면의 [원점 표시] 체크로 옮김(ShowOriginCross)
+		/// 우클릭은 화면 쪽 메뉴(예: Chain 목록)와 겹치지 않게 지도에서 아무 동작도 하지 않는다.
+		/// </summary>
 		public GdsMapControl()
 		{
-			InitializeContextMenu();
 		}
 
 		public ViewMode Mode
@@ -211,40 +215,6 @@ namespace NexplantQMS.GdsMap
 		public IEnumerable<GdsElement> GetSelectedElements()
 		{
 			return _selectedItems.Select(a => a.Source);
-		}
-
-		private void InitializeContextMenu()
-		{
-			_contextMenu = new ContextMenuStrip();
-			var viewModeItem = new ToolStripMenuItem("보기 모드 (View)", null, (s, e) => Mode = ViewMode.View);
-			var selectModeItem = new ToolStripMenuItem("선택 모드 (Select)", null, (s, e) => Mode = ViewMode.Select);
-			var originCrossItem = new ToolStripMenuItem("원점 십자가 표시")
-			{
-				CheckOnClick = true
-			};
-			originCrossItem.CheckedChanged += (s, e) => ShowOriginCross = originCrossItem.Checked;
-
-			_contextMenu.Items.Add(viewModeItem);
-			_contextMenu.Items.Add(selectModeItem);
-			_contextMenu.Items.Add(new ToolStripSeparator());
-			_contextMenu.Items.Add(new ToolStripMenuItem("전체 보기 (Zoom to Fit)", null, (s, e) => ZoomToFit()));
-			_contextMenu.Items.Add(originCrossItem);
-			_contextMenu.Items.Add(new ToolStripMenuItem("선택 해제 (Clear Selection)", null, (s, e) =>
-			{
-				var changedItems = _selectedItems.ToArray();
-				ClearSelectionInternal();
-				UpdateSelectionVertices(changedItems);
-				RaiseSelectionChanged();
-				Invalidate();
-			}));
-
-			_contextMenu.Opening += (s, e) =>
-			{
-				viewModeItem.Checked = _mode == ViewMode.View;
-				selectModeItem.Checked = _mode == ViewMode.Select;
-				originCrossItem.Checked = ShowOriginCross;
-			};
-			ContextMenuStrip = _contextMenu;
 		}
 
 		// ---- OpenGL Initialization & Pipeline Setup --------------------------------------
@@ -1014,6 +984,8 @@ namespace NexplantQMS.GdsMap
 			DrawTextLabels();
 			DrawOriginCross();
 			DrawChainSetupOverlay();
+			// KLARF Defect 표시(Die 상세 분석 화면). 표시할 Defect가 없으면 바로 끝난다.
+			DrawDefectOverlay();
 			ReportFrameTiming(frameStart, mapDrawEnd, chainDrawEnd, swapEnd);
 			if (reportFirstFrame)
 			{

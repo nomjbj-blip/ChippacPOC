@@ -10,11 +10,11 @@ using System.Windows.Forms;
 namespace NexplantQMS.GdsMap
 {
     /// <summary>
-    /// GDS Map View 화면의 DB Chain 불러오기다. (설계: 문서/2026-10-06_GDS_Map_화면역할_재정의_설계.md 4.3절 / CLAUDE-026 3단계)
+    /// GDS Map View 화면의 DB Chain 불러오기다. (설계: 문서/2026-10-06_GDS_Map_화면역할_재정의_설계.md 4.3절)
     ///
     /// 처리 흐름 ([조회] 안에서 호출)
     ///  1) 도면을 그리기 전: DB Chain 목록 + Chain별 Layer / 규칙 / Member(+도형 Layer) / 편집 기록 읽기(ReadDbChains, 백그라운드)
-    ///  2) Chain이 쓰는 Layer(탐색 Layer + Member 도형 Layer)가 조회 체크에 없으면 함께 조회할지 묻기(ConfirmChainLayers, 사용자 결정 3)
+    ///  2) Chain이 쓰는 Layer(탐색 Layer + Member 도형 Layer)가 조회 체크에 없으면 함께 조회할지 묻기(ConfirmChainLayers, 설계 결정 3)
     ///  3) 도면을 그린 뒤: DB 행을 화면 Chain(ChainDefinition)으로 복원(LoadChainsFromDb)
     ///     - Input / Output = 단자 후보 + 저장된 클릭 좌표, 수동 추가 / 제외 = 편집 기록
     ///     - 자동 탐색 결과 = TRACE Member로 만든 "열린 탐색 결과". 수동 편집 / 유사 묶음 코드가 탐색 결과를 그대로 쓰므로 고치지 않아도 된다.
@@ -56,7 +56,7 @@ namespace NexplantQMS.GdsMap
             foreach (DataRow row in list.Rows)
             {
                 string seq = row["CHAIN_SEQ"].ToString();
-                progress.Report("저장된 Chain 조회 중 " + (++index) + " / " + list.Rows.Count + " (" + row["CHAIN_CODE"] + ")");
+                progress.Report("저장된 Chain 조회 중 " + (++index) + " / " + list.Rows.Count + " (" + row["CHAIN_NAME"] + ")");
                 result.Add(new ChainDbData
                 {
                     Header = row,
@@ -70,7 +70,7 @@ namespace NexplantQMS.GdsMap
         }
 
         /// <summary>
-        /// Chain이 쓰는 Layer 중 조회 체크에 없는 Layer가 있으면 함께 조회할지 묻는다(사용자 결정 3).
+        /// Chain이 쓰는 Layer 중 조회 체크에 없는 Layer가 있으면 함께 조회할지 묻는다(설계 결정 3).
         /// [예]면 그 Layer를 목록에서 체크해 이번 조회에 포함하고 true. [아니오]면 그대로 진행한다(false).
         /// </summary>
         private bool ConfirmChainLayers(IEnumerable<int> neededLayers, string chainText)
@@ -109,14 +109,13 @@ namespace NexplantQMS.GdsMap
         private void LoadChainsFromDb(List<ChainDbData> data)
         {
             map.RebuildChainTraceItems();
-            int maxOrdinal = 0, incomplete = 0;
+            int maxOrdinal = 0;
             _switchingChain = true;
             try
             {
                 foreach (ChainDbData item in data)
                 {
                     ChainDefinition chain = CreateChainFromDb(item);
-                    if (chain.DbIncomplete != null) incomplete++;
                     _chains.Add(chain);
                     _chainList.Items.Add(chain, chain.Visible);
                     maxOrdinal = Math.Max(maxOrdinal, ParseChainCode(chain.Code));
@@ -130,9 +129,7 @@ namespace NexplantQMS.GdsMap
             _nextChainOrdinal = Math.Max(_nextChainOrdinal, maxOrdinal);
             RefreshChainDisplay();
             SetChainListButtonsEnabled(true);
-            _lblChainSetupStatus.Text = "DB Chain " + data.Count + "개를 불러왔습니다."
-                + (incomplete > 0 ? " / Layer 미조회로 일부 도형을 복원하지 못한 Chain " + incomplete + "개(저장 제외)" : "")
-                + " / 목록에서 Chain을 선택하면 편집할 수 있습니다.";
+            // 불러온 Chain 수 / 일부 복원 못 한 Chain 수는 조회 결과 한 줄에 함께 보인다(btnSearch_Click, 2026-10-13).
         }
 
         /// <summary>DB Chain 1개를 화면 Chain으로 만든다. RebuildChainTraceItems 뒤에 호출한다.</summary>
@@ -174,7 +171,7 @@ namespace NexplantQMS.GdsMap
                     var pick = new ChainEndpointPick
                     {
                         Candidate = candidate,
-                        // DB Marker는 저장 기준 좌표. 화면 보기 기준과 다르면 X 반전(CLAUDE-030). GPoint 생성자 반올림을 피하려고 필드에 직접 넣는다.
+                        // DB Marker는 저장 기준 좌표. 화면 보기 기준과 다르면 X 반전. GPoint 생성자 반올림을 피하려고 필드에 직접 넣는다.
                         Point = MarkerPoint(Convert.ToDouble(row["MARKER_X"], CultureInfo.InvariantCulture),
                             Convert.ToDouble(row["MARKER_Y"], CultureInfo.InvariantCulture))
                     };
@@ -216,8 +213,6 @@ namespace NexplantQMS.GdsMap
             if (missing > 0)
                 chain.DbIncomplete = "Layer " + String.Join(", ", missingLayers) + " 미조회로 도형 " + missing
                     + "개를 복원하지 못함(그 Layer를 체크하고 Device를 다시 선택해 조회하세요)";
-            chain.Status = (ready ? "DB에서 불러온 Chain입니다." : "DB 저장이 끝나지 않은 Chain입니다(다시 저장하세요).")
-                + (chain.DbIncomplete == null ? "" : " / " + chain.DbIncomplete);
             // 바꾸지 않으면 "변경 없음"이 되도록 지금 내용의 저장 지문을 기록한다. DRAFT는 다시 저장 대상이 되도록 비워 둔다.
             chain.SavedFingerprint = ready ? BuildChainSaveData(chain).Fingerprint : null;
             return chain;

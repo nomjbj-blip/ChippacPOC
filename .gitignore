@@ -1,7 +1,7 @@
 *.pdb
 *.log
 
-# Visual Studio 사용자 / 캐시 (2026-10-07 CLAUDE-034)
+# Visual Studio 사용자 / 캐시 (2026-10-07)
 .vs/
 *.suo
 *.user
@@ -9,3 +9,12 @@ obj/
 
 # Office 잠금 파일
 ~$*
+
+# 개발 보조 도구 설정 (2026-10-12, 저장소 / 납품 소스에서 제외)
+.claude/
+AGENTS.md
+CLAUDE.md
+_codex_build/
+
+# 일일 브리핑 기록 (2026-10-14, 저장소 / 납품 소스에서 제외)
+브리핑/

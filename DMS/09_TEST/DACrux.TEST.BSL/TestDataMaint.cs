@@ -246,9 +246,12 @@ namespace DACrux.TEST.BSL
             // TD 테이블이 없어도 LOT SUM 재생성 / 빈 LOT 정리는 진행한다.
             TQP_LOT_SUM lotSum = new TQP_LOT_SUM();
 
-            // LOT SUM 삭제 후 새로 생성
+            // LOT SUM 삭제 후 Wafer 가 남아 있을 때만 새로 생성
+            // (2026-10-14: 마지막 Wafer 를 지울 때도 생성해서 INSERT_LOT_SUMMARY 가 빈 집계 행을 넣다가
+            //  ORA-01400(TQP_LOT_SUM.CUSTOMER NULL) 으로 멈추고 LOT 행만 남던 문제)
             lotSum.DeleteLot(lotSeq);
-            lotSum.InsertLotSummary(lotSeq);
+            if (Int32.Parse(waf.GetWaferCount(lotSeq).Rows[0][0].ToString()) > 0)
+                lotSum.InsertLotSummary(lotSeq);
 
             // LOT 데이터 삭제여부 체크
             DeleteLotSeqIfEmpty(lotSeq);

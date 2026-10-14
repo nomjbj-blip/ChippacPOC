@@ -1,0 +1,46 @@
+-- 2026-10-12: E-Test Limit(Spec) 를 Parameter(헤더 전체) 단위로 다시 만든다
+-- 결정 (2026-10-12, 고객 Spec 표 검토 후):
+--   1) Limit 키 = 디바이스 + 공정(TSVET / COWET / FT) + Parameter (헤더 전체, 예: Resistance_iforce=8.0mA@TSVDC_TL_FH)
+--   2) 정의된 항목의 '-' 만 Fail (정의 안 된 항목은 판정하지 않음)
+--   3) 헤더 원문을 항목명으로 쓰고 뒤의 '#번호' 는 지운다 (FT: ...@TSVDC_HBM_C_P_FH #717)
+--   기존 결정 유지: 등록 시 대문자 / Enable / Limit 한쪽만 가능
+-- 2026-10-07 Para 단위 테이블(키 FACTORY + DEVICE_ID + PARA_NAME)을 대체한다. 적용 전 0행 확인.
+-- 설계: 문서/2026-10-07_ETest_Limit_설정_설계.md 12절
+-- 적용: 2026-10-12 로컬 docker oracle19c DMSMGR. 고객 DB 적용 여부는 별도 확인.
+
+WHENEVER SQLERROR EXIT SQL.SQLCODE ROLLBACK
+SET ECHO OFF FEEDBACK ON
+
+DROP TABLE DMSMGR.TQP_GDS_ET_LIMIT PURGE;
+
+CREATE TABLE DMSMGR.TQP_GDS_ET_LIMIT
+   (    FACTORY          VARCHAR2(30 CHAR) NOT NULL,
+        DEVICE_ID        VARCHAR2(50 CHAR) NOT NULL,
+        TEST_PROGRAM     VARCHAR2(50 CHAR) NOT NULL,
+        ITEM_NAME        VARCHAR2(200 CHAR) NOT NULL,
+        LOWER_LIMIT      BINARY_DOUBLE,
+        UPPER_LIMIT      BINARY_DOUBLE,
+        UNIT             VARCHAR2(10 CHAR),
+        ENABLE_FLAG      CHAR(1) DEFAULT 'Y' NOT NULL,
+        SPEC_TEXT        VARCHAR2(200 CHAR),
+        REMARK           VARCHAR2(200 CHAR),
+        CREATE_USER      VARCHAR2(30),
+        CREATE_TIME      DATE DEFAULT SYSDATE NOT NULL,
+        UPDATE_USER      VARCHAR2(30),
+        UPDATE_TIME      DATE,
+        CONSTRAINT CK_GDS_ET_LIMIT_ONE CHECK (LOWER_LIMIT IS NOT NULL OR UPPER_LIMIT IS NOT NULL),
+        CONSTRAINT CK_GDS_ET_LIMIT_RANGE CHECK (LOWER_LIMIT IS NULL OR UPPER_LIMIT IS NULL OR LOWER_LIMIT <= UPPER_LIMIT),
+        CONSTRAINT CK_GDS_ET_LIMIT_ENABLE CHECK (ENABLE_FLAG IN ('Y', 'N')),
+        CONSTRAINT CK_GDS_ET_LIMIT_UPPER CHECK (ITEM_NAME = UPPER(ITEM_NAME) AND TEST_PROGRAM = UPPER(TEST_PROGRAM)),
+        CONSTRAINT PK_GDS_ET_LIMIT PRIMARY KEY (FACTORY, DEVICE_ID, TEST_PROGRAM, ITEM_NAME)
+   );
+
+COMMENT ON TABLE DMSMGR.TQP_GDS_ET_LIMIT IS 'E-Test Spec (Device + 공정 + Parameter 헤더 전체). 정의된 항목만 판정';
+COMMENT ON COLUMN DMSMGR.TQP_GDS_ET_LIMIT.TEST_PROGRAM IS '공정 = 파일명 Test Type (TSVET / COWET / FT), 대문자';
+COMMENT ON COLUMN DMSMGR.TQP_GDS_ET_LIMIT.ITEM_NAME IS 'Parameter = 측정 헤더 전체 (공백 정리, 끝 #번호 제거, 대문자). TQP_GDS_ET_ITEM.ITEM_NAME 과 UPPER 로 비교';
+COMMENT ON COLUMN DMSMGR.TQP_GDS_ET_LIMIT.LOWER_LIMIT IS '하한, NULL = 없음 (값 < 하한 이면 Fail)';
+COMMENT ON COLUMN DMSMGR.TQP_GDS_ET_LIMIT.UPPER_LIMIT IS '상한, NULL = 없음 (값 > 상한 이면 Fail)';
+COMMENT ON COLUMN DMSMGR.TQP_GDS_ET_LIMIT.ENABLE_FLAG IS 'Y = 판정 / N = 값만 보관. 판정 시 ''-'' 값도 Fail';
+COMMENT ON COLUMN DMSMGR.TQP_GDS_ET_LIMIT.SPEC_TEXT IS '고객 Spec 원문 (예: If val > 715, Fail; otherwise, Pass)';
+
+EXIT

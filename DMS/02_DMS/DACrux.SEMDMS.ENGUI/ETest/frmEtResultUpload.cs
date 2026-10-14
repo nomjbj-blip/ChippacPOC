@@ -9,11 +9,11 @@ using System.Windows.Forms;
 namespace DACrux.SEMDMS.ENGUI
 {
     /// <summary>
-    /// E-Test 결과 파일(xlsx)을 읽어 DMS DB(TQP_GDS_SRC_FILE / ET_ITEM / ET_DIE / ET_VALUE)에 저장하는 화면이다. (CLAUDE-029)
+    /// E-Test 결과 파일(xlsx)을 읽어 DMS DB(TQP_GDS_SRC_FILE / ET_ITEM / ET_DIE / ET_VALUE)에 저장하는 화면이다.
     /// 설계: 문서/2026-10-07_ETest_결과파일_Parsing_DB설계.md 9절 / 10절
     /// 처리 흐름:
-    ///  1) [찾아보기]: 파일을 고르면 바로 분석한다(EtResultFileParser). 요약 / Die 미리보기 / 경고를 보여 준다.
-    ///  2) Factory / Device: 파일에 제품 정보가 없어 사용자가 고른다. Device 목록은 GDS Map(READY)이 있는 Device를 보여 주지만 직접 입력도 된다.
+    ///  1) [찾아보기]: 파일을 고르면 바로 분석한다(EtResultFileParser). 파일 정보(항목별 읽기 전용 칸) / Die 미리보기 / 경고를 보여 준다.
+    ///  2) Factory: 로그인 Factory 기본. Device: 고르지 않고 파일명 2칸(Device)을 그대로 DEVICE_ID 로 쓴다(읽기 전용, 2026-10-12).
     ///  2-1) Slot No: 파일에 없어 사용자가 입력한다(파일명 Wafer '{Lot}-{숫자}'면 기본값). WAFER_ID = Lot + '-' + 2자리 Slot 을 미리 보여 준다.
     ///  3) [DB 저장]: 같은 Wafer(Factory + WAFER_ID)가 있으면 묻고 삭제 후 재등록 -> 헤더(LOADING) -> 측정 항목 -> Die -> 측정값(10,000행씩) -> 확정(READY)
     ///     Device 는 중복 허용(같은 Device 에 여러 Lot / Wafer).
@@ -42,13 +42,13 @@ namespace DACrux.SEMDMS.ENGUI
             get { return uploadService ?? (uploadService = new RO.GdsEtResult()); }
         }
 
-        /// <summary>화면이 처음 열릴 때 로그인 Factory와 Device 목록을 채운다.</summary>
+        /// <summary>화면이 처음 열릴 때 로그인 Factory 를 채운다.</summary>
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
             if (txtFactory.Text.Trim().Length == 0)
                 txtFactory.Text = DACrux.Base.GlobalVariable.Factory ?? string.Empty;
-            LoadDeviceList();
+            ShowFileInfo(null);
         }
 
         #region [파일 분석]
@@ -71,7 +71,7 @@ namespace DACrux.SEMDMS.ENGUI
         private void AnalyzeFile()
         {
             parsedFile = null;
-            txtSummary.Text = string.Empty;
+            ShowFileInfo(null);
             dgvDie.DataSource = null;
             string path = txtFile.Text.Trim();
             if (path.Length == 0 || !File.Exists(path))
@@ -85,13 +85,14 @@ namespace DACrux.SEMDMS.ENGUI
                 Cursor = Cursors.WaitCursor;
                 SetStatus("파일 분석 중...");
                 parsedFile = EtResultFileParser.Parse(path);
-                txtSummary.Text = BuildSummary(parsedFile);
+                ShowFileInfo(parsedFile);
                 dgvDie.DataSource = BuildDieTable(parsedFile);
-                // Slot 번호는 파일에 없어 사용자가 입력한다. 파일명 Wafer에서 얻으면 기본값으로 넣는다(2026-10-07 사용자 지시).
+                // Slot 번호는 파일에 없어 사용자가 입력한다. 파일명 Wafer에서 얻으면 기본값으로 넣는다 (2026-10-07).
                 txtSlot.Text = parsedFile.SlotNo > 0 ? parsedFile.SlotNo.ToString(CultureInfo.InvariantCulture) : string.Empty;
                 UpdateWaferPreview();
-                SetStatus(string.Format("분석 완료 / Die {0} / 측정 항목 {1} / 측정값 {2:N0}{3} / Factory / Device / Slot No 를 확인한 뒤 [DB 저장]을 누르세요.",
-                    parsedFile.DieCount, parsedFile.ItemCount, parsedFile.ValueCount,
+                LoadFileList();
+                SetStatus(string.Format("분석 완료 / Device {0} / Die {1} / 측정 항목 {2} / 측정값 {3:N0}{4} / Factory / Slot No 를 확인한 뒤 [DB 저장]을 누르세요.",
+                    parsedFile.FileDevice, parsedFile.DieCount, parsedFile.ItemCount, parsedFile.ValueCount,
                     parsedFile.Warnings.Count > 0 ? " / 경고 " + parsedFile.Warnings.Count + "건" : string.Empty));
             }
             catch (Exception ex)
@@ -129,26 +130,40 @@ namespace DACrux.SEMDMS.ENGUI
             lblWafer.ForeColor = parsedFile != null && slot == 0 ? System.Drawing.Color.Firebrick : System.Drawing.SystemColors.ControlText;
         }
 
-        /// <summary>분석 요약 문자열 (기준 정보 / 건수 / 경고)</summary>
-        private static string BuildSummary(EtResultFile f)
+        /// <summary>
+        /// 파일 정보 칸을 채운다(문자열 대신 항목별 칸, 2026-10-12). null 이면 모두 비운다.
+        /// 파일명 8칸 규칙: [Customer]_[Device]_[Wafer Type]_[Wafer Rev]_[Test Type]_[Test Date]_[Lot]_[Lot-Wafer No]$Fab$ (Device 는 위 Device 칸)
+        /// </summary>
+        private void ShowFileInfo(EtResultFile f)
         {
-            StringBuilder sb = new StringBuilder();
-            sb.AppendLine("Lot " + f.LotId + "  /  파일명 Wafer " + f.WaferId
-                + (f.SlotNo > 0 ? " (Slot 기본값 " + f.SlotNo + ", 확인 후 수정 가능)" : " (Slot 을 얻을 수 없음 -> Slot No 입력 필요)")
-                + "  /  시험 프로그램 " + f.TestProgram + "  /  시험 일시 " + FormatTestTime(f.TestTime) + "  /  접두어 " + f.FilePrefix);
-            sb.AppendLine("Die " + f.DieCount + " (Fail " + f.FailDieCount + ")  /  측정 항목 " + f.ItemCount + "  /  측정값 " + f.ValueCount.ToString("N0", CultureInfo.InvariantCulture)
-                + " (미측정 '-' " + f.NotTestedCount + " / 빈 칸 " + f.EmptyCount + ")  /  시트 " + f.SheetName);
-            sb.Append("파일의 Upper / Lower Limit 은 저장하지 않습니다 (판정 기준은 Limit 설정 화면에서 관리 예정).");
-            foreach (string warning in f.Warnings)
-                sb.Append("\r\n경고: " + warning);
-            return sb.ToString();
+            txtDevice.Text = f == null ? string.Empty : f.FileDevice;
+            txtInfoCustomer.Text = f == null ? string.Empty : f.Customer;
+            txtInfoWaferType.Text = f == null ? string.Empty : f.WaferType;
+            txtInfoWaferRev.Text = f == null ? string.Empty : f.WaferRev;
+            txtInfoFab.Text = f == null ? string.Empty : (f.FabName.Length > 0 ? f.FabName : "(없음)");
+            txtInfoTestType.Text = f == null ? string.Empty : f.TestProgram;
+            txtInfoTestDate.Text = f == null ? string.Empty : FormatTestTime(f.TestTime);
+            txtInfoLot.Text = f == null ? string.Empty : f.LotId;
+            txtInfoLotWafer.Text = f == null ? string.Empty : f.WaferId;
+            txtInfoDie.Text = f == null ? string.Empty : f.DieCount.ToString("N0", CultureInfo.InvariantCulture);
+            txtInfoPass.Text = f == null ? string.Empty : (f.DieCount - f.FailDieCount).ToString("N0", CultureInfo.InvariantCulture);
+            txtInfoFail.Text = f == null ? string.Empty : f.FailDieCount.ToString("N0", CultureInfo.InvariantCulture);
+            txtInfoSheet.Text = f == null ? string.Empty : f.SheetName;
+            txtInfoItems.Text = f == null ? string.Empty : f.ItemCount.ToString("N0", CultureInfo.InvariantCulture);
+            txtInfoValues.Text = f == null ? string.Empty : f.ValueCount.ToString("N0", CultureInfo.InvariantCulture);
+            txtInfoNotTested.Text = f == null ? string.Empty : f.NotTestedCount.ToString("N0", CultureInfo.InvariantCulture);
+            txtInfoEmpty.Text = f == null ? string.Empty : f.EmptyCount.ToString("N0", CultureInfo.InvariantCulture);
+            txtInfoFail.ForeColor = f != null && f.FailDieCount > 0 ? System.Drawing.Color.Firebrick : System.Drawing.SystemColors.WindowText;
+            txtWarning.Text = f == null ? string.Empty
+                : f.Warnings.Count == 0 ? "경고 없음" : "경고 " + f.Warnings.Count + "건: " + string.Join("  /  ", f.Warnings.ToArray());
+            txtWarning.ForeColor = f != null && f.Warnings.Count == 0 ? System.Drawing.SystemColors.GrayText : System.Drawing.Color.Firebrick;
         }
 
-        /// <summary>Die 미리보기 표 (Die별 미측정 수 포함)</summary>
+        /// <summary>Die 미리보기 표 (Die별 '-' 값 수 포함)</summary>
         private static DataTable BuildDieTable(EtResultFile f)
         {
             DataTable dt = new DataTable("ET_DIE");
-            foreach (string name in new[] { "DUT", "X", "Y", "HW Bin", "SW Bin", "Pass/Fail", "Flag", "시험 시간(ms)", "미측정" })
+            foreach (string name in new[] { "DUT", "X", "Y", "HW Bin", "SW Bin", "Pass/Fail", "Flag", "시험 시간(ms)", "'-' 값" })
                 dt.Columns.Add(name, typeof(string));
             for (int i = 0; i < f.DieCount; i++)
             {
@@ -178,40 +193,7 @@ namespace DACrux.SEMDMS.ENGUI
 
         #region [Factory / Device / 파일 목록]
 
-        /// <summary>GDS Map(READY)이 있는 Device를 콤보에 채운다. 조회 실패는 상태 표시줄에만 알리고 직접 입력은 계속 가능하다.</summary>
-        private void LoadDeviceList()
-        {
-            string current = cboDevice.Text;
-            string factory = txtFactory.Text.Trim();
-            try
-            {
-                DataTable dt = new RO.GdsMapView().GetMapDeviceList();
-                cboDevice.BeginUpdate();
-                cboDevice.Items.Clear();
-                foreach (DataRow dr in dt.Rows)
-                    if (factory.Length == 0 || string.Equals(dr["FACTORY"].ToString(), factory, StringComparison.OrdinalIgnoreCase))
-                        cboDevice.Items.Add(dr["DEVICE_ID"].ToString());
-                cboDevice.EndUpdate();
-            }
-            catch (Exception ex)
-            {
-                SetStatus("Device 목록 조회 실패(직접 입력 가능): " + Cause(ex).Message);
-            }
-            cboDevice.Text = current;
-        }
-
         private void txtFactory_Leave(object sender, EventArgs e)
-        {
-            LoadDeviceList();
-            LoadFileList();
-        }
-
-        private void cboDevice_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            LoadFileList();
-        }
-
-        private void cboDevice_Leave(object sender, EventArgs e)
         {
             LoadFileList();
         }
@@ -225,15 +207,17 @@ namespace DACrux.SEMDMS.ENGUI
         private static readonly Dictionary<string, string> FileListHeaders = new Dictionary<string, string>
         {
             { "SRC_FILE_SEQ", "파일 번호" }, { "FILE_NAME", "파일명" }, { "LOT_ID", "Lot" }, { "SLOT_NO", "Slot" },
-            { "TEST_PROGRAM", "시험 프로그램" }, { "TEST_TIME", "시험 일시" }, { "DIE_COUNT", "Die" }, { "ITEM_COUNT", "항목" },
-            { "VALUE_COUNT", "측정값" }, { "LOAD_STATUS", "상태" }, { "CREATE_USER", "등록자" }, { "CREATE_TIME", "등록 시각" }
+            { "TEST_PROGRAM", "공정 (Test Type)" }, { "TEST_TIME", "Test Date" }, { "DIE_COUNT", "Die" }, { "ITEM_COUNT", "항목" },
+            { "VALUE_COUNT", "측정값" }, { "LOAD_STATUS", "상태" }, { "CREATE_USER", "등록자" }, { "CREATE_TIME", "등록 시각" },
+            { "CUSTOMER", "Customer" }, { "FILE_DEVICE", "파일 Device" }, { "WAFER_TYPE", "Wafer Type" }, { "WAFER_REV", "Wafer Rev" },
+            { "FAB_NAME", "Fab" }, { "PASS_DIE_COUNT", "Pass Die" }, { "FAIL_DIE_COUNT", "Fail Die" }, { "NOT_TESTED_COUNT", "'-' 값" }
         };
 
-        /// <summary>Factory / Device에 등록된 E-Test 파일 목록을 조회한다.</summary>
+        /// <summary>Factory / Device(파일명 Device)에 등록된 E-Test 파일 목록을 조회한다. 파일을 고르기 전에는 Device 가 없어 비어 있다.</summary>
         private void LoadFileList()
         {
             string factory = txtFactory.Text.Trim();
-            string device = cboDevice.Text.Trim();
+            string device = txtDevice.Text.Trim();
             if (factory.Length == 0 || device.Length == 0)
             {
                 dgvFiles.DataSource = null;
@@ -266,13 +250,13 @@ namespace DACrux.SEMDMS.ENGUI
         /// <summary>
         /// DB 저장. 처리 흐름은 클래스 설명 3) 참고.
         /// 같은 Wafer 파일(Factory + WAFER_ID = Lot + 입력 Slot)이 있으면 삭제 후 재등록할지 묻는다.
-        /// 2026-10-07 사용자 지시: Device 는 중복 허용(같은 Device 에 여러 Lot / Wafer), 중복 방지는 WAFER_ID 기준, Slot 은 사용자 입력.
+        /// 기준 (2026-10-07): Device 는 중복 허용(같은 Device 에 여러 Lot / Wafer), 중복 방지는 WAFER_ID 기준, Slot 은 사용자 입력.
         /// </summary>
         private void btnSave_Click(object sender, EventArgs e)
         {
             EtResultFile f = parsedFile;
             string factory = txtFactory.Text.Trim();
-            string device = cboDevice.Text.Trim();
+            string device = f == null ? string.Empty : f.FileDevice; // 2026-10-12: 파일명 Device 를 그대로 DEVICE_ID 로 저장
             if (f == null)
             {
                 Notify("먼저 E-Test 파일을 선택해 분석하세요.", MessageBoxIcon.Warning);
@@ -280,7 +264,7 @@ namespace DACrux.SEMDMS.ENGUI
             }
             if (factory.Length == 0 || device.Length == 0)
             {
-                Notify("Factory / Device 를 입력하세요. 파일에 제품 정보가 없어 저장할 Device 를 직접 고릅니다.", MessageBoxIcon.Warning);
+                Notify("Factory 를 입력하세요. (Device 는 파일명의 Device 칸을 그대로 씁니다)", MessageBoxIcon.Warning);
                 return;
             }
             int slotNo = InputSlot();
@@ -304,12 +288,13 @@ namespace DACrux.SEMDMS.ENGUI
                 SetBusy(true);
 
                 // 1) 같은 Wafer 파일 확인 (Factory + WAFER_ID, Device / 시험 일시는 보지 않음) -> 삭제 후 재등록
-                DataTable exist = Service.GetEtFileByKey(new string[] { factory, f.LotId, slot });
+                // 키 = Factory + WAFER_ID + 공정(Test Type) (2026-10-12: TSVET -> COWET -> FT 는 같은 Wafer 라도 따로 저장)
+                DataTable exist = Service.GetEtFileByKey(new string[] { factory, f.LotId, slot, f.TestProgram });
                 if (exist.Rows.Count > 0)
                 {
                     DataRow dr = exist.Rows[0];
-                    string text = "같은 Wafer 의 E-Test 파일이 이미 등록되어 있습니다.\r\n\r\n"
-                        + "WAFER_ID " + dr["WAFER_ID"] + " / Device " + dr["DEVICE_ID"] + " / 시험 일시 " + FormatTestTime(dr["TEST_TIME"].ToString()) + "\r\n"
+                    string text = "같은 Wafer / 같은 공정의 E-Test 파일이 이미 등록되어 있습니다.\r\n\r\n"
+                        + "WAFER_ID " + dr["WAFER_ID"] + " / 공정 " + dr["TEST_PROGRAM"] + " / Device " + dr["DEVICE_ID"] + " / 시험 일시 " + FormatTestTime(dr["TEST_TIME"].ToString()) + "\r\n"
                         + "새 파일: Device " + device + " / 시험 일시 " + FormatTestTime(f.TestTime) + "\r\n"
                         + "파일 번호 " + dr["SRC_FILE_SEQ"] + " / 상태 " + dr["LOAD_STATUS"] + " / 등록 " + dr["CREATE_USER"] + " " + FormatDate(dr["CREATE_TIME"]) + "\r\n\r\n"
                         + "기존 데이터를 삭제하고 다시 저장할까요?";
@@ -324,8 +309,9 @@ namespace DACrux.SEMDMS.ENGUI
 
                 // 2) 헤더 (LOADING)
                 DataTable head = Service.BeginEtFile(new string[] {
-                    factory, device, f.FileName, f.LotId, slot, f.TestProgram, f.TestTime, f.FilePrefix, f.SheetName,
-                    f.DieCount.ToString(CultureInfo.InvariantCulture), f.ItemCount.ToString(CultureInfo.InvariantCulture), user });
+                    factory, device, f.FileName, f.LotId, slot, f.TestProgram, f.TestTime, string.Empty, f.SheetName,
+                    f.DieCount.ToString(CultureInfo.InvariantCulture), f.ItemCount.ToString(CultureInfo.InvariantCulture), user,
+                    f.Customer, f.FileDevice, f.WaferType, f.WaferRev, f.WaferId, f.FabName }); // 18항목 = 파일명 8칸 규칙 (PARSE_RULE_VER 2)
                 seq = head.Rows[0]["SRC_FILE_SEQ"].ToString();
 
                 // 3) 측정 항목 -> 이름별 번호
@@ -354,10 +340,10 @@ namespace DACrux.SEMDMS.ENGUI
                 DataRow done = Service.CompleteEtFile(seq, user).Rows[0];
                 if (done["RESULT"].ToString() == "OK")
                 {
-                    SetStatus(string.Format("저장 완료 / 파일 번호 {0} / WAFER_ID {1} / Die {2} / 측정값 {3:N0} (미측정 {4})",
+                    SetStatus(string.Format("저장 완료 / 파일 번호 {0} / WAFER_ID {1} / Die {2} / 측정값 {3:N0} ('-' {4})",
                         seq, head.Rows[0]["WAFER_ID"], done["DB_DIE"], done["DB_VALUE"], done["NOT_TESTED"]));
                     Notify("저장이 완료되었습니다.\r\n\r\nWAFER_ID " + head.Rows[0]["WAFER_ID"] + " / 파일 번호 " + seq
-                        + "\r\nDie " + done["DB_DIE"] + " (Fail " + done["FAIL_DIE"] + ") / 측정값 " + done["DB_VALUE"] + " (미측정 " + done["NOT_TESTED"] + ")",
+                        + "\r\nDie " + done["DB_DIE"] + " (Fail " + done["FAIL_DIE"] + ") / 측정값 " + done["DB_VALUE"] + " ('-' " + done["NOT_TESTED"] + ")",
                         MessageBoxIcon.Information);
                 }
                 else
@@ -445,7 +431,7 @@ namespace DACrux.SEMDMS.ENGUI
         {
             btnBrowse.Enabled = !busy;
             btnRefresh.Enabled = !busy;
-            txtFactory.Enabled = cboDevice.Enabled = txtSlot.Enabled = !busy;
+            txtFactory.Enabled = txtSlot.Enabled = !busy;
             btnSave.Enabled = !busy && parsedFile != null;
             btnDelete.Enabled = !busy && dgvFiles.Rows.Count > 0;
         }

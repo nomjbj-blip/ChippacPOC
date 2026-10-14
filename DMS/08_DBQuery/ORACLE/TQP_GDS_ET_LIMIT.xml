@@ -1,106 +1,190 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!--
-  TQP_GDS_ET_LIMIT: E-Test Para Limit (Factory + Device + Para 대문자). 2026-10-07 Claude CLAUDE-029 추가.
-  설계: 문서/2026-10-07_ETest_Limit_설정_설계.md 10절. 사용자 결정: Para 별 구간 / Device 별 / 등록 시 대문자 / Enable / 한쪽 Limit 허용.
-  측정 항목 PARA_NAME 은 UPPER(PARA_NAME) 로 비교한다. double 은 G17(R) 문자열 + TO_BINARY_DOUBLE, 빈 문자열은 NULL(그쪽 Limit 없음).
+  TQP_GDS_ET_LIMIT: E-Test Spec (FACTORY + DEVICE_ID + 공정 TEST_PROGRAM + Parameter ITEM_NAME 헤더 전체). 2026-10-12 재작성.
+  설계: 문서/2026-10-07_ETest_Limit_설정_설계.md 12절. 기준: Device + 공정 + Parameter(헤더 전체) / 정의된 항목의 '-' 만 Fail / '#번호' 제거 / 대문자.
+  2026-10-07 Para 단위 쿼리(SELECT_ET_LIMIT_LIST 6파라미터 등)를 대체한다(그때 화면은 아직 배포되지 않았고 테이블도 다시 만들었다).
+  측정 항목은 UPPER(TQP_GDS_ET_ITEM.ITEM_NAME) = ITEM_NAME 으로 찾는다. IN_DATA = 그 공정 READY 파일에 값이 있음(측정 항목 마스터는 Device 단위라 공정 구분이 없다). double 은 R 문자열 + TO_BINARY_DOUBLE, 빈 문자열은 NULL.
   같은 :이름 을 두 번 쓰지 않는다(Middleware 는 순서대로 바인딩) -> f1 / f2 / f3 처럼 이름을 나눴다.
+  2026-10-12 묶음 기능(15절): 대표 Chain 열을 뺐다(묶음 / Setup Chain 은 화면이 Chain 묶음 목록으로 계산). SELECT_ET_LIMIT_BY_CHAIN = Chain 1개의 Spec + 측정 항목 정보.
 -->
 <queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
-    <query statement="Select" queryid="SELECT_ET_LIMIT_LIST" commandtype="Text" description="Limit 설정 화면: Device 의 Para 목록(측정 항목 UPPER 묶음) + 저장된 Limit + READY 파일 값 통계 / 범위 밖 수" commandtimeout="600">
-        <commandtext><![CDATA[WITH I AS (SELECT ET_ITEM_SEQ, UPPER(PARA_NAME) AS PARA, UNIT, DISPLAY_ORDER FROM TQP_GDS_ET_ITEM WHERE FACTORY = :f1 AND DEVICE_ID = :d1),
-P AS (SELECT PARA, COUNT(*) AS ITEM_COUNT, MIN(UNIT) AS UNIT, COUNT(DISTINCT UNIT) AS UNIT_KINDS, MIN(DISPLAY_ORDER) AS FIRST_ORDER FROM I GROUP BY PARA),
-L AS (SELECT * FROM TQP_GDS_ET_LIMIT WHERE FACTORY = :f2 AND DEVICE_ID = :d2),
-V AS (SELECT I.PARA, V.MEAS_VALUE, V.VALUE_STATUS
-        FROM TQP_GDS_ET_VALUE V
-        JOIN I ON I.ET_ITEM_SEQ = V.ET_ITEM_SEQ
+    <query statement="Select" queryid="SELECT_ET_LIMIT_LIST" commandtype="Text" description="Spec 화면: Device + 공정의 정의 Parameter(Chain 1 / 2) + 업로드 데이터 유무 / READY 파일 값 통계 / Fail 수 (Enable 이면 범위 밖 + '-')" commandtimeout="600">
+        <commandtext><![CDATA[WITH L AS (SELECT T.*, REGEXP_SUBSTR(T.ITEM_NAME, '@([^:]+)', 1, 1, NULL, 1) AS CHAIN_NAME, REGEXP_SUBSTR(T.ITEM_NAME, '@[^:]+:(.+)$', 1, 1, NULL, 1) AS CHAIN_NAME2
+             FROM TQP_GDS_ET_LIMIT T WHERE T.FACTORY = :f1 AND T.DEVICE_ID = :d1 AND T.TEST_PROGRAM = :t1),
+I AS (SELECT ET_ITEM_SEQ, UPPER(ITEM_NAME) AS ITEM_KEY, UNIT, DISPLAY_ORDER FROM TQP_GDS_ET_ITEM WHERE FACTORY = :f2 AND DEVICE_ID = :d2),
+LI AS (SELECT L.ITEM_NAME, I.ET_ITEM_SEQ, I.UNIT AS ITEM_UNIT, I.DISPLAY_ORDER FROM L JOIN I ON I.ITEM_KEY = L.ITEM_NAME),
+X AS (SELECT ITEM_NAME, COUNT(*) AS ITEM_CNT, MIN(ITEM_UNIT) AS ITEM_UNIT, MIN(DISPLAY_ORDER) AS FIRST_ORDER FROM LI GROUP BY ITEM_NAME),
+V AS (SELECT LI.ITEM_NAME, V.MEAS_VALUE, V.VALUE_STATUS
+        FROM LI
+        JOIN TQP_GDS_ET_VALUE V ON V.ET_ITEM_SEQ = LI.ET_ITEM_SEQ
         JOIN TQP_GDS_SRC_FILE F ON F.SRC_FILE_SEQ = V.SRC_FILE_SEQ
-       WHERE F.FACTORY = :f3 AND F.DEVICE_ID = :d3 AND F.LOAD_STATUS = 'READY'),
-S AS (SELECT V.PARA,
+       WHERE F.FACTORY = :f3 AND F.DEVICE_ID = :d3 AND F.TEST_PROGRAM = :t3 AND F.LOAD_STATUS = 'READY'),
+S AS (SELECT V.ITEM_NAME,
              COUNT(V.MEAS_VALUE) AS VALUE_COUNT,
              SUM(CASE WHEN V.VALUE_STATUS = 'N' THEN 1 ELSE 0 END) AS NOT_TESTED_COUNT,
              MIN(V.MEAS_VALUE) AS MIN_VALUE,
              PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY V.MEAS_VALUE) AS MEDIAN_VALUE,
              PERCENTILE_CONT(0.99) WITHIN GROUP (ORDER BY V.MEAS_VALUE) AS P99_VALUE,
              MAX(V.MEAS_VALUE) AS MAX_VALUE,
-             SUM(CASE WHEN L.ENABLE_FLAG = 'Y' AND V.VALUE_STATUS = 'V'
-                       AND ((L.LOWER_LIMIT IS NOT NULL AND V.MEAS_VALUE < L.LOWER_LIMIT) OR (L.UPPER_LIMIT IS NOT NULL AND V.MEAS_VALUE > L.UPPER_LIMIT))
-                      THEN 1 ELSE 0 END) AS OUT_COUNT
-        FROM V LEFT JOIN L ON L.PARA_NAME = V.PARA
-       GROUP BY V.PARA)
-SELECT NVL(P.PARA, L.PARA_NAME) AS PARA_NAME, NVL(P.UNIT, L.UNIT) AS UNIT, NVL(P.UNIT_KINDS, 0) AS UNIT_KINDS, NVL(P.ITEM_COUNT, 0) AS ITEM_COUNT,
+             SUM(CASE WHEN L.ENABLE_FLAG = 'Y'
+                       AND (V.VALUE_STATUS = 'N'
+                            OR (V.VALUE_STATUS = 'V' AND ((L.LOWER_LIMIT IS NOT NULL AND V.MEAS_VALUE < L.LOWER_LIMIT)
+                                                       OR (L.UPPER_LIMIT IS NOT NULL AND V.MEAS_VALUE > L.UPPER_LIMIT))))
+                      THEN 1 ELSE 0 END) AS FAIL_COUNT
+        FROM V JOIN L ON L.ITEM_NAME = V.ITEM_NAME
+       GROUP BY V.ITEM_NAME)
+SELECT L.ITEM_NAME, L.CHAIN_NAME, L.CHAIN_NAME2, L.UNIT, X.ITEM_UNIT, CASE WHEN S.ITEM_NAME IS NOT NULL THEN 'Y' ELSE 'N' END AS IN_DATA,
        NVL(S.VALUE_COUNT, 0) AS VALUE_COUNT, NVL(S.NOT_TESTED_COUNT, 0) AS NOT_TESTED_COUNT,
-       S.MIN_VALUE, S.MEDIAN_VALUE, S.P99_VALUE, S.MAX_VALUE, NVL(S.OUT_COUNT, 0) AS OUT_COUNT,
-       L.LOWER_LIMIT, L.UPPER_LIMIT, L.ENABLE_FLAG, L.REMARK, NVL(L.UPDATE_USER, L.CREATE_USER) AS UPDATE_USER, NVL(L.UPDATE_TIME, L.CREATE_TIME) AS UPDATE_TIME,
-       CASE WHEN L.PARA_NAME IS NULL THEN 'N' ELSE 'Y' END AS HAS_LIMIT
-  FROM P
-  FULL OUTER JOIN L ON L.PARA_NAME = P.PARA
-  LEFT JOIN S ON S.PARA = P.PARA
- ORDER BY NVL(P.FIRST_ORDER, 999999999), NVL(P.PARA, L.PARA_NAME)]]></commandtext>
+       S.MIN_VALUE, S.MEDIAN_VALUE, S.P99_VALUE, S.MAX_VALUE, NVL(S.FAIL_COUNT, 0) AS FAIL_COUNT,
+       L.LOWER_LIMIT, L.UPPER_LIMIT, L.ENABLE_FLAG, L.SPEC_TEXT, L.REMARK,
+       NVL(L.UPDATE_USER, L.CREATE_USER) AS UPDATE_USER, NVL(L.UPDATE_TIME, L.CREATE_TIME) AS UPDATE_TIME
+  FROM L
+  LEFT JOIN X ON X.ITEM_NAME = L.ITEM_NAME
+  LEFT JOIN S ON S.ITEM_NAME = L.ITEM_NAME
+ ORDER BY NVL(X.FIRST_ORDER, 999999999), L.ITEM_NAME]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="120">:f1</param>
+            <param direction="Input" dbtype="VarChar" size="200">:d1</param>
+            <param direction="Input" dbtype="VarChar" size="200">:t1</param>
+            <param direction="Input" dbtype="VarChar" size="120">:f2</param>
+            <param direction="Input" dbtype="VarChar" size="200">:d2</param>
+            <param direction="Input" dbtype="VarChar" size="120">:f3</param>
+            <param direction="Input" dbtype="VarChar" size="200">:d3</param>
+            <param direction="Input" dbtype="VarChar" size="200">:t3</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ET_LIMIT_BY_CHAIN" commandtype="Text" description="Setup Chain 으로 찾기: E-Test Chain 1개가 들어간 Spec(모든 공정) + Spec 없는 측정 항목 + READY 파일 값 통계 / Fail 수" commandtimeout="600">
+        <commandtext><![CDATA[WITH I AS (SELECT ET_ITEM_SEQ, ITEM_NAME, UPPER(ITEM_NAME) AS ITEM_KEY, UPPER(CHAIN_NAME) AS C1, UPPER(CHAIN_NAME2) AS C2, UNIT
+             FROM TQP_GDS_ET_ITEM
+            WHERE FACTORY = :f1 AND DEVICE_ID = :d1 AND (UPPER(CHAIN_NAME) = :c1 OR UPPER(CHAIN_NAME2) = :c2)),
+L AS (SELECT * FROM (SELECT T.*, REGEXP_SUBSTR(T.ITEM_NAME, '@([^:]+)', 1, 1, NULL, 1) AS C1, REGEXP_SUBSTR(T.ITEM_NAME, '@[^:]+:(.+)$', 1, 1, NULL, 1) AS C2
+                        FROM TQP_GDS_ET_LIMIT T WHERE T.FACTORY = :f2 AND T.DEVICE_ID = :d2)
+       WHERE C1 = :c3 OR C2 = :c4),
+R AS (SELECT L.TEST_PROGRAM, L.ITEM_NAME AS ITEM_KEY, L.ITEM_NAME, L.C1, L.C2, 'Y' AS DEFINED,
+             L.LOWER_LIMIT, L.UPPER_LIMIT, L.UNIT, L.ENABLE_FLAG, L.SPEC_TEXT, L.REMARK
+        FROM L
+      UNION ALL
+      SELECT NULL, I.ITEM_KEY, I.ITEM_NAME, I.C1, I.C2, 'N', NULL, NULL, I.UNIT, NULL, NULL, NULL
+        FROM I WHERE NOT EXISTS (SELECT 1 FROM L WHERE L.ITEM_NAME = I.ITEM_KEY)),
+V AS (SELECT R.TEST_PROGRAM, R.ITEM_KEY, V.SRC_FILE_SEQ, V.MEAS_VALUE, V.VALUE_STATUS,
+             CASE WHEN R.ENABLE_FLAG = 'Y'
+                   AND (V.VALUE_STATUS = 'N'
+                        OR (V.VALUE_STATUS = 'V' AND ((R.LOWER_LIMIT IS NOT NULL AND V.MEAS_VALUE < R.LOWER_LIMIT)
+                                                   OR (R.UPPER_LIMIT IS NOT NULL AND V.MEAS_VALUE > R.UPPER_LIMIT))))
+                  THEN 1 ELSE 0 END AS FAIL
+        FROM R
+        JOIN I ON I.ITEM_KEY = R.ITEM_KEY
+        JOIN TQP_GDS_ET_VALUE V ON V.ET_ITEM_SEQ = I.ET_ITEM_SEQ
+        JOIN TQP_GDS_SRC_FILE F ON F.SRC_FILE_SEQ = V.SRC_FILE_SEQ
+       WHERE F.FACTORY = :f3 AND F.DEVICE_ID = :d3 AND F.LOAD_STATUS = 'READY'
+         AND (R.TEST_PROGRAM IS NULL OR F.TEST_PROGRAM = R.TEST_PROGRAM)),
+S AS (SELECT TEST_PROGRAM, ITEM_KEY,
+             COUNT(DISTINCT SRC_FILE_SEQ) AS FILE_COUNT,
+             COUNT(MEAS_VALUE) AS VALUE_COUNT,
+             SUM(CASE WHEN VALUE_STATUS = 'N' THEN 1 ELSE 0 END) AS NOT_TESTED_COUNT,
+             MIN(MEAS_VALUE) AS MIN_VALUE,
+             MAX(MEAS_VALUE) AS MAX_VALUE,
+             SUM(FAIL) AS FAIL_COUNT
+        FROM V
+       GROUP BY TEST_PROGRAM, ITEM_KEY)
+SELECT R.TEST_PROGRAM, R.ITEM_NAME, R.C1 AS CHAIN_NAME, R.C2 AS CHAIN_NAME2, R.DEFINED,
+       R.LOWER_LIMIT, R.UPPER_LIMIT, R.UNIT, R.ENABLE_FLAG, R.SPEC_TEXT, R.REMARK,
+       NVL(S.FILE_COUNT, 0) AS FILE_COUNT, NVL(S.VALUE_COUNT, 0) AS VALUE_COUNT, NVL(S.NOT_TESTED_COUNT, 0) AS NOT_TESTED_COUNT,
+       S.MIN_VALUE, S.MAX_VALUE, NVL(S.FAIL_COUNT, 0) AS FAIL_COUNT
+  FROM R
+  LEFT JOIN S ON S.ITEM_KEY = R.ITEM_KEY AND NVL(S.TEST_PROGRAM, '~') = NVL(R.TEST_PROGRAM, '~')
+ ORDER BY R.DEFINED DESC, R.TEST_PROGRAM, R.ITEM_KEY]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="120">:f1</param>
+            <param direction="Input" dbtype="VarChar" size="200">:d1</param>
+            <param direction="Input" dbtype="VarChar" size="256">:c1</param>
+            <param direction="Input" dbtype="VarChar" size="256">:c2</param>
+            <param direction="Input" dbtype="VarChar" size="120">:f2</param>
+            <param direction="Input" dbtype="VarChar" size="200">:d2</param>
+            <param direction="Input" dbtype="VarChar" size="256">:c3</param>
+            <param direction="Input" dbtype="VarChar" size="256">:c4</param>
+            <param direction="Input" dbtype="VarChar" size="120">:f3</param>
+            <param direction="Input" dbtype="VarChar" size="200">:d3</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ET_TEST_PROGRAM_LIST" commandtype="Text" description="Spec 화면: Device 의 공정 목록 (업로드된 파일 + Spec 이 있는 공정)" commandtimeout="60">
+        <commandtext><![CDATA[SELECT TEST_PROGRAM FROM TQP_GDS_SRC_FILE WHERE FACTORY = :f1 AND DEVICE_ID = :d1
+UNION
+SELECT TEST_PROGRAM FROM TQP_GDS_ET_LIMIT WHERE FACTORY = :f2 AND DEVICE_ID = :d2
+ORDER BY 1]]></commandtext>
         <parameters>
             <param direction="Input" dbtype="VarChar" size="120">:f1</param>
             <param direction="Input" dbtype="VarChar" size="200">:d1</param>
             <param direction="Input" dbtype="VarChar" size="120">:f2</param>
             <param direction="Input" dbtype="VarChar" size="200">:d2</param>
-            <param direction="Input" dbtype="VarChar" size="120">:f3</param>
-            <param direction="Input" dbtype="VarChar" size="200">:d3</param>
         </parameters>
     </query>
-    <query statement="Select" queryid="SELECT_ET_LIMIT" commandtype="Text" description="Device 의 저장된 Limit (판정용)" commandtimeout="60">
-        <commandtext><![CDATA[SELECT PARA_NAME, LOWER_LIMIT, UPPER_LIMIT, UNIT, ENABLE_FLAG, REMARK
+    <query statement="Select" queryid="SELECT_ET_LIMIT" commandtype="Text" description="Device + 공정의 Spec (판정용)" commandtimeout="60">
+        <commandtext><![CDATA[SELECT ITEM_NAME, LOWER_LIMIT, UPPER_LIMIT, UNIT, ENABLE_FLAG, SPEC_TEXT, REMARK
   FROM TQP_GDS_ET_LIMIT
  WHERE FACTORY = :factory
    AND DEVICE_ID = :device_id
- ORDER BY PARA_NAME]]></commandtext>
+   AND TEST_PROGRAM = :test_program
+ ORDER BY ITEM_NAME]]></commandtext>
         <parameters>
             <param direction="Input" dbtype="VarChar" size="120">:factory</param>
             <param direction="Input" dbtype="VarChar" size="200">:device_id</param>
+            <param direction="Input" dbtype="VarChar" size="200">:test_program</param>
         </parameters>
     </query>
-    <query statement="Insert" queryid="MERGE_ET_LIMIT" commandtype="Text" description="Limit 저장 (있으면 수정 / 없으면 추가, InsertExecuteMultiple)" commandtimeout="60">
+    <query statement="Insert" queryid="MERGE_ET_LIMIT" commandtype="Text" description="Spec 저장 (있으면 수정 / 없으면 추가, InsertExecuteMultiple)" commandtimeout="60">
         <commandtext><![CDATA[MERGE INTO TQP_GDS_ET_LIMIT T
 USING (SELECT :factory AS FACTORY,
               :device_id AS DEVICE_ID,
-              :para_name AS PARA_NAME,
+              :test_program AS TEST_PROGRAM,
+              :item_name AS ITEM_NAME,
               TO_BINARY_DOUBLE(:lower_limit) AS LOWER_LIMIT,
               TO_BINARY_DOUBLE(:upper_limit) AS UPPER_LIMIT,
               :unit AS UNIT,
               :enable_flag AS ENABLE_FLAG,
+              :spec_text AS SPEC_TEXT,
               :remark AS REMARK,
               :update_user AS UPDATE_USER
          FROM DUAL) S
-   ON (T.FACTORY = S.FACTORY AND T.DEVICE_ID = S.DEVICE_ID AND T.PARA_NAME = S.PARA_NAME)
+   ON (T.FACTORY = S.FACTORY AND T.DEVICE_ID = S.DEVICE_ID AND T.TEST_PROGRAM = S.TEST_PROGRAM AND T.ITEM_NAME = S.ITEM_NAME)
  WHEN MATCHED THEN UPDATE SET
       T.LOWER_LIMIT = S.LOWER_LIMIT,
       T.UPPER_LIMIT = S.UPPER_LIMIT,
       T.UNIT = S.UNIT,
       T.ENABLE_FLAG = S.ENABLE_FLAG,
+      T.SPEC_TEXT = S.SPEC_TEXT,
       T.REMARK = S.REMARK,
       T.UPDATE_USER = S.UPDATE_USER,
       T.UPDATE_TIME = SYSDATE
  WHEN NOT MATCHED THEN INSERT
-      (FACTORY, DEVICE_ID, PARA_NAME, LOWER_LIMIT, UPPER_LIMIT, UNIT, ENABLE_FLAG, REMARK, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
-      VALUES (S.FACTORY, S.DEVICE_ID, S.PARA_NAME, S.LOWER_LIMIT, S.UPPER_LIMIT, S.UNIT, S.ENABLE_FLAG, S.REMARK, S.UPDATE_USER, SYSDATE, S.UPDATE_USER, SYSDATE)]]></commandtext>
+      (FACTORY, DEVICE_ID, TEST_PROGRAM, ITEM_NAME, LOWER_LIMIT, UPPER_LIMIT, UNIT, ENABLE_FLAG, SPEC_TEXT, REMARK, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+      VALUES (S.FACTORY, S.DEVICE_ID, S.TEST_PROGRAM, S.ITEM_NAME, S.LOWER_LIMIT, S.UPPER_LIMIT, S.UNIT, S.ENABLE_FLAG, S.SPEC_TEXT, S.REMARK,
+              S.UPDATE_USER, SYSDATE, S.UPDATE_USER, SYSDATE)]]></commandtext>
         <parameters>
             <param direction="Input" dbtype="VarChar" size="120">:factory</param>
             <param direction="Input" dbtype="VarChar" size="200">:device_id</param>
-            <param direction="Input" dbtype="VarChar" size="200">:para_name</param>
+            <param direction="Input" dbtype="VarChar" size="200">:test_program</param>
+            <param direction="Input" dbtype="VarChar" size="800">:item_name</param>
             <param direction="Input" dbtype="VarChar" size="40">:lower_limit</param>
             <param direction="Input" dbtype="VarChar" size="40">:upper_limit</param>
             <param direction="Input" dbtype="VarChar" size="40">:unit</param>
             <param direction="Input" dbtype="VarChar" size="1">:enable_flag</param>
+            <param direction="Input" dbtype="VarChar" size="800">:spec_text</param>
             <param direction="Input" dbtype="VarChar" size="800">:remark</param>
             <param direction="Input" dbtype="VarChar" size="30">:update_user</param>
         </parameters>
     </query>
-    <query statement="Delete" queryid="DELETE_ET_LIMIT" commandtype="Text" description="Para Limit 1행 삭제 (판정 안 함으로 돌아감)" commandtimeout="60">
+    <query statement="Delete" queryid="DELETE_ET_LIMIT" commandtype="Text" description="Spec 1행 삭제 (그 Parameter 는 판정하지 않음)" commandtimeout="60">
         <commandtext><![CDATA[DELETE FROM TQP_GDS_ET_LIMIT
  WHERE FACTORY = :factory
    AND DEVICE_ID = :device_id
-   AND PARA_NAME = :para_name]]></commandtext>
+   AND TEST_PROGRAM = :test_program
+   AND ITEM_NAME = :item_name]]></commandtext>
         <parameters>
             <param direction="Input" dbtype="VarChar" size="120">:factory</param>
             <param direction="Input" dbtype="VarChar" size="200">:device_id</param>
-            <param direction="Input" dbtype="VarChar" size="200">:para_name</param>
+            <param direction="Input" dbtype="VarChar" size="200">:test_program</param>
+            <param direction="Input" dbtype="VarChar" size="800">:item_name</param>
         </parameters>
     </query>
 </queryxml>

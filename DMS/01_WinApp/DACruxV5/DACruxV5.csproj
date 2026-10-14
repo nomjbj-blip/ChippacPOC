@@ -881,6 +881,10 @@
       <Project>{D70179B9-FC65-4CE9-A31A-FA5822DA9DFF}</Project>
       <Name>DACrux.Common.Setup</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\06_CoreLibSource\GdsMapControl\NexplantQMS.GdsMap.csproj">
+      <Project>{393ff757-f840-4205-b983-6788698c499b}</Project>
+      <Name>NexplantQMS.GdsMap</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\09_TEST\DACrux.TEST.Control\DACrux.TEST.Control.csproj">
       <Project>{B3ED24CA-1B2C-401B-ACB7-EBBEBA502E2F}</Project>
       <Name>DACrux.TEST.Control</Name>

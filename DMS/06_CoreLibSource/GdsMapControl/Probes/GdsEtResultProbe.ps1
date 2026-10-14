@@ -1,4 +1,4 @@
-﻿# E-Test 결과 파일 DB 저장 서비스 검증 스크립트 (CLAUDE-029, 설계: 문서/2026-10-07_ETest_결과파일_Parsing_DB설계.md 9절 / 10절)
+﻿# E-Test 결과 파일 DB 저장 서비스 검증 스크립트 (2026-10-07, 설계: 문서/2026-10-07_ETest_결과파일_Parsing_DB설계.md 9절 / 10절)
 # 목적: 샘플 E-Test xlsx 를 읽어 BSL GdsEtResult 를 같은 프로세스에서 직접 호출하고 저장 / 확정 / 재조회 / 거부 / 삭제를 확인한다.
 #       DB 접속은 BSL -> DSL -> Miracom.Middleware 경로다 (Service Remoting 경유 아님).
 #       xlsx 읽기는 ClientBin 의 ClosedXML 을 쓴다. 헤더 분해 규칙은 설계 10.2절 정규식과 같다 (화면 Parsing 클래스는 2단계에서 만든다).
@@ -177,6 +177,10 @@ Check '같은 Wafer 재저장 거부' ($m -like '*이미 있습니다*') $m
 $infoOtherDevice = [string[]]$info.Clone(); $infoOtherDevice[1] = $Device + '_OTHER'; $infoOtherDevice[6] = '20260610090000'
 $m = Throws { $bsl.BeginEtFile($infoOtherDevice) }
 Check '같은 Wafer 다른 Device / 다른 시험 일시도 거부' ($m -like '*이미 있습니다*' -and $m -like "*Device $Device*") $m
+$infoCowet = [string[]]$info.Clone(); $infoCowet[5] = 'COWET'
+$hc = $bsl.BeginEtFile($infoCowet).Rows[0]
+Check '같은 Wafer 다른 공정(COWET) 은 저장 가능 (2026-10-12 키 = Wafer + 공정)' ($hc['WAFER_ID'] -eq 'RH-HS2615-02' -and $hc['TEST_PROGRAM'] -eq 'COWET') "seq=$($hc['SRC_FILE_SEQ']) $($hc['WAFER_ID']) $($hc['TEST_PROGRAM'])"
+[void]$bsl.DeleteEtFile([string]$hc['SRC_FILE_SEQ'], 'probe')
 $infoSlot3 = [string[]]$info.Clone(); $infoSlot3[4] = '3'
 $h3 = $bsl.BeginEtFile($infoSlot3).Rows[0]
 Check '같은 Device 다른 Slot 은 저장 가능 (WAFER_ID -03)' ($h3['WAFER_ID'] -eq 'RH-HS2615-03') "seq=$($h3['SRC_FILE_SEQ']) wafer=$($h3['WAFER_ID'])"

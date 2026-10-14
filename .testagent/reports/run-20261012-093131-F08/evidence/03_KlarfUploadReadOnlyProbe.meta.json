@@ -1,0 +1,27 @@
+﻿{
+    "id":  "03",
+    "name":  "KlarfUploadReadOnlyProbe",
+    "scenarios":  [
+                      "SCN-01,SCN-05"
+                  ],
+    "status":  "PASS",
+    "exitCode":  0,
+    "timedOut":  false,
+    "durationMs":  2672,
+    "started":  "2026-10-12 09:33:18",
+    "command":  "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\probes\\KlarfUploadReadOnlyProbe.ps1\"",
+    "workingDir":  "D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\probes",
+    "keys":  {
+                 "STEP_SEQ":  "501",
+                 "WAFER_SEQ":  "282",
+                 "STEP_COMMENT":  "UPLOAD;USER=ADMIN;FILE=XD106.02;RAW_WAFER_ID=XD106.02;CLASS_SRC=ROUGHBIN",
+                 "IMAGE_ROWS":  "15",
+                 "KLARF_UPLOAD_READ_ONLY_PROBE":  "PASS (11)"
+             },
+    "passLines":  11,
+    "failLines":  [
+
+                  ],
+    "stdout":  "03_KlarfUploadReadOnlyProbe.stdout.txt",
+    "stderr":  "03_KlarfUploadReadOnlyProbe.stderr.txt"
+}

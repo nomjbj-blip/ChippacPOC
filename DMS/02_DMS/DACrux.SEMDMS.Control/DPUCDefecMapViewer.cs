@@ -126,6 +126,25 @@ namespace DACrux.SEMDMS.Control
             //
             //
             m_prevMapType = MAP_TYPE.CLASS;
+
+            // 우클릭 메뉴에 중심 십자선 보이기 / 숨기기 추가 (2026-10-13).
+            // 내부 Map 의 메뉴는 공개 함수(AddContextMenuItem)로만 붙일 수 있어 체크 표시 없이 누를 때마다 바뀐다.
+            map.AddContextMenuItem("-", null);
+            map.AddContextMenuItem("Center Cross Show / Hide", CenterCrossMenu_Click);
+        }
+
+        /// <summary>작업자가 우클릭 메뉴로 십자선을 바꿨는지. 바꾼 뒤에는 Draw 가 Debug 기본값(켬)으로 되돌리지 않는다 (2026-10-13).</summary>
+        private bool m_bCenterCrossChanged = false;
+
+        /// <summary>
+        /// 우클릭 [Center Cross Show / Hide]: Wafer 중심 십자선(CenterMark)을 켜고 끈다 (2026-10-13).
+        /// CenterMark 는 켤 때 바로 선을 긋지만 끌 때는 이미 그린 선을 지우지 않으므로 다시 그린다.
+        /// </summary>
+        private void CenterCrossMenu_Click(object sender, EventArgs e)
+        {
+            m_bCenterCrossChanged = true;
+            map.CenterMark = !map.CenterMark;
+            map.Redraw();
         }
 
         private void DPUCDefecMapViewer_Load(object sender, System.EventArgs e)
@@ -279,7 +298,8 @@ namespace DACrux.SEMDMS.Control
             this.Reclassify = new System.Windows.Forms.Panel();
             this.dpucReclassify1 = new DACrux.SEMDMS.Control.DPUCReclassify();
             this.rdSetup = new DACrux.SEMDMS.Control.DPUCRDSetup();
-            this.map = new DACrux.Map.DefectMap();
+            // 우클릭 메뉴를 작업 항목만 보이게 하는 전용 Map (DefectViewerMap 주석 참고, 2026-10-13)
+            this.map = new DefectViewerMap();
             this.ultraDockManager = new Infragistics.Win.UltraWinDock.UltraDockManager(this.components);
             this._DPUCDefecMapViewerUnpinnedTabAreaLeft = new Infragistics.Win.UltraWinDock.UnpinnedTabArea();
             this._DPUCDefecMapViewerUnpinnedTabAreaRight = new Infragistics.Win.UltraWinDock.UnpinnedTabArea();
@@ -2021,7 +2041,8 @@ namespace DACrux.SEMDMS.Control
 
 
 #if DEBUG
-                map.CenterMark = true;
+                // Debug 빌드 기본값은 십자선 켬. 작업자가 우클릭 메뉴로 바꿨으면 그 값을 유지한다 (2026-10-13).
+                if (!m_bCenterCrossChanged) map.CenterMark = true;
 #endif
                 StatusMessage("Defect 데이터를 조회 중입니다.");
 
@@ -2107,8 +2128,9 @@ namespace DACrux.SEMDMS.Control
                 if (dsDefect.Tables.Contains("STEP_INFO") && dsDefect.Tables["STEP_INFO"].Rows.Count > 0 && dsDefect.Tables["STEP_INFO"].Columns.Contains("ST_XCNT"))
                 {
                     DataRow stepRow = dsDefect.Tables["STEP_INFO"].Rows[0];
-                    rdSetup.ShotArrayX = map.ShotArrayX = DACrux.Base.Convert.intParse(stepRow["ST_XCNT"].ToString(), 1);
-                    rdSetup.ShotArrayY = map.ShotArrayY = DACrux.Base.Convert.intParse(stepRow["ST_YCNT"].ToString(), 1);
+                    // Shot 미설정 Map 은 ST_XCNT / ST_YCNT 가 0 으로 저장됨. Shot 배열 입력의 최소값(1) 미만이면 기본값 1 사용 (2026-10-13)
+                    rdSetup.ShotArrayX = map.ShotArrayX = Math.Max(1, DACrux.Base.Convert.intParse(stepRow["ST_XCNT"].ToString(), 1));
+                    rdSetup.ShotArrayY = map.ShotArrayY = Math.Max(1, DACrux.Base.Convert.intParse(stepRow["ST_YCNT"].ToString(), 1));
                     rdSetup.ShotStartX = map.ShotStartX = DACrux.Base.Convert.intParse(stepRow["ST_START_X"].ToString(), 1);
                     rdSetup.ShotStartY = map.ShotStartY = DACrux.Base.Convert.intParse(stepRow["ST_START_Y"].ToString(), 1);
                 }

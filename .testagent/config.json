@@ -1,0 +1,57 @@
+{
+  "project": "ChippacPOC",
+  "root": "D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC",
+  "surfaces": ["dotnet", "oracle"],
+  "rulesDocs": ["CLAUDE.md", "DMS/Assistant/공통_개발_지침.md", "DMS/Assistant/빌드_검증_가이드.md"],
+  "build": {
+    "tool": "msbuild",
+    "tempRoot": "%TEMP%\\ChippacBuild",
+    "knownWarnings": ["CS0649 GlDefectItem.LineVertexCount"]
+  },
+  "protected": ["DMS/100_ClientBin", "DMS/101_ServerBin", "DMS/71_CoreLib"],
+  "db": {
+    "kind": "oracle",
+    "alias": "LOCAL",
+    "envVar": "TESTAGENT_ORA_LOCAL",
+    "host": "localhost",
+    "port": 1521,
+    "dockerContainer": "oracle19c-DMS",
+    "schema": "DMSMGR",
+    "driverDll": "DMS/101_ServerBin/Oracle.ManagedDataAccess.dll",
+    "isShared": false,
+    "testKeyPrefix": "PROBE",
+    "note": "앱은 Miracom.Middleware 접속 ID(DMSMGR)로 접속. Probe 는 서버 config 를 지정해 BSL 로 조회하므로 envVar 없이도 DB 확인 가능"
+  },
+  "assets": {
+    "probeDirs": ["DMS/06_CoreLibSource/GdsMapControl/Probes", "DMS/02_DMS/DACrux.SEMDMS.BSL/Probes"],
+    "smokeDirs": ["DMS/02_DMS/DACrux.SEMDMS.ENGUI/Verification", "DMS/09_TEST/DACrux.TEST.ENGUI/Verification"],
+    "samples": ["SampleFile"]
+  },
+  "features": {
+    "F06": {
+      "name": "KLARF 파일 조회",
+      "doc": "DMS/Assistant/기능/F06_KLARF_파일_조회.md",
+      "probes": [],
+      "smokes": ["DMS/02_DMS/DACrux.SEMDMS.ENGUI/Verification/Verify-KlarfFileViewer.ps1"],
+      "needsDb": false
+    },
+    "F08": {
+      "name": "KLARF 업로드 / DB 적재",
+      "doc": "DMS/Assistant/기능/F08_KLARF_업로드_DB적재.md",
+      "probes": ["DMS/02_DMS/DACrux.SEMDMS.BSL/Probes/KlarfUploadProbe.ps1"],
+      "smokes": ["DMS/02_DMS/DACrux.SEMDMS.ENGUI/Verification/Verify-KlarfUpload.ps1"],
+      "needsDb": true
+    }
+  },
+  "regression": {
+    "quick": [],
+    "full": ["DMS/06_CoreLibSource/GdsMapControl/Probes/*.ps1", "DMS/02_DMS/DACrux.SEMDMS.BSL/Probes/*.ps1"]
+  },
+  "sharedDocs": {
+    "status": "DMS/Assistant/작업_현황.md",
+    "changelogDir": "DMS/Assistant/변경이력",
+    "policy": "검증 결과 기록은 사용자 확인 후. 작업 현황 표는 다른 세션과 공유하므로 Test Agent 가 임의로 행을 추가하지 않는다"
+  },
+  "powershell": "powershell.exe",
+  "language": "ko"
+}

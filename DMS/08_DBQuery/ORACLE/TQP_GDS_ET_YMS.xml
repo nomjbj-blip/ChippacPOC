@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TQP_GDS_ET_YMS: E-Test 결과를 YMS 테이블에 넣을 때 기존 YMS 쿼리로는 할 수 없는 것만 둔다 (2026-10-14).
+  설계: 문서/2026-10-14_ETest_Upload_YMS적재_설계.md 14절 / 15절.
+  YMS 적재 / 조회 / 삭제는 기존 YMS 함수와 쿼리를 그대로 쓴다
+  (TestCommon.SaveWaferData / TestDataManager.SaveData / TestCommon.SummaryData / TestDataMaint.DeleteWaferData,
+   TQP_WAFER.xml GET_WAFER_INFO [WSQ] / TQP_WAFER_SUM.xml GET_WAFER_LOT_INFO / TQP_BINDESC.xml EXISTS_BIN_INFO·CREATE_BIN).
+  UPDATE_YMS_PARASPEC 만 새로 둔 이유: 기존 PARASPEC 저장(TQP_PARASPEC.UpdateProgramParaSpec -> CREATE_PARASPEC)은
+  Program 행 전체를 지우고 다시 넣는데 LSL / USL 컬럼을 넣지 않는다. 자동 등록된 행(형식 FLOAT, 설명·단위·Spec 없음)을 보정할 쿼리가 없다.
+  숫자는 InvariantCulture 문자열로 받아 CAST(TO_BINARY_DOUBLE(..) AS NUMBER) 로 바꾼다 (0.1 / 1E-05 그대로 들어감 확인). 빈 문자열은 NULL.
+  같은 :이름 을 두 번 쓰지 않는다 (Middleware 는 순서대로 바인딩).
+-->
+<queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Update" queryid="UPDATE_YMS_PARASPEC" commandtype="Text" description="YMS Parameter 정의 보정: 설명(헤더 원문) / 단위 / LSL / USL / 형식 (ExecuteMultiple)" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_PARASPEC
+   SET PARAM_DESC = :param_desc,
+       UOM = :uom,
+       LSL = CAST(TO_BINARY_DOUBLE(:lsl) AS NUMBER),
+       USL = CAST(TO_BINARY_DOUBLE(:usl) AS NUMBER),
+       PARAM_TYPE = :param_type,
+       UPDATE_USER = :update_user,
+       UPDATE_TIME = SYSDATE
+ WHERE FACTORY = :factory
+   AND PROGRAM = :program
+   AND PROGRAM_REV = TO_NUMBER(:program_rev)
+   AND PARAM_NAME = :param_name]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="800">:param_desc</param>
+            <param direction="Input" dbtype="VarChar" size="120">:uom</param>
+            <param direction="Input" dbtype="VarChar" size="40">:lsl</param>
+            <param direction="Input" dbtype="VarChar" size="40">:usl</param>
+            <param direction="Input" dbtype="VarChar" size="20">:param_type</param>
+            <param direction="Input" dbtype="VarChar" size="30">:update_user</param>
+            <param direction="Input" dbtype="VarChar" size="120">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="200">:program</param>
+            <param direction="Input" dbtype="VarChar" size="20">:program_rev</param>
+            <param direction="Input" dbtype="VarChar" size="200">:param_name</param>
+        </parameters>
+    </query>
+</queryxml>

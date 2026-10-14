@@ -5,8 +5,8 @@ using System.Data;
 
 namespace DACrux.SEMDMS.RO
 {
-    /// <summary>기존 DMS 원격 호출 방식으로 E-Test 결과 파일 저장 / 조회 / 삭제 서비스를 화면에 제공한다. (CLAUDE-029)</summary>
-    public class GdsEtResult
+    /// <summary>기존 DMS 원격 호출 방식으로 E-Test 결과 파일 저장 / 조회 / 삭제 서비스를 화면에 제공한다.</summary>
+    public partial class GdsEtResult
     {
         DACrux.SEMDMS.Interface.iGdsEtResult m_OBJ;
 
@@ -198,11 +198,11 @@ namespace DACrux.SEMDMS.RO
             }
         }
 
-        public DataTable GetEtLimitList(string strFactory, string strDeviceID)
+        public DataTable GetEtTestProgramList(string strFactory, string strDeviceID)
         {
             try
             {
-                return m_OBJ.GetEtLimitList(strFactory, strDeviceID);
+                return m_OBJ.GetEtTestProgramList(strFactory, strDeviceID);
             }
             catch (Exception ex)
             {
@@ -210,11 +210,23 @@ namespace DACrux.SEMDMS.RO
             }
         }
 
-        public DataTable GetEtLimit(string strFactory, string strDeviceID)
+        public DataTable GetEtLimitList(string strFactory, string strDeviceID, string strTestProgram)
         {
             try
             {
-                return m_OBJ.GetEtLimit(strFactory, strDeviceID);
+                return m_OBJ.GetEtLimitList(strFactory, strDeviceID, strTestProgram);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public DataTable GetEtLimit(string strFactory, string strDeviceID, string strTestProgram)
+        {
+            try
+            {
+                return m_OBJ.GetEtLimit(strFactory, strDeviceID, strTestProgram);
             }
             catch (Exception ex)
             {
@@ -239,6 +251,82 @@ namespace DACrux.SEMDMS.RO
             try
             {
                 return m_OBJ.DeleteEtLimit(aKey, strUpdateUser);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        #endregion
+
+        #region [TQP_GDS_ET_CHAIN_GROUP]
+
+        public DataTable GetEtChainGroupList(string strFactory, string strDeviceID)
+        {
+            try
+            {
+                return m_OBJ.GetEtChainGroupList(strFactory, strDeviceID);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public DataTable GetEtGdsChainList(string strFactory)
+        {
+            try
+            {
+                return m_OBJ.GetEtGdsChainList(strFactory);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public int CreateEtChainGroups(string[] aKey, string[,] aRows, string strUpdateUser)
+        {
+            try
+            {
+                return m_OBJ.CreateEtChainGroups(aKey, aRows, strUpdateUser);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public int DeleteEtChainGroup(string[] aKey, string strUpdateUser)
+        {
+            try
+            {
+                return m_OBJ.DeleteEtChainGroup(aKey, strUpdateUser);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public DataTable GetEtChainMatch(string strFactory, string strDeviceID, string strSetupChain)
+        {
+            try
+            {
+                return m_OBJ.GetEtChainMatch(strFactory, strDeviceID, strSetupChain);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public DataTable GetEtChainSpecInfo(string strFactory, string strDeviceID, string strSetupChain)
+        {
+            try
+            {
+                return m_OBJ.GetEtChainSpecInfo(strFactory, strDeviceID, strSetupChain);
             }
             catch (Exception ex)
             {

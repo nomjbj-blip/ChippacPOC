@@ -112,7 +112,7 @@ namespace NexplantQMS.GdsMap
         private void BtnChainClearSimilar_Click(object sender, EventArgs e)
         {
             ClearChainSimilarPreview();
-            _lblChainSetupStatus.Text = "유사 묶음 미리보기를 취소했습니다. 예시 묶음은 유지합니다.";
+            SetChainStatus("유사 묶음 미리보기를 취소했습니다.");
         }
 
         /// <summary>Chain 편집과 클릭을 구분하기 위해 Map MouseDown 위치를 보관한다.</summary>
@@ -153,7 +153,7 @@ namespace NexplantQMS.GdsMap
             map.Cursor = Cursors.Cross;
             UpdateChainSelectionButtons();
             ShowChainEndpointSelection();
-            _lblChainSetupStatus.Text = GetCaptureGuide(mode);
+            SetChainStatus(GetCaptureGuide(mode));
         }
 
         /// <summary>Input/Output 작업은 목록에서 선택한 Chain에만 귀속되도록 마지막 진입 지점에서도 검사한다.</summary>
@@ -163,7 +163,7 @@ namespace NexplantQMS.GdsMap
             CaptureActiveChain();
             ClearActiveChainSelection();
             const string message = "Chain을 먼저 선택하세요. 목록이 비어 있으면 새 Chain을 만드세요.";
-            _lblChainSetupStatus.Text = message;
+            SetChainStatus(message);
             MessageBox.Show(this, message, "Chain 선택 필요",
                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return false;
@@ -175,11 +175,11 @@ namespace NexplantQMS.GdsMap
             switch (mode)
             {
                 case ChainPointCaptureMode.Input:
-                    return "Input 선택 중 / Element 하나를 클릭한 뒤 선택 적용을 누르세요.";
+                    return "지도에서 Input 도형을 클릭한 뒤 [선택 적용]을 누르세요.";
                 case ChainPointCaptureMode.Output:
-                    return "Output 선택 중 / Element 하나를 클릭한 뒤 선택 적용을 누르세요.";
+                    return "지도에서 Output 도형을 클릭한 뒤 [선택 적용]을 누르세요.";
                 default:
-                    return "Chain 설정 대기";
+                    return string.Empty;
             }
         }
 
@@ -188,7 +188,7 @@ namespace NexplantQMS.GdsMap
         {
             string message = "한 Chain에는 Input과 Output을 각각 한 개씩만 지정할 수 있습니다. "
                 + role + "을 추가하거나 다시 지정하려면 새 Chain을 만드세요.";
-            _lblChainSetupStatus.Text = message;
+            SetChainStatus(message);
             MessageBox.Show(this, message, "Chain 단자 지정 제한",
                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
@@ -231,7 +231,7 @@ namespace NexplantQMS.GdsMap
             IList<ChainElementCandidate> candidates = map.GetChainElementCandidates(screenPoint);
             if (candidates.Count == 0)
             {
-                _lblChainSetupStatus.Text = "선택 Layer의 BOUNDARY/PATH 실제 도형이 클릭 위치에 없습니다.";
+                SetChainStatus("클릭한 위치에 고를 수 있는 도형이 없습니다. 켜져 있는 Layer 의 도형만 고를 수 있습니다.");
                 return;
             }
 
@@ -273,7 +273,7 @@ namespace NexplantQMS.GdsMap
                 ? _chainOutputSelections : _chainInputSelections;
             if (other.ContainsKey(candidate.ElementKey))
             {
-                _lblChainSetupStatus.Text = "이 Element는 이미 다른 역할로 지정되었습니다.";
+                SetChainStatus("이 도형은 이미 다른 단자로 지정되어 있습니다.");
                 return;
             }
 
@@ -289,8 +289,9 @@ namespace NexplantQMS.GdsMap
                 _chainDraftSelections.Add(candidate.ElementKey,
                     new ChainEndpointPick { Candidate = candidate, Point = point });
             ShowChainEndpointSelection();
-            _lblChainSetupStatus.Text = GetCaptureGuide(_chainPointCaptureMode)
-                + " / 임시 " + _chainDraftSelections.Count + "개";
+            SetChainStatus(_chainDraftSelections.Count == 0
+                ? GetCaptureGuide(_chainPointCaptureMode)
+                : "도형을 골랐습니다. [선택 적용]을 누르세요.");
         }
 
         /// <summary>역할별 임시/확정 선택을 합쳐 지도에 표시하고 후보 메뉴의 Hover를 추가한다.</summary>
@@ -305,8 +306,9 @@ namespace NexplantQMS.GdsMap
                 ? _chainDraftSelections : _chainInputSelections;
             var output = _chainPointCaptureMode == ChainPointCaptureMode.Output
                 ? _chainDraftSelections : _chainOutputSelections;
-            map.SetChainEndpointPoints(input.Values.Select(pick => pick.Point),
-                output.Values.Select(pick => pick.Point));
+            // IN / OUT 원형 표시는 쓰지 않는다. 다시 조회할 때 표시가 남는 문제가 있어 제거 (2026-10-08).
+            // 지정한 Input / Output 도형은 아래 노란 선택 강조로 보인다.
+            map.SetChainEndpointPoints(new GPoint[0], new GPoint[0]);
             map.HighlightChainElements(input.Keys.Concat(output.Keys).Concat(
                 hovered == null ? Enumerable.Empty<string>() : new[] { hovered.ElementKey }));
         }
@@ -319,7 +321,7 @@ namespace NexplantQMS.GdsMap
             if (!EnsureSelectedChainForEndpoint()) return;
             if (_chainDraftSelections.Count == 0)
             {
-                _lblChainSetupStatus.Text = "Element를 한 개 이상 선택해야 적용할 수 있습니다.";
+                SetChainStatus("지도에서 도형을 먼저 클릭하세요.");
                 return;
             }
             if (_chainDraftSelections.Count != 1)
@@ -334,7 +336,7 @@ namespace NexplantQMS.GdsMap
                     checkedLayers.Add(((LayerDisplayItem)chkLayerItems.Items[i]).LayerId);
             if (_chainDraftSelections.Values.Any(pick => !checkedLayers.Contains(pick.Candidate.LayerId)))
             {
-                _lblChainSetupStatus.Text = "선택한 Element의 Layer가 해제되었습니다. 다시 체크하거나 선택을 제거하세요.";
+                SetChainStatus("고른 도형의 Layer 가 꺼져 있습니다. Layer 를 켜거나 다시 고르세요.");
                 return;
             }
 
@@ -353,8 +355,40 @@ namespace NexplantQMS.GdsMap
             map.Cursor = Cursors.SizeAll;
             UpdateChainSelectionButtons();
             RefreshChainDisplay();
-            _lblChainSetupStatus.Text = role + " " + confirmed.Count + "개 확정 / Input "
-                + _chainInputSelections.Count + "개 / Output " + _chainOutputSelections.Count + "개";
+            string nameNote = role == "Input" ? ApplyInputLabelName() : string.Empty;
+            SetChainStatus(role + " 지정 완료." + nameNote + " [후보 경로 찾기]를 누르세요.");
+        }
+
+        /// <summary>
+        /// Input 확정 직후 Input 근처 Label로 Chain 이름을 정한다 (2026-10-08).
+        /// 이름이 기본값(IsDefaultChainName)이거나 이전에 자동으로 붙인 이름일 때만 바꾸고, 사용자가 고친 이름은 그대로 둔다.
+        /// 1순위 = Input과 연결된 도형 안의 Label, 2순위 = 근처에서 가장 가까운 Label, 없으면 이름을 바꾸지 않는다.
+        /// 반환: 상태 줄에 덧붙일 한 문장(정한 이름 / 같은 이름의 Chain 여부 / Label 없음). 찾은 근거(연결 단계 등)는 보이지 않는다 (2026-10-13).
+        /// </summary>
+        private string ApplyInputLabelName()
+        {
+            if (!HasSelectedChain) return string.Empty;
+            ChainDefinition chain = _activeChain;
+            if (!chain.NameAuto && !IsDefaultChainName(chain)) return string.Empty;
+            ChainEndpointLabelResult found;
+            try
+            {
+                found = map.FindChainEndpointLabel(_chainInputSelections.Select(pair =>
+                    new KeyValuePair<string, GPoint>(pair.Key, pair.Value.Point)));
+            }
+            catch (Exception ex)
+            {
+                // 이름 자동 지정은 보조 기능이다. 실패해도 Input 확정은 유지하고 화면에는 알리지 않는다.
+                System.Diagnostics.Trace.TraceWarning("Chain 이름 자동 지정 실패: {0}", ex.Message);
+                return string.Empty;
+            }
+            if (found == null || found.Text == null)
+                return " 근처 Label 이 없어 이름은 그대로입니다.";
+            chain.Name = found.Text;
+            chain.NameAuto = true;
+            _chainList.Invalidate();
+            bool duplicate = _chains.Any(other => !ReferenceEquals(other, chain) && other.Name == chain.Name);
+            return " 이름: " + found.Text + (duplicate ? "(같은 이름의 Chain 이 있습니다)" : "") + ".";
         }
 
         /// <summary>이번 마우스 편집을 버리고 이전 Input/Output 확정값과 경로 표시를 복원한다.</summary>
@@ -367,8 +401,7 @@ namespace NexplantQMS.GdsMap
             map.Cursor = Cursors.SizeAll;
             UpdateChainSelectionButtons();
             RefreshChainDisplay();
-            _lblChainSetupStatus.Text = "선택을 취소했습니다. Input " + _chainInputSelections.Count
-                + "개 / Output " + _chainOutputSelections.Count + "개";
+            SetChainStatus("선택을 취소했습니다.");
         }
 
         /// <summary>Esc로 임시 선택을 취소하여 지도 작업을 마우스와 키보드로 종료할 수 있게 한다.</summary>
@@ -380,7 +413,7 @@ namespace NexplantQMS.GdsMap
             {
                 ToggleChainExampleSelection();
                 ClearChainExampleSelection();
-                _lblChainSetupStatus.Text = "예시 묶음 지정을 취소했습니다.";
+                SetChainStatus("예시 묶음 지정을 취소했습니다.");
             }
             else if (_chainEditMode != ChainEditMode.None)
                 ToggleChainEditMode(_chainEditMode);
@@ -431,6 +464,7 @@ namespace NexplantQMS.GdsMap
             _btnChainApply.Enabled = loaded && _chainPointCaptureMode != ChainPointCaptureMode.None;
             _btnChainCancel.Enabled = loaded && _chainPointCaptureMode != ChainPointCaptureMode.None;
             SetChainListButtonsEnabled(map.Structure != null);
+            UpdateViewLayout(); // Chain 작업 줄 / 유사 묶음 목록 표시 (2026-10-12)
         }
 
         /// <summary>확정된 Input/Output과 현재 후보 경로를 지도에 다시 표시한다.</summary>
@@ -462,7 +496,7 @@ namespace NexplantQMS.GdsMap
             _btnChainOutput.Enabled = false;
             SetChainListButtonsEnabled(false);
             int traceGeneration = _chainTraceGeneration;
-            _lblChainSetupStatus.Text = "후보 경로를 찾는 중입니다.";
+            SetChainStatus("후보 경로를 찾는 중입니다.");
             progressLoad.Style = ProgressBarStyle.Marquee;
             progressLoad.Visible = true;
             try
@@ -485,14 +519,13 @@ namespace NexplantQMS.GdsMap
                 _chainLastTraceResult = result;
                 _activeChain.LayerIds = new HashSet<int>(selectedLayerIds);
                 ShowEditedChainCandidate();
-                _lblChainSetupStatus.Text = FormatEditedConnectivity().TrimStart(' ', '/')
-                    + " / " + FormatChainTraceResult(result) + FormatChainManualCounts();
+                SetChainStatus(FormatChainTraceResult(result) + FormatConnectivityWarning());
             }
             catch (Exception ex)
             {
                 if (traceGeneration != _chainTraceGeneration)
                     return;
-                _lblChainSetupStatus.Text = "후보 경로 조회 실패";
+                SetChainStatus("후보 경로 찾기 실패");
                 MessageBox.Show(this, ex.Message, "Chain Setup", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
@@ -504,40 +537,26 @@ namespace NexplantQMS.GdsMap
         }
 
         /// <summary>
-        /// 후보 추적 결과를 성공 경로 수 또는 실패 진단 정보로 표시한다.
-        /// 실패 시 Input/Output Layer와 실제 방문 Layer를 보여 주어 빠진 연결 규칙을 판단할 수 있게 한다.
+        /// 후보 경로 찾기 결과를 한 문장으로 알린다.
+        /// 겹침 / 분기 수, 경로 시작·끝 Element 키, 지정 단자 수 같은 확인용 계산 값은 보이지 않는다 (2026-10-13).
+        /// 연결에 실패하면 지나간 Layer 를 알려 Layer 체크를 고칠 수 있게 한다.
         /// </summary>
         private static string FormatChainTraceResult(ChainTraceResult result)
         {
             if (result.IsOpenEnded)
-                return "Output 미지정 / Input에서 닿는 후보 "
-                    + result.VisitedElements.Count.ToString("N0")
-                    + "개 Element / 마지막 연결 지점은 지도에서 확인 필요";
+                return "Input 에서 이어진 도형 " + result.VisitedElements.Count.ToString("N0")
+                    + "개를 찾았습니다. 지도에서 확인하고 필요하면 [경로 추가] / [경로 제외]로 고치세요.";
             if (result.IsConnected)
-                return "후보 경로 " + result.Path.Count.ToString("N0") + "개 Element / "
-                    + "지정 단자 " + result.EndpointElements.Count.ToString("N0")
-                    + "개 / 경로 밖 단자 " + result.OffPathEndpointElements.Count.ToString("N0")
-                    + "개(연결 확인 필요) / "
-                    + "직접 겹침 " + result.OverlappingElements.Count.ToString("N0")
-                    + "개 / 그중 분기 " + result.BranchCandidates.Count.ToString("N0") + "개 / "
-                    + result.Path[0].ElementKey + " → "
-                    + result.Path[result.Path.Count - 1].ElementKey + " / 사용자 확인 필요";
+                return "후보 경로 도형 " + result.Path.Count.ToString("N0")
+                    + "개를 찾았습니다. 지도에서 확인하고 필요하면 [경로 추가] / [경로 제외]로 고치세요.";
 
-            string inputLayer = result.InputLayerId.HasValue ? "L" + result.InputLayerId.Value : "확인 불가";
-            string outputLayer = result.OutputLayerId.HasValue ? "L" + result.OutputLayerId.Value : "확인 불가";
-            string visitedLayers = string.Join(",", result.VisitedElements
+            string visitedLayers = string.Join(", ", result.VisitedElements
                 .Select(element => element.LayerId)
                 .Distinct()
                 .OrderBy(layerId => layerId)
-                .Select(layerId => "L" + layerId));
-            if (string.IsNullOrEmpty(visitedLayers))
-                visitedLayers = "없음";
-
-            return "연결 실패 / Input " + inputLayer
-                + " / Output " + outputLayer
-                + " / 지정 단자 " + result.EndpointElements.Count.ToString("N0") + "개"
-                + " / 방문 " + result.VisitedElements.Count.ToString("N0")
-                + "개 / " + visitedLayers;
+                .Select(layerId => "Layer " + layerId));
+            return "Output 까지 이어진 경로를 찾지 못했습니다. Layer 체크를 확인하세요."
+                + (string.IsNullOrEmpty(visitedLayers) ? "" : " (지나간 Layer: " + visitedLayers + ")");
         }
 
         /// <summary>왼쪽 Layer 체크 상태와 선택적 Layer 규칙을 한 번의 추적 요청 값으로 복사한다.</summary>
@@ -610,7 +629,7 @@ namespace NexplantQMS.GdsMap
             map.Cursor = Cursors.SizeAll;
             RestoreChainEndpointHighlight();
             UpdateChainSelectionButtons();
-            _lblChainSetupStatus.Text = "Layer 조건이 바뀌었습니다. 후보 경로를 다시 찾으세요.";
+            SetChainStatus("Layer 체크가 바뀌었습니다. [후보 경로 찾기]를 다시 누르세요.");
         }
 
         /// <summary>GDS 조회 상태에 따라 Chain 설정 버튼의 사용 가능 상태를 일괄 변경한다.</summary>
@@ -630,6 +649,7 @@ namespace NexplantQMS.GdsMap
             _chainSimilarList.Enabled = false;
             _btnChainApply.Enabled = false;
             _btnChainCancel.Enabled = false;
+            UpdateViewLayout(); // Chain 작업 줄 / 유사 묶음 목록 표시 (2026-10-12)
         }
 
         /// <summary>새 GDS를 조회한 뒤 이전 도면의 Chain 좌표를 제거하고 설정을 시작할 수 있게 한다.</summary>
@@ -651,9 +671,7 @@ namespace NexplantQMS.GdsMap
             map.Cursor = Cursors.SizeAll;
             map.ResetChainSetupOverlay();
             SetChainButtonsEnabled(loadSucceeded);
-            _lblChainSetupStatus.Text = loadSucceeded
-                ? "Input / Output을 지정하고 왼쪽 Layer를 체크하세요."
-                : "GDS 조회 후 Input부터 지정하세요.";
+            // 조회 직후 상태 줄은 조회 결과 한 줄만 보인다. Chain 안내는 Chain 을 고를 때 보인다 (2026-10-13).
             ResetChainWorkspace(loadSucceeded);
         }
     }

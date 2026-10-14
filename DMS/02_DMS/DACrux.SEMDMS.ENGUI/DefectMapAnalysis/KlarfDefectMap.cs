@@ -8,12 +8,28 @@ namespace DACrux.SEMDMS.ENGUI
     /// <summary>
     /// KLARF 파일 조회 화면 전용 Defect Map 이다.
     /// Wafer/Die/Defect 그리기와 확대/이동/메뉴는 기존 DACrux.Map.DefectMap 을 그대로 사용하고,
-    /// 이 클래스는 아래 두 가지만 추가한다.
+    /// 이 클래스는 아래 세 가지만 추가한다.
     /// 1. 기존 OnChangePosition 은 Die 위에서만 발생하므로 Wafer 어디서든 마우스 좌표(um, Wafer 중심 기준)를 알려주는 이벤트
     /// 2. Die 안에 KLARF 원본 Index "(x,y)" 라벨을 그리는 기능 (화면 확대 배율이 충분할 때만)
+    /// 3. 우클릭 메뉴는 Free Zoom / Fit Size / Move View Center 만 보인다 (2026-10-13).
+    ///    기존 메뉴(WaferMap 의 protected ctxmWaferMap)는 수정하지 않고 메뉴가 뜰 때(Popup) 표시 여부만 바꾼다.
+    ///    GdsKlarfAnalysisMap 은 자기 Popup 처리기가 이 처리 뒤에 실행되므로 자기 메뉴 구성을 그대로 쓴다.
     /// </summary>
     public class KlarfDefectMap : DACrux.Map.DefectMap
     {
+        public KlarfDefectMap()
+        {
+            // 기반 클래스 생성자(InitializeComponent)가 메뉴와 기존 Popup 처리기를 만든 뒤라, 이 처리기는 그 뒤에 실행된다.
+            ctxmWaferMap.Popup += ctxmWaferMap_ShowViewItemsOnly;
+        }
+
+        /// <summary>메뉴가 뜨기 직전: 보기 항목 3개(Free Zoom / Fit Size / Move View Center)만 보이고 나머지 항목과 구분선은 숨긴다.</summary>
+        private void ctxmWaferMap_ShowViewItemsOnly(object sender, EventArgs e)
+        {
+            foreach (MenuItem item in ctxmWaferMap.MenuItems)
+                item.Visible = item == mnuitemMAPMODE_FREEZOOM || item == mnuitemMAPMODE_FITSIZE || item == mnuitemMOUSEDRAGMODE_MOVE;
+        }
+
         /// <summary>마우스 위치가 바뀔 때 Wafer 중심 기준 좌표(um)를 전달한다. 드래그 중에는 발생하지 않는다.</summary>
         public event EventHandler<KlarfMousePositionEventArgs> MousePositionChanged;
 

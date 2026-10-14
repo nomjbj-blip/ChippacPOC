@@ -295,6 +295,9 @@
     <Compile Include="frmChartYOption.Designer.cs">
       <DependentUpon>frmChartYOption.cs</DependentUpon>
     </Compile>
+    <Compile Include="DefectViewerMap.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="UserConfiguration.cs" />
     <EmbeddedResource Include="DPUCDataSheetControl.resx">
       <DependentUpon>DPUCDataSheetControl.cs</DependentUpon>

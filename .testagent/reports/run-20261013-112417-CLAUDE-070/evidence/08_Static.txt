@@ -1,0 +1,8 @@
+# SCN-08 줄바꿈 / BOM (원본 백업 대비) + 고친 줄 AI 흔적 2026-10-13 11:26:10
+GdsMapViewForm_Layout.cs noBOM CRLF=0
+GdsMapViewForm.Designer.cs noBOM CRLF=0
+Probes/GdsViewLayoutSmoke.ps1 BOM CRLF=0
+AI 흔적(고친 줄): 0
+GdsMapViewForm.Designer.cs:23:        ///  도면 우클릭 메뉴(전체 보기)는 제거했다(2026-10-13).
+GdsMapViewForm.Designer.cs:728:            this.chainListTitle.Text = "체크: 표시 / 행: 편집 / 우클릭: 색 변경";
+GdsMapViewForm_Layout.cs:11:    ///  - 도면 우클릭 메뉴(전체 보기)는 제대로 동작하지 않아 제거했다(2026-10-13).

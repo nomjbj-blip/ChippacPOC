@@ -13,14 +13,14 @@ namespace NexplantQMS.GdsMap
 {
     /// <summary>
     /// GDS Map View 화면의 "Chain 저장(DB)" 기능이다. (설계: 문서/2026-10-06_GDS_Chain_DB저장_설계.md 10.1절, 문서/2026-10-06_GDS_Map_화면역할_재정의_설계.md 4.4절)
-    /// 2026-10-06 사용자 결정: 버전 이력 없음(덮어쓰기) / 변경된 Chain 전체 저장 / 삭제는 실제 삭제 / DMS 호스트 모드에서만 사용.
-    /// 2026-10-06 CLAUDE-026: Setup 화면에서 이 화면으로 옮겼다. 화면 도형이 DB 도형 그대로라서 GDS 파일 SHA-256 / DB Map Layer 범위 검사는 하지 않는다.
+    /// 버전 이력 없음(덮어쓰기) / 변경된 Chain 전체 저장 / 삭제는 실제 삭제 / DMS 호스트 모드에서만 사용 (2026-10-06).
+    /// Setup 화면에서 이 화면으로 옮겼다 (2026-10-06). 화면 도형이 DB 도형 그대로라서 GDS 파일 SHA-256 / DB Map Layer 범위 검사는 하지 않는다.
     ///
     /// 처리 흐름 (BtnChainDbSave_Click)
     ///  1) 조회한 Map / 편집 모드 확인 -> 2) DB Map이 아직 READY인지 확인(다른 사용자가 삭제 / 재등록했을 수 있음)
     ///  -> 3) Chain마다 저장 행(Layer / 규칙 / Member / 편집 기록) 생성 + 검사(Input 1개 / Output ≤ 1개 / 포함 도형 있음)
     ///  -> 4) 변경 여부(마지막 저장 지문과 비교) / 삭제 대기 Chain을 보여 주고 확인.
-    ///     새 Chain인데 DB에 같은 Code가 있으면(불러온 뒤 다른 사용자가 저장) 덮어쓰지 않고 그 Chain만 제외한다(CLAUDE-026 4단계).
+    ///     새 Chain인데 DB에 같은 Code가 있으면(불러온 뒤 다른 사용자가 저장) 덮어쓰지 않고 그 Chain만 제외한다.
     ///  -> 5) 삭제 대기 Chain 삭제 -> Chain마다 BeginChainSave -> Member / 편집 배치 -> CompleteChainSave
     /// 서비스 호출은 Task.Run으로 UI 스레드 밖에서 한다.
     /// </summary>
@@ -145,7 +145,7 @@ namespace NexplantQMS.GdsMap
                 int deleted = 0, saved = 0, done = 0, total = _deletedDbChains.Count + toSave.Count;
                 foreach (ChainDefinition removed in _deletedDbChains.ToList())
                 {
-                    SetChainDbStatus("Chain 삭제 " + removed.Code + " (" + (++done) + "/" + total + ")");
+                    SetChainDbStatus("Chain 삭제 " + removed.Name + " (" + (++done) + "/" + total + ")");
                     string seq = removed.ChainSeq;
                     await Task.Run(() => chainService.DeleteChain(factory, deviceId, seq, user));
                     _deletedDbChains.Remove(removed);
@@ -153,10 +153,10 @@ namespace NexplantQMS.GdsMap
                 }
                 foreach (ChainSaveData item in toSave)
                 {
-                    SetChainDbStatus("Chain 저장 " + item.Chain.Code + " (" + (++done) + "/" + total + ")");
+                    SetChainDbStatus("Chain 저장 " + item.Chain.Name + " (" + (++done) + "/" + total + ")");
                     string result = await SaveOneChain(chainService, item, factory, deviceId, user);
                     if (result == null) saved++;
-                    else failures.Add(item.Chain.Code + " / " + item.Chain.Name + " : " + result);
+                    else failures.Add(item.Chain.Name + " : " + result);
                 }
                 _chainList.Invalidate();
                 string message = "저장 " + saved + "개 / 삭제 " + deleted + "개 / 변경 없음 " + data.Count(item => !item.Changed) + "개"
@@ -248,10 +248,10 @@ namespace NexplantQMS.GdsMap
             var text = new StringBuilder();
             text.Append("저장: ").Append(toSave.Count).Append("개");
             if (toSave.Count > 0)
-                text.Append(" (").Append(String.Join(", ", toSave.Select(item => item.Chain.Code + " 도형 " + item.Members.Count.ToString("N0")))).Append(")");
+                text.Append(" (").Append(String.Join(", ", toSave.Select(item => item.Chain.Name + " 도형 " + item.Members.Count.ToString("N0")))).Append(")");
             text.Append("\r\n변경 없음: ").Append(unchanged).Append("개");
             if (_deletedDbChains.Count > 0)
-                text.Append("\r\nDB에서 삭제: ").Append(String.Join(", ", _deletedDbChains.Select(chain => chain.Code + " / " + chain.Name)));
+                text.Append("\r\nDB에서 삭제: ").Append(String.Join(", ", _deletedDbChains.Select(chain => chain.Name)));
             if (invalid.Count > 0)
                 text.Append("\r\n\r\n아래 Chain은 저장하지 않습니다.\r\n").Append(FormatInvalidChains(invalid));
             text.Append("\r\n\r\nChain을 저장하시겠습니까?");
@@ -261,7 +261,8 @@ namespace NexplantQMS.GdsMap
 
         private static string FormatInvalidChains(IEnumerable<ChainSaveData> invalid)
         {
-            return String.Join("\r\n", invalid.Select(item => item.Chain.Code + " / " + item.Chain.Name + " : " + String.Join(", ", item.Problems)));
+            // Code(A, B, C)는 화면에 보이지 않는다. 이름으로 안내한다 (2026-10-12).
+            return String.Join("\r\n", invalid.Select(item => item.Chain.Name + " : " + String.Join(", ", item.Problems)));
         }
 
         /// <summary>
@@ -367,8 +368,7 @@ namespace NexplantQMS.GdsMap
 
         private void SetChainDbStatus(string text)
         {
-            _lblChainSetupStatus.Text = text;
-            _lblChainSetupStatus.Refresh();
+            SetChainStatus(text);
         }
     }
 }

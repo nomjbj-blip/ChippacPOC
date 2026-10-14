@@ -9,13 +9,14 @@ using System.Windows.Forms;
 namespace DACrux.SEMDMS.ENGUI
 {
     /// <summary>
-    /// 업로드된 E-Test 파일 1건의 저장 데이터를 보여 주는 조회 창이다. 업로드 화면의 등록 파일 목록을 더블클릭하면 열린다. (CLAUDE-029)
+    /// 업로드된 E-Test 파일 1건의 저장 데이터를 보여 주는 조회 창이다. 업로드 화면의 등록 파일 목록을 더블클릭하면 열린다.
     /// 설계: 문서/2026-10-07_ETest_결과파일_Parsing_DB설계.md 11절
     /// 처리 흐름:
     ///  1) 파일 정보 / Die 목록 / Device 측정 항목 / 측정값 전체를 한 번 조회한다(서버 GdsEtResult).
     ///  2) 측정값을 행 = 측정 항목, 열 = Die 표로 펼친다. 항목이 2,755개라 반대로 펼치면 열이 너무 많아진다.
-    ///  3) 거르기(Para / Chain 포함 / 미측정 있는 항목만)는 다시 조회하지 않고 DataView RowFilter로 한다.
-    /// 값은 저장값 그대로(R 형식) 보여 주고, 미측정은 "-"(회색), Fail Die 열 머리글은 붉은색이다. Limit 판정 색은 Limit 설정 화면과 함께 나중에 한다.
+    ///  3) 거르기(Para / Chain 포함 / '-' 있는 항목만)는 다시 조회하지 않고 DataView RowFilter로 한다.
+    /// 값은 저장값 그대로(R 형식) 보여 준다. "-" 셀은 회색이다(Fail 판정은 Spec 정의 항목만, 2026-10-12). Fail Die(DUT Flag) 열 머리글은 붉은색이다.
+    /// Limit 범위 밖 값 색은 아직 표시하지 않는다(Limit 설정 화면 연동 단계).
     /// </summary>
     public partial class frmEtResultView : Form
     {
@@ -143,11 +144,15 @@ namespace DACrux.SEMDMS.ENGUI
             // 파일 정보 줄
             Text = "E-Test 업로드 데이터 조회 - " + f["WAFER_ID"] + " (" + FormatTestTime(f["TEST_TIME"].ToString()) + ")"
                 + (f["LOAD_STATUS"].ToString() == "READY" ? string.Empty : " [" + f["LOAD_STATUS"] + "]");
-            lblInfo.Text = "WAFER_ID " + f["WAFER_ID"] + "  /  Lot " + f["LOT_ID"] + "  /  Slot " + f["SLOT_NO"]
-                + "  /  시험 프로그램 " + f["TEST_PROGRAM"] + "  /  시험 일시 " + FormatTestTime(f["TEST_TIME"].ToString())
-                + "  /  Factory " + f["FACTORY"] + "  /  Device " + f["DEVICE_ID"] + "\r\n"
-                + "Die " + dies.Rows.Count + "  /  측정 항목 " + table.Rows.Count + "  /  측정값 " + values.Rows.Count.ToString("N0", CultureInfo.InvariantCulture)
-                + " (미측정 " + notTestedTotal + ")  /  상태 " + f["LOAD_STATUS"] + "  /  파일 번호 " + f["SRC_FILE_SEQ"]
+            // 2026-10-12: 파일명 8칸 규칙 값(Customer / 파일 Device / Wafer Type / Rev / Fab)과 Pass / Fail Die 수를 함께 보여 준다(이전 규칙 파일은 DDL 이 채움).
+            lblInfo.Text = "WAFER_ID " + f["WAFER_ID"] + "  /  Lot " + f["LOT_ID"] + "  /  Slot " + f["SLOT_NO"] + "  /  Lot-Wafer No " + f["LOT_WAFER_NO"]
+                + "  /  Factory " + f["FACTORY"] + "  /  Device " + f["DEVICE_ID"] + "  /  면 " + f["VIEW_SIDE"] + "\r\n"
+                + "Customer " + f["CUSTOMER"] + "  /  파일 Device " + f["FILE_DEVICE"] + "  /  Wafer Type " + f["WAFER_TYPE"] + "  /  Wafer Rev " + f["WAFER_REV"]
+                + "  /  공정 " + f["TEST_PROGRAM"] + "  /  Test Date " + FormatTestTime(f["TEST_TIME"].ToString())
+                + "  /  Fab " + (f["FAB_NAME"].ToString().Length > 0 ? f["FAB_NAME"].ToString() : "(없음)") + "\r\n"
+                + "Die " + dies.Rows.Count + " (Pass " + f["PASS_DIE_COUNT"] + " / Fail " + f["FAIL_DIE_COUNT"] + ")  /  측정 항목 " + table.Rows.Count
+                + "  /  측정값 " + values.Rows.Count.ToString("N0", CultureInfo.InvariantCulture)
+                + " ('-' " + notTestedTotal + ")  /  상태 " + f["LOAD_STATUS"] + "  /  파일 번호 " + f["SRC_FILE_SEQ"]
                 + "  /  등록 " + f["CREATE_USER"] + " " + FormatDate(f["CREATE_TIME"]) + "  /  파일 " + f["FILE_NAME"];
 
             BindDieGrid(dies, dieNotTested);
@@ -155,11 +160,11 @@ namespace DACrux.SEMDMS.ENGUI
             FillParaList(table);
         }
 
-        /// <summary>왼쪽 Die 목록 (Die별 미측정 수 포함)</summary>
+        /// <summary>왼쪽 Die 목록 (Die별 '-' 값 수 포함)</summary>
         private void BindDieGrid(DataTable dies, int[] dieNotTested)
         {
             DataTable dt = new DataTable("ET_DIE_VIEW");
-            foreach (string name in new[] { "DUT", "X", "Y", "HW Bin", "SW Bin", "P/F", "Flag", "미측정" })
+            foreach (string name in new[] { "DUT", "X", "Y", "HW Bin", "SW Bin", "P/F", "Flag", "'-' 값" })
                 dt.Columns.Add(name, typeof(string));
             for (int i = 0; i < dies.Rows.Count; i++)
             {
@@ -251,7 +256,7 @@ namespace DACrux.SEMDMS.ENGUI
             ApplyFilter();
         }
 
-        /// <summary>Para / Chain 포함 / 미측정 있는 항목만 조건을 RowFilter로 건다.</summary>
+        /// <summary>Para / Chain 포함 / '-' 있는 항목만 조건을 RowFilter로 건다.</summary>
         private void ApplyFilter()
         {
             if (valueView == null) return;
@@ -304,14 +309,13 @@ namespace DACrux.SEMDMS.ENGUI
             }
         }
 
-        /// <summary>미측정("-") 셀은 회색 배경.</summary>
+        /// <summary>"-" 셀은 회색 가운데 정렬. Fail 여부는 Spec 정의 항목만 판정하므로(정의된 항목의 '-' 만 Fail, 2026-10-12) 여기서는 색으로 Fail 을 표시하지 않는다.</summary>
         private void dgvValue_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
         {
             if (e.ColumnIndex < 0 || e.RowIndex < 0) return;
             if (!dgvValue.Columns[e.ColumnIndex].Name.StartsWith(DieColumnPrefix, StringComparison.Ordinal)) return;
             if (Convert.ToString(e.Value) == "-")
             {
-                e.CellStyle.BackColor = Color.Gainsboro;
                 e.CellStyle.ForeColor = Color.DimGray;
                 e.CellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
             }

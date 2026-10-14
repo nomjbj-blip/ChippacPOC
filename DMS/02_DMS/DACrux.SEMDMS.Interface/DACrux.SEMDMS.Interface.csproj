@@ -69,7 +69,12 @@
     <Compile Include="iGdsMapView.cs" />
     <Compile Include="iGdsChain.cs" />
     <Compile Include="iGdsEtResult.cs" />
+    <Compile Include="iGdsEtResult_Para.cs" />
+    <Compile Include="Coordinate\DieCoordinateMapper.cs" />
+    <Compile Include="ETest\EtYmsRule.cs" />
+    <Compile Include="ETest\EtParameterNameRule.cs" />
     <Compile Include="iKlarfUpload.cs" />
+    <Compile Include="iGdsKlarfAnalysis.cs" />
     <Compile Include="iDefectMapAnalysis.cs" />
     <Compile Include="iDMReport.cs" />
     <Compile Include="iSEMConfiguration.cs" />

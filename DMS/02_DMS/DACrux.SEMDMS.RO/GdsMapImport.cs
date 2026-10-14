@@ -46,6 +46,22 @@ namespace DACrux.SEMDMS.RO
 
         #endregion
 
+        #region [TQP_GDS_MAP_SUB_DEVICE]
+
+        public int SaveSubDeviceList(string strFactory, string strDeviceID, string[] aSubDeviceIDs, string[] aRemarks, string strUpdateUser)
+        {
+            try
+            {
+                return m_OBJ.SaveSubDeviceList(strFactory, strDeviceID, aSubDeviceIDs, aRemarks, strUpdateUser);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        #endregion
+
         #region [TQP_GDS_IMPORT_JOB]
 
         public DataTable BeginMapImport(string[] ImportInfo)
@@ -121,22 +137,6 @@ namespace DACrux.SEMDMS.RO
             try
             {
                 return m_OBJ.CreateLayerBatch(strImportJobSeq, lBatchNo, aParas, strUpdateUser);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        #endregion
-
-        #region [TQP_GDS_SOURCE_EL]
-
-        public int CreateSourceBatch(string strImportJobSeq, long lBatchNo, string[,] aParas, string strUpdateUser)
-        {
-            try
-            {
-                return m_OBJ.CreateSourceBatch(strImportJobSeq, lBatchNo, aParas, strUpdateUser);
             }
             catch (Exception ex)
             {

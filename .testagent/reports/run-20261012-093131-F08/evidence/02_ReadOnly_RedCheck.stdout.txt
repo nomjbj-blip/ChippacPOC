@@ -1,0 +1,17 @@
+﻿BSL: D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\101_ServerBin\DACrux.SEMDMS.BSL.dll
+STEP_SEQ=501
+WAFER_SEQ=282
+PASS / 미리보기 후 Cancel 로 작업 폴더 0 (DB 쓰기 없는 경로) / 0
+STEP_COMMENT=UPLOAD;USER=ADMIN;FILE=XD106.02;RAW_WAFER_ID=XD106.02;CLASS_SRC=ROUGHBIN
+PASS / STEP COMMENT 업로드 구분 / 원본 WaferID / UPLOAD;USER=ADMIN;FILE=XD106.02;RAW_WAFER_ID=XD106.02;CLASS_SRC=ROUGHBIN
+PASS / 왼쪽 Wafer 조회(GetDMSStepWaferList)에 표시 / STEPLIST 1행 중 1
+PASS / Map 정보(GetDefectMapInfo) MAP 1 / DIE 26 (원본 검사 Die 26) / MAP 1 / DIE 26
+FAIL / Defect 16 건(GetDefectData, 원본 KLARF) / 15
+PASS / Defect 1 X = -23229.419 / Y = 86770.97 (원본 KLARF) / X=-23229.42 Y=86770.97
+PASS / CLASSNUMBER = ROUGHBIN 54 (D3, CLASS_SRC=ROUGHBIN) / CLASS=54 ROUGH=54
+IMAGE_ROWS=15
+PASS / 이미지 경로 = 드라이브 없는 / 상대 경로 (D4) / 이미지 행 15 중 절대/역슬래시 경로 0 예: FTP/SCK/20261008/PFIC_RH-HS2615_C4BUMP
+PASS / 이미지 행 수 = IMAGECOUNT>0 Defect 수 (없는 파일 행 미생성) / 이미지 행 15 / IMAGECOUNT>0 Defect 15
+PASS / Defect Map Viewer 정보(GetDefectMapViewer_Info) 예외 없음 / 
+PASS / TQD_SETUP.SETUP_ID 46자 그대로 (D2) / 46자 ROOT-CAI-OMM_Hybrid-OMM_Hybrid_C4Bump_Silterra
+KLARF_UPLOAD_READ_ONLY_PROBE=FAIL (1 / 11)

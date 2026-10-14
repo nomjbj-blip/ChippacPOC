@@ -86,3 +86,24 @@ powershell -NoProfile -ExecutionPolicy Bypass -File '.\Probes\ChainOpenEndedProb
 **2026-10-07 Front / Back 보기(CLAUDE-030):** View 보기 기준을 바꿔도 Chain 소속(도형 ID)은 같다. Marker는 저장 기준 좌표로 저장되고 화면에서만 반전. 전환 처리 `GdsMapViewForm_ChainSide.cs`(`MirrorChainsForSideChange` / `ToStoredX` / `ToDisplayX`). Probe `GdsFrontBackViewProbe.ps1`.
 
 **2026-10-07 Label 검색(CLAUDE-032):** View 화면 조회 조건 아래 Label 검색 줄. TEXT 도형 전체(Layer 무관) 색인을 [조회] 때 받아 정확히 / 시작 / 포함 검색 -> 결과 목록 콤보 + 지도 표시(노란 원 + 십자) + 300µm 이동. Chain 연결 표시는 2단계. 서비스 `iGdsMapView.GetMapTextIndex`, 로직 `Persistence/GdsLabelIndex.cs`, Probe `GdsLabelSearchProbe.ps1`. [Label 검색 설계](../../../문서/2026-10-07_GDS_Label_검색_설계.md) 9절.
+
+## 2026-10-08 / Chain 색상 구분 + 색상 변경 + IN·OUT 표시 제거 (CLAUDE-038, GDS Map View)
+
+- **새 Chain 색:** 고정 8색 순환 대신 `Chain/ChainColorPicker.Pick`이 화면의 모든 Chain 색(DB에서 불러온 Chain 포함)과 CIE Lab 거리가 가장 먼 후보를 고른다. 지도 Layer 색과의 거리는 작은 가중치(최대 40 x 0.3)로만 반영한다. 후보는 색상환 24 x 3단계 + 흰색이며, 어두운 배경에서 안 보이는 색(Lab L < 50, 예: #0000FF)은 제외한다. 같은 입력이면 항상 같은 색이다.
+- **색상 변경:** Chain 목록 우클릭 -> "색상 변경..."(ColorDialog, 추천 16색 제공). 우클릭한 행의 Chain 색을 바꾸며 편집 중인 Chain이 아니어도 된다. 다른 작업(Input / Output 지정, 편집, 탐색, DB 저장) 중에는 목록이 비활성이라 메뉴가 열리지 않는다. 색은 DB 저장 지문에 포함되므로 [Chain 저장(DB)] 때 변경 Chain으로 저장된다. 다른 Chain과 ΔE 15 미만이면 상태 줄에 알린다.
+- **IN / OUT 표시 제거:** View 화면이 `GdsMapControl.SetChainEndpointPoints`에 항상 빈 목록을 넘긴다(2곳). 지정한 Input / Output 도형은 노란 선택 강조로 보인다. 공통 컨트롤의 표시 기능 자체는 남겨 두었다(다른 화면 호출 없음).
+- 검증: `Probes/GdsChainColorProbe.ps1` 7 PASS(예전 8색 최소 ΔE 27.6 -> 51.2, 기존 초록 / 하늘색 다음 색 #FF0000 ΔE 148, 배경 대비 최소 ΔE 58.6). 화면 동작(우클릭 메뉴 / IN·OUT 미표시 / 다시 조회 후 잔여 없음)은 DMS 화면 확인 대기.
+
+## 2026-10-08 / Input 근처 Label로 Chain 이름 자동 지정 (CLAUDE-049, GDS Map View)
+
+- Input 확정 직후 `GdsMapControl.FindChainEndpointLabel`로 Input 주변 창(Input 크기 x 3) 안에서만 계산한다. 1순위 = Input에서 3단계 이내로 실제 겹쳐 이어진 도형 안의 Label(단계 수 -> 클릭점 거리), 2순위 = 창 안 가장 가까운 Label, 없으면 이름 유지. 창 안 도형이 2,000개를 넘으면 연결 탐색을 건너뛰고 2순위만 쓴다.
+- 이름은 기본값("Chain " + Code)이거나 자동으로 붙인 이름일 때만 바꾼다. [이름 수정]으로 바꾼 이름은 그대로 둔다. Label 문자열을 그대로 쓰고, 같은 이름의 Chain이 있으면 상태 줄에만 알린다.
+- 연결은 지금 보이는 Layer의 도형만 따라간다. Label은 Layer와 무관하며 화면 기준 좌표(Front / Back 반영)를 쓴다. DB / 서비스 변경 없음.
+- 검증: `Probes/GdsChainInputLabelProbe.ps1` 4 PASS(표본 60 모두 정답, 평균 64.5ms / 최대 176.8ms). 화면 확인 대기.
+
+## 2026-10-12 화면 표시 정리
+
+- CLAUDE-059: Chain Code(A, B, C)는 화면에서 숨김(DB 키로만 사용). 새 Chain 기본 이름 "새 Chain n", Input Label 을 찾으면 그 이름으로 바뀜.
+- CLAUDE-060: 자동 Chain 색에서 흰색 / 흰색 근처 제외(흰색 = 유사 묶음 찾기 결과 표시 색).
+
+**2026-10-13 목록 체크는 더블클릭(CLAUDE-079):** 조회 화면 Chain 목록(표시) / 유사 묶음 목록(제외)은 한 번 클릭 = 선택만, 더블클릭 = 체크 토글. Smoke `GdsChainListDoubleClickSmoke.ps1`.

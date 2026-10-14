@@ -55,7 +55,7 @@ VALUES
         <commandtext><![CDATA[SELECT STREAM_KIND, BATCH_NO, PAYLOAD_SHA256
   FROM TQP_GDS_IMPORT_BATCH
  WHERE IMPORT_JOB_SEQ = :import_job_seq
- ORDER BY DECODE(STREAM_KIND, 'LAYER', 1, 'SOURCE', 2, 'PLACED', 3, 9), BATCH_NO]]></commandtext>
+ ORDER BY DECODE(STREAM_KIND, 'LAYER', 1, 'PLACED', 2, 9), BATCH_NO]]></commandtext>
         <parameters>
             <param direction="Input" dbtype="Number" size="0">:import_job_seq</param>
         </parameters>

@@ -138,6 +138,17 @@
     <Compile Include="Admin\frmStandardMapSetup.Designer.cs">
       <DependentUpon>frmStandardMapSetup.cs</DependentUpon>
     </Compile>
+    <Compile Include="Admin\StoredMapLayout.cs" />
+    <Compile Include="Admin\DieNumberRule.cs" />
+    <Compile Include="Admin\frmStandardMapView.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\frmStandardMapView.Designer.cs">
+      <DependentUpon>frmStandardMapView.cs</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="Admin\frmStandardMapView.resx">
+      <DependentUpon>frmStandardMapView.cs</DependentUpon>
+    </EmbeddedResource>
     <Compile Include="Admin\DlgBinCopy.cs">
       <SubType>Form</SubType>
     </Compile>

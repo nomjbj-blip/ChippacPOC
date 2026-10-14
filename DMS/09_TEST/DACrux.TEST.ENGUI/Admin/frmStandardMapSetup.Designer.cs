@@ -15,6 +15,7 @@
         /// <summary>파일 선택 / 저장 설정 / 형상 미리보기를 WinForms 디자이너 구성으로 만든다.</summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmStandardMapSetup));
             this.fileBar = new System.Windows.Forms.Panel();
             this.txtFile = new System.Windows.Forms.TextBox();
             this.btnBrowse = new System.Windows.Forms.Button();
@@ -29,6 +30,12 @@
             this.lblOriginY = new System.Windows.Forms.Label();
             this.numOriginX = new System.Windows.Forms.NumericUpDown();
             this.numOriginY = new System.Windows.Forms.NumericUpDown();
+            this.lblPitch = new System.Windows.Forms.Label();
+            this.lblPitchX = new System.Windows.Forms.Label();
+            this.lblPitchY = new System.Windows.Forms.Label();
+            this.numPitchX = new System.Windows.Forms.NumericUpDown();
+            this.numPitchY = new System.Windows.Forms.NumericUpDown();
+            this.btnPitchKlarf = new System.Windows.Forms.Button();
             this.lblHelp = new System.Windows.Forms.Label();
             this.txtInfo = new System.Windows.Forms.TextBox();
             this.btnSave = new System.Windows.Forms.Button();
@@ -41,7 +48,18 @@
             this.numEdge = new System.Windows.Forms.NumericUpDown();
             this.lblDirection = new System.Windows.Forms.Label();
             this.cmbXYDirection = new System.Windows.Forms.ComboBox();
+            this.lblFlatZone = new System.Windows.Forms.Label();
+            this.cmbFlatZone = new System.Windows.Forms.ComboBox();
+            this.lblMarkType = new System.Windows.Forms.Label();
+            this.cmbMarkType = new System.Windows.Forms.ComboBox();
             this.btnGenerate = new System.Windows.Forms.Button();
+            this.chkDieNumber = new System.Windows.Forms.CheckBox();
+            this.lblEditMode = new System.Windows.Forms.Label();
+            this.rdoView = new System.Windows.Forms.RadioButton();
+            this.rdoRemove = new System.Windows.Forms.RadioButton();
+            this.rdoRestore = new System.Windows.Forms.RadioButton();
+            this.btnRemoveNotInspected = new System.Windows.Forms.Button();
+            this.btnRemoveOutside = new System.Windows.Forms.Button();
             this.lblDieCount = new System.Windows.Forms.Label();
             this.m_wMap = new DACrux.TEST.ENGUI.StandardMapEditMap();
             this.fileBar.SuspendLayout();
@@ -49,6 +67,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.numOriginX)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numOriginY)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numEdge)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numPitchX)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numPitchY)).BeginInit();
             this.SuspendLayout();
             // 
             // fileBar
@@ -68,28 +88,36 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtFile.Location = new System.Drawing.Point(12, 14);
             this.txtFile.Name = "txtFile";
-            this.txtFile.Size = new System.Drawing.Size(1386, 31);
+            this.txtFile.Size = new System.Drawing.Size(1350, 31);
             this.txtFile.TabIndex = 0;
             this.txtFile.TextChanged += new System.EventHandler(this.txtFile_TextChanged);
             // 
             // btnBrowse
             // 
             this.btnBrowse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnBrowse.Location = new System.Drawing.Point(1408, 10);
+            this.btnBrowse.BackColor = System.Drawing.Color.White;
+            this.btnBrowse.Image = ((System.Drawing.Image)(resources.GetObject("btnBrowse.Image")));
+            this.btnBrowse.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnBrowse.UseVisualStyleBackColor = false;
+            this.btnBrowse.Location = new System.Drawing.Point(1372, 10);
             this.btnBrowse.Name = "btnBrowse";
-            this.btnBrowse.Size = new System.Drawing.Size(102, 32);
+            this.btnBrowse.Size = new System.Drawing.Size(120, 32);
             this.btnBrowse.TabIndex = 1;
-            this.btnBrowse.Text = "파일 선택";
+            this.btnBrowse.Text = "  파일 선택";
             this.btnBrowse.Click += new System.EventHandler(this.btnBrowse_Click);
             // 
             // btnParse
             // 
             this.btnParse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnParse.Location = new System.Drawing.Point(1518, 10);
+            this.btnParse.BackColor = System.Drawing.Color.White;
+            this.btnParse.Image = ((System.Drawing.Image)(resources.GetObject("btnParse.Image")));
+            this.btnParse.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnParse.UseVisualStyleBackColor = false;
+            this.btnParse.Location = new System.Drawing.Point(1500, 10);
             this.btnParse.Name = "btnParse";
-            this.btnParse.Size = new System.Drawing.Size(102, 32);
+            this.btnParse.Size = new System.Drawing.Size(120, 32);
             this.btnParse.TabIndex = 2;
-            this.btnParse.Text = "다시 읽기";
+            this.btnParse.Text = "  다시 읽기";
             this.btnParse.Click += new System.EventHandler(this.btnParse_Click);
             // 
             // settings
@@ -105,12 +133,29 @@
             this.settings.Controls.Add(this.numEdge);
             this.settings.Controls.Add(this.lblDirection);
             this.settings.Controls.Add(this.cmbXYDirection);
+            this.settings.Controls.Add(this.lblFlatZone);
+            this.settings.Controls.Add(this.cmbFlatZone);
+            this.settings.Controls.Add(this.lblMarkType);
+            this.settings.Controls.Add(this.cmbMarkType);
             this.settings.Controls.Add(this.lblOrigin);
             this.settings.Controls.Add(this.lblOriginX);
             this.settings.Controls.Add(this.lblOriginY);
             this.settings.Controls.Add(this.numOriginX);
             this.settings.Controls.Add(this.numOriginY);
+            this.settings.Controls.Add(this.lblPitch);
+            this.settings.Controls.Add(this.lblPitchX);
+            this.settings.Controls.Add(this.lblPitchY);
+            this.settings.Controls.Add(this.numPitchX);
+            this.settings.Controls.Add(this.numPitchY);
+            this.settings.Controls.Add(this.btnPitchKlarf);
             this.settings.Controls.Add(this.btnGenerate);
+            this.settings.Controls.Add(this.chkDieNumber);
+            this.settings.Controls.Add(this.lblEditMode);
+            this.settings.Controls.Add(this.rdoView);
+            this.settings.Controls.Add(this.rdoRemove);
+            this.settings.Controls.Add(this.rdoRestore);
+            this.settings.Controls.Add(this.btnRemoveNotInspected);
+            this.settings.Controls.Add(this.btnRemoveOutside);
             this.settings.Controls.Add(this.lblHelp);
             this.settings.Controls.Add(this.txtInfo);
             this.settings.Controls.Add(this.btnSave);
@@ -226,9 +271,51 @@
             this.cmbXYDirection.TabIndex = 4;
             this.cmbXYDirection.SelectedIndexChanged += new System.EventHandler(this.MapSettingsChanged);
             // 
+            // lblFlatZone
+            // 
+            this.lblFlatZone.Location = new System.Drawing.Point(12, 256);
+            this.lblFlatZone.Name = "lblFlatZone";
+            this.lblFlatZone.Size = new System.Drawing.Size(135, 22);
+            this.lblFlatZone.TabIndex = 19;
+            this.lblFlatZone.Text = "Flat Zone 위치";
+            // 
+            // cmbFlatZone
+            // 
+            this.cmbFlatZone.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbFlatZone.Items.AddRange(new object[] {
+            "Bottom",
+            "Top",
+            "Left",
+            "Right"});
+            this.cmbFlatZone.Location = new System.Drawing.Point(12, 280);
+            this.cmbFlatZone.Name = "cmbFlatZone";
+            this.cmbFlatZone.Size = new System.Drawing.Size(135, 33);
+            this.cmbFlatZone.TabIndex = 20;
+            this.cmbFlatZone.SelectedIndexChanged += new System.EventHandler(this.MapSettingsChanged);
+            // 
+            // lblMarkType
+            // 
+            this.lblMarkType.Location = new System.Drawing.Point(157, 256);
+            this.lblMarkType.Name = "lblMarkType";
+            this.lblMarkType.Size = new System.Drawing.Size(135, 22);
+            this.lblMarkType.TabIndex = 21;
+            this.lblMarkType.Text = "형태 (Notch / Flat)";
+            // 
+            // cmbMarkType
+            // 
+            this.cmbMarkType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbMarkType.Items.AddRange(new object[] {
+            "Notch",
+            "Flat"});
+            this.cmbMarkType.Location = new System.Drawing.Point(157, 280);
+            this.cmbMarkType.Name = "cmbMarkType";
+            this.cmbMarkType.Size = new System.Drawing.Size(135, 33);
+            this.cmbMarkType.TabIndex = 22;
+            this.cmbMarkType.SelectedIndexChanged += new System.EventHandler(this.MapSettingsChanged);
+            // 
             // lblOrigin
             // 
-            this.lblOrigin.Location = new System.Drawing.Point(12, 256);
+            this.lblOrigin.Location = new System.Drawing.Point(12, 320);
             this.lblOrigin.Name = "lblOrigin";
             this.lblOrigin.Size = new System.Drawing.Size(290, 22);
             this.lblOrigin.TabIndex = 2;
@@ -236,7 +323,7 @@
             // 
             // lblOriginX
             // 
-            this.lblOriginX.Location = new System.Drawing.Point(12, 288);
+            this.lblOriginX.Location = new System.Drawing.Point(12, 352);
             this.lblOriginX.Name = "lblOriginX";
             this.lblOriginX.Size = new System.Drawing.Size(20, 22);
             this.lblOriginX.TabIndex = 3;
@@ -244,7 +331,7 @@
             // 
             // lblOriginY
             // 
-            this.lblOriginY.Location = new System.Drawing.Point(157, 288);
+            this.lblOriginY.Location = new System.Drawing.Point(157, 352);
             this.lblOriginY.Name = "lblOriginY";
             this.lblOriginY.Size = new System.Drawing.Size(20, 22);
             this.lblOriginY.TabIndex = 4;
@@ -253,7 +340,7 @@
             // numOriginX
             // 
             this.numOriginX.DecimalPlaces = 3;
-            this.numOriginX.Location = new System.Drawing.Point(32, 285);
+            this.numOriginX.Location = new System.Drawing.Point(32, 349);
             this.numOriginX.Maximum = new decimal(new int[] {
             1000000,
             0,
@@ -272,7 +359,7 @@
             // numOriginY
             // 
             this.numOriginY.DecimalPlaces = 3;
-            this.numOriginY.Location = new System.Drawing.Point(177, 285);
+            this.numOriginY.Location = new System.Drawing.Point(177, 349);
             this.numOriginY.Maximum = new decimal(new int[] {
             1000000,
             0,
@@ -288,54 +375,229 @@
             this.numOriginY.TabIndex = 6;
             this.numOriginY.ValueChanged += new System.EventHandler(this.MapSettingsChanged);
             // 
+            // lblPitch
+            // 
+            this.lblPitch.Location = new System.Drawing.Point(12, 388);
+            this.lblPitch.Name = "lblPitch";
+            this.lblPitch.Size = new System.Drawing.Size(290, 22);
+            this.lblPitch.TabIndex = 23;
+            this.lblPitch.Text = "Die Pitch (µm) / 기본: KLARF DiePitch";
+            // 
+            // lblPitchX
+            // 
+            this.lblPitchX.Location = new System.Drawing.Point(12, 420);
+            this.lblPitchX.Name = "lblPitchX";
+            this.lblPitchX.Size = new System.Drawing.Size(20, 22);
+            this.lblPitchX.TabIndex = 24;
+            this.lblPitchX.Text = "X";
+            // 
+            // lblPitchY
+            // 
+            this.lblPitchY.Location = new System.Drawing.Point(157, 420);
+            this.lblPitchY.Name = "lblPitchY";
+            this.lblPitchY.Size = new System.Drawing.Size(20, 22);
+            this.lblPitchY.TabIndex = 25;
+            this.lblPitchY.Text = "Y";
+            // 
+            // numPitchX
+            // 
+            this.numPitchX.DecimalPlaces = 3;
+            this.numPitchX.Location = new System.Drawing.Point(32, 417);
+            this.numPitchX.Maximum = new decimal(new int[] {
+            1000000,
+            0,
+            0,
+            0});
+            this.numPitchX.Name = "numPitchX";
+            this.numPitchX.Size = new System.Drawing.Size(115, 31);
+            this.numPitchX.TabIndex = 26;
+            this.numPitchX.ThousandsSeparator = true;
+            this.numPitchX.ValueChanged += new System.EventHandler(this.MapSettingsChanged);
+            // 
+            // numPitchY
+            // 
+            this.numPitchY.DecimalPlaces = 3;
+            this.numPitchY.Location = new System.Drawing.Point(177, 417);
+            this.numPitchY.Maximum = new decimal(new int[] {
+            1000000,
+            0,
+            0,
+            0});
+            this.numPitchY.Name = "numPitchY";
+            this.numPitchY.Size = new System.Drawing.Size(115, 31);
+            this.numPitchY.TabIndex = 27;
+            this.numPitchY.ThousandsSeparator = true;
+            this.numPitchY.ValueChanged += new System.EventHandler(this.MapSettingsChanged);
+            // 
+            // btnPitchKlarf
+            // 
+            this.btnPitchKlarf.Enabled = false;
+            this.btnPitchKlarf.BackColor = System.Drawing.Color.White;
+            this.btnPitchKlarf.Image = ((System.Drawing.Image)(resources.GetObject("btnPitchKlarf.Image")));
+            this.btnPitchKlarf.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnPitchKlarf.UseVisualStyleBackColor = false;
+            this.btnPitchKlarf.Location = new System.Drawing.Point(12, 456);
+            this.btnPitchKlarf.Name = "btnPitchKlarf";
+            this.btnPitchKlarf.Size = new System.Drawing.Size(170, 32);
+            this.btnPitchKlarf.TabIndex = 28;
+            this.btnPitchKlarf.Text = "  KLARF 값으로";
+            this.btnPitchKlarf.Click += new System.EventHandler(this.btnPitchKlarf_Click);
+            // 
             // btnGenerate
             // 
             this.btnGenerate.Enabled = false;
-            this.btnGenerate.Location = new System.Drawing.Point(12, 324);
+            this.btnGenerate.BackColor = System.Drawing.Color.White;
+            this.btnGenerate.Image = ((System.Drawing.Image)(resources.GetObject("btnGenerate.Image")));
+            this.btnGenerate.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnGenerate.UseVisualStyleBackColor = false;
+            this.btnGenerate.Location = new System.Drawing.Point(12, 496);
             this.btnGenerate.Name = "btnGenerate";
-            this.btnGenerate.Size = new System.Drawing.Size(280, 36);
+            this.btnGenerate.Size = new System.Drawing.Size(170, 36);
             this.btnGenerate.TabIndex = 7;
-            this.btnGenerate.Text = "원형 생성";
+            this.btnGenerate.Text = "  원형 생성";
             this.btnGenerate.Click += new System.EventHandler(this.btnGenerate_Click);
+            // 
+            // chkDieNumber
+            // 
+            this.chkDieNumber.Checked = true;
+            this.chkDieNumber.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkDieNumber.Location = new System.Drawing.Point(192, 500);
+            this.chkDieNumber.Name = "chkDieNumber";
+            this.chkDieNumber.Size = new System.Drawing.Size(100, 28);
+            this.chkDieNumber.TabIndex = 19;
+            this.chkDieNumber.Text = "Die 번호";
+            this.chkDieNumber.UseVisualStyleBackColor = true;
+            this.chkDieNumber.CheckedChanged += new System.EventHandler(this.chkDieNumber_CheckedChanged);
+            // 
+            // lblEditMode
+            // 
+            this.lblEditMode.Location = new System.Drawing.Point(12, 540);
+            this.lblEditMode.Name = "lblEditMode";
+            this.lblEditMode.Size = new System.Drawing.Size(280, 22);
+            this.lblEditMode.TabIndex = 13;
+            this.lblEditMode.Text = "Die 편집 (제거 / 복원 = Map 클릭 또는 드래그)";
+            // 
+            // rdoView
+            // 
+            this.rdoView.Appearance = System.Windows.Forms.Appearance.Button;
+            this.rdoView.BackColor = System.Drawing.Color.White;
+            this.rdoView.Checked = true;
+            this.rdoView.TabStop = true;
+            this.rdoView.Image = ((System.Drawing.Image)(resources.GetObject("rdoView.Image")));
+            this.rdoView.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.rdoView.Location = new System.Drawing.Point(12, 564);
+            this.rdoView.Name = "rdoView";
+            this.rdoView.Size = new System.Drawing.Size(88, 32);
+            this.rdoView.TabIndex = 14;
+            this.rdoView.Text = "  보기";
+            this.rdoView.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.rdoView.UseVisualStyleBackColor = false;
+            this.rdoView.CheckedChanged += new System.EventHandler(this.EditModeChanged);
+            // 
+            // rdoRemove
+            // 
+            this.rdoRemove.Appearance = System.Windows.Forms.Appearance.Button;
+            this.rdoRemove.BackColor = System.Drawing.Color.White;
+            this.rdoRemove.Image = ((System.Drawing.Image)(resources.GetObject("rdoRemove.Image")));
+            this.rdoRemove.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.rdoRemove.Location = new System.Drawing.Point(108, 564);
+            this.rdoRemove.Name = "rdoRemove";
+            this.rdoRemove.Size = new System.Drawing.Size(88, 32);
+            this.rdoRemove.TabIndex = 15;
+            this.rdoRemove.Text = "  제거";
+            this.rdoRemove.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.rdoRemove.UseVisualStyleBackColor = false;
+            this.rdoRemove.CheckedChanged += new System.EventHandler(this.EditModeChanged);
+            // 
+            // rdoRestore
+            // 
+            this.rdoRestore.Appearance = System.Windows.Forms.Appearance.Button;
+            this.rdoRestore.BackColor = System.Drawing.Color.White;
+            this.rdoRestore.Image = ((System.Drawing.Image)(resources.GetObject("rdoRestore.Image")));
+            this.rdoRestore.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.rdoRestore.Location = new System.Drawing.Point(204, 564);
+            this.rdoRestore.Name = "rdoRestore";
+            this.rdoRestore.Size = new System.Drawing.Size(88, 32);
+            this.rdoRestore.TabIndex = 16;
+            this.rdoRestore.Text = "  복원";
+            this.rdoRestore.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.rdoRestore.UseVisualStyleBackColor = false;
+            this.rdoRestore.CheckedChanged += new System.EventHandler(this.EditModeChanged);
+            // 
+            // btnRemoveNotInspected
+            // 
+            this.btnRemoveNotInspected.BackColor = System.Drawing.Color.White;
+            this.btnRemoveNotInspected.Enabled = false;
+            this.btnRemoveNotInspected.Image = ((System.Drawing.Image)(resources.GetObject("btnRemoveNotInspected.Image")));
+            this.btnRemoveNotInspected.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnRemoveNotInspected.Location = new System.Drawing.Point(12, 604);
+            this.btnRemoveNotInspected.Name = "btnRemoveNotInspected";
+            this.btnRemoveNotInspected.Size = new System.Drawing.Size(280, 34);
+            this.btnRemoveNotInspected.TabIndex = 17;
+            this.btnRemoveNotInspected.Text = "  검사 Die 외 제거";
+            this.btnRemoveNotInspected.UseVisualStyleBackColor = false;
+            this.btnRemoveNotInspected.Click += new System.EventHandler(this.btnRemoveNotInspected_Click);
+            // 
+            // btnRemoveOutside
+            // 
+            this.btnRemoveOutside.BackColor = System.Drawing.Color.White;
+            this.btnRemoveOutside.Enabled = false;
+            this.btnRemoveOutside.Image = ((System.Drawing.Image)(resources.GetObject("btnRemoveOutside.Image")));
+            this.btnRemoveOutside.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnRemoveOutside.Location = new System.Drawing.Point(12, 644);
+            this.btnRemoveOutside.Name = "btnRemoveOutside";
+            this.btnRemoveOutside.Size = new System.Drawing.Size(280, 34);
+            this.btnRemoveOutside.TabIndex = 18;
+            this.btnRemoveOutside.Text = "  Wafer 밖 제거";
+            this.btnRemoveOutside.UseVisualStyleBackColor = false;
+            this.btnRemoveOutside.Click += new System.EventHandler(this.btnRemoveOutside_Click);
             // 
             // lblHelp
             // 
             this.lblHelp.ForeColor = System.Drawing.Color.DimGray;
-            this.lblHelp.Location = new System.Drawing.Point(12, 368);
+            this.lblHelp.Location = new System.Drawing.Point(12, 686);
             this.lblHelp.Name = "lblHelp";
             this.lblHelp.Size = new System.Drawing.Size(285, 66);
             this.lblHelp.TabIndex = 5;
-            this.lblHelp.Text = "설정을 바꾸면 [원형 생성]을 누르세요.\r\nMap 오른쪽 클릭 > Edit Map 으로 Die 를\r\n지우거나 되살립니다. 제거 Die 는 USECODE -1 입니다.";
+            this.lblHelp.Text = "설정을 바꾸면 [원형 생성]을 누르세요.\r\n제거 / 복원을 고른 뒤 Map 을 클릭하거나 드래그합니다.\r\n제거 Die 는 USECODE -1 로 저장합니다.";
             // 
             // txtInfo
             // 
             this.txtInfo.BackColor = System.Drawing.SystemColors.Window;
-            this.txtInfo.Location = new System.Drawing.Point(12, 438);
+            this.txtInfo.Location = new System.Drawing.Point(12, 756);
             this.txtInfo.Multiline = true;
             this.txtInfo.Name = "txtInfo";
             this.txtInfo.ReadOnly = true;
             this.txtInfo.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtInfo.Size = new System.Drawing.Size(280, 300);
+            this.txtInfo.Size = new System.Drawing.Size(280, 180);
             this.txtInfo.TabIndex = 8;
             // 
             // btnSave
             // 
             this.btnSave.Enabled = false;
-            this.btnSave.Location = new System.Drawing.Point(12, 748);
+            this.btnSave.BackColor = System.Drawing.Color.White;
+            this.btnSave.Image = ((System.Drawing.Image)(resources.GetObject("btnSave.Image")));
+            this.btnSave.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnSave.UseVisualStyleBackColor = false;
+            this.btnSave.Location = new System.Drawing.Point(12, 944);
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(280, 36);
             this.btnSave.TabIndex = 9;
-            this.btnSave.Text = "Map 저장 (같은 ID 는 덮어쓰기 확인)";
+            this.btnSave.Text = "  Map 저장 (같은 ID 는 덮어쓰기 확인)";
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
             // btnOpenMap
             // 
             this.btnOpenMap.Enabled = false;
-            this.btnOpenMap.Location = new System.Drawing.Point(12, 791);
+            this.btnOpenMap.BackColor = System.Drawing.Color.White;
+            this.btnOpenMap.Image = ((System.Drawing.Image)(resources.GetObject("btnOpenMap.Image")));
+            this.btnOpenMap.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnOpenMap.UseVisualStyleBackColor = false;
+            this.btnOpenMap.Location = new System.Drawing.Point(12, 986);
             this.btnOpenMap.Name = "btnOpenMap";
             this.btnOpenMap.Size = new System.Drawing.Size(280, 34);
             this.btnOpenMap.TabIndex = 10;
-            this.btnOpenMap.Text = "저장 Map 열기";
+            this.btnOpenMap.Text = "  저장 Map 열기";
             this.btnOpenMap.Click += new System.EventHandler(this.btnOpenMap_Click);
             // 
             // lblStatus
@@ -399,7 +661,7 @@
             this.m_wMap.DrawSkipDie = false;
             this.m_wMap.EdgeColor = System.Drawing.Color.LightGray;
             this.m_wMap.EdgeSize = 0D;
-            this.m_wMap.EditMenuVisible = true;
+            this.m_wMap.EditMenuVisible = false;
             this.m_wMap.EditMethod = DACrux.Map.EditMode.ADD;
             this.m_wMap.FirstDieBorderColor = System.Drawing.Color.SkyBlue;
             this.m_wMap.FirstDieX = 0;
@@ -461,6 +723,7 @@
             this.m_wMap.OnChangeDieProperty += new DACrux.Map.ChangeDieProperty(this.m_wMap_OnChangeDieProperty);
             this.m_wMap.MouseMove += new System.Windows.Forms.MouseEventHandler(this.m_wMap_MouseMove);
             this.m_wMap.MouseLeave += new System.EventHandler(this.m_wMap_MouseLeave);
+            this.m_wMap.MouseUp += new System.Windows.Forms.MouseEventHandler(this.m_wMap_MouseUp);
             // 
             // frmStandardMapSetup
             // 
@@ -485,6 +748,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.numOriginX)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numOriginY)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numEdge)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numPitchX)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numPitchY)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -503,6 +768,12 @@
         private System.Windows.Forms.Label lblOriginY;
         private System.Windows.Forms.NumericUpDown numOriginX;
         private System.Windows.Forms.NumericUpDown numOriginY;
+        private System.Windows.Forms.Label lblPitch;
+        private System.Windows.Forms.Label lblPitchX;
+        private System.Windows.Forms.Label lblPitchY;
+        private System.Windows.Forms.NumericUpDown numPitchX;
+        private System.Windows.Forms.NumericUpDown numPitchY;
+        private System.Windows.Forms.Button btnPitchKlarf;
         private System.Windows.Forms.Label lblHelp;
         private System.Windows.Forms.TextBox txtInfo;
         private System.Windows.Forms.Button btnSave;
@@ -514,7 +785,18 @@
         private System.Windows.Forms.NumericUpDown numEdge;
         private System.Windows.Forms.Label lblDirection;
         private System.Windows.Forms.ComboBox cmbXYDirection;
+        private System.Windows.Forms.Label lblFlatZone;
+        private System.Windows.Forms.ComboBox cmbFlatZone;
+        private System.Windows.Forms.Label lblMarkType;
+        private System.Windows.Forms.ComboBox cmbMarkType;
         private System.Windows.Forms.Button btnGenerate;
+        private System.Windows.Forms.CheckBox chkDieNumber;
+        private System.Windows.Forms.Label lblEditMode;
+        private System.Windows.Forms.RadioButton rdoView;
+        private System.Windows.Forms.RadioButton rdoRemove;
+        private System.Windows.Forms.RadioButton rdoRestore;
+        private System.Windows.Forms.Button btnRemoveNotInspected;
+        private System.Windows.Forms.Button btnRemoveOutside;
         private System.Windows.Forms.Label lblStatus;
         private System.Windows.Forms.Label lblCoordinates;
         private System.Windows.Forms.Label lblDieCount;

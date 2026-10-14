@@ -1,4 +1,4 @@
-﻿# E-Test 결과 업로드 화면(frmEtResultUpload) Smoke 검사 (CLAUDE-029, 구현 2단계)
+﻿# E-Test 결과 업로드 화면(frmEtResultUpload) Smoke 검사 (2026-10-07)
 # Smoke = 화면을 화면 밖에서 실제로 띄워 [분석] -> [DB 저장] -> 재저장 -> 삭제 흐름이 깨지지 않는지 확인하는 자동 검사. Verify-KlarfUpload.ps1 과 같은 구조.
 # 하는 일:
 #  1) 운영 폴더(100_ClientBin / 101_ServerBin)는 바꾸지 않고 %TEMP% 에 Interface / DSL / BSL / RO / ENGUI 를 따로 빌드한다.
@@ -33,11 +33,17 @@ function Build-Temp($proj, $refDir) {
     $warn | ForEach-Object { Write-Output ('  ' + ($_.Line -replace '^.*\\02_DMS\\', '')) }
 }
 
+# 0) 코어 DLL: 2026-10-08 빌드 경로 정리 이후 06_CoreLibSource 산출물은 71_CoreLib 에 있고, 프로젝트 참조라
+#    BuildProjectReferences=false TEMP 빌드에서는 OutDir 에 먼저 있어야 한다(빌드_검증_가이드.md 1절).
+$coreLib = Join-Path $dmsDir '71_CoreLib'
+if (Test-Path $coreLib) { Get-ChildItem $coreLib -Filter '*.dll' | ForEach-Object { Copy-Item $_.FullName $out -Force } }
+
 # 1) 서버 / 원격 호출 DLL (iGdsEtResult / GdsEtResult) -> ENGUI
 foreach ($d in 'DACrux.Data.Parser', 'DACrux.Common.DSL', 'DACrux.TEST.DSL', 'DACrux.Base', 'Miracom.Middleware') {
     $p = Join-Path $serverBin "$d.dll"; if (Test-Path $p) { Copy-Item $p $out -Force }
 }
-foreach ($d in 'DACrux.Common.RO', 'DACrux.Common.Interface') { Copy-Item (Join-Path $clientBin "$d.dll") $out -Force }
+# DACrux.Utility: 2026-10-08 RO csproj 에 프로젝트 참조가 생겨(빌드 경로 정리 작업) BuildProjectReferences=false 빌드에 DLL 이 필요하다
+foreach ($d in 'DACrux.Common.RO', 'DACrux.Common.Interface', 'DACrux.Utility') { Copy-Item (Join-Path $clientBin "$d.dll") $out -Force }
 Build-Temp "$dmsDir\02_DMS\DACrux.SEMDMS.Interface\DACrux.SEMDMS.Interface.csproj" $serverBin
 Build-Temp "$dmsDir\02_DMS\DACrux.SEMDMS.DSL\DACrux.SEMDMS.DSL.csproj" $serverBin
 Build-Temp "$dmsDir\02_DMS\DACrux.SEMDMS.BSL\DACrux.SEMDMS.BSL.csproj" $serverBin
@@ -67,12 +73,22 @@ $keepArg = if ($Keep) { 'keep' } else { '' }
 & "$out\EtResultUploadSmoke.exe" $sample "$buildRoot\upload.png" "$buildRoot\work" $keepArg
 if ($LASTEXITCODE -ne 0) { throw 'E-Test 업로드 화면 Smoke 실패' }
 
-# 3) Limit 설정 화면 Smoke (2026-10-07 추가, FACTORY=PROBE / DEVICE_ID=ET_LIMIT_SMOKE / Slot 4)
+# 3) Spec 설정 화면 Smoke (2026-10-07 추가, 2026-10-12 Parameter 단위 + Spec 표 붙여넣기 + Chain 묶기로 다시 작성, FACTORY=PROBE / DEVICE_ID=ET_LIMIT_SMOKE / Slot 4)
+#    고객 Spec 표: Verification\EtSpecTable_U9_20261012.txt (2026-10-12 고객 Spec 표, 119행)
 & $csc /nologo /target:exe /platform:anycpu "/out:$out\EtLimitSetupSmoke.exe" /r:System.Windows.Forms.dll /r:System.Drawing.dll /r:System.Data.dll `
     "/r:$out\DACrux.SEMDMS.ENGUI.dll" "/r:$out\DACrux.Framework.Base.dll" "/r:$out\DACrux.Base.dll" `
     "/r:$out\DACrux.SEMDMS.RO.dll" "/r:$out\DACrux.SEMDMS.Interface.dll" "/r:$out\DACrux.SEMDMS.BSL.dll" "/r:$out\Miracom.Middleware.dll" "$PSScriptRoot\EtLimitSetupFormSmoke.cs"
 if ($LASTEXITCODE -ne 0) { throw 'Limit Smoke 빌드 실패' }
 Copy-Item "$out\EtResultUploadSmoke.exe.config" "$out\EtLimitSetupSmoke.exe.config" -Force
-& "$out\EtLimitSetupSmoke.exe" $sample "$buildRoot\limit.png" $keepArg
-if ($LASTEXITCODE -ne 0) { throw 'E-Test Limit 설정 화면 Smoke 실패' }
+& "$out\EtLimitSetupSmoke.exe" $sample "$buildRoot\limit.png" "$PSScriptRoot\EtSpecTable_U9_20261012.txt" $keepArg
+if ($LASTEXITCODE -ne 0) { throw 'E-Test Spec 설정 화면 Smoke 실패' }
+
+# 4) Die 좌표 변환(Interface DieCoordinateMapper) 검사 (2026-10-13, DB 사용 안 함)
+#    Map 스냅샷: Verification\U9_OMM_Hybrid_UseMap_20261013.tsv (로컬 DB SCK / OMM_Hybrid 의 TQP_USEMAP)
+#    고객 대응표: SampleFile\U9_Die좌표_대응표_20261012.tsv (E-Test / KLARF Back / KLARF Front / Die#, 76행)
+& $csc /nologo /target:exe /platform:anycpu "/out:$out\DieCoordinateProbe.exe" /r:System.Data.dll /r:System.Core.dll `
+    "/r:$out\DACrux.SEMDMS.Interface.dll" "/r:$out\DACrux.SEMDMS.ENGUI.dll" "$PSScriptRoot\DieCoordinateProbe.cs"
+if ($LASTEXITCODE -ne 0) { throw 'Die 좌표 Probe 빌드 실패' }
+& "$out\DieCoordinateProbe.exe" "$PSScriptRoot\U9_OMM_Hybrid_UseMap_20261013.tsv" (Join-Path $rootDir 'SampleFile\U9_Die좌표_대응표_20261012.tsv') $sample
+if ($LASTEXITCODE -ne 0) { throw 'Die 좌표 Probe 실패' }
 Write-Output "검사 완료: $buildRoot (화면 이미지 upload.png / view.png / limit.png)"

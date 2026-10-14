@@ -49,6 +49,27 @@ internal static class KlarfViewerFormSmoke
                 Console.WriteLine("  Legend " + legend.Rows[i].Cells[1].Value + " " + legend.Rows[i].Cells[2].Value + " = " + legend.Rows[i].Cells[3].Value);
             Console.WriteLine(info.Text);
 
+            // 우클릭 메뉴 (2026-10-13): KlarfDefectMap 은 Free Zoom / Fit Size / Move View Center 만,
+            // 연관 분석 Map(GdsKlarfAnalysisMap, KlarfDefectMap 상속)은 자기 메뉴 구성(2026-10-12)이 그대로여야 한다.
+            string viewerMenu = ShownMenu(map);
+            Console.WriteLine("Context menu (KLARF File View): " + viewerMenu);
+            if (viewerMenu != "Free Zoom / Fit Size / Move View Center") throw new Exception("Context menu mismatch: " + viewerMenu);
+            using (var analysisMap = new DACrux.SEMDMS.ENGUI.GdsKlarfAnalysisMap())
+            {
+                string analysisMenu = ShownMenu(analysisMap);
+                Console.WriteLine("Context menu (GDS-KLARF Analysis): " + analysisMenu);
+                if (analysisMenu != "Free Zoom / Fit Size / Defect Select / Die Select / - / Center Cross / - / Detail Analysis")
+                    throw new Exception("Analysis context menu changed: " + analysisMenu);
+                // [Center Cross] (2026-10-13): 연관 분석 Map 은 기본 끔, 누르면 켬
+                var cross = FindMenu(analysisMap, "Center Cross");
+                if ((bool)analysisMap.CenterMark) throw new Exception("Analysis center cross default is not off");
+                cross.PerformClick();
+                if (!(bool)analysisMap.CenterMark) throw new Exception("Analysis center cross menu did not turn on");
+                ShownMenu(analysisMap);
+                if (!cross.Checked) throw new Exception("Analysis center cross menu is not checked");
+                Console.WriteLine("Center Cross (GDS-KLARF Analysis): default off -> menu on / checked");
+            }
+
             // 첫 번째 Defect 의 화면 위치로 실제 OnMouseMove 를 보내 가까운 Defect / 검사 Die 표시를 확인한다.
             var mouse = (Label)Field(type, form, "lblMouse");
             var first = (DACrux.Base.Defect)defects.Rows[0].Tag;
@@ -74,8 +95,31 @@ internal static class KlarfViewerFormSmoke
             if (mapImage != null) mapImage.Save(Path.ChangeExtension(args[2], ".map.png"));
             form.Close();
         }
-        Console.WriteLine("PASS: KLARF load / legend / defect list / mouse info / bitmap");
+        Console.WriteLine("PASS: KLARF load / legend / defect list / mouse info / context menu / bitmap");
         return 0;
+    }
+
+    /// <summary>Map 의 우클릭 메뉴(WaferMap 의 protected ctxmWaferMap)에서 Text 가 같은 항목을 찾는다.</summary>
+    private static MenuItem FindMenu(Control map, string text)
+    {
+        Type waferMap = map.GetType();
+        while (waferMap != null && waferMap.Name != "WaferMap") waferMap = waferMap.BaseType;
+        var menu = (ContextMenu)waferMap.GetField("ctxmWaferMap", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(map);
+        foreach (MenuItem item in menu.MenuItems) if (item.Text == text) return item;
+        throw new Exception("Menu not found: " + text);
+    }
+
+    /// <summary>우클릭 메뉴가 뜰 때(Popup)와 같은 처리를 실행하고 보이는 항목 Text 를 " / " 로 잇는다.</summary>
+    private static string ShownMenu(Control map)
+    {
+        Type waferMap = map.GetType();
+        while (waferMap != null && waferMap.Name != "WaferMap") waferMap = waferMap.BaseType;
+        var menu = (ContextMenu)waferMap.GetField("ctxmWaferMap", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(map);
+        typeof(ContextMenu).GetMethod("OnPopup", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(menu, new object[] { EventArgs.Empty });
+        var shown = new System.Collections.Generic.List<string>();
+        foreach (MenuItem item in menu.MenuItems)
+            if (item.Visible) shown.Add(item.Text);
+        return string.Join(" / ", shown.ToArray());
     }
 
     private static object Field(Type type, object instance, string name)

@@ -73,7 +73,9 @@
     <Compile Include="GdsMapView.cs" />
     <Compile Include="GdsChain.cs" />
     <Compile Include="GdsEtResult.cs" />
+    <Compile Include="GdsEtResult_Para.cs" />
     <Compile Include="KlarfUpload.cs" />
+    <Compile Include="GdsKlarfAnalysis.cs" />
     <Compile Include="DefectMapAnalysis.cs" />
     <Compile Include="DMReport.cs" />
     <Compile Include="SEMConfiguration.cs" />

@@ -15,13 +15,15 @@ using DACrux.Data.Parser.Klarf;
 namespace DACrux.SEMDMS.ENGUI
 {
     /// <summary>
-    /// 엔지니어가 KLARF 파일과 Defect 이미지를 골라 DMS DB(TQD_*)와 이미지 저장소에 올리는 화면이다. (CLAUDE-031, F08)
+    /// 엔지니어가 KLARF 파일과 Defect 이미지를 골라 DMS DB(TQD_*)와 이미지 저장소에 올리는 화면이다. (F08)
     /// 왜: 기존 자동 적재(Inspection.DataService)는 설비 폴더 감시 서비스라 화면에서 바로 올릴 수 없고, 고객 샘플은 기존 규칙으로 저장되지 않는다.
     ///     저장된 데이터는 기존 Defect 조회 화면(왼쪽 Wafer 조회 -> Map Viewer / Gallery / Chart)에서 그대로 조회된다.
     /// 역할:
-    /// 1. [분석]: 기존 Parser 로 파일을 읽어 Wafer 목록 / Map 미리보기 / 이미지 찾기 결과 / 저장 값(Product / Step ID / 설비 / 분류 기준)을 보여 준다. DB 를 쓰지 않는다.
+    /// 1. [파일 선택] / [폴더 선택]: 고르면 바로 기존 Parser 로 읽어 KLARF 요약 / Wafer 목록 / Map 미리보기 / KLARF Defect 목록(Grid)을 보여 준다.
+    ///    DB 는 쓰지 않는다. (2026-10-08 요청: [분석] 버튼 제거, 처리 기록 제거, Defect Grid 추가)
     /// 2. [DB 저장]: RO.KlarfUpload 로 BeginUpload(서버 파싱 + 기존 등록 확인) -> 재등록 확인(D1) -> AddImage x N -> CommitUpload 를 호출한다.
     ///    저장 규칙(좌표 / 집계 / SetupID 128 / RoughBin -> Class / 이미지 FTP 상대 경로)은 서버 BSL KlarfUpload 한 곳에 있다.
+    /// 결과는 Wafer 목록의 상태 / STEP_SEQ / 메시지 열과 완료 안내 창으로 보여 준다.
     /// 설계: 문서/2026-10-07_KLARF_Upload_DB적재_설계.md 6.5절
     /// </summary>
     public partial class frmKlarfUpload : DACrux.Framework.Base.DACruxUXBasic01
@@ -55,11 +57,11 @@ namespace DACrux.SEMDMS.ENGUI
         public frmKlarfUpload()
         {
             InitializeComponent();
-            cmbClassSource.SelectedIndex = 0; // 사용자 결정 D3: 기본 RoughBin
+            cmbClassSource.SelectedIndex = 0; // 결정 D3: 기본 RoughBin
             ClearView();
         }
 
-        /// <summary>원격 호출 객체. 처음 저장할 때 만든다(분석만 할 때는 Service 연결이 필요 없음).</summary>
+        /// <summary>원격 호출 객체. 처음 저장할 때 만든다(파일만 읽을 때는 Service 연결이 필요 없음).</summary>
         private RO.KlarfUpload UploadService
         {
             get { return uploadService ?? (uploadService = new RO.KlarfUpload()); }
@@ -76,13 +78,13 @@ namespace DACrux.SEMDMS.ENGUI
                 dialog.CheckFileExists = true;
                 if (dialog.ShowDialog(this) != DialogResult.OK) return;
                 txtFile.Text = dialog.FileName;
-                txtImageDir.Text = ""; // 새 파일이면 이미지 폴더를 다시 자동으로 찾는다
-                Analyze();
+                txtImageDir.Text = ""; // 새 파일이면 이미지 폴더는 [폴더 선택]으로 다시 고른다(이전 파일의 폴더를 잘못 쓰지 않게)
+                Analyze(); // 2026-10-08: [분석] 버튼 없이 파일을 고르면 바로 읽는다
             }
         }
 
         /// <summary>
-        /// 이미지 폴더를 탐색기 형식 창(FolderPickerDialog)으로 고른다. 사용자 요청(2026-10-07): 옛 트리 형식 창은 폴더 찾기가 어렵다.
+        /// 이미지 폴더를 탐색기 형식 창(FolderPickerDialog)으로 고른다. 요청(2026-10-07): 옛 트리 형식 창은 폴더 찾기가 어렵다.
         /// 시작 폴더 = 지금 이미지 폴더, 없으면 KLARF 파일 폴더.
         /// </summary>
         private void btnImageDir_Click(object sender, EventArgs e)
@@ -96,26 +98,23 @@ namespace DACrux.SEMDMS.ENGUI
             string selected = FolderPickerDialog.Show(this, "Defect 이미지 폴더 선택 (KLARF 의 TiffFileName 파일이 있는 폴더)", start);
             if (selected == null) return;
             txtImageDir.Text = selected;
-            if (parser != null) Analyze();
-        }
-
-        private void btnAnalyze_Click(object sender, EventArgs e)
-        {
-            Analyze();
+            if (File.Exists(txtFile.Text.Trim())) Analyze(); // 파일이 있으면 바로 다시 읽어 이미지 찾음 수를 갱신한다
         }
 
         #endregion
 
-        #region 분석 (DB 저장 없음)
+        #region 파일 읽기 / 미리보기 (DB 저장 없음)
 
         /// <summary>
-        /// 파일을 기존 Parser 로 읽어 미리보기를 만든다. 순서: Parser 선택(FileAnalyzer) -> 오류 / Wafer / Pitch / SampleSize 검사
-        /// -> 원본 WaferID -> 이미지 폴더 결정 / 찾기 -> 저장 값 기본값 -> Wafer 목록 -> 첫 Wafer Map.
+        /// 파일을 기존 Parser 로 읽어 미리보기를 만든다. 파일 / 이미지 폴더를 고를 때마다 호출된다.
+        /// 순서: Parser 선택(FileAnalyzer) -> 오류 / Wafer / Pitch / SampleSize 검사 -> 원본 WaferID -> 지정한 이미지 폴더에서 찾기
+        ///       -> 저장 값 기본값(같은 파일을 다시 읽을 때는 사용자가 고친 값을 유지) -> KLARF 요약 -> Wafer 목록 -> 첫 Wafer Map / Defect 목록.
         /// 저장 시에는 서버가 같은 Parser 로 다시 읽으므로, 여기 값은 확인용이다(Origin Index 는 서버가 DB 저장값을 우선 적용).
         /// </summary>
         private void Analyze()
         {
             string path = txtFile.Text.Trim();
+            bool sameFile = analyzedFile != null && string.Equals(analyzedFile, path, StringComparison.OrdinalIgnoreCase);
             ClearView();
             if (path.Length == 0 || !File.Exists(path))
             {
@@ -139,20 +138,21 @@ namespace DACrux.SEMDMS.ENGUI
                 rawWaferIds = ReadRawWaferIds(path);
                 ResolveImages(path);
 
-                txtProduct.Text = parser.DeviceID;
-                txtStepId.Text = parser.StepID;
-                txtEquip.Text = parser.Equip;
+                if (!sameFile || txtProduct.Text.Trim().Length == 0)
+                {
+                    txtProduct.Text = parser.DeviceID;
+                    txtStepId.Text = parser.StepID;
+                    txtEquip.Text = parser.Equip;
+                }
+                FillSummary();
                 FillWaferGrid();
                 if (dgvWafer.Rows.Count > 0) dgvWafer.Rows[0].Selected = true;
                 ShowSelectedWafer();
                 btnSave.Enabled = true;
 
-                AppendLog(string.Format("분석: {0} / Lot {1} / Wafer {2}장 / 이미지 찾음 {3} / 없음 {4} (폴더: {5})",
-                    Path.GetFileName(path), parser.LotID, parser.Wafers.Count, foundImages.Count, missingImages.Count,
-                    txtImageDir.Text.Length > 0 ? txtImageDir.Text : "-"));
-                if (missingImages.Count > 0)
-                    AppendLog("  없는 이미지: " + string.Join(", ", missingImages.Take(10).ToArray()) + (missingImages.Count > 10 ? " ..." : ""));
-                lblStatus.Text = string.Format("분석 완료 / Wafer {0}장 / 저장 값을 확인한 뒤 [DB 저장]을 누르세요.", parser.Wafers.Count);
+                string imageGuide = txtImageDir.Text.Length == 0 ? " / 이미지를 함께 올리려면 [폴더 선택]으로 이미지 폴더를 고르세요."
+                    : missingImages.Count > 0 ? string.Format(" / 이미지 {0}개를 폴더에서 찾지 못했습니다.", missingImages.Count) : "";
+                lblStatus.Text = string.Format("읽기 완료 / Wafer {0}장 / 저장 값을 확인한 뒤 [DB 저장]을 누르세요.{1}", parser.Wafers.Count, imageGuide);
             }
             catch (Exception ex)
             {
@@ -167,8 +167,8 @@ namespace DACrux.SEMDMS.ENGUI
         }
 
         /// <summary>
-        /// KLARF 가 참조하는 이미지 이름을 모으고 이미지 폴더에서 찾는다.
-        /// 폴더를 지정하지 않았으면 KLARF 폴더 -> "Defect Images" 하위 폴더 순서로 더 많이 찾는 곳을 고른다(고객 샘플은 하위 폴더, 설계 S4).
+        /// KLARF 가 참조하는 이미지 이름을 모으고 [폴더 선택]으로 지정한 이미지 폴더에서 찾는다.
+        /// 폴더를 지정하지 않으면 모두 "없음"으로 둔다(2026-10-07 화면 수정: 자동으로 폴더를 고르지 않음).
         /// </summary>
         private void ResolveImages(string klarfPath)
         {
@@ -221,7 +221,7 @@ namespace DACrux.SEMDMS.ENGUI
                 int row = dgvWafer.Rows.Add(
                     rawWaferIds.TryGetValue(wafer.Slot, out rawId) ? rawId : "",
                     wafer.WaferID, wafer.Slot, wafer.DefectList.Count, CountSampleDies(wafer),
-                    string.Format("{0} / {1}", found, names.Count), "분석", "", "");
+                    string.Format("{0} / {1}", found, names.Count), "읽음(미저장)", "", "");
                 dgvWafer.Rows[row].Tag = wafer;
             }
             dgvWafer.ClearSelection();
@@ -239,11 +239,124 @@ namespace DACrux.SEMDMS.ENGUI
         private void dgvWafer_SelectionChanged(object sender, EventArgs e)
         {
             ShowSelectedWafer();
+            FillDefectGrid();
         }
 
+        /// <summary>분류 기준을 바꾸면 Map 색과 Defect 목록의 "저장 Class" 열을 다시 계산한다.</summary>
         private void cmbClassSource_SelectedIndexChanged(object sender, EventArgs e)
         {
             ShowSelectedWafer();
+            FillDefectGrid();
+        }
+
+        /// <summary>Wafer 목록에서 선택한 Wafer. 선택이 없으면 null.</summary>
+        private Wafer SelectedWafer
+        {
+            get { return parser == null || dgvWafer.SelectedRows.Count == 0 ? null : dgvWafer.SelectedRows[0].Tag as Wafer; }
+        }
+
+        /// <summary>
+        /// 요약 한 줄: Lot / Device / Step / 검사시각 / Wafer 크기 / Die Pitch / Wafer 수 / Defect 수 / 이미지 찾음 수.
+        /// 처리 기록 창을 없앤 대신(2026-10-08) 파일에서 읽은 핵심 값을 한눈에 보이게 한다.
+        /// </summary>
+        private void FillSummary()
+        {
+            int defects = parser.Wafers.Cast<Wafer>().Sum(w => w.DefectList.Count);
+            int images = foundImages.Count + missingImages.Count;
+            lblSummary.Text = string.Format(CultureInfo.InvariantCulture,
+                "Lot {0}   |   Device {1}   |   Step {2}   |   검사 {3:yyyy-MM-dd HH:mm}   |   {4} mm   |   Die {5:#,0.###} x {6:#,0.###} um   |   Wafer {7}장   |   Defect {8}   |   이미지 {9} / {10}",
+                parser.LotID, parser.DeviceID, parser.StepID, parser.ResultTimestamp, parser.SampleSize, parser.DiePitchX, parser.DiePitchY,
+                parser.Wafers.Count, defects, foundImages.Count, images);
+        }
+
+        /// <summary>
+        /// 선택한 Wafer 의 KLARF Defect 를 표로 보여 준다(2026-10-08 요청 "klarf data 를 grid 형식으로").
+        /// Index 는 KLARF 원본 값(화면 Index - 보정량), X / Y 는 Wafer 중심 기준 um, "저장 Class" 는 분류 기준을 적용해 DB CLASSNUMBER 로 저장될 값.
+        /// 행 Tag 에 Defect 를 두어 선택 시 Map 에 강조한다.
+        /// </summary>
+        private void FillDefectGrid()
+        {
+            dgvDefect.Rows.Clear();
+            Wafer wafer = SelectedWafer;
+            if (wafer == null)
+            {
+                grpDefect.Text = "KLARF Defect 목록";
+                return;
+            }
+
+            int offsetX = (int)wafer.DieOriginX;
+            int offsetY = (int)wafer.DieOriginY;
+            foreach (Defect d in wafer.DefectList)
+            {
+                int saveClass = SelectedClassSource == "ROUGHBIN" ? d.ROUGHBINNUMBER : SelectedClassSource == "FINEBIN" ? d.FINEBINNUMBER : d.CLASSNUMBER;
+                string className;
+                if (wafer.ClassLookup == null || !wafer.ClassLookup.TryGetValue(saveClass, out className)) className = "";
+                string image = FirstImageName(d);
+                string imageState = image.Length == 0 ? "-" : foundImages.ContainsKey(image) ? "있음" : "없음";
+                // 열 순서(Designer)를 바꿔도 값이 어긋나지 않게 열 이름으로 넣는다
+                DataGridViewRow r = dgvDefect.Rows[dgvDefect.Rows.Add()];
+                r.Cells[colDefectId.Index].Value = d.DEFECTID;
+                r.Cells[colIndexX.Index].Value = d.XINDEX - offsetX;
+                r.Cells[colIndexY.Index].Value = d.YINDEX - offsetY;
+                r.Cells[colSaveClass.Index].Value = saveClass;
+                r.Cells[colClassName.Index].Value = className.Trim();
+                r.Cells[colImageFound.Index].Value = imageState;
+                r.Cells[colX.Index].Value = d.X.ToString("#,0.###", CultureInfo.InvariantCulture);
+                r.Cells[colY.Index].Value = d.Y.ToString("#,0.###", CultureInfo.InvariantCulture);
+                r.Cells[colXRel.Index].Value = d.XREL.ToString("0.###", CultureInfo.InvariantCulture);
+                r.Cells[colYRel.Index].Value = d.YREL.ToString("0.###", CultureInfo.InvariantCulture);
+                r.Cells[colSize.Index].Value = d.DSIZE.ToString("0.###", CultureInfo.InvariantCulture);
+                r.Cells[colTest.Index].Value = d.TEST;
+                r.Cells[colClass.Index].Value = d.CLASSNUMBER;
+                r.Cells[colRoughBin.Index].Value = d.ROUGHBINNUMBER;
+                r.Cells[colFineBin.Index].Value = d.FINEBINNUMBER;
+                r.Cells[colImageFile.Index].Value = image;
+                r.Tag = d;
+                if (imageState == "없음") r.Cells[colImageFound.Index].Style.ForeColor = Color.Firebrick;
+            }
+            dgvDefect.ClearSelection();
+            grpDefect.Text = string.Format("KLARF Defect 목록 - {0} / {1}건 (선택하면 Map 에 표시 / 더블클릭하면 이미지 열기)", wafer.WaferID, wafer.DefectList.Count);
+        }
+
+        /// <summary>Defect 의 첫 이미지 파일 이름(없으면 빈 값).</summary>
+        private static string FirstImageName(Defect d)
+        {
+            if (d.Images == null) return "";
+            for (int i = 0; i < d.Images.Count; i++)
+            {
+                string name = d.Images.GetDefectImage(i).IMAGEPATH;
+                if (!string.IsNullOrEmpty(name)) return Path.GetFileName(name);
+            }
+            return "";
+        }
+
+        /// <summary>Defect 목록에서 고른 행을 기존 DefectMap 선택 강조(파란 원)로 표시한다(frmKlarfFileViewer 와 같은 방식).</summary>
+        private void dgvDefect_SelectionChanged(object sender, EventArgs e)
+        {
+            if (parser == null) return;
+            m_dMap.SelectedDefect.Clear();
+            foreach (DataGridViewRow row in dgvDefect.SelectedRows)
+            {
+                Defect defect = row.Tag as Defect;
+                if (defect != null) m_dMap.SelectedDefect.Add(defect);
+            }
+            m_dMap.Redraw();
+        }
+
+        /// <summary>Defect 행을 더블클릭하면 이미지 폴더에서 찾은 이미지를 Windows 기본 프로그램으로 연다.</summary>
+        private void dgvDefect_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0) return;
+            Defect defect = dgvDefect.Rows[e.RowIndex].Tag as Defect;
+            string name = defect == null ? "" : FirstImageName(defect);
+            string full;
+            if (name.Length == 0 || !foundImages.TryGetValue(name, out full))
+            {
+                lblStatus.Text = name.Length == 0 ? "이 Defect 에는 이미지가 없습니다." : "이미지 폴더에서 찾지 못했습니다: " + name;
+                return;
+            }
+            try { System.Diagnostics.Process.Start(full); }
+            catch (Exception ex) { lblStatus.Text = "이미지를 열지 못했습니다: " + FirstLine(ex.Message); }
         }
 
         /// <summary>
@@ -341,7 +454,7 @@ namespace DACrux.SEMDMS.ENGUI
         /// <summary>
         /// 저장 순서(서비스 계약 iKlarfUpload):
         ///  1) BeginUpload: 서버가 같은 Parser 로 읽고 Wafer 별 저장 예정 값 / 기존 등록(EXISTS) / 입력 오류(INVALID)를 돌려준다.
-        ///  2) INVALID 가 있으면 저장하지 않는다. EXISTS 가 있으면 "삭제 후 재등록 / 건너뜀 / 취소"를 묻는다(사용자 결정 D1).
+        ///  2) INVALID 가 있으면 저장하지 않는다. EXISTS 가 있으면 "삭제 후 재등록 / 건너뜀 / 취소"를 묻는다(결정 D1).
         ///  3) 없는 이미지가 있으면 계속할지 묻는다(없는 이미지는 서버가 행을 만들지 않음).
         ///  4) 찾은 이미지 파일을 하나씩 AddImage -> CommitUpload. 결과를 Wafer 목록과 로그에 표시한다.
         /// 중간에 그만두거나 오류가 나면 CancelUpload 로 서버 작업 폴더를 지운다.
@@ -350,12 +463,12 @@ namespace DACrux.SEMDMS.ENGUI
         {
             if (parser == null || analyzedFile == null)
             {
-                Notify("먼저 KLARF 파일을 분석하세요.", MessageBoxIcon.Information);
+                Notify("먼저 [파일 선택]으로 KLARF 파일을 고르세요.", MessageBoxIcon.Information);
                 return;
             }
             if (!string.Equals(analyzedFile, txtFile.Text.Trim(), StringComparison.OrdinalIgnoreCase))
             {
-                Notify("파일 경로가 바뀌었습니다. [분석]을 다시 누르세요.", MessageBoxIcon.Information);
+                Notify("파일 경로가 바뀌었습니다. [파일 선택]으로 다시 고르세요.", MessageBoxIcon.Information);
                 return;
             }
 
@@ -436,8 +549,7 @@ namespace DACrux.SEMDMS.ENGUI
             catch (Exception ex)
             {
                 if (key != null) CancelQuietly(key);
-                SetStatus("저장 실패");
-                AppendLog("오류: " + FirstLine(ex.Message));
+                SetStatus("저장 실패: " + FirstLine(ex.Message));
                 Notify("저장 중 오류가 났습니다.\r\n" + FirstLine(ex.Message), MessageBoxIcon.Error);
             }
             finally
@@ -481,21 +593,24 @@ namespace DACrux.SEMDMS.ENGUI
             }
         }
 
-        /// <summary>저장 결과를 로그에 남기고, 기존 Defect 조회 화면에서 찾는 방법(Lot / 기간)을 알려 준다.</summary>
+        /// <summary>
+        /// 저장 결과를 상태 표시줄과 완료 안내 창으로 알린다(Wafer 별 상세는 Wafer 목록의 상태 / STEP_SEQ / 메시지 열).
+        /// 기존 Defect 조회 화면에서 찾는 방법(Lot / 기간)도 함께 알려 준다.
+        /// </summary>
         private void ReportResult(DataTable result)
         {
             int saved = result.Select("RESULT = 'SAVED'").Length;
             int skipped = result.Select("RESULT = 'SKIPPED'").Length;
             int error = result.Select("RESULT = 'ERROR'").Length;
+            StringBuilder lines = new StringBuilder();
             foreach (DataRow r in result.Rows)
-                AppendLog(string.Format("  {0} {1} / STEP_SEQ {2} / Defect {3} / 이미지 {4} / {5} ms {6}", r["WAFER_ID"], StateText(r["RESULT"].ToString()),
-                    r["STEP_SEQ"], r["DEFECTS"], r["SAVED_IMAGES"], r["ELAPSED_MS"], r["MESSAGE"]));
+                lines.AppendFormat("  {0} : {1} / STEP_SEQ {2} / Defect {3} / 이미지 {4}{5}\r\n", r["WAFER_ID"], StateText(r["RESULT"].ToString()),
+                    r["STEP_SEQ"], r["DEFECTS"], r["SAVED_IMAGES"], r["MESSAGE"].ToString().Length > 0 ? " (" + r["MESSAGE"] + ")" : "");
 
             string date = parser.ResultTimestamp.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
             string guide = string.Format("왼쪽 Wafer 조회에서 Lot = {0}, 기간에 {1} 를 넣어 조회하세요.", parser.LotID, date);
-            AppendLog(string.Format("저장 결과: 저장 {0} / 건너뜀 {1} / 오류 {2}. {3}", saved, skipped, error, guide));
-            SetStatus(string.Format("저장 {0} / 건너뜀 {1} / 오류 {2}", saved, skipped, error));
-            Notify(string.Format("저장 {0} / 건너뜀 {1} / 오류 {2}\r\n\r\n{3}", saved, skipped, error, guide),
+            SetStatus(string.Format("저장 {0} / 건너뜀 {1} / 오류 {2}   |   {3}", saved, skipped, error, guide));
+            Notify(string.Format("저장 {0} / 건너뜀 {1} / 오류 {2}\r\n\r\n{3}\r\n{4}", saved, skipped, error, lines, guide),
                 error > 0 ? MessageBoxIcon.Warning : MessageBoxIcon.Information);
         }
 
@@ -527,12 +642,7 @@ namespace DACrux.SEMDMS.ENGUI
             lblStatus.Refresh();
         }
 
-        private void AppendLog(string text)
-        {
-            txtLog.AppendText(DateTime.Now.ToString("HH:mm:ss", CultureInfo.InvariantCulture) + "  " + text + Environment.NewLine);
-        }
-
-        /// <summary>다른 파일을 읽기 전 / 실패 시 이전 결과가 남지 않게 비운다. 로그는 남긴다.</summary>
+        /// <summary>다른 파일을 읽기 전 / 실패 시 이전 결과가 남지 않게 비운다. 저장 값 입력란은 Analyze 가 다시 채운다.</summary>
         private void ClearView()
         {
             parser = null;
@@ -541,6 +651,9 @@ namespace DACrux.SEMDMS.ENGUI
             foundImages.Clear();
             missingImages.Clear();
             dgvWafer.Rows.Clear();
+            dgvDefect.Rows.Clear();
+            grpDefect.Text = "KLARF Defect 목록";
+            lblSummary.Text = "KLARF 파일을 선택하세요.";
             btnSave.Enabled = false;
             m_dMap.DefectClear();
             m_dMap.DieClear();

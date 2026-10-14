@@ -58,7 +58,6 @@ D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\100_ClientBin\DAC
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\100_ClientBin\DACrux.TEST.Control.pdb
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.TEST.Control.csproj.AssemblyReference.cache
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.TEST.Control.PopUpAxisY.resources
-D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.TEST.Control.ucParameterTrend.resources
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.TEST.Control.ucTrendChart.resources
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.TEST.Control.ImagePopUp.resources
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.TEST.Control.Image.PopUpAVIImageSave.resources
@@ -69,10 +68,8 @@ D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TE
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.TEST.Control.TPUCMapEdit.resources
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.MapAnalysis.Control.TPUCMapView.resources
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.TEST.Control.TPUCPCMView.resources
-D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.TEST.Control.TPUCQCInspection.resources
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.TEST.Control.TPUCRS232Option.resources
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.TEST.Control.WrapMap.resources
-D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.MapAnalysis.Control.TPUCMapDefine.resources
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.MapAnalysis.Control.TPUCMapConfig.resources
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.MapAnalysis.Control.TPUCMapControl.resources
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.Control\obj\Debug\DACrux.MapAnalysis.Control.TPUCMapGallery.resources

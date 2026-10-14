@@ -23,3 +23,5 @@ C:\Users\USER\AppData\Local\Temp\GdsMapViewBuild\DACrux.TEST.DSL.dll
 C:\Users\USER\AppData\Local\Temp\GdsMapViewBuild\DACrux.TEST.DSL.pdb
 C:\Users\USER\AppData\Local\Temp\GdsMapView018Build\DACrux.TEST.DSL.dll
 C:\Users\USER\AppData\Local\Temp\GdsMapView018Build\DACrux.TEST.DSL.pdb
+C:\Users\USER\AppData\Local\Temp\chippac_testbsl\DACrux.TEST.DSL.dll
+C:\Users\USER\AppData\Local\Temp\chippac_testbsl\DACrux.TEST.DSL.pdb

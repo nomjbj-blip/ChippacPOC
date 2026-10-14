@@ -129,15 +129,12 @@ D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TE
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.ENGUI\obj\Debug\DACrux.TEST.ENGUI.DlgSetOrigin.resources
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.ENGUI\obj\Debug\DACrux.TEST.ENGUI.DlgSetupMap.resources
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.ENGUI\obj\Debug\DACrux.TEST.ENGUI.dlgSetupProgram.resources
-D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.ENGUI\obj\Debug\DACrux.TEST.ENGUI.frmAdminCustomer.resources
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.ENGUI\obj\Debug\DACrux.TEST.ENGUI.frmMapConfigUpdate.resources
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.ENGUI\obj\Debug\DACrux.TEST.ENGUI.frmNewMapID.resources
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.ENGUI\obj\Debug\DACrux.TEST.ENGUI.frmPcmEquipStatus.resources
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.ENGUI\obj\Debug\DACrux.TEST.ENGUI.frmSelectMapID.resources
-D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.ENGUI\obj\Debug\DACrux.TEST.ENGUI.frmSetupDevice.resources
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.ENGUI\obj\Debug\DACrux.TEST.ENGUI.frmSetupMap.resources
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.ENGUI\obj\Debug\DACrux.TEST.ENGUI.frmSetupProgram.resources
-D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.ENGUI\obj\Debug\DACrux.TEST.ENGUI.frmSetupShot.resources
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.ENGUI\obj\Debug\DACrux.TEST.ENGUI.frmTestDataUserComment.resources
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.ENGUI\obj\Debug\DACrux.TEST.ENGUI.frmTestDataMaint.resources
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.ENGUI\obj\Debug\DACrux.TEST.ENGUI.frmVisualInspDefine.resources
@@ -146,15 +143,10 @@ D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TE
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.ENGUI\obj\Debug\DACrux.TEST.ENGUI.frmAVIFileUpload.resources
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.ENGUI\obj\Debug\DACrux.TEST.ENGUI.frmTestDataUpload_Pcm.resources
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.ENGUI\obj\Debug\DACrux.TEST.ENGUI.frmShotMapInformation.resources
-D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.ENGUI\obj\Debug\DACrux.TEST.ENGUI.frmBinStackBar.resources
-D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.ENGUI\obj\Debug\DACrux.TEST.ENGUI.frmCummapAnalysis.resources
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.ENGUI\obj\Debug\DACrux.TEST.ENGUI.frmDutByYieldReport.resources
-D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.ENGUI\obj\Debug\DACrux.TEST.ENGUI.frmPatternSearch.resources
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.ENGUI\obj\Debug\DACrux.TEST.ENGUI.frmPatternSearchNew.resources
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.ENGUI\obj\Debug\DACrux.TEST.ENGUI.frmProbeBinMapGallery.resources
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.ENGUI\obj\Debug\DACrux.TEST.ENGUI.frmSingleMapView.resources
-D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.ENGUI\obj\Debug\DACrux.TEST.ENGUI.frmTPWaferSelect.resources
-D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.ENGUI\obj\Debug\DACrux.TEST.ENGUI.frmVisualInspection.resources
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.ENGUI\obj\Debug\DACrux.TEST.ENGUI.frmWaferParaAnalysis.resources
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.ENGUI\obj\Debug\DACrux.TEST.ENGUI.frmYieldReport.resources
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.ENGUI\obj\Debug\DACrux.TEST.ENGUI.frmTESTWaferEdit.resources
@@ -190,3 +182,4 @@ D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TE
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\100_ClientBin\DACrux.TEST.ENGUI.dll
 C:\Users\USER\AppData\Local\Temp\claude\testbuild\DACrux.TEST.ENGUI.dll
 C:\Users\USER\AppData\Local\Temp\claude\testbuild\DACrux.TEST.ENGUI.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\09_TEST\DACrux.TEST.ENGUI\obj\Debug\DACrux.TEST.ENGUI.frmStandardMapView.resources

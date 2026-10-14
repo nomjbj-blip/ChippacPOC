@@ -33,3 +33,5 @@ AOI 데이터를 GDS와 비교하기 전에 KLARF 자체의 Wafer / 검사 Die /
 - 좌표 단위와 DieOrigin / 방향을 확인한 뒤 [F07](F07_Correlation.md)의 변환 계약으로 이어간다.
 
 이번에는 화면을 실행하지 않았다. 기존 공통 Parser 파일에 미커밋 변경이 있으므로 후속 작업자는 해당 차이를 확인하되 이 화면 작업이라는 이유로 되돌리지 않는다.
+
+- 우클릭 메뉴 (2026-10-13, CLAUDE-076): `KlarfDefectMap` (KLARF File View / KLARF Upload) 은 Free Zoom / Fit Size / Move View Center 만 보인다. 상속한 GDS-KLARF Analysis Map 은 자기 메뉴 구성 유지. `Verify-KlarfFileViewer.ps1` 참조 DLL 목록 보강.

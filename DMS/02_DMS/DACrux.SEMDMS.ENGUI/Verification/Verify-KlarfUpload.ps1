@@ -1,4 +1,4 @@
-﻿# KLARF 업로드 화면(frmKlarfUpload) Smoke 검사 (CLAUDE-031, F08 구현 3단계)
+﻿# KLARF 업로드 화면(frmKlarfUpload) Smoke 검사 (F08 구현 3단계)
 # Smoke = 화면을 화면 밖에서 실제로 띄워 [분석] -> [DB 저장] 흐름이 깨지지 않는지 빠르게 확인하는 자동 검사.
 # 하는 일:
 #  1) 운영 폴더(100_ClientBin / 101_ServerBin)는 바꾸지 않고 %TEMP% 에 Interface / BSL / RO / ENGUI 를 따로 빌드한다.
@@ -37,6 +37,8 @@ foreach ($d in 'DACrux.Data.Parser', 'DACrux.Common.DSL', 'DACrux.TEST.DSL', 'DA
     $p = Join-Path $serverBin "$d.dll"; if (Test-Path $p) { Copy-Item $p $out -Force }
 }
 foreach ($d in 'DACrux.Common.RO', 'DACrux.Common.Interface') { Copy-Item (Join-Path $clientBin "$d.dll") $out -Force }
+# RO / ENGUI 의 프로젝트 참조(Base / Framework / Map / Utility 등, 다른 작업으로 늘어남)는 ClientBin DLL 로 맞춘다. 이미 있는 DLL(방금 빌드한 것)은 덮어쓰지 않는다.
+Get-ChildItem $clientBin -Filter '*.dll' | Where-Object { -not (Test-Path (Join-Path $out $_.Name)) } | ForEach-Object { Copy-Item $_.FullName $out }
 Build-Temp "$dmsDir\02_DMS\DACrux.SEMDMS.Interface\DACrux.SEMDMS.Interface.csproj" $serverBin
 # BSL 에는 다른 작업(E-Test 등)이 새 DSL 클래스를 참조하는 코드가 함께 있을 수 있어 DSL 도 현재 소스로 빌드한다(운영 DSL 은 바꾸지 않음)
 Build-Temp "$dmsDir\02_DMS\DACrux.SEMDMS.DSL\DACrux.SEMDMS.DSL.csproj" $serverBin

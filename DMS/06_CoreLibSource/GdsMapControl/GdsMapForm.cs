@@ -15,7 +15,7 @@ namespace NexplantQMS.GdsMap
 {
     /// <summary>
     /// GDS Map Setup(등록) 화면: GDS 파일 읽기 -> Layer 필터(도형 수 확인) -> Map DB 저장 / 원본 Grid 확인.
-    /// 2026-10-06 사용자 결정(CLAUDE-026): Chain 설정 / Chain DB 반영은 GDS Map View(GdsMapViewForm)에서 한다.
+    /// 2026-10-06 결정: Chain 설정 / Chain DB 반영은 GDS Map View(GdsMapViewForm)에서 한다.
     /// </summary>
     public partial class GdsMapForm : Form
     {
@@ -26,6 +26,14 @@ namespace NexplantQMS.GdsMap
 		private bool _mapLoadSucceeded;
 		private int _lastCoordinateUpdateTick;
 		private bool _updatingLayerChecks;
+		/// <summary>더블클릭으로 Layer 체크를 바꾸는 중인지. 이때만 목록 체크 변경을 받는다(2026-10-13).</summary>
+		private bool _layerCheckByDoubleClick;
+		/// <summary>
+		/// 오른쪽 Layer 목록 폭(px). Map(왼쪽 Tab)이 남는 폭을 모두 쓰도록 이 폭을 유지한다(2026-10-13).
+		/// 처음 값은 Layer 패널 최소 폭(Panel2MinSize). 사용자가 분할선을 끌면 그 폭을 기억한다.
+		/// </summary>
+		private int _layerPanelWidth;
+		private bool _keepingLayerPanel;
 		private bool _hostedByDms;
 		// Layer별 화면 배치 도형 수. 도면을 읽을 때(RefreshLayerList) 한 번 만들고 목록 표시 / 선택 합계에 쓴다.
 		private Dictionary<int, int> _layerElementCounts = new Dictionary<int, int>();
@@ -34,6 +42,10 @@ namespace NexplantQMS.GdsMap
 		public GdsMapForm()
         {
 			InitializeComponent();
+			// 분할선 이벤트는 InitializeComponent(자동 배율 조정 포함)가 끝난 뒤 연결한다.
+			GDSContainer.SizeChanged += GDSContainer_SizeChanged;
+			GDSContainer.SplitterMoved += GDSContainer_SplitterMoved;
+			KeepLayerPanelWidth();
 			InitializeElementGridFeatures();
 			InitializeDbSaveState();
 			statusStripMap.ShowItemToolTips = true;
@@ -53,8 +65,48 @@ namespace NexplantQMS.GdsMap
 		private void Form1_Load(object sender, EventArgs e)
 		{
 			map.OnlySelectSquareItems = true;
+			KeepLayerPanelWidth();
 
 			//button1.PerformClick();
+		}
+
+		/// <summary>
+		/// Map(왼쪽 Tab)이 크게 보이도록 분할선을 Layer 목록 폭에 맞춘다(2026-10-13).
+		/// SplitContainer 기본 동작은 자동 배율 조정 / DACrux 가 작은 크기로 먼저 붙였다가 키울 때 비율을 유지해서 Map 칸이 작게 남는다.
+		/// 창이 Layer 폭 + Map 최소 폭보다 좁으면 SplitContainer 에 맡긴다.
+		/// </summary>
+		private void KeepLayerPanelWidth()
+		{
+			if (_layerPanelWidth <= 0) _layerPanelWidth = GDSContainer.Panel2MinSize;
+			int distance = GDSContainer.ClientSize.Width - _layerPanelWidth - GDSContainer.SplitterWidth;
+			if (distance < GDSContainer.Panel1MinSize || GDSContainer.SplitterDistance == distance) return;
+			_keepingLayerPanel = true;
+			try
+			{
+				GDSContainer.SplitterDistance = distance;
+			}
+			finally
+			{
+				_keepingLayerPanel = false;
+			}
+		}
+
+		private void GDSContainer_SizeChanged(object sender, EventArgs e)
+		{
+			KeepLayerPanelWidth();
+		}
+
+		/// <summary>사용자가 분할선을 끌어 바꾼 Layer 폭은 다음 크기 변경에도 유지한다.</summary>
+		private void GDSContainer_SplitterMoved(object sender, SplitterEventArgs e)
+		{
+			if (_keepingLayerPanel || Control.MouseButtons != MouseButtons.Left) return;
+			_layerPanelWidth = Math.Max(GDSContainer.Panel2MinSize, GDSContainer.Panel2.Width);
+		}
+
+		/// <summary>원점(0, 0) 십자가 표시 켜기 / 끄기. 2026-10-12 지도 우클릭 메뉴에서 화면으로 옮겼다.</summary>
+		private void chkOriginCross_CheckedChanged(object sender, EventArgs e)
+		{
+			map.ShowOriginCross = chkOriginCross.Checked;
 		}
 
 		private async void button1_Click(object sender, EventArgs e)
@@ -406,11 +458,35 @@ namespace NexplantQMS.GdsMap
 		/// <summary>
 		/// 개별 Layer 체크가 바뀌면 즉시 도면에 적용한다.
 		/// ItemCheck는 목록 상태 변경 전에 발생하므로 이벤트의 새 상태를 사용한다.
+		/// 체크는 더블클릭으로만 바뀐다(2026-10-13). 한 번 클릭 / 선택된 행 다시 클릭 / Space 키로 바뀌는 체크는 되돌린다.
+		/// [전체 체크] / [전체 미체크]는 _updatingLayerChecks 로 먼저 빠져나가므로 그대로 동작한다.
 		/// </summary>
 		private void ChkLayerItems_ItemCheck(object sender, ItemCheckEventArgs e)
 		{
 			if (_updatingLayerChecks) return;
+			if (!_layerCheckByDoubleClick)
+			{
+				e.NewValue = e.CurrentValue;
+				return;
+			}
 			ApplyLayerVisibility(e.Index, e.NewValue);
+		}
+
+		/// <summary>Layer 행을 더블클릭하면 체크(표시 / 저장 대상)를 바꾼다. 한 번 클릭은 행 선택만 한다(2026-10-13).</summary>
+		private void ChkLayerItems_MouseDoubleClick(object sender, MouseEventArgs e)
+		{
+			if (e.Button != MouseButtons.Left) return;
+			int index = chkLayerItems.IndexFromPoint(e.Location);
+			if (index < 0 || index >= chkLayerItems.Items.Count || !chkLayerItems.GetItemRectangle(index).Contains(e.Location)) return;
+			_layerCheckByDoubleClick = true;
+			try
+			{
+				chkLayerItems.SetItemChecked(index, !chkLayerItems.GetItemChecked(index));
+			}
+			finally
+			{
+				_layerCheckByDoubleClick = false;
+			}
 		}
 
 		/// <summary>모든 Layer를 체크한 뒤 한 번만 Map 표시 상태를 적용한다.</summary>

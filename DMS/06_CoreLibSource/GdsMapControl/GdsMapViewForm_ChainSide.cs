@@ -7,7 +7,7 @@ using System.Linq;
 namespace NexplantQMS.GdsMap
 {
     /// <summary>
-    /// GDS Map View 화면의 Front / Back side 전환 중 Chain 쪽 좌표 처리다. (설계: 문서/2026-10-07_GDS_FrontBack_전환_설계.md 4 / 5.2절, CLAUDE-030)
+    /// GDS Map View 화면의 Front / Back side 전환 중 Chain 쪽 좌표 처리다. (설계: 문서/2026-10-07_GDS_FrontBack_전환_설계.md 4 / 5.2절)
     ///
     /// 좌표 공간 규칙
     ///  - DB(PLACED / Chain Marker)는 저장 기준(TQP_GDS_MAP.VIEW_SIDE) 좌표. 화면은 보기 기준(_displaySide) 좌표.

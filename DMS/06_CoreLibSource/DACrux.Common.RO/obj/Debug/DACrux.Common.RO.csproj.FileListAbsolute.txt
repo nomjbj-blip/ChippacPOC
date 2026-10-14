@@ -23,3 +23,5 @@ C:\Users\USER\AppData\Local\Temp\GdsMapViewBuild\DACrux.Common.RO.dll
 C:\Users\USER\AppData\Local\Temp\GdsMapViewBuild\DACrux.Common.RO.pdb
 C:\Users\USER\AppData\Local\Temp\GdsMapView018Build\DACrux.Common.RO.dll
 C:\Users\USER\AppData\Local\Temp\GdsMapView018Build\DACrux.Common.RO.pdb
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\71_CoreLib\DACrux.Common.RO.dll
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\71_CoreLib\DACrux.Common.RO.pdb

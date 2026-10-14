@@ -14,9 +14,13 @@ if (-not $msbuild -or -not (Test-Path $csc)) { throw 'Visual Studio MSBuild / .N
 New-Item -ItemType Directory -Force $outputDir, $intermediateDir | Out-Null
 
 # 프로젝트 참조는 현재 클라이언트 DLL로 확인하고 ENGUI만 별도 위치에 빌드한다.
+# 공통 / Map / Framework / TEST.ENGUI 참조는 프로젝트 참조가 늘어나 함께 복사한다 (2026-10-13).
 $dependencies = @('DACrux.Common.RO.dll', 'DACrux.Data.Handler.dll', 'DACrux.Data.Parser.dll',
     'DACrux.SEMDMS.Control.dll', 'DACrux.SEMDMS.RO.dll', 'DACrux.TEST.Control.dll',
-    'DACrux.TEST.Interface.dll', 'DACrux.TEST.RO.dll')
+    'DACrux.TEST.Interface.dll', 'DACrux.TEST.RO.dll',
+    'DACrux.Base.dll', 'DACrux.FPDMap.dll', 'DACrux.Framework.Base.dll', 'DACrux.Framework.Controls.dll',
+    'DACrux.Framework.Interface.dll', 'DACrux.Framework.RO.dll', 'DACrux.Map.dll', 'DACrux.SEMDMS.Interface.dll',
+    'DACrux.TEST.ENGUI.dll', 'DACrux.Utility.dll')
 foreach ($dependency in $dependencies) {
     Copy-Item -LiteralPath (Join-Path "$dmsDir\100_ClientBin" $dependency) -Destination (Join-Path $outputDir $dependency) -Force
 }

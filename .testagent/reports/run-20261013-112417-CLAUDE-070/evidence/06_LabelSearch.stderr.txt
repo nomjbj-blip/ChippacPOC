@@ -1,0 +1,10 @@
+﻿Copy-Item : 'C:\Users\USER\AppData\Local\Temp\ChippacBuild\CLAUDE-070_112459\NexplantQMS.GdsMap.exe' 경로는 존재하지 않
+으므로 찾을 수 없습니다.
+위치 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\06_CoreLibSource\GdsMapControl\Probes\GdsLabelSearchProbe.ps1:
+35 문자:1
++ Copy-Item $GdsExe (Join-Path $probeDir 'NexplantQMS.GdsMap.dll') -For ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (C:\Users\USER\A...tQMS.GdsMap.exe:String) [Copy-Item], ItemNotFoundExce 
+   ption
+    + FullyQualifiedErrorId : PathNotFound,Microsoft.PowerShell.Commands.CopyItemCommand
+ 

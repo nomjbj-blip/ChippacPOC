@@ -3,7 +3,7 @@
 #       Back side 저장을 실행하고 확인한다.
 #       1) 반전 좌표 = GDS 원점 기준 X' = -X(비트 일치), Y / 도형 수 / 좌표 수 동일, Bounds = (-MaxX, MinY, -MinX, MaxY)
 #       2) 반전 추출 후에도 화면 도형 좌표(원본 GDS 배열 공유) 불변, 두 번 반전 = 원본(비트 일치)
-#       3) DB Back 저장 -> 확정 OK / GetMapInfo VIEW_SIDE = BACK / PLACED 재조회 좌표 = 반전 좌표 / SOURCE 건수 = 원본 기준
+#       3) DB Back 저장 -> 확정 OK / GetMapInfo VIEW_SIDE = BACK / PLACED 재조회 좌표 = 반전 좌표 (원본 행 SOURCE는 2026-10-12 제거)
 #       4) DB(Back) 도형으로 Chain 탐색한 연결 집합 = 파일(Front) 도형 탐색 집합
 #       5) 기존 11개 항목 BeginMapImport는 VIEW_SIDE = FRONT(호환)
 #       Service를 띄우지 않고 BSL을 직접 호출한다(DB: 로컬 docker DMSMGR, TQP_GDS_MAP.VIEW_SIDE 컬럼 필요).
@@ -27,9 +27,11 @@ $flags = [Reflection.BindingFlags]'NonPublic,Static'
 $cm = [Configuration.ConfigurationManager]
 $cm.GetField('s_initState', $flags).SetValue($null, 0)
 $cm.GetField('s_configSystem', $flags).SetValue($null, $null)
-foreach ($d in 'Oracle.ManagedDataAccess', 'Miracom.Middleware', 'DACrux.Base', 'DACrux.SEMDMS.Interface', 'DACrux.SEMDMS.DSL') {
+foreach ($d in 'Oracle.ManagedDataAccess', 'Miracom.Middleware', 'DACrux.Base') {
     $p = Join-Path $serverBin "$d.dll"; if (Test-Path $p) { [void][Reflection.Assembly]::LoadFrom($p) }
 }
+# Interface / DSL 은 BSL 과 같은 폴더에서 읽는다(시험 빌드의 서비스 계약이 운영 폴더와 다를 수 있음, 2026-10-12)
+foreach ($d in 'DACrux.SEMDMS.Interface', 'DACrux.SEMDMS.DSL') { [void][Reflection.Assembly]::LoadFrom((Join-Path $BslDir "$d.dll")) }
 $bslDll = Join-Path $BslDir 'DACrux.SEMDMS.BSL.dll'
 [void][Reflection.Assembly]::LoadFrom($bslDll)
 Write-Host "BSL: $bslDll"
@@ -122,22 +124,21 @@ public static class BackSideProbe
         return a;
     }
 
-    /// <summary>3) Setup DB 저장과 같은 순서로 Back side 저장. 반환: job|확정결과|VIEW_SIDE|DB SOURCE|예상 SOURCE|DB PLACED|예상 PLACED</summary>
+    /// <summary>3) Setup DB 저장과 같은 순서로 Back side 저장. 반환: job|확정결과|VIEW_SIDE|DB PLACED|예상 PLACED</summary>
     public static string SaveBack(string factory, string device, int[] layerArr)
     {
         var layers = new HashSet<int>(layerArr);
         var bsl = new DACrux.SEMDMS.BSL.GdsMapImport();
         if (bsl.GetMapInfo(factory, device).Rows.Count > 0) bsl.DeleteMap(factory, device, "probe");
-        long source = GdsMapSourceRowBuilder.CountSourceRows(Lib, layers), placed = 0, pts = 0;
+        long placed = 0, pts = 0;
         FileMap.VisitPlacedElements(layers, true, d => { placed++; pts += d.WorldPoints.Length; });
         string[] info = { factory, device, Lib.Structures[0].Name, "probe.gds", new string('B', 64), "0.001", "1E-09", "probe",
-            source.ToString(), placed.ToString(), pts.ToString(), "BACK" };
+            "", placed.ToString(), pts.ToString(), "BACK" };
         string job = bsl.BeginMapImport(info).Rows[0]["IMPORT_JOB_SEQ"].ToString();
         var colors = FileMap.GetLayerDisplayItems().Where(i => layers.Contains(i.LayerId)).OrderBy(i => i.LayerId)
             .Select(i => new KeyValuePair<int, int>(i.LayerId, i.Color.ToArgb())).ToList();
-        bsl.CreateLayerBatch(job, 0, GdsMapSourceRowBuilder.BuildLayerRows(colors), "probe");
+        bsl.CreateLayerBatch(job, 0, GdsMapLayerRowBuilder.BuildLayerRows(colors), "probe");
         long no = 0;
-        foreach (string[,] rows in GdsMapSourceRowBuilder.BuildSourceBatches(Lib, 10000, layers)) bsl.CreateSourceBatch(job, no++, rows, "probe");
         var pending = new List<string[]>(); no = 0;
         FileMap.VisitPlacedElements(layers, true, d =>
         {
@@ -147,7 +148,7 @@ public static class BackSideProbe
         if (pending.Count > 0) bsl.CreatePlacedBatch(job, no++, To2D(pending), "probe");
         DataRow c = bsl.CompleteMapImport(job, "probe").Rows[0];
         DataRow m = bsl.GetMapInfo(factory, device).Rows[0];
-        return job + "|" + c["RESULT"] + "|" + m["VIEW_SIDE"] + "|" + c["DB_SOURCE"] + "|" + source + "|" + c["DB_PLACED"] + "|" + placed;
+        return job + "|" + c["RESULT"] + "|" + m["VIEW_SIDE"] + "|" + c["DB_PLACED"] + "|" + placed;
     }
 
     public static GdsMapControl DbMap(string factory, string device, int[] layers)
@@ -205,14 +206,14 @@ public static class BackSideProbe
     {
         var bsl = new DACrux.SEMDMS.BSL.GdsMapImport();
         if (bsl.GetMapInfo(factory, device).Rows.Count > 0) bsl.DeleteMap(factory, device, "probe");
-        bsl.BeginMapImport(new[] { factory, device, "TOP", "compat.gds", new string('C', 64), "0.001", "1E-09", "probe", "0", "0", "0" });
+        bsl.BeginMapImport(new[] { factory, device, "TOP", "compat.gds", new string('C', 64), "0.001", "1E-09", "probe", "", "0", "0" });
         string side = bsl.GetMapInfo(factory, device).Rows[0]["VIEW_SIDE"].ToString();
         bsl.DeleteMap(factory, device, "probe");
         return side;
     }
 }
 "@
-Add-Type -TypeDefinition $helper -ReferencedAssemblies @($gdsDll, $bslDll, (Join-Path $serverBin 'DACrux.SEMDMS.Interface.dll'),
+Add-Type -TypeDefinition $helper -ReferencedAssemblies @($gdsDll, $bslDll, (Join-Path $BslDir 'DACrux.SEMDMS.Interface.dll'),
     (Join-Path $serverBin 'Miracom.Middleware.dll'), (Join-Path $probeDir 'OpenTK.GLControl.dll'), (Join-Path $probeDir 'OpenTK.dll'),
     'System.Core', 'System.Data', 'System.Windows.Forms', 'System.Drawing', 'System.Xml')
 
@@ -229,10 +230,10 @@ Check '반전 추출 후 화면 도형(원본 공유 배열) 불변 / 두 번 �
 
 $sw = [Diagnostics.Stopwatch]::StartNew()
 $s = ([BackSideProbe]::SaveBack($f, $dev, $Layers)).Split('|')
-Check 'Back 저장 확정 / VIEW_SIDE / 건수' ($s[1] -eq 'OK' -and $s[2] -eq 'BACK' -and $s[3] -eq $s[4] -and $s[5] -eq $s[6]) ("job={0} {1} VIEW_SIDE={2} SOURCE {3}/{4} PLACED {5}/{6} / {7:N0} ms" -f $s[0], $s[1], $s[2], $s[3], $s[4], $s[5], $s[6], $sw.ElapsedMilliseconds)
+Check 'Back 저장 확정 / VIEW_SIDE / 건수' ($s[1] -eq 'OK' -and $s[2] -eq 'BACK' -and $s[3] -eq $s[4]) ("job={0} {1} VIEW_SIDE={2} PLACED {3}/{4} / {5:N0} ms" -f $s[0], $s[1], $s[2], $s[3], $s[4], $sw.ElapsedMilliseconds)
 $db = [BackSideProbe]::DbMap($f, $dev, $Layers)
 $c = ([BackSideProbe]::CompareDb($db, $Layers)).Split('|')
-Check 'DB 재조회 좌표 = 반전 좌표(비트)' ($c[0] -eq $s[6] -and $c[1] -eq '0') "DB 도형 $($c[0]) / 불일치 $($c[1])"
+Check 'DB 재조회 좌표 = 반전 좌표(비트)' ($c[0] -eq $s[4] -and $c[1] -eq '0') "DB 도형 $($c[0]) / 불일치 $($c[1])"
 $t = ([BackSideProbe]::TraceCompare($db, $Layers[0])).Split('|')
 Check 'Back DB 도형 Chain 탐색 = Front 파일 도형 탐색' ($t[3] -eq 'True' -and [int]$t[1] -gt 0) "Input $($t[0]) / Front $($t[1]) / Back $($t[2])"
 $side = [BackSideProbe]::Compat($f, 'FRONT_COMPAT_PROBE')

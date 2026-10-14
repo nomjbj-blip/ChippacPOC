@@ -10,7 +10,7 @@ namespace DACrux.SEMDMS.BSL
     /// <summary>
     /// GDS Map 조회 화면의 읽기 전용 업무 검증과 DSL 호출을 담당한다.
     /// 설계: 문서/2026-10-02_GDS_Map_조회화면_설계.md 4~5절 / 15절.
-    /// 2026-10-02 리비전 관리 제거(CLAUDE-017)로 조회 키는 Factory + Device다(Device당 Map 1개).
+    /// 2026-10-02 리비전 관리 제거로 조회 키는 Factory + Device다(Device당 Map 1개).
     /// 저장 중이거나 실패한 Map(DRAFT)은 도형 일부만 있을 수 있으므로 READY Map만 조회한다.
     /// </summary>
     public class GdsMapView : Miracom.Middleware.BaseComponent, DACrux.SEMDMS.Interface.iGdsMapView
@@ -93,7 +93,7 @@ namespace DACrux.SEMDMS.BSL
         }
 
         /// <summary>
-        /// Label 검색 색인(2026-10-07 CLAUDE-032). 처리 흐름: READY Map 확인 -> TEXT 도형 전체(ID / Layer / TEXTTYPE / 값 / 위치) 조회.
+        /// Label 검색 색인(2026-10-07). 처리 흐름: READY Map 확인 -> TEXT 도형 전체(ID / Layer / TEXTTYPE / 값 / 위치) 조회.
         /// Layer가 바뀌어도 찾을 수 있도록 Layer 조건 없이 도형 종류(TEXT)로만 찾는다. 샘플 기준 약 3만 행.
         /// </summary>
         public DataTable GetMapTextIndex(string strFactory, string strDeviceID)
@@ -103,6 +103,30 @@ namespace DACrux.SEMDMS.BSL
             DataTable dt = oTQP_GDS_PLACED_EL.GetData("SELECT_PLACED_TEXT_INDEX", null, new string[] { key[0], key[1] });
             dt.RemotingFormat = SerializationFormat.Binary;
             return dt;
+        }
+
+        #endregion
+
+        #region [TQP_GDS_MAP_SUB_DEVICE]
+
+        /// <summary>대표 Device의 Sub Device 목록(2026-10-12). Map 상태와 관계없이 저장된 설정을 그대로 돌려준다.</summary>
+        public DataTable GetSubDeviceList(string strFactory, string strDeviceID)
+        {
+            DACrux.SEMDMS.DSL.TQP_GDS_MAP_SUB_DEVICE oSub = new DACrux.SEMDMS.DSL.TQP_GDS_MAP_SUB_DEVICE();
+            return oSub.GetData("SELECT_SUB_DEVICE_LIST", null,
+                new string[] { Required(strFactory, "Factory", 30), Required(strDeviceID, "Device ID", 50) });
+        }
+
+        /// <summary>
+        /// 다른 데이터의 Device 이름으로 READY 대표 Map Device를 찾는다(2026-10-12).
+        /// 처리: 입력 정리 -> Sub 등록(SUB) 우선, 없으면 같은 이름 Map(SELF). 대소문자 무시. 없으면 0행.
+        /// </summary>
+        public DataTable GetMapDeviceBySub(string strFactory, string strSubDeviceID)
+        {
+            string strFac = Required(strFactory, "Factory", 30);
+            string strSub = Required(strSubDeviceID, "Device ID", 50);
+            DACrux.SEMDMS.DSL.TQP_GDS_MAP_SUB_DEVICE oSub = new DACrux.SEMDMS.DSL.TQP_GDS_MAP_SUB_DEVICE();
+            return oSub.GetData("SELECT_MAP_DEVICE_BY_SUB", null, new string[] { strFac, strSub, strFac, strSub });
         }
 
         #endregion

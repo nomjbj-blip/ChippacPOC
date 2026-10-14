@@ -2,7 +2,6 @@ using NexplantQMS.GdsMap.Persistence;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
@@ -10,8 +9,10 @@ using System.Windows.Forms;
 namespace NexplantQMS.GdsMap
 {
     /// <summary>
-    /// GDS Map View Label 검색(2026-10-07 CLAUDE-032, 설계: 문서/2026-10-07_GDS_Label_검색_설계.md).
-    /// 사용자 결정: Label 색인을 [조회] 때 한 번 받아 메모리 검색 / 정확히(기본)·시작·포함 / 결과 목록 + 첫 건 이동 + [전체 보기] / 결과 중심 300µm.
+    /// GDS Map View Label 검색 (2026-10-07, 설계: 문서/2026-10-07_GDS_Label_검색_설계.md).
+    /// Label 색인을 [조회] 때 한 번 받아 메모리 검색 / 결과 목록 + 첫 건 이동 + [전체 보기] / 결과 중심 300µm.
+    /// 일치 방식은 "포함" 하나(대소문자 무시)로 고정하고 일치 방식 콤보를 없앴다. 검색 시간 표시도 뺐다 (2026-10-12).
+    /// 검색 결과 수 / 안내는 상태 줄 한 곳에만 보인다. 검색 칸 옆 결과 글자는 없앴다 (2026-10-13).
     /// Label = 도형 종류 TEXT인 배치 도형 전체(Layer 무관). 그래서 Label Layer(지금은 775)가 바뀌거나 조회하지 않아도 찾는다.
     ///
     /// 처리 흐름
@@ -19,13 +20,13 @@ namespace NexplantQMS.GdsMap
     ///  [검색] / Enter -> 색인 검색 -> 결과 목록(최대 1,000) -> 첫 건 위치로 이동
     ///  결과 선택 -> 그 위치로 이동 / [전체 보기] -> 결과 전체 범위
     ///  보기 기준 전환 -> 목록 좌표를 새 기준 X로 다시 표시 / Device 변경 -> 색인 / 결과 비움
-    /// 2026-10-07 사용자 지시: 지도에 검색 표시(과녁 / Label 글자)는 그리지 않고 위치 이동만 한다(소스 단순화).
+    /// 지도에 검색 표시(과녁 / Label 글자)는 그리지 않고 위치 이동만 한다(소스 단순화, 2026-10-07).
     /// </summary>
     public partial class GdsMapViewForm
     {
         /// <summary>목록에 보여 줄 최대 결과 수. 그보다 많으면 "외 n건"만 알린다.</summary>
         private const int LabelResultLimit = 1000;
-        /// <summary>결과로 이동할 때 보이는 범위(결과 중심 사각형 한 변, µm). 사용자 결정 4.</summary>
+        /// <summary>결과로 이동할 때 보이는 범위(결과 중심 사각형 한 변, µm). 설계 결정 4.</summary>
         private const double LabelFocusSize = 300.0;
 
         /// <summary>지금 도면 Map의 Label 색인. null이면 아직 받지 않았거나 받지 못함.</summary>
@@ -35,25 +36,13 @@ namespace NexplantQMS.GdsMap
         private List<GdsLabelEntry> _labelResults = new List<GdsLabelEntry>();
         private bool _updatingLabelResults;
 
-        /// <summary>Designer 생성 뒤 초기 상태(일치 방식 기본 = 정확히, 도면 전에는 검색 비활성).</summary>
+        /// <summary>Label 일치 방식: 포함(대소문자 무시, 앞뒤 공백 제거). GdsLabelIndex.Search 참고.</summary>
+        private const GdsLabelMatchMode LabelMatchMode = GdsLabelMatchMode.Contains;
+
+        /// <summary>Designer 생성 뒤 초기 상태(도면 전에는 검색 비활성).</summary>
         private void InitializeLabelSearchState()
         {
-            cboLabelMatch.SelectedIndex = 0;
             SetLabelSearchEnabled(false);
-            lblLabelResult.Text = "[조회] 후 검색할 수 있습니다.";
-        }
-
-        private GdsLabelMatchMode SelectedLabelMatchMode
-        {
-            get
-            {
-                switch (cboLabelMatch.SelectedIndex)
-                {
-                    case 1: return GdsLabelMatchMode.Prefix;
-                    case 2: return GdsLabelMatchMode.Contains;
-                    default: return GdsLabelMatchMode.Exact;
-                }
-            }
         }
 
         /// <summary>서비스에서 Label 색인을 받는다. 백그라운드 스레드에서 실행한다.</summary>
@@ -64,20 +53,16 @@ namespace NexplantQMS.GdsMap
                 return GdsLabelIndex.FromTable(table);
         }
 
-        /// <summary>새 Map을 그린 뒤 색인을 바꾼다. 색인을 받지 못해도 도면은 그대로 쓰고 검색만 막는다.</summary>
+        /// <summary>
+        /// 새 Map을 그린 뒤 색인을 바꾼다. 색인을 받지 못해도 도면은 그대로 쓰고 검색만 막는다.
+        /// 색인 건수 / 실패 사유는 미리 보이지 않고, 검색할 때 상태 줄로 알린다(RunLabelSearch).
+        /// </summary>
         private void ReplaceLabelIndex(GdsLabelIndex index, string error)
         {
             ClearLabelResults();
             _labelIndex = index;
             _labelIndexError = error;
             SetLabelSearchEnabled(true);
-            if (index == null)
-                lblLabelResult.Text = "Label 색인 조회 실패: " + error;
-            else if (index.Count == 0)
-                lblLabelResult.Text = "이 Map에는 TEXT(Label)가 없습니다(Setup 저장 Layer 확인).";
-            else
-                lblLabelResult.Text = "Label " + index.Count.ToString("N0") + "개 검색 가능 ("
-                    + string.Join(", ", index.Entries.Select(e => e.LayerId).Distinct().OrderBy(l => l).Select(l => "Layer " + l)) + ")";
         }
 
         /// <summary>Device가 바뀌면 이전 Map의 색인 / 결과를 버린다.</summary>
@@ -87,7 +72,6 @@ namespace NexplantQMS.GdsMap
             _labelIndex = null;
             _labelIndexError = null;
             SetLabelSearchEnabled(false);
-            lblLabelResult.Text = "[조회] 후 검색할 수 있습니다.";
         }
 
         private void ClearLabelResults()
@@ -103,7 +87,7 @@ namespace NexplantQMS.GdsMap
         private void SetLabelSearchEnabled(bool enabled)
         {
             bool ready = enabled && _labelIndex != null;
-            txtLabel.Enabled = cboLabelMatch.Enabled = btnLabelSearch.Enabled = ready;
+            txtLabel.Enabled = btnLabelSearch.Enabled = ready;
             cboLabelResults.Enabled = ready && _labelResults.Count > 0;
             btnLabelAll.Enabled = ready && _labelResults.Count > 1;
         }
@@ -138,19 +122,16 @@ namespace NexplantQMS.GdsMap
                 txtLabel.Focus();
                 return;
             }
-            var watch = Stopwatch.StartNew();
-            List<GdsLabelEntry> results = _labelIndex.Search(text, SelectedLabelMatchMode);
-            double ms = watch.Elapsed.TotalMilliseconds;
+            List<GdsLabelEntry> results = _labelIndex.Search(text, LabelMatchMode);
 
             ClearLabelResults();
             _labelResults = results;
             if (results.Count == 0)
             {
                 SetLabelSearchEnabled(true);
-                lblLabelResult.Text = "'" + text + "' 0건";
                 SetStatus(_labelIndex.Count == 0
                     ? "이 Map에는 TEXT(Label)가 없습니다. Setup에서 Label Layer를 포함해 저장했는지 확인하세요."
-                    : "'" + text + "'와 " + cboLabelMatch.Text + " 일치하는 Label이 없습니다. 일치 방식을 시작 / 포함으로 바꿔 보세요.");
+                    : "'" + text + "'이(가) 들어 있는 Label이 없습니다.");
                 return;
             }
 
@@ -162,12 +143,10 @@ namespace NexplantQMS.GdsMap
             _updatingLabelResults = false;
             SetLabelSearchEnabled(true);
 
-            string layers = string.Join(", ", results.Select(r => r.LayerId).Distinct().OrderBy(l => l).Select(l => "Layer " + l));
-            lblLabelResult.Text = results.Count.ToString("N0") + "건" + (results.Count > LabelResultLimit
-                ? " (목록 " + LabelResultLimit.ToString("N0") + "건, 외 " + (results.Count - LabelResultLimit).ToString("N0") + "건)" : "");
             SelectLabelResult(0);
-            SetStatus("'" + text + "' " + results.Count.ToString("N0") + "건 (" + layers + ") / 1번째 위치로 이동 / 검색 "
-                + ms.ToString("0.0") + "ms" + UnloadedLabelLayerNote(results));
+            SetStatus("'" + text + "' " + results.Count.ToString("N0") + "건"
+                + (results.Count > LabelResultLimit ? "(목록에는 앞 " + LabelResultLimit.ToString("N0") + "건)" : "")
+                + ". 첫 번째 위치로 이동했습니다." + UnloadedLabelLayerNote(results));
         }
 
         /// <summary>결과 Layer 중 도면에 올리지 않은 Layer가 있으면 안내 문구(위치로는 이동하지만 지도에 글자가 없다).</summary>
@@ -175,7 +154,7 @@ namespace NexplantQMS.GdsMap
         {
             var missing = results.Select(r => r.LayerId).Distinct().Where(l => !_loadedLayers.Contains(l)).OrderBy(l => l).ToList();
             return missing.Count == 0 ? ""
-                : " / Label Layer " + string.Join(", ", missing) + " 미조회 - 글자를 보려면 체크 후 [조회]";
+                : " Label 글자를 보려면 Layer " + string.Join(", ", missing) + " 을(를) 체크하고 [조회]를 누르세요.";
         }
 
         /// <summary>목록 문구: 값 / Layer / 화면 좌표(지금 보기 기준).</summary>

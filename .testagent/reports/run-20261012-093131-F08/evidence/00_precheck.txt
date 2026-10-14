@@ -1,0 +1,2 @@
+﻿DOCKER=oracle19c Up 9 minutes (healthy)
+CHECKED=2026-10-12T09:31:32

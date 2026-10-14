@@ -90,6 +90,7 @@ Y=1 :         5 6 7 8
 | [파일 빈칸 제거] | SINF 밑줄 칸 | **[검사 Die 외 제거]**: SampleTestPlan 에 없는 Die 를 -1 로. 격자 전체가 대상 |
 | [Wafer 밖 제거] | 그대로 | 그대로 (`StandardMapEditMap.IsInsideWafer`) |
 | 저장 | `MapCreationService.Create` | 그대로. µm 값이 그대로 `SetMapDef` 로 간다 |
+- Die Pitch (2026-10-13 추가): 기본 = KLARF `DiePitch`, 작업자가 X / Y 를 조정할 수 있다 (KLARF 값 50% ~ 200%). 격자 / Die 크기 / 저장 CHIP_SIZE 에 쓰고 KLARF (0,0) Die 인덱스는 유지한다. KLARF 값과 다르면 정보창에 차이와 격자 끝 최대 어긋남을 표시하고 [KLARF 값으로] 로 되돌린다. Die / Scribe 크기 입력은 두지 않는다.
 
 ### 4.3 Notch 각도
 
@@ -120,7 +121,7 @@ Y=1 :         5 6 7 8
 
 1. `KlarfMapSource` / `KlarfMapRule` + Probe: 샘플에서 옮기는 양 (7,5) / 격자 X 1~12, Y 1~9 / 검사 Die 26개가 모두 격자 안 / Defect 109건이 검사 Die 안에 있는지 PASS.
 2. `StandardMapEditMap` + 화면 생성 동작 교체 (SINF -> KLARF). 샘플로 원형 Map 표시 / Notch 위치 / 검사 Die 위치를 KLARF File View 와 나란히 비교.
-3. 편집 모드 (보기 / 제거 / 복원) + 보조 버튼 2개 + 정보창.
+3. 편집 모드 (보기 / 제거 / 복원) + 보조 버튼 2개 + 정보창. (2026-10-08 완료: 보기 = Map 기본 Zoom, Edit 메뉴 숨김, 화면 밖 검사 PASS)
 4. (결정 2 가 조회면) Interface / RO `GetOriginDieIndex` 추가 + ServerBin 반영.
 5. 저장 -> 기존 Map Define 화면에서 열어 형상 / 인덱스 / µm 값 확인.
 
@@ -134,6 +135,7 @@ Y=1 :         5 6 7 8
 
 - 결정 1: XY 방향은 작업자가 선택, 기본 LeftBottom.
 - 결정 2: 옮기는 양은 TQD_SETUP 저장값 조회 우선, 없으면 계산기 (SEMDMS Interface / RO 에 조회 함수 추가).
+  - **2026-10-13 변경**: TQD_SETUP 이 없으면 계산기로 대신하지 않고 Error. Map Setup 은 필수. 알고리즘은 9절.
 - 결정 3: SINF txt 지원 중지 (KLARF 만). SINF 코드는 파일만 남기고 화면에서 뺀다.
 - 참고 (사용자 질문): GDS 도 µm 기준이다. 샘플 `OMM all layer2.gds` UNITS = DB 단위 1 nm / User 단위 1 µm (정수 좌표 x 0.001 = µm). KLARF / TQP_MAPDEF / GDS 가 모두 µm 로 맞는다.
 
@@ -142,3 +144,42 @@ Y=1 :         5 6 7 8
 1. **XY 방향**: KLARF 기준 Map 은 DMS Defect 인덱스와 같도록 **LeftBottom 고정**을 권장한다. 10/02 결정 (선택 가능, 기본 LeftTop) 은 SINF 기준이었다. 기존 TEST Map 은 모두 LeftTop 이므로, ET 데이터가 LeftTop 인덱스로 들어오면 ET 쪽 변환이 필요해진다.
 2. **옮기는 양의 출처**: DMS 와 100% 같게 하려면 `TQD_SETUP` 저장값을 먼저 조회해야 한다 (SEMDMS Interface / RO 함수 추가 필요). 권장: 조회 추가 (없으면 계산기). 대안: 계산기만 사용 (서비스 변경 없음, 이미 업로드된 Setup 과 다를 수 있음).
 3. **SINF txt 지원**: 사용 중지 (KLARF 만) 권장. SINF 코드는 파일만 남기고 화면에서 뺀다.
+
+## 9. TQD_SETUP 원점 필수 / KLARF Die Index -> Map 같은 위치 (2026-10-13 초안, CLAUDE-075)
+
+결정 (2026-10-13): Die 추가 기능은 만들지 않음 (편집은 보기 / 제거 / 복원 그대로) / TQD_SETUP 원점이 없으면 Error / Map Setup 필수.
+
+### 9.1 같은 위치가 되는 조건
+
+```text
+KLARF Die (원본 번호 i) 좌하단 X = i x PitchX - CenterX                    (Wafer 중심 기준, Y 도 같은 식)
+Map Die (LeftBottom 번호 u) 좌하단 X = (u - OriginIndexX) x PitchX - OriginX  (AddDie LeftBottom)
+DMS 가 저장하는 Defect 번호 = i + DIE_ORIGIN_X                              (TQD_SETUP)
+```
+
+- Pitch 와 중심(OriginX = CenterX)이 같으면 u = i + OriginIndexX 이다.
+- 따라서 **OriginIndex = TQD_SETUP.DIE_ORIGIN** 이면 Map 번호 = DMS Defect 번호 = 같은 물리 위치가 된다. 맞춰야 할 값은 DIE_ORIGIN 하나다.
+- 현재 화면은 이 값을 계산기(WaferDieCalculator)로 구한다. 이번 변경은 이 값을 TQD_SETUP 에서만 가져오는 것이다.
+
+### 9.2 처리 순서 (File Map Setup)
+
+1. KLARF 를 읽어 SetupID / StepID / SetupTime 을 얻는다.
+2. TQD_SETUP 조회 (SETUP_ID + STEP_ID + SETUP_TIME). **없으면 Error** -> 원형 생성 / 저장을 막고 "DMS 에 이 KLARF 의 Setup 이 없습니다. KLARF 를 먼저 DMS 에 올리세요." 안내.
+   - 조회값은 Parser 의 `GetOriginDieIndex` 훅으로 넣는다 (KlarfMapSource.Load 의 originLookup). DMS 업로드와 같은 코드(`WaferList.UpdateDieIndex`, 각도 90 / 270 이면 X / Y 교환 포함)를 그대로 타므로 Core 수정이 없다.
+   - SETUP_ID 길이 주의: 기존 `SELECT_ORIGIN_INDEX` / `CREATE_SETUP_INFO` 는 size 40 바인딩이라 41자 이상 ID 를 잘라 비교 / 저장한다 (F08 실측). F08 업로드는 128자 쿼리로 전체 ID 를 저장한다. 그래서 전체 ID 로 찾고, 없으면 앞 40자로 한 번 더 찾는다 (로컬 41자 이상 1건: OMM_Hybrid C4Bump 46자).
+3. 파일값과 TQD_SETUP 저장값 비교: Wafer 크기 / Pitch / 각도가 다르면 Error, 중심(ORIGIN_X / Y) 차이는 Pitch 절반 미만이면 통과 (번호가 바뀌지 않는 범위). [기준은 확인 대기]
+4. 격자 = 계산기 격자를 (DIE_ORIGIN - 계산기 원점) 만큼 옮긴다 (현재 `KlarfMapRule.CalculateGrid` 그대로).
+5. 같은 위치 검증 (검사 Die + Defect 가 있는 Die 전부): u = i + DIE_ORIGIN 이 격자 안인가 / Map Die 좌하단 = i x Pitch - Center 인가 / Map 에서 사용(1) 인가. 앞의 두 개가 틀리면 Error, 사용 아님은 경고.
+6. 정보창에 "원점 출처: TQD_SETUP (SETUP_SEQ n)" 과 검증 결과를 표시한다. 저장 번호는 지금처럼 선택 XY 방향 (LeftBottom <-> 방향 번호 = `ToDirection`).
+
+### 9.3 근거 (로컬 DB TQD_SETUP 53건, 2026-10-13 조회)
+
+- 각도 0: 48건 모두 DIE_ORIGIN = 계산기 값.
+- 각도 270: 5건 중 2건 (TL09_90_XPPP / XPSH) 은 저장 (6, 88) / 계산기 (6, 89) -> 계산기만 쓰면 Map 이 한 줄 어긋난다. TQD_SETUP 을 필수로 하는 실제 근거.
+- 샘플 KLARF 의 Setup (ROOT-Hybrid_TBDB, SETUP_SEQ 283) 은 있고 DIE_ORIGIN (7, 5) 로 현재 화면 값과 같다.
+
+### 9.4 구현 범위 (진행 지시 후)
+
+- SEMDMS BSL / DSL / XML: 기존 DefectDefine 방식으로 원점 조회 함수 추가 (128자 쿼리 재사용 + 40자 재조회). Interface / RO 에 같은 이름 노출. 기존 함수 변경 없음. ServerBin 배포 필요 (사용자).
+- 화면: originLookup 연결, 없으면 Error, 9.2 의 3 / 5 검증과 정보창 표시. Smoke 에 TQD_SETUP 있음 / 없음 / 40자 경우 추가.
+- 확인 대기: (1) 순서 = KLARF 를 DMS 에 먼저 올린 뒤 Map Setup (TQD_SETUP 은 업로드 때 생김) / (2) 3번의 Error 기준. 각도 90 / 270 KLARF 샘플이 없어 실제 파일 검증이 필요하다.

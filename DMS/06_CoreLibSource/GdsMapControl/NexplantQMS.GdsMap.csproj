@@ -70,6 +70,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Chain\ChainColorPicker.cs" />
     <Compile Include="Chain\ChainCandidateTracer.cs" />
     <Compile Include="Chain\ChainElementCandidateForm.cs">
       <SubType>Form</SubType>
@@ -85,11 +86,17 @@
     <Compile Include="Controls\GdsMapControl_Chain.cs">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="Controls\GdsMapControl_ChainLabel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="Controls\GdsMapControl_ChainOverlay.cs" />
     <Compile Include="Controls\GdsMapControl_Persistence.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Controls\GdsMapControl_DbView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\GdsMapControl_DefectOverlay.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Controls\GdsMapControl_Layer.cs">
@@ -154,6 +161,20 @@
       <DependentUpon>GdsMapViewForm.cs</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="GdsMapViewForm_SubDevice.cs">
+      <DependentUpon>GdsMapViewForm.cs</DependentUpon>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GdsMapViewForm_Layout.cs">
+      <DependentUpon>GdsMapViewForm.cs</DependentUpon>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SubDeviceSetupForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SubDeviceSetupForm.Designer.cs">
+      <DependentUpon>SubDeviceSetupForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="GdsMapForm.Designer.cs">
       <DependentUpon>GdsMapForm.cs</DependentUpon>
     </Compile>
@@ -163,6 +184,12 @@
     </Compile>
     <Compile Include="GdsMapViewForm.Designer.cs">
       <DependentUpon>GdsMapViewForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GdsDieAnalysisForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GdsDieAnalysisForm.Designer.cs">
+      <DependentUpon>GdsDieAnalysisForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Gds\GBox.cs" />
     <Compile Include="Gds\GdsGeometry.cs" />
@@ -180,7 +207,7 @@
     <Compile Include="Persistence\MapPlacedBatchPayload.cs" />
     <Compile Include="Persistence\MapPlacedBatchReader.cs" />
     <Compile Include="Persistence\MapPlacedSceneItemFactory.cs" />
-    <Compile Include="Persistence\GdsMapSourceRowBuilder.cs" />
+    <Compile Include="Persistence\GdsMapLayerRowBuilder.cs" />
     <Compile Include="Persistence\GdsSideTransform.cs" />
     <Compile Include="Persistence\GdsLabelIndex.cs" />
     <Compile Include="Persistence\GdsMapPlacedRowBuilder.cs" />

@@ -1,0 +1,104 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TQP_GDS_ET_CHAIN_LINK: E-Test 대표 Chain -> GDS Setup Chain (1:1). 2026-10-14.
+  설계: 문서/2026-10-14_ETest_Para_Setup_설계.md 4.4절 / 7절.
+  LINK_TYPE: NAME = GDS 이름(비교 이름)이 대표 이름 또는 구성 단자와 같아 연결 / MANUAL = 사용자가 고름.
+  GDS Chain 을 지우면 FK CASCADE 로 연결 행이 지워진다. 대표 Chain(단자)이 모두 빠지면 서비스가 연결을 지운다(DELETE_ET_CHAIN_LINK_ORPHAN).
+-->
+<queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Select" queryid="SELECT_ET_CHAIN_LINK_LIST" commandtype="Text" description="GDS 대표 Device 의 연결 전체 + GDS Chain 지금 이름" commandtimeout="60">
+        <commandtext><![CDATA[SELECT L.REP_CHAIN_NAME, L.CHAIN_SEQ, L.GDS_CHAIN_NAME, L.LINK_TYPE, L.REMARK,
+       V.CHAIN_NAME AS CUR_CHAIN_NAME,
+       NVL(L.UPDATE_USER, L.CREATE_USER) AS UPDATE_USER, NVL(L.UPDATE_TIME, L.CREATE_TIME) AS UPDATE_TIME
+  FROM TQP_GDS_ET_CHAIN_LINK L
+  LEFT JOIN TQP_GDS_CHAIN_VER V ON V.FACTORY = L.FACTORY AND V.DEVICE_ID = L.DEVICE_ID AND V.CHAIN_SEQ = L.CHAIN_SEQ AND V.IS_CURRENT = 1
+ WHERE L.FACTORY = :factory
+   AND L.DEVICE_ID = :device_id
+ ORDER BY L.REP_CHAIN_NAME]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="120">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="200">:device_id</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="MERGE_ET_CHAIN_LINK" commandtype="Text" description="대표 Chain 연결 저장 (있으면 바꿈)" commandtimeout="60">
+        <commandtext><![CDATA[MERGE INTO TQP_GDS_ET_CHAIN_LINK T
+USING (SELECT :factory AS FACTORY,
+              :device_id AS DEVICE_ID,
+              :rep_chain_name AS REP_CHAIN_NAME,
+              TO_NUMBER(:chain_seq) AS CHAIN_SEQ,
+              :gds_chain_name AS GDS_CHAIN_NAME,
+              :link_type AS LINK_TYPE,
+              :update_user AS UPDATE_USER
+         FROM DUAL) S
+   ON (T.FACTORY = S.FACTORY AND T.DEVICE_ID = S.DEVICE_ID AND T.REP_CHAIN_NAME = S.REP_CHAIN_NAME)
+ WHEN MATCHED THEN UPDATE SET
+      T.CHAIN_SEQ = S.CHAIN_SEQ,
+      T.GDS_CHAIN_NAME = S.GDS_CHAIN_NAME,
+      T.LINK_TYPE = S.LINK_TYPE,
+      T.UPDATE_USER = S.UPDATE_USER,
+      T.UPDATE_TIME = SYSDATE
+ WHEN NOT MATCHED THEN INSERT
+      (FACTORY, DEVICE_ID, REP_CHAIN_NAME, CHAIN_SEQ, GDS_CHAIN_NAME, LINK_TYPE, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+      VALUES (S.FACTORY, S.DEVICE_ID, S.REP_CHAIN_NAME, S.CHAIN_SEQ, S.GDS_CHAIN_NAME, S.LINK_TYPE, S.UPDATE_USER, SYSDATE, S.UPDATE_USER, SYSDATE)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="120">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="200">:device_id</param>
+            <param direction="Input" dbtype="VarChar" size="256">:rep_chain_name</param>
+            <param direction="Input" dbtype="VarChar" size="20">:chain_seq</param>
+            <param direction="Input" dbtype="VarChar" size="800">:gds_chain_name</param>
+            <param direction="Input" dbtype="VarChar" size="40">:link_type</param>
+            <param direction="Input" dbtype="VarChar" size="30">:update_user</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_ET_CHAIN_LINK_NAME" commandtype="Text" description="대표 Chain 이름을 바꿀 때 연결의 대표 이름도 바꾼다" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_GDS_ET_CHAIN_LINK
+   SET REP_CHAIN_NAME = :new_name,
+       UPDATE_USER = :update_user,
+       UPDATE_TIME = SYSDATE
+ WHERE FACTORY = :factory
+   AND DEVICE_ID = :device_id
+   AND REP_CHAIN_NAME = :old_name]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="256">:new_name</param>
+            <param direction="Input" dbtype="VarChar" size="30">:update_user</param>
+            <param direction="Input" dbtype="VarChar" size="120">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="200">:device_id</param>
+            <param direction="Input" dbtype="VarChar" size="256">:old_name</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_ET_CHAIN_LINK" commandtype="Text" description="대표 Chain 1개의 연결 해제" commandtimeout="60">
+        <commandtext><![CDATA[DELETE FROM TQP_GDS_ET_CHAIN_LINK
+ WHERE FACTORY = :factory
+   AND DEVICE_ID = :device_id
+   AND REP_CHAIN_NAME = :rep_chain_name]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="120">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="200">:device_id</param>
+            <param direction="Input" dbtype="VarChar" size="256">:rep_chain_name</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_ET_CHAIN_LINK_BY_SEQ" commandtype="Text" description="GDS Chain 1개의 연결 해제 (1:1 유지를 위해 다른 대표로 옮기기 전)" commandtimeout="60">
+        <commandtext><![CDATA[DELETE FROM TQP_GDS_ET_CHAIN_LINK
+ WHERE FACTORY = :factory
+   AND DEVICE_ID = :device_id
+   AND CHAIN_SEQ = TO_NUMBER(:chain_seq)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="120">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="200">:device_id</param>
+            <param direction="Input" dbtype="VarChar" size="20">:chain_seq</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_ET_CHAIN_LINK_ORPHAN" commandtype="Text" description="구성 단자가 하나도 없는 대표 Chain 의 연결 정리" commandtimeout="60">
+        <commandtext><![CDATA[DELETE FROM TQP_GDS_ET_CHAIN_LINK L
+ WHERE L.FACTORY = :f1
+   AND L.DEVICE_ID = :d1
+   AND NOT EXISTS (SELECT 1 FROM TQP_GDS_ET_REP_CHAIN R
+                    WHERE R.FACTORY = :f2 AND R.DEVICE_ID = :d2 AND R.REP_CHAIN_NAME = L.REP_CHAIN_NAME)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="120">:f1</param>
+            <param direction="Input" dbtype="VarChar" size="200">:d1</param>
+            <param direction="Input" dbtype="VarChar" size="120">:f2</param>
+            <param direction="Input" dbtype="VarChar" size="200">:d2</param>
+        </parameters>
+    </query>
+</queryxml>

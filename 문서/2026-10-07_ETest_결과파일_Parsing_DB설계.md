@@ -624,3 +624,134 @@ DMS > E-Test 결과 업로드 화면 아래 **등록된 E-Test 파일 목록에�
 - 서비스: `GetEtFileByKey` 키가 3항목 (Factory / Lot / Slot) 으로 바뀜, 새 쿼리 `SELECT_SRC_FILE_BY_WAFER`. 이전 `SELECT_SRC_FILE_BY_KEY` 는 배포 전 BSL 호환용으로 그대로 둔다 (Service 가 08_DBQuery XML 을 바로 읽기 때문).
 - 파서: 파일명 Wafer 가 `{Lot}-{숫자}` 가 아니어도 중단하지 않는다 (SlotNo = 0 -> 사용자 입력).
 - 시험 값은 Lot / Slot 만으로 정해지므로, 같은 Wafer 의 재시험 파일을 함께 보관해야 하면 키 재정의 필요 ("우선 정의").
+
+
+---
+
+## 13. 파일명 규칙 정형화 (2026-10-12 사용자 제공 규칙)
+
+사용자 제공 (2026-10-12):
+
+```text
+[Customer]_[Device]_[Wafer Type]_[Wafer Rev]_[Test Type]_[Test Date]_[Lot]_[Lot-Wafer No]$Silterra$
+CAI_OMM_ATV_A0_TSVET_20260902141031_U9-HS2633_U9-HS2633-01$Silterra$
+```
+
+상태: **구현 완료 (2026-10-12, 사용자 "제안대로 진행") — 13.7절**
+
+### 13.1 분석
+
+| 칸 | 규칙 이름 | 예시 (새 규칙) | 기존 샘플 (RH-HS2615-02) | 지금 저장 위치 (9 ~ 12절) |
+| --- | --- | --- | --- | --- |
+| 1 | Customer | `CAI` | `CAI` | `FILE_PREFIX` 에 1~4칸이 붙어서 들어감 |
+| 2 | Device | `OMM` | `OMM` | `FILE_PREFIX` (DEVICE_ID 는 사용자가 따로 선택) |
+| 3 | Wafer Type | `ATV` | `ATV` | `FILE_PREFIX` |
+| 4 | Wafer Rev | `A0` | `A0` | `FILE_PREFIX` |
+| 5 | Test Type | `TSVET` | `TSVET` | `TEST_PROGRAM` |
+| 6 | Test Date | `20260902141031` | `20260609161940` | `TEST_TIME` |
+| 7 | Lot | `U9-HS2633` | `RH-HS2615` | `LOT_ID` |
+| 8 | Lot-Wafer No | `U9-HS2633-01` | `RH-HS2615-02` | 저장 안 함 (Slot 기본값 `01` 에만 사용) |
+| 끝 | `$Silterra$` | `Silterra` | 없음 | 없음 |
+
+- 두 파일 모두 `$...$` 를 떼고 `_` 로 나누면 **정확히 8칸**이다. 이전 설계에서 "의미 확인 필요" 로 둔 접두어 `CAI_OMM_ATV_A0` 의 뜻이 이번 규칙으로 확정된다 (Customer / Device / Wafer Type / Wafer Rev).
+- `$Silterra$` 는 `$` 로 둘러싼 꼬리표다. Silterra 는 말레이시아 파운드리 이름이라 **Wafer 제조 Fab** 으로 추정한다 (N2, 확인 필요). 없는 파일 (기존 샘플) 도 있으므로 선택 항목이다.
+- **지금 파서의 문제**: 뒤에서부터 나누므로 새 파일의 마지막 칸이 `U9-HS2633-01$Silterra$` 가 된다. 그래서 Slot 기본값을 얻지 못해 매번 Slot 을 입력해야 하고, 요약에 나오는 파일명 Wafer 도 틀린다. 저장 (Lot / 시험 일시 / Test Type) 은 맞게 된다.
+- 파일명 Device (`OMM`) 와 DMS / GDS Device 는 다르다 (저장된 E-Test 1건은 `OMM_Hybrid`, KLARF DeviceID `Hybrid_OMM`, GDS Map 에는 `U9` 도 있음). 그래서 파일명 Device 는 **원문으로만 보관**하고 DEVICE_ID 는 지금처럼 사용자가 고른다 (N3).
+- Lot `U9-HS2633` 의 앞부분 `U9` 가 GDS Device `U9` 와 같아 보이지만 규칙으로 정해진 것이 아니므로 연결에 쓰지 않는다 (참고만).
+
+### 13.2 파싱 규칙 (변경)
+
+| 순서 | 규칙 | 실패 시 |
+| --- | --- | --- |
+| 1 | 확장자를 뺀 파일명 끝의 `$이름$` 를 떼어 Fab 꼬리표로 둔다 (`^(.*?)(?:\$([^$]+)\$)?$`). 없으면 빈 값 | - |
+| 2 | 남은 이름을 `_` 로 나눠 **정확히 8칸**이어야 한다. 앞에서부터 Customer / Device / Wafer Type / Wafer Rev / Test Type / Test Date / Lot / Lot-Wafer No | 8칸이 아니면 업로드 중단, 규칙 문자열을 메시지에 표시 |
+| 3 | Test Date 는 `yyyyMMddHHmmss` 14자리 | 중단 |
+| 4 | 1 ~ 7칸은 빈 값이면 안 된다 | 중단 |
+| 5 | Lot-Wafer No 가 `{Lot}-{숫자 1~99}` 면 숫자를 Slot **기본값**으로 쓴다 (최종 Slot 은 지금처럼 사용자 입력). Lot 으로 시작하지 않으면 경고 표시 + Slot 빈 칸 | 경고만 |
+| 6 | 내용의 `Wafer ID` 열이 Lot 과 다르면 경고 (지금과 같음) | 경고만 |
+
+8칸 고정으로 바꾸는 이유: 지금은 앞부분 칸 수가 정해지지 않아 뒤에서부터 나눴지만, 규칙이 정해졌으니 칸 수를 검사해야 잘못된 파일 (칸 누락 / `_` 가 섞인 Lot) 을 저장 전에 막을 수 있다.
+
+### 13.3 DB (`TQP_GDS_SRC_FILE` 컬럼 추가)
+
+| 컬럼 | 형식 | 값 (예시) |
+| --- | --- | --- |
+| CUSTOMER | VARCHAR2(30 CHAR) | `CAI` |
+| FILE_DEVICE | VARCHAR2(50 CHAR) | `OMM` (파일명 Device 원문, DEVICE_ID 와 별개) |
+| WAFER_TYPE | VARCHAR2(30 CHAR) | `ATV` |
+| WAFER_REV | VARCHAR2(20 CHAR) | `A0` |
+| LOT_WAFER_NO | VARCHAR2(60 CHAR) | `U9-HS2633-01` (파일명 원문) |
+| FAB_NAME | VARCHAR2(50 CHAR) | `Silterra` (없으면 NULL, N2) |
+
+- 기존 컬럼은 그대로 쓴다: Test Type = `TEST_PROGRAM`, Test Date = `TEST_TIME`, Lot = `LOT_ID` (N4). 화면 제목만 "Test Type" / "Test Date" 로 바꾼다.
+- `FILE_PREFIX` (= Customer_Device_WaferType_WaferRev) 는 새 컬럼과 겹친다. 새 저장부터는 채우지 않고 남겨 둘지 / 삭제할지 결정 (N5). 기존 1건 (SCK / OMM_Hybrid / RH-HS2615-02) 은 FILE_NAME 에서 새 컬럼을 채우는 UPDATE 를 DDL 에 같이 넣는다.
+- 모두 NULL 허용 (기존 행 / 꼬리표 없는 파일).
+
+### 13.4 서비스 / 화면
+
+- `BeginEtFile` FileInfo 를 12항목 -> **18항목** 으로 늘린다 (12 Customer / 13 File Device / 14 Wafer Type / 15 Wafer Rev / 16 Lot-Wafer No / 17 Fab). 12항목 호출도 계속 받는다 (지금 배포된 화면 호환, GdsMapImport.BeginMapImport 11 / 12항목과 같은 방식).
+- 쿼리 XML `TQP_GDS_SRC_FILE.xml`: `CREATE_SRC_FILE` 은 기존 쿼리를 바꾸지 않고 새 쿼리 `CREATE_SRC_FILE_V2` 를 추가한다 (Service 가 XML 을 바로 읽으므로 배포 전 BSL 이 깨지지 않게, 12절과 같은 이유). `SELECT_SRC_FILE` / `SELECT_SRC_FILE_LIST` 는 열만 추가 (기존 BSL 은 열 이름으로 읽으므로 영향 없음).
+- 업로드 화면: 요약 첫 줄을 `Customer CAI / 파일 Device OMM / Wafer Type ATV / Rev A0 / Test Type TSVET / Test Date 2026-09-02 14:10:31 / Lot U9-HS2633 / Lot-Wafer No U9-HS2633-01 / Fab Silterra` 로 바꾼다. 등록 목록에 Customer / Wafer Type / Wafer Rev / Fab 열, `TEST_PROGRAM` 제목을 "Test Type" 으로.
+- 조회 창 파일 정보 줄에 같은 값 추가.
+- 중복 키는 그대로 FACTORY + WAFER_ID (12절). 단 N1 참고.
+
+### 13.5 결정 필요
+
+| ID | 내용 | 제안 |
+| --- | --- | --- |
+| N1 | **같은 Wafer 의 다른 Test Type** (예: TSVET 와 다른 시험) 을 함께 저장해야 하나. 지금 키 (FACTORY + WAFER_ID) 로는 두 번째 파일이 첫 파일을 "삭제 후 재등록" 한다 | Test Type 이 여러 개 오는 경우가 있으면 키를 **FACTORY + WAFER_ID + TEST_PROGRAM(Test Type)** 으로 넓힌다. 확실하지 않으면 지금 키 유지 |
+| N2 | `$Silterra$` 의 의미 / 컬럼 이름 | Wafer 제조 Fab 으로 보고 `FAB_NAME`. 다른 뜻이면 이름만 바꿈 |
+| N3 | 파일명 Device (`OMM`) 와 DMS Device 의 관계 | 원문 `FILE_DEVICE` 로 보관, DEVICE_ID 는 계속 사용자 선택. 대응 규칙이 정해지면 자동 추천 추가 |
+| N4 | Test Type 을 `TEST_PROGRAM` 그대로 쓸지 / `TEST_TYPE` 로 이름을 바꿀지 | **그대로** (XML / BSL / 화면 / Limit 쿼리 등 여러 곳이 쓰고 있어 바꾸면 손댈 곳이 많다). 화면 제목만 "Test Type" |
+| N5 | `FILE_PREFIX` 처리 | 새 저장부터 채우지 않고 컬럼은 남김 (나중에 정리할 때 삭제) |
+
+### 13.6 구현 단계 (결정 후)
+
+1. DDL: 컬럼 6개 추가 + 기존 행 채우기 (+ N1 이면 UNIQUE 변경)
+2. XML (`CREATE_SRC_FILE_V2`, SELECT 열 추가) / BSL `BeginEtFile` 18항목 / Interface 주석
+3. 파서 `ParseFileName` 8칸 규칙 + Fab 꼬리표 / 업로드 화면 요약 / 등록 목록 열 / 조회 창 정보 줄
+4. Probe / Smoke: 새 규칙 예시 이름 (`...U9-HS2633-01$Silterra$.xlsx`, 샘플 사본) 과 기존 샘플 둘 다, 칸 수 틀린 이름 거부
+
+### 13.7 구현 (2026-10-12)
+
+결정: N1 키 유지 (FACTORY + WAFER_ID) / N2 `FAB_NAME` / N3 `FILE_DEVICE` 원문 / N4 `TEST_PROGRAM` 유지 (화면 제목 Test Type) / N5 `FILE_PREFIX` 새 저장부터 미사용. 추가 요청 (같은 날 "추가로 넣을 정보" 제안 채택): `PASS_DIE_COUNT` / `FAIL_DIE_COUNT` / `NOT_TESTED_COUNT` (READY 확정 때 기록), `PARSE_RULE_VER` (1 = 뒤에서부터, 2 = 8칸 규칙), `VIEW_SIDE` (BACK).
+
+- DDL `DMS/06_CoreLibSource/GdsMapControl/Persistence/2026-10-12_tqp_gds_src_file_name_rule.sql` 로컬 적용 (컬럼 11개 + CHECK, 기존 1건 FILE_NAME 에서 채움 -> CAI / OMM / ATV / A0 / RH-HS2615-02, Pass 20 / Fail 4 / 미측정 17, 규칙 1).
+- XML `TQP_GDS_SRC_FILE.xml`: 신규 `CREATE_SRC_FILE_V2` / `UPDATE_SRC_FILE_READY_V2` (기존 쿼리 유지), `SELECT_SRC_FILE` / `SELECT_SRC_FILE_LIST` 열 추가.
+- BSL `BeginEtFile` 12 / 18항목 (18 = V2), `CompleteEtFile` 은 V2 로 요약 기록. Interface 주석.
+- 파서 `ParseFileName` 8칸 고정 + `$Fab$` 꼬리표 + 빈 칸 / Test Date 검사 + Slot 기본값 실패 경고. 업로드 화면 요약 2줄 (파일명 칸 / Lot-Wafer No), 18항목 전송, 목록 열 제목 (Test Type / Test Date / Customer / 파일 Device / Wafer Type / Wafer Rev / Fab / Pass Die / Fail Die / 미측정). 조회 창 정보 3줄 (Lot-Wafer No / 면 / 파일명 칸 / Pass·Fail).
+- 검증: `Verify-EtResultUpload.ps1` -> `ET_UPLOAD_FORM_SMOKE=PASS` (추가: 요약 파일명 8칸, DB 파일명 칸 / 규칙 2 / BACK / FILE_PREFIX NULL, DB 요약 20 / 4 / 17, 목록 열 제목, 조회 창 정보, 새 규칙 이름 `...U9-HS2633-01$Silterra$.xlsx` 분석 (Fab Silterra / Slot 기본값 1 / WAFER_ID U9-HS2633-01 / 내용 Wafer ID 다름 경고) + 저장 (FAB_NAME / LOT / WAFER_ID / Test Date / 규칙 2), 7칸 이름 거부) + `ET_LIMIT_FORM_SMOKE=PASS` (12항목 이전 경로 업로드 포함) + `GdsEtResultProbe` 18/18 (12항목 호출 호환).
+
+### 13.8 화면 정리 / Device = 파일명 Device (2026-10-12 사용자 지시)
+
+사용자 지시: "문자열로 보여 주지 말고 text box 로 정리해서 보여줘. device 는 선택이 아니라 파일 이름에 있는 device 로 한다."
+
+- **N3 변경**: DEVICE_ID = 파일명 2칸 Device (`OMM`). 업로드 화면 Device 칸은 읽기 전용 표시 (선택 / GDS Device 목록 조회 제거). FILE_DEVICE 와 DEVICE_ID 가 같은 값으로 저장된다. 이전에 사용자가 고른 Device 로 저장된 파일 (SCK / `OMM_Hybrid` / RH-HS2615-02) 은 그대로이며, 등록 목록 (Factory + Device 기준) 에는 `OMM` 으로 조회할 때 나오지 않는다. Limit 설정 (Device 단위) 도 `OMM` 으로 다시 정해야 한다.
+- 업로드 화면 분석 결과: 여러 줄 문자열 대신 "파일 정보" 그룹에 항목별 읽기 전용 칸 4열 x 4줄 (Customer / Wafer Type / Wafer Rev / Fab, Test Type / Test Date / Lot / Lot-Wafer No, Die / Pass Die / Fail Die / 시트, 측정 항목 / 측정값 / 미측정 / 빈 칸) + 경고 칸 (없으면 "경고 없음", 있으면 붉은 글씨). Limit 안내는 그룹 제목으로.
+- 검증: Smoke `ET_UPLOAD_FORM_SMOKE=PASS` / `ET_LIMIT_FORM_SMOKE=PASS` (Device 칸 = OMM 읽기 전용, 정보 칸 값 16개, 경고 칸, Factory 미입력 막음, 저장 Device = OMM, 새 규칙 파일 정보 칸 / 경고). 화면 이미지 확인.
+
+---
+
+## 14. 고객 메일 (10-08 회의 답변, 2026-10-12) 반영
+
+사용자 결정 (2026-10-12): 1) "TSVET -> COWET -> FT 자체가 공정이므로 공정으로 두고 조합해서 Key" 2) "'-' 측정 Fail 로 두고 그냥 Fail" 4) "OMM = 디바이스. U9 는 자재 코드 느낌, GDS 에서만 사용 중 - 고민" (3) Spec 단위 / '-' 범위는 15절).
+
+- 중복 키: UNIQUE (FACTORY, WAFER_ID, TEST_PROGRAM) — DDL `Persistence/2026-10-12_tqp_gds_src_file_uq_wafer_test.sql` 로컬 적용. 같은 Wafer 의 TSVET / COWET / FT 는 따로 저장, 같은 공정이면 재등록 질문. `GetEtFileByKey` 3항목 (Wafer 전체 공정) / 4항목 (+ 공정) 둘 다 받음, 새 쿼리 `SELECT_SRC_FILE_BY_WAFER_TEST`. 화면 제목 "공정 (Test Type)".
+- '-' = Fail: Limit 목록 `FAIL_COUNT` (Enable Limit 범위 밖 + '-', Limit 없어도 '-' 는 Fail), Limit 화면 열 "Fail", 업로드 / 조회 창 표시 "'-' (Fail)", 조회 창 '-' 셀 붉은 배경. DB 컬럼 (NOT_TESTED_COUNT / VALUE_STATUS N) 은 그대로.
+- Slot 기본값: Lot-Wafer No 끝의 `-숫자` (고객 예시 COWET / FT `HS2606-02` 처럼 Lot 으로 시작하지 않아도 됨).
+- 검증: Smoke 업로드 PASS (추가: 같은 Wafer COWET / FT 따로 저장, FT 꼬리표 없음, 같은 공정 재저장 질문, 삭제 단계 보정) / Limit PASS (Fail = 범위 밖 + '-') / Probe 19/19 (같은 Wafer 다른 공정 저장).
+
+
+## 15. 미정 항목 결정 반영 (2026-10-12)
+
+| 번호 | 사용자 결정 | 반영 |
+| --- | --- | --- |
+| Spec 단위 | 디바이스 + 공정 + Parameter(헤더 전체) | [Limit 설계](2026-10-07_ETest_Limit_설정_설계.md) 12절 |
+| '-' | **정의된 항목의 '-' 만 Fail** (14절 "'-' = Fail" 을 좁힘) | 업로드 / 조회 창 표시를 "'-' 값" 으로 되돌림, 조회 창 '-' 셀 회색. Fail 은 Spec 화면(정의 + Enable 항목)에서만 센다 |
+| '#' | 헤더 원문을 항목명으로 쓰고 끝 `#번호` 는 지운다 | `EtResultFileParser.NormalizeHeader` (연속 공백 1칸 + `\s*#\S*\s*$` 제거, 대소문자 유지). 정리 후 같은 헤더가 두 번 나오면 기존 규칙대로 "중복" 오류. 지금까지 저장된 항목에는 '#' 이 없었다(0건 확인) |
+| DEVICE_ID | U9 / OMM 보류 -> **2026-10-13 OMM 으로 종결** | 파일명 Device(OMM) 유지. GDS 대표 Device(U9)와는 Sub Device 연결(CLAUDE-055)로 잇는다 |
+| 6 Chain 연결 | GDS Chain 은 Input 값의 Chain 을 대표로 둔다 -> Spec 설정 시 2개 Chain 을 묶는 기능. 이어서 "대표 chain 보다는 그냥 묶는 기능, Setup 된 Chain 에서 찾으면 묶인 Chain 의 Limit 등 정보를 전부 찾는다" | [Limit 설계](2026-10-07_ETest_Limit_설정_설계.md) 15절 (TQP_GDS_ET_CHAIN_GROUP, 13절 대표 Chain 은 대체) |
+| 7 이전 데이터 | **A. 삭제하고 새 규칙으로 다시 올림** | 로컬 DB: SCK / OMM_Hybrid 파일 번호 25(규칙 1) 삭제 + 고아가 된 OMM_Hybrid 측정 항목 2,755행 삭제 -> 같은 샘플을 업로드 화면과 같은 순서(18항목)로 다시 저장: **파일 번호 94 / SCK / Device OMM / WAFER_ID RH-HS2615-02 / TSVET / 규칙 2 / READY / Die 24 (Pass 20 / Fail 4) / 측정값 66,120 ('-' 17)**. 등록자는 이전과 같은 ADMIN |
+| 8 DB 시간 | **A. 그대로 두고 고객 DB(KST)에서만 확인** | 로컬 docker DB 는 UTC(PC 보다 9시간 늦음). 코드 / 쿼리는 SYSDATE 그대로, 고객 DB 에서 등록 시각만 확인 |
+| 5 | $Silterra$ 의미 | 2026-10-13 회의록으로 정리: 파일에 Silterra Die 만 있다는 표시 (FT 는 Silterra 만 측정해 생략). Die# 대응은 [Die 좌표 Setup 설계](2026-10-13_Die좌표_대응_Setup_설계.md) (CLAUDE-081) |
+| 8(측정 종류) | 다른 측정 종류 Spec | 답변 대기 (지금 상태 유지) |

@@ -89,7 +89,7 @@ public static class LabelSearchProbe
 
     /// <summary>
     /// View 화면 검색: 보기 기준 side로 Map을 그렸다고 두고(_shownMap / _displaySide) 색인을 넣은 뒤 txtLabel = text로 RunLabelSearch.
-    /// 반환: 결과 목록 문구(0x1E 구분) + "#" + 이동 후 지도 화면 중심 + "#" + 선택 index + "#" + lblLabelResult + "#" + 상태줄
+    /// 반환: 결과 목록 문구(0x1E 구분) + "#" + 이동 후 지도 화면 중심 + "#" + 선택 index + "#" + (빈 칸, 예전 결과 글자 자리) + "#" + 상태줄
     /// </summary>
     public static string FormSearch(DataRow mapRow, GdsLabelIndex index, string side, string text, int matchIndex)
     {
@@ -102,7 +102,7 @@ public static class LabelSearchProbe
             t.GetField("_displaySide", NP).SetValue(form, side);
             t.GetMethod("ReplaceLabelIndex", NP).Invoke(form, new object[] { index, null });
             ((TextBox)t.GetField("txtLabel", NP).GetValue(form)).Text = text;
-            ((ComboBox)t.GetField("cboLabelMatch", NP).GetValue(form)).SelectedIndex = matchIndex;
+            // 화면 일치 방식은 포함 고정(콤보 제거, 2026-10-12). matchIndex 는 호출 호환용으로만 남긴다.
             t.GetMethod("RunLabelSearch", NP).Invoke(form, null);
             var results = (ComboBox)t.GetField("cboLabelResults", NP).GetValue(form);
             var map = (GdsMapControl)t.GetField("map", NP).GetValue(form);
@@ -110,7 +110,8 @@ public static class LabelSearchProbe
             float cx = (float)offset.GetType().GetField("X").GetValue(offset), cy = (float)offset.GetType().GetField("Y").GetValue(offset);
             int selected = results.SelectedIndex;
             string status = ((ToolStripStatusLabel)t.GetField("lblStatus", NP).GetValue(form)).Text;
-            string resultText = ((Label)t.GetField("lblLabelResult", NP).GetValue(form)).Text;
+            // 검색 칸 옆 결과 글자는 없앴다. 결과 수 / 안내는 상태 줄 한 곳에 있다 (2026-10-13).
+            string resultText = "";
             return string.Join("\u001e", results.Items.Cast<object>().Select(o => o.ToString())) + "#"
                 + (results.Items.Count == 0 ? "" : "(" + Math.Round(cx, 2).ToString(CultureInfo.InvariantCulture) + "," + Math.Round(cy, 2).ToString(CultureInfo.InvariantCulture) + ")")
                 + "#" + selected + "#" + resultText + "#" + status;
@@ -164,16 +165,21 @@ Check '검색 시간' ($searchMs -lt 200) ("포함 검색 1회 {0:0.0}ms (3만 �
 
 # 4. View 화면 검색(Front / Back 보기)
 $mapRow = (New-Object DACrux.SEMDMS.BSL.GdsMapView).GetMapInfo($Factory, $Device).Rows[0]
+# 화면 검색은 포함(대소문자 무시) 고정 (2026-10-12). 'C4DC_212_71' 을 포함하는 Label 전체가 결과이고 첫 건은 같은 값.
+$c71File = @($fileTexts | Where-Object { $_.Split('|')[0].IndexOf('C4DC_212_71', [StringComparison]::OrdinalIgnoreCase) -ge 0 }).Count
 $front = ([LabelSearchProbe]::FormSearch($mapRow, $index, 'FRONT', 'C4DC_212_71', 0)).Split('#')
-Write-Host "  Front 목록: $($front[0] -replace [string][char]0x1e, ' || ')"
-Check 'Front 보기 결과 / 첫 건 이동' ($front[1] -eq '(10800,14582.21)' -and $front[2] -eq '0' -and $front[0].Split([char]0x1e).Count -eq 2) "화면 중심 $($front[1]) / 선택 $($front[2]) / $($front[3]) / 상태: $($front[4])"
+Write-Host "  Front 목록(앞 3건): $(($front[0].Split([char]0x1e) | Select-Object -First 3) -join ' || ')"
+Check 'Front 보기 결과(포함) / 첫 건 이동' ($front[1] -eq '(10800,14582.21)' -and $front[2] -eq '0' -and $front[0].Split([char]0x1e).Count -eq [Math]::Min(1000, $c71File)) "화면 중심 $($front[1]) / 선택 $($front[2]) / $($front[3]) (파일 포함 $($c71File)건) / 상태: $($front[4])"
+Check '상태 줄에 검색 시간 없음' (-not ($front[4] -match '\d+(\.\d+)?ms')) $front[4]
+$lowerForm = ([LabelSearchProbe]::FormSearch($mapRow, $index, 'FRONT', '  c4dc_212_71 ', 0)).Split('#')
+Check '화면 검색 소문자 / 공백 무시' ($lowerForm[0] -eq $front[0] -and $lowerForm[1] -eq $front[1]) "$($lowerForm[3])"
 $back = ([LabelSearchProbe]::FormSearch($mapRow, $index, 'BACK', 'C4DC_212_71', 0)).Split('#')
 Check 'Back 보기 X 반전' ($back[1] -eq '(-10800,14582.21)' -and $back[0].Contains('(-10800, 14582.208)')) "화면 중심 $($back[1]) / 목록 $($back[0].Split([char]0x1e)[0])"
 $none = ([LabelSearchProbe]::FormSearch($mapRow, $index, 'FRONT', 'NO_SUCH_LABEL_X', 0)).Split('#')
-Check '0건 안내' ($none[1] -eq '' -and $none[3].Contains('0건') -and $none[4].Contains('시작 / 포함')) "$($none[3]) / 상태: $($none[4])"
+Check '0건 안내(상태 줄)' ($none[1] -eq '' -and $none[4].Contains('들어 있는 Label이 없습니다')) "상태: $($none[4])"
 $many = ([LabelSearchProbe]::FormSearch($mapRow, $index, 'FRONT', 'C4DC', 1)).Split('#')
 $listCount = $many[0].Split([char]0x1e).Count
-Check '많은 결과 목록 제한' ($listCount -eq 1000 -and $many[3].Contains('외')) "목록 $($listCount)건 / $($many[3])"
+Check '많은 결과 목록 제한(상태 줄 안내)' ($listCount -eq 1000 -and $many[4].Contains('목록에는 앞 1,000건')) "목록 $($listCount)건 / $($many[4])"
 
 $fail = @($results | Where-Object { $_.StartsWith('FAIL') }).Count
 if ($fail -eq 0) { Write-Host "GDS_LABEL_SEARCH_PROBE=PASS ($($results.Count))" } else { Write-Host "GDS_LABEL_SEARCH_PROBE=FAIL ($fail)"; exit 1 }

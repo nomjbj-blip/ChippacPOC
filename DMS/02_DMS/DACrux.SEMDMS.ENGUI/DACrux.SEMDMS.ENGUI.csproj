@@ -180,7 +180,18 @@
       <DependentUpon>frmKlarfUpload.cs</DependentUpon>
     </Compile>
     <Compile Include="DefectMapAnalysis\FolderPickerDialog.cs" />
+    <Compile Include="DefectMapAnalysis\GdsKlarfAnalysisMap.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DefectMapAnalysis\GdsKlarfColorBands.cs" />
+    <Compile Include="DefectMapAnalysis\frmGdsKlarfAnalysis.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DefectMapAnalysis\frmGdsKlarfAnalysis.Designer.cs">
+      <DependentUpon>frmGdsKlarfAnalysis.cs</DependentUpon>
+    </Compile>
     <Compile Include="ETest\EtResultFileParser.cs" />
+    <Compile Include="ETest\EtSpecTable.cs" />
     <Compile Include="ETest\frmEtResultUpload.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -210,6 +221,12 @@
     </Compile>
     <Compile Include="GdsMap\frmGdsMapView.Designer.cs">
       <DependentUpon>frmGdsMapView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GdsMap\frmGdsDieAnalysis.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GdsMap\frmGdsDieAnalysis.Designer.cs">
+      <DependentUpon>frmGdsDieAnalysis.cs</DependentUpon>
     </Compile>
     <Compile Include="DefectMapAnalysis\frmDefectImageGallery.designer.cs">
       <DependentUpon>frmDefectImageGallery.cs</DependentUpon>
@@ -324,6 +341,12 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="DefectMapAnalysis\frmKlarfUpload.resx">
+      <DependentUpon>frmKlarfUpload.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DefectMapAnalysis\frmGdsKlarfAnalysis.resx">
+      <DependentUpon>frmGdsKlarfAnalysis.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Admin\frmConfiguration.resx">
       <DependentUpon>frmConfiguration.cs</DependentUpon>
     </EmbeddedResource>

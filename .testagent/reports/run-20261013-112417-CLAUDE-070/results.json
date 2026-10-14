@@ -1,0 +1,133 @@
+﻿[
+    {
+        "id":  "01",
+        "name":  "Build",
+        "scenarios":  [
+                          "SCN-01"
+                      ],
+        "status":  "FAIL",
+        "exitCode":  1,
+        "timedOut":  false,
+        "durationMs":  809,
+        "started":  "2026-10-13 11:24:59",
+        "command":  "C:\\Program Files\\Microsoft Visual Studio\\2022\\Professional\\MSBuild\\Current\\Bin\\MSBuild.exe \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\DMS\\06_CoreLibSource\\GdsMapControl\\NexplantQMS.GdsMap.csproj\" -t:Build -p:Configuration=Debug -v:minimal -nologo -p:OutputPath=C:\\Users\\USER\\AppData\\Local\\Temp\\ChippacBuild\\CLAUDE-070_112459\\ -p:IntermediateOutputPath=C:\\Users\\USER\\AppData\\Local\\Temp\\ChippacBuild\\CLAUDE-070_112459\\obj\\",
+        "workingDir":  "D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\DMS\\06_CoreLibSource\\GdsMapControl",
+        "keys":  {
+
+                 },
+        "passLines":  0,
+        "failLines":  [
+
+                      ],
+        "skipLines":  [
+
+                      ],
+        "stdout":  "01_Build.stdout.txt",
+        "stderr":  "01_Build.stderr.txt"
+    },
+    {
+        "id":  "02",
+        "name":  "LayoutSmokeNew",
+        "scenarios":  [
+                          "SCN-02",
+                          "SCN-04"
+                      ],
+        "status":  "FAIL",
+        "exitCode":  1,
+        "timedOut":  false,
+        "durationMs":  786,
+        "started":  "2026-10-13 11:24:59",
+        "command":  "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\DMS\\06_CoreLibSource\\GdsMapControl\\Probes\\GdsViewLayoutSmoke.ps1\" -GdsExe C:\\Users\\USER\\AppData\\Local\\Temp\\ChippacBuild\\CLAUDE-070_112459\\NexplantQMS.GdsMap.exe -OutDir C:\\Users\\USER\\AppData\\Local\\Temp\\ChippacBuild\\CLAUDE-070_112459\\png",
+        "workingDir":  "D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\DMS\\06_CoreLibSource\\GdsMapControl\\Probes",
+        "keys":  {
+
+                 },
+        "passLines":  0,
+        "failLines":  [
+
+                      ],
+        "skipLines":  [
+
+                      ],
+        "stdout":  "02_LayoutSmokeNew.stdout.txt",
+        "stderr":  "02_LayoutSmokeNew.stderr.txt"
+    },
+    {
+        "id":  "03",
+        "name":  "LayoutSmokeOldExeRed",
+        "scenarios":  [
+                          "SCN-03"
+                      ],
+        "status":  "FAIL",
+        "exitCode":  1,
+        "timedOut":  false,
+        "durationMs":  3610,
+        "started":  "2026-10-13 11:25:00",
+        "command":  "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\DMS\\06_CoreLibSource\\GdsMapControl\\Probes\\GdsViewLayoutSmoke.ps1\" -GdsExe C:\\Users\\USER\\AppData\\Local\\Temp\\ChippacBuild\\SOURCE_DROP_gds_164119\\NexplantQMS.GdsMap.exe -OutDir C:\\Users\\USER\\AppData\\Local\\Temp\\ChippacBuild\\CLAUDE-070_112459\\png_old",
+        "workingDir":  "D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\DMS\\06_CoreLibSource\\GdsMapControl\\Probes",
+        "keys":  {
+
+                 },
+        "passLines":  0,
+        "failLines":  [
+
+                      ],
+        "skipLines":  [
+
+                      ],
+        "stdout":  "03_LayoutSmokeOldExeRed.stdout.txt",
+        "stderr":  "03_LayoutSmokeOldExeRed.stderr.txt"
+    },
+    {
+        "id":  "06",
+        "name":  "LabelSearch",
+        "scenarios":  [
+                          "SCN-06"
+                      ],
+        "status":  "FAIL",
+        "exitCode":  1,
+        "timedOut":  false,
+        "durationMs":  1114,
+        "started":  "2026-10-13 11:25:04",
+        "command":  "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\DMS\\06_CoreLibSource\\GdsMapControl\\Probes\\GdsLabelSearchProbe.ps1\" -GdsExe C:\\Users\\USER\\AppData\\Local\\Temp\\ChippacBuild\\CLAUDE-070_112459\\NexplantQMS.GdsMap.exe -BinDir C:\\Users\\USER\\AppData\\Local\\Temp\\ChippacBuild\\SOURCE_DROP_164101\\srv",
+        "workingDir":  "D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\DMS\\06_CoreLibSource\\GdsMapControl\\Probes",
+        "keys":  {
+
+                 },
+        "passLines":  0,
+        "failLines":  [
+
+                      ],
+        "skipLines":  [
+
+                      ],
+        "stdout":  "06_LabelSearch.stdout.txt",
+        "stderr":  "06_LabelSearch.stderr.txt"
+    },
+    {
+        "id":  "07",
+        "name":  "SubDeviceUiSmoke",
+        "scenarios":  [
+                          "SCN-07"
+                      ],
+        "status":  "FAIL",
+        "exitCode":  1,
+        "timedOut":  false,
+        "durationMs":  1022,
+        "started":  "2026-10-13 11:25:05",
+        "command":  "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\DMS\\06_CoreLibSource\\GdsMapControl\\Probes\\GdsSubDeviceUiSmoke.ps1\" -BuildDir C:\\Users\\USER\\AppData\\Local\\Temp\\ChippacBuild\\CLAUDE-070_subdev_112459 -GdsDir C:\\Users\\USER\\AppData\\Local\\Temp\\ChippacBuild\\CLAUDE-070_112459",
+        "workingDir":  "D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\DMS\\06_CoreLibSource\\GdsMapControl\\Probes",
+        "keys":  {
+
+                 },
+        "passLines":  0,
+        "failLines":  [
+
+                      ],
+        "skipLines":  [
+
+                      ],
+        "stdout":  "07_SubDeviceUiSmoke.stdout.txt",
+        "stderr":  "07_SubDeviceUiSmoke.stderr.txt"
+    }
+]

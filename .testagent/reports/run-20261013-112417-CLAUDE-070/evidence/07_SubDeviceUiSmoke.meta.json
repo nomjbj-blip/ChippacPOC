@@ -1,0 +1,26 @@
+﻿{
+    "id":  "07",
+    "name":  "SubDeviceUiSmoke",
+    "scenarios":  [
+                      "SCN-07"
+                  ],
+    "status":  "FAIL",
+    "exitCode":  1,
+    "timedOut":  false,
+    "durationMs":  1022,
+    "started":  "2026-10-13 11:25:05",
+    "command":  "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\DMS\\06_CoreLibSource\\GdsMapControl\\Probes\\GdsSubDeviceUiSmoke.ps1\" -BuildDir C:\\Users\\USER\\AppData\\Local\\Temp\\ChippacBuild\\CLAUDE-070_subdev_112459 -GdsDir C:\\Users\\USER\\AppData\\Local\\Temp\\ChippacBuild\\CLAUDE-070_112459",
+    "workingDir":  "D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\DMS\\06_CoreLibSource\\GdsMapControl\\Probes",
+    "keys":  {
+
+             },
+    "passLines":  0,
+    "failLines":  [
+
+                  ],
+    "skipLines":  [
+
+                  ],
+    "stdout":  "07_SubDeviceUiSmoke.stdout.txt",
+    "stderr":  "07_SubDeviceUiSmoke.stderr.txt"
+}

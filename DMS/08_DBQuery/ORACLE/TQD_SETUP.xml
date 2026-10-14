@@ -242,4 +242,25 @@ AND SETUP_TIME = TO_DATE(:SETUP_TIME,'YYYY-MM-DD HH24:MI:SS')]]></commandtext>
             <param direction="Input" dbtype="VarChar2" size="40" value="SETUP_TIME">:SETUP_TIME</param>
         </parameters>
     </query>
+    <query statement="Update" queryid="UPDATE_SETUP_INFO_KLARF_UPLOAD" commandtype="Text" description="KLARF 업로드 Setup 값을 Map Setup(TQP_MAPDEF) 값으로 바꿈 (Wafer 크기 / Pitch / 원점)" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQD_SETUP
+SET WAFER_SIZE = :wafer_size
+,DIE_PITCH_X = :die_pitch_x
+,DIE_PITCH_Y = :die_pitch_y
+,DIE_ORIGIN_X = :die_origin_x
+,DIE_ORIGIN_Y = :die_origin_y
+,ORIGIN_X = :origin_x
+,ORIGIN_Y = :origin_y
+WHERE SETUP_SEQ = :setup_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:wafer_size</param>
+            <param direction="Input" dbtype="VarChar" size="40">:die_pitch_x</param>
+            <param direction="Input" dbtype="VarChar" size="40">:die_pitch_y</param>
+            <param direction="Input" dbtype="VarChar" size="40">:die_origin_x</param>
+            <param direction="Input" dbtype="VarChar" size="40">:die_origin_y</param>
+            <param direction="Input" dbtype="VarChar" size="40">:origin_x</param>
+            <param direction="Input" dbtype="VarChar" size="40">:origin_y</param>
+            <param direction="Input" dbtype="VarChar" size="40">:setup_seq</param>
+        </parameters>
+    </query>
 </queryxml>

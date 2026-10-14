@@ -60,18 +60,29 @@ namespace NexplantQMS.GdsMap
             UpdateChainSelectionButtons();
         }
 
-        /// <summary>단자 보호 묶음의 체크를 막고 나머지 체크 변경은 확정 버튼에 반영한다.</summary>
+        /// <summary>단자 보호 묶음의 체크를 막고 나머지 체크 변경은 확정 버튼에 반영한다. 체크는 더블클릭으로만 바뀐다(2026-10-13).</summary>
         private void ChainSimilarList_ItemCheck(object sender, ItemCheckEventArgs e)
         {
             if (_updatingChainSimilarList || e.Index < 0) return;
+            if (!_chainCheckByDoubleClick)
+            {
+                e.NewValue = e.CurrentValue;
+                return;
+            }
             var item = (ChainSimilarListItem)_chainSimilarList.Items[e.Index];
             if (item.Group.IsProtected && e.NewValue == CheckState.Checked)
             {
                 e.NewValue = CheckState.Unchecked;
-                _lblChainSetupStatus.Text = "Input/Output이 포함된 묶음은 제외할 수 없습니다.";
+                SetChainStatus("Input / Output 도형이 들어 있는 묶음은 뺄 수 없습니다.");
             }
             if (IsHandleCreated)
                 BeginInvoke(new Action(UpdateChainSelectionButtons));
+        }
+
+        /// <summary>유사 묶음 행을 더블클릭하면 제외 체크를 바꾼다. 한 번 클릭은 위치 이동만 한다(2026-10-13).</summary>
+        private void ChainSimilarList_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            ToggleCheckByDoubleClick(_chainSimilarList, e);
         }
 
         /// <summary>결과 행을 고르면 해당 묶음을 강조하고 화면 중심으로 이동한다.</summary>
@@ -89,10 +100,7 @@ namespace NexplantQMS.GdsMap
                 bounds.Include(element.Bounds);
             map.SetChainSimilarSelected(elements);
             map.FocusChainBounds(bounds);
-            _lblChainSetupStatus.Text = item.Number + "번 묶음 / "
-                + item.Group.ElementKeys.Length + " Element / "
-                + (item.Group.IsProtected ? "단자 보호"
-                    : item.Group.IsAmbiguous ? "검토 필요" : "일치");
+            // 묶음 번호 / 도형 수 / 상태는 목록 행에 이미 있어 상태 줄에 다시 쓰지 않는다 (2026-10-13).
         }
 
         /// <summary>현재 검색 결과에서 체크된 묶음만 모아 단자/Chain 소속을 다시 검증한다.</summary>
@@ -115,7 +123,7 @@ namespace NexplantQMS.GdsMap
             HashSet<string> removeKeys = GetCheckedChainSimilarKeys();
             if (removeKeys.Count == 0)
             {
-                _lblChainSetupStatus.Text = "제외할 묶음을 하나 이상 체크하세요.";
+                SetChainStatus("뺄 묶음을 하나 이상 체크하세요.");
                 return;
             }
             var endpoints = new HashSet<string>(_chainInputSelections.Keys
@@ -123,14 +131,14 @@ namespace NexplantQMS.GdsMap
             HashSet<string> beforeKeys = GetEditedChainKeys();
             if (removeKeys.Overlaps(endpoints) || !removeKeys.IsSubsetOf(beforeKeys))
             {
-                _lblChainSetupStatus.Text = "단자 또는 현재 Chain 밖의 객체가 포함되어 다시 검색해야 합니다.";
+                SetChainStatus("체크한 묶음이 바뀐 Chain 과 맞지 않습니다. [유사 묶음 찾기]를 다시 누르세요.");
                 return;
             }
             ChainTraceElement[] beforeElements = map.GetChainTraceElements(beforeKeys).ToArray();
             if (beforeElements.Length != beforeKeys.Count
                 || beforeElements.Any(element => !_activeChain.LayerIds.Contains(element.LayerId)))
             {
-                _lblChainSetupStatus.Text = "현재 Layer에서 검사할 수 없는 경로가 있습니다. 후보 경로를 다시 찾으세요.";
+                SetChainStatus("Layer 체크가 바뀌어 검사할 수 없습니다. [후보 경로 찾기]를 다시 누르세요.");
                 return;
             }
             ChainTraceElement[] afterElements = beforeElements
@@ -145,7 +153,7 @@ namespace NexplantQMS.GdsMap
             int similarGeneration = _chainSimilarGeneration;
             _chainSimilarApplying = true;
             UpdateChainSelectionButtons();
-            _lblChainSetupStatus.Text = "체크한 묶음의 제외 전후 연결을 검사하는 중입니다.";
+            SetChainStatus("체크한 묶음을 빼는 중입니다.");
             try
             {
                 Tuple<ChainConnectivityResult, ChainConnectivityResult> checks = await Task.Run(() =>
@@ -179,15 +187,16 @@ namespace NexplantQMS.GdsMap
                 chain.LastSimilarUndo = ChainSimilarBatchEdit.Apply(removeKeys, automatic,
                     _chainManualAdded, _chainManualExcluded);
                 ClearChainExampleSelection();
-                _lblChainSetupStatus.Text = "현재 Chain에서 " + removeKeys.Count
-                    + "개 Element 제외 / 연결 검사: 새 단절 " + newDisconnected
-                    + "개 / 되돌리기 가능";
+                SetChainStatus("도형 " + removeKeys.Count + "개를 뺐습니다."
+                    + (newDisconnected > 0
+                        ? " Input 과 이어지지 않는 도형 " + newDisconnected + "개가 생겼습니다. 필요하면 [직전 제외 되돌리기]를 누르세요."
+                        : ""));
                 RefreshChainDisplay();
             }
             catch (Exception ex)
             {
                 if (ReferenceEquals(chain, _activeChain))
-                    _lblChainSetupStatus.Text = "일괄 제외 검사 실패: " + ex.Message;
+                    SetChainStatus("묶음 제외 실패: " + ex.Message);
             }
             finally
             {
@@ -204,8 +213,7 @@ namespace NexplantQMS.GdsMap
             ChainSimilarBatchChange undo = _activeChain.LastSimilarUndo;
             undo.Restore(_chainManualAdded, _chainManualExcluded);
             _activeChain.LastSimilarUndo = null;
-            _lblChainSetupStatus.Text = "직전 일괄 제외 " + undo.ChangedCount
-                + "개 Element를 되돌렸습니다.";
+            SetChainStatus("직전 제외를 되돌렸습니다(도형 " + undo.ChangedCount + "개).");
             RefreshChainDisplay();
             UpdateChainSelectionButtons();
         }

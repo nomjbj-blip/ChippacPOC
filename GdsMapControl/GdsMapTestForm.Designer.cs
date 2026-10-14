@@ -29,11 +29,13 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.chainCellSizeLabel = new System.Windows.Forms.Label();
             this.btnLoad = new System.Windows.Forms.Button();
+            this._numChainCellSize = new System.Windows.Forms.NumericUpDown();
             this.btnSave = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
             this.dataGrid = new System.Windows.Forms.DataGridView();
@@ -67,8 +69,6 @@
             this._btnChainClearSimilar = new System.Windows.Forms.Button();
             this._btnChainApplySimilar = new System.Windows.Forms.Button();
             this._btnChainUndoSimilar = new System.Windows.Forms.Button();
-            this.chainCellSizeLabel = new System.Windows.Forms.Label();
-            this._numChainCellSize = new System.Windows.Forms.NumericUpDown();
             this.chainFirstRow = new System.Windows.Forms.FlowLayoutPanel();
             this._btnChainInput = new System.Windows.Forms.Button();
             this._btnChainOutput = new System.Windows.Forms.Button();
@@ -80,6 +80,7 @@
             this.map = new NexplantQMS.GdsMap.GdsMapControl();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this._numChainCellSize)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGrid)).BeginInit();
             this.statusStripMap.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.GDSContainer)).BeginInit();
@@ -97,7 +98,6 @@
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
             this.chainSimilarRow.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this._numChainCellSize)).BeginInit();
             this.chainFirstRow.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.SuspendLayout();
@@ -116,6 +116,17 @@
             this.panel1.Size = new System.Drawing.Size(1478, 59);
             this.panel1.TabIndex = 2;
             // 
+            // chainCellSizeLabel
+            // 
+            this.chainCellSizeLabel.AutoSize = true;
+            this.chainCellSizeLabel.Location = new System.Drawing.Point(478, 24);
+            this.chainCellSizeLabel.Margin = new System.Windows.Forms.Padding(8, 8, 3, 0);
+            this.chainCellSizeLabel.Name = "chainCellSizeLabel";
+            this.chainCellSizeLabel.Size = new System.Drawing.Size(86, 18);
+            this.chainCellSizeLabel.TabIndex = 0;
+            this.chainCellSizeLabel.Text = "격자 크기";
+            this.chainCellSizeLabel.Visible = false;
+            // 
             // btnLoad
             // 
             this.btnLoad.Location = new System.Drawing.Point(325, 13);
@@ -125,7 +136,37 @@
             this.btnLoad.TabIndex = 4;
             this.btnLoad.Text = "Load DB";
             this.btnLoad.UseVisualStyleBackColor = true;
+            this.btnLoad.Visible = false;
             this.btnLoad.Click += new System.EventHandler(this.btnLoad_Click);
+            // 
+            // _numChainCellSize
+            // 
+            this._numChainCellSize.DecimalPlaces = 3;
+            this._numChainCellSize.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            196608});
+            this._numChainCellSize.Location = new System.Drawing.Point(570, 19);
+            this._numChainCellSize.Maximum = new decimal(new int[] {
+            1000000000,
+            0,
+            0,
+            0});
+            this._numChainCellSize.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            196608});
+            this._numChainCellSize.Name = "_numChainCellSize";
+            this._numChainCellSize.Size = new System.Drawing.Size(92, 28);
+            this._numChainCellSize.TabIndex = 1;
+            this._numChainCellSize.Value = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this._numChainCellSize.Visible = false;
             // 
             // btnSave
             // 
@@ -136,6 +177,7 @@
             this.btnSave.TabIndex = 3;
             this.btnSave.Text = "Save DB";
             this.btnSave.UseVisualStyleBackColor = true;
+            this.btnSave.Visible = false;
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
             // button1
@@ -153,36 +195,36 @@
             // 
             this.dataGrid.AllowUserToAddRows = false;
             this.dataGrid.AllowUserToDeleteRows = false;
-            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle4.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGrid.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGrid.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.dataGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle5.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            dataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dataGrid.DefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dataGrid.DefaultCellStyle = dataGridViewCellStyle2;
             this.dataGrid.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataGrid.Location = new System.Drawing.Point(3, 3);
             this.dataGrid.Margin = new System.Windows.Forms.Padding(4);
             this.dataGrid.Name = "dataGrid";
             this.dataGrid.ReadOnly = true;
-            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle6.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            dataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGrid.RowHeadersDefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle3.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGrid.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
             this.dataGrid.RowHeadersWidth = 62;
             this.dataGrid.RowTemplate.Height = 23;
             this.dataGrid.Size = new System.Drawing.Size(1238, 1635);
@@ -526,44 +568,6 @@
             this._btnChainUndoSimilar.Text = "직전 제외 되돌리기";
             this._btnChainUndoSimilar.Click += new System.EventHandler(this.BtnChainUndoSimilar_Click);
             // 
-            // chainCellSizeLabel
-            // 
-            this.chainCellSizeLabel.AutoSize = true;
-            this.chainCellSizeLabel.Location = new System.Drawing.Point(478, 24);
-            this.chainCellSizeLabel.Margin = new System.Windows.Forms.Padding(8, 8, 3, 0);
-            this.chainCellSizeLabel.Name = "chainCellSizeLabel";
-            this.chainCellSizeLabel.Size = new System.Drawing.Size(86, 18);
-            this.chainCellSizeLabel.TabIndex = 0;
-            this.chainCellSizeLabel.Text = "격자 크기";
-            // 
-            // _numChainCellSize
-            // 
-            this._numChainCellSize.DecimalPlaces = 3;
-            this._numChainCellSize.Increment = new decimal(new int[] {
-            1,
-            0,
-            0,
-            196608});
-            this._numChainCellSize.Location = new System.Drawing.Point(570, 19);
-            this._numChainCellSize.Maximum = new decimal(new int[] {
-            1000000000,
-            0,
-            0,
-            0});
-            this._numChainCellSize.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            196608});
-            this._numChainCellSize.Name = "_numChainCellSize";
-            this._numChainCellSize.Size = new System.Drawing.Size(92, 28);
-            this._numChainCellSize.TabIndex = 1;
-            this._numChainCellSize.Value = new decimal(new int[] {
-            10,
-            0,
-            0,
-            0});
-            // 
             // chainFirstRow
             // 
             this.chainFirstRow.AutoScroll = true;
@@ -691,6 +695,7 @@
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.GdsMapTestForm_ChainKeyDown);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this._numChainCellSize)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGrid)).EndInit();
             this.statusStripMap.ResumeLayout(false);
             this.statusStripMap.PerformLayout();
@@ -710,7 +715,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
             this.chainSimilarRow.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this._numChainCellSize)).EndInit();
             this.chainFirstRow.ResumeLayout(false);
             this.tabPage2.ResumeLayout(false);
             this.ResumeLayout(false);

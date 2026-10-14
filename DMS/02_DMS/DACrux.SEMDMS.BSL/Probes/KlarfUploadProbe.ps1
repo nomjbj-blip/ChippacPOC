@@ -194,6 +194,11 @@ Check '잘못된 업로드 키 -> 거부' ($e.Length -gt 0) $e
 $pv = [KlarfUploadProbeHelper]::Begin((Info), $bytes)
 $r = $pv.Rows[0]
 $key = $r['UPLOAD_KEY']
+# Map Setup 에 없는 Device 로 올리면 미리보기 INVALID, 저장하면 ERROR (DB 변경 없음) (2026-10-13)
+$noMap = [KlarfUploadProbeHelper]::Begin([string[]]@('SCK', 'PROBE', 'XD106.02', 'NO_MAP_PROBE_DEVICE', '', '', 'ROUGHBIN'), $bytes)
+Check 'Map 없는 Device -> 미리보기 INVALID' (($noMap.Rows[0]['RESULT'] -eq 'INVALID') -and $noMap.Rows[0]['MESSAGE'].ToString().Contains('Map')) "$($noMap.Rows[0]['RESULT']) $($noMap.Rows[0]['MESSAGE'])"
+$noMapSave = [KlarfUploadProbeHelper]::Commit($noMap.Rows[0]['UPLOAD_KEY'], 'Y')
+Check 'Map 없는 Device -> 저장 ERROR / STEP 없음' (($noMapSave.Rows[0]['RESULT'] -eq 'ERROR') -and ($noMapSave.Rows[0]['STEP_SEQ'] -eq [DBNull]::Value)) "$($noMapSave.Rows[0]['RESULT']) $($noMapSave.Rows[0]['MESSAGE'])"
 # 사용자 데이터 보호(2026-10-07): 같은 샘플 Wafer 를 사용자가 화면에서 올려 둔 경우(STEP COMMENT 의 USER 가 PROBE / SMOKE 가 아님)
 # Probe 의 재등록이 그 데이터를 지우므로, 아무것도 바꾸지 않고 멈춘다. (실제로 사용자 업로드 STEP 454 가 Smoke 재등록으로 지워진 적이 있음)
 if ($r['RESULT'] -eq 'EXISTS') {
@@ -230,7 +235,8 @@ $wli = [KlarfUploadProbeHelper]::WaferList('2026-06-05', '2026-06-06', [string[]
 $foundI = @($wli.Tables['STEPLIST'].Rows | Where-Object { [long]$_['STEP_SEQ'] -eq $step })
 Check '"Include Image"(IMAGES > 0) 조건에도 표시' ($foundI.Count -ge 1) "$($foundI.Count)"
 $mi = [KlarfUploadProbeHelper]::MapInfo($step)
-Check 'Map 정보(GetDefectMapInfo) MAP 1 / DIE 26' (($mi.Tables['MAP'].Rows.Count -eq 1) -and ($mi.Tables['DIE'].Rows.Count -eq 26)) "MAP $($mi.Tables['MAP'].Rows.Count) / DIE $($mi.Tables['DIE'].Rows.Count)"
+# DIE = Map Setup(OMM_Hybrid) 사용 Die 76 (2026-10-13 부터 SETUP_MAP 은 KLARF 검사 Die 26 이 아니라 Map Setup 기준)
+Check 'Map 정보(GetDefectMapInfo) MAP 1 / DIE 76' (($mi.Tables['MAP'].Rows.Count -eq 1) -and ($mi.Tables['DIE'].Rows.Count -eq 76)) "MAP $($mi.Tables['MAP'].Rows.Count) / DIE $($mi.Tables['DIE'].Rows.Count)"
 $df = [KlarfUploadProbeHelper]::Defects($step)
 $d1 = @($df.Rows | Where-Object { [int]$_['DEFECTID'] -eq 1 })[0]
 Check 'Defect 15건(GetDefectData)' ($df.Rows.Count -eq 15) "$($df.Rows.Count)"

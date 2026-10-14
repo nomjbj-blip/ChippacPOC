@@ -1,11 +1,11 @@
-﻿# GDS Map DB 복원 검증 스크립트 (CLAUDE-015 작성 / CLAUDE-018 Factory + Device 키로 변경)
+﻿# GDS Map DB 복원 검증 스크립트 (작성 / Factory + Device 키로 변경)
 # 목적: 같은 GDS 파일을 (1) 파일 Flatten(ShowStructure)과 (2) DB 조회(GdsMapView 페이지 -> GdsMapPlacedRowReader -> ShowPlacedElements)로
 #       각각 GdsMapControl에 올린 뒤, 화면 도형을 VisitPlacedElements로 꺼내 도형 단위로 대조한다.
 #       ID / Layer / DataType / 종류 / 닫힘 / PATH 폭·타입 / Bounds / TEXT 속성 / 좌표(double 비트 단위)가 모두 같아야 PASS.
 #       단계별 시간(DB 조회 / 행 해석 / 도면 구성)도 측정한다.
 # 대상: BSL GdsMapView / GdsMapImport(Service 없이 직접 호출) + GdsMapControl\bin\Debug EXE / 로컬 docker DMSMGR
 # 결과: FACTORY / DEVICE_ID(기본 PROBE / VIEW_PROBE)에 READY Map이 없거나 다른 GDS면 지우고 이 GDS로 저장한다(시험 DB DML).
-#       READY Map이 같은 GDS(SHA-256)로 있으면 저장하지 않고 조회만 한다.
+#       READY Map이 같은 GDS(파일 이름 + 도형 수 이후)로 있으면 저장하지 않고 조회만 한다.
 # 실행: powershell -NoProfile -ExecutionPolicy Bypass -File GdsMapDbRestoreProbe.ps1 [-GdsPath 경로] [-Factory PROBE] [-Device VIEW_PROBE] [-BslDir 폴더] [-PageRows 10000]
 param(
     [string]$GdsPath = '',
@@ -13,13 +13,15 @@ param(
     [string]$Device = 'VIEW_PROBE',
     [string]$BslDir = '',
     [int]$PageRows = 10000,
-    [int]$BatchRows = 2000
+    [int]$BatchRows = 2000,
+    [string]$GdsExe = ''
 )
 $ErrorActionPreference = 'Stop'
 $dms = (Resolve-Path (Join-Path $PSScriptRoot '..\..\..')).Path
 $serverBin = Join-Path $dms '101_ServerBin'
 if ($BslDir -eq '') { $BslDir = $serverBin }
-$gdsExe = Join-Path $dms '06_CoreLibSource\GdsMapControl\bin\Debug\NexplantQMS.GdsMap.exe'
+# 2026-10-07부터 GdsMap Debug 출력 경로가 100_ClientBin\GdsMap 이라 기본값을 그 EXE로 한다(bin\Debug는 예전 빌드).
+$gdsExe = if ($GdsExe -ne '') { $GdsExe } else { Join-Path $dms '100_ClientBin\GdsMap\NexplantQMS.GdsMap.exe' }
 if ($GdsPath -eq '') { $GdsPath = Join-Path (Split-Path $dms -Parent) 'SampleFile\OMM all layer2.gds\OMM all layer2.gds' }
 
 [AppDomain]::CurrentDomain.SetData('APP_CONFIG_FILE', (Join-Path $serverBin 'DACrux.SEMDMS.Service.exe.config'))
@@ -31,7 +33,7 @@ $cm.GetField('s_configSystem', $flags).SetValue($null, $null)
 foreach ($d in 'Oracle.ManagedDataAccess', 'Miracom.Middleware') { [void][Reflection.Assembly]::LoadFrom((Join-Path $serverBin "$d.dll")) }
 foreach ($d in 'DACrux.SEMDMS.Interface', 'DACrux.SEMDMS.DSL', 'DACrux.SEMDMS.BSL') { [void][Reflection.Assembly]::LoadFrom((Join-Path $BslDir "$d.dll")) }
 # Add-Type(CodeDom)은 .exe를 참조로 받지 못하므로 시험용 임시 폴더에 같은 어셈블리를 .dll 이름으로 복사해 참조 / 로드한다.
-$probeDir = Join-Path $env:TEMP 'claude\gdsdbrestoreprobe'
+$probeDir = Join-Path $env:TEMP 'chippac\gdsdbrestoreprobe'
 New-Item -ItemType Directory -Force $probeDir | Out-Null
 Copy-Item $gdsExe (Join-Path $probeDir 'NexplantQMS.GdsMap.dll') -Force
 foreach ($d in 'OpenTK.dll', 'OpenTK.GLControl.dll') { Copy-Item (Join-Path (Split-Path $gdsExe) $d) $probeDir -Force }
@@ -61,7 +63,7 @@ public static class GdsDbRestoreProbe
     }
 
     /// <summary>
-    /// 화면 저장(GdsMapForm_DbSave)과 같은 순서로 저장한다: Begin -> LAYER -> SOURCE -> PLACED -> Complete.
+    /// 화면 저장(GdsMapForm_DbSave)과 같은 순서로 저장한다: Begin -> LAYER -> PLACED -> Complete. (원본 행 SOURCE는 2026-10-12 제거)
     /// LAYER 색상은 화면 Layer 색상, 원본에만 있는 Layer는 회색. 반환: 확정 결과 문자열
     /// </summary>
     public static string Import(DACrux.SEMDMS.BSL.GdsMapImport bsl, string[] info, GdsLibrary lib, GdsMapControl map, int batchRows)
@@ -71,13 +73,10 @@ public static class GdsDbRestoreProbe
         var colors = new Dictionary<int, int>();
         foreach (var item in map.GetLayerDisplayItems()) colors[item.LayerId] = item.Color.ToArgb();
         var pairs = new List<KeyValuePair<int, int>>();
-        foreach (int id in GdsMapSourceRowBuilder.CollectLayerIds(lib))
+        foreach (int id in GdsMapLayerRowBuilder.CollectLayerIds(lib))
             pairs.Add(new KeyValuePair<int, int>(id, colors.ContainsKey(id) ? colors[id] : Color.Gray.ToArgb()));
-        bsl.CreateLayerBatch(job, 0, GdsMapSourceRowBuilder.BuildLayerRows(pairs), "probe");
+        bsl.CreateLayerBatch(job, 0, GdsMapLayerRowBuilder.BuildLayerRows(pairs), "probe");
         long no = 0;
-        foreach (string[,] batch in GdsMapSourceRowBuilder.BuildSourceBatches(lib, batchRows))
-            bsl.CreateSourceBatch(job, no++, batch, "probe");
-        no = 0;
         var pending = new List<string[]>(batchRows);
         Action flush = () =>
         {
@@ -192,17 +191,16 @@ $fileTexts = $map.GetTextLabelDiagnostics().Count
 Write-Host ("파일: 도형 {0:N0} / 좌표 {1:N0} / Layer {2} / TEXT 라벨 {3} / 파싱+Flatten+버퍼 {4:N1}초" -f $fileSig.Count, $filePoints, $fileLayers, $fileTexts, ($fileMs / 1000.0))
 
 # 2. 시험 Map 준비: 같은 GDS의 READY Map이 없으면 지우고 저장한다.
-$sha = (Get-FileHash -Algorithm SHA256 -LiteralPath $GdsPath).Hash
+#    같은 GDS 판단은 파일 이름 + 도형 수로 한다(2026-10-08 GDS_SHA256 컬럼 제거).
 $import = New-Object DACrux.SEMDMS.BSL.GdsMapImport
 $info = $import.GetMapInfo($Factory, $Device)
-$ready = $info.Rows.Count -eq 1 -and $info.Rows[0]['MAP_STATUS'] -eq 'READY' -and ([string]$info.Rows[0]['GDS_SHA256']).Trim() -ieq $sha
+$ready = $info.Rows.Count -eq 1 -and $info.Rows[0]['MAP_STATUS'] -eq 'READY' -and [string]$info.Rows[0]['GDS_FILE_NAME'] -eq (Split-Path $GdsPath -Leaf) -and [long]$info.Rows[0]['PLACED_COUNT'] -eq $fileSig.Count
 if (-not $ready) {
     if ($info.Rows.Count -gt 0) { Write-Host ("기존 Map 삭제: 도형 {0:N0}건" -f $import.DeleteMap($Factory, $Device, 'probe')) }
-    $expectedSource = [NexplantQMS.GdsMap.Persistence.GdsMapSourceRowBuilder]::CountSourceRows($lib)
     $topName = $lib.Structures[0].Name
-    $importInfo = [string[]]@($Factory, $Device, $topName, (Split-Path $GdsPath -Leaf), $sha,
+    $importInfo = [string[]]@($Factory, $Device, $topName, (Split-Path $GdsPath -Leaf), '',
         $lib.UserUnit.ToString('G17', [Globalization.CultureInfo]::InvariantCulture), $lib.DatabaseUnit.ToString('G17', [Globalization.CultureInfo]::InvariantCulture), 'probe',
-        "$expectedSource", "$($fileSig.Count)", "$filePoints")
+        '', "$($fileSig.Count)", "$filePoints")
     $r = [GdsDbRestoreProbe]::Import($import, $importInfo, $lib, $map, $BatchRows)
     Check '시험 Map 저장' ($r.StartsWith('OK')) $r
 } else {
