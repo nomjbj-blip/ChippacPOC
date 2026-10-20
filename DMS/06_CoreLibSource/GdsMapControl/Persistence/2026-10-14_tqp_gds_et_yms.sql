@@ -1,13 +1,14 @@
--- 2026-10-14: E-Test -> YMS 적재 상태 / YMS 컬럼 이름
--- 설계: 문서/2026-10-14_ETest_Upload_YMS적재_설계.md 14.4절
--- 적용: 미적용. 같은 날 순서대로 적용한다: Para Setup DDL(결정 시) -> Upload 재설계 DDL(2026-10-13_tqp_gds_et_defined_only.sql) -> 이 파일.
---       TQP_GDS_ET_ITEM 의 UQ 범위는 Para Setup 결정 P2(Parameter 를 공정마다 따로 등록)에 따라 2절에서 하나를 고른다.
+-- 2026-10-14: E-Test -> YMS 적재 상태
+-- 설계: 문서/설계/04_ETest/2026-10-14_ETest_Upload_YMS적재_설계.md 14.4절 / 16절
+-- 선행: 2026-10-14_tqp_gds_et_upload_registered.sql (TQP_GDS_SRC_FILE.MAP_ID 등) 적용 상태.
+-- 처음 안의 TQP_GDS_ET_ITEM.YMS_PARAM_NAME 은 만들지 않는다. Parameter 저장 이름(TQP_GDS_ET_ITEM.ITEM_NAME)이
+-- EtYmsRule.ToParamName 규칙으로 만들어져 YMS 컬럼 이름과 같고, UQ(FACTORY, DEVICE_ID, TEST_PROGRAM, ITEM_NAME)가 이미 있다.
 -- YMS 테이블(TQP_LOT / TQP_WAFER / TD_* / TQP_PARASPEC 등)의 구조는 바꾸지 않는다.
 
 WHENEVER SQLERROR EXIT SQL.SQLCODE ROLLBACK
 SET ECHO OFF FEEDBACK ON
 
--- 1. 파일 헤더: YMS 반영 상태 (NULL = 반영 안 함 / DONE / WAIT = Map 없음 보류 / FAIL)
+-- 파일 헤더: YMS 반영 상태 (NULL = 반영 안 함 / DONE / WAIT = Map 없음 보류 / FAIL)
 ALTER TABLE DMSMGR.TQP_GDS_SRC_FILE ADD (
     YMS_STATUS     VARCHAR2(10)
         CONSTRAINT CK_GDS_SRC_FILE_YMS CHECK (YMS_STATUS IN ('DONE', 'WAIT', 'FAIL')),
@@ -21,17 +22,8 @@ ALTER TABLE DMSMGR.TQP_GDS_SRC_FILE ADD (
 COMMENT ON COLUMN DMSMGR.TQP_GDS_SRC_FILE.YMS_STATUS IS 'YMS 반영 상태: NULL 반영 안 함 / DONE / WAIT(Map 없음, 좌표 다시 계산 때 반영) / FAIL';
 COMMENT ON COLUMN DMSMGR.TQP_GDS_SRC_FILE.YMS_PROGRAM IS 'YMS Program = Device_공정 (예: OMM_TSVET), TD 테이블 TD_<Program>';
 COMMENT ON COLUMN DMSMGR.TQP_GDS_SRC_FILE.YMS_LOT_SEQ IS '반영한 TQP_LOT.LOT_SEQ';
-COMMENT ON COLUMN DMSMGR.TQP_GDS_SRC_FILE.YMS_WAFER_SEQ IS '반영한 TQP_WAFER.WAFER_SEQ (다시 반영 / 삭제 때 이 Wafer 를 먼저 지운다). Lot / Wafer 를 만든 직후 기록';
+COMMENT ON COLUMN DMSMGR.TQP_GDS_SRC_FILE.YMS_WAFER_SEQ IS '반영한 TQP_WAFER.WAFER_SEQ (다시 반영 / 파일 삭제 때 이 Wafer 를 먼저 지운다). Lot / Wafer 를 만든 직후 기록';
 COMMENT ON COLUMN DMSMGR.TQP_GDS_SRC_FILE.YMS_TIME IS 'YMS 반영 시각';
 COMMENT ON COLUMN DMSMGR.TQP_GDS_SRC_FILE.YMS_MESSAGE IS 'YMS 반영 실패 사유 (단계: 메시지) 또는 보류 안내';
-
--- 2. Parameter: YMS 컬럼 이름 (TQP_PARASPEC.PARAM_NAME 이 VARCHAR2(50) 이라 50자. 규칙은 EtYmsRule.ToParamName)
-ALTER TABLE DMSMGR.TQP_GDS_ET_ITEM ADD (YMS_PARAM_NAME VARCHAR2(50 CHAR));
-COMMENT ON COLUMN DMSMGR.TQP_GDS_ET_ITEM.YMS_PARAM_NAME IS 'YMS TD 컬럼 이름 (예: RESISTANCE_IFORCE_8P0MA_C4DC_28_37_FH). Parameter 를 처음 등록할 때 한 번 만들고 바꾸지 않는다';
-
--- 2-A. Para Setup P2 채택 (TQP_GDS_ET_ITEM 에 TEST_PROGRAM 이 있음): 같은 Device + 공정 안에서 겹치지 않게
-ALTER TABLE DMSMGR.TQP_GDS_ET_ITEM ADD CONSTRAINT UQ_GDS_ET_ITEM_YMS UNIQUE (FACTORY, DEVICE_ID, TEST_PROGRAM, YMS_PARAM_NAME);
--- 2-B. P2 를 채택하지 않을 때 (ITEM 이 Device 단위): 위 한 줄 대신 아래를 쓴다
--- ALTER TABLE DMSMGR.TQP_GDS_ET_ITEM ADD CONSTRAINT UQ_GDS_ET_ITEM_YMS UNIQUE (FACTORY, DEVICE_ID, YMS_PARAM_NAME);
 
 EXIT

@@ -10,7 +10,7 @@ namespace DACrux.SEMDMS.ENGUI
 {
     /// <summary>
     /// E-Test 결과 파일(xlsx) 1개를 읽은 결과. 배열 열 순서는 서버 iGdsEtResult 계약과 같다.
-    /// 설계: 문서/2026-10-07_ETest_결과파일_Parsing_DB설계.md 9.2절 / 10.2절
+    /// 설계: 문서/설계/04_ETest/2026-10-07_ETest_결과파일_Parsing_DB설계.md 9.2절 / 10.2절
     /// </summary>
     public class EtResultFile
     {
@@ -120,6 +120,14 @@ namespace DACrux.SEMDMS.ENGUI
         /// <summary>Lot-Wafer No 끝의 Slot 번호 (예: U9-HS2633-01 -> 01, HS2606-02 -> 02)</summary>
         private static readonly Regex SlotSuffixRegex = new Regex(@"-(?<slot>\d{1,2})$", RegexOptions.Compiled);
 
+        /// <summary>Lot-Wafer No 끝의 '-숫자(1~99)' 를 Slot 기본값으로 돌려준다. 없으면 0 (업로드 화면에서 Lot-Wafer No 를 고쳤을 때도 쓴다, 2026-10-15).</summary>
+        public static int SlotFromWaferNo(string waferNo)
+        {
+            Match slotMatch = SlotSuffixRegex.Match(waferNo ?? string.Empty);
+            int slot;
+            return slotMatch.Success && int.TryParse(slotMatch.Groups["slot"].Value, out slot) && slot >= 1 && slot <= 99 ? slot : 0;
+        }
+
         /// <summary>
         /// 파일명 기준 정보를 채운다 (2026-10-12 8칸 규칙).
         /// 처리 흐름: 확장자 제거 -> 끝의 $Fab$ 분리 -> _ 로 나눠 정확히 8칸 검사 -> 칸별 값 / Test Date 14자리 / 빈 칸 검사 -> Slot 기본값.
@@ -157,9 +165,7 @@ namespace DACrux.SEMDMS.ENGUI
             // Slot 번호는 파일에 정식 항목이 없어 화면에서 사용자가 입력한다 (2026-10-07).
             // Lot-Wafer No 끝의 '-숫자'를 입력 기본값으로만 쓴다. 고객 예시(2026-10-12 메일)에서 COWET / FT 는 Lot RH-HS2606 / Lot-Wafer No HS2606-02 처럼
             // 앞부분이 Lot 과 달라 '{Lot}-{숫자}' 로만 보면 기본값을 못 얻었다. 끝에 숫자가 없으면 0(입력 필요) + 경고.
-            Match slotMatch = SlotSuffixRegex.Match(result.WaferId);
-            int slot;
-            result.SlotNo = slotMatch.Success && int.TryParse(slotMatch.Groups["slot"].Value, out slot) && slot >= 1 && slot <= 99 ? slot : 0;
+            result.SlotNo = SlotFromWaferNo(result.WaferId);
             if (result.SlotNo == 0)
                 result.Warnings.Add("Lot-Wafer No(" + result.WaferId + ") 끝에 '-숫자(1~99)'가 없어 Slot 기본값을 정하지 못했습니다. Slot No 를 입력하세요.");
         }

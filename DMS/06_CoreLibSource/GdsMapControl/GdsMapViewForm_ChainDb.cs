@@ -12,7 +12,7 @@ using System.Windows.Forms;
 namespace NexplantQMS.GdsMap
 {
     /// <summary>
-    /// GDS Map View 화면의 "Chain 저장(DB)" 기능이다. (설계: 문서/2026-10-06_GDS_Chain_DB저장_설계.md 10.1절, 문서/2026-10-06_GDS_Map_화면역할_재정의_설계.md 4.4절)
+    /// GDS Map View 화면의 "Chain 저장(DB)" 기능이다. (설계: 문서/설계/02_GDS/2026-10-06_GDS_Chain_DB저장_설계.md 10.1절, 문서/설계/02_GDS/2026-10-06_GDS_Map_화면역할_재정의_설계.md 4.4절)
     /// 버전 이력 없음(덮어쓰기) / 변경된 Chain 전체 저장 / 삭제는 실제 삭제 / DMS 호스트 모드에서만 사용 (2026-10-06).
     /// Setup 화면에서 이 화면으로 옮겼다 (2026-10-06). 화면 도형이 DB 도형 그대로라서 GDS 파일 SHA-256 / DB Map Layer 범위 검사는 하지 않는다.
     ///
@@ -220,15 +220,22 @@ namespace NexplantQMS.GdsMap
             if (chain.DbIncomplete != null) data.Problems.Add(chain.DbIncomplete);
 
             List<int> layers = chain.LayerIds.OrderBy(id => id).ToList();
-            data.Layers = new string[layers.Count, 1];
-            for (int i = 0; i < layers.Count; i++) data.Layers[i, 0] = layers[i].ToString(CultureInfo.InvariantCulture);
+            // 탐색 Layer / 규칙은 Layer 키(번호 + DataType)를 번호 / DataType 열로 나눠 보낸다 (2026-10-20)
+            data.Layers = new string[layers.Count, 2];
+            for (int i = 0; i < layers.Count; i++)
+            {
+                data.Layers[i, 0] = GdsLayerKey.Layer(layers[i]).ToString(CultureInfo.InvariantCulture);
+                data.Layers[i, 1] = GdsLayerKey.DataType(layers[i]).ToString(CultureInfo.InvariantCulture);
+            }
             if (layers.Count == 0) data.Problems.Add("탐색 Layer 없음");
-            data.Rules = new string[chain.LayerRules.Count, 3];
+            data.Rules = new string[chain.LayerRules.Count, 5];
             for (int i = 0; i < chain.LayerRules.Count; i++)
             {
-                data.Rules[i, 0] = chain.LayerRules[i].FirstLayerId.ToString(CultureInfo.InvariantCulture);
-                data.Rules[i, 1] = chain.LayerRules[i].SecondLayerId.ToString(CultureInfo.InvariantCulture);
-                data.Rules[i, 2] = Coordinate(chain.LayerRules[i].Tolerance);
+                data.Rules[i, 0] = GdsLayerKey.Layer(chain.LayerRules[i].FirstLayerId).ToString(CultureInfo.InvariantCulture);
+                data.Rules[i, 1] = GdsLayerKey.DataType(chain.LayerRules[i].FirstLayerId).ToString(CultureInfo.InvariantCulture);
+                data.Rules[i, 2] = GdsLayerKey.Layer(chain.LayerRules[i].SecondLayerId).ToString(CultureInfo.InvariantCulture);
+                data.Rules[i, 3] = GdsLayerKey.DataType(chain.LayerRules[i].SecondLayerId).ToString(CultureInfo.InvariantCulture);
+                data.Rules[i, 4] = Coordinate(chain.LayerRules[i].Tolerance);
             }
             data.Fingerprint = ChainFingerprint(chain, data);
             return data;
@@ -348,10 +355,17 @@ namespace NexplantQMS.GdsMap
             return value.ToString("G17", CultureInfo.InvariantCulture);
         }
 
-        /// <summary>저장 중에는 Chain 편집 / 목록 / 도면 열기를 막는다. 저장 도중 Chain 내용이 바뀌지 않게 하기 위함이다.</summary>
+        /// <summary>
+        /// 저장 중에는 Chain 편집 / 목록 / 도면 열기를 막는다. 저장 도중 Chain 내용이 바뀌지 않게 하기 위함이다.
+        /// 2026-10-14: 저장 중에는 상태 표시줄 진행 막대(Marquee)와 작업 중 표시를 보인다(2026-10-15 처리 시간 표시 없앰, 모래시계 커서).
+        /// </summary>
         private void SetChainDbSaving(bool saving)
         {
             _chainDbSaving = saving;
+            progressLoad.Style = saving ? ProgressBarStyle.Marquee : ProgressBarStyle.Continuous;
+            progressLoad.Visible = saving;
+            if (saving) ViewBusy.Start();
+            else ViewBusy.Stop();
             btnSearch.Enabled = cboDevice.Enabled = cboViewSide.Enabled = !saving;
             if (saving)
             {

@@ -19,6 +19,11 @@ foreach ($name in 'DACrux.Common.RO', 'DACrux.Data.Handler', 'DACrux.Data.Parser
     'DACrux.SEMDMS.RO', 'DACrux.TEST.Control', 'DACrux.TEST.Interface', 'DACrux.TEST.RO') {
     Copy-Item -LiteralPath (Join-Path "$dmsDir\100_ClientBin" "$name.dll") -Destination $outputDir -Force
 }
+# DACrux.SEMDMS.Control: 2026-10-14 공통 진행 표시줄(ProgressStatusBar)이 들어 있어 운영 폴더 DLL 대신 새로 빌드한다(참조 DLL 은 없는 것만 운영 폴더에서 복사)
+Get-ChildItem "$dmsDir\100_ClientBin" -Filter '*.dll' | Where-Object { -not (Test-Path (Join-Path $outputDir $_.Name)) } | ForEach-Object { Copy-Item $_.FullName $outputDir }
+& $msbuild "$dmsDir\02_DMS\DACrux.SEMDMS.Control\DACrux.SEMDMS.Control.csproj" /t:Build /p:Configuration=Debug /p:Platform=AnyCPU /p:BuildProjectReferences=false `
+    "/p:OutputPath=$outputDir\" "/p:IntermediateOutputPath=$outputDir\..\obj_control\" /v:minimal /nologo *> "$outputDir\..\build_control.log"
+if ($LASTEXITCODE -ne 0) { Get-Content "$outputDir\..\build_control.log" -Tail 30; throw 'DACrux.SEMDMS.Control 빌드 실패' }
 & $msbuild "$projectDir\DACrux.TEST.ENGUI.csproj" /t:Build /p:Configuration=Debug /p:Platform=AnyCPU /p:BuildProjectReferences=false `
     "/p:OutputPath=$outputDir\" "/p:IntermediateOutputPath=$buildRoot\obj\" /v:minimal /nologo *> "$buildRoot\build.log"
 if ($LASTEXITCODE -ne 0) { Get-Content "$buildRoot\build.log" -Tail 30; throw 'TEST.ENGUI 빌드 실패' }

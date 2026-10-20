@@ -184,6 +184,9 @@ namespace NexplantQMS.GdsMap
 		{
 			lib.UserUnit = Real8(bytes, 0);
 			lib.DatabaseUnit = Real8(bytes, 8);
+			// DB 저장용으로 파일 원값을 따로 둔다 (2026-10-16)
+			lib.FileUserUnit = lib.UserUnit;
+			lib.FileDatabaseUnit = lib.DatabaseUnit;
 
 			lib.UserUnit *= (int)LengthUnit;
 			lib.DatabaseUnit *= (int)LengthUnit;

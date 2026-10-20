@@ -9,7 +9,7 @@ namespace NexplantQMS.GdsMap
 {
     /// <summary>
     /// GDS 지도 위에 표시할 KLARF Defect 1개. 좌표는 지도와 같은 월드 좌표(µm, 보기 기준)다.
-    /// 설계: 문서/2026-10-12_GDS_KLARF_연관분석_화면_설계.md 5.2절
+    /// 설계: 문서/설계/05_연관분석/2026-10-12_GDS_KLARF_연관분석_화면_설계.md 5.2절
     /// </summary>
     public sealed class DefectOverlayMarker
     {

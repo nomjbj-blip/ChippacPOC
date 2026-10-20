@@ -36,7 +36,7 @@ namespace NexplantQMS.GdsMap
 
         /// <summary>
         /// layerIds Layer의 배치 도형을 방문한다. mirrorX = true면 Back side 저장용으로 X 좌표를 GDS 원점 기준 좌우 반전(X' = -X)한
-        /// 사본을 넘긴다(설계: 문서/2026-10-06_GDS_반전_BackSide_설계.md 8절). 화면 도형과 원본 좌표는 바꾸지 않는다.
+        /// 사본을 넘긴다(설계: 문서/설계/02_GDS/2026-10-06_GDS_반전_BackSide_설계.md 8절). 화면 도형과 원본 좌표는 바꾸지 않는다.
         /// </summary>
         public int VisitPlacedElements(ISet<int> layerIds, bool mirrorX, Action<MapPlacedElementData> visitor)
         {
@@ -122,7 +122,7 @@ namespace NexplantQMS.GdsMap
         }
 
         /// <summary>
-        /// 배치 도형 ID별 Layer를 돌려준다. 현재 도면에 없는 ID는 결과에 넣지 않는다.
+        /// 배치 도형 ID별 Layer 키(번호 + DataType, GdsLayerKey)를 돌려준다. 현재 도면에 없는 ID는 결과에 넣지 않는다 (2026-10-20 키로 변경).
         /// Chain DB 저장 전 검사(Member / 편집 도형이 DB Map에 저장된 Layer 안인지, 지금 도면에 있는지)에 사용한다.
         /// Chain 탐색 캐시는 탐색한 도형만 가지므로 전체 화면 도형에서 찾는다.
         /// </summary>
@@ -134,17 +134,17 @@ namespace NexplantQMS.GdsMap
             foreach (GlSceneItem item in AllItems)
             {
                 if (item.PlacedElementId == null || !wanted.Contains(item.PlacedElementId)) continue;
-                result[item.PlacedElementId] = item.LayerID;
+                result[item.PlacedElementId] = item.LayerKey;
                 if (result.Count == wanted.Count) break;
             }
             return result;
         }
 
-        /// <summary>Layer 조건에 맞는 화면 도형. 조건이 null이면 전체다.</summary>
+        /// <summary>Layer 키(번호 + DataType) 조건에 맞는 화면 도형. 조건이 null이면 전체다.</summary>
         private IEnumerable<GlSceneItem> ItemsOnLayers(ISet<int> layerIds)
         {
             return layerIds == null ? AllItems
-                : _layerList.Where(layer => layerIds.Contains(layer.LayerID)).SelectMany(layer => layer.Items);
+                : _layerList.Where(layer => layerIds.Contains(layer.LayerKey)).SelectMany(layer => layer.Items);
         }
 
         /// <summary>도면을 다시 열었다면 이전 개정본의 배치를 계속 보내지 않게 한다.</summary>
@@ -176,7 +176,8 @@ namespace NexplantQMS.GdsMap
                 PlacedElementId = item.PlacedElementId,
                 SourceElementId = item.SourceElementId,
                 LayerId = item.LayerID,
-                DataType = item.Source.DataType,
+                // DB DATA_TYPE = 화면 Layer 키의 DataType(TEXT 는 TEXTTYPE, KLayout 과 같음) (2026-10-20)
+                DataType = GdsLayerKey.DataType(item.LayerKey),
                 ElementType = item.Source is GdsBoundary ? "BOUNDARY"
                     : item.Source is GdsPath ? "PATH" : "TEXT",
                 Closed = item.Closed,

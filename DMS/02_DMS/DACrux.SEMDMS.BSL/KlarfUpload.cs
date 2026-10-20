@@ -15,7 +15,7 @@ namespace DACrux.SEMDMS.BSL
 {
     /// <summary>
     /// 엔지니어가 화면에서 올린 KLARF 를 기존 DMS 자동 적재(Inspection.DataService)와 같은 TQD_* 테이블 / 같은 값 규칙으로 저장한다.
-    /// 설계: 문서/2026-10-07_KLARF_Upload_DB적재_설계.md (F08)
+    /// 설계: 문서/설계/03_KLARF_Map/2026-10-07_KLARF_Upload_DB적재_설계.md (F08)
     ///
     /// 만든 이유: 기존 자동 적재는 설비 폴더 감시 서비스라 화면에서 바로 올릴 수 없고, 고객 샘플(XD106.02)은 기존 규칙
     ///            (SetupID 40자 / Step ID 8자리 규칙 / 이미지가 하위 폴더)으로는 저장되지 않는다.
@@ -24,7 +24,9 @@ namespace DACrux.SEMDMS.BSL
     ///    순서와 계산은 InspectionDataService.cs Step 1~12 와 같다(Step 13 Alarm 메일은 하지 않음).
     ///  - DataService 와 의도적으로 다른 점(설계 6.2절): Step ID 8자리 규칙 / LotID 앞 'A' 제거(FAB1 규칙) 미적용,
     ///    ANGLE 은 Parser 각도, SetupID 는 size 128 쿼리(기존 쿼리는 40자로 잘림),
-    ///    분류 기준 선택(D3: 기본 RoughBin -> CLASSNUMBER), 같은 키가 있으면 삭제 후 재등록(D1).
+    ///    같은 키가 있으면 삭제 후 재등록(D1).
+    ///  - Defect 분류는 KLARF 표준대로 저장한다 (2026-10-15): CLASSNUMBER / ROUGHBINNUMBER / FINEBINNUMBER 를 파일 값 그대로 저장하고
+    ///    ClassLookup 은 CLASSNUMBER 의 이름표로 본다(기존 자동 적재와 같음). 예전의 RoughBin -> CLASSNUMBER 복사는 하지 않는다.
     ///  - Map 은 Map Setup(TQP_MAPDEF / TQP_USEMAP, Map ID = Device) 기준으로 저장한다 (2026-10-13).
     ///    SETUP_MAP = Map Setup 사용 Die 전체(Test 마다 같은 목록), SETUP 의 Wafer 크기 / Pitch / 원점 = Map Setup 값,
     ///    Defect Die 번호는 Map Setup 원점에 맞춰 옮긴다. KLARF 에서는 Defect 정보만 쓰고 검사 Die(SampleTestPlan)로 Map 을 만들지 않는다.
@@ -67,8 +69,8 @@ namespace DACrux.SEMDMS.BSL
 
         private static readonly Regex UploadKeyPattern = new Regex(@"^\d{17}_[0-9a-f]{8}$", RegexOptions.Compiled);
 
-        /// <summary>UploadInfo 배열 위치(Interface 주석과 같은 순서).</summary>
-        private enum UploadInfoIndex { FACTORY, USER, FILE_NAME, PRODUCT, STEP_ID, EQUIP, CLASS_SOURCE }
+        /// <summary>UploadInfo 배열 위치(Interface 주석과 같은 순서). RESERVED(옛 분류 기준 자리)는 받기만 하고 쓰지 않는다 (2026-10-15).</summary>
+        private enum UploadInfoIndex { FACTORY, USER, FILE_NAME, PRODUCT, STEP_ID, EQUIP, RESERVED }
 
         /// <summary>DataService 의 TQD_STEP 배열 순서(InspectionDataService.cs 27행 enum 과 같음).</summary>
         private enum StepCol { TEST, WAFER_SEQ, STEP_ID, SLOT_ID, RESULT_ID, INSPECTION_EQ, REVIEW_EQ, SETUP_SEQ, RESULTTIMESTAMP, FILETIMESTAMP, MAIN_EQ, ROUTE, OPER, SCAN_AREA, DEFECTIVE_DIE, DEFECTS, IMAGES, DEFECT_DD, INSP_FILENAME, INSP_FILEPATH, COMMENT }
@@ -401,7 +403,7 @@ namespace DACrux.SEMDMS.BSL
                 stepInfo[(int)StepCol.DEFECT_DD] = "-1";
                 stepInfo[(int)StepCol.INSP_FILENAME] = setting.FileName;
                 stepInfo[(int)StepCol.INSP_FILEPATH] = store.RelativePath; // 이미지 저장소 FTP 상대 경로(D4). 저장소 미사용이면 ' '
-                stepInfo[(int)StepCol.COMMENT] = BuildStepComment(setting, row["RAW_WAFER_ID"].ToString());
+                stepInfo[(int)StepCol.COMMENT] = BuildStepComment(setting, row["RAW_WAFER_ID"].ToString(), parser.DiePitchX, parser.DiePitchY);
 
                 oDefectDefine.CreateStepSeq(stepInfo);
                 stepSeq = oDefectDefine.GetStepInfo(new string[] { waferSeq.ToString(CultureInfo.InvariantCulture), stepId, resultTime, "1" });
@@ -411,9 +413,7 @@ namespace DACrux.SEMDMS.BSL
                 row["STEP_SEQ"] = stepSeq;
                 #endregion
 
-                #region [Step 07 : TQD_DEFECT 생성 (분류 기준 적용 / New Defect)]
-                ApplyClassSource(wafer.DefectList, setting.ClassSource);
-
+                #region [Step 07 : TQD_DEFECT 생성 (New Defect)]
                 DataTable prevXY = oDefectDefine.GetLastestStepDefectXY(wafer.WaferID, stepId, parser.ResultTimestamp.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture));
                 if (prevXY != null && prevXY.Rows.Count > 0)
                 {
@@ -431,18 +431,9 @@ namespace DACrux.SEMDMS.BSL
 
                 if (wafer.DefectList.Count > 0)
                     oDefectDefine.CreateDefect(BuildDefectArray(wafer.DefectList, stepSeq, waferSeq));
-
-                int nDefDie = 0;
-                DataTable dtDefect = oDefectDefine.GetDefectDataCount(waferSeq.ToString(CultureInfo.InvariantCulture), stepSeq.ToString(CultureInfo.InvariantCulture));
-                if (dtDefect != null)
-                {
-                    if (dtDefect.Rows.Count > 0)
-                        nDefDie = dtDefect.DefaultView.ToTable(true, "XY").Rows.Count;
-                    dtDefect.Dispose();
-                }
                 #endregion
 
-                #region [Step 08 : TQD_INSP_INFO 생성 (Test 마다 1행, 집계식은 DataService 와 같음)]
+                #region [Step 08 : TQD_INSP_INFO 생성 (Test 마다 1행, 집계식은 DataService 와 같음. DEFECTIVE_DIE 만 Test 별)]
                 foreach (InspectionTest test in wafer.TestList)
                 {
                     DataTable dtInsp = oDefectDefine.GetInspInfoDuple(stepSeq.ToString(CultureInfo.InvariantCulture), test.TestNo.ToString(CultureInfo.InvariantCulture));
@@ -457,6 +448,14 @@ namespace DACrux.SEMDMS.BSL
                     double density = (double)((defects.Count / test.AreaPerTest) * 100000000);
                     double areaTest = (double)(test.AreaPerTest / 100000000);
                     DefectStat stat = defects.GetDefectStat();
+
+                    // Defect Die 수는 이 Test 의 Defect 로만 센다. 같은 행의 DEFECTS / CLASSIFIED 와 같은 기준이다. (2026-10-19)
+                    // 이전에는 DataService 처럼 STEP 전체 Defect 의 Die 수를 모든 Test 행에 넣어, Test 가 여러 개인 파일에서
+                    // Defect 가 없는 Test 행에도 다른 Test 의 Die 수가 들어갔다(예: Test 80 행 DEFECTS 0 / DEFECTIVE_DIE 51).
+                    // 원본 SummaryList NDEFDIE 는 쓰지 않는다. DEFECTS 도 Summary NDEFECT 가 아니라 DefectList 로 센 값이다.
+                    HashSet<Point> defectDies = new HashSet<Point>();
+                    foreach (Defect d in defects)
+                        defectDies.Add(new Point(d.XINDEX, d.YINDEX));
 
                     // 기존 DefectDefine.CreateInspData(CREATE_INSP_INFO_PARSE)는 NOT NULL 컬럼 SUMMARY_FLAG 를 넣지 않아 ORA-01400 이 난다(Probe 실측).
                     // 같은 INSERT 에 SUMMARY_FLAG = ' ' 만 더한 추가 쿼리를 기존 DSL 범용 함수로 실행한다. 배열 순서는 CreateInspData 와 같다.
@@ -493,7 +492,7 @@ namespace DACrux.SEMDMS.BSL
                         "0",                                                       // KILLER_DEFECT_DD
                         Num(stat.AreaRandom / areaTest),                           // RANDOM_DEFECT_DD
                         test.SampleTestPlan.Length.ToString(CultureInfo.InvariantCulture), // INSPECTED_DIE
-                        nDefDie.ToString(CultureInfo.InvariantCulture),            // DEFECTIVE_DIE (DataService 와 같이 전체 Test 합산)
+                        defectDies.Count.ToString(CultureInfo.InvariantCulture),   // DEFECTIVE_DIE (이 Test 의 Defect Die 수)
                         "0",                                                       // ADDER_DEF_DIE
                         "0",                                                       // KILL_DEF_DIE
                         "0",                                                       // KILL_ADDER_DEF_DIE
@@ -584,16 +583,6 @@ namespace DACrux.SEMDMS.BSL
             new TQD_INSP_SUM().ExecuteNonQuery("DELETE_INSP_SUM_KLARF_UPLOAD", null, new string[] { step });
         }
 
-        /// <summary>분류 기준(D3)을 CLASSNUMBER 에 반영한다. ROUGHBIN / FINEBIN 이면 그 값을 CLASSNUMBER 로 복사하고, 원래 BIN 값은 그대로 둔다.</summary>
-        private static void ApplyClassSource(DefectList defects, string classSource)
-        {
-            foreach (Defect d in defects)
-            {
-                if (classSource == "ROUGHBIN") d.CLASSNUMBER = d.ROUGHBINNUMBER;
-                else if (classSource == "FINEBIN") d.CLASSNUMBER = d.FINEBINNUMBER;
-            }
-        }
-
         /// <summary>DataService Step 7 과 같은 열 순서로 TQD_DEFECT 배열을 만든다.</summary>
         private static string[,] BuildDefectArray(DefectList defects, long stepSeq, long waferSeq)
         {
@@ -633,10 +622,14 @@ namespace DACrux.SEMDMS.BSL
             return para;
         }
 
-        /// <summary>TQD_STEP.COMMENT: 업로드 구분 + 사용자 / 원본 파일 / 원본 WaferID / 분류 기준. 500자를 넘으면 파일 이름을 줄인다.</summary>
-        private static string BuildStepComment(UploadSetting setting, string rawWaferId)
+        /// <summary>
+        /// TQD_STEP.COMMENT: 업로드 구분 + 사용자 / 원본 파일 / KLARF 원본 Die Pitch / 원본 WaferID. 500자를 넘으면 파일 이름을 줄인다.
+        /// RAW_DIE_PITCH(2026-10-16, 통합 연관 분석 설계 05_연관분석/2026-10-15_GDS_KLARF_ETest_통합분석_데이터_설계.md 5.2절 결정 B6):
+        /// TQD_SETUP 에는 Map Setup Pitch 를 저장하므로, XREL / YREL 기준인 파일 DiePitch(µm)를 "x,y" 로 따로 남긴다.
+        /// </summary>
+        private static string BuildStepComment(UploadSetting setting, string rawWaferId, double pitchX, double pitchY)
         {
-            string tail = ";RAW_WAFER_ID=" + rawWaferId + ";CLASS_SRC=" + setting.ClassSource;
+            string tail = ";RAW_DIE_PITCH=" + Num(pitchX) + "," + Num(pitchY) + ";RAW_WAFER_ID=" + rawWaferId;
             string head = UploadCommentPrefix + "USER=" + setting.User + ";FILE=";
             int room = StepCommentLength - head.Length - tail.Length;
             string file = setting.FileName.Length > room ? setting.FileName.Substring(0, Math.Max(0, room)) : setting.FileName;
@@ -844,7 +837,7 @@ namespace DACrux.SEMDMS.BSL
         {
             DataTable dt = new DataTable("KLARF_UPLOAD");
             foreach (string col in new string[] { "UPLOAD_KEY", "FILE_NAME", "FILE_VERSION", "RAW_WAFER_ID", "WAFER_ID", "LOT_ID", "PRODUCT", "STEP_ID",
-                                                  "SETUP_ID", "SETUP_TIME", "RESULTTIMESTAMP", "EQUIP", "CLASS_SOURCE", "IMAGE_NAMES", "IMAGE_PATH", "RESULT", "MESSAGE", "MAP_NOTE" })
+                                                  "SETUP_ID", "SETUP_TIME", "RESULTTIMESTAMP", "EQUIP", "IMAGE_NAMES", "IMAGE_PATH", "RESULT", "MESSAGE", "MAP_NOTE" })
                 dt.Columns.Add(col, typeof(string));
             // MAP_DIES = Map Setup 사용 Die 수(SETUP_MAP 저장 수), MAP_NOTE = Map Setup 과 KLARF 가 다른 점 (2026-10-13)
             foreach (string col in new string[] { "SLOT_ID", "TEST_COUNT", "INSPECTED_DIE", "DEFECTS", "IMAGE_FILES", "SAVED_IMAGES", "ANGLE", "DIE_ORIGIN_X", "DIE_ORIGIN_Y", "MAP_DIES" })
@@ -899,7 +892,6 @@ namespace DACrux.SEMDMS.BSL
             row["SETUP_TIME"] = parser.SetupTimestamp.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
             row["RESULTTIMESTAMP"] = parser.ResultTimestamp.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
             row["EQUIP"] = equip;
-            row["CLASS_SOURCE"] = setting.ClassSource;
             row["TEST_COUNT"] = wafer.TestList.Count;
             row["INSPECTED_DIE"] = dies.Count;
             row["DEFECTS"] = wafer.DefectList.Count;
@@ -1242,12 +1234,11 @@ namespace DACrux.SEMDMS.BSL
             public string Product;
             public string StepId;
             public string Equip;
-            public string ClassSource;
 
             public static UploadSetting FromArray(string[] info)
             {
                 if (info == null || info.Length != Enum.GetNames(typeof(UploadInfoIndex)).Length)
-                    throw new Exception("UploadInfo 는 7개 항목이어야 합니다. (Factory / User / 파일명 / Product / Step ID / 설비 / 분류 기준)");
+                    throw new Exception("UploadInfo 는 7개 항목이어야 합니다. (Factory / User / 파일명 / Product / Step ID / 설비 / 예약(빈 값))");
                 UploadSetting s = new UploadSetting();
                 s.Factory = Required(info[(int)UploadInfoIndex.FACTORY], "Factory", IdColumnLength);
                 s.User = Required(info[(int)UploadInfoIndex.USER], "User", 30);
@@ -1257,16 +1248,12 @@ namespace DACrux.SEMDMS.BSL
                 s.Product = Trim(info[(int)UploadInfoIndex.PRODUCT]);
                 s.StepId = Trim(info[(int)UploadInfoIndex.STEP_ID]);
                 s.Equip = Trim(info[(int)UploadInfoIndex.EQUIP]);
-                s.ClassSource = Trim(info[(int)UploadInfoIndex.CLASS_SOURCE]).ToUpperInvariant();
-                if (s.ClassSource.Length == 0) s.ClassSource = "ROUGHBIN";
-                if (s.ClassSource != "ROUGHBIN" && s.ClassSource != "FINEBIN" && s.ClassSource != "CLASS")
-                    throw new Exception("분류 기준은 ROUGHBIN / FINEBIN / CLASS 중 하나여야 합니다: " + s.ClassSource);
                 return s;
             }
 
             public string[] ToArray()
             {
-                return new string[] { Factory, User, FileName, Product, StepId, Equip, ClassSource };
+                return new string[] { Factory, User, FileName, Product, StepId, Equip, "" };
             }
 
             public static UploadSetting Read(string path)

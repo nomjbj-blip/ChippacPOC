@@ -23,10 +23,11 @@ namespace NexplantQMS.GdsMap
                 map.Mode = GdsMapControl.ViewMode.View;
             map.Cursor = _chainEditMode == ChainEditMode.None ? Cursors.SizeAll : Cursors.Cross;
             UpdateChainSelectionButtons();
+            // 버튼 이름(도형 추가 / 도형 제외)과 같은 말을 쓴다 (2026-10-19)
             SetChainStatus(_chainEditMode == ChainEditMode.None
-                ? "경로 편집을 마쳤습니다." + FormatConnectivityWarning()
-                : (_chainEditMode == ChainEditMode.Add ? "경로에 더할" : "경로에서 뺄")
-                    + " 도형을 지도에서 클릭하세요. 같은 버튼이나 Esc 로 끝냅니다.");
+                ? "도형 편집을 마쳤습니다." + FormatConnectivityWarning()
+                : (_chainEditMode == ChainEditMode.Add ? "Chain 에 더할" : "Chain 에서 뺄")
+                    + " 도형 선택 중");
         }
 
         /// <summary>현재 클릭 위치의 체크된 Layer 객체만 제시하고 겹친 객체는 메뉴에서 구분한다.</summary>
@@ -35,10 +36,10 @@ namespace NexplantQMS.GdsMap
             var checkedLayers = new HashSet<int>();
             for (int i = 0; i < chkLayerItems.Items.Count; i++)
                 if (chkLayerItems.GetItemChecked(i))
-                    checkedLayers.Add(((LayerDisplayItem)chkLayerItems.Items[i]).LayerId);
+                    checkedLayers.Add(((LayerDisplayItem)chkLayerItems.Items[i]).LayerKey);
 
             List<ChainElementCandidate> candidates = map.GetChainElementCandidates(screenPoint)
-                .Where(candidate => checkedLayers.Contains(candidate.LayerId))
+                .Where(candidate => checkedLayers.Contains(candidate.LayerKey))
                 .ToList();
             if (candidates.Count == 0)
             {
@@ -67,7 +68,7 @@ namespace NexplantQMS.GdsMap
             }
             menu.Items.Add(new ToolStripSeparator());
             var all = new ToolStripMenuItem(_chainEditMode == ChainEditMode.Add
-                ? "이 위치의 객체 모두 추가" : "이 위치의 후보 모두 제외");
+                ? "이 위치의 도형 모두 추가" : "이 위치의 도형 모두 제외");
             all.Click += (sender, args) => ApplyChainEdit(candidates);
             menu.Items.Add(all);
             menu.Closed += (sender, args) =>
@@ -164,9 +165,9 @@ namespace NexplantQMS.GdsMap
                     _activeChain.LayerIds, _chainLayerRules, _applyChainLayerRules,
                     (double)_numChainCellSize.Value);
                 if (_chainOutputSelections.Count > 0 && !check.IsConnected)
-                    return " Output 까지 이어지지 않습니다. 지도에서 확인하세요.";
+                    return " / Output 까지 이어지지 않음";
                 return check.DisconnectedKeys.Count == 0 ? string.Empty
-                    : " Input 과 이어지지 않는 도형 " + check.DisconnectedKeys.Count + "개가 있습니다. 지도에서 확인하세요.";
+                    : " / 연결 안 된 도형 " + check.DisconnectedKeys.Count + "개";
             }
             catch (ArgumentException ex)
             {

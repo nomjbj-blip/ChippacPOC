@@ -1,4 +1,4 @@
-﻿# GDS x KLARF 연관 분석 서비스 검증 스크립트 (설계: 문서/2026-10-12_GDS_KLARF_연관분석_화면_설계.md 6 / 7절)
+﻿# GDS x KLARF 연관 분석 서비스 검증 스크립트 (설계: 문서/설계/05_연관분석/2026-10-12_GDS_KLARF_연관분석_화면_설계.md 6 / 7절)
 # 목적: BSL GdsKlarfAnalysis / GdsKlarfMatchEngine 을 같은 프로세스에서 직접 호출해
 #       1) 판정 엔진(좌표 변환 / 반전 / 허용오차 경계 / Defect 크기 / 큰 도형 / 중복 제거)을 합성 데이터로 확인하고
 #       2) 실제 DB 의 Chain + KLARF 로 AnalyzeWafer 결과를 엔진과 별개로 만든 단순 전수 비교(모든 Member x 모든 Defect)와 대조한다.

@@ -97,4 +97,23 @@ VALUES
             <param direction="Input" dbtype="Number" size="0">:import_job_seq</param>
         </parameters>
     </query>
+    <!-- Map 복사(GdsMapImport.CopyMap, 2026-10-15): 원본 Device 의 행을 새 Device 이름으로 INSERT ... SELECT -->
+    <query statement="Insert" queryid="COPY_IMPORT_JOB" commandtype="Text" description="Map 복사: 저장 작업 건수(조회 화면 Map 정보)를 새 작업 번호로 복사" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_GDS_IMPORT_JOB
+    (IMPORT_JOB_SEQ, FACTORY, DEVICE_ID, JOB_STATUS, EXPECTED_PLACED_COUNT, EXPECTED_POINT_COUNT,
+    RECEIVED_PLACED_COUNT, RECEIVED_POINT_COUNT, CREATE_USER, UPDATE_USER)
+SELECT :import_job_seq, FACTORY, :target_device_id, JOB_STATUS, EXPECTED_PLACED_COUNT, EXPECTED_POINT_COUNT,
+       RECEIVED_PLACED_COUNT, RECEIVED_POINT_COUNT, :create_user, :update_user
+  FROM TQP_GDS_IMPORT_JOB
+ WHERE FACTORY = :factory
+   AND DEVICE_ID = :source_device_id]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:import_job_seq</param>
+            <param direction="Input" dbtype="VarChar" size="50">:target_device_id</param>
+            <param direction="Input" dbtype="VarChar" size="30">:create_user</param>
+            <param direction="Input" dbtype="VarChar" size="30">:update_user</param>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:source_device_id</param>
+        </parameters>
+    </query>
 </queryxml>

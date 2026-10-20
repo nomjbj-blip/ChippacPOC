@@ -28,8 +28,8 @@ $request = [NexplantQMS.GdsMap.Chain.ChainTraceRequest]::new(
     $elements, 'A', 'C', $rules, 2.0)
 $request.ApplyLayerRules = $false
 $request.SelectedLayerIds = [System.Collections.Generic.HashSet[int]]::new()
-[void]$request.SelectedLayerIds.Add(1)
-[void]$request.SelectedLayerIds.Add(2)
+[void]$request.SelectedLayerIds.Add([NexplantQMS.GdsMap.GdsLayerKey]::Make(1, 0))
+[void]$request.SelectedLayerIds.Add([NexplantQMS.GdsMap.GdsLayerKey]::Make(2, 0))
 $tracer = [NexplantQMS.GdsMap.Chain.ChainCandidateTracer]::new()
 $result = $tracer.Trace($request)
 $path = ($result.Path | ForEach-Object ElementKey) -join ','
@@ -40,7 +40,7 @@ if (-not $result.IsConnected -or $path -ne 'A,B,C' -or $overlaps -ne 'D,E' -or $
     throw "직접 겹침/분기 결과가 다릅니다: path=$path overlap=$overlaps branch=$branches candidates=$candidates"
 }
 
-[void]$request.SelectedLayerIds.Remove(2)
+[void]$request.SelectedLayerIds.Remove([NexplantQMS.GdsMap.GdsLayerKey]::Make(2, 0))
 $filtered = $tracer.Trace($request)
 $filteredOverlaps = ($filtered.OverlappingElements | ForEach-Object ElementKey) -join ','
 if (-not $filtered.IsConnected -or $filteredOverlaps -ne 'D' -or $filtered.BranchCandidates.Count -ne 0) {
@@ -58,8 +58,8 @@ $sameLocation = [NexplantQMS.GdsMap.Chain.ChainTraceRequest]::new(
     $sameLocationElements, 'A', 'C', $rules, 2.0)
 $sameLocation.ApplyLayerRules = $false
 $sameLocation.SelectedLayerIds = [System.Collections.Generic.HashSet[int]]::new()
-[void]$sameLocation.SelectedLayerIds.Add(1)
-[void]$sameLocation.SelectedLayerIds.Add(2)
+[void]$sameLocation.SelectedLayerIds.Add([NexplantQMS.GdsMap.GdsLayerKey]::Make(1, 0))
+[void]$sameLocation.SelectedLayerIds.Add([NexplantQMS.GdsMap.GdsLayerKey]::Make(2, 0))
 $sameResult = $tracer.Trace($sameLocation)
 $sameOverlaps = (($sameResult.OverlappingElements | ForEach-Object ElementKey) | Sort-Object) -join ','
 if ($sameOverlaps -ne 'H,I') {

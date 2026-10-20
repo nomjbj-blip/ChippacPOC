@@ -176,6 +176,9 @@
     <Compile Include="DPUCDefectInfo.Designer.cs">
       <DependentUpon>DPUCDefectInfo.cs</DependentUpon>
     </Compile>
+    <Compile Include="DPUCDefectImageCard.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="DefectMapDraw.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -273,6 +276,14 @@
     </Compile>
     <Compile Include="DPUCDefecMapViewer.cs">
       <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="BusyCursor.cs" />
+    <Compile Include="GridBuffer.cs" />
+    <Compile Include="ProgressStatusBar.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ProgressStatusBar.Designer.cs">
+      <DependentUpon>ProgressStatusBar.cs</DependentUpon>
     </Compile>
     <Compile Include="SetupSearchItem.cs">
       <SubType>Form</SubType>

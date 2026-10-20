@@ -7,7 +7,7 @@
 --   -> E-Test Chain 이름 1행 = 대표 Chain 1개. 같은 대표 Chain 을 가진 행끼리 "묶음"이다(보통 _FH + _FL 2개).
 -- 키는 E-Test Device(파일명 Device) 기준이다. GDS Device(U9)와 E-Test Device(OMM) 연결은 보류라 대표 Chain 은 이름(문자열)으로만 둔다(FK 없음).
 -- 공정(TSVET / COWET / FT)과 관계없이 Device 단위다(물리 Chain 은 공정이 달라도 같다).
--- 설계: 문서/2026-10-07_ETest_Limit_설정_설계.md 13절
+-- 설계: 문서/설계/04_ETest/2026-10-07_ETest_Limit_설정_설계.md 13절
 -- 적용: 2026-10-12 로컬 docker oracle19c DMSMGR. 고객 DB 적용 여부는 별도 확인.
 
 WHENEVER SQLERROR EXIT SQL.SQLCODE ROLLBACK

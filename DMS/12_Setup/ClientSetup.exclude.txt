@@ -1,0 +1,30 @@
+﻿# 클라이언트 Setup 에 넣지 않을 파일 규칙 (Build-ClientSetup.ps1 이 읽는다)
+#
+# 형식: 100_ClientBin 기준 상대 경로 와일드카드 (PowerShell -like)
+#   - 끝이 \ 이면 그 폴더 아래 전체
+#   - \ 가 없으면 모든 폴더의 같은 파일 이름
+# 스크립트가 따로 처리하는 것
+#   - DLL / EXE 와 이름이 같은 *.xml 문서 주석 파일 (실행과 무관, 약 82 MB)
+#   - *.pdb (-NoPdb 일 때만 뺌)
+#   - DACruxConfig.ini (원본의 포트 줄만 옮겨 새로 만든다)
+# DLL 은 쓰지 않는 것처럼 보여도 여기에 넣지 않는다. 화면 하나가 실행 중에 깨질 위험이 더 크다.
+
+# Visual Studio / ClickOnce 부산물
+*.vshost.exe
+*.vshost.exe.config
+*.vshost.exe.manifest
+DACruxV5.application
+DACruxV5.exe.manifest
+app.publish\
+
+# 실행 중 생기는 임시 파일 / 폴더
+excel_temp*.xls
+temp_chart*.bmp
+tmpMap_*.bmp
+DEFECT_IMAGE\
+AVI\
+Temp\
+MenuOption.xml
+설치점검_결과.txt
+~envcheck_write.tmp
+*.log

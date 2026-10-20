@@ -131,14 +131,14 @@ namespace NexplantQMS.GdsMap
             HashSet<string> beforeKeys = GetEditedChainKeys();
             if (removeKeys.Overlaps(endpoints) || !removeKeys.IsSubsetOf(beforeKeys))
             {
-                SetChainStatus("체크한 묶음이 바뀐 Chain 과 맞지 않습니다. [유사 묶음 찾기]를 다시 누르세요.");
+                SetChainStatus("체크한 묶음이 바뀐 Chain 과 맞지 않습니다.");
                 return;
             }
             ChainTraceElement[] beforeElements = map.GetChainTraceElements(beforeKeys).ToArray();
             if (beforeElements.Length != beforeKeys.Count
-                || beforeElements.Any(element => !_activeChain.LayerIds.Contains(element.LayerId)))
+                || beforeElements.Any(element => !_activeChain.LayerIds.Contains(element.LayerKey)))
             {
-                SetChainStatus("Layer 체크가 바뀌어 검사할 수 없습니다. [후보 경로 찾기]를 다시 누르세요.");
+                SetChainStatus("Layer 체크가 바뀌어 검사할 수 없습니다.");
                 return;
             }
             ChainTraceElement[] afterElements = beforeElements
@@ -156,16 +156,18 @@ namespace NexplantQMS.GdsMap
             SetChainStatus("체크한 묶음을 빼는 중입니다.");
             try
             {
-                Tuple<ChainConnectivityResult, ChainConnectivityResult> checks = await Task.Run(() =>
-                {
-                    var tracer = new ChainCandidateTracer();
-                    var beforeRequest = new ChainTraceRequest(beforeElements, inputKeys,
-                        outputKeys, rules, cellSize) { ApplyLayerRules = applyRules };
-                    var afterRequest = new ChainTraceRequest(afterElements, inputKeys,
-                        outputKeys, rules, cellSize) { ApplyLayerRules = applyRules };
-                    return Tuple.Create(tracer.CheckSelectionConnectivity(beforeRequest),
-                        tracer.CheckSelectionConnectivity(afterRequest));
-                });
+                Tuple<ChainConnectivityResult, ChainConnectivityResult> checks;
+                using (ViewBusy.Busy()) // 서버 조회 / 계산 동안 모래시계 커서 (2026-10-15)
+                    checks = await Task.Run(() =>
+                    {
+                        var tracer = new ChainCandidateTracer();
+                        var beforeRequest = new ChainTraceRequest(beforeElements, inputKeys,
+                            outputKeys, rules, cellSize) { ApplyLayerRules = applyRules };
+                        var afterRequest = new ChainTraceRequest(afterElements, inputKeys,
+                            outputKeys, rules, cellSize) { ApplyLayerRules = applyRules };
+                        return Tuple.Create(tracer.CheckSelectionConnectivity(beforeRequest),
+                            tracer.CheckSelectionConnectivity(afterRequest));
+                    });
                 if (traceGeneration != _chainTraceGeneration
                     || similarGeneration != _chainSimilarGeneration
                     || !ReferenceEquals(chain, _activeChain)) return;
@@ -189,7 +191,7 @@ namespace NexplantQMS.GdsMap
                 ClearChainExampleSelection();
                 SetChainStatus("도형 " + removeKeys.Count + "개를 뺐습니다."
                     + (newDisconnected > 0
-                        ? " Input 과 이어지지 않는 도형 " + newDisconnected + "개가 생겼습니다. 필요하면 [직전 제외 되돌리기]를 누르세요."
+                        ? " 연결 안 된 도형 " + newDisconnected + "개 생김"
                         : ""));
                 RefreshChainDisplay();
             }

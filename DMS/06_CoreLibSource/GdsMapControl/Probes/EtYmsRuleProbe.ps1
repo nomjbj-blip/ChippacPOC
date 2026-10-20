@@ -1,4 +1,4 @@
-﻿# E-Test -> YMS 적재 규칙(EtYmsRule) 검증 스크립트 (2026-10-14, 설계: 문서/2026-10-14_ETest_Upload_YMS적재_설계.md 14절)
+﻿# E-Test -> YMS 적재 규칙(EtYmsRule) 검증 스크립트 (2026-10-14, 설계: 문서/설계/04_ETest/2026-10-14_ETest_Upload_YMS적재_설계.md 14절)
 # 목적: Interface DLL 의 EtYmsRule 을 직접 불러 YMS 컬럼 이름 / Program / Bin / 값 / 수율 규칙을 확인한다. DB 는 쓰지 않는다.
 #       샘플 E-Test xlsx 의 측정 헤더 전체와 고객 Spec 표(TSVET)로 이름 겹침 / 길이 초과가 없는지도 본다.
 # 실행: powershell -NoProfile -ExecutionPolicy Bypass -File EtYmsRuleProbe.ps1 [-BinDir <DACrux.SEMDMS.Interface.dll 폴더>]
@@ -64,12 +64,17 @@ Check '만들 수 없는 이름' ($p2.Length -eq 1) ([string]::Join(' | ', $p2))
 Check 'ToProgramName' (($R::ToProgramName('OMM', 'TSVET') -eq 'OMM_TSVET') -and ($R::ToProgramName(' omm-1 ', 'tsvet') -eq 'OMM_1_TSVET') -and ($R::ToProgramName('', 'TSVET') -eq '')) "$($R::ToProgramName('OMM', 'TSVET')) / $($R::ToProgramName(' omm-1 ', 'tsvet'))"
 Check 'ToTestArea' ($R::ToTestArea(' tsvet ') -eq 'TSVET') $R::ToTestArea(' tsvet ')
 
-# 4. BIN
-$bins = @($R::ToBin('P', 0, 0), $R::ToBin('F', 2, 0), $R::ToBin('F', 0, 3), $R::ToBin('F', 1, 1), $R::ToBin(' p ', 0, 0))
-Check 'ToBin' ([string]::Join(',', $bins) -eq '1,2,3,2,1') ([string]::Join(',', $bins))
-$err = Throws { $R::ToBin('X', 0, 0) }
-Check 'ToBin 잘못된 판정' ($err -ne '') $err
-Check 'Bin 이름 / 색' (($R::BinName(1) -eq 'PASS') -and ($R::BinName(2) -eq 'SPEC_FAIL') -and ($R::BinName(3) -eq 'NOT_TESTED') -and ($R::BinColor(1) -eq '#00C000')) "$($R::BinName(1)) $($R::BinColor(1)) / $($R::BinName(2)) $($R::BinColor(2)) / $($R::BinName(3)) $($R::BinColor(3))"
+# 4. BIN (2026-10-14: YMS BIN = 결과 파일 Hardware Bin 0 ~ 99, E-Test Spec 판정과 별개)
+$bins = @($R::ToBin(1), $R::ToBin(5), $R::ToBin(0), $R::ToBin(99))
+Check 'ToBin = Hardware Bin' ([string]::Join(',', $bins) -eq '1,5,0,99') ([string]::Join(',', $bins))
+$errs = @((Throws { $R::ToBin($null) }), (Throws { $R::ToBin(100) }), (Throws { $R::ToBin(2001) }), (Throws { $R::ToBin(-1) }))
+Check 'ToBin 없음 / 100 이상 / 음수는 오류' (@($errs | Where-Object { $_ -eq '' }).Count -eq 0) ([string]::Join(' | ', $errs))
+$names = @($R::BinName(2, [int[]]@(2001)), $R::BinName(2, [int[]]@(2002, 2001, 2001)), $R::BinName(1, [int[]]@()), $R::BinName(3, [int[]]@(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13)))
+Check 'Bin 이름 (Software Bin 포함, 30자 이하)' ($names[0] -eq 'HW2 SW2001' -and $names[1] -eq 'HW2 SW2001,2002' -and $names[2] -eq 'HW1' -and $names[3].Length -eq 30) ([string]::Join(' / ', $names))
+$descs = @($R::BinDescription(2, [int[]]@(2001), $false, $false), $R::BinDescription(1, [int[]]@(1), $true, $false), $R::BinDescription(4, [int[]]@(4001), $false, $true))
+Check 'Bin 설명' ($descs[0] -eq 'E-Test file Hardware Bin 2 / Software Bin 2001 / Fail' -and $descs[1].EndsWith('/ Pass') -and $descs[2].EndsWith('Pass and Fail mixed')) ([string]::Join(' / ', $descs))
+Check 'Bin 색 (양품 초록 / 불량은 초록 아님)' ($R::BinColor(1, $true) -eq '#00C000' -and $R::BinColor(1, $false) -ne '#00C000' -and $R::BinColor(2, $false) -ne $R::BinColor(5, $false)) "$($R::BinColor(1, $true)) / $($R::BinColor(2, $false)) / $($R::BinColor(5, $false))"
+Check '예전 판정 Bin 정의 구분' ($R::IsLegacyJudgeBin('1', 'PASS', 'E-Test Spec Pass') -and $R::IsLegacyJudgeBin('3', 'NOT_TESTED', 'E-Test Fail by not tested value only') -and -not $R::IsLegacyJudgeBin('3', 'NOT_TESTED', 'user edited') -and -not $R::IsLegacyJudgeBin('2', 'PASS', 'E-Test Spec Pass')) 'BIN / 이름 / 설명 모두 같을 때만'
 
 # 5. 값 (빈 값은 '' -> TD NULL, 숫자는 InvariantCulture R)
 $vals = @($R::ToYmsValue(715.0), $R::ToYmsValue(0.1), $R::ToYmsValue(-2.5E-12), $R::ToYmsValue($null), $R::ToYmsValue([double]::NaN))

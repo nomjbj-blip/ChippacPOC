@@ -1,16 +1,17 @@
-﻿# E-Test Para Setup 서비스 검증 스크립트 (2026-10-14, 설계: 문서/2026-10-14_ETest_Para_Setup_설계.md)
-# 목적: 이름 분해 / 변환 규칙(EtParameterNameRule)과 BSL GdsEtResult 의 Parameter 등록 / 대표 Chain / GDS 연결을
-#       같은 프로세스에서 직접 호출해 확인한다. DB 접속은 BSL -> DSL -> Miracom.Middleware 경로다(Service Remoting 경유 아님).
+﻿# E-Test Para 설정 서비스 검증 스크립트 (2026-10-14)
+# 설계: 문서/설계/04_ETest/2026-10-14_ETest_Para_Setup_설계.md (등록 / 이름 변환), 문서/설계/04_ETest/2026-10-14_ETest_Para_화면_재구성_설계.md (GDS Chain / Spec 편집)
+# 목적: 이름 분해 / 변환 규칙(EtParameterNameRule)과 BSL GdsEtResult 의 Parameter 등록 / [등록 Parameter] 탭 저장(수정 행만, GDS Chain + Spec) /
+#       GDS Chain 참고 목록 / 인계 API 를 같은 프로세스에서 직접 호출해 확인한다. DB 접속은 BSL -> DSL -> Miracom.Middleware 경로다(Service Remoting 경유 아님).
 # 전제: FACTORY=PROBE / DEVICE_ID=LAYER_FILTER_PROBE 에 READY GDS Map 이 있어야 한다(GdsChainProbe 와 같은 전제, Layer 1 도형 사용).
-# 결과: E-Test Device PRB_PARA 에 Parameter 를 등록하고, GDS 시험 Chain(Code ZZETP*) / 대표 Chain / Sub Device 연결
-#       (LAYER_FILTER_PROBE <- PRB_PARA)을 만들었다가 -Keep 이 없으면 마지막에 모두 지운다.
+# 결과: E-Test Device PRB_PARA 에 Parameter 를 등록하고, LAYER_FILTER_PROBE 를 E-Test Device 이름(PRB_PARA)으로 복사한 GDS Map 에
+#       시험 Chain(Code ZZETP*)을 만들었다가 -Keep 이 없으면 마지막에 모두 지운다(GDS Device = E-Test Device 와 같은 이름, 2026-10-15).
 # 실행: powershell -NoProfile -ExecutionPolicy Bypass -File EtParaSetupProbe.ps1 [-BinDir <BSL/DSL/Interface DLL 폴더>] [-Keep]
 #       -BinDir 생략 시 101_ServerBin. 배포 전에는 TEMP 빌드 폴더를 넘긴다.
 param(
     [string]$BinDir = '',
     [string]$Factory = 'PROBE',
     [string]$EtDevice = 'PRB_PARA',
-    [string]$GdsDevice = 'LAYER_FILTER_PROBE',
+    [string]$GdsSource = 'LAYER_FILTER_PROBE',
     [string]$SampleFile = '',
     [string]$SpecTable = '',
     [switch]$Keep
@@ -20,6 +21,8 @@ $dms = (Resolve-Path (Join-Path $PSScriptRoot '..\..\..')).Path
 $serverBin = Join-Path $dms '101_ServerBin'
 $clientBin = Join-Path $dms '100_ClientBin'
 if ($BinDir -eq '') { $BinDir = $serverBin }
+# GDS Device = E-Test Device 와 같은 이름의 Map (시험 중에 GdsSource 를 복사해 만든다, 2026-10-15)
+$GdsDevice = $EtDevice
 if ($SampleFile -eq '') { $SampleFile = Join-Path $dms '..\SampleFile\26_10_06 Sample File\CAI_OMM_ATV_A0_TSVET_20260609161940_RH-HS2615_RH-HS2615-02.xlsx' }
 if ($SpecTable -eq '') { $SpecTable = Join-Path $dms '02_DMS\DACrux.SEMDMS.ENGUI\Verification\EtSpecTable_U9_20261012.txt' }
 $SampleFile = (Resolve-Path $SampleFile).Path
@@ -59,17 +62,17 @@ $inv = [Globalization.CultureInfo]::InvariantCulture
 # 1. 이름 규칙 (DB 없음)
 # ---------------------------------------------------------------------------------------------------
 $p = $rule::Parse('Resistance_iforce=8.0mA@TSVDC_TR_FH')
-Check '분해: Resistance' ($p.IsValid -and $p.ParameterName -eq 'RESISTANCE_IFORCE_8P0MA_TSVDC_TR_FH' -and $p.HeaderText -eq 'Resistance_iforce=8.0mA@TSVDC_TR_FH' -and $p.ParaName -eq 'RESISTANCE_IFORCE' -and $p.CondValue -eq '8.0MA' -and $p.MeasType -eq 'RESISTANCE' -and $p.Condition -eq 'IFORCE=8.0MA' -and $p.Terminal1 -eq 'TSVDC_TR_FH' -and $p.ForceLeg1 -eq 'FH' -and $p.ChainType -eq 'TSVDC') "$($p.ParameterName) / $($p.Condition) / $($p.Terminal1)"
+Check '분해: Resistance' ($p.IsValid -and $p.ParameterName -eq 'RESISTANCE_IFORCE_8P0MA_TSVDC_TR_FH' -and $p.HeaderText -eq 'Resistance_iforce=8.0mA@TSVDC_TR_FH' -and $p.ParaName -eq 'RESISTANCE_IFORCE' -and $p.CondValue -eq '8.0MA' -and $p.MeasType -eq 'RESISTANCE' -and $p.Condition -eq 'IFORCE=8.0MA' -and $p.Chain1 -eq 'TSVDC_TR_FH' -and $p.ForceLeg1 -eq 'FH' -and $p.ChainType -eq 'TSVDC') "$($p.ParameterName) / $($p.Condition) / $($p.Chain1)"
 $p = $rule::Parse('  Leakage_Serial@TSVDC_ASIC1_N_FL:TSVDC_ASIC1_P_FH #421 ')
-Check '분해: FT Leakage_Serial (#번호 제거 / 단자 2개)' ($p.IsValid -and $p.HeaderText -eq 'Leakage_Serial@TSVDC_ASIC1_N_FL:TSVDC_ASIC1_P_FH' -and $p.ParameterName -eq 'LEAKAGE_SERIAL_TSVDC_ASIC1_N_FL_TSVDC_ASIC1_P_FH' -and $p.Terminal1 -eq 'TSVDC_ASIC1_N_FL' -and $p.Terminal2 -eq 'TSVDC_ASIC1_P_FH' -and $p.ForceLeg1 -eq 'FL' -and $p.ForceLeg2 -eq 'FH' -and $p.Condition -eq 'SERIAL') "$($p.HeaderText) -> $($p.ParameterName)"
+Check '분해: FT Leakage_Serial (#번호 제거 / Chain 2개)' ($p.IsValid -and $p.HeaderText -eq 'Leakage_Serial@TSVDC_ASIC1_N_FL:TSVDC_ASIC1_P_FH' -and $p.ParameterName -eq 'LEAKAGE_SERIAL_TSVDC_ASIC1_N_FL_TSVDC_ASIC1_P_FH' -and $p.Chain1 -eq 'TSVDC_ASIC1_N_FL' -and $p.Chain2 -eq 'TSVDC_ASIC1_P_FH' -and $p.ForceLeg1 -eq 'FL' -and $p.ForceLeg2 -eq 'FH' -and $p.Condition -eq 'SERIAL') "$($p.HeaderText) -> $($p.ParameterName)"
 $p = $rule::Parse('Leakage_Serial@TSVDC_ASIC_HBM_N_FH:TSVDC_ASIC_HBM_P_FL')
 Check '분해: 50자 초과 -> 고객 약어(LKG)' ($p.IsValid -and $p.ParameterName -eq 'LKG_SERIAL_TSVDC_ASIC_HBM_N_FH_TSVDC_ASIC_HBM_P_FL' -and $p.ParameterName.Length -le 50) "$($p.ParameterName) ($($p.ParameterName.Length)자)"
 $p = $rule::Parse('Leakage_Serial@PIC_SERP1_M2_FL:PIC_SERP1_M3_FL')
-Check '분해: Chain type PIC_SERP' ($p.IsValid -and $p.ChainType -eq 'PIC_SERP' -and $p.Terminal2 -eq 'PIC_SERP1_M3_FL') $p.ChainType
+Check '분해: Chain type PIC_SERP' ($p.IsValid -and $p.ChainType -eq 'PIC_SERP' -and $p.Chain2 -eq 'PIC_SERP1_M3_FL') $p.ChainType
 $p = $rule::Parse('Resistance_iforce=8.0mA TSVDC_TR_FH')
 $p2 = $rule::Parse('Resistance@TSVDC_TR')
 Check '분해: @ 없음 오류 / Force leg 없음 경고' ((-not $p.IsValid) -and $p2.IsValid -and $p2.Warning -ne '') "$($p.Error) / $($p2.Warning)"
-Check '이름 변환: 대표 / 단자' ($rule::ToSafeName('tsvdc top1') -eq 'TSVDC_TOP1' -and $rule::ToSafeName(' TSVDC_TR_FH ') -eq 'TSVDC_TR_FH' -and $rule::ToSafeName('a.b@c:d') -eq 'APB_C_D' -and -not $rule::IsSafeName($rule::ToSafeName('1abc'), 64) -and $rule::IsSafeName('TSVDC_TOP1', 64)) "tsvdc top1 -> $($rule::ToSafeName('tsvdc top1'))"
+Check '이름 변환: 대표 / Chain' ($rule::ToSafeName('tsvdc top1') -eq 'TSVDC_TOP1' -and $rule::ToSafeName(' TSVDC_TR_FH ') -eq 'TSVDC_TR_FH' -and $rule::ToSafeName('a.b@c:d') -eq 'APB_C_D' -and -not $rule::IsSafeName($rule::ToSafeName('1abc'), 64) -and $rule::IsSafeName('TSVDC_TOP1', 64)) "tsvdc top1 -> $($rule::ToSafeName('tsvdc top1'))"
 $cl = $rule::FindNameProblems([string[]]@('Resistance_iforce=8.0mA@TSVDC_TR_FH', 'Resistance_iforce_8.0mA@TSVDC_TR_FH', 'resistance_iforce=8.0mA@TSVDC_TR_FH'))
 Check '충돌 검사: 다른 헤더가 같은 이름 / 같은 헤더 두 번' ($cl.Length -eq 2) ($cl -join ' | ')
 
@@ -88,17 +91,17 @@ for ($c = 1; $c -le $lastCol; $c++) {
 $wb.Dispose(); $fs.Dispose()
 $parts = @($headers | ForEach-Object { $rule::Parse($_[0]) })
 $terms = New-Object 'Collections.Generic.HashSet[string]'
-foreach ($x in $parts) { [void]$terms.Add($x.Terminal1); if ($x.Terminal2 -ne '') { [void]$terms.Add($x.Terminal2) } }
+foreach ($x in $parts) { [void]$terms.Add($x.Chain1); if ($x.Chain2 -ne '') { [void]$terms.Add($x.Chain2) } }
 $bad = @($parts | Where-Object { -not $_.IsValid }).Count
 $legless = @($terms | Where-Object { $rule::ForceLegOf($_) -eq '' }).Count
 $maxLen = ($parts | ForEach-Object { $_.ParameterName.Length } | Measure-Object -Maximum).Maximum
 $abbr = @($parts | Where-Object { $_.ParameterName.StartsWith('LKG_') -or $_.ParameterName.StartsWith('RES_') }).Count
 $prob = $rule::FindNameProblems([string[]]@($headers | ForEach-Object { $_[0] }))
-Check '샘플 헤더 2,755: 오류 0 / 충돌 0 / 단자 1,306 / Force leg 없음 0 / 최대 50자 / 약어 1' ($headers.Count -eq 2755 -and $bad -eq 0 -and $prob.Length -eq 0 -and $terms.Count -eq 1306 -and $legless -eq 0 -and $maxLen -le 50 -and $abbr -eq 1) "헤더 $($headers.Count) / 오류 $bad / 충돌 $($prob.Length) / 단자 $($terms.Count) / leg 없음 $legless / 최대 $maxLen / 약어 $abbr"
+Check '샘플 헤더 2,755: 오류 0 / 충돌 0 / Chain 1,306 / Force leg 없음 0 / 최대 50자 / 약어 1' ($headers.Count -eq 2755 -and $bad -eq 0 -and $prob.Length -eq 0 -and $terms.Count -eq 1306 -and $legless -eq 0 -and $maxLen -le 50 -and $abbr -eq 1) "헤더 $($headers.Count) / 오류 $bad / 충돌 $($prob.Length) / Chain $($terms.Count) / leg 없음 $legless / 최대 $maxLen / 약어 $abbr"
 
 # 고객 Spec 표 119행 (Device / Test Type / Chain name / Parameter / Spec / Unit)
 $spec = @(Get-Content -Path $SpecTable -Encoding UTF8 | Select-Object -Skip 1 | Where-Object { $_.Trim() -ne '' } | ForEach-Object { , ($_ -split "`t") })
-$specTerms = New-Object 'Collections.Generic.HashSet[string]'
+$specChains = New-Object 'Collections.Generic.HashSet[string]'
 $specBad = 0; $specProb = 0
 foreach ($tt in @('TSVET', 'COWET', 'FT')) {
     $hs = @($spec | Where-Object { $_[1].Trim() -eq $tt } | ForEach-Object { $_[2] })
@@ -106,9 +109,9 @@ foreach ($tt in @('TSVET', 'COWET', 'FT')) {
 }
 foreach ($row in $spec) {
     $x = $rule::Parse($row[2]); if (-not $x.IsValid) { $specBad++ ; continue }
-    [void]$specTerms.Add($x.Terminal1); if ($x.Terminal2 -ne '') { [void]$specTerms.Add($x.Terminal2) }
+    [void]$specChains.Add($x.Chain1); if ($x.Chain2 -ne '') { [void]$specChains.Add($x.Chain2) }
 }
-Check 'Spec 표 119: 오류 0 / 공정별 충돌 0 / 단자 52' ($spec.Count -eq 119 -and $specBad -eq 0 -and $specProb -eq 0 -and $specTerms.Count -eq 52) "행 $($spec.Count) / 오류 $specBad / 충돌 $specProb / 단자 $($specTerms.Count)"
+Check 'Spec 표 119: 오류 0 / 공정별 충돌 0 / Chain 52' ($spec.Count -eq 119 -and $specBad -eq 0 -and $specProb -eq 0 -and $specChains.Count -eq 52) "행 $($spec.Count) / 오류 $specBad / 충돌 $specProb / Chain $($specChains.Count)"
 
 # ---------------------------------------------------------------------------------------------------
 # 2. 서비스 (DB)
@@ -116,19 +119,18 @@ Check 'Spec 표 119: 오류 0 / 공정별 충돌 0 / 단자 52' ($spec.Count -eq
 $bsl = New-Object DACrux.SEMDMS.BSL.GdsEtResult
 $chain = New-Object DACrux.SEMDMS.BSL.GdsChain
 $import = New-Object DACrux.SEMDMS.BSL.GdsMapImport
-$info = $import.GetMapInfo($Factory, $GdsDevice)
-if ($info.Rows.Count -eq 0 -or $info.Rows[0]['MAP_STATUS'] -ne 'READY') { Write-Host "전제 실패: $Factory / $GdsDevice READY Map 없음 (GdsImportLayerFilterProbe.ps1 -Keep 먼저 실행)"; exit 2 }
+$info = $import.GetMapInfo($Factory, $GdsSource)
+if ($info.Rows.Count -eq 0 -or $info.Rows[0]['MAP_STATUS'] -ne 'READY') { Write-Host "전제 실패: $Factory / $GdsSource READY Map 없음 (GdsImportLayerFilterProbe.ps1 -Keep 먼저 실행)"; exit 2 }
 $placed = New-Object DACrux.SEMDMS.DSL.TQP_GDS_PLACED_EL
-$ids = @($placed.GetData('SELECT_PLACED_EL_PAGE', $null, [string[]]@($Factory, $GdsDevice, '1', ' ', '6')).Rows | ForEach-Object { [string]$_['PLACED_ELEMENT_ID'] })
+$ids = @($placed.GetData('SELECT_PLACED_EL_PAGE', $null, [string[]]@($Factory, $GdsSource, '1', ' ', '6')).Rows | ForEach-Object { [string]$_['PLACED_ELEMENT_ID'] })
 
 function Remove-ProbeData {
-    foreach ($r in @($bsl.GetEtRepChainList($Factory, $GdsDevice).Rows)) { [void]$bsl.DeleteEtRepChain([string[]]@($Factory, $GdsDevice, [string]$r['REP_CHAIN_NAME']), 'probe') }
     foreach ($r in @($chain.GetChainList($Factory, $GdsDevice).Rows)) { if ([string]$r['CHAIN_CODE'] -like 'ZZETP*') { [void]$chain.DeleteChain($Factory, $GdsDevice, [string]$r['CHAIN_SEQ'], 'probe') } }
     foreach ($t in @('TSVET', 'COWET')) {
         $names = @($bsl.GetEtParameterList($Factory, $EtDevice, $t).Rows | ForEach-Object { [string]$_['ITEM_NAME'] })
         if ($names.Count -gt 0) { [void]$bsl.DeleteEtParameters([string[]]@($Factory, $EtDevice, $t), [string[]]$names, 'probe') }
     }
-    [void]$import.SaveSubDeviceList($Factory, $GdsDevice, [string[]]@(), $null, 'probe')
+    if ($import.GetMapInfo($Factory, $GdsDevice).Rows.Count -gt 0) { [void]$import.DeleteMap($Factory, $GdsDevice, 'probe') }
 }
 function New-ProbeChain($code, $name, $seq = '') {
     $s = [string]$chain.BeginChainSave([string[]]@($Factory, $GdsDevice, $seq, $code, $name, '-16711936', '0', '10', 'probe'), (Rows @(,@('1')) 1), $null).Rows[0]['CHAIN_SEQ']
@@ -137,10 +139,11 @@ function New-ProbeChain($code, $name, $seq = '') {
     if ($r['RESULT'] -ne 'OK') { throw "GDS 시험 Chain 저장 실패: $code $($r['MESSAGE'])" }
     return $s
 }
-function RepRow($name) { return @($bsl.GetEtRepChainList($Factory, $GdsDevice).Rows | Where-Object { [string]$_['REP_CHAIN_NAME'] -eq $name })[0] }
+function SetupRow($t, $name) { return @($bsl.GetEtParameterSetupList($Factory, $EtDevice, $t).Rows | Where-Object { [string]$_['ITEM_NAME'] -eq $name })[0] }
+function SaveSetup($t, $rows, $user) { return $bsl.SaveEtParameterSetup([string[]]@($Factory, $EtDevice, $t), (Rows $rows 7), $user).Rows[0] }
 
 Remove-ProbeData
-[void]$import.SaveSubDeviceList($Factory, $GdsDevice, [string[]]@($EtDevice), $null, 'probe')
+[void]$import.CopyMap($Factory, $GdsSource, $GdsDevice, 'probe')
 
 # 2-1. Parameter 등록: 샘플 파일에서 Spec 표 TSVET 헤더 37개 (원문 / 단위 / Test No / 열 순서)
 $specTsvet = New-Object 'Collections.Generic.HashSet[string]'
@@ -164,89 +167,59 @@ Check '등록 거부: @ 없음 / 같은 이름 충돌 / 단위 다름 / 출처 /
 $regSpec = $bsl.RegisterEtParameters([string[]]@($Factory, $EtDevice, 'COWET', 'SPEC', 'EtSpecTable_U9_20261012.txt'), (Rows @(,@('Resistance_iforce=8.0mA@TSVDC_TOP1_P_FH  ', 'Ohm', '', '')) 4), 'probe').Rows[0]
 Check '같은 헤더를 다른 공정(COWET, 출처 SPEC)에 따로 등록' ([int]$regSpec['REGISTERED'] -eq 1 -and @($bsl.GetEtParameterList($Factory, $EtDevice, 'COWET').Rows).Count -eq 1) "COWET $($regSpec['REGISTERED'])"
 
-# 2-2. 사용 여부 / 비고, 예전 키 Spec 표시, 삭제(Spec 같이)
-[void]$bsl.SaveEtParameters([string[]]@($Factory, $EtDevice, 'TSVET'), (Rows @(,@('RESISTANCE_IFORCE_8P0MA_TSVDC_TR_FH', 'N', '시험 비고')) 3), 'probe')
-$r0 = @($bsl.GetEtParameterList($Factory, $EtDevice, 'TSVET').Rows | Where-Object { [string]$_['ITEM_NAME'] -eq 'RESISTANCE_IFORCE_8P0MA_TSVDC_TR_FH' })[0]
-$e5 = Throws { $bsl.SaveEtParameters([string[]]@($Factory, $EtDevice, 'TSVET'), (Rows @(,@('NOT_REGISTERED_NAME', 'Y', '')) 3), 'probe') }
-Check '사용 안 함 / 비고 저장, 없는 Parameter 거부' ([string]$r0['USE_FLAG'] -eq 'N' -and [string]$r0['REMARK'] -eq '시험 비고' -and $e5 -match '등록되지') "$($r0['USE_FLAG']) / $e5"
-[void]$bsl.SaveEtParameters([string[]]@($Factory, $EtDevice, 'TSVET'), (Rows @(,@('RESISTANCE_IFORCE_8P0MA_TSVDC_TR_FH', 'Y', '')) 3), 'probe')
+# 2-2. [등록 Parameter] 탭 저장(SaveEtParameterSetup): 수정된 행만 / 사용 · 비고 · GDS Chain · Spec 같이 / 틀리면 전체 거부
+$TR = 'RESISTANCE_IFORCE_8P0MA_TSVDC_TR_FH'; $RN = 'RESISTANCE_IFORCE_8P0MA_TSVDC_R_N_FH'; $LP = 'RESISTANCE_IFORCE_8P0MA_TSVDC_L_P_FH'
+$sv = SaveSetup 'TSVET' @(@($TR, 'N', '시험 비고', ' tsvdc_tr_fh ', '', '715', 'Y'), @($RN, 'Y', '', '', '', '', 'N')) 'probe2'
+$st = $bsl.GetEtParameterSetupList($Factory, $EtDevice, 'TSVET')
+$tr0 = @($st.Rows | Where-Object { [string]$_['ITEM_NAME'] -eq $TR })[0]
+$by2 = @($st.Rows | Where-Object { [string]$_['UPDATE_USER'] -eq 'probe2' }).Count
+Check '저장: 2행만 (사용 N / 비고 / GDS Chain 앞뒤 공백 제거 / Spec 새로 저장, 나머지 35행 그대로)' ([int]$sv['UPDATED'] -eq 2 -and [int]$sv['SPEC_SAVED'] -eq 1 -and [int]$sv['SPEC_DELETED'] -eq 0 -and [string]$tr0['USE_FLAG'] -eq 'N' -and [string]$tr0['REMARK'] -eq '시험 비고' -and [string]$tr0['GDS_CHAIN_NAME'] -eq 'tsvdc_tr_fh' -and [string]$tr0['HAS_SPEC'] -eq 'Y' -and [double]$tr0['UPPER_LIMIT'] -eq 715 -and [string]$tr0['UNIT'] -eq 'Ohm' -and $by2 -eq 2 -and $st.Rows.Count -eq 37) "UPDATED $($sv['UPDATED']) / SPEC $($sv['SPEC_SAVED']) / probe2 행 $by2 / GDS '$($tr0['GDS_CHAIN_NAME'])'"
+Check '목록 열: Spec 원문 + 출처 / 등록 파일, 값 통계 열 없음(설정 화면에서 쓰지 않음)' ($st.Columns.Contains('SPEC_TEXT') -and $st.Columns.Contains('REG_FILE_NAME') -and $st.Columns.Contains('GDS_CHAIN_NAME') -and -not $st.Columns.Contains('FILE_COUNT') -and -not $st.Columns.Contains('FAIL_COUNT')) "$($st.Columns.Count)열"
+$e5 = Throws { SaveSetup 'TSVET' @(@($LP, 'Y', '', '', '800', '700', 'Y'), @('NOT_REGISTERED_NAME', 'Y', '', '', '', '', 'N'), @($RN, 'Y', '', '', '', '', 'Y'), @($TR, 'X', '', '', '', '', 'N')) 'probe' }
+$lp0 = SetupRow 'TSVET' $LP
+Check '틀린 행이 있으면 아무것도 저장 안 함 (Lower > Upper / 등록 안 됨 / Enable 인데 Limit 없음 / 사용 값)' ($e5 -match '4건' -and $e5 -match '보다 큽니다' -and $e5 -match '등록되지 않은' -and $e5 -match 'Enable 인데' -and [string]$lp0['HAS_SPEC'] -eq 'N') $e5
+[void]$bsl.SaveEtLimit([string[]]@($Factory, $EtDevice, 'TSVET'), (Rows @(,@('Resistance_iforce=8.0mA@TSVDC_TR_FH', '', '715', 'Y', 'Ohm', 'If val > 715, Fail', '표 비고')) 7), 'probe')
+$sv = SaveSetup 'TSVET' @(,@($TR, 'Y', '', 'tsvdc_tr_fh', '', '720', 'N')) 'probe'
+$tr0 = SetupRow 'TSVET' $TR
+$lim0 = @($bsl.GetEtLimit($Factory, $EtDevice, 'TSVET').Rows | Where-Object { [string]$_['ITEM_NAME'] -eq $TR })[0]
+Check 'Spec 수정: Upper 720 / Enable N, Spec 원문 · Spec 비고는 그대로' ([int]$sv['SPEC_SAVED'] -eq 1 -and [double]$tr0['UPPER_LIMIT'] -eq 720 -and [string]$tr0['ENABLE_FLAG'] -eq 'N' -and [string]$tr0['SPEC_TEXT'] -eq 'If val > 715, Fail' -and [string]$lim0['REMARK'] -eq '표 비고') "$($tr0['UPPER_LIMIT']) / $($tr0['ENABLE_FLAG']) / $($tr0['SPEC_TEXT'])"
+$sv = SaveSetup 'TSVET' @(,@($TR, 'Y', '', 'TSVDC_TR_FL', '', '720.0', 'N')) 'probe3'
+$tr0 = SetupRow 'TSVET' $TR
+Check 'Spec 값이 같으면(720 = 720.0 / Enable N) Spec 은 다시 쓰지 않음 - GDS Chain 만 바뀜' ([int]$sv['UPDATED'] -eq 1 -and [int]$sv['SPEC_SAVED'] -eq 0 -and [int]$sv['SPEC_DELETED'] -eq 0 -and [string]$tr0['GDS_CHAIN_NAME'] -eq 'TSVDC_TR_FL' -and [double]$tr0['UPPER_LIMIT'] -eq 720) "UPDATED $($sv['UPDATED']) / SPEC $($sv['SPEC_SAVED']) / GDS $($tr0['GDS_CHAIN_NAME'])"
+$sv = SaveSetup 'TSVET' @(,@($TR, 'Y', '', 'tsvdc_tr_fh', '', '', 'N')) 'probe'
+$tr0 = SetupRow 'TSVET' $TR
+Check 'Lower / Upper 모두 비움 -> Spec 삭제 (Parameter / GDS Chain 은 남음)' ([int]$sv['SPEC_DELETED'] -eq 1 -and [string]$tr0['HAS_SPEC'] -eq 'N' -and [string]$tr0['GDS_CHAIN_NAME'] -eq 'tsvdc_tr_fh') "삭제 $($sv['SPEC_DELETED'])"
 [void]$bsl.SaveEtLimit([string[]]@($Factory, $EtDevice, 'TSVET'), (Rows @(,@('Resistance_iforce=8.0mA@TSVDC_TR_FH', '', '715', 'Y', 'Ohm', 'If val > 715, Fail', '')) 7), 'probe')
-$r0 = @($bsl.GetEtParameterList($Factory, $EtDevice, 'TSVET').Rows | Where-Object { [string]$_['ITEM_NAME'] -eq 'RESISTANCE_IFORCE_8P0MA_TSVDC_TR_FH' })[0]
-Check '예전 키(헤더 원문)로 저장된 Spec 이 Parameter 목록에 보임' ([string]$r0['HAS_SPEC'] -eq 'Y' -and [double]$r0['UPPER_LIMIT'] -eq 715) "Spec $($r0['HAS_SPEC']) / Upper $($r0['UPPER_LIMIT'])"
+$limKey = @($bsl.GetEtLimit($Factory, $EtDevice, 'TSVET').Rows | ForEach-Object { [string]$_['ITEM_NAME'] })
+$e9 = Throws { $bsl.SaveEtLimit([string[]]@($Factory, $EtDevice, 'TSVET'), (Rows @(,@('Resistance_iforce=8.0mA@ZZ_NOT_REG_FH', '', '1', 'Y', '', '', '')) 7), 'probe') }
+$fk = Throws { (New-Object DACrux.SEMDMS.DSL.TQP_GDS_ET_LIMIT).InsertExecuteMultiple('MERGE_ET_LIMIT', (Rows @(,@($Factory, $EtDevice, 'TSVET', 'ZZ_NOT_REGISTERED', '', '1', '', 'Y', '', '', 'probe')) 11)) }
+Check '헤더 원문으로 Spec 저장(붙여넣기 경로) -> 저장 이름 키 / 등록 안 된 Parameter: 서비스 거부 · DB FK 거부(ORA-02291)' (($limKey -join ',') -eq $TR -and $e9 -match '등록되지 않은' -and $fk -match 'ORA-02291') "$($limKey -join ',') | $e9 | $fk"
 
-# 2-3. 대표 Chain / GDS 연결
-$sTop1 = New-ProbeChain 'ZZETP1' 'TSVDC_TOP1_N_FL'      # 사용자 예: GDS 는 한쪽 끝 이름(N_FL)으로 등록
-$sTr = New-ProbeChain 'ZZETP2' 'TSVDC_TR_FH'
-$sAsic = New-ProbeChain 'ZZETP3' 'tsvdc_asic1_p'         # 사람이 고친 이름(대소문자 섞임)
-$sDup1 = New-ProbeChain 'ZZETP4' 'TSVDC_DUP_FH'
-$sDup2 = New-ProbeChain 'ZZETP5' 'TSVDC_DUP_FH'
-
-$n1 = $bsl.SaveEtRepChain([string[]]@($Factory, $GdsDevice, 'tsvdc top1'), [string[]]@('TSVDC_TOP1_P_FH', 'tsvdc_top1_n_fl'), 'probe')
-$top = RepRow 'TSVDC_TOP1'
-Check '사용자 예: 단자 P_FH + N_FL 을 대표 TSVDC_TOP1 로 묶음 -> GDS 이름 N_FL 과 이름 연결' ($n1 -eq 2 -and $top -ne $null -and [string]$top['TERMINALS'] -eq 'TSVDC_TOP1_N_FL, TSVDC_TOP1_P_FH' -and [string]$top['LINK_STATUS'] -eq 'NAME' -and [string]$top['CHAIN_SEQ'] -eq $sTop1) "$($top['TERMINALS']) / $($top['LINK_STATUS']) / $($top['GDS_CHAIN_NAME'])"
-[void]$bsl.SaveEtRepChain([string[]]@($Factory, $GdsDevice, 'TSVDC_TR_FH'), [string[]]@('TSVDC_TR_FH', 'TSVDC_TR_FL'), 'probe')
-[void]$bsl.SaveEtRepChain([string[]]@($Factory, $GdsDevice, 'ASIC1P'), [string[]]@('TSVDC_ASIC1_P_FH', 'TSVDC_ASIC1_P_FL'), 'probe')
-[void]$bsl.SaveEtRepChain([string[]]@($Factory, $GdsDevice, 'DUPREP'), [string[]]@('TSVDC_DUP_FH'), 'probe')
-[void]$bsl.SaveEtRepChain([string[]]@($Factory, $GdsDevice, 'TSVDC_TOP1_N_FL'), [string[]]@('ZZ_ONLY_FH'), 'probe')
-$st = @{}; foreach ($r in @($bsl.GetEtRepChainList($Factory, $GdsDevice).Rows)) { $st[[string]$r['REP_CHAIN_NAME']] = [string]$r['LINK_STATUS'] }
-Check '상태: NAME / NONE / MULTIPLE / TAKEN' ($st['TSVDC_TR_FH'] -eq 'NAME' -and $st['ASIC1P'] -eq 'NONE' -and $st['DUPREP'] -eq 'MULTIPLE' -and $st['TSVDC_TOP1_N_FL'] -eq 'TAKEN') (($st.GetEnumerator() | Sort-Object Name | ForEach-Object { "$($_.Name)=$($_.Value)" }) -join ' ')
-
-[void]$bsl.SaveEtChainLink([string[]]@($Factory, $GdsDevice, 'ASIC1P', $sAsic), 'probe')
-$asic = RepRow 'ASIC1P'
-Check '사용자 연결(MANUAL): 이름이 다른 GDS Chain' ([string]$asic['LINK_STATUS'] -eq 'MANUAL' -and [string]$asic['GDS_CHAIN_NAME'] -eq 'tsvdc_asic1_p') "$($asic['LINK_STATUS']) / $($asic['GDS_CHAIN_NAME'])"
-[void]$bsl.SaveEtChainLink([string[]]@($Factory, $GdsDevice, 'DUPREP', $sTr), 'probe')
-$st = @{}; foreach ($r in @($bsl.GetEtRepChainList($Factory, $GdsDevice).Rows)) { $st[[string]$r['REP_CHAIN_NAME']] = [string]$r['LINK_STATUS'] }
-$e6 = Throws { $bsl.SaveEtChainLink([string[]]@($Factory, $GdsDevice, 'ASIC1P', '999999999'), 'probe') }
-Check '1:1: 이미 연결된 GDS Chain 을 다른 대표로 옮김 -> 이전 대표 TAKEN / 없는 GDS Chain 거부' ($st['DUPREP'] -eq 'MANUAL' -and $st['TSVDC_TR_FH'] -eq 'TAKEN' -and $e6 -ne '') "DUPREP=$($st['DUPREP']) TR=$($st['TSVDC_TR_FH']) / $e6"
-[void]$bsl.DeleteEtChainLink([string[]]@($Factory, $GdsDevice, 'DUPREP'), 'probe')
-$lk = $bsl.LinkEtRepChainsByName($Factory, $GdsDevice, 'probe').Rows[0]
-Check '연결 해제 뒤 이름 연결 다시 계산 (TR 다시 연결)' ([string](RepRow 'TSVDC_TR_FH')['LINK_STATUS'] -eq 'NAME' -and [int]$lk['LINKED'] -eq 1) "LINKED $($lk['LINKED']) NONE $($lk['NONE']) MULTIPLE $($lk['MULTIPLE']) TAKEN $($lk['TAKEN'])"
-
-$e7 = Throws { $bsl.RenameEtRepChain([string[]]@($Factory, $GdsDevice, 'TSVDC_TOP1', 'ASIC1P'), 'probe') }
-[void]$bsl.RenameEtRepChain([string[]]@($Factory, $GdsDevice, 'TSVDC_TOP1', 'top1 chain'), 'probe')
-$t1 = RepRow 'TOP1_CHAIN'
-Check '대표 이름 바꾸기(변환 TOP1_CHAIN, 연결 유지) / 같은 이름 거부' ($t1 -ne $null -and [string]$t1['LINK_STATUS'] -eq 'NAME' -and [string]$t1['CHAIN_SEQ'] -eq $sTop1 -and $null -eq (RepRow 'TSVDC_TOP1') -and $e7 -match '이미') "$($t1['LINK_STATUS']) / $e7"
-
-# GDS 쪽 이름 변경: 다른 끝 이름(P_FH)으로 바꾸면 연결 유지 + 저장 이름 갱신, 관계없는 이름이면 NAME_CHANGED -> 다시 계산하면 해제
-[void](New-ProbeChain 'ZZETP1' 'TSVDC_TOP1_P_FH' $sTop1)
-$t1 = RepRow 'TOP1_CHAIN'; $lk = $bsl.LinkEtRepChainsByName($Factory, $GdsDevice, 'probe').Rows[0]
-Check 'GDS 이름을 다른 끝(P_FH)으로 바꿈 -> 연결 유지, 저장 이름 갱신' ([string]$t1['LINK_STATUS'] -eq 'NAME' -and [string]$t1['GDS_CHAIN_NAME'] -eq 'TSVDC_TOP1_P_FH' -and [int]$lk['UPDATED'] -eq 1) "$($t1['LINK_STATUS']) / UPDATED $($lk['UPDATED'])"
-[void](New-ProbeChain 'ZZETP1' 'ZZ_OTHER_NAME' $sTop1)
-$before = [string](RepRow 'TOP1_CHAIN')['LINK_STATUS']; $lk = $bsl.LinkEtRepChainsByName($Factory, $GdsDevice, 'probe').Rows[0]
-$t1 = RepRow 'TOP1_CHAIN'
-Check 'GDS 이름이 관계없게 바뀜 -> NAME_CHANGED -> 다시 계산하면 해제(NONE)' ($before -eq 'NAME_CHANGED' -and [int]$lk['REMOVED'] -eq 1 -and [string]$t1['LINK_STATUS'] -eq 'NONE') "$before -> $($t1['LINK_STATUS'])"
-
-# 단자 목록 / 대표 Chain 의 Parameter / Parameter 목록의 대표·GDS 열
-$tl = $bsl.GetEtTerminalList($Factory, $GdsDevice)
-$tr = @($tl.Rows | Where-Object { [string]$_['TERMINAL_NAME'] -eq 'TSVDC_TR_FH' })[0]
-$zz = @($tl.Rows | Where-Object { [string]$_['TERMINAL_NAME'] -eq 'ZZ_ONLY_FH' })[0]
-$p1 = @($tl.Rows | Where-Object { [string]$_['TERMINAL_NAME'] -eq 'TSVDC_TOP1_P_FH' })[0]
-Check '단자 목록: 등록 단자 + 대표에만 있는 단자(종류 채움) + 공정 합침' ($tr -ne $null -and [string]$tr['REP_CHAIN_NAME'] -eq 'TSVDC_TR_FH' -and [int]$tr['PARA_COUNT'] -ge 1 -and [int]$tr['SPEC_COUNT'] -ge 1 -and $zz -ne $null -and [int]$zz['PARA_COUNT'] -eq 0 -and [string]$zz['FORCE_LEG'] -eq 'FH' -and [string]$p1['TEST_PROGRAMS'] -eq 'COWET') "단자 $($tl.Rows.Count) / TR para=$($tr['PARA_COUNT']) spec=$($tr['SPEC_COUNT']) / TOP1_P_FH 공정=$($p1['TEST_PROGRAMS'])"
-$si = $bsl.GetEtRepChainSpecInfo($Factory, $GdsDevice, 'tsvdc_tr_fh')
-$siTr = @($si.Rows | Where-Object { [string]$_['ITEM_NAME'] -eq 'RESISTANCE_IFORCE_8P0MA_TSVDC_TR_FH' })[0]
-Check '대표 Chain 의 Parameter / Spec' ($si.Rows.Count -ge 1 -and $siTr -ne $null -and [string]$siTr['HAS_SPEC'] -eq 'Y' -and [string]$siTr['MATCH_POSITION'] -eq '1') "$($si.Rows.Count)행"
-$r0 = @($bsl.GetEtParameterList($Factory, $EtDevice, 'TSVET').Rows | Where-Object { [string]$_['ITEM_NAME'] -eq 'RESISTANCE_IFORCE_8P0MA_TSVDC_TR_FH' })[0]
-Check 'Parameter 목록에 대표 Chain / GDS Chain (Sub Device 로 GDS Device 찾음)' ([string]$r0['REP_CHAIN_NAME'] -eq 'TSVDC_TR_FH' -and [string]$r0['GDS_CHAIN_NAME'] -eq 'TSVDC_TR_FH') "$($r0['REP_CHAIN_NAME']) / $($r0['GDS_CHAIN_NAME'])"
-
-# 단자 빼기 / CASCADE / 대표 삭제
-[void]$bsl.RemoveEtRepChainMembers([string[]]@($Factory, $GdsDevice), [string[]]@('TSVDC_DUP_FH'), 'probe')
-Check '단자를 모두 빼면 대표가 없어짐' ($null -eq (RepRow 'DUPREP')) ''
-[void]$chain.DeleteChain($Factory, $GdsDevice, $sAsic, 'probe')
-$asic = RepRow 'ASIC1P'
-Check 'GDS Chain 삭제 -> 연결만 CASCADE 삭제, 대표 Chain 남음' ($asic -ne $null -and [string]$asic['CHAIN_SEQ'] -eq '' -and [string]$asic['LINK_STATUS'] -eq 'NONE') "$($asic['LINK_STATUS'])"
-$nd = $bsl.DeleteEtRepChain([string[]]@($Factory, $GdsDevice, 'TSVDC_TR_FH'), 'probe')
-Check '대표 Chain 삭제(단자 + 연결)' ($nd -eq 2 -and $null -eq (RepRow 'TSVDC_TR_FH')) "지운 단자 $nd"
+# 2-3. GDS Chain 참고 목록 / GDS Device(E-Test Device 와 같은 이름) / 인계 API(GDS Chain 이름 -> 모든 공정 Parameter + Spec)
+$sTr = New-ProbeChain 'ZZETP1' 'TSVDC_TR_FH'
+$gl = $bsl.GetEtGdsChainList($Factory, $GdsDevice)
+$gTr = @($gl.Rows | Where-Object { [string]$_['CHAIN_SEQ'] -eq $sTr })[0]
+Check 'GDS Device = 같은 이름 READY Map(대소문자 무시, 없으면 그대로) / GDS Setup Chain 목록(Code / 이름)' ($bsl.GetEtGdsDevice($Factory, $EtDevice.ToLowerInvariant()) -eq $GdsDevice -and $bsl.GetEtGdsDevice($Factory, 'ZZ_NO_DEVICE') -eq 'ZZ_NO_DEVICE' -and $gTr -ne $null -and [string]$gTr['CHAIN_CODE'] -eq 'ZZETP1' -and [string]$gTr['CHAIN_NAME'] -eq 'TSVDC_TR_FH') "GDS Device $($bsl.GetEtGdsDevice($Factory, $EtDevice)) / 목록 $($gl.Rows.Count)"
+$cowetName = [string]@($bsl.GetEtParameterList($Factory, $EtDevice, 'COWET').Rows)[0]['ITEM_NAME']
+[void]$bsl.SaveEtParameterSetup([string[]]@($Factory, $EtDevice, 'COWET'), (Rows @(,@($cowetName, 'Y', '', 'TSVDC_TR_FH', '', '', 'N')) 7), 'probe')
+$ci = $bsl.GetEtChainSpecInfo($Factory, $EtDevice, 'TSVDC_TR_FH')
+$ciGds = $bsl.GetEtChainSpecInfo($Factory, $GdsDevice.ToLowerInvariant(), 'tsvdc_tr_fh')
+$ciNone = $bsl.GetEtChainSpecInfo($Factory, $EtDevice, 'ZZ_NO_SUCH_CHAIN')
+$ciTr = @($ci.Rows | Where-Object { [string]$_['ITEM_NAME'] -eq $TR })[0]
+Check '인계 API: GDS Chain 이름(대소문자 무시) -> TSVET + COWET Parameter + Spec / Device 소문자로 불러도 같음 / 없는 이름 0행(열 있음)' ($ci.Rows.Count -eq 2 -and (@($ci.Rows | ForEach-Object { [string]$_['TEST_PROGRAM'] }) -join ',') -eq 'COWET,TSVET' -and [string]$ciTr['HAS_SPEC'] -eq 'Y' -and $ciGds.Rows.Count -eq 2 -and $ciNone.Rows.Count -eq 0 -and $ciNone.Columns.Contains('GDS_CHAIN_NAME') -and -not $ci.Columns.Contains('REP_CHAIN_NAME')) "$($ci.Rows.Count)행 / GDS Device $($ciGds.Rows.Count)행 / 없는 이름 $($ciNone.Rows.Count)행"
+$r0 = @($bsl.GetEtParameterList($Factory, $EtDevice, 'TSVET').Rows | Where-Object { [string]$_['ITEM_NAME'] -eq $TR })[0]
+Check 'Parameter 목록(업로드 계획용)에 GDS Chain / 대표 Chain 열 없음' ([string]$r0['GDS_CHAIN_NAME'] -eq 'tsvdc_tr_fh' -and -not $r0.Table.Columns.Contains('REP_CHAIN_NAME') -and -not $r0.Table.Columns.Contains('GDS_CHAIN_NAME2')) "$($r0['GDS_CHAIN_NAME'])"
 
 # Parameter 삭제: Spec 같이 삭제 / 없는 이름 거부(아무것도 지우지 않음)
 $e8 = Throws { $bsl.DeleteEtParameters([string[]]@($Factory, $EtDevice, 'TSVET'), [string[]]@('RESISTANCE_IFORCE_8P0MA_TSVDC_TR_FH', 'NOT_REGISTERED_NAME'), 'probe') }
 $still = @($bsl.GetEtParameterList($Factory, $EtDevice, 'TSVET').Rows).Count
 $nDel = $bsl.DeleteEtParameters([string[]]@($Factory, $EtDevice, 'TSVET'), [string[]]@('RESISTANCE_IFORCE_8P0MA_TSVDC_TR_FH'), 'probe')
 $lim = @($bsl.GetEtLimit($Factory, $EtDevice, 'TSVET').Rows).Count
-Check 'Parameter 삭제: 없는 이름이 섞이면 전체 거부 / 삭제 시 Spec(예전 키) 같이 삭제' ($e8 -match '등록되지' -and $still -eq 37 -and $nDel -eq 1 -and $lim -eq 0 -and @($bsl.GetEtParameterList($Factory, $EtDevice, 'TSVET').Rows).Count -eq 36) "거부 후 $still / 삭제 $nDel / Spec $lim"
+Check 'Parameter 삭제: 없는 이름이 섞이면 전체 거부 / 삭제 시 Spec 같이 삭제' ($e8 -match '등록되지' -and $still -eq 37 -and $nDel -eq 1 -and $lim -eq 0 -and @($bsl.GetEtParameterList($Factory, $EtDevice, 'TSVET').Rows).Count -eq 36) "거부 후 $still / 삭제 $nDel / Spec $lim"
 
 if (-not $Keep) {
     Remove-ProbeData
-    $left = @($bsl.GetEtParameterList($Factory, $EtDevice, 'TSVET').Rows).Count + @($bsl.GetEtRepChainList($Factory, $GdsDevice).Rows).Count + @($chain.GetChainList($Factory, $GdsDevice).Rows | Where-Object { [string]$_['CHAIN_CODE'] -like 'ZZETP*' }).Count
+    $left = @($bsl.GetEtParameterList($Factory, $EtDevice, 'TSVET').Rows).Count + @($bsl.GetEtParameterList($Factory, $EtDevice, 'COWET').Rows).Count + @($chain.GetChainList($Factory, $GdsDevice).Rows | Where-Object { [string]$_['CHAIN_CODE'] -like 'ZZETP*' }).Count + $import.GetMapInfo($Factory, $GdsDevice).Rows.Count
     Check '시험 데이터 정리' ($left -eq 0) "남은 행 $left"
 }
 

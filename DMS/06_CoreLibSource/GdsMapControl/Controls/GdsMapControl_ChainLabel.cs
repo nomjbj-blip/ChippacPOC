@@ -25,7 +25,7 @@ namespace NexplantQMS.GdsMap
     }
 
     /// <summary>
-    /// Chain Input 근처 Label로 Chain 이름을 정하기 위한 탐색(2026-10-08, 설계: 문서/2026-10-08_Chain_Input_Label_자동이름_설계.md).
+    /// Chain Input 근처 Label로 Chain 이름을 정하기 위한 탐색(2026-10-08, 설계: 문서/설계/02_GDS/2026-10-08_Chain_Input_Label_자동이름_설계.md).
     /// 전체 도면을 탐색하지 않고 Input 주변 작은 창 안에서만 계산해 Input 확정 때 1회, 수 ms~수십 ms 안에 끝나게 한다.
     /// </summary>
     public partial class GdsMapControl
@@ -50,7 +50,7 @@ namespace NexplantQMS.GdsMap
             if (picks.Count == 0) return null;
             var watch = Stopwatch.StartNew();
             var keys = new HashSet<string>(picks.Select(pair => pair.Key), StringComparer.Ordinal);
-            var visibleLayers = new HashSet<int>(_layerList.Where(layer => layer.Visible).Select(layer => layer.LayerID));
+            var visibleLayers = new HashSet<int>(_layerList.Where(layer => layer.Visible).Select(layer => layer.LayerKey));
 
             // 1) Input 도형 찾기 + 창 계산
             var seeds = new Dictionary<string, GlSceneItem>(StringComparer.Ordinal);
@@ -71,7 +71,7 @@ namespace NexplantQMS.GdsMap
             foreach (GlSceneItem item in AllItems)
             {
                 if (!(item.Source is GdsBoundary) && !(item.Source is GdsPath)) continue;
-                if (!visibleLayers.Contains(item.LayerID) && !seeds.ContainsKey(item.PlacedElementId)) continue;
+                if (!visibleLayers.Contains(item.LayerKey) && !seeds.ContainsKey(item.PlacedElementId)) continue;
                 if (item.WorldBounds.IntersectsWith(window)) candidates.Add(item);
             }
             var result = new ChainEndpointLabelResult { CandidateCount = candidates.Count };

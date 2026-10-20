@@ -133,16 +133,13 @@ namespace DACrux.SEMDMS.Control
             map.AddContextMenuItem("Center Cross Show / Hide", CenterCrossMenu_Click);
         }
 
-        /// <summary>작업자가 우클릭 메뉴로 십자선을 바꿨는지. 바꾼 뒤에는 Draw 가 Debug 기본값(켬)으로 되돌리지 않는다 (2026-10-13).</summary>
-        private bool m_bCenterCrossChanged = false;
-
         /// <summary>
         /// 우클릭 [Center Cross Show / Hide]: Wafer 중심 십자선(CenterMark)을 켜고 끈다 (2026-10-13).
         /// CenterMark 는 켤 때 바로 선을 긋지만 끌 때는 이미 그린 선을 지우지 않으므로 다시 그린다.
+        /// 기본값은 끔(InitializeComponent)이고 빌드 종류(Debug / Release)와 관계없다 (2026-10-16).
         /// </summary>
         private void CenterCrossMenu_Click(object sender, EventArgs e)
         {
-            m_bCenterCrossChanged = true;
             map.CenterMark = !map.CenterMark;
             map.Redraw();
         }
@@ -980,7 +977,8 @@ namespace DACrux.SEMDMS.Control
             this.map.DrawDefects = "ALL";
             this.map.DrawFirstDie = true;
             this.map.DrawMarkDie = false;
-            this.map.DrawOriginDie = true;
+            // 원점(중심) Die 빨간 테두리는 POC 에서 쓰지 않아 기본으로 그리지 않는다 (2026-10-16)
+            this.map.DrawOriginDie = false;
             this.map.DrawSkipDie = true;
             this.map.EdgeColor = System.Drawing.Color.LightGray;
             this.map.EdgeSize = 1D;
@@ -1073,11 +1071,15 @@ namespace DACrux.SEMDMS.Control
             dockableControlPane5.OriginalControlBounds = new System.Drawing.Rectangle(393, 198, 200, 100);
             dockableControlPane5.Size = new System.Drawing.Size(100, 100);
             dockableControlPane5.Text = "Reclassify";
+            // POC 에서 쓰지 않는 탭이라 닫아 둔다 (2026-10-16)
+            dockableControlPane5.Closed = true;
             dockableControlPane6.Control = this.rdSetup;
             dockableControlPane6.Key = "RD";
             dockableControlPane6.OriginalControlBounds = new System.Drawing.Rectangle(616, 128, 200, 344);
             dockableControlPane6.Size = new System.Drawing.Size(376, 278);
             dockableControlPane6.Text = "RD";
+            // RD 탭은 Map 을 RD 모드로 바꾸고 Shot 선을 켠다. POC 는 Shot 을 쓰지 않으므로 닫아 둔다 (2026-10-16)
+            dockableControlPane6.Closed = true;
             dockAreaPane1.Panes.AddRange(new Infragistics.Win.UltraWinDock.DockablePaneBase[] {
             dockableControlPane1,
             dockableControlPane2,
@@ -1085,7 +1087,8 @@ namespace DACrux.SEMDMS.Control
             dockableControlPane4,
             dockableControlPane5,
             dockableControlPane6});
-            dockAreaPane1.SelectedTabIndex = 5;
+            // 처음 선택 탭: 예전 RD(5) 대신 Defect Distribution (2026-10-16)
+            dockAreaPane1.SelectedTabIndex = 0;
             dockAreaPane1.Size = new System.Drawing.Size(327, 600);
             this.ultraDockManager.DockAreas.AddRange(new Infragistics.Win.UltraWinDock.DockAreaPane[] {
             dockAreaPane1});
@@ -1467,11 +1470,10 @@ namespace DACrux.SEMDMS.Control
         {
             imageList.SuspendLayout();
 
+            // 이미지 카드는 폭만 바꾸고 높이는 카드가 이미지 비율로 맞춘다.
+            // (2026-10-20: 크기가 바뀔 때마다 높이에 여백을 더해 카드가 점점 길어지던 것도 함께 없앰)
             foreach (System.Windows.Forms.Control ctrl in imageList.Controls)
-            {
-                ctrl.Height = ctrl.Height + (ctrl.Margin.Top + ctrl.Margin.Bottom);
-                ctrl.Width = imageList.Width - 30;
-            }
+                ctrl.Width = ImageCardWidth(ctrl);
 
             imageList.ResumeLayout();
         }
@@ -1910,7 +1912,7 @@ namespace DACrux.SEMDMS.Control
 
         private void map_OnSelectedDefect(object sender, DACrux.Base.Defect[] oDefect)
         {
-            DPUCDefectInfo oForm = null;
+            DPUCDefectImageCard oForm = null;
 
             try
             {
@@ -1943,7 +1945,7 @@ namespace DACrux.SEMDMS.Control
 
                 if (imageList.Controls.Count > 0)
                 {
-                    // Clear 만 하면 제거된 DPUCDefectInfo(이미지 / 창 핸들)가 해제되지 않아 Defect 를 선택할 때마다 핸들이 쌓인다. (2026-10-08)
+                    // Clear 만 하면 제거된 이미지 카드(이미지 / 창 핸들)가 해제되지 않아 Defect 를 선택할 때마다 핸들이 쌓인다. (2026-10-08)
                     while (imageList.Controls.Count > 0)
                         imageList.Controls[0].Dispose();
                 }
@@ -1952,13 +1954,11 @@ namespace DACrux.SEMDMS.Control
                 {
                     foreach (DefectImage img in oDefect[i].Images)
                     {
-                        System.Threading.Thread.Sleep(10);
-
+                        // 가벼운 이미지 카드로 교체(컨트롤 1개 / 원본 비율 / 정보 2줄, 나머지 값은 더블클릭 창 제목 줄). (2026-10-20)
+                        // 이미지 읽기는 카드 대기열이 순서대로 하므로 카드마다 10ms 멈추던 Sleep 도 뺐다.
                         try
                         {
-                            oForm = new DPUCDefectInfo(oDefect[i].DEFECTID.ToString(), img.IMAGEPATH, oDefect[i].XINDEX.ToString(), oDefect[i].YINDEX.ToString(),
-                                oDefect[i].CLASSNUMBER.ToString(), oDefect[i].CLUSTERNUMBER.ToString(), oDefect[i].XREL.ToString(),
-                                oDefect[i].YREL.ToString(), oDefect[i].XSIZE.ToString(), oDefect[i].YSIZE.ToString());
+                            oForm = new DPUCDefectImageCard(oDefect[i], img.IMAGEPATH);
 
                             ControlAdd(oForm);
                         }
@@ -2040,10 +2040,6 @@ namespace DACrux.SEMDMS.Control
                     lStepSeq[iw] = DACrux.Base.Convert.longParse(Wafer[iw].StepSeq);
 
 
-#if DEBUG
-                // Debug 빌드 기본값은 십자선 켬. 작업자가 우클릭 메뉴로 바꿨으면 그 값을 유지한다 (2026-10-13).
-                if (!m_bCenterCrossChanged) map.CenterMark = true;
-#endif
                 StatusMessage("Defect 데이터를 조회 중입니다.");
 
                 RO.DefectMapAnalysis oDMapAnalysis = new RO.DefectMapAnalysis();
@@ -2182,7 +2178,9 @@ namespace DACrux.SEMDMS.Control
                 var stat = map.Defects.GetDefectStat();
                 toolDefectStat.Text = String.Format("Total Defect : {0}, New Random : {1}, Cluster Group : {2}", map.Defects.Count, stat.NewRandom, stat.ClusterGroup);
 
-                imageList.Controls.Clear();
+                // Clear 만 하면 이미지 카드(축소본 / 창 핸들)가 해제되지 않으므로 하나씩 해제한다. (2026-10-20)
+                while (imageList.Controls.Count > 0)
+                    imageList.Controls[0].Dispose();
 
                 DrawChart();
 
@@ -2395,7 +2393,7 @@ namespace DACrux.SEMDMS.Control
             }
         }
 
-        private void ControlAdd(DPUCDefectInfo container)
+        private void ControlAdd(DPUCDefectImageCard container)
         {
             if (imageList.InvokeRequired)
             {
@@ -2410,11 +2408,17 @@ namespace DACrux.SEMDMS.Control
             {
                 if (container == null) return;
 
-                container.Height = container.Height + container.Margin.Top;
-                container.Width = imageList.Width - SystemInformation.VerticalScrollBarWidth - container.Margin.Left - container.Margin.Right;
+                // 이미지 카드는 폭만 정하면 높이를 이미지 비율로 맞춘다. (2026-10-20)
+                container.Width = ImageCardWidth(container);
                 imageList.Controls.Add(container);
                 imageList.ResumeLayout();
             }
+        }
+
+        /// <summary>이미지 목록 카드 폭 = 목록 폭 - 세로 스크롤 막대 - 카드 여백. (2026-10-20)</summary>
+        private int ImageCardWidth(System.Windows.Forms.Control card)
+        {
+            return Math.Max(120, imageList.Width - SystemInformation.VerticalScrollBarWidth - card.Margin.Left - card.Margin.Right);
         }
 
         private void ImageList_MouseEnter(object sender, EventArgs e)
@@ -2826,7 +2830,7 @@ namespace DACrux.SEMDMS.Control
             List<System.Windows.Forms.Control> lsImages = new List<System.Windows.Forms.Control>();
             foreach (System.Windows.Forms.Control cr in imageList.Controls)
             {
-                if (cr.Name == "DPUCDefectInfo")
+                if (cr is DPUCDefectImageCard)
                     lsImages.Add(cr);
             }
 

@@ -64,18 +64,16 @@ public static class GdsDbRestoreProbe
 
     /// <summary>
     /// 화면 저장(GdsMapForm_DbSave)과 같은 순서로 저장한다: Begin -> LAYER -> PLACED -> Complete. (원본 행 SOURCE는 2026-10-12 제거)
-    /// LAYER 색상은 화면 Layer 색상, 원본에만 있는 Layer는 회색. 반환: 확정 결과 문자열
+    /// LAYER 는 화면 Layer 키(번호 + DataType) / 색상 그대로다(화면 저장과 같은 BuildLayerKeyRows, 2026-10-20). 반환: 확정 결과 문자열
     /// </summary>
     public static string Import(DACrux.SEMDMS.BSL.GdsMapImport bsl, string[] info, GdsLibrary lib, GdsMapControl map, int batchRows)
     {
         var sw = Stopwatch.StartNew();
         string job = bsl.BeginMapImport(info).Rows[0]["IMPORT_JOB_SEQ"].ToString();
-        var colors = new Dictionary<int, int>();
-        foreach (var item in map.GetLayerDisplayItems()) colors[item.LayerId] = item.Color.ToArgb();
         var pairs = new List<KeyValuePair<int, int>>();
-        foreach (int id in GdsMapLayerRowBuilder.CollectLayerIds(lib))
-            pairs.Add(new KeyValuePair<int, int>(id, colors.ContainsKey(id) ? colors[id] : Color.Gray.ToArgb()));
-        bsl.CreateLayerBatch(job, 0, GdsMapLayerRowBuilder.BuildLayerRows(pairs), "probe");
+        foreach (var item in map.GetLayerDisplayItems()) pairs.Add(new KeyValuePair<int, int>(item.LayerKey, item.Color.ToArgb()));
+        pairs.Sort((a, b) => a.Key.CompareTo(b.Key));
+        bsl.CreateLayerBatch(job, 0, GdsMapLayerRowBuilder.BuildLayerKeyRows(pairs), "probe");
         long no = 0;
         var pending = new List<string[]>(batchRows);
         Action flush = () =>
@@ -132,13 +130,14 @@ public static class GdsDbRestoreProbe
         dbMs += sw.Elapsed.TotalMilliseconds;
         foreach (DataRow l in layers.Rows)
         {
-            int layerId = Convert.ToInt32(l["LAYER_ID"]);
-            layerColors[layerId] = Color.FromArgb(Convert.ToInt32(l["COLOR_ARGB"]));
+            // Layer 키 = 번호 + DataType, 페이지 조회는 "번호/DataType" (2026-10-20)
+            int layerKey = GdsLayerKey.FromRow(l);
+            layerColors[layerKey] = Color.FromArgb(Convert.ToInt32(l["COLOR_ARGB"]));
             string after = "";
             while (true)
             {
                 sw.Restart();
-                DataTable page = view.GetPlacedElementPage(factory, device, layerId.ToString(), after, pageRows);
+                DataTable page = view.GetPlacedElementPage(factory, device, GdsLayerKey.Format(layerKey), after, pageRows);
                 dbMs += sw.Elapsed.TotalMilliseconds; pages++;
                 sw.Restart();
                 foreach (DataRow row in page.Rows) items.Add(GdsMapPlacedRowReader.Read(row));
@@ -186,7 +185,7 @@ $map.ShowStructure($lib)
 $fileMs = $sw.ElapsedMilliseconds
 $filePoints = 0L
 $fileSig = [GdsDbRestoreProbe]::Capture($map, [ref]$filePoints)
-$fileLayers = @($map.GetLayerDisplayItems() | ForEach-Object { $_.LayerId }) -join ','
+$fileLayers = @($map.GetLayerDisplayItems() | ForEach-Object { [NexplantQMS.GdsMap.GdsLayerKey]::Format($_.LayerKey) }) -join ','
 $fileTexts = $map.GetTextLabelDiagnostics().Count
 Write-Host ("파일: 도형 {0:N0} / 좌표 {1:N0} / Layer {2} / TEXT 라벨 {3} / 파싱+Flatten+버퍼 {4:N1}초" -f $fileSig.Count, $filePoints, $fileLayers, $fileTexts, ($fileMs / 1000.0))
 
@@ -198,8 +197,9 @@ $ready = $info.Rows.Count -eq 1 -and $info.Rows[0]['MAP_STATUS'] -eq 'READY' -an
 if (-not $ready) {
     if ($info.Rows.Count -gt 0) { Write-Host ("기존 Map 삭제: 도형 {0:N0}건" -f $import.DeleteMap($Factory, $Device, 'probe')) }
     $topName = $lib.Structures[0].Name
+    # 단위는 화면 저장과 같이 파일 UNITS 원값 (2026-10-16)
     $importInfo = [string[]]@($Factory, $Device, $topName, (Split-Path $GdsPath -Leaf), '',
-        $lib.UserUnit.ToString('G17', [Globalization.CultureInfo]::InvariantCulture), $lib.DatabaseUnit.ToString('G17', [Globalization.CultureInfo]::InvariantCulture), 'probe',
+        $lib.FileUserUnit.ToString('G17', [Globalization.CultureInfo]::InvariantCulture), $lib.FileDatabaseUnit.ToString('G17', [Globalization.CultureInfo]::InvariantCulture), 'probe',
         '', "$($fileSig.Count)", "$filePoints")
     $r = [GdsDbRestoreProbe]::Import($import, $importInfo, $lib, $map, $BatchRows)
     Check '시험 Map 저장' ($r.StartsWith('OK')) $r
@@ -218,7 +218,7 @@ $showMs = $sw.ElapsedMilliseconds
 $items = $null
 $dbPoints = 0L
 $dbSig = [GdsDbRestoreProbe]::Capture($map, [ref]$dbPoints)
-$dbLayers = @($map.GetLayerDisplayItems() | ForEach-Object { $_.LayerId }) -join ','
+$dbLayers = @($map.GetLayerDisplayItems() | ForEach-Object { [NexplantQMS.GdsMap.GdsLayerKey]::Format($_.LayerKey) }) -join ','
 $dbTexts = $map.GetTextLabelDiagnostics().Count
 Write-Host ("DB  : 도형 {0:N0} / 좌표 {1:N0} / Layer {2} / TEXT 라벨 {3}" -f $dbSig.Count, $dbPoints, $dbLayers, $dbTexts)
 Write-Host ("시간: DB 조회 {0:N1}초 ({1}페이지) / 행 해석 {2:N1}초 / 도면 구성(ShowPlacedElements) {3:N1}초 / 합계 {4:N1}초" -f ($t[0] / 1000), $t[2], ($t[1] / 1000), ($showMs / 1000.0), (($t[0] + $t[1] + $showMs) / 1000))
@@ -230,9 +230,11 @@ Check '도형 수 / 좌표 수 일치' ($fileSig.Count -eq $dbSig.Count -and $fi
 Check '도형 단위 전체 값 일치 (ID / 속성 / Bounds / 좌표 비트)' ($c[0] -eq 0 -and $c[1] -eq 0 -and $c[2] -eq 0) "파일에만=$($c[0]) DB에만=$($c[1]) 다름=$($c[2]) $first"
 Check 'Layer 목록 일치' ($fileLayers -eq $dbLayers) "file=$fileLayers db=$dbLayers"
 Check 'TEXT 라벨 수 일치' ($fileTexts -eq $dbTexts) "file=$fileTexts db=$dbTexts"
-Check '도면 Structure 지정 (Layer 표시 / Chain 탐색 전제)' ($map.Structure -ne $null -and $map.Structure.Layers.Count -eq $colors.Count) "layers=$($map.Structure.Layers.Count)"
+# Structure.Layers 는 GDS Layer 번호(같은 번호의 DataType 은 한 번), 저장 색상은 Layer 키(번호 + DataType)별이다 (2026-10-20)
+$layerNumbers = @($colors.Keys | ForEach-Object { [NexplantQMS.GdsMap.GdsLayerKey]::Layer($_) } | Sort-Object -Unique).Count
+Check '도면 Structure 지정 (Layer 표시 / Chain 탐색 전제)' ($map.Structure -ne $null -and $map.Structure.Layers.Count -eq $layerNumbers) "layers=$($map.Structure.Layers.Count) / 저장 Layer 번호 $layerNumbers"
 $colorOk = $true
-foreach ($li in $map.GetLayerDisplayItems()) { if ($colors.ContainsKey($li.LayerId) -and $li.Color.ToArgb() -ne $colors[$li.LayerId].ToArgb()) { $colorOk = $false } }
+foreach ($li in $map.GetLayerDisplayItems()) { if ($colors.ContainsKey($li.LayerKey) -and $li.Color.ToArgb() -ne $colors[$li.LayerKey].ToArgb()) { $colorOk = $false } }
 Check 'Layer 색상 = 저장 색상' $colorOk ''
 
 $fail = @($results | Where-Object { $_.StartsWith('FAIL') }).Count

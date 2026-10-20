@@ -28,21 +28,7 @@ namespace DACrux.TEST.ENGUI
         /// <param name="grid">Wafer 격자 (번호 변환 범위)</param>
         public static void Create(string mapId, DACrux.Map.EditWaferMap map, XYDirection direction, KlarfMapGrid grid)
         {
-            MapDefStoredValues stored = ToStoredValues(map, direction, grid);
-            var admin = new DACrux.TEST.RO.ProbeAdmin();
-            using (DataTable dies = CreateDieTable(map, direction, grid))
-            {
-                admin.SetMapDef(mapId,
-                    map.WaferSize, map.DieSizeX, map.DieSizeY,
-                    stored.OriginMicroX, stored.OriginMicroY, stored.OriginIndexX, stored.OriginIndexY,
-                    map.FirstDieX * map.DieSizeX, map.FirstDieY * map.DieSizeY,
-                    map.FirstDieX, map.FirstDieY, stored.EdgeSizeMm, map.NotchAngle,
-                    map.NetDie, map.NotchType == DACrux.Base.Notch.Notch ? 0 : 1,
-                    0, 0, 0, 0, 0, 0,
-                    map.DieMinX, map.DieMaxX, map.DieMinY, map.DieMaxY,
-                    stored.XYDirection, map.ReferenceDieSetting);
-                admin.CreateUseMap(DACrux.Base.GlobalVariable.Factory, mapId, dies);
-            }
+            PrepareSave(mapId, map, direction, grid, false)();
         }
 
         /// <summary>
@@ -55,21 +41,66 @@ namespace DACrux.TEST.ENGUI
         /// </summary>
         public static void Update(string mapId, DACrux.Map.EditWaferMap map, XYDirection direction, KlarfMapGrid grid)
         {
+            PrepareSave(mapId, map, direction, grid, true)();
+        }
+
+        /// <summary>
+        /// 저장 준비 (2026-10-14 진행 표시줄): 화면 Map 컨트롤 값 / Die 목록은 화면 스레드에서 미리 읽어 두고,
+        /// 원격 저장(신규 SetMapDef 또는 덮어쓰기 UpdateMapDef -> CreateUseMap)은 돌려준 작업에서 한다.
+        /// 돌려준 작업은 화면 컨트롤을 만지지 않으므로 진행 표시줄의 작업 스레드에서 실행할 수 있다. Create / Update 와 저장값은 같다.
+        /// </summary>
+        public static Action PrepareSave(string mapId, DACrux.Map.EditWaferMap map, XYDirection direction, KlarfMapGrid grid, bool overwrite)
+        {
             MapDefStoredValues stored = ToStoredValues(map, direction, grid);
-            var admin = new DACrux.TEST.RO.ProbeAdmin();
-            using (DataTable dies = CreateDieTable(map, direction, grid))
+            DataTable dies = CreateDieTable(map, direction, grid);
+            var waferSize = map.WaferSize;
+            var dieSizeX = map.DieSizeX;
+            var dieSizeY = map.DieSizeY;
+            var firstMicroX = map.FirstDieX * map.DieSizeX;
+            var firstMicroY = map.FirstDieY * map.DieSizeY;
+            var firstDieX = map.FirstDieX;
+            var firstDieY = map.FirstDieY;
+            var notchAngle = map.NotchAngle;
+            var netDie = map.NetDie;
+            int notchType = map.NotchType == DACrux.Base.Notch.Notch ? 0 : 1;
+            var dieMinX = map.DieMinX;
+            var dieMaxX = map.DieMaxX;
+            var dieMinY = map.DieMinY;
+            var dieMaxY = map.DieMaxY;
+            var referenceDie = map.ReferenceDieSetting;
+            string factory = DACrux.Base.GlobalVariable.Factory;
+            return () =>
             {
-                admin.UpdateMapDef(mapId,
-                    map.WaferSize, map.DieSizeX, map.DieSizeY,
-                    stored.OriginMicroX, stored.OriginMicroY, stored.OriginIndexX, stored.OriginIndexY,
-                    map.FirstDieX * map.DieSizeX, map.FirstDieY * map.DieSizeY,
-                    map.FirstDieX, map.FirstDieY, stored.EdgeSizeMm, map.NotchAngle,
-                    map.NetDie, map.NotchType == DACrux.Base.Notch.Notch ? 0 : 1,
-                    0, 0, 0, 0, 0, 0,
-                    map.DieMinX, map.DieMaxX, map.DieMinY, map.DieMaxY,
-                    stored.XYDirection);
-                admin.CreateUseMap(DACrux.Base.GlobalVariable.Factory, mapId, dies);
-            }
+                try
+                {
+                    var admin = new DACrux.TEST.RO.ProbeAdmin();
+                    if (overwrite)
+                        admin.UpdateMapDef(mapId,
+                            waferSize, dieSizeX, dieSizeY,
+                            stored.OriginMicroX, stored.OriginMicroY, stored.OriginIndexX, stored.OriginIndexY,
+                            firstMicroX, firstMicroY,
+                            firstDieX, firstDieY, stored.EdgeSizeMm, notchAngle,
+                            netDie, notchType,
+                            0, 0, 0, 0, 0, 0,
+                            dieMinX, dieMaxX, dieMinY, dieMaxY,
+                            stored.XYDirection);
+                    else
+                        admin.SetMapDef(mapId,
+                            waferSize, dieSizeX, dieSizeY,
+                            stored.OriginMicroX, stored.OriginMicroY, stored.OriginIndexX, stored.OriginIndexY,
+                            firstMicroX, firstMicroY,
+                            firstDieX, firstDieY, stored.EdgeSizeMm, notchAngle,
+                            netDie, notchType,
+                            0, 0, 0, 0, 0, 0,
+                            dieMinX, dieMaxX, dieMinY, dieMaxY,
+                            stored.XYDirection, referenceDie);
+                    admin.CreateUseMap(factory, mapId, dies);
+                }
+                finally
+                {
+                    dies.Dispose();
+                }
+            };
         }
 
         /// <summary>

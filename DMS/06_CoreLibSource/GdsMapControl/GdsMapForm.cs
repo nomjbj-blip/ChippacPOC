@@ -20,10 +20,6 @@ namespace NexplantQMS.GdsMap
     public partial class GdsMapForm : Form
     {
 		public static readonly string SAMPLE_FILE = @"D:\PROJECT\스태츠칩팩\Defect E-Test\sample\OMM all layer2\OMM all layer2.gds";
-		private readonly Stopwatch _mapLoadWatch = new Stopwatch();
-		private readonly Stopwatch _firstFrameWatch = new Stopwatch();
-		private GdsMapLoadMetrics _lastLoadMetrics;
-		private bool _mapLoadSucceeded;
 		private int _lastCoordinateUpdateTick;
 		private bool _updatingLayerChecks;
 		/// <summary>더블클릭으로 Layer 체크를 바꾸는 중인지. 이때만 목록 체크 변경을 받는다(2026-10-13).</summary>
@@ -42,6 +38,7 @@ namespace NexplantQMS.GdsMap
 		public GdsMapForm()
         {
 			InitializeComponent();
+			GridBuffer.Enable(this); // 표 스크롤 잔상 방지 (2026-10-15)
 			// 분할선 이벤트는 InitializeComponent(자동 배율 조정 포함)가 끝난 뒤 연결한다.
 			GDSContainer.SizeChanged += GDSContainer_SizeChanged;
 			GDSContainer.SplitterMoved += GDSContainer_SplitterMoved;
@@ -127,7 +124,11 @@ namespace NexplantQMS.GdsMap
 				reader.ProgressChanged += Reader_ProgressChanged;
 				var lib = await Task.Run(() => reader.Read(path));
 				reader.ProgressChanged -= Reader_ProgressChanged;
-				var str = lib.Structures.First();
+				// 최상위 Cell 목록을 채우고 펼친 도형이 가장 많은 Cell 부터 그린다(첫 Structure 가 하위 Cell 인 파일 대응) (2026-10-20)
+				string topName = FillTopCellList(lib);
+				GdsStructure str;
+				if (topName == null || !lib.Structures.TryGetValue(topName, out str))
+					throw new InvalidDataException("Structure 가 없는 GDS 파일입니다.");
 
 				// 단독 시험에서만 가상 결함을 그려 DACrux 업무 화면의 실제 결함과 혼동하지 않게 한다.
 				if (!_hostedByDms)
@@ -136,13 +137,13 @@ namespace NexplantQMS.GdsMap
 					str.DefectList.Add(new Defect() { X = 1000, Y = 1500, Width = 30, Height = 20 });
 				}
 				SetMapStage("도면 구성 및 화면 반영 중", true);
-				map.ShowStructure(lib);
+				map.ShowStructure(lib, topName);
 				// DB 저장(GdsMapForm_DbSave)이 원본 Grid 행과 파일 해시를 만들 수 있도록 현재 도면의 원본과 경로를 보관한다.
 				_dbSaveLibrary = lib;
 				_dbSaveGdsPath = path;
 				BindElementList(lib);
 				RefreshLayerList();
-				EndMapLoad("완료 / Layer " + map.GetLayerDisplayItems().Count + "개 / " + _mapLoadWatch.Elapsed.TotalSeconds.ToString("0.0") + "초");
+				EndMapLoad("완료 / Layer " + map.GetLayerDisplayItems().Count + "개");
 			}
 			catch (Exception ex)
 			{
@@ -151,15 +152,81 @@ namespace NexplantQMS.GdsMap
 			}
 		}
 
+		/// <summary>작업 중 표시 (2026-10-15): 파일 / DB 조회와 DB 저장 중 상태 칸 "작업 중..." + 모래시계 커서. 처리 시간은 보이지 않는다.</summary>
+		private BusyStatus MapBusy
+		{
+			get { return _mapBusy ?? (_mapBusy = new BusyStatus(this, lblMapElapsed)); }
+		}
+		private BusyStatus _mapBusy;
+
+		/// <summary>
+		/// 최상위 Cell 목록을 채우고 처음 그릴 Cell 이름을 돌려준다(펼친 도형이 많은 순서, 첫 항목 선택) (2026-10-20).
+		/// 최상위 Cell 이 둘 이상일 때만 선택할 수 있다. 예: U8 = OMM_PFIC_PIC_PKG_A0(제품) / TOP(Package C4) / mark_cell.
+		/// </summary>
+		private string FillTopCellList(GdsLibrary lib)
+		{
+			cboTopCell.BeginUpdate();
+			try
+			{
+				cboTopCell.Items.Clear();
+				foreach (var top in lib.GetTopStructures())
+					cboTopCell.Items.Add(new TopCellItem(top.Name, top.ElementCount));
+				if (cboTopCell.Items.Count > 0) cboTopCell.SelectedIndex = 0;
+			}
+			finally
+			{
+				cboTopCell.EndUpdate();
+			}
+			cboTopCell.Enabled = cboTopCell.Items.Count > 1;
+			var first = cboTopCell.SelectedItem as TopCellItem;
+			return first != null ? first.Name : lib.GetDefaultTopStructureName();
+		}
+
+		/// <summary>다른 최상위 Cell 을 고르면 그 Cell 로 다시 펼친다. DB 저장 TOP_STRUCTURE 도 이 Cell 이 된다 (2026-10-20)</summary>
+		private void cboTopCell_SelectionChangeCommitted(object sender, EventArgs e)
+		{
+			var item = cboTopCell.SelectedItem as TopCellItem;
+			if (item == null || _dbSaveLibrary == null || (map.Structure != null && map.Structure.Name == item.Name))
+				return;
+
+			BeginMapLoad("도면 구성 중 / " + item.Name, true);
+			try
+			{
+				map.ShowStructure(_dbSaveLibrary, item.Name);
+				RefreshLayerList();
+				EndMapLoad("완료 / Cell " + item.Name + " / Layer " + map.GetLayerDisplayItems().Count + "개");
+			}
+			catch (Exception ex)
+			{
+				EndMapLoad("도면 구성 실패");
+				MessageBox.Show(this, ex.Message, "Cell 변경", MessageBoxButtons.OK, MessageBoxIcon.Error);
+			}
+		}
+
+		/// <summary>Cell 선택 목록 항목: 이름 (펼친 도형 수)</summary>
+		private sealed class TopCellItem
+		{
+			public TopCellItem(string name, long elementCount)
+			{
+				Name = name;
+				ElementCount = elementCount;
+			}
+
+			public string Name { get; private set; }
+			public long ElementCount { get; private set; }
+
+			public override string ToString()
+			{
+				return Name + " (" + ElementCount.ToString("N0") + ")";
+			}
+		}
+
 		/// <summary>파일/DB 조회 중 조작을 막고 StatusStrip의 진행 상태를 초기화한다.</summary>
 		private void BeginMapLoad(string stage, bool marquee)
 		{
-			_mapLoadWatch.Restart();
-			_firstFrameWatch.Restart();
-			_lastLoadMetrics = null;
-			_mapLoadSucceeded = false;
+			MapBusy.Start();
+			cboTopCell.Enabled = false;
 			button1.Enabled = false;
-			btnLayer.Enabled = false;
 			btnLayerCheckAll.Enabled = false;
 			btnLayerCheckNone.Enabled = false;
 			SetMapStage(stage, marquee);
@@ -191,13 +258,11 @@ namespace NexplantQMS.GdsMap
 		/// <summary>조회가 끝나면 버튼과 StatusStrip을 정상 상태로 되돌린다.</summary>
 		private void EndMapLoad(string message)
 		{
-			_mapLoadWatch.Stop();
-			_mapLoadSucceeded = message.StartsWith("완료", StringComparison.Ordinal);
-			if (!_mapLoadSucceeded) _firstFrameWatch.Stop();
+			MapBusy.Stop();
 			progressMapLoad.Visible = false;
-			lblMapStatus.Text = _mapLoadSucceeded && _lastLoadMetrics != null ? FormatLoadMetrics(_lastLoadMetrics) : message;
+			lblMapStatus.Text = message;
 			button1.Enabled = true;
-			btnLayer.Enabled = chkLayerItems.Items.Count > 0;
+			cboTopCell.Enabled = cboTopCell.Items.Count > 1;
 			btnLayerCheckAll.Enabled = chkLayerItems.Items.Count > 0;
 			btnLayerCheckNone.Enabled = chkLayerItems.Items.Count > 0;
 		}
@@ -400,41 +465,6 @@ namespace NexplantQMS.GdsMap
 			statusStripMap.Refresh();
 		}
 
-		/// <summary>첫 화면 완료 후 Flatten, 정점 생성, GPU 업로드의 실제 시간을 StatusStrip에 표시한다.</summary>
-		private void Map_FirstFrameMeasured(object sender, GdsMapLoadMetrics metrics)
-		{
-			_firstFrameWatch.Stop();
-			_lastLoadMetrics = metrics;
-			if (_mapLoadSucceeded)
-				lblMapStatus.Text = FormatLoadMetrics(metrics);
-			lblMapStatus.ToolTipText = "Flatten " + metrics.FlattenMs.ToString("0") + "ms"
-				+ " / 좌표 변환 " + metrics.CoordinateTransformMs.ToString("0") + "ms"
-				+ " / Item 생성 및 Bounds " + metrics.SceneItemCreateMs.ToString("0") + "ms"
-				+ " / Layer 등록 " + metrics.SceneInsertMs.ToString("0") + "ms"
-				+ " / SREF 조회 " + metrics.SrefLookupMs.ToString("0") + "ms"
-				+ " / SREF 행렬 " + metrics.SrefMatrixMs.ToString("0") + "ms"
-				+ " / SREF 경로 " + metrics.SrefPathMs.ToString("0") + "ms"
-				+ " / TEXT 등록 " + metrics.TextRegisterMs.ToString("0") + "ms"
-				+ " / 정점 생성 " + metrics.VertexBuildMs.ToString("0") + "ms"
-				+ " / GPU 업로드 " + metrics.GpuUploadMs.ToString("0") + "ms"
-				+ " / Draw " + metrics.FirstDrawMs.ToString("0") + "ms"
-				+ " / BOUNDARY " + metrics.BoundaryCount.ToString("N0")
-				+ " / PATH " + metrics.PathCount.ToString("N0")
-				+ " / TEXT " + metrics.TextCount.ToString("N0")
-				+ " / SREF " + metrics.SrefCount.ToString("N0")
-				+ " / 원본 좌표 " + metrics.SourcePointCount.ToString("N0")
-				+ " / 배열 재사용 " + metrics.ReusedPointArrayCount.ToString("N0") + "개"
-				+ " / 재사용 좌표 " + metrics.ReusedPointCount.ToString("N0") + "개"
-				+ " / 도형 " + metrics.SceneItemCount.ToString("N0") + "개"
-				+ " / 정점 " + metrics.VertexCount.ToString("N0") + "개";
-        }
-
-		/// <summary>병목 비교에 필요한 시간만 짧게 표시하고 처리량은 마우스를 올리면 확인하게 한다.</summary>
-		private string FormatLoadMetrics(GdsMapLoadMetrics metrics)
-		{
-			return "첫 화면 " + _firstFrameWatch.Elapsed.TotalSeconds.ToString("0.0") + "초 / Flatten " + metrics.FlattenMs.ToString("0") + "ms / 정점 " + metrics.VertexBuildMs.ToString("0") + "ms / 업로드 " + metrics.GpuUploadMs.ToString("0") + "ms";
-		}
-
 		private static string FormatBytes(long bytes)
 		{
 			return bytes < 1024 * 1024 ? (bytes / 1024.0).ToString("0.0") + " KB" : (bytes / 1024.0 / 1024.0).ToString("0.0") + " MB";
@@ -530,21 +560,21 @@ namespace NexplantQMS.GdsMap
 			for (int i = 0; i < chkLayerItems.Items.Count; i++)
 			{
 				var item = (LayerDisplayItem)chkLayerItems.Items[i];
-				visibility[item.LayerId] = i == changingIndex
+				visibility[item.LayerKey] = i == changingIndex
 					? newState == CheckState.Checked : chkLayerItems.GetItemChecked(i);
 			}
 			map.SetLayerVisibility(visibility);
 			UpdateLayerSummary(visibility);
 		}
 
-		/// <summary>Layer 이름 뒤에 화면 배치 도형 수를 붙인다. 예: Layer 1 (12,345)</summary>
+		/// <summary>Layer 이름(번호/DataType) 뒤에 화면 배치 도형 수를 붙인다. 예: Layer 18/3 (12,345)</summary>
 		private void ChkLayerItems_Format(object sender, ListControlConvertEventArgs e)
 		{
 			var item = e.ListItem as LayerDisplayItem;
 			if (item == null) return;
 			int count;
-			e.Value = "Layer " + item.LayerId + " ("
-				+ (_layerElementCounts.TryGetValue(item.LayerId, out count) ? count.ToString("N0") : "-") + ")";
+			e.Value = "Layer " + GdsLayerKey.Format(item.LayerKey) + " ("
+				+ (_layerElementCounts.TryGetValue(item.LayerKey, out count) ? count.ToString("N0") : "-") + ")";
 		}
 
 		/// <summary>
@@ -557,7 +587,7 @@ namespace NexplantQMS.GdsMap
 			long total = 0, selected = 0;
 			for (int i = 0; i < layerCount; i++)
 			{
-				int id = ((LayerDisplayItem)chkLayerItems.Items[i]).LayerId;
+				int id = ((LayerDisplayItem)chkLayerItems.Items[i]).LayerKey;
 				int count;
 				_layerElementCounts.TryGetValue(id, out count);
 				total += count;
@@ -583,7 +613,6 @@ namespace NexplantQMS.GdsMap
 				foreach (var layer in map.GetLayerDisplayItems())
 					chkLayerItems.Items.Add(layer, layer.Visible);
 				if (chkLayerItems.Items.Count > 0) chkLayerItems.SelectedIndex = 0;
-				btnLayer.Enabled = chkLayerItems.Items.Count > 0;
 				btnLayerCheckAll.Enabled = chkLayerItems.Items.Count > 0;
 				btnLayerCheckNone.Enabled = chkLayerItems.Items.Count > 0;
 			}

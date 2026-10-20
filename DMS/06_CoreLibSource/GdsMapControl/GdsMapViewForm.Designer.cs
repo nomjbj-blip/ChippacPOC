@@ -1,6 +1,6 @@
 namespace NexplantQMS.GdsMap
 {
-    /// <summary>GDS Map 조회 화면의 컨트롤 생성과 배치를 정의한다. (설계: 문서/2026-10-02_GDS_Map_조회화면_설계.md 3.2절)</summary>
+    /// <summary>GDS Map 조회 화면의 컨트롤 생성과 배치를 정의한다. (설계: 문서/설계/02_GDS/2026-10-02_GDS_Map_조회화면_설계.md 3.2절)</summary>
     partial class GdsMapViewForm
     {
         private System.ComponentModel.IContainer components = null;
@@ -17,15 +17,18 @@ namespace NexplantQMS.GdsMap
 
         /// <summary>
         /// 레이아웃 정리(2026-10-12, 컨셉 A "도구 막대 한 줄 + 오른쪽 탭 패널", Map 정보 Label 제거).
-        ///  위: 도구 막대 한 줄(Device / 조회 / 중지 | 보기 기준 | Label 검색(포함, 대소문자 무시) | [Map ▾] = Sub Device / 원점 표시 / Map 삭제). 창이 좁으면 다음 줄로 넘어간다.
-        ///  가운데: Chain 작업 줄(도면을 조회한 뒤에만 보임. 왼쪽 = Input / 선택 적용·취소 / 후보 경로 / 예시·유사 묶음, 오른쪽 끝 = 경로 추가·제외) + 도면. 상태 문구는 아래 상태 줄 한 곳에만 보인다 (2026-10-13).
-        ///  Label 일치 방식 콤보 제거(포함 고정) / 버튼 순서 번호 제거 / Output 지정 숨김(기능 유지) / 경로 추가·제외 오른쪽 끝(2026-10-12).
+        ///  위: 도구 막대 한 줄(Device / 조회 / 중지 | 보기 기준 | Label 검색(포함, 대소문자 무시) | [Map 복사] [Map ▾] = 원점 표시 / Map 삭제). 창이 좁으면 다음 줄로 넘어간다.
+        ///  [Map 복사] 추가, Sub Device 설정 제거(2026-10-15).
+        ///  가운데: Chain 작업 줄(도면을 조회한 뒤에만 보임. 왼쪽 = Input / 선택 적용·취소 / 후보 경로 / 예시·유사 묶음, 오른쪽 끝 = 도형 추가·제외) + 도면. 상태 문구는 아래 상태 줄 한 곳에만 보인다 (2026-10-13).
+        ///  Label 일치 방식 콤보 제거(포함 고정) / 버튼 순서 번호 제거 / Output 지정 숨김(기능 유지) / 도형 추가·제외 오른쪽 끝(2026-10-12).
+        ///  Chain 편집 버튼 이름 "경로 추가 / 경로 제외" -> "도형 추가 / 도형 제외": 지도에서 도형 하나씩 Chain 에 넣고 뺀다(2026-10-19).
         ///  도면 우클릭 메뉴(전체 보기)는 제거했다(2026-10-13).
         ///  오른쪽: 탭 [Chain](목록 + 유사 묶음은 찾았을 때만) / [Layer]. 아래: 진행률 / 상태 / 마우스 좌표.
-        ///  Map 정보(파일 / 건수 / 저장 기준 / Sub Device)는 Device 콤보 툴팁으로 옮겼다.
+        ///  Map 정보(파일 / 건수 / 저장 기준)는 Device 콤보 툴팁으로 옮겼다.
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(GdsMapViewForm));
             this.components = new System.ComponentModel.Container();
             this.pnlCondition = new System.Windows.Forms.FlowLayoutPanel();
             this.lblDevice = new System.Windows.Forms.Label();
@@ -42,13 +45,14 @@ namespace NexplantQMS.GdsMap
             this.btnLabelAll = new System.Windows.Forms.Button();
             this.cboLabelResults = new System.Windows.Forms.ComboBox();
             this.sepTool3 = new System.Windows.Forms.Label();
+            this.btnCopyMap = new System.Windows.Forms.Button();
             this.btnMapMenu = new System.Windows.Forms.Button();
             this.mnuMap = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.mnuSubDevice = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuOriginCross = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuMapSep = new System.Windows.Forms.ToolStripSeparator();
             this.mnuDeleteMap = new System.Windows.Forms.ToolStripMenuItem();
             this.splitMain = new System.Windows.Forms.SplitContainer();
+            this.map = new NexplantQMS.GdsMap.GdsMapControl();
             this.tblChainBar = new System.Windows.Forms.TableLayoutPanel();
             this.chainFirstRow = new System.Windows.Forms.FlowLayoutPanel();
             this.lblChainBarTitle = new System.Windows.Forms.Label();
@@ -69,6 +73,7 @@ namespace NexplantQMS.GdsMap
             this.tabRight = new System.Windows.Forms.TabControl();
             this.tabChain = new System.Windows.Forms.TabPage();
             this.chainListPanel = new System.Windows.Forms.Panel();
+            this._chainList = new NexplantQMS.GdsMap.LayerColorCheckedListBox();
             this._chainListMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this._chainColorMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.chainListButtons = new System.Windows.Forms.FlowLayoutPanel();
@@ -84,18 +89,17 @@ namespace NexplantQMS.GdsMap
             this._btnChainUndoSimilar = new System.Windows.Forms.Button();
             this.chainSimilarListTitle = new System.Windows.Forms.Label();
             this.tabLayer = new System.Windows.Forms.TabPage();
+            this.chkLayerItems = new NexplantQMS.GdsMap.LayerColorCheckedListBox();
             this.pnlLayerButtons = new System.Windows.Forms.Panel();
             this.btnLayerNone = new System.Windows.Forms.Button();
             this.btnLayerAll = new System.Windows.Forms.Button();
             this.lblLayerTitle = new System.Windows.Forms.Label();
             this.statusStripView = new System.Windows.Forms.StatusStrip();
             this.progressLoad = new System.Windows.Forms.ToolStripProgressBar();
+            this.lblElapsed = new System.Windows.Forms.ToolStripStatusLabel();
             this.lblStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.lblCoordinate = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolTipView = new System.Windows.Forms.ToolTip(this.components);
-            this.map = new NexplantQMS.GdsMap.GdsMapControl();
-            this._chainList = new NexplantQMS.GdsMap.LayerColorCheckedListBox();
-            this.chkLayerItems = new NexplantQMS.GdsMap.LayerColorCheckedListBox();
             this.pnlCondition.SuspendLayout();
             this.mnuMap.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitMain)).BeginInit();
@@ -136,19 +140,20 @@ namespace NexplantQMS.GdsMap
             this.pnlCondition.Controls.Add(this.btnLabelAll);
             this.pnlCondition.Controls.Add(this.cboLabelResults);
             this.pnlCondition.Controls.Add(this.sepTool3);
+            this.pnlCondition.Controls.Add(this.btnCopyMap);
             this.pnlCondition.Controls.Add(this.btnMapMenu);
             this.pnlCondition.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlCondition.Location = new System.Drawing.Point(0, 0);
             this.pnlCondition.Name = "pnlCondition";
             this.pnlCondition.Padding = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.pnlCondition.Size = new System.Drawing.Size(1714, 48);
+            this.pnlCondition.Size = new System.Drawing.Size(1714, 54);
             this.pnlCondition.TabIndex = 0;
             // 
             // lblDevice
             // 
             this.lblDevice.AutoSize = true;
             this.lblDevice.Location = new System.Drawing.Point(10, 15);
-            this.lblDevice.Margin = new System.Windows.Forms.Padding(6, 15, 3, 3);
+            this.lblDevice.Margin = new System.Windows.Forms.Padding(6, 18, 3, 3);
             this.lblDevice.Name = "lblDevice";
             this.lblDevice.Size = new System.Drawing.Size(62, 18);
             this.lblDevice.TabIndex = 0;
@@ -158,11 +163,10 @@ namespace NexplantQMS.GdsMap
             // 
             this.cboDevice.FormattingEnabled = true;
             this.cboDevice.Location = new System.Drawing.Point(78, 11);
-            this.cboDevice.Margin = new System.Windows.Forms.Padding(3, 11, 3, 3);
+            this.cboDevice.Margin = new System.Windows.Forms.Padding(3, 14, 3, 3);
             this.cboDevice.Name = "cboDevice";
             this.cboDevice.Size = new System.Drawing.Size(190, 26);
             this.cboDevice.TabIndex = 1;
-            this.toolTipView.SetToolTip(this.cboDevice, "Device를 선택하세요.");
             this.cboDevice.SelectedIndexChanged += new System.EventHandler(this.cboDevice_SelectedIndexChanged);
             this.cboDevice.KeyDown += new System.Windows.Forms.KeyEventHandler(this.cboDevice_KeyDown);
             // 
@@ -171,7 +175,9 @@ namespace NexplantQMS.GdsMap
             this.btnSearch.Location = new System.Drawing.Point(274, 6);
             this.btnSearch.Margin = new System.Windows.Forms.Padding(3, 6, 3, 6);
             this.btnSearch.Name = "btnSearch";
-            this.btnSearch.Size = new System.Drawing.Size(90, 36);
+            this.btnSearch.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.btnSearch.Image = ((System.Drawing.Image)(resources.GetObject("btnSearch.Image")));
+            this.btnSearch.Size = new System.Drawing.Size(126, 42);
             this.btnSearch.TabIndex = 2;
             this.btnSearch.Text = "조회";
             this.btnSearch.UseVisualStyleBackColor = true;
@@ -183,7 +189,9 @@ namespace NexplantQMS.GdsMap
             this.btnStop.Location = new System.Drawing.Point(370, 6);
             this.btnStop.Margin = new System.Windows.Forms.Padding(3, 6, 3, 6);
             this.btnStop.Name = "btnStop";
-            this.btnStop.Size = new System.Drawing.Size(80, 36);
+            this.btnStop.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.btnStop.Image = ((System.Drawing.Image)(resources.GetObject("btnStop.Image")));
+            this.btnStop.Size = new System.Drawing.Size(126, 42);
             this.btnStop.TabIndex = 3;
             this.btnStop.Text = "중지";
             this.btnStop.UseVisualStyleBackColor = true;
@@ -193,7 +201,7 @@ namespace NexplantQMS.GdsMap
             // 
             this.sepTool1.BackColor = System.Drawing.SystemColors.ControlDark;
             this.sepTool1.Location = new System.Drawing.Point(459, 10);
-            this.sepTool1.Margin = new System.Windows.Forms.Padding(6, 10, 6, 10);
+            this.sepTool1.Margin = new System.Windows.Forms.Padding(6, 13, 6, 13);
             this.sepTool1.Name = "sepTool1";
             this.sepTool1.Size = new System.Drawing.Size(1, 28);
             this.sepTool1.TabIndex = 4;
@@ -202,7 +210,7 @@ namespace NexplantQMS.GdsMap
             // 
             this.lblViewSide.AutoSize = true;
             this.lblViewSide.Location = new System.Drawing.Point(469, 15);
-            this.lblViewSide.Margin = new System.Windows.Forms.Padding(3, 15, 3, 3);
+            this.lblViewSide.Margin = new System.Windows.Forms.Padding(3, 18, 3, 3);
             this.lblViewSide.Name = "lblViewSide";
             this.lblViewSide.Size = new System.Drawing.Size(44, 18);
             this.lblViewSide.TabIndex = 5;
@@ -216,7 +224,7 @@ namespace NexplantQMS.GdsMap
             "Front side(원본)",
             "Back side(좌우 반전)"});
             this.cboViewSide.Location = new System.Drawing.Point(519, 11);
-            this.cboViewSide.Margin = new System.Windows.Forms.Padding(3, 11, 3, 3);
+            this.cboViewSide.Margin = new System.Windows.Forms.Padding(3, 14, 3, 3);
             this.cboViewSide.Name = "cboViewSide";
             this.cboViewSide.Size = new System.Drawing.Size(200, 26);
             this.cboViewSide.TabIndex = 6;
@@ -226,28 +234,31 @@ namespace NexplantQMS.GdsMap
             // 
             this.sepTool2.BackColor = System.Drawing.SystemColors.ControlDark;
             this.sepTool2.Location = new System.Drawing.Point(728, 10);
-            this.sepTool2.Margin = new System.Windows.Forms.Padding(6, 10, 6, 10);
+            this.sepTool2.Margin = new System.Windows.Forms.Padding(6, 13, 6, 13);
             this.sepTool2.Name = "sepTool2";
             this.sepTool2.Size = new System.Drawing.Size(1, 28);
             this.sepTool2.TabIndex = 7;
+            this.sepTool2.Visible = false;
             // 
             // lblLabel
             // 
             this.lblLabel.AutoSize = true;
             this.lblLabel.Location = new System.Drawing.Point(738, 15);
-            this.lblLabel.Margin = new System.Windows.Forms.Padding(3, 15, 3, 3);
+            this.lblLabel.Margin = new System.Windows.Forms.Padding(3, 18, 3, 3);
             this.lblLabel.Name = "lblLabel";
             this.lblLabel.Size = new System.Drawing.Size(50, 18);
             this.lblLabel.TabIndex = 8;
             this.lblLabel.Text = "Label";
+            this.lblLabel.Visible = false;
             // 
             // txtLabel
             // 
             this.txtLabel.Location = new System.Drawing.Point(794, 10);
-            this.txtLabel.Margin = new System.Windows.Forms.Padding(3, 10, 3, 3);
+            this.txtLabel.Margin = new System.Windows.Forms.Padding(3, 13, 3, 3);
             this.txtLabel.Name = "txtLabel";
             this.txtLabel.Size = new System.Drawing.Size(180, 28);
             this.txtLabel.TabIndex = 9;
+            this.txtLabel.Visible = false;
             this.txtLabel.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtLabel_KeyDown);
             // 
             // btnLabelSearch
@@ -255,10 +266,13 @@ namespace NexplantQMS.GdsMap
             this.btnLabelSearch.Location = new System.Drawing.Point(980, 6);
             this.btnLabelSearch.Margin = new System.Windows.Forms.Padding(3, 6, 3, 6);
             this.btnLabelSearch.Name = "btnLabelSearch";
-            this.btnLabelSearch.Size = new System.Drawing.Size(76, 36);
+            this.btnLabelSearch.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.btnLabelSearch.Image = ((System.Drawing.Image)(resources.GetObject("btnLabelSearch.Image")));
+            this.btnLabelSearch.Size = new System.Drawing.Size(126, 42);
             this.btnLabelSearch.TabIndex = 11;
             this.btnLabelSearch.Text = "검색";
             this.btnLabelSearch.UseVisualStyleBackColor = true;
+            this.btnLabelSearch.Visible = false;
             this.btnLabelSearch.Click += new System.EventHandler(this.btnLabelSearch_Click);
             // 
             // btnLabelAll
@@ -266,10 +280,13 @@ namespace NexplantQMS.GdsMap
             this.btnLabelAll.Location = new System.Drawing.Point(1062, 6);
             this.btnLabelAll.Margin = new System.Windows.Forms.Padding(3, 6, 3, 6);
             this.btnLabelAll.Name = "btnLabelAll";
-            this.btnLabelAll.Size = new System.Drawing.Size(96, 36);
+            this.btnLabelAll.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.btnLabelAll.Image = ((System.Drawing.Image)(resources.GetObject("btnLabelAll.Image")));
+            this.btnLabelAll.Size = new System.Drawing.Size(137, 42);
             this.btnLabelAll.TabIndex = 12;
             this.btnLabelAll.Text = "전체 보기";
             this.btnLabelAll.UseVisualStyleBackColor = true;
+            this.btnLabelAll.Visible = false;
             this.btnLabelAll.Click += new System.EventHandler(this.btnLabelAll_Click);
             // 
             // cboLabelResults
@@ -280,28 +297,47 @@ namespace NexplantQMS.GdsMap
             this.cboLabelResults.FormattingEnabled = true;
             this.cboLabelResults.IntegralHeight = false;
             this.cboLabelResults.Location = new System.Drawing.Point(1164, 11);
-            this.cboLabelResults.Margin = new System.Windows.Forms.Padding(3, 11, 3, 3);
+            this.cboLabelResults.Margin = new System.Windows.Forms.Padding(3, 14, 3, 3);
             this.cboLabelResults.Name = "cboLabelResults";
             this.cboLabelResults.Size = new System.Drawing.Size(250, 26);
             this.cboLabelResults.TabIndex = 13;
+            this.cboLabelResults.Visible = false;
             this.cboLabelResults.SelectedIndexChanged += new System.EventHandler(this.cboLabelResults_SelectedIndexChanged);
             // 
             // sepTool3
             // 
             this.sepTool3.BackColor = System.Drawing.SystemColors.ControlDark;
             this.sepTool3.Location = new System.Drawing.Point(1423, 10);
-            this.sepTool3.Margin = new System.Windows.Forms.Padding(6, 10, 6, 10);
+            this.sepTool3.Margin = new System.Windows.Forms.Padding(6, 13, 6, 13);
             this.sepTool3.Name = "sepTool3";
             this.sepTool3.Size = new System.Drawing.Size(1, 28);
             this.sepTool3.TabIndex = 15;
+            this.sepTool3.Visible = false;
+            // 
+            // btnCopyMap
+            // 
+            this.btnCopyMap.Enabled = false;
+            this.btnCopyMap.Location = new System.Drawing.Point(1433, 6);
+            this.btnCopyMap.Margin = new System.Windows.Forms.Padding(3, 6, 3, 6);
+            this.btnCopyMap.Name = "btnCopyMap";
+            this.btnCopyMap.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.btnCopyMap.Image = ((System.Drawing.Image)(resources.GetObject("btnCopyMap.Image")));
+            this.btnCopyMap.Size = new System.Drawing.Size(143, 42);
+            this.btnCopyMap.TabIndex = 16;
+            this.btnCopyMap.Text = "Map 복사";
+            this.btnCopyMap.UseVisualStyleBackColor = true;
+            this.btnCopyMap.Visible = false;
+            this.btnCopyMap.Click += new System.EventHandler(this.btnCopyMap_Click);
             // 
             // btnMapMenu
             // 
-            this.btnMapMenu.Location = new System.Drawing.Point(1433, 6);
+            this.btnMapMenu.Location = new System.Drawing.Point(1549, 6);
             this.btnMapMenu.Margin = new System.Windows.Forms.Padding(3, 6, 3, 6);
             this.btnMapMenu.Name = "btnMapMenu";
-            this.btnMapMenu.Size = new System.Drawing.Size(133, 36);
-            this.btnMapMenu.TabIndex = 16;
+            this.btnMapMenu.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.btnMapMenu.Image = ((System.Drawing.Image)(resources.GetObject("btnMapMenu.Image")));
+            this.btnMapMenu.Size = new System.Drawing.Size(126, 42);
+            this.btnMapMenu.TabIndex = 17;
             this.btnMapMenu.Text = "Map ▾";
             this.btnMapMenu.UseVisualStyleBackColor = true;
             this.btnMapMenu.Click += new System.EventHandler(this.btnMapMenu_Click);
@@ -310,21 +346,11 @@ namespace NexplantQMS.GdsMap
             // 
             this.mnuMap.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.mnuMap.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.mnuSubDevice,
             this.mnuOriginCross,
             this.mnuMapSep,
             this.mnuDeleteMap});
             this.mnuMap.Name = "mnuMap";
-            this.mnuMap.Size = new System.Drawing.Size(231, 106);
-            // 
-            // mnuSubDevice
-            // 
-            this.mnuSubDevice.Enabled = false;
-            this.mnuSubDevice.Name = "mnuSubDevice";
-            this.mnuSubDevice.Size = new System.Drawing.Size(230, 32);
-            this.mnuSubDevice.Text = "Sub Device 설정...";
-            this.mnuSubDevice.Visible = false;
-            this.mnuSubDevice.Click += new System.EventHandler(this.mnuSubDevice_Click);
+            this.mnuMap.Size = new System.Drawing.Size(176, 74);
             // 
             // mnuOriginCross
             // 
@@ -332,21 +358,21 @@ namespace NexplantQMS.GdsMap
             this.mnuOriginCross.CheckOnClick = true;
             this.mnuOriginCross.CheckState = System.Windows.Forms.CheckState.Checked;
             this.mnuOriginCross.Name = "mnuOriginCross";
-            this.mnuOriginCross.Size = new System.Drawing.Size(230, 32);
+            this.mnuOriginCross.Size = new System.Drawing.Size(175, 32);
             this.mnuOriginCross.Text = "원점 표시";
             this.mnuOriginCross.CheckedChanged += new System.EventHandler(this.mnuOriginCross_CheckedChanged);
             // 
             // mnuMapSep
             // 
             this.mnuMapSep.Name = "mnuMapSep";
-            this.mnuMapSep.Size = new System.Drawing.Size(227, 6);
+            this.mnuMapSep.Size = new System.Drawing.Size(172, 6);
             this.mnuMapSep.Visible = false;
             // 
             // mnuDeleteMap
             // 
             this.mnuDeleteMap.ForeColor = System.Drawing.Color.Firebrick;
             this.mnuDeleteMap.Name = "mnuDeleteMap";
-            this.mnuDeleteMap.Size = new System.Drawing.Size(230, 32);
+            this.mnuDeleteMap.Size = new System.Drawing.Size(175, 32);
             this.mnuDeleteMap.Text = "Map 삭제...";
             this.mnuDeleteMap.Visible = false;
             this.mnuDeleteMap.Click += new System.EventHandler(this.mnuDeleteMap_Click);
@@ -368,9 +394,28 @@ namespace NexplantQMS.GdsMap
             // 
             this.splitMain.Panel2.Controls.Add(this.tabRight);
             this.splitMain.Size = new System.Drawing.Size(1714, 1071);
-            this.splitMain.SplitterDistance = 1366;
+            this.splitMain.SplitterDistance = 1364;
             this.splitMain.SplitterWidth = 6;
             this.splitMain.TabIndex = 1;
+            // 
+            // map
+            // 
+            this.map.BackColor = System.Drawing.Color.Black;
+            this.map.ColorAlpha = 50;
+            this.map.Cursor = System.Windows.Forms.Cursors.SizeAll;
+            this.map.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.map.Location = new System.Drawing.Point(0, 96);
+            this.map.Margin = new System.Windows.Forms.Padding(7, 6, 7, 6);
+            this.map.Mode = NexplantQMS.GdsMap.GdsMapControl.ViewMode.View;
+            this.map.Name = "map";
+            this.map.Size = new System.Drawing.Size(1364, 975);
+            this.map.TabIndex = 2;
+            this.map.VSync = false;
+            this.map.MouseWorldPositionChanged += new System.EventHandler<System.Drawing.PointF>(this.map_MouseWorldPositionChanged);
+            this.map.RenderProgressChanged += new System.EventHandler<NexplantQMS.GdsMap.GdsMapRenderProgressChangedEventArgs>(this.map_RenderProgressChanged);
+            this.map.FirstFrameMeasured += new System.EventHandler<NexplantQMS.GdsMap.GdsMapLoadMetrics>(this.map_FirstFrameMeasured);
+            this.map.MouseClick += new System.Windows.Forms.MouseEventHandler(this.Map_ChainMouseClick);
+            this.map.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Map_ChainMouseDown);
             // 
             // tblChainBar
             // 
@@ -387,7 +432,7 @@ namespace NexplantQMS.GdsMap
             this.tblChainBar.Name = "tblChainBar";
             this.tblChainBar.RowCount = 1;
             this.tblChainBar.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tblChainBar.Size = new System.Drawing.Size(1366, 96);
+            this.tblChainBar.Size = new System.Drawing.Size(1364, 96);
             this.tblChainBar.TabIndex = 0;
             this.tblChainBar.Visible = false;
             // 
@@ -412,7 +457,7 @@ namespace NexplantQMS.GdsMap
             this.chainFirstRow.Margin = new System.Windows.Forms.Padding(0);
             this.chainFirstRow.Name = "chainFirstRow";
             this.chainFirstRow.Padding = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.chainFirstRow.Size = new System.Drawing.Size(1156, 96);
+            this.chainFirstRow.Size = new System.Drawing.Size(1154, 96);
             this.chainFirstRow.TabIndex = 0;
             // 
             // lblChainBarTitle
@@ -420,7 +465,7 @@ namespace NexplantQMS.GdsMap
             this.lblChainBarTitle.AutoSize = true;
             this.lblChainBarTitle.Font = new System.Drawing.Font("맑은 고딕", 9F, System.Drawing.FontStyle.Bold);
             this.lblChainBarTitle.Location = new System.Drawing.Point(10, 14);
-            this.lblChainBarTitle.Margin = new System.Windows.Forms.Padding(6, 14, 10, 3);
+            this.lblChainBarTitle.Margin = new System.Windows.Forms.Padding(6, 15, 10, 3);
             this.lblChainBarTitle.MinimumSize = new System.Drawing.Size(130, 0);
             this.lblChainBarTitle.Name = "lblChainBarTitle";
             this.lblChainBarTitle.Size = new System.Drawing.Size(144, 25);
@@ -433,7 +478,9 @@ namespace NexplantQMS.GdsMap
             this._btnChainInput.Location = new System.Drawing.Point(167, 6);
             this._btnChainInput.Margin = new System.Windows.Forms.Padding(3, 6, 3, 6);
             this._btnChainInput.Name = "_btnChainInput";
-            this._btnChainInput.Size = new System.Drawing.Size(98, 36);
+            this._btnChainInput.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this._btnChainInput.Image = ((System.Drawing.Image)(resources.GetObject("_btnChainInput.Image")));
+            this._btnChainInput.Size = new System.Drawing.Size(143, 42);
             this._btnChainInput.TabIndex = 1;
             this._btnChainInput.Text = "Input 지정";
             this._btnChainInput.UseVisualStyleBackColor = true;
@@ -445,7 +492,9 @@ namespace NexplantQMS.GdsMap
             this._btnChainOutput.Location = new System.Drawing.Point(271, 6);
             this._btnChainOutput.Margin = new System.Windows.Forms.Padding(3, 6, 3, 6);
             this._btnChainOutput.Name = "_btnChainOutput";
-            this._btnChainOutput.Size = new System.Drawing.Size(113, 36);
+            this._btnChainOutput.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this._btnChainOutput.Image = ((System.Drawing.Image)(resources.GetObject("_btnChainOutput.Image")));
+            this._btnChainOutput.Size = new System.Drawing.Size(154, 42);
             this._btnChainOutput.TabIndex = 2;
             this._btnChainOutput.Text = "Output 지정";
             this._btnChainOutput.UseVisualStyleBackColor = true;
@@ -458,7 +507,9 @@ namespace NexplantQMS.GdsMap
             this._btnChainApply.Location = new System.Drawing.Point(390, 6);
             this._btnChainApply.Margin = new System.Windows.Forms.Padding(3, 6, 3, 6);
             this._btnChainApply.Name = "_btnChainApply";
-            this._btnChainApply.Size = new System.Drawing.Size(96, 36);
+            this._btnChainApply.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this._btnChainApply.Image = ((System.Drawing.Image)(resources.GetObject("_btnChainApply.Image")));
+            this._btnChainApply.Size = new System.Drawing.Size(137, 42);
             this._btnChainApply.TabIndex = 3;
             this._btnChainApply.Text = "선택 적용";
             this._btnChainApply.UseVisualStyleBackColor = true;
@@ -470,7 +521,9 @@ namespace NexplantQMS.GdsMap
             this._btnChainCancel.Location = new System.Drawing.Point(492, 6);
             this._btnChainCancel.Margin = new System.Windows.Forms.Padding(3, 6, 3, 6);
             this._btnChainCancel.Name = "_btnChainCancel";
-            this._btnChainCancel.Size = new System.Drawing.Size(96, 36);
+            this._btnChainCancel.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this._btnChainCancel.Image = ((System.Drawing.Image)(resources.GetObject("_btnChainCancel.Image")));
+            this._btnChainCancel.Size = new System.Drawing.Size(137, 42);
             this._btnChainCancel.TabIndex = 4;
             this._btnChainCancel.Text = "선택 취소";
             this._btnChainCancel.UseVisualStyleBackColor = true;
@@ -480,7 +533,7 @@ namespace NexplantQMS.GdsMap
             // 
             this.sepChain1.BackColor = System.Drawing.SystemColors.ControlDark;
             this.sepChain1.Location = new System.Drawing.Point(597, 10);
-            this.sepChain1.Margin = new System.Windows.Forms.Padding(6, 10, 6, 10);
+            this.sepChain1.Margin = new System.Windows.Forms.Padding(6, 13, 6, 13);
             this.sepChain1.Name = "sepChain1";
             this.sepChain1.Size = new System.Drawing.Size(1, 28);
             this.sepChain1.TabIndex = 5;
@@ -489,7 +542,7 @@ namespace NexplantQMS.GdsMap
             // 
             this.chainCellSizeLabel.AutoSize = true;
             this.chainCellSizeLabel.Location = new System.Drawing.Point(607, 15);
-            this.chainCellSizeLabel.Margin = new System.Windows.Forms.Padding(3, 15, 3, 3);
+            this.chainCellSizeLabel.Margin = new System.Windows.Forms.Padding(3, 18, 3, 3);
             this.chainCellSizeLabel.Name = "chainCellSizeLabel";
             this.chainCellSizeLabel.Size = new System.Drawing.Size(86, 18);
             this.chainCellSizeLabel.TabIndex = 6;
@@ -505,7 +558,7 @@ namespace NexplantQMS.GdsMap
             0,
             196608});
             this._numChainCellSize.Location = new System.Drawing.Point(699, 10);
-            this._numChainCellSize.Margin = new System.Windows.Forms.Padding(3, 10, 3, 3);
+            this._numChainCellSize.Margin = new System.Windows.Forms.Padding(3, 13, 3, 3);
             this._numChainCellSize.Maximum = new decimal(new int[] {
             1000000000,
             0,
@@ -532,7 +585,9 @@ namespace NexplantQMS.GdsMap
             this._btnChainTrace.Location = new System.Drawing.Point(819, 6);
             this._btnChainTrace.Margin = new System.Windows.Forms.Padding(3, 6, 3, 6);
             this._btnChainTrace.Name = "_btnChainTrace";
-            this._btnChainTrace.Size = new System.Drawing.Size(138, 36);
+            this._btnChainTrace.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this._btnChainTrace.Image = ((System.Drawing.Image)(resources.GetObject("_btnChainTrace.Image")));
+            this._btnChainTrace.Size = new System.Drawing.Size(177, 42);
             this._btnChainTrace.TabIndex = 8;
             this._btnChainTrace.Text = "후보 경로 찾기";
             this._btnChainTrace.UseVisualStyleBackColor = true;
@@ -542,7 +597,7 @@ namespace NexplantQMS.GdsMap
             // 
             this.sepChain2.BackColor = System.Drawing.SystemColors.ControlDark;
             this.sepChain2.Location = new System.Drawing.Point(966, 10);
-            this.sepChain2.Margin = new System.Windows.Forms.Padding(6, 10, 6, 10);
+            this.sepChain2.Margin = new System.Windows.Forms.Padding(6, 13, 6, 13);
             this.sepChain2.Name = "sepChain2";
             this.sepChain2.Size = new System.Drawing.Size(1, 28);
             this.sepChain2.TabIndex = 11;
@@ -553,7 +608,9 @@ namespace NexplantQMS.GdsMap
             this._btnChainExample.Location = new System.Drawing.Point(976, 6);
             this._btnChainExample.Margin = new System.Windows.Forms.Padding(3, 6, 3, 6);
             this._btnChainExample.Name = "_btnChainExample";
-            this._btnChainExample.Size = new System.Drawing.Size(138, 36);
+            this._btnChainExample.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this._btnChainExample.Image = ((System.Drawing.Image)(resources.GetObject("_btnChainExample.Image")));
+            this._btnChainExample.Size = new System.Drawing.Size(177, 42);
             this._btnChainExample.TabIndex = 12;
             this._btnChainExample.Text = "예시 묶음 지정";
             this._btnChainExample.UseVisualStyleBackColor = true;
@@ -565,7 +622,9 @@ namespace NexplantQMS.GdsMap
             this._btnChainFindSimilar.Location = new System.Drawing.Point(7, 54);
             this._btnChainFindSimilar.Margin = new System.Windows.Forms.Padding(3, 6, 3, 6);
             this._btnChainFindSimilar.Name = "_btnChainFindSimilar";
-            this._btnChainFindSimilar.Size = new System.Drawing.Size(138, 36);
+            this._btnChainFindSimilar.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this._btnChainFindSimilar.Image = ((System.Drawing.Image)(resources.GetObject("_btnChainFindSimilar.Image")));
+            this._btnChainFindSimilar.Size = new System.Drawing.Size(177, 42);
             this._btnChainFindSimilar.TabIndex = 13;
             this._btnChainFindSimilar.Text = "유사 묶음 찾기";
             this._btnChainFindSimilar.UseVisualStyleBackColor = true;
@@ -578,11 +637,11 @@ namespace NexplantQMS.GdsMap
             this.chainEditRow.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.chainEditRow.Controls.Add(this._btnChainAdd);
             this.chainEditRow.Controls.Add(this._btnChainRemove);
-            this.chainEditRow.Location = new System.Drawing.Point(1156, 0);
+            this.chainEditRow.Location = new System.Drawing.Point(1154, 0);
             this.chainEditRow.Margin = new System.Windows.Forms.Padding(0);
             this.chainEditRow.Name = "chainEditRow";
             this.chainEditRow.Padding = new System.Windows.Forms.Padding(0, 0, 6, 0);
-            this.chainEditRow.Size = new System.Drawing.Size(210, 48);
+            this.chainEditRow.Size = new System.Drawing.Size(292, 54);
             this.chainEditRow.TabIndex = 1;
             this.chainEditRow.WrapContents = false;
             // 
@@ -592,9 +651,11 @@ namespace NexplantQMS.GdsMap
             this._btnChainAdd.Location = new System.Drawing.Point(3, 6);
             this._btnChainAdd.Margin = new System.Windows.Forms.Padding(3, 6, 3, 6);
             this._btnChainAdd.Name = "_btnChainAdd";
-            this._btnChainAdd.Size = new System.Drawing.Size(96, 36);
+            this._btnChainAdd.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this._btnChainAdd.Image = ((System.Drawing.Image)(resources.GetObject("_btnChainAdd.Image")));
+            this._btnChainAdd.Size = new System.Drawing.Size(137, 42);
             this._btnChainAdd.TabIndex = 9;
-            this._btnChainAdd.Text = "경로 추가";
+            this._btnChainAdd.Text = "도형 추가";
             this._btnChainAdd.UseVisualStyleBackColor = true;
             this._btnChainAdd.Click += new System.EventHandler(this.BtnChainAdd_Click);
             // 
@@ -604,9 +665,11 @@ namespace NexplantQMS.GdsMap
             this._btnChainRemove.Location = new System.Drawing.Point(105, 6);
             this._btnChainRemove.Margin = new System.Windows.Forms.Padding(3, 6, 3, 6);
             this._btnChainRemove.Name = "_btnChainRemove";
-            this._btnChainRemove.Size = new System.Drawing.Size(96, 36);
+            this._btnChainRemove.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this._btnChainRemove.Image = ((System.Drawing.Image)(resources.GetObject("_btnChainRemove.Image")));
+            this._btnChainRemove.Size = new System.Drawing.Size(137, 42);
             this._btnChainRemove.TabIndex = 10;
-            this._btnChainRemove.Text = "경로 제외";
+            this._btnChainRemove.Text = "도형 제외";
             this._btnChainRemove.UseVisualStyleBackColor = true;
             this._btnChainRemove.Click += new System.EventHandler(this.BtnChainRemove_Click);
             // 
@@ -618,7 +681,7 @@ namespace NexplantQMS.GdsMap
             this.tabRight.Location = new System.Drawing.Point(0, 0);
             this.tabRight.Name = "tabRight";
             this.tabRight.SelectedIndex = 0;
-            this.tabRight.Size = new System.Drawing.Size(342, 1071);
+            this.tabRight.Size = new System.Drawing.Size(344, 1071);
             this.tabRight.TabIndex = 0;
             // 
             // tabChain
@@ -628,7 +691,7 @@ namespace NexplantQMS.GdsMap
             this.tabChain.Location = new System.Drawing.Point(4, 28);
             this.tabChain.Name = "tabChain";
             this.tabChain.Padding = new System.Windows.Forms.Padding(3);
-            this.tabChain.Size = new System.Drawing.Size(334, 1039);
+            this.tabChain.Size = new System.Drawing.Size(336, 1039);
             this.tabChain.TabIndex = 0;
             this.tabChain.Text = "Chain";
             this.tabChain.UseVisualStyleBackColor = true;
@@ -640,8 +703,24 @@ namespace NexplantQMS.GdsMap
             this.chainListPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.chainListPanel.Location = new System.Drawing.Point(3, 3);
             this.chainListPanel.Name = "chainListPanel";
-            this.chainListPanel.Size = new System.Drawing.Size(328, 733);
+            this.chainListPanel.Size = new System.Drawing.Size(330, 733);
             this.chainListPanel.TabIndex = 0;
+            // 
+            // _chainList
+            // 
+            this._chainList.ContextMenuStrip = this._chainListMenu;
+            this._chainList.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._chainList.HorizontalScrollbar = true;
+            this._chainList.IntegralHeight = false;
+            this._chainList.Location = new System.Drawing.Point(0, 93);
+            this._chainList.Margin = new System.Windows.Forms.Padding(4);
+            this._chainList.Name = "_chainList";
+            this._chainList.SelectOnRightClick = false;
+            this._chainList.Size = new System.Drawing.Size(330, 640);
+            this._chainList.TabIndex = 2;
+            this._chainList.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.ChainList_ItemCheck);
+            this._chainList.SelectedIndexChanged += new System.EventHandler(this.ChainList_SelectedIndexChanged);
+            this._chainList.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.ChainList_MouseDoubleClick);
             // 
             // _chainListMenu
             // 
@@ -665,17 +744,20 @@ namespace NexplantQMS.GdsMap
             this.chainListButtons.Controls.Add(this._btnChainRename);
             this.chainListButtons.Controls.Add(this._btnChainDelete);
             this.chainListButtons.Controls.Add(this._btnChainDbSave);
+            this.chainListButtons.SetFlowBreak(this._btnChainRename, true);
             this.chainListButtons.Dock = System.Windows.Forms.DockStyle.Top;
             this.chainListButtons.Location = new System.Drawing.Point(0, 0);
             this.chainListButtons.Name = "chainListButtons";
-            this.chainListButtons.Size = new System.Drawing.Size(328, 93);
+            this.chainListButtons.Size = new System.Drawing.Size(330, 96);
             this.chainListButtons.TabIndex = 1;
             // 
             // _btnChainNew
             // 
             this._btnChainNew.Location = new System.Drawing.Point(3, 3);
             this._btnChainNew.Name = "_btnChainNew";
-            this._btnChainNew.Size = new System.Drawing.Size(156, 36);
+            this._btnChainNew.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this._btnChainNew.Image = ((System.Drawing.Image)(resources.GetObject("_btnChainNew.Image")));
+            this._btnChainNew.Size = new System.Drawing.Size(159, 42);
             this._btnChainNew.TabIndex = 0;
             this._btnChainNew.Text = "새 Chain";
             this._btnChainNew.UseVisualStyleBackColor = true;
@@ -685,7 +767,9 @@ namespace NexplantQMS.GdsMap
             // 
             this._btnChainRename.Location = new System.Drawing.Point(165, 3);
             this._btnChainRename.Name = "_btnChainRename";
-            this._btnChainRename.Size = new System.Drawing.Size(156, 36);
+            this._btnChainRename.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this._btnChainRename.Image = ((System.Drawing.Image)(resources.GetObject("_btnChainRename.Image")));
+            this._btnChainRename.Size = new System.Drawing.Size(159, 42);
             this._btnChainRename.TabIndex = 1;
             this._btnChainRename.Text = "이름 수정";
             this._btnChainRename.UseVisualStyleBackColor = true;
@@ -695,7 +779,9 @@ namespace NexplantQMS.GdsMap
             // 
             this._btnChainDelete.Location = new System.Drawing.Point(3, 45);
             this._btnChainDelete.Name = "_btnChainDelete";
-            this._btnChainDelete.Size = new System.Drawing.Size(156, 36);
+            this._btnChainDelete.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this._btnChainDelete.Image = ((System.Drawing.Image)(resources.GetObject("_btnChainDelete.Image")));
+            this._btnChainDelete.Size = new System.Drawing.Size(120, 42);
             this._btnChainDelete.TabIndex = 2;
             this._btnChainDelete.Text = "삭제";
             this._btnChainDelete.UseVisualStyleBackColor = true;
@@ -705,7 +791,9 @@ namespace NexplantQMS.GdsMap
             // 
             this._btnChainDbSave.Location = new System.Drawing.Point(165, 45);
             this._btnChainDbSave.Name = "_btnChainDbSave";
-            this._btnChainDbSave.Size = new System.Drawing.Size(156, 36);
+            this._btnChainDbSave.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this._btnChainDbSave.Image = ((System.Drawing.Image)(resources.GetObject("_btnChainDbSave.Image")));
+            this._btnChainDbSave.Size = new System.Drawing.Size(198, 42);
             this._btnChainDbSave.TabIndex = 3;
             this._btnChainDbSave.Text = "Chain 저장(DB)";
             this._btnChainDbSave.UseVisualStyleBackColor = true;
@@ -720,7 +808,7 @@ namespace NexplantQMS.GdsMap
             this.chainSimilarListPanel.Location = new System.Drawing.Point(3, 736);
             this.chainSimilarListPanel.Name = "chainSimilarListPanel";
             this.chainSimilarListPanel.Padding = new System.Windows.Forms.Padding(0, 6, 0, 0);
-            this.chainSimilarListPanel.Size = new System.Drawing.Size(328, 300);
+            this.chainSimilarListPanel.Size = new System.Drawing.Size(330, 300);
             this.chainSimilarListPanel.TabIndex = 1;
             this.chainSimilarListPanel.Visible = false;
             // 
@@ -733,7 +821,7 @@ namespace NexplantQMS.GdsMap
             this._chainSimilarList.Location = new System.Drawing.Point(0, 33);
             this._chainSimilarList.Margin = new System.Windows.Forms.Padding(4);
             this._chainSimilarList.Name = "_chainSimilarList";
-            this._chainSimilarList.Size = new System.Drawing.Size(328, 183);
+            this._chainSimilarList.Size = new System.Drawing.Size(330, 183);
             this._chainSimilarList.TabIndex = 1;
             this._chainSimilarList.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.ChainSimilarList_ItemCheck);
             this._chainSimilarList.SelectedIndexChanged += new System.EventHandler(this.ChainSimilarList_SelectedIndexChanged);
@@ -744,17 +832,21 @@ namespace NexplantQMS.GdsMap
             this.chainSimilarButtons.Controls.Add(this._btnChainApplySimilar);
             this.chainSimilarButtons.Controls.Add(this._btnChainClearSimilar);
             this.chainSimilarButtons.Controls.Add(this._btnChainUndoSimilar);
+            this.chainSimilarButtons.SetFlowBreak(this._btnChainApplySimilar, true);
+            this.chainSimilarButtons.SetFlowBreak(this._btnChainClearSimilar, true);
             this.chainSimilarButtons.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.chainSimilarButtons.Location = new System.Drawing.Point(0, 216);
             this.chainSimilarButtons.Name = "chainSimilarButtons";
-            this.chainSimilarButtons.Size = new System.Drawing.Size(328, 84);
+            this.chainSimilarButtons.Size = new System.Drawing.Size(330, 144);
             this.chainSimilarButtons.TabIndex = 2;
             // 
             // _btnChainApplySimilar
             // 
             this._btnChainApplySimilar.Location = new System.Drawing.Point(3, 3);
             this._btnChainApplySimilar.Name = "_btnChainApplySimilar";
-            this._btnChainApplySimilar.Size = new System.Drawing.Size(156, 36);
+            this._btnChainApplySimilar.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this._btnChainApplySimilar.Image = ((System.Drawing.Image)(resources.GetObject("_btnChainApplySimilar.Image")));
+            this._btnChainApplySimilar.Size = new System.Drawing.Size(324, 42);
             this._btnChainApplySimilar.TabIndex = 0;
             this._btnChainApplySimilar.Text = "체크 묶음 제외";
             this._btnChainApplySimilar.UseVisualStyleBackColor = true;
@@ -764,7 +856,9 @@ namespace NexplantQMS.GdsMap
             // 
             this._btnChainClearSimilar.Location = new System.Drawing.Point(165, 3);
             this._btnChainClearSimilar.Name = "_btnChainClearSimilar";
-            this._btnChainClearSimilar.Size = new System.Drawing.Size(156, 36);
+            this._btnChainClearSimilar.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this._btnChainClearSimilar.Image = ((System.Drawing.Image)(resources.GetObject("_btnChainClearSimilar.Image")));
+            this._btnChainClearSimilar.Size = new System.Drawing.Size(324, 42);
             this._btnChainClearSimilar.TabIndex = 1;
             this._btnChainClearSimilar.Text = "미리보기 취소";
             this._btnChainClearSimilar.UseVisualStyleBackColor = true;
@@ -774,7 +868,9 @@ namespace NexplantQMS.GdsMap
             // 
             this._btnChainUndoSimilar.Location = new System.Drawing.Point(3, 45);
             this._btnChainUndoSimilar.Name = "_btnChainUndoSimilar";
-            this._btnChainUndoSimilar.Size = new System.Drawing.Size(318, 36);
+            this._btnChainUndoSimilar.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this._btnChainUndoSimilar.Image = ((System.Drawing.Image)(resources.GetObject("_btnChainUndoSimilar.Image")));
+            this._btnChainUndoSimilar.Size = new System.Drawing.Size(324, 42);
             this._btnChainUndoSimilar.TabIndex = 2;
             this._btnChainUndoSimilar.Text = "직전 제외 되돌리기";
             this._btnChainUndoSimilar.UseVisualStyleBackColor = true;
@@ -785,7 +881,7 @@ namespace NexplantQMS.GdsMap
             this.chainSimilarListTitle.Dock = System.Windows.Forms.DockStyle.Top;
             this.chainSimilarListTitle.Location = new System.Drawing.Point(0, 6);
             this.chainSimilarListTitle.Name = "chainSimilarListTitle";
-            this.chainSimilarListTitle.Size = new System.Drawing.Size(328, 27);
+            this.chainSimilarListTitle.Size = new System.Drawing.Size(330, 27);
             this.chainSimilarListTitle.TabIndex = 0;
             this.chainSimilarListTitle.Text = "유사 묶음";
             this.chainSimilarListTitle.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -797,10 +893,24 @@ namespace NexplantQMS.GdsMap
             this.tabLayer.Location = new System.Drawing.Point(4, 28);
             this.tabLayer.Name = "tabLayer";
             this.tabLayer.Padding = new System.Windows.Forms.Padding(3);
-            this.tabLayer.Size = new System.Drawing.Size(334, 1039);
+            this.tabLayer.Size = new System.Drawing.Size(336, 1039);
             this.tabLayer.TabIndex = 1;
             this.tabLayer.Text = "Layer";
             this.tabLayer.UseVisualStyleBackColor = true;
+            // 
+            // chkLayerItems
+            // 
+            this.chkLayerItems.CheckOnClick = true;
+            this.chkLayerItems.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.chkLayerItems.FormattingEnabled = true;
+            this.chkLayerItems.IntegralHeight = false;
+            this.chkLayerItems.Location = new System.Drawing.Point(3, 48);
+            this.chkLayerItems.Margin = new System.Windows.Forms.Padding(4);
+            this.chkLayerItems.Name = "chkLayerItems";
+            this.chkLayerItems.Size = new System.Drawing.Size(330, 988);
+            this.chkLayerItems.TabIndex = 1;
+            this.chkLayerItems.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.chkLayerItems_ItemCheck);
+            this.chkLayerItems.Format += new System.Windows.Forms.ListControlConvertEventHandler(this.chkLayerItems_Format);
             // 
             // pnlLayerButtons
             // 
@@ -810,15 +920,17 @@ namespace NexplantQMS.GdsMap
             this.pnlLayerButtons.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlLayerButtons.Location = new System.Drawing.Point(3, 3);
             this.pnlLayerButtons.Name = "pnlLayerButtons";
-            this.pnlLayerButtons.Size = new System.Drawing.Size(328, 45);
+            this.pnlLayerButtons.Size = new System.Drawing.Size(330, 54);
             this.pnlLayerButtons.TabIndex = 0;
             // 
             // btnLayerNone
             // 
             this.btnLayerNone.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnLayerNone.Location = new System.Drawing.Point(244, 5);
+            this.btnLayerNone.Location = new System.Drawing.Point(237, 6);
             this.btnLayerNone.Name = "btnLayerNone";
-            this.btnLayerNone.Size = new System.Drawing.Size(80, 34);
+            this.btnLayerNone.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.btnLayerNone.Image = ((System.Drawing.Image)(resources.GetObject("btnLayerNone.Image")));
+            this.btnLayerNone.Size = new System.Drawing.Size(90, 42);
             this.btnLayerNone.TabIndex = 2;
             this.btnLayerNone.Text = "해제";
             this.btnLayerNone.UseVisualStyleBackColor = true;
@@ -827,9 +939,11 @@ namespace NexplantQMS.GdsMap
             // btnLayerAll
             // 
             this.btnLayerAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnLayerAll.Location = new System.Drawing.Point(158, 5);
+            this.btnLayerAll.Location = new System.Drawing.Point(141, 6);
             this.btnLayerAll.Name = "btnLayerAll";
-            this.btnLayerAll.Size = new System.Drawing.Size(80, 34);
+            this.btnLayerAll.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.btnLayerAll.Image = ((System.Drawing.Image)(resources.GetObject("btnLayerAll.Image")));
+            this.btnLayerAll.Size = new System.Drawing.Size(90, 42);
             this.btnLayerAll.TabIndex = 1;
             this.btnLayerAll.Text = "전체";
             this.btnLayerAll.UseVisualStyleBackColor = true;
@@ -838,7 +952,7 @@ namespace NexplantQMS.GdsMap
             // lblLayerTitle
             // 
             this.lblLayerTitle.AutoSize = true;
-            this.lblLayerTitle.Location = new System.Drawing.Point(4, 13);
+            this.lblLayerTitle.Location = new System.Drawing.Point(4, 18);
             this.lblLayerTitle.Name = "lblLayerTitle";
             this.lblLayerTitle.Size = new System.Drawing.Size(131, 18);
             this.lblLayerTitle.TabIndex = 0;
@@ -849,6 +963,7 @@ namespace NexplantQMS.GdsMap
             this.statusStripView.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.statusStripView.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.progressLoad,
+            this.lblElapsed,
             this.lblStatus,
             this.lblCoordinate});
             this.statusStripView.Location = new System.Drawing.Point(0, 1119);
@@ -864,6 +979,13 @@ namespace NexplantQMS.GdsMap
             this.progressLoad.Name = "progressLoad";
             this.progressLoad.Size = new System.Drawing.Size(229, 28);
             this.progressLoad.Visible = false;
+            // 
+            // lblElapsed
+            // 
+            this.lblElapsed.ForeColor = System.Drawing.Color.DimGray;
+            this.lblElapsed.Name = "lblElapsed";
+            this.lblElapsed.Size = new System.Drawing.Size(0, 29);
+            this.lblElapsed.Visible = false;
             // 
             // lblStatus
             // 
@@ -885,55 +1007,6 @@ namespace NexplantQMS.GdsMap
             this.toolTipView.AutoPopDelay = 30000;
             this.toolTipView.InitialDelay = 400;
             this.toolTipView.ReshowDelay = 100;
-            // 
-            // map
-            // 
-            this.map.BackColor = System.Drawing.Color.Black;
-            this.map.ColorAlpha = 50;
-            this.map.Cursor = System.Windows.Forms.Cursors.SizeAll;
-            this.map.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.map.Location = new System.Drawing.Point(0, 96);
-            this.map.Margin = new System.Windows.Forms.Padding(7, 6, 7, 6);
-            this.map.Mode = NexplantQMS.GdsMap.GdsMapControl.ViewMode.View;
-            this.map.Name = "map";
-            this.map.Size = new System.Drawing.Size(1366, 975);
-            this.map.TabIndex = 2;
-            this.map.VSync = false;
-            this.map.MouseWorldPositionChanged += new System.EventHandler<System.Drawing.PointF>(this.map_MouseWorldPositionChanged);
-            this.map.RenderProgressChanged += new System.EventHandler<NexplantQMS.GdsMap.GdsMapRenderProgressChangedEventArgs>(this.map_RenderProgressChanged);
-            this.map.FirstFrameMeasured += new System.EventHandler<NexplantQMS.GdsMap.GdsMapLoadMetrics>(this.map_FirstFrameMeasured);
-            this.map.MouseClick += new System.Windows.Forms.MouseEventHandler(this.Map_ChainMouseClick);
-            this.map.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Map_ChainMouseDown);
-            // 
-            // _chainList
-            // 
-            this._chainList.ContextMenuStrip = this._chainListMenu;
-            this._chainList.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._chainList.HorizontalScrollbar = true;
-            this._chainList.IntegralHeight = false;
-            this._chainList.Location = new System.Drawing.Point(0, 93);
-            this._chainList.Margin = new System.Windows.Forms.Padding(4);
-            this._chainList.Name = "_chainList";
-            this._chainList.SelectOnRightClick = false;
-            this._chainList.Size = new System.Drawing.Size(328, 640);
-            this._chainList.TabIndex = 2;
-            this._chainList.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.ChainList_ItemCheck);
-            this._chainList.SelectedIndexChanged += new System.EventHandler(this.ChainList_SelectedIndexChanged);
-            this._chainList.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.ChainList_MouseDoubleClick);
-            // 
-            // chkLayerItems
-            // 
-            this.chkLayerItems.CheckOnClick = true;
-            this.chkLayerItems.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.chkLayerItems.FormattingEnabled = true;
-            this.chkLayerItems.IntegralHeight = false;
-            this.chkLayerItems.Location = new System.Drawing.Point(3, 48);
-            this.chkLayerItems.Margin = new System.Windows.Forms.Padding(4);
-            this.chkLayerItems.Name = "chkLayerItems";
-            this.chkLayerItems.Size = new System.Drawing.Size(328, 988);
-            this.chkLayerItems.TabIndex = 1;
-            this.chkLayerItems.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.chkLayerItems_ItemCheck);
-            this.chkLayerItems.Format += new System.Windows.Forms.ListControlConvertEventHandler(this.chkLayerItems_Format);
             // 
             // GdsMapViewForm
             // 
@@ -999,9 +1072,9 @@ namespace NexplantQMS.GdsMap
         private System.Windows.Forms.Button btnLabelAll;
         private System.Windows.Forms.ComboBox cboLabelResults;
         private System.Windows.Forms.Label sepTool3;
+        private System.Windows.Forms.Button btnCopyMap;
         private System.Windows.Forms.Button btnMapMenu;
         private System.Windows.Forms.ContextMenuStrip mnuMap;
-        private System.Windows.Forms.ToolStripMenuItem mnuSubDevice;
         private System.Windows.Forms.ToolStripMenuItem mnuOriginCross;
         private System.Windows.Forms.ToolStripSeparator mnuMapSep;
         private System.Windows.Forms.ToolStripMenuItem mnuDeleteMap;
@@ -1019,6 +1092,7 @@ namespace NexplantQMS.GdsMap
         private NexplantQMS.GdsMap.LayerColorCheckedListBox chkLayerItems;
         private System.Windows.Forms.StatusStrip statusStripView;
         private System.Windows.Forms.ToolStripProgressBar progressLoad;
+        private System.Windows.Forms.ToolStripStatusLabel lblElapsed;
         private System.Windows.Forms.ToolStripStatusLabel lblStatus;
         private System.Windows.Forms.ToolStripStatusLabel lblCoordinate;
         // Chain 설정 컨트롤(2026-10-06 Setup 화면에서 이동). 동작은 GdsMapViewForm_Chain*.cs partial에서 연결한다.

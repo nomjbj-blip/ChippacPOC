@@ -1,5 +1,5 @@
 ﻿-- 2026-10-12: E-Test 파일명 규칙 정형화 + 파일 요약 컬럼
--- 설계: 문서/2026-10-07_ETest_결과파일_Parsing_DB설계.md 13절 (제안안대로 적용)
+-- 설계: 문서/설계/04_ETest/2026-10-07_ETest_결과파일_Parsing_DB설계.md 13절 (제안안대로 적용)
 -- 파일명 규칙: [Customer]_[Device]_[Wafer Type]_[Wafer Rev]_[Test Type]_[Test Date]_[Lot]_[Lot-Wafer No]$Fab$
 --   예: CAI_OMM_ATV_A0_TSVET_20260902141031_U9-HS2633_U9-HS2633-01$Silterra$
 --   Test Type = 기존 TEST_PROGRAM, Test Date = 기존 TEST_TIME, Lot = 기존 LOT_ID 를 그대로 쓴다 (N4).

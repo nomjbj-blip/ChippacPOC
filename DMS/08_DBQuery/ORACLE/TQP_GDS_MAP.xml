@@ -86,4 +86,33 @@ VALUES
  WHERE MAP_STATUS = 'READY'
  ORDER BY FACTORY, DEVICE_ID]]></commandtext>
     </query>
+    <!-- Map 복사(GdsMapImport.CopyMap, 2026-10-15): 원본 Device 의 행을 새 Device 이름으로 INSERT ... SELECT / 이름 찾기(대소문자 무시) -->
+    <query statement="Insert" queryid="COPY_MAP" commandtype="Text" description="Map 복사: READY 원본 헤더를 새 Device 의 DRAFT 헤더로 복사" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_GDS_MAP
+    (FACTORY, DEVICE_ID, TOP_STRUCTURE, GDS_FILE_NAME, USER_UNIT, DATABASE_UNIT,
+    ID_GENERATOR_VERSION, POINTS_FORMAT_VERSION, MAP_STATUS, VIEW_SIDE, CREATE_USER)
+SELECT FACTORY, :target_device_id, TOP_STRUCTURE, GDS_FILE_NAME, USER_UNIT, DATABASE_UNIT,
+       ID_GENERATOR_VERSION, POINTS_FORMAT_VERSION, 'DRAFT', VIEW_SIDE, :create_user
+  FROM TQP_GDS_MAP
+ WHERE FACTORY = :factory
+   AND DEVICE_ID = :source_device_id
+   AND MAP_STATUS = 'READY']]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="50">:target_device_id</param>
+            <param direction="Input" dbtype="VarChar" size="30">:create_user</param>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:source_device_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_MAP_BY_NAME" commandtype="Text" description="이름(대소문자 무시)이 같은 Map: 복사 대상 중복 확인 / KLARF Product · E-Test Device 와 같은 이름의 GDS Device 찾기" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DEVICE_ID, MAP_STATUS
+  FROM TQP_GDS_MAP
+ WHERE FACTORY = :factory
+   AND UPPER(DEVICE_ID) = UPPER(:device_id)
+ ORDER BY DEVICE_ID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
+        </parameters>
+    </query>
 </queryxml>

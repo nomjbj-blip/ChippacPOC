@@ -12,11 +12,11 @@ namespace NexplantQMS.GdsMap
 		public GPoint[] WorldPoints { get; }
 		public GBox WorldBounds { get; }
 
-		// Index offset and count in GPU VBO
-		public int FillVertexOffset;
-		public int FillVertexCount;
-		public int LineVertexOffset;
-		public int LineVertexCount;
+		// 결함 GPU 버퍼 안의 위치 (2026-10-20 Layer 별 버퍼로 변경)
+		public int VertexOffset;
+		public int VertexCount;
+		public int FillIndexOffset;
+		public int FillIndexCount;
 
 		public GlDefectItem(Defect source, GPoint[] worldPoints)
 		{

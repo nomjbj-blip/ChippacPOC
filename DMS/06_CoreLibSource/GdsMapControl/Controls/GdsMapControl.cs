@@ -61,30 +61,114 @@ namespace NexplantQMS.GdsMap
 		public enum ViewMode { View, Select }
 
 		// ---- GPU Vertex Structure --------------------------------------------------------
+		// 12바이트 정점: 위치(float 2) + 색(RGB 3바이트) + 선택 표시(1바이트, 255 = 선택). 채우기 / 외곽선 투명도는 uniform(uAlpha)로 준다.
+		// 예전 28바이트(위치 + Vector4 색 + float 선택)는 U8 제품 Cell(도형 181만, 정점 약 2억 6천만)에서 배열 2GB 한도를 넘었다 (2026-10-20)
+		[System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 4)]
 		private struct Vertex
 		{
-			public Vector2 Position;
-			public Vector4 Color;
-			public float IsSelected; // 1.0f = selected, 0.0f = normal
+			public float X;
+			public float Y;
+			public uint Color; // R | G << 8 | B << 16 | 선택(0 / 255) << 24
 
-			public Vertex(Vector2 pos, Color col, bool selected = false)
+			public Vertex(float x, float y, uint color)
 			{
-				Position = pos;
-				Color = new Vector4(col.R / 255f, col.G / 255f, col.B / 255f, col.A / 255f);
-				IsSelected = selected ? 1.0f : 0.0f;
+				X = x;
+				Y = y;
+				Color = color;
 			}
 		}
 
-		/// <summary>여러 Item의 부분 업로드 구간을 정렬하고 병합하는 데 사용한다.</summary>
-		private struct VertexRange
-		{
-			public int Start;
-			public int Count;
+		private const int VertexStride = 12;
+		private const uint SelectedMask = 0xFF000000u;
+		// List<T> 배열 1개 2GB 한도보다 충분히 작게 막아, 넘으면 예외 대신 원인을 알려 준다 (Layer 1개 기준)
+		private const int MaxLayerVertices = 120000000;
+		private const int MaxLayerIndices = 400000000;
 
-			public VertexRange(int start, int count)
+		/// <summary>RGB 색과 선택 표시를 정점 색 4바이트로 만든다.</summary>
+		private static uint PackColor(Color color, bool selected)
+		{
+			return (uint)color.R | ((uint)color.G << 8) | ((uint)color.B << 16) | (selected ? SelectedMask : 0u);
+		}
+
+		/// <summary>
+		/// Layer 하나의 GPU 버퍼 (2026-10-20). 다각형은 점 n 개만 정점으로 두고 채우기는 인덱스 3(n-2)개, 외곽선은 같은 정점으로
+		/// LineLoop / LineStrip 을 MultiDrawArrays 로 한 번에 그린다. Layer 마다 VAO / VBO / EBO 를 따로 둬 배열 1개 한도와 무관하다.
+		/// CPU 정점 목록은 색 / 선택 변경 부분 업로드에 쓰려고 남기고, 채우기 인덱스는 업로드 뒤 비운다.
+		/// </summary>
+		private sealed class LayerGpuBuffer
+		{
+			public readonly int LayerKey;
+			public readonly List<Vertex> Vertices = new List<Vertex>();
+			public List<int> FillIndices = new List<int>();
+			public int FillIndexCount;
+			public readonly List<int> LoopFirst = new List<int>();
+			public readonly List<int> LoopCount = new List<int>();
+			public readonly List<int> StripFirst = new List<int>();
+			public readonly List<int> StripCount = new List<int>();
+			public int[] LoopFirstArray = new int[0];
+			public int[] LoopCountArray = new int[0];
+			public int[] StripFirstArray = new int[0];
+			public int[] StripCountArray = new int[0];
+			public int Vao;
+			public int Vbo;
+			public int Ebo;
+			public bool Uploaded;
+
+			public LayerGpuBuffer(int layerKey)
 			{
-				Start = start;
-				Count = count;
+				LayerKey = layerKey;
+			}
+
+			/// <summary>점들을 정점으로 넣고 첫 정점 번호를 돌려준다.</summary>
+			public int AddPoints(GPoint[] points, uint color)
+			{
+				CheckLimit(points.Length, 0);
+				int start = Vertices.Count;
+				for (int i = 0; i < points.Length; i++)
+					Vertices.Add(new Vertex((float)points[i].X, (float)points[i].Y, color));
+				return start;
+			}
+
+			/// <summary>start 부터 count 개 점을 첫 점 기준 부채꼴 삼각형으로 채운다(기존 채우기와 같은 방식).</summary>
+			public void AddFan(int start, int count)
+			{
+				CheckLimit(0, 3 * (count - 2));
+				for (int i = 1; i < count - 1; i++)
+				{
+					FillIndices.Add(start);
+					FillIndices.Add(start + i);
+					FillIndices.Add(start + i + 1);
+				}
+			}
+
+			/// <summary>PATH 면의 삼각형 하나(정점 3개 + 인덱스 3개)를 넣는다.</summary>
+			public void AddTriangle(Vector2 a, Vector2 b, Vector2 c, uint color)
+			{
+				CheckLimit(3, 3);
+				int start = Vertices.Count;
+				Vertices.Add(new Vertex(a.X, a.Y, color));
+				Vertices.Add(new Vertex(b.X, b.Y, color));
+				Vertices.Add(new Vertex(c.X, c.Y, color));
+				FillIndices.Add(start);
+				FillIndices.Add(start + 1);
+				FillIndices.Add(start + 2);
+			}
+
+			/// <summary>그리기 목록을 MultiDrawArrays 용 배열로 확정한다.</summary>
+			public void FinishDrawLists()
+			{
+				LoopFirstArray = LoopFirst.ToArray();
+				LoopCountArray = LoopCount.ToArray();
+				StripFirstArray = StripFirst.ToArray();
+				StripCountArray = StripCount.ToArray();
+				FillIndexCount = FillIndices.Count;
+			}
+
+			private void CheckLimit(int addVertices, int addIndices)
+			{
+				if ((long)Vertices.Count + addVertices > MaxLayerVertices || (long)FillIndices.Count + addIndices > MaxLayerIndices)
+					throw new InvalidOperationException("Layer " + GdsLayerKey.Format(LayerKey) + " 의 도형이 너무 많아 화면에 그릴 수 없습니다(정점 "
+						+ Vertices.Count.ToString("N0") + "개). Layer 를 나눠 저장하거나 담당자에게 문의하세요.");
 			}
 		}
 
@@ -116,14 +200,14 @@ namespace NexplantQMS.GdsMap
 		private bool _showOriginCross = true;
 
 		// OpenGL Resources
-		private int _vao;
-		private int _vbo;
 		private int _shaderProgram;
 		private int _uMatrixLoc;
+		private int _uAlphaLoc;
 		private bool _glInitialized;
-		// 미리 5천만 개(약 1.4GB)를 잡으면 x86 DMS 호스트(DACruxV5)에서 컨트롤 생성만으로 OutOfMemory가 난다.
-		// 실제 도면 크기만큼만 늘어나도록 기본 용량으로 만든다.
-		private List<Vertex> _gpuVertices = new List<Vertex>();
+		// Layer 별 GPU 버퍼(Layer 키 -> 버퍼, GdsLayerKey)와 결함 버퍼 (2026-10-20)
+		private readonly Dictionary<int, LayerGpuBuffer> _layerBuffers = new Dictionary<int, LayerGpuBuffer>();
+		private LayerGpuBuffer _defectBuffer;
+		private int[] _indexUploadChunk;
 		private bool _gpuBufferReady;
 		private Vertex[] _partialUploadChunk;
 		private int _lastRenderProgressTick;
@@ -140,21 +224,22 @@ namespace NexplantQMS.GdsMap
 		private int _lastFrameTimingLogTick;
 
 		// GLSL Shaders
+		// aColor: rgb = Layer 색, a = 선택(1). 선택 도형은 채우기 / 외곽선 모두 노란색 불투명, 나머지는 uAlpha(채우기 ColorAlpha, 외곽선 1) (2026-10-20)
 		private const string VertexShaderCode = @"
 			#version 330 core
 			layout(location = 0) in vec2 aPos;
 			layout(location = 1) in vec4 aColor;
-			layout(location = 2) in float aSelected;
 
 			uniform mat4 uMatrix;
+			uniform float uAlpha;
 			out vec4 vColor;
 
 			void main() {
 				gl_Position = uMatrix * vec4(aPos, 0.0, 1.0);
-				if (aSelected > 0.5) {
+				if (aColor.a > 0.5) {
 					vColor = vec4(1.0, 0.92, 0.23, 1.0); // Highlight Yellow
 				} else {
-					vColor = aColor;
+					vColor = vec4(aColor.rgb, uAlpha);
 				}
 			}
 		";
@@ -246,41 +331,24 @@ namespace NexplantQMS.GdsMap
 			GL.DeleteShader(fs);
 
 			_uMatrixLoc = GL.GetUniformLocation(_shaderProgram, "uMatrix");
-
-			// Buffer allocations
-			_vao = GL.GenVertexArray();
-			_vbo = GL.GenBuffer();
-
-			GL.BindVertexArray(_vao);
-			GL.BindBuffer(BufferTarget.ArrayBuffer, _vbo);
-
-			int stride = sizeof(float) * 7; // Vector2(2) + Vector4(4) + float(1)
-
-			// Position Attribute
-			GL.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, stride, 0);
-			GL.EnableVertexAttribArray(0);
-
-			// Color Attribute
-			GL.VertexAttribPointer(1, 4, VertexAttribPointerType.Float, false, stride, sizeof(float) * 2);
-			GL.EnableVertexAttribArray(1);
-
-			// Selected Attribute
-			GL.VertexAttribPointer(2, 1, VertexAttribPointerType.Float, false, stride, sizeof(float) * 6);
-			GL.EnableVertexAttribArray(2);
+			_uAlphaLoc = GL.GetUniformLocation(_shaderProgram, "uAlpha");
+			// 정점 버퍼는 도면을 그릴 때 Layer 별로 만든다(UploadAllGpuVertices) (2026-10-20)
 			InitializeChainOverlayGlResources();
 
 			_glInitialized = true;
 			// 컨트롤 초기화 전에 도면을 받은 경우에도 한 번만 전체 정점을 업로드한다.
-			if (Structure != null)
+			if (_layerBuffers.Count > 0 || _defectBuffer != null)
 				UploadAllGpuVertices();
 		}
 
 		// ---- GDS Structure Loading & Triangulation --------------------------------------
 
+		/// <summary>최상위 Cell(펼친 도형이 가장 많은 Cell)을 그린다. 첫 Structure 가 하위 Cell 인 파일도 KLayout 과 같은 Cell 로 연다 (2026-10-20)</summary>
 		public void ShowStructure(GdsLibrary lib)
 		{
-			if (lib.Structures.Count > 0)
-				ShowStructure(lib, lib.Structures[0].Name);
+			string name = lib == null ? null : lib.GetDefaultTopStructureName();
+			if (name != null)
+				ShowStructure(lib, name);
 		}
 
 		public void ShowStructure(GdsLibrary lib, string structureName)
@@ -303,8 +371,9 @@ namespace NexplantQMS.GdsMap
 
 				long flattenStart = Stopwatch.GetTimestamp();
 				using (var identity = new System.Drawing.Drawing2D.Matrix())
-					FlattenStructure(lib, str, identity, new HashSet<string>(StringComparer.OrdinalIgnoreCase),
+					FlattenStructure(lib, str, identity, 1.0, new HashSet<string>(StringComparer.OrdinalIgnoreCase),
 						0, str.Name, "R0");
+				SortMeasuredSceneItems();
 				ApplyInitialLayerColors();
 				_loadMetrics.FlattenMs = ElapsedMilliseconds(flattenStart);
 				CompleteFlattenMeasurements();
@@ -319,107 +388,94 @@ namespace NexplantQMS.GdsMap
 			ZoomToFit();
 		}
 
-		/// <summary>새 도면의 모든 Layer를 표시 여부와 무관하게 고정 VBO 위치로 구성한다.</summary>
+		/// <summary>
+		/// 새 도면의 모든 Layer 를 표시 여부와 무관하게 Layer 별 GPU 버퍼로 구성한다 (2026-10-20 Layer 별 버퍼 / 12바이트 정점 / 인덱스 채우기).
+		/// 처리 순서: 이전 버퍼 해제 -> Layer 마다 도형 정점 / 채우기 인덱스 / 외곽선 목록 생성 -> 결함 버퍼 -> 업로드.
+		///  - 닫힌 도형: 점 n 개 + 부채꼴 인덱스 3(n-2) + 외곽선 LineLoop
+		///  - 폭 있는 PATH: 면 삼각형(정점 3 + 인덱스 3씩), 외곽선 없음(기존과 같음)
+		///  - 그 밖의 2점 이상: 외곽선 LineStrip
+		/// </summary>
 		private void BuildGpuBuffers()
 		{
 			_gpuBufferReady = false;
-			_gpuVertices.Clear();
+			ReleaseGpuBuffers();
+			_layerBuffers.Clear();
+			_defectBuffer = null;
 			int totalItems = _layerList.Sum(layer => layer.Items.Count) + _defectList.Count;
 			int processedItems = 0;
 			ReportRenderProgress("GPU 버퍼 생성 중", 0, false, false, true);
 			long vertexStart = Stopwatch.GetTimestamp();
+			long vertexCount = 0;
 
 			foreach (var layer in _layerList)
 			{
-				layer.VertexOffset = _gpuVertices.Count;
-					Color color = layer.Color;
-
-					foreach (var item in layer.Items)
+				var buffer = new LayerGpuBuffer(layer.LayerKey);
+				foreach (var item in layer.Items)
+				{
+					uint color = PackColor(layer.Color, item.Selected);
+					item.VertexOffset = buffer.Vertices.Count;
+					item.FillIndexOffset = buffer.FillIndices.Count;
+					item.LineFirst = -1;
+					item.LineCount = 0;
+					item.LineLoop = false;
+					if (item.Source is GdsPath filledPath && item.Width > 0 && item.WorldPoints.Length > 0)
 					{
-						item.FillVertexOffset = -1;
-						item.FillVertexCount = 0;
-						item.LineVertexOffset = -1;
-						item.LineVertexCount = 0;
-						if (item.Source is GdsPath filledPath && item.Width > 0 && item.WorldPoints.Length > 0)
-						{
-							// GDS PATH의 폭을 실제 면으로 만든다. 한 좌표만 가진 PATH도 패드로 표시한다.
-							item.FillVertexOffset = _gpuVertices.Count;
-							AddPathFillVertices(item, filledPath, color);
-							item.FillVertexCount = _gpuVertices.Count - item.FillVertexOffset;
-						}
-						else if (item.Closed && item.WorldPoints.Length >= 3)
-						{
-							// ... (기존 삼각화 / 라인 추가 코드 유지) ...
-							item.FillVertexOffset = _gpuVertices.Count;
-
-							for (int i = 1; i < item.WorldPoints.Length - 1; i++)
-							{
-								_gpuVertices.Add(new Vertex(new Vector2((float)item.WorldPoints[0].X, (float)item.WorldPoints[0].Y), Color.FromArgb(ColorAlpha, color), item.Selected));
-								_gpuVertices.Add(new Vertex(new Vector2((float)item.WorldPoints[i].X, (float)item.WorldPoints[i].Y), Color.FromArgb(ColorAlpha, color), item.Selected));
-								_gpuVertices.Add(new Vertex(new Vector2((float)item.WorldPoints[i + 1].X, (float)item.WorldPoints[i + 1].Y), Color.FromArgb(ColorAlpha, color), item.Selected));
-							}
-							item.FillVertexCount = _gpuVertices.Count - item.FillVertexOffset;
-
-							item.LineVertexOffset = _gpuVertices.Count;
-							for (int i = 0; i < item.WorldPoints.Length; i++)
-							{
-								var p1 = item.WorldPoints[i];
-								var p2 = item.WorldPoints[(i + 1) % item.WorldPoints.Length];
-								_gpuVertices.Add(new Vertex(new Vector2((float)p1.X, (float)p1.Y), color, item.Selected));
-								_gpuVertices.Add(new Vertex(new Vector2((float)p2.X, (float)p2.Y), color, item.Selected));
-							}
-							item.LineVertexCount = _gpuVertices.Count - item.LineVertexOffset;
-						}
-						else if (item.WorldPoints.Length >= 2)
-						{
-							item.LineVertexOffset = _gpuVertices.Count;
-							for (int i = 0; i < item.WorldPoints.Length - 1; i++)
-							{
-								var p1 = item.WorldPoints[i];
-								var p2 = item.WorldPoints[i + 1];
-								_gpuVertices.Add(new Vertex(new Vector2((float)p1.X, (float)p1.Y), color, item.Selected));
-								_gpuVertices.Add(new Vertex(new Vector2((float)p2.X, (float)p2.Y), color, item.Selected));
-							}
-							item.LineVertexCount = _gpuVertices.Count - item.LineVertexOffset;
-						}
-						ReportBufferBuildProgress(++processedItems, totalItems);
+						// GDS PATH의 폭을 실제 면으로 만든다. 한 좌표만 가진 PATH도 패드로 표시한다.
+						AddPathFillVertices(buffer, item, filledPath, color);
 					}
-				layer.VertexCount = _gpuVertices.Count - layer.VertexOffset;
+					else if (item.Closed && item.WorldPoints.Length >= 3)
+					{
+						int start = buffer.AddPoints(item.WorldPoints, color);
+						buffer.AddFan(start, item.WorldPoints.Length);
+						item.LineFirst = start;
+						item.LineCount = item.WorldPoints.Length;
+						item.LineLoop = true;
+						buffer.LoopFirst.Add(start);
+						buffer.LoopCount.Add(item.WorldPoints.Length);
+					}
+					else if (item.WorldPoints.Length >= 2)
+					{
+						int start = buffer.AddPoints(item.WorldPoints, color);
+						item.LineFirst = start;
+						item.LineCount = item.WorldPoints.Length;
+						buffer.StripFirst.Add(start);
+						buffer.StripCount.Add(item.WorldPoints.Length);
+					}
+					item.VertexCount = buffer.Vertices.Count - item.VertexOffset;
+					item.FillIndexCount = buffer.FillIndices.Count - item.FillIndexOffset;
+					ReportBufferBuildProgress(++processedItems, totalItems);
+				}
+				buffer.FinishDrawLists();
+				_layerBuffers[layer.LayerKey] = buffer;
+				vertexCount += buffer.Vertices.Count;
 			}
 
-			// defect
-			foreach (var item in _defectList)
+			// defect: 사각형 채우기만(외곽선 없음)
+			if (_defectList.Count > 0)
 			{
-				item.FillVertexOffset = _gpuVertices.Count;
-
-				for (int i = 1; i < item.WorldPoints.Length - 1; i++)
+				_defectBuffer = new LayerGpuBuffer(-1);
+				uint defectColor = PackColor(DefectColor, false);
+				foreach (var item in _defectList)
 				{
-					_gpuVertices.Add(new Vertex(new Vector2((float)item.WorldPoints[0].X, (float)item.WorldPoints[0].Y), Color.FromArgb(255, DefectColor)));
-					_gpuVertices.Add(new Vertex(new Vector2((float)item.WorldPoints[i].X, (float)item.WorldPoints[i].Y), Color.FromArgb(255, DefectColor)));
-					_gpuVertices.Add(new Vertex(new Vector2((float)item.WorldPoints[i + 1].X, (float)item.WorldPoints[i + 1].Y), Color.FromArgb(255, DefectColor)));
+					item.VertexOffset = _defectBuffer.Vertices.Count;
+					item.FillIndexOffset = _defectBuffer.FillIndices.Count;
+					int start = _defectBuffer.AddPoints(item.WorldPoints, defectColor);
+					_defectBuffer.AddFan(start, item.WorldPoints.Length);
+					item.VertexCount = _defectBuffer.Vertices.Count - item.VertexOffset;
+					item.FillIndexCount = _defectBuffer.FillIndices.Count - item.FillIndexOffset;
+					ReportBufferBuildProgress(++processedItems, totalItems);
 				}
-
-				item.FillVertexCount = _gpuVertices.Count - item.FillVertexOffset;
-				item.LineVertexOffset = _gpuVertices.Count;
-
-				//for (int i = 0; i < item.WorldPoints.Length; i++)
-				//{
-				//	var p1 = item.WorldPoints[i];
-				//	var p2 = item.WorldPoints[(i + 1) % item.WorldPoints.Length];
-				//	_gpuVertices.Add(new Vertex(new Vector2((float)p1.X, (float)p1.Y), DefectColor));
-				//	_gpuVertices.Add(new Vertex(new Vector2((float)p2.X, (float)p2.Y), DefectColor));
-				//}
-				//item.LineVertexCount = _gpuVertices.Count - item.LineVertexOffset;
-				ReportBufferBuildProgress(++processedItems, totalItems);
+				_defectBuffer.FinishDrawLists();
+				vertexCount += _defectBuffer.Vertices.Count;
 			}
 
 			_loadMetrics.VertexBuildMs = ElapsedMilliseconds(vertexStart);
-			_loadMetrics.VertexCount = _gpuVertices.Count;
+			_loadMetrics.VertexCount = (int)Math.Min(int.MaxValue, vertexCount);
 			long uploadStart = Stopwatch.GetTimestamp();
 			UploadAllGpuVertices();
 			_loadMetrics.GpuUploadMs = ElapsedMilliseconds(uploadStart);
 			ReportRenderProgress("GPU 버퍼 생성 완료", 100, false, false, true);
-			// 다음 OnPaint에서 실제 DrawArrays 실행 진행률을 이어서 보고한다.
+			// 다음 OnPaint에서 실제 그리기 진행률을 이어서 보고한다.
 			_firstFrameProgressPending = true;
 		}
 
@@ -427,15 +483,14 @@ namespace NexplantQMS.GdsMap
 		/// PATH 중심선과 폭으로 삼각형 면을 만든다. 1점 PATH는 원형/사각형 패드로,
 		/// 여러 점은 각 선분의 사각형과 꺾이는 위치의 연결 삼각형으로 표시한다.
 		/// </summary>
-		private void AddPathFillVertices(GlSceneItem item, GdsPath path, Color layerColor)
+		private static void AddPathFillVertices(LayerGpuBuffer buffer, GlSceneItem item, GdsPath path, uint color)
 		{
 			float radius = (float)(item.Width / 2.0);
 			if (radius <= 0) return;
-			Color fillColor = Color.FromArgb(ColorAlpha, layerColor);
 			GPoint[] points = item.WorldPoints;
 			if (points.Length == 1)
 			{
-				AddPathPad(new Vector2((float)points[0].X, (float)points[0].Y), radius, path.PathType == 1, fillColor, item.Selected);
+				AddPathPad(buffer, new Vector2((float)points[0].X, (float)points[0].Y), radius, path.PathType == 1, color);
 				return;
 			}
 
@@ -459,7 +514,7 @@ namespace NexplantQMS.GdsMap
 					if (Math.Abs(cross) > 0.000001f)
 					{
 						float side = cross > 0 ? -1f : 1f;
-						AddPathTriangle(start, start + previousNormal * side, start + normal * side, fillColor, item.Selected);
+						buffer.AddTriangle(start, start + previousNormal * side, start + normal * side, color);
 					}
 				}
 				else firstPoint = start;
@@ -471,8 +526,8 @@ namespace NexplantQMS.GdsMap
 					if (!hasSegment) drawStart -= direction * radius;
 					if (i == points.Length - 2) drawEnd += direction * radius;
 				}
-				AddPathTriangle(drawStart + normal, drawStart - normal, drawEnd + normal, fillColor, item.Selected);
-				AddPathTriangle(drawStart - normal, drawEnd - normal, drawEnd + normal, fillColor, item.Selected);
+				buffer.AddTriangle(drawStart + normal, drawStart - normal, drawEnd + normal, color);
+				buffer.AddTriangle(drawStart - normal, drawEnd - normal, drawEnd + normal, color);
 				previousDirection = direction;
 				previousNormal = normal;
 				lastPoint = end;
@@ -480,23 +535,23 @@ namespace NexplantQMS.GdsMap
 			}
 
 			if (!hasSegment)
-				AddPathPad(new Vector2((float)points[0].X, (float)points[0].Y), radius, path.PathType == 1, fillColor, item.Selected);
+				AddPathPad(buffer, new Vector2((float)points[0].X, (float)points[0].Y), radius, path.PathType == 1, color);
 			else if (path.PathType == 1)
 			{
-				AddPathPad(firstPoint, radius, true, fillColor, item.Selected);
-				AddPathPad(lastPoint, radius, true, fillColor, item.Selected);
+				AddPathPad(buffer, firstPoint, radius, true, color);
+				AddPathPad(buffer, lastPoint, radius, true, color);
 			}
 		}
 
 		/// <summary>한 좌표의 PATH를 폭만큼 채운다. Round 타입은 원, 나머지는 정사각형으로 표시한다.</summary>
-		private void AddPathPad(Vector2 center, float radius, bool round, Color color, bool selected)
+		private static void AddPathPad(LayerGpuBuffer buffer, Vector2 center, float radius, bool round, uint color)
 		{
 			if (!round)
 			{
 				var x = new Vector2(radius, 0);
 				var y = new Vector2(0, radius);
-				AddPathTriangle(center - x - y, center + x - y, center + x + y, color, selected);
-				AddPathTriangle(center - x - y, center + x + y, center - x + y, color, selected);
+				buffer.AddTriangle(center - x - y, center + x - y, center + x + y, color);
+				buffer.AddTriangle(center - x - y, center + x + y, center - x + y, color);
 				return;
 			}
 			const int segments = 16;
@@ -506,110 +561,161 @@ namespace NexplantQMS.GdsMap
 				float angle2 = (float)(2.0 * Math.PI * (i + 1) / segments);
 				var point1 = center + new Vector2((float)Math.Cos(angle1) * radius, (float)Math.Sin(angle1) * radius);
 				var point2 = center + new Vector2((float)Math.Cos(angle2) * radius, (float)Math.Sin(angle2) * radius);
-				AddPathTriangle(center, point1, point2, color, selected);
+				buffer.AddTriangle(center, point1, point2, color);
 			}
 		}
 
-		/// <summary>PATH 채움 삼각형 하나를 기존 GPU 정점 목록에 추가한다.</summary>
-		private void AddPathTriangle(Vector2 a, Vector2 b, Vector2 c, Color color, bool selected)
-		{
-			_gpuVertices.Add(new Vertex(a, color, selected));
-			_gpuVertices.Add(new Vertex(b, color, selected));
-			_gpuVertices.Add(new Vertex(c, color, selected));
-		}
-
-		/// <summary>새 도면에서만 정점 전체를 업로드한다. Layer/선택 변경은 부분 업로드를 사용한다.</summary>
+		/// <summary>새 도면에서만 Layer 버퍼 전체를 업로드한다. Layer 색 / 선택 변경은 부분 업로드를 쓴다.</summary>
 		private void UploadAllGpuVertices()
 		{
 			if (!_glInitialized) return;
 			ReportRenderProgress("GPU 업로드 중", 0, true, false, true);
 			// 색상 선택 창을 닫은 뒤에도 이 컨트롤의 OpenGL 컨텍스트에 업로드한다.
 			MakeCurrent();
-
-			GL.BindBuffer(BufferTarget.ArrayBuffer, _vbo);
-
-			if (_gpuVertices.Count == 0)
-			{
-				// 빈 버퍼 처리: 이전 데이터 지우기
-				GL.BufferData(BufferTarget.ArrayBuffer, IntPtr.Zero, IntPtr.Zero, BufferUsageHint.DynamicDraw);
-			}
-			else
-			{
-				// ToArray()로 전체 정점을 한 번 더 복사하면 메모리가 두 배로 필요하다.
-				// VBO 크기만 먼저 잡고 고정 크기 배열로 나눠 전송하여 추가 메모리를 8192개 분량으로 제한한다.
-				const int chunkVertices = 8192;
-				const int stride = sizeof(float) * 7;
-				GL.BufferData(BufferTarget.ArrayBuffer, new IntPtr((long)_gpuVertices.Count * stride), IntPtr.Zero, BufferUsageHint.DynamicDraw);
-				if (_partialUploadChunk == null)
-					_partialUploadChunk = new Vertex[chunkVertices];
-				for (int position = 0; position < _gpuVertices.Count; position += chunkVertices)
-				{
-					int count = Math.Min(chunkVertices, _gpuVertices.Count - position);
-					_gpuVertices.CopyTo(position, _partialUploadChunk, 0, count);
-					GL.BufferSubData(BufferTarget.ArrayBuffer, new IntPtr((long)position * stride), count * stride, _partialUploadChunk);
-				}
-			}
+			foreach (var buffer in _layerBuffers.Values)
+				UploadBuffer(buffer);
+			if (_defectBuffer != null)
+				UploadBuffer(_defectBuffer);
+			GL.BindVertexArray(0);
 			_gpuBufferReady = true;
 			ReportRenderProgress("GPU 업로드 완료", 100, false, false, true);
 		}
 
-		/// <summary>Layer 색상만 CPU 정점에 반영하고 그 Layer의 연속 VBO 구간만 전송한다.</summary>
+		/// <summary>
+		/// Layer 버퍼 하나의 VAO / VBO / EBO 를 만들고 전송한다. ToArray 로 한 번 더 복사하면 메모리가 두 배로 들어
+		/// 고정 크기 배열로 나눠 보낸다. 채우기 인덱스는 GPU 에만 있으면 되므로 전송 뒤 CPU 목록을 비운다.
+		/// </summary>
+		private void UploadBuffer(LayerGpuBuffer buffer)
+		{
+			const int chunkVertices = 8192;
+			const int chunkIndices = 65536;
+			if (buffer.Vao == 0)
+			{
+				buffer.Vao = GL.GenVertexArray();
+				buffer.Vbo = GL.GenBuffer();
+				buffer.Ebo = GL.GenBuffer();
+			}
+			GL.BindVertexArray(buffer.Vao);
+
+			GL.BindBuffer(BufferTarget.ArrayBuffer, buffer.Vbo);
+			GL.BufferData(BufferTarget.ArrayBuffer, new IntPtr((long)buffer.Vertices.Count * VertexStride), IntPtr.Zero, BufferUsageHint.DynamicDraw);
+			if (_partialUploadChunk == null)
+				_partialUploadChunk = new Vertex[chunkVertices];
+			for (int position = 0; position < buffer.Vertices.Count; position += chunkVertices)
+			{
+				int count = Math.Min(chunkVertices, buffer.Vertices.Count - position);
+				buffer.Vertices.CopyTo(position, _partialUploadChunk, 0, count);
+				GL.BufferSubData(BufferTarget.ArrayBuffer, new IntPtr((long)position * VertexStride), count * VertexStride, _partialUploadChunk);
+			}
+			// 위치: float 2개 / 색: 부호 없는 바이트 4개를 0~1 로 정규화(rgb = 색, a = 선택)
+			GL.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, VertexStride, 0);
+			GL.EnableVertexAttribArray(0);
+			GL.VertexAttribPointer(1, 4, VertexAttribPointerType.UnsignedByte, true, VertexStride, sizeof(float) * 2);
+			GL.EnableVertexAttribArray(1);
+
+			// EBO 연결은 VAO 에 기록된다.
+			GL.BindBuffer(BufferTarget.ElementArrayBuffer, buffer.Ebo);
+			if (buffer.FillIndices != null)
+			{
+				GL.BufferData(BufferTarget.ElementArrayBuffer, new IntPtr((long)buffer.FillIndices.Count * sizeof(int)), IntPtr.Zero, BufferUsageHint.StaticDraw);
+				if (_indexUploadChunk == null)
+					_indexUploadChunk = new int[chunkIndices];
+				for (int position = 0; position < buffer.FillIndices.Count; position += chunkIndices)
+				{
+					int count = Math.Min(chunkIndices, buffer.FillIndices.Count - position);
+					buffer.FillIndices.CopyTo(position, _indexUploadChunk, 0, count);
+					GL.BufferSubData(BufferTarget.ElementArrayBuffer, new IntPtr((long)position * sizeof(int)), count * sizeof(int), _indexUploadChunk);
+				}
+				buffer.FillIndexCount = buffer.FillIndices.Count;
+				buffer.FillIndices = null;
+			}
+			buffer.Uploaded = true;
+		}
+
+		/// <summary>이전 도면의 Layer / 결함 GPU 버퍼를 지운다. GL 컨텍스트가 없으면 CPU 목록만 버린다.</summary>
+		private void ReleaseGpuBuffers()
+		{
+			if (!_glInitialized || IsDisposed)
+				return;
+			MakeCurrent();
+			foreach (var buffer in _layerBuffers.Values)
+				DeleteBufferObjects(buffer);
+			if (_defectBuffer != null)
+				DeleteBufferObjects(_defectBuffer);
+		}
+
+		private static void DeleteBufferObjects(LayerGpuBuffer buffer)
+		{
+			if (buffer.Vao == 0) return;
+			GL.DeleteVertexArray(buffer.Vao);
+			GL.DeleteBuffer(buffer.Vbo);
+			GL.DeleteBuffer(buffer.Ebo);
+			buffer.Vao = buffer.Vbo = buffer.Ebo = 0;
+			buffer.Uploaded = false;
+		}
+
+		/// <summary>여러 Item의 부분 업로드 구간을 정렬하고 병합하는 데 사용한다.</summary>
+		private struct VertexRange
+		{
+			public int Start;
+			public int Count;
+
+			public VertexRange(int start, int count)
+			{
+				Start = start;
+				Count = count;
+			}
+		}
+
+		/// <summary>Layer 색상만 CPU 정점에 반영하고(선택 표시는 유지) 그 Layer 버퍼만 다시 보낸다.</summary>
 		private void UpdateLayerColorVertices(GlSceneLayer layer)
 		{
-			Color fillColor = Color.FromArgb(ColorAlpha, layer.Color);
-			foreach (var item in layer.Items)
+			LayerGpuBuffer buffer;
+			if (!_layerBuffers.TryGetValue(layer.LayerKey, out buffer) || buffer.Vertices.Count == 0)
+				return;
+			uint rgb = PackColor(layer.Color, false);
+			for (int i = 0; i < buffer.Vertices.Count; i++)
 			{
-				SetVertexColor(item.FillVertexOffset, item.FillVertexCount, fillColor);
-				SetVertexColor(item.LineVertexOffset, item.LineVertexCount, layer.Color);
+				var vertex = buffer.Vertices[i];
+				vertex.Color = (vertex.Color & SelectedMask) | rgb;
+				buffer.Vertices[i] = vertex;
 			}
-			if (layer.VertexCount > 0)
-				UploadVertexRanges(new List<VertexRange> { new VertexRange(layer.VertexOffset, layer.VertexCount) });
+			UploadVertexRanges(buffer, new List<VertexRange> { new VertexRange(0, buffer.Vertices.Count) });
 		}
 
-		/// <summary>선택 상태가 실제로 바뀐 Item만 CPU 정점과 GPU 구간에 반영한다.</summary>
+		/// <summary>선택 상태가 실제로 바뀐 Item만 CPU 정점과 그 Layer 버퍼 구간에 반영한다.</summary>
 		private void UpdateSelectionVertices(IEnumerable<GlSceneItem> changedItems)
 		{
-			var ranges = new List<VertexRange>();
+			var rangesByLayer = new Dictionary<int, List<VertexRange>>();
 			foreach (var item in changedItems)
 			{
-				int count = item.FillVertexCount + item.LineVertexCount;
-				if (count == 0) continue;
-				int start = item.FillVertexCount > 0 ? item.FillVertexOffset : item.LineVertexOffset;
-				if (start < 0) continue;
-				float selected = item.Selected ? 1.0f : 0.0f;
-				for (int i = start; i < start + count; i++)
+				LayerGpuBuffer buffer;
+				if (item.VertexCount == 0 || !_layerBuffers.TryGetValue(item.LayerKey, out buffer))
+					continue;
+				uint selected = item.Selected ? SelectedMask : 0u;
+				for (int i = item.VertexOffset; i < item.VertexOffset + item.VertexCount; i++)
 				{
-					var vertex = _gpuVertices[i];
-					vertex.IsSelected = selected;
-					_gpuVertices[i] = vertex;
+					var vertex = buffer.Vertices[i];
+					vertex.Color = (vertex.Color & ~SelectedMask) | selected;
+					buffer.Vertices[i] = vertex;
 				}
-				ranges.Add(new VertexRange(start, count));
+				List<VertexRange> ranges;
+				if (!rangesByLayer.TryGetValue(item.LayerKey, out ranges))
+					rangesByLayer[item.LayerKey] = ranges = new List<VertexRange>();
+				ranges.Add(new VertexRange(item.VertexOffset, item.VertexCount));
 			}
-			UploadVertexRanges(ranges);
+			foreach (var pair in rangesByLayer)
+				UploadVertexRanges(_layerBuffers[pair.Key], pair.Value);
 		}
 
-		/// <summary>채움/선의 기존 알파 값을 유지하면서 색상 필드만 바꾼다.</summary>
-		private void SetVertexColor(int start, int count, Color color)
+		/// <summary>인접 변경 구간을 합치고 고정 크기 배열로 나눠 그 Layer VBO 의 해당 구간만 다시 보낸다.</summary>
+		private void UploadVertexRanges(LayerGpuBuffer buffer, List<VertexRange> ranges)
 		{
-			if (count == 0 || start < 0) return;
-			var rgba = new Vector4(color.R / 255f, color.G / 255f, color.B / 255f, color.A / 255f);
-			for (int i = start; i < start + count; i++)
-			{
-				var vertex = _gpuVertices[i];
-				vertex.Color = rgba;
-				_gpuVertices[i] = vertex;
-			}
-		}
-
-		/// <summary>인접 변경 구간을 합치고 고정 크기 배열로 나눠 전체 VBO 재전송을 피한다.</summary>
-		private void UploadVertexRanges(List<VertexRange> ranges)
-		{
-			if (!_glInitialized || !_gpuBufferReady || ranges.Count == 0) return;
+			if (!_glInitialized || !_gpuBufferReady || !buffer.Uploaded || ranges.Count == 0) return;
 			ranges.Sort((left, right) => left.Start.CompareTo(right.Start));
 			MakeCurrent();
-			GL.BindBuffer(BufferTarget.ArrayBuffer, _vbo);
+			GL.BindBuffer(BufferTarget.ArrayBuffer, buffer.Vbo);
 			const int chunkVertices = 8192;
-			const int stride = sizeof(float) * 7;
 			// 큰 배열을 색상/선택 변경마다 다시 할당하지 않도록 처음 사용 시 한 번만 만든다.
 			if (_partialUploadChunk == null)
 				_partialUploadChunk = new Vertex[chunkVertices];
@@ -625,8 +731,8 @@ namespace NexplantQMS.GdsMap
 				for (int position = start; position < end; position += chunkVertices)
 				{
 					int count = Math.Min(chunkVertices, end - position);
-					_gpuVertices.CopyTo(position, _partialUploadChunk, 0, count);
-					GL.BufferSubData(BufferTarget.ArrayBuffer, new IntPtr((long)position * stride), count * stride, _partialUploadChunk);
+					buffer.Vertices.CopyTo(position, _partialUploadChunk, 0, count);
+					GL.BufferSubData(BufferTarget.ArrayBuffer, new IntPtr((long)position * VertexStride), count * VertexStride, _partialUploadChunk);
 				}
 				if (i < ranges.Count)
 				{
@@ -662,8 +768,12 @@ namespace NexplantQMS.GdsMap
 
 		// ---- Flattening (Identical logic to GDS Geometry Engine) --------------------------
 
-		/// <summary>참조 구조를 재귀적으로 펼쳐 도형을 월드 좌표로 바꾸고 화면용 Layer에 모은다.</summary>
-		private void FlattenStructure(GdsLibrary lib, GdsStructure str, System.Drawing.Drawing2D.Matrix parent,
+		/// <summary>
+		/// 참조 구조를 재귀적으로 펼쳐 도형을 월드 좌표로 바꾸고 화면용 Layer에 모은다.
+		/// parent는 이 구조의 점을 월드 좌표로 보내는 누적 배치 행렬, parentMagnification은 그 누적 배율이다.
+		/// System.Drawing.Matrix는 점을 행벡터로 변환하므로 자식 배치 행렬은 부모 행렬 앞에 곱한다(자식 먼저, 부모 나중).
+		/// </summary>
+		private void FlattenStructure(GdsLibrary lib, GdsStructure str, System.Drawing.Drawing2D.Matrix parent, double parentMagnification,
 			HashSet<string> stack, int depth, string structurePath, string instancePath)
 		{
 			if (depth > 64 || stack.Contains(str.Name)) 
@@ -671,6 +781,7 @@ namespace NexplantQMS.GdsMap
 
 			stack.Add(str.Name);
 			bool parentIsIdentity = parent.IsIdentity;
+			ParentTranslation translation = ParentTranslation.From(parent);
 			int sourceOrdinal = 0;
 
 			foreach (var layer in str.Layers)
@@ -685,30 +796,32 @@ namespace NexplantQMS.GdsMap
 					{
 						_loadMetrics.BoundaryCount++;
 						_loadMetrics.SourcePointCount += boundary.Points.Length;
-						var pts = TransformMeasuredGeometryPoints(boundary.Points, e.Transform, parent, parentIsIdentity);
+						var pts = TransformMeasuredGeometryPoints(boundary.Points, e.Transform, parent, parentIsIdentity, translation);
 
 						if (pts.Length >= 2)
 							AddMeasuredSceneItem(CreateMeasuredSceneItem(e, pts, true, 0, null, placedId, sourceId));
 						else
-							_layerList.AddLayer(e.LayerID);
+							_layerList.AddLayer(GdsLayerKey.Of(e));
 					}
 					else if (e is GdsPath path)
 					{
 						_loadMetrics.PathCount++;
 						_loadMetrics.SourcePointCount += path.Points.Length;
-						var pts = TransformMeasuredGeometryPoints(path.Points, e.Transform, parent, parentIsIdentity);
+						var pts = TransformMeasuredGeometryPoints(path.Points, e.Transform, parent, parentIsIdentity, translation);
 
+						// SREF 배율을 PATH 폭에 반영한다. 음수 폭은 GDS 절대 폭이라 배율을 적용하지 않는다. (2026-10-15)
+						double width = path.Width < 0 ? -path.Width : path.Width * parentMagnification;
 						if (pts.Length >= 1)
-							AddMeasuredSceneItem(CreateMeasuredSceneItem(e, pts, false, Math.Abs(path.Width), null, placedId, sourceId));
+							AddMeasuredSceneItem(CreateMeasuredSceneItem(e, pts, false, width, null, placedId, sourceId));
 						else
-							_layerList.AddLayer(e.LayerID);
+							_layerList.AddLayer(GdsLayerKey.Of(e));
 					}
 					else if (e is GdsText text)
 					{
 						_loadMetrics.TextCount++;
 						_loadMetrics.SourcePointCount++;
 						long transformStart = Stopwatch.GetTimestamp();
-						var pts = TransformTextPosition(text, parent, parentIsIdentity);
+						var pts = TransformTextPosition(text, parent, parentIsIdentity, translation);
 						_coordinateTransformTicks += Stopwatch.GetTimestamp() - transformStart;
 						AddMeasuredSceneItem(CreateMeasuredSceneItem(e, pts, false, 0, text.Text, placedId, sourceId));
 						long textStart = Stopwatch.GetTimestamp();
@@ -731,12 +844,15 @@ namespace NexplantQMS.GdsMap
 							m.Translate((float)sref.Origin.X, (float)sref.Origin.Y, System.Drawing.Drawing2D.MatrixOrder.Append);
 							using (var combined = (System.Drawing.Drawing2D.Matrix)parent.Clone())
 							{
-								combined.Multiply(m, System.Drawing.Drawing2D.MatrixOrder.Append);
+								// combined = m × parent: 자식 점에 이 SREF 배치(m)를 먼저, 부모 배치를 나중에 적용한다.
+								// Append(parent × m)는 2단 이상 중첩에 회전 / 반전 / 배율이 섞이면 좌표가 틀어져 Prepend로 바꿈 (2026-10-15)
+								combined.Multiply(m, System.Drawing.Drawing2D.MatrixOrder.Prepend);
+								double magnification = e.Transform.Magnification == 0 ? 1 : Math.Abs(e.Transform.Magnification);
 								_srefMatrixTicks += Stopwatch.GetTimestamp() - matrixStart;
 								long pathStart = Stopwatch.GetTimestamp();
 								string childPath = structurePath + " > " + child.Name + " @ (" + sref.Origin.X + ", " + sref.Origin.Y + ")";
 								_srefPathTicks += Stopwatch.GetTimestamp() - pathStart;
-								FlattenStructure(lib, child, combined, stack, depth + 1, childPath,
+								FlattenStructure(lib, child, combined, parentMagnification * magnification, stack, depth + 1, childPath,
 									instancePath + "/R" + elementOrdinal);
 							}
 						}
@@ -758,7 +874,7 @@ namespace NexplantQMS.GdsMap
 		private void ApplyInitialLayerColors()
 		{
 			foreach (var layer in _layerList)
-				layer.Color = GetLayerColor(layer.LayerID);
+				layer.Color = GetLayerColor(layer.LayerKey);
 		}
 
 		/// <summary>새 도면을 열 때 Flatten 내부 구간별 누적 시간을 초기화한다.</summary>
@@ -786,10 +902,11 @@ namespace NexplantQMS.GdsMap
 		}
 
 		/// <summary>좌표 변환 시간만 누적하여 배열 생성과 Matrix 적용 비용을 확인한다.</summary>
-		private GPoint[] TransformMeasuredGeometryPoints(GPoint[] points, GTransform transform, System.Drawing.Drawing2D.Matrix parent, bool parentIsIdentity)
+		private GPoint[] TransformMeasuredGeometryPoints(GPoint[] points, GTransform transform, System.Drawing.Drawing2D.Matrix parent, bool parentIsIdentity,
+			ParentTranslation translation)
 		{
 			long start = Stopwatch.GetTimestamp();
-			GPoint[] result = TransformGeometryPoints(points, transform, parent, parentIsIdentity);
+			GPoint[] result = TransformGeometryPoints(points, transform, parent, parentIsIdentity, translation);
 			_coordinateTransformTicks += Stopwatch.GetTimestamp() - start;
 			if (Object.ReferenceEquals(points, result))
 			{
@@ -815,9 +932,18 @@ namespace NexplantQMS.GdsMap
 		private void AddMeasuredSceneItem(GlSceneItem item)
 		{
 			long start = Stopwatch.GetTimestamp();
-			_layerList.AddSceneItem(item);
+			// 뒤에 붙이고 펼치기가 끝나면 SortMeasuredSceneItems 로 한 번 정렬한다 (2026-10-20)
+			_layerList.AppendSceneItem(item);
 			_sceneInsertTicks += Stopwatch.GetTimestamp() - start;
 			_loadMetrics.SceneItemCount++;
+		}
+
+		/// <summary>펼치기 / DB 행 읽기가 끝난 뒤 Layer 항목을 한 번 정렬한다. 시간은 Layer 삽입 시간에 더한다.</summary>
+		private void SortMeasuredSceneItems()
+		{
+			long start = Stopwatch.GetTimestamp();
+			_layerList.SortSceneItems();
+			_sceneInsertTicks += Stopwatch.GetTimestamp() - start;
 		}
 
 		/// <summary>Stopwatch 원시 타임스탬프를 밀리초로 변환한다.</summary>
@@ -836,16 +962,20 @@ namespace NexplantQMS.GdsMap
 		/// GDS TEXT의 XY는 문자열 삽입점이므로 부모 구조의 배치 변환만 적용한다.
 		/// TEXT 자체 MAG/ANGLE/Mirror는 삽입점을 중심으로 글자 모양에 적용되는 값이므로 좌표에는 적용하지 않는다.
 		/// </summary>
-		private static GPoint[] TransformTextPosition(GdsText text, System.Drawing.Drawing2D.Matrix parent, bool parentIsIdentity)
+		private static GPoint[] TransformTextPosition(GdsText text, System.Drawing.Drawing2D.Matrix parent, bool parentIsIdentity, ParentTranslation translation)
 		{
-			return TransformPoints(new GPoint[] { text.Position }, null, parent, parentIsIdentity);
+			var position = new GPoint[] { text.Position };
+			return translation.IsTranslation && !parentIsIdentity ? TranslatePoints(position, translation)
+				: TransformPoints(position, null, parent, parentIsIdentity);
 		}
 
 		/// <summary>회전/배율/반전이 없는 도형에는 동일한 좌표 결과를 내는 부모 변환만 적용한다.</summary>
-		private static GPoint[] TransformGeometryPoints(GPoint[] points, GTransform transform, System.Drawing.Drawing2D.Matrix parent, bool parentIsIdentity)
+		private static GPoint[] TransformGeometryPoints(GPoint[] points, GTransform transform, System.Drawing.Drawing2D.Matrix parent, bool parentIsIdentity,
+			ParentTranslation translation)
 		{
 			if (!transform.MirrorX && transform.Rotation == 0 && (transform.Magnification == 0 || transform.Magnification == 1))
-				return TransformPoints(points, null, parent, parentIsIdentity);
+				return translation.IsTranslation && !parentIsIdentity ? TranslatePoints(points, translation)
+					: TransformPoints(points, null, parent, parentIsIdentity);
 
 			using (var local = GdsGeometry.CreateTransform(transform))
 				return TransformPoints(points, local, parent, parentIsIdentity);
@@ -866,6 +996,56 @@ namespace NexplantQMS.GdsMap
 			};
 
 			return TransformPoints(points, local, parent, parentIsIdentity);
+		}
+
+		/// <summary>
+		/// 부모 배치 행렬이 평행 이동뿐인지와 이동량 (2026-10-20). Structure 를 펼칠 때 한 번만 읽는다.
+		/// U8 처럼 SREF 가 평행 이동뿐인 파일은 도형마다 GDI+ Matrix.TransformPoints 를 부르지 않고 직접 더한다(펼치기 시간 대부분이 이 호출이었음).
+		/// </summary>
+		private struct ParentTranslation
+		{
+			public bool IsTranslation;
+			public float Dx;
+			public float Dy;
+
+			public static ParentTranslation From(System.Drawing.Drawing2D.Matrix matrix)
+			{
+				float[] e = matrix.Elements; // m11, m12, m21, m22, dx, dy
+				return new ParentTranslation
+				{
+					IsTranslation = e[0] == 1f && e[1] == 0f && e[2] == 0f && e[3] == 1f,
+					Dx = e[4],
+					Dy = e[5]
+				};
+			}
+		}
+
+		/// <summary>
+		/// 평행 이동만 적용한다. GDI+ Matrix.TransformPoints 와 비트 단위로 같은 결과를 낸다 (2026-10-20):
+		/// GDI+ 는 float 좌표 + float 이동량의 정확한 합을 아래쪽(-무한대 방향)으로 내려 float 로 만든다(일반 float 덧셈과 동률 처리가 다름, 30만 회 비교로 확인).
+		/// 두 float 의 합은 double 로 정확히 표현되므로 double 로 더한 뒤 float 값이 합보다 크면 한 칸 내린다.
+		/// </summary>
+		private static GPoint[] TranslatePoints(GPoint[] src, ParentTranslation translation)
+		{
+			var result = new GPoint[src.Length];
+			for (int i = 0; i < src.Length; i++)
+				result[i] = new GPoint(AddRoundDown((float)src[i].X, translation.Dx), AddRoundDown((float)src[i].Y, translation.Dy));
+			return result;
+		}
+
+		/// <summary>두 float 의 정확한 합을 아래쪽으로 내린 float 값</summary>
+		private static unsafe float AddRoundDown(float value, float offset)
+		{
+			double sum = (double)value + offset;
+			float result = (float)sum;
+			if (result > sum)
+			{
+				if (result == 0f) return -float.Epsilon;
+				int bits = *(int*)&result;
+				bits += result > 0f ? -1 : 1;
+				result = *(float*)&bits;
+			}
+			return result;
 		}
 
 		/// <summary>도형 자체 변환이 있을 때만 적용한 뒤 부모 구조의 배치 변환을 적용한다.</summary>
@@ -924,7 +1104,7 @@ namespace NexplantQMS.GdsMap
 				ReportRenderProgress("화면 그리기 중", 0, false, false, true);
 
 			long mapDrawEnd = frameStart;
-			if (_gpuVertices.Count > 0)
+			if (_gpuBufferReady)
 			{
 				GL.UseProgram(_shaderProgram);
 
@@ -938,40 +1118,38 @@ namespace NexplantQMS.GdsMap
 					-1.0f, 1.0f);
 
 				GL.UniformMatrix4(_uMatrixLoc, false, ref projection);
-				GL.BindVertexArray(_vao);
 
+				// Layer 마다 채우기 1번 + 외곽선 1~2번만 호출한다(도형마다 호출하면 U8 제품 Cell 은 프레임당 360만 번) (2026-10-20)
 				foreach (var layer in _layerList)
 				{
 					if (!layer.Visible)
 						continue;
 
-					foreach (var item in layer.Items)
+					LayerGpuBuffer buffer;
+					if (_layerBuffers.TryGetValue(layer.LayerKey, out buffer))
+						DrawLayerBuffer(buffer, ColorAlpha / 255f);
+
+					if (reportFirstFrame)
 					{
-						if (item.FillVertexCount > 0)
-							GL.DrawArrays(PrimitiveType.Triangles, item.FillVertexOffset, item.FillVertexCount);
-
-						if (item.LineVertexCount > 0)
-							GL.DrawArrays(PrimitiveType.Lines, item.LineVertexOffset, item.LineVertexCount);
-
-						if (reportFirstFrame)
-							ReportDrawProgress(++drawProcessed, drawTotal);
+						drawProcessed += layer.Items.Count;
+						ReportDrawProgress(drawProcessed, drawTotal);
 					}
 				}
 
 				// 뒤에 그린 Layer가 이미 선택된 Chain 객체를 덮지 않도록 선택 객체를 마지막에 다시 그린다.
 				DrawSelectedItemsOnTop();
 
-				foreach (var item in _defectList)
+				// 결함은 불투명 빨간색으로 채운다.
+				if (_defectBuffer != null && _defectList.Count > 0)
 				{
-					if (item.FillVertexCount > 0)
-						GL.DrawArrays(PrimitiveType.Triangles, item.FillVertexOffset, item.FillVertexCount);
-
-					if (item.LineVertexCount > 0)
-						GL.DrawArrays(PrimitiveType.Lines, item.LineVertexOffset, item.LineVertexCount);
-
+					DrawLayerBuffer(_defectBuffer, 1f);
 					if (reportFirstFrame)
-						ReportDrawProgress(++drawProcessed, drawTotal);
+					{
+						drawProcessed += _defectList.Count;
+						ReportDrawProgress(drawProcessed, drawTotal);
+					}
 				}
+				GL.BindVertexArray(0);
 
 				// Map과 같은 투영 행렬로 모든 Chain Element 외곽선을 그린다.
 				mapDrawEnd = Stopwatch.GetTimestamp();
@@ -1050,16 +1228,42 @@ namespace NexplantQMS.GdsMap
 				return;
 
 			var visibleLayers = new HashSet<int>(_layerList.Where(layer => layer.Visible)
-				.Select(layer => layer.LayerID));
+				.Select(layer => layer.LayerKey));
+			GL.Uniform1(_uAlphaLoc, 1f);
+			int boundLayer = int.MinValue;
 			foreach (var item in _selectedItems)
 			{
-				if (!visibleLayers.Contains(item.LayerID))
+				LayerGpuBuffer buffer;
+				if (!visibleLayers.Contains(item.LayerKey) || !_layerBuffers.TryGetValue(item.LayerKey, out buffer) || !buffer.Uploaded)
 					continue;
-				if (item.FillVertexCount > 0)
-					GL.DrawArrays(PrimitiveType.Triangles, item.FillVertexOffset, item.FillVertexCount);
-				if (item.LineVertexCount > 0)
-					GL.DrawArrays(PrimitiveType.Lines, item.LineVertexOffset, item.LineVertexCount);
+				if (boundLayer != item.LayerKey)
+				{
+					GL.BindVertexArray(buffer.Vao);
+					boundLayer = item.LayerKey;
+				}
+				if (item.FillIndexCount > 0)
+					GL.DrawElements(PrimitiveType.Triangles, item.FillIndexCount, DrawElementsType.UnsignedInt, new IntPtr((long)item.FillIndexOffset * sizeof(int)));
+				if (item.LineCount > 0)
+					GL.DrawArrays(item.LineLoop ? PrimitiveType.LineLoop : PrimitiveType.LineStrip, item.LineFirst, item.LineCount);
 			}
+		}
+
+		/// <summary>Layer 버퍼 하나를 그린다: 채우기(인덱스 삼각형, 투명도 fillAlpha) -> 닫힌 외곽선(LineLoop) / 열린 선(LineStrip) 불투명.</summary>
+		private void DrawLayerBuffer(LayerGpuBuffer buffer, float fillAlpha)
+		{
+			if (!buffer.Uploaded || buffer.Vertices.Count == 0)
+				return;
+			GL.BindVertexArray(buffer.Vao);
+			if (buffer.FillIndexCount > 0)
+			{
+				GL.Uniform1(_uAlphaLoc, fillAlpha);
+				GL.DrawElements(PrimitiveType.Triangles, buffer.FillIndexCount, DrawElementsType.UnsignedInt, IntPtr.Zero);
+			}
+			GL.Uniform1(_uAlphaLoc, 1f);
+			if (buffer.LoopFirstArray.Length > 0)
+				GL.MultiDrawArrays(PrimitiveType.LineLoop, buffer.LoopFirstArray, buffer.LoopCountArray, buffer.LoopFirstArray.Length);
+			if (buffer.StripFirstArray.Length > 0)
+				GL.MultiDrawArrays(PrimitiveType.LineStrip, buffer.StripFirstArray, buffer.StripCountArray, buffer.StripFirstArray.Length);
 		}
 
 		/// <summary>
@@ -1130,16 +1334,18 @@ namespace NexplantQMS.GdsMap
 			// world -> pixel 스케일 계산 (pixels per world unit)
 			double sx = availW / Math.Max(b.Width, 1e-9);
 			double sy = availH / Math.Max(b.Height, 1e-9);
-			
-			_scale = Math.Min(sx, sy) * 3f;
+
+			// 원점이 도면 안에 있는 파일(U9 / OMM_TCB 등)은 지금까지처럼 원점 중심 + 3배로 연다.
+			// 원점이 도면 밖이거나 경계에 있는 파일(U8: 0 ~ 23.7mm / 0 ~ 29.8mm)은 원점 중심이면 도면 모서리만 보여 도면 중심에 전체를 맞춘다 (2026-10-20)
+			bool originInside = b.MinX < 0 && b.MaxX > 0 && b.MinY < 0 && b.MaxY > 0;
+			_scale = Math.Min(sx, sy) * (originInside ? 3f : 1f);
 			_scale = Clamp(_scale, MinScale, MaxScale);
 
 			if (_scale <= 0 || double.IsNaN(_scale) || double.IsInfinity(_scale)) _scale = 1;
 			SetTextLabelFitScale();
 
-			// 월드 중심을 화면 중앙에 맞춤
-			double cx = 0;// b.MinX + b.Width * 0.5;
-			double cy = 0;// b.MinY + b.Height * 0.5;
+			double cx = originInside ? 0 : b.MinX + b.Width * 0.5;
+			double cy = originInside ? 0 : b.MinY + b.Height * 0.5;
 			_offset = new Vector2((float)cx, (float)cy);
 
 			Invalidate();
@@ -1197,8 +1403,7 @@ namespace NexplantQMS.GdsMap
 				{
 					MakeCurrent();
 					ReleaseChainOverlayGlResources();
-					GL.DeleteBuffer(_vbo);
-					GL.DeleteVertexArray(_vao);
+					ReleaseGpuBuffers();
 					GL.DeleteProgram(_shaderProgram);
 				}
 			}

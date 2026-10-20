@@ -8,6 +8,9 @@ namespace NexplantQMS.GdsMap
 	/// <summary>
 	/// 모든 Layer의 GDS TEXT를 도형 렌더링 뒤에 표시하는 화면 오버레이다.
 	/// OpenGL 도형 버퍼와 분리하여 문자열 데이터가 GPU 버퍼를 불필요하게 늘리지 않도록 한다.
+	/// 글자 크기는 배율마다 화면 전체에서 하나다. Label 마다 이웃 거리로 크기를 바꾸면 빈 자리 옆 / 한 자리 여러 Label 에서 크기가 제각각이 되기 때문이다 (2026-10-20).
+	/// 한 자리에 Label 이 여러 개 겹친 도면(U8: Bump 마다 핀 번호 + Net 이름, 같은 내용 2벌)은 같은 좌표 묶음(자리) 단위로 줄을 나눠 그린다 (2026-10-20).
+	/// 설계: 문서/설계/02_GDS/2026-10-20_U8_Label_표시크기_설계.md
 	/// </summary>
 	public partial class GdsMapControl
 	{
@@ -19,7 +22,14 @@ namespace NexplantQMS.GdsMap
 		private const float LabelMinimumFontPixels = 6.0f;
 		// 간격에 맞춘 크기 조정을 우선하고, 극단적인 줌에서만 최대 글꼴 크기를 제한한다.
 		private const float LabelMaximumFontPixels = 64.0f;
+		// 보통 이름 폭을 잴 때 쓰는 이름 수와 글꼴 크기. 도면을 읽은 뒤 첫 그리기에서 한 번만 잰다 (2026-10-20)
+		private const int LabelReferenceSampleCount = 32;
+		private const float LabelMeasureFontPixels = 100.0f;
 		private readonly List<LayerTextLabel> _textLabels = new List<LayerTextLabel>();
+		// 같은 좌표 Label 묶음(그리기 단위)과 Layer 키별 글자 크기 기준. CalculateTextLabelDisplayAreas 에서 만든다 (2026-10-20)
+		private readonly List<TextLabelSpot> _textLabelSpots = new List<TextLabelSpot>();
+		private readonly Dictionary<int, TextLabelKeyInfo> _textLabelKeyInfos = new Dictionary<int, TextLabelKeyInfo>();
+		private int _textLabelLayoutCount = -1;
 		private double _labelFitScale = 1.0;
 		public int LastVisibleTextLabelCount { get; private set; }
 
@@ -64,8 +74,10 @@ namespace NexplantQMS.GdsMap
 		}
 
 		/// <summary>
-		/// 각 Layer에서 실제로 같은 X/Y 좌표에 있는 TEXT만 묶어 인접 간격을 계산한다.
+		/// 각 Layer 키(Layer 번호 + TEXTTYPE)에서 실제로 같은 X/Y 좌표에 있는 TEXT만 묶어 인접 간격을 계산한다.
 		/// GPoint가 소수 다섯째 자리까지 정규화되므로 셋째 자리 반올림은 서로 다른 행/열을 합쳐 버린다.
+		/// 화면에서 18/3 / 18/4 를 따로 켜고 끄므로 간격도 같은 키 안에서 구한다. 간격은 키별 대표 칸(중앙값)을 구하는 데 쓴다 (2026-10-20).
+		/// 이어서 같은 내용 사본 표시 / 키별 글자 크기 기준 / 같은 좌표 묶음(자리)을 만든다 (2026-10-20).
 		/// </summary>
 		private void CalculateTextLabelDisplayAreas()
 		{
@@ -73,10 +85,11 @@ namespace NexplantQMS.GdsMap
 			{
 				label.AvailableWidth = 0;
 				label.AvailableHeight = 0;
+				label.SkipDraw = false;
 			}
-			foreach (var row in _textLabels.GroupBy(label => new { label.LayerId, label.Position.Y }))
+			foreach (var row in _textLabels.GroupBy(label => new { label.LayerKey, label.Position.Y }))
 				AssignAvailableSpace(row.OrderBy(label => label.Position.X).ToList(), true);
-			foreach (var column in _textLabels.GroupBy(label => new { label.LayerId, label.Position.X }))
+			foreach (var column in _textLabels.GroupBy(label => new { label.LayerKey, label.Position.X }))
 				AssignAvailableSpace(column.OrderBy(label => label.Position.Y).ToList(), false);
 			// 2026-10-07 결정 A: 한쪽 방향에만 이웃이 있으면 그 간격을 다른 방향 제한에도 쓴다.
 			// 이웃이 없는 방향은 화면 크기가 제한이 되어 확대할수록 최대 글꼴(64px)까지 커지기 때문이다(예: C4DC_HBM0_N_FH).
@@ -85,11 +98,17 @@ namespace NexplantQMS.GdsMap
 				if (label.AvailableWidth <= 0 && label.AvailableHeight > 0) label.AvailableWidth = label.AvailableHeight;
 				else if (label.AvailableHeight <= 0 && label.AvailableWidth > 0) label.AvailableHeight = label.AvailableWidth;
 			}
+			MarkDuplicateTextLabels();
+			BuildTextLabelKeyInfos();
+			BuildTextLabelSpots();
+			_textLabelLayoutCount = _textLabels.Count;
 		}
 
 		/// <summary>
 		/// 가장 가까운 양쪽 이웃 간격을 안전 영역으로 사용한다.
 		/// 배열 경계의 TEXT는 이웃이 한쪽만 있어도 그 간격으로 표시 가능 여부를 판단한다.
+		/// 같은 좌표 Label(한 자리 여러 Label / 같은 내용 2벌)은 건너뛰고 다른 좌표의 첫 이웃까지 본다.
+		/// 바로 앞 / 뒤만 보면 같은 좌표가 3개 이상 이어질 때 가운데 Label 의 간격이 0(= 화면 크기)이 되었다 (2026-10-20).
 		/// </summary>
 		private static void AssignAvailableSpace(List<LayerTextLabel> labels, bool horizontal)
 		{
@@ -97,15 +116,23 @@ namespace NexplantQMS.GdsMap
 			{
 				double current = horizontal ? labels[index].Position.X : labels[index].Position.Y;
 				double available = Double.MaxValue;
-				if (index > 0)
+				for (int previousIndex = index - 1; previousIndex >= 0; previousIndex--)
 				{
-					double previous = horizontal ? labels[index - 1].Position.X : labels[index - 1].Position.Y;
-					if (current > previous) available = Math.Min(available, current - previous);
+					double previous = horizontal ? labels[previousIndex].Position.X : labels[previousIndex].Position.Y;
+					if (current > previous)
+					{
+						available = Math.Min(available, current - previous);
+						break;
+					}
 				}
-				if (index < labels.Count - 1)
+				for (int nextIndex = index + 1; nextIndex < labels.Count; nextIndex++)
 				{
-					double next = horizontal ? labels[index + 1].Position.X : labels[index + 1].Position.Y;
-					if (next > current) available = Math.Min(available, next - current);
+					double next = horizontal ? labels[nextIndex].Position.X : labels[nextIndex].Position.Y;
+					if (next > current)
+					{
+						available = Math.Min(available, next - current);
+						break;
+					}
 				}
 				if (available == Double.MaxValue) continue;
 				if (horizontal) labels[index].AvailableWidth = available;
@@ -114,8 +141,76 @@ namespace NexplantQMS.GdsMap
 		}
 
 		/// <summary>
+		/// 같은 Layer 키 / 글자 / 좌표의 두 번째 이후 Label 은 그리지 않는다. 목록(진단 / Chain 이름 찾기)에는 그대로 둔다.
+		/// U8 은 제품 Cell 의 TEXT 와 같은 내용의 하위 Cell 이 (0, 0)에 한 번 더 배치되어 Label 이 2벌 펼쳐진다 (2026-10-20).
+		/// </summary>
+		private void MarkDuplicateTextLabels()
+		{
+			var seen = new HashSet<(int, string, double, double)>();
+			foreach (var label in _textLabels)
+				label.SkipDraw = !seen.Add((label.LayerKey, label.Text, label.Position.X, label.Position.Y));
+		}
+
+		/// <summary>
+		/// Layer 키별 글자 크기 기준을 만든다.
+		/// - 대표 칸: Label 칸 가로 / 세로의 중앙값(배열 피치). 빈 자리 옆처럼 넓은 칸이 크기를 키우지 않게 Label 하나의 칸 대신 쓴다.
+		/// - 보통 이름: 이름 길이 중앙값의 이름들. 그리기 때 폭을 재서 대표 칸의 40% 에 들어가는 크기를 그 키의 글자 크기로 본다.
+		/// </summary>
+		private void BuildTextLabelKeyInfos()
+		{
+			_textLabelKeyInfos.Clear();
+			foreach (var key in _textLabels.Where(label => !label.SkipDraw).GroupBy(label => label.LayerKey))
+			{
+				var lengths = key.Select(label => label.Text.Length).OrderBy(length => length).ToList();
+				int typicalLength = lengths[lengths.Count / 2];
+				_textLabelKeyInfos.Add(key.Key, new TextLabelKeyInfo
+				{
+					MedianWidth = MedianOfPositive(key.Select(label => label.AvailableWidth)),
+					MedianHeight = MedianOfPositive(key.Select(label => label.AvailableHeight)),
+					ReferenceTexts = key.Select(label => label.Text).Where(text => text.Length == typicalLength)
+						.Distinct().Take(LabelReferenceSampleCount).ToList()
+				});
+			}
+		}
+
+		/// <summary>0 보다 큰 값의 중앙값. 값이 없으면 0.</summary>
+		private static double MedianOfPositive(IEnumerable<double> values)
+		{
+			var sorted = values.Where(value => value > 0).OrderBy(value => value).ToList();
+			return sorted.Count == 0 ? 0 : sorted[sorted.Count / 2];
+		}
+
+		/// <summary>
+		/// 같은 좌표의 Label 을 그리기 단위(자리)로 묶는다. 자리 순서는 처음 나온 순서(파일 순서)다.
+		/// 자리 안 순서: Layer 번호 -> TEXTTYPE 큰 쪽(U8: Net 이름 4 -> 핀 번호 3) -> 파일 순서. 그릴 때 이 순서로 줄을 나눈다.
+		/// </summary>
+		private void BuildTextLabelSpots()
+		{
+			_textLabelSpots.Clear();
+			var spots = new Dictionary<(double, double), TextLabelSpot>();
+			foreach (var label in _textLabels)
+			{
+				if (label.SkipDraw) continue;
+				var position = (label.Position.X, label.Position.Y);
+				if (!spots.TryGetValue(position, out var spot))
+				{
+					spot = new TextLabelSpot(label.Position);
+					spots.Add(position, spot);
+					_textLabelSpots.Add(spot);
+				}
+				spot.Labels.Add(label);
+			}
+			foreach (var spot in _textLabelSpots)
+			{
+				if (spot.Labels.Count > 1)
+					spot.Labels = spot.Labels.OrderBy(label => label.LayerId).ThenByDescending(label => label.TextType).ToList();
+			}
+		}
+
+		/// <summary>
 		/// 현재 화면 안에 있고 해당 TEXT Layer가 표시 중인 Label만 GDI 오버레이로 그린다.
 		/// 축소 상태에서는 문자 수가 많아도 반복 DrawString 비용이 발생하지 않도록 표시를 건너뛴다.
+		/// 배치 계산(LayoutTextLabels)과 그리기를 나눠 Probe 에서 같은 계산을 비트맵으로 확인한다 (2026-10-20).
 		/// </summary>
 		private void DrawTextLabels()
 		{
@@ -123,61 +218,118 @@ namespace NexplantQMS.GdsMap
 			if (_textLabels.Count == 0)
 				return;
 
-			var visibleLayers = new HashSet<int>(_layerList.Where(layer => layer.Visible).Select(layer => layer.LayerID));
-			if (visibleLayers.Count == 0)
-				return;
-
 			using (var graphics = CreateGraphics())
 			using (var brush = new SolidBrush(Color.White))
-			using (var maximumFont = new Font("Segoe UI", GetTextLabelFontPixels(), FontStyle.Regular, GraphicsUnit.Pixel))
 			{
 				graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
-				var occupiedRegions = new Dictionary<long, List<RectangleF>>();
-				var fittedFonts = new Dictionary<int, Font>();
+				var placements = LayoutTextLabels(graphics, ClientSize.Width, ClientSize.Height);
+				var fonts = new Dictionary<int, Font>();
 				try
 				{
-					foreach (var label in _textLabels)
+					foreach (var placement in placements)
 					{
-						if (!visibleLayers.Contains(label.LayerId)) continue;
-						// 이웃이 없는 방향은 화면 크기를 사용한다. 확대 글씨는 인접 간격의 40%에 맞춰 줄인다.
-						PointF screen = WorldToScreen(label.Position);
-						// 화면 밖 기준점은 최종 문자열도 화면 안에 완전히 들어올 수 없어 측정 전에 제외한다.
-						if (screen.X < 0 || screen.Y < 0 || screen.X > ClientSize.Width || screen.Y > ClientSize.Height) continue;
-						float allowedWidth = label.AvailableWidth > 0
-							? (float)(label.AvailableWidth * _scale) - LabelMarginPixels
-							: ClientSize.Width - LabelMarginPixels * 2;
-						float allowedHeight = label.AvailableHeight > 0
-							? (float)(label.AvailableHeight * _scale) - LabelMarginPixels
-							: ClientSize.Height - LabelMarginPixels * 2;
-						if (allowedWidth <= 0 || allowedHeight <= 0) continue;
-						SizeF maximumSize = graphics.MeasureString(label.Text, maximumFont);
-						float fitRatio = Math.Min(1f, Math.Min(
-							allowedWidth * LabelSpaceUseRatio / maximumSize.Width,
-							allowedHeight * LabelSpaceUseRatio / maximumSize.Height));
-						int fontPixels = (int)Math.Floor(maximumFont.Size * fitRatio);
-						if (fontPixels < LabelMinimumFontPixels) continue;
-						if (!fittedFonts.TryGetValue(fontPixels, out var labelFont))
+						if (!fonts.TryGetValue(placement.FontPixels, out var font))
 						{
-							labelFont = new Font("Segoe UI", fontPixels, FontStyle.Regular, GraphicsUnit.Pixel);
-							fittedFonts.Add(fontPixels, labelFont);
+							font = new Font("Segoe UI", placement.FontPixels, FontStyle.Regular, GraphicsUnit.Pixel);
+							fonts.Add(placement.FontPixels, font);
 						}
-						SizeF textSize = graphics.MeasureString(label.Text, labelFont);
-						if (textSize.Width > allowedWidth || textSize.Height > allowedHeight) continue;
-						PointF drawPoint = GetTextLabelDrawPoint(label, screen, textSize);
-						var textBounds = new RectangleF(drawPoint.X, drawPoint.Y, textSize.Width, textSize.Height);
-						if (textBounds.Left < 0 || textBounds.Top < 0 || textBounds.Right > ClientSize.Width || textBounds.Bottom > ClientSize.Height ||
-							HasLabelCollision(textBounds, occupiedRegions))
-							continue;
-						graphics.DrawString(label.Text, labelFont, brush, drawPoint);
-						ReserveLabelCells(textBounds, occupiedRegions);
-						LastVisibleTextLabelCount++;
+						graphics.DrawString(placement.Text, font, brush, placement.Location);
 					}
 				}
 				finally
 				{
-					foreach (var font in fittedFonts.Values) font.Dispose();
+					foreach (var font in fonts.Values) font.Dispose();
+				}
+				LastVisibleTextLabelCount = placements.Count;
+			}
+		}
+
+		/// <summary>
+		/// 그릴 Label 의 글자 / 위치 / 크기를 계산한다(그리지는 않음).
+		/// 처리 흐름:
+		///  1) 글자 크기를 한 번 정한다 = 켜진 Label Layer 키마다 "대표 칸 40% 에 보통 이름이 들어가는 크기" 중 가장 작은 값,
+		///     최대 글꼴(10px x 배율 비율, 64px) 이하. 6px 미만이면 아무것도 그리지 않는다(멀리서는 안 보임)
+		///  2) 자리마다: 기준점이 화면 밖이면 제외 -> 켜진 Layer 키의 Label 만 모아 같은 글자는 한 번, 다른 글자는 줄을 나눈다(Net 위 / 핀 번호 아래)
+		///  3) 모든 자리를 같은 크기로 재서 PRESENTATION 기준점에 놓고, 화면 밖 / 이미 그린 글자와 겹치면 제외
+		/// </summary>
+		internal List<TextLabelPlacement> LayoutTextLabels(Graphics graphics, int clientWidth, int clientHeight)
+		{
+			var placements = new List<TextLabelPlacement>();
+			if (_textLabels.Count == 0)
+				return placements;
+			if (_textLabelLayoutCount != _textLabels.Count)
+				CalculateTextLabelDisplayAreas();
+
+			// 표시 Layer 는 Layer 번호 + TEXTTYPE 키로 비교한다(KLayout 처럼 18/3 / 18/4 를 따로 켜고 끔) (2026-10-20)
+			var visibleLayers = new HashSet<int>(_layerList.Where(layer => layer.Visible).Select(layer => layer.LayerKey));
+			if (visibleLayers.Count == 0)
+				return placements;
+
+			double fontLimit = GetTextLabelFontPixels();
+			foreach (int layerKey in visibleLayers)
+			{
+				if (_textLabelKeyInfos.TryGetValue(layerKey, out var info))
+					fontLimit = Math.Min(fontLimit, GetKeyFontPixels(info, graphics));
+			}
+			if (Double.IsNaN(fontLimit) || fontLimit < LabelMinimumFontPixels)
+				return placements;
+			int fontPixels = (int)Math.Floor(fontLimit);
+
+			var occupiedRegions = new Dictionary<long, List<RectangleF>>();
+			var lines = new List<string>();
+			using (var labelFont = new Font("Segoe UI", fontPixels, FontStyle.Regular, GraphicsUnit.Pixel))
+			{
+				foreach (var spot in _textLabelSpots)
+				{
+					PointF screen = WorldToScreen(spot.Position);
+					// 화면 밖 기준점은 최종 문자열도 화면 안에 완전히 들어올 수 없어 측정 전에 제외한다.
+					if (screen.X < 0 || screen.Y < 0 || screen.X > clientWidth || screen.Y > clientHeight) continue;
+
+					LayerTextLabel first = null;
+					lines.Clear();
+					foreach (var label in spot.Labels)
+					{
+						if (!visibleLayers.Contains(label.LayerKey)) continue;
+						if (first == null) first = label;
+						if (!lines.Contains(label.Text)) lines.Add(label.Text);
+					}
+					if (first == null) continue;
+					string text = lines.Count == 1 ? lines[0] : String.Join("\n", lines);
+
+					SizeF textSize = graphics.MeasureString(text, labelFont);
+					PointF drawPoint = GetTextLabelDrawPoint(first, screen, textSize);
+					var textBounds = new RectangleF(drawPoint.X, drawPoint.Y, textSize.Width, textSize.Height);
+					if (textBounds.Left < 0 || textBounds.Top < 0 || textBounds.Right > clientWidth || textBounds.Bottom > clientHeight ||
+						HasLabelCollision(textBounds, occupiedRegions))
+						continue;
+					placements.Add(new TextLabelPlacement(text, drawPoint, textSize, fontPixels));
+					ReserveLabelCells(textBounds, occupiedRegions);
 				}
 			}
+			return placements;
+		}
+
+		/// <summary>
+		/// 키 하나의 이번 배율 글자 크기(px) = 보통 이름이 대표 칸 가로 / 세로의 40% 에 들어가는 크기.
+		/// 보통 이름 폭은 도면을 읽은 뒤 처음 한 번 100px 글꼴로 재서 중앙값을 쓴다. 대표 칸이 없으면(이웃 없음) 제한하지 않는다.
+		/// </summary>
+		private double GetKeyFontPixels(TextLabelKeyInfo info, Graphics graphics)
+		{
+			if (info.LineHeight <= 0)
+			{
+				using (var measureFont = new Font("Segoe UI", LabelMeasureFontPixels, FontStyle.Regular, GraphicsUnit.Pixel))
+				{
+					var widths = info.ReferenceTexts.Select(text => (double)graphics.MeasureString(text, measureFont).Width).OrderBy(width => width).ToList();
+					info.ReferenceWidth = widths.Count == 0 ? 0 : widths[widths.Count / 2];
+					info.LineHeight = graphics.MeasureString("Ag", measureFont).Height;
+				}
+			}
+			double pixels = Double.MaxValue;
+			if (info.MedianWidth > 0 && info.ReferenceWidth > 0)
+				pixels = Math.Min(pixels, ((info.MedianWidth * _scale) - LabelMarginPixels) * LabelSpaceUseRatio * LabelMeasureFontPixels / info.ReferenceWidth);
+			if (info.MedianHeight > 0 && info.LineHeight > 0)
+				pixels = Math.Min(pixels, ((info.MedianHeight * _scale) - LabelMarginPixels) * LabelSpaceUseRatio * LabelMeasureFontPixels / info.LineHeight);
+			return pixels;
 		}
 
 		/// <summary>
@@ -233,22 +385,67 @@ namespace NexplantQMS.GdsMap
 					yield return ((long)x << 32) ^ (uint)y;
 		}
 
+		/// <summary>화면에 그릴 Label 하나(자리 묶음)의 글자 / 위치 / 크기 (2026-10-20).</summary>
+		internal sealed class TextLabelPlacement
+		{
+			public TextLabelPlacement(string text, PointF location, SizeF size, int fontPixels)
+			{
+				Text = text;
+				Location = location;
+				Size = size;
+				FontPixels = fontPixels;
+			}
+			public string Text { get; private set; }
+			public PointF Location { get; private set; }
+			public SizeF Size { get; private set; }
+			public int FontPixels { get; private set; }
+		}
+
+		/// <summary>같은 좌표의 Label 묶음(그리기 단위) (2026-10-20).</summary>
+		private sealed class TextLabelSpot
+		{
+			public TextLabelSpot(GPoint position)
+			{
+				Position = position;
+				Labels = new List<LayerTextLabel>();
+			}
+			public GPoint Position { get; private set; }
+			public List<LayerTextLabel> Labels { get; set; }
+		}
+
+		/// <summary>Layer 키의 글자 크기 기준(대표 칸 / 보통 이름 폭) (2026-10-20).</summary>
+		private sealed class TextLabelKeyInfo
+		{
+			public double MedianWidth { get; set; }
+			public double MedianHeight { get; set; }
+			public List<string> ReferenceTexts { get; set; }
+			public double ReferenceWidth { get; set; }
+			public double LineHeight { get; set; }
+		}
+
 		/// <summary>GDS 변환이 반영된 TEXT와 기준 좌표를 한 쌍으로 보관한다.</summary>
 		private sealed class LayerTextLabel
 		{
 			public int LayerId { get; private set; }
+			// 화면 Layer 키(Layer 번호 + TEXTTYPE)와 TEXTTYPE. 간격 계산 / 표시 여부 / 자리 안 순서에 쓴다 (2026-10-20)
+			public int LayerKey { get; private set; }
+			public int TextType { get; private set; }
 			public string Text { get; private set; }
 			public GPoint Position { get; private set; }
 			public GdsTextHorizontalPresentation HorizontalPresentation { get; private set; }
 			public GdsTextVerticalPresentation VerticalPresentation { get; private set; }
 			public double AvailableWidth { get; set; }
 			public double AvailableHeight { get; set; }
+			// 같은 키 / 글자 / 좌표의 두 번째 이후 사본이면 그리지 않는다 (2026-10-20)
+			public bool SkipDraw { get; set; }
 			public GdsTextLabelDiagnostic Diagnostic { get; private set; }
 			public LayerTextLabel(int layerId, string text, int textType, int fontNumber,
 				GdsTextHorizontalPresentation horizontalPresentation, GdsTextVerticalPresentation verticalPresentation,
 				GPoint rawPosition, GPoint position, string structurePath)
 			{
 				LayerId = layerId;
+				LayerKey = GdsLayerKey.Make(layerId, textType);
+				TextType = textType;
 				Text = text;
 				Position = position;
 				HorizontalPresentation = horizontalPresentation;

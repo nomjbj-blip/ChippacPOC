@@ -55,14 +55,14 @@ namespace NexplantQMS.GdsMap
                 Math.Max(first.X, second.X), Math.Max(first.Y, second.Y));
             GPoint center = ScreenToWorld(screenPoint);
             double tolerance = Math.Max(hitArea.Width, hitArea.Height) / 2;
-            var visibleLayers = new HashSet<int>(_layerList.Where(layer => layer.Visible).Select(layer => layer.LayerID));
+            var visibleLayers = new HashSet<int>(_layerList.Where(layer => layer.Visible).Select(layer => layer.LayerKey));
             var candidates = new List<ChainElementCandidate>();
             foreach (GlSceneItem item in AllItems)
             {
                 if (!(item.Source is GdsBoundary) && !(item.Source is GdsPath))
                     continue;
 
-                if (visibleLayers.Contains(item.LayerID)
+                if (visibleLayers.Contains(item.LayerKey)
                     && item.WorldBounds.IntersectsWith(hitArea)
                     && ChainGeometryOverlap.ContainsPoint(center, item.WorldPoints,
                         item.Source is GdsPath, item.Width, tolerance))
@@ -118,7 +118,7 @@ namespace NexplantQMS.GdsMap
         /// </summary>
         /// <param name="inputElementKeys">엔지니어가 확정한 Input의 현재 화면 Element 키 집합</param>
         /// <param name="outputElementKeys">엔지니어가 확정한 Output의 현재 화면 Element 키 집합</param>
-        /// <param name="selectedLayerIds">왼쪽 Layer 목록에서 체크한 Layer ID</param>
+        /// <param name="selectedLayerIds">왼쪽 Layer 목록에서 체크한 Layer 키(번호 + DataType, GdsLayerKey)</param>
         /// <param name="layerRules">선택적으로 적용할 Layer 연결 규칙</param>
         /// <param name="applyLayerRules">규칙 추가 검사를 실행할지 여부</param>
         /// <param name="spatialCellSize">주변 Element 검색에 사용할 공간 격자 크기</param>
@@ -248,7 +248,7 @@ namespace NexplantQMS.GdsMap
             var included = new HashSet<string>(includedElementKeys, StringComparer.Ordinal);
             var selectedLayers = new HashSet<int>(selectedLayerIds);
             var elements = _lastChainTraceItems
-                .Where(pair => included.Contains(pair.Key) && selectedLayers.Contains(pair.Value.LayerID))
+                .Where(pair => included.Contains(pair.Key) && selectedLayers.Contains(pair.Value.LayerKey))
                 .Select(pair => new ChainTraceElement(pair.Key, pair.Value.LayerID,
                     pair.Value.WorldBounds, pair.Value.Source.ElementName,
                     pair.Value.WorldPoints, pair.Value.Source is GdsPath ? pair.Value.Width : 0,
@@ -307,7 +307,7 @@ namespace NexplantQMS.GdsMap
                 if (!(item.Source is GdsBoundary) && !(item.Source is GdsPath))
                     continue;
                 string key = item.PlacedElementId;
-                if (!selectedLayerIds.Contains(item.LayerID))
+                if (!selectedLayerIds.Contains(item.LayerKey))
                     continue;
                 var traceElement = new ChainTraceElement(
                     key,

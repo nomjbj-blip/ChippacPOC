@@ -45,7 +45,7 @@ namespace DACrux.TEST.ENGUI
     /// 왜: GDS / KLARF / ET Map 을 같은 Die 격자로 맞추려면 DMS 가 KLARF 를 저장할 때 쓰는 인덱스 규칙을 그대로 따라야 한다.
     /// 근거: DACrux.Data.Parser Klarf/WaferList.UpdateDieIndex 는 원본 인덱스(가운데 Die = 0,0)에
     ///       TQD_SETUP.DIE_ORIGIN 또는 WaferDieCalculator.OriginIndex 를 더해 좌하단 (1,1) 기준으로 옮긴다.
-    /// 설계: 문서/2026-10-06_KLARF_Map_Setup_설계.md 2~3절
+    /// 설계: 문서/설계/03_KLARF_Map/2026-10-06_KLARF_Map_Setup_설계.md 2~3절
     /// </summary>
     internal static class KlarfMapRule
     {

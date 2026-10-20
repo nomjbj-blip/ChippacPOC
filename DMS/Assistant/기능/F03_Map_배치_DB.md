@@ -21,7 +21,7 @@
 | [MapPlacedBatchReader.cs](../../06_CoreLibSource/GdsMapControl/Persistence/MapPlacedBatchReader.cs) | 배치 검증 / 복원 |
 | [MapPlacedSceneItemFactory.cs](../../06_CoreLibSource/GdsMapControl/Persistence/MapPlacedSceneItemFactory.cs) | 복원한 도형을 GlSceneItem으로 변환 |
 | [Map DDL](../../06_CoreLibSource/GdsMapControl/Persistence/2026-10-01_tqp_gds_map_schema.sql) / [Chain DDL](../../06_CoreLibSource/GdsMapControl/Persistence/2026-10-01_tqp_gds_chain_schema.sql) | 신규 테이블 정의 |
-| [DB 설계 / 적용 기록](../../../문서/2026-10-01_Device_Map_Chain_DB_스키마_설계.md) | 키 / 상태 / 제약 / 과거 적용 결과 |
+| [DB 설계 / 적용 기록](../../../문서/설계/02_GDS/2026-10-01_Device_Map_Chain_DB_스키마_설계.md) | 키 / 상태 / 제약 / 과거 적용 결과 |
 
 ## 구현과 설계 경계
 
@@ -57,7 +57,7 @@
 
 ## 다음 단계
 
-**2026-10-02 설계:** GDS Map Setup 화면의 DB 저장 설계는 [GDS Map DB 저장 설계](../../../문서/2026-10-02_GDS_Map_DB저장_설계.md)를 따른다. 요점: 전송은 GMP1 대신 행 DTO 배열(BSL이 .NET 4.0이라 4.8 Reader 참조 불가) / 행 INSERT는 키 중복 시 건너뛰고 배치 기록은 마지막 / BLOB은 Middleware `Execute1(object[])` 검증이 1단계 / 파서 중복 행 Source ID는 `<Structure>/D<순번>` / AREF 도면은 저장 차단 / MAP_ACTIVE와 Chain 저장은 제외.
+**2026-10-02 설계:** GDS Map Setup 화면의 DB 저장 설계는 [GDS Map DB 저장 설계](../../../문서/설계/02_GDS/2026-10-02_GDS_Map_DB저장_설계.md)를 따른다. 요점: 전송은 GMP1 대신 행 DTO 배열(BSL이 .NET 4.0이라 4.8 Reader 참조 불가) / 행 INSERT는 키 중복 시 건너뛰고 배치 기록은 마지막 / BLOB은 Middleware `Execute1(object[])` 검증이 1단계 / 파서 중복 행 Source ID는 `<Structure>/D<순번>` / AREF 도면은 저장 차단 / MAP_ACTIVE와 Chain 저장은 제외.
 
 **2026-10-02 구현 1단계:** `08_DBQuery/ORACLE/TQP_GDS_IMPORT.xml`(LAYER / SOURCE / PLACED INSERT, 좌표 재조회) 추가. `Probes/GdsImportBlobProbe.ps1`로 로컬 DB에서 BLOB / Double / CLOB 왕복과 중복 건너뛰기 PASS. Middleware SQL 로그가 byte[]를 처리하지 못해 이 XML은 `logging="FALSE"`. 행당 약 4.4ms / 자동 Commit.
 
@@ -81,7 +81,7 @@ SOURCE 전송 계약과 ID를 정리한 뒤 Layer -> Source -> Placed 순서의 
 
 **2026-10-02 구현 5단계(CLAUDE-012):** GDS Map Setup 화면에 DB 저장 연결(`GdsMapForm_DbSave.cs`, RO `GdsMapImport` 호출). 빌드 / ClientBin 배포 완료, DMS 화면 실저장 확인 대기. 설계 18절.
 
-**2026-10-02 조회 화면 설계(CLAUDE-013):** 등록 화면과 분리한 조회 전용 화면 [GDS Map 조회 화면 설계](../../../문서/2026-10-02_GDS_Map_조회화면_설계.md). 1차는 READY 개정본의 도면만(LAYER + PLACED, Layer별 keyset 페이지 조회) / 신규 읽기 서비스 `iGdsMapView` / `GdsMapControl.ShowPlacedElements` 추가 / 호스트 `frmGdsMapView`. Chain 옵션은 Chain 저장 후. 설계만, 사용자 결정 대기.
+**2026-10-02 조회 화면 설계(CLAUDE-013):** 등록 화면과 분리한 조회 전용 화면 [GDS Map 조회 화면 설계](../../../문서/설계/02_GDS/2026-10-02_GDS_Map_조회화면_설계.md). 1차는 READY 개정본의 도면만(LAYER + PLACED, Layer별 keyset 페이지 조회) / 신규 읽기 서비스 `iGdsMapView` / `GdsMapControl.ShowPlacedElements` 추가 / 호스트 `frmGdsMapView`. Chain 옵션은 Chain 저장 후. 설계만, 사용자 결정 대기.
 
 **2026-10-02 조회 구현 1단계(CLAUDE-014):** 읽기 전용 `iGdsMapView`(Device / Revision / Layer / PLACED keyset 페이지) + XML SELECT 6개. BSL 직접 Probe PASS(605,080행 66페이지 약 16초, 누락 / 중복 없음). 페이지는 `RemotingFormat = Binary`(10,000행 7.7MB -> 2.9MB). DLL 배포 대기. 상세는 조회 설계 11절.
 
@@ -104,11 +104,11 @@ SOURCE 전송 계약과 ID를 정리한 뒤 Layer -> Source -> Placed 순서의 
 
 **2026-10-06 배치 저장을 DefectDefine.CreateDefect 방식으로 전환(CLAUDE-023, 최신 기준):** 사용자 지시. BSL 배치 저장은 작업 키 조회 + `InsertExecuteMultiple`만 한다(큰 도형만 `Execute1`). 행 검증 / 해시 / 배치 기록(TQP_GDS_IMPORT_BATCH) / 수신 건수 누적 / 중복 재시도 제거, 확정은 DB 건수 비교만. 실패 시 삭제 후 재등록. Service config에서 사라졌던 GdsMapImport / GdsMapView wellknown을 운영 config와 원본 App.config에 다시 넣음.
 
-**2026-10-06 화면 역할 재정의(CLAUDE-026):** GDS Map Setup = GDS 읽기 + Layer 필터 + Map DB 저장, GDS Map View = Map 조회 + Chain 설정 / 저장 / 불러오기. View 조회 옵션 라디오(도면만 / Chain만 / 둘 다)는 제거됨. [화면 역할 재정의 설계](../../../문서/2026-10-06_GDS_Map_화면역할_재정의_설계.md) 9~12절.
+**2026-10-06 화면 역할 재정의(CLAUDE-026):** GDS Map Setup = GDS 읽기 + Layer 필터 + Map DB 저장, GDS Map View = Map 조회 + Chain 설정 / 저장 / 불러오기. View 조회 옵션 라디오(도면만 / Chain만 / 둘 다)는 제거됨. [화면 역할 재정의 설계](../../../문서/설계/02_GDS/2026-10-06_GDS_Map_화면역할_재정의_설계.md) 9~12절.
 
-**2026-10-06 저장 기준 Front / Back side(CLAUDE-027):** GDS 원본은 Front side. Setup DB 저장 시 콤보로 Back side(기본)를 고르면 PLACED 좌표를 GDS 원점 기준 좌우 반전(X' = -X)해 저장하고 `TQP_GDS_MAP.VIEW_SIDE`에 BACK 기록. SOURCE는 항상 원본. Device당 하나의 기준(바꾸려면 삭제 후 재등록). [GDS 반전 설계](../../../문서/2026-10-06_GDS_반전_BackSide_설계.md) 8~9절.
+**2026-10-06 저장 기준 Front / Back side(CLAUDE-027):** GDS 원본은 Front side. Setup DB 저장 시 콤보로 Back side(기본)를 고르면 PLACED 좌표를 GDS 원점 기준 좌우 반전(X' = -X)해 저장하고 `TQP_GDS_MAP.VIEW_SIDE`에 BACK 기록. SOURCE는 항상 원본. Device당 하나의 기준(바꾸려면 삭제 후 재등록). [GDS 반전 설계](../../../문서/설계/02_GDS/2026-10-06_GDS_반전_BackSide_설계.md) 8~9절.
 
-**2026-10-07 Front / Back 보기 전환(CLAUDE-030, 최신 기준 - 10-06 저장 기준 콤보 대체):** Setup 저장은 항상 원본(Front). View에서 [보기 기준 Front / Back]을 골라 화면에서 좌우 반전(X' = -X, `GdsSideTransform`)해 보여 준다. DB / Chain은 1벌(저장 기준 좌표), Chain Marker만 저장 / 불러오기 / 전환 때 변환. 로컬 DB의 기존 GDS 데이터는 전부 삭제됨. [Front / Back 전환 설계](../../../문서/2026-10-07_GDS_FrontBack_전환_설계.md).
+**2026-10-07 Front / Back 보기 전환(CLAUDE-030, 최신 기준 - 10-06 저장 기준 콤보 대체):** Setup 저장은 항상 원본(Front). View에서 [보기 기준 Front / Back]을 골라 화면에서 좌우 반전(X' = -X, `GdsSideTransform`)해 보여 준다. DB / Chain은 1벌(저장 기준 좌표), Chain Marker만 저장 / 불러오기 / 전환 때 변환. 로컬 DB의 기존 GDS 데이터는 전부 삭제됨. [Front / Back 전환 설계](../../../문서/설계/02_GDS/2026-10-07_GDS_FrontBack_전환_설계.md).
 
 **2026-10-08 GDS_SHA256 컬럼 제거(CLAUDE-041, 사용자 결정 "1"):** CLAUDE-028(계산 제거 / NULL 허용)의 후속으로 `TQP_GDS_MAP.GDS_SHA256` 컬럼을 DROP(`Persistence/2026-10-08_tqp_gds_map_drop_sha.sql`, 로컬 DB 적용). `TQP_GDS_MAP.xml` SELECT_MAP_INFO / CREATE_MAP에서 제거, BSL `BeginMapImport`는 SHA 검사 삭제. `ImportInfo[4]`는 이미 배포된 화면 / Probe와 순서를 맞추려고 자리만 남기고 값을 무시한다(계약 길이 11 / 12 그대로). 같은 도면 판단은 파일 이름 / 등록 시각 / 건수로 한다.
 
@@ -116,8 +116,26 @@ SOURCE 전송 계약과 ID를 정리한 뒤 Layer -> Source -> Placed 순서의 
 
 ## 대표 Device / Sub Device (2026-10-12 CLAUDE-055)
 
+- **2026-10-15 폐기(CLAUDE-109):** 아래 Sub Device 기능은 [Map 복사]로 대체되어 제거했다(화면 / 서비스 / DSL / XML, 테이블 DROP 은 배포 뒤). 아래는 이력.
+
 - GDS Map 이 있는 Device = 대표(예: `U9`). 다른 데이터의 Device 이름(KLARF Product `OMM_Hybrid`, E-Test `OMM`)을 GDS Map 조회 화면 [Sub Device]에서 수동 등록한다(`TQP_GDS_MAP_SUB_DEVICE`, FK 없음 - Map 재등록 후에도 유지).
 - 찾기: `GdsMapView.GetMapDeviceBySub(factory, 이름)` = Sub 등록 -> 같은 이름 READY Map 순, 대소문자 무시. KLARF 연관 분석이 사용 중, E-Test 는 연결 예정.
-- 설계 / 검증: `문서/2026-10-12_GDS_대표Device_SubDevice_설계.md` (Probe 17/17, Smoke 11/11, 배포 대기).
+- 설계 / 검증: `문서/설계/02_GDS/2026-10-12_GDS_대표Device_SubDevice_설계.md` (Probe 17/17, Smoke 11/11, 배포 대기).
 
 **2026-10-12 원본 행 테이블 제거(CLAUDE-061, 최신 기준):** `TQP_GDS_SOURCE_EL`은 저장할 때만 쓰고 조회하는 곳이 없어 제거한다. 저장 흐름 = 시작 -> LAYER -> PLACED -> 확정. PLACED의 `SOURCE_ELEMENT_ID` 컬럼은 남김(FK / 인덱스만 제거). 저장 작업의 원본 건수 컬럼 / Map 헤더 `SOURCE_PAYLOAD_VERSION` 도 제거. `BeginMapImport` ImportInfo[8]은 자리만 남기고 무시. DDL `Persistence/2026-10-12_tqp_gds_source_el_drop.sql`.
+- 2026-10-14 CLAUDE-094: GDS Map 설정 화면(파일 읽기 / DB 저장) 상태 줄에 경과 시간 칸 추가(기존 진행 막대 옆 `경과 n.n초`, 끝나면 `걸린 시간`). 배포(GdsMap EXE) / DMS 화면 확인 대기. [POC 화면 진행 표시줄](../../../문서/설계/06_환경_운영/2026-10-14_POC_화면_진행표시줄.md)
+
+## GDS Map 복사 / Sub Device 제거 (2026-10-15 CLAUDE-109)
+
+- GDS Map 조회 화면 도구 막대 [Map 복사]([Map ▾] 왼쪽, DMS 호스트 모드, READY Map 선택 후) -> 복사 창에 새 Device 이름 -> 서버 `GdsMapImport.CopyMap` 이 DB 안에서 `INSERT ... SELECT` 로 헤더(DRAFT) / Layer / 도형 / 저장 작업 건수 / Chain 전체(새 Chain 번호, Code·이름·색 그대로)를 복사한 뒤 READY. 중간 실패면 새 Device 를 DeleteMap 으로 정리. E-Test / KLARF 데이터는 복사하지 않는다.
+- 새 이름: 빈 값 / 50바이트 초과 / 원본과 같은 이름 / 이미 있는 Device(대소문자 무시) 거부. 화면에 저장하지 않은 Chain 변경이 있으면 "DB 에 저장된 내용만 복사"를 확인한다. 완료 후 Device 목록만 다시 읽고 지금 화면은 그대로, 결과는 상태 줄 한 줄.
+- Sub Device 제거: KLARF Product / E-Test Device 는 이름이 같은(대소문자 무시) READY GDS Map 에 연결(`TQP_GDS_MAP.SELECT_MAP_BY_NAME`). 이름이 다르면 [Map 복사]로 그 이름의 Map 을 만든다. 배포 뒤 U9 -> OMM / OMM_Hybrid 복사 필요, 그 다음 `Persistence/2026-10-15_tqp_gds_map_sub_device_drop.sql`.
+- 측정(로컬): U9 도형 204,898 + Chain 15 복사 약 4초. 검증: `GdsMapCopyProbe` 22 / `GdsMapCopyUiSmoke` 9 / `GdsViewLayoutSmoke` 27 / `EtParaSetupProbe` 26 / ET_PARA_FORM_SMOKE PASS, 좌표 BLOB 까지 SQL 전체 비교 일치. 배포 / DMS 화면 확인 대기.
+- 설계: `문서/설계/02_GDS/2026-10-15_GDS_Map_복사_설계.md` (8절 구현 결과)
+
+## Layer = 번호 + DataType (2026-10-20 CLAUDE-163)
+
+- `TQP_GDS_LAYER` PK = FACTORY + DEVICE_ID + LAYER_ID + **DATA_TYPE**, `TQP_GDS_CHAIN_LAYER.DATA_TYPE` / `TQP_GDS_CHAIN_RULE.FIRST_DATA_TYPE` · `SECOND_DATA_TYPE` 추가, PLACED / Chain FK 가 DataType 포함. `TQP_GDS_PLACED_EL` TEXT 행의 DATA_TYPE = TEXTTYPE(KLayout 기준).
+- DDL / 기존 데이터 변환: `06_CoreLibSource/GdsMapControl/Persistence/2026-10-20_tqp_gds_layer_datatype.sql` (로컬 적용 완료, 백업 `DMSMGR.BAK1020_GDS_*`). 운영 순서: 서비스 중지 -> DDL -> BSL + XML -> 서비스 시작 -> GdsMap EXE.
+- 서비스(시그니처 그대로, 열 수로 구분): `CreateLayerBatch` 4열(3열 = DataType 0) / `GetMapLayerList` DATA_TYPE 열 / `GetPlacedElementPage` "18/3"(번호만이면 그 번호 전체) / `CopyMap` `_DT` 복사 / KLARF 분석 LAYER_IDS "번호/DataType". XML 은 기존 ID 유지 + `_DT` 추가.
+- 검증: U8 저장 -> 조회 왕복 1,817,538 도형 / Layer 17개 비트 일치, 기존 Map 변환본 일치, 저장 / 조회 / 복사 Probe PASS. 설계 `문서/설계/02_GDS/2026-10-20_U8_GDS_로딩_원인분석_설계.md` 9절.

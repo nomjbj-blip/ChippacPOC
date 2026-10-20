@@ -39,7 +39,7 @@ Assert-Condition (-not @($result.CandidateElements | Where-Object ElementKey -eq
     '떨어진 도형 D를 후보에 포함했습니다.'
 
 $withoutOutput.SelectedLayerIds = [System.Collections.Generic.HashSet[int]]::new()
-[void]$withoutOutput.SelectedLayerIds.Add(1)
+[void]$withoutOutput.SelectedLayerIds.Add([NexplantQMS.GdsMap.GdsLayerKey]::Make(1, 0))
 $filtered = $tracer.Trace($withoutOutput)
 Assert-Condition ($filtered.VisitedElements.Count -eq 2) 'Layer 필터를 벗어난 C를 따라갔습니다.'
 

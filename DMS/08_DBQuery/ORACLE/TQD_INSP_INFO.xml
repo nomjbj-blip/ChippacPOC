@@ -333,6 +333,10 @@ WHERE 1=1
             <param direction="Input" dbtype="VarChar" size="0">:etime</param>
         </parameters>
     </query>
+    <!-- 2026-10-19 수정: TQD_INSP_INFO 는 검사 Test(KLARF InspectionTest)마다 행이 있고 STEP 당 한 행(RN = 1)만 쓴다.
+         이전 순서(B.MAPID)는 같은 STEP 의 Test 행끼리 순서가 정해지지 않아, Test 가 2개인 파일에서 Defect 0 인 보조 Test 행이
+         골라져 Defect Map 정보 창 / Chart 의 Defects / Inspected Die 가 그 Test 값으로 보였다.
+         주 Test = Defect 가 가장 많은 Test(같으면 작은 Test 번호)를 고른다. SELECT_KLARF_STEP_BY_WAFER 와 같은 기준. -->
     <query statement="Select" queryid="GET_INSP_INFO_MULTI_SEQ" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[
 SELECT * FROM (
@@ -387,7 +391,7 @@ SELECT * FROM (
            B.ST_YCNT,
            B.ST_START_X,
            B.ST_START_Y ,
-           ROW_NUMBER() OVER (PARTITION BY STEP_SEQ ORDER BY B.MAPID) RN
+           ROW_NUMBER() OVER (PARTITION BY STEP_SEQ ORDER BY B.MAPID, A.DEFECTS DESC NULLS LAST, A.TEST) RN
       FROM TQD_INSP_INFO A, TQP_MAPDEF B
      WHERE A.FACTORY = B.FACTORY(+)
            AND A.PRODUCT = B.MAPID(+)
@@ -2073,6 +2077,67 @@ ORDER BY A.STEP_ID, A.WAFER_ID ]]></commandtext>
             <param direction="Input" dbtype="VarChar" size="0">:reticle_id</param>
             <param direction="Input" dbtype="VarChar" size="0">:interlock</param>
             <param direction="Input" dbtype="VarChar" size="0">:stepper_eq</param>
+        </parameters>
+    </query>
+    <!-- 2026-10-16 추가: 통합 연관 분석 Ready 조회(BSL GdsKlarfAnalysis.GetWaferReady)가 같은 Wafer 의 KLARF Step 후보를 넓게 읽는다
+         (설계 05_연관분석/2026-10-15_GDS_KLARF_ETest_통합분석_데이터_설계.md 16.4 / 16.8절). 같은 Wafer 인지는 BSL 이 WaferKeyRule 로 판단한다.
+         Lot 글자(LIKE) + Slot + 검사 시각 기간으로 범위를 줄인다. STEP_COMMENT 는 원본 Wafer ID(RAW_WAFER_ID) 확인용.
+         2026-10-16 수정: TQD_INSP_INFO 는 검사 Test(KLARF InspectionTest)마다 행이 있어 Test 가 2개인 파일은 같은 Step 이 두 줄로 나왔고,
+         [준비] 표에 같은 Step 이 두 번 들어가 [분석]이 "같은 KLARF Step 이 두 번" 오류로 멈췄다. Step 당 한 줄로 합친다:
+         DEFECTS = Test 합, INSPECTED_DIE / TEST = Defect 가 가장 많은 Test(같으면 작은 Test 번호). -->
+    <query statement="Select" queryid="SELECT_KLARF_STEP_BY_WAFER" commandtype="Text" description="연관 분석 Ready: 같은 Wafer 후보 KLARF Step (Lot 글자 / Slot / 검사 시각 기간, Step 당 한 줄)" commandtimeout="120">
+        <commandtext><![CDATA[SELECT A.STEP_SEQ, A.FACTORY, A.PRODUCT, A.LOT_ID, A.WAFER_ID, A.SLOT_ID, A.STEP_ID,
+       TO_CHAR(A.RESULTTIMESTAMP, 'YYYY-MM-DD HH24:MI:SS') AS RESULTTIMESTAMP,
+       SUM(A.DEFECTS) AS DEFECTS,
+       MAX(A.INSPECTED_DIE) KEEP (DENSE_RANK LAST ORDER BY A.DEFECTS NULLS FIRST, A.TEST DESC) AS INSPECTED_DIE,
+       A.SETUP_SEQ,
+       MAX(A.TEST) KEEP (DENSE_RANK LAST ORDER BY A.DEFECTS NULLS FIRST, A.TEST DESC) AS TEST,
+       S."COMMENT" AS STEP_COMMENT
+  FROM TQD_INSP_INFO A
+  LEFT JOIN TQD_STEP S ON S.STEP_SEQ = A.STEP_SEQ AND S.WAFER_SEQ = A.WAFER_SEQ
+ WHERE A.FACTORY = :factory
+   AND UPPER(A.LOT_ID) LIKE :lot_like
+   AND LTRIM(TRIM(A.SLOT_ID), '0') = :slot_no
+   AND A.RESULTTIMESTAMP BETWEEN TO_DATE(:from_time, 'YYYYMMDDHH24MISS') AND TO_DATE(:to_time, 'YYYYMMDDHH24MISS')
+ GROUP BY A.STEP_SEQ, A.FACTORY, A.PRODUCT, A.LOT_ID, A.WAFER_ID, A.SLOT_ID, A.STEP_ID, A.RESULTTIMESTAMP, A.SETUP_SEQ, S."COMMENT"
+ ORDER BY A.RESULTTIMESTAMP, A.STEP_SEQ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="120">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="200">:lot_like</param>
+            <param direction="Input" dbtype="VarChar" size="40">:slot_no</param>
+            <param direction="Input" dbtype="VarChar" size="14">:from_time</param>
+            <param direction="Input" dbtype="VarChar" size="14">:to_time</param>
+        </parameters>
+    </query>
+    <!-- 2026-10-16 추가: SELECT_KLARF_STEP_BY_WAFER 에 같은 Product 조건(:product)과 TEST_ORDER 를 더한 것. GetWaferReady 는 이 쿼리를 쓴다.
+         같은 파일을 다시 올리면 업로드가 지우고 다시 쓰지만 그 키에 Product 가 들어 있어, Product 만 다르게 올린 같은 파일은 둘 다 남아
+         Defect 가 두 번 세어졌다. 고른 Step 과 같은 Product 만 모은다. TEST_ORDER(같은 Wafer + Step ID 재검사 순서, 작을수록 최신)는
+         BSL 이 재검사를 정리할 때 쓴다. 매개변수가 하나 늘어 새 ID 로 둔다(기존 ID 를 쓰는 예전 서버 DLL 이 서비스 재시작 뒤에도 그대로 동작). -->
+    <query statement="Select" queryid="SELECT_KLARF_STEP_BY_WAFER_PRODUCT" commandtype="Text" description="연관 분석 Ready: 같은 Wafer 후보 KLARF Step (Lot 글자 / Slot / 검사 시각 기간 / 같은 Product, Step 당 한 줄 + TEST_ORDER)" commandtimeout="120">
+        <commandtext><![CDATA[SELECT A.STEP_SEQ, A.FACTORY, A.PRODUCT, A.LOT_ID, A.WAFER_ID, A.SLOT_ID, A.STEP_ID,
+       TO_CHAR(A.RESULTTIMESTAMP, 'YYYY-MM-DD HH24:MI:SS') AS RESULTTIMESTAMP,
+       SUM(A.DEFECTS) AS DEFECTS,
+       MAX(A.INSPECTED_DIE) KEEP (DENSE_RANK LAST ORDER BY A.DEFECTS NULLS FIRST, A.TEST DESC) AS INSPECTED_DIE,
+       A.SETUP_SEQ,
+       MAX(A.TEST) KEEP (DENSE_RANK LAST ORDER BY A.DEFECTS NULLS FIRST, A.TEST DESC) AS TEST,
+       S.TEST_ORDER,
+       S."COMMENT" AS STEP_COMMENT
+  FROM TQD_INSP_INFO A
+  LEFT JOIN TQD_STEP S ON S.STEP_SEQ = A.STEP_SEQ AND S.WAFER_SEQ = A.WAFER_SEQ
+ WHERE A.FACTORY = :factory
+   AND UPPER(A.LOT_ID) LIKE :lot_like
+   AND LTRIM(TRIM(A.SLOT_ID), '0') = :slot_no
+   AND A.RESULTTIMESTAMP BETWEEN TO_DATE(:from_time, 'YYYYMMDDHH24MISS') AND TO_DATE(:to_time, 'YYYYMMDDHH24MISS')
+   AND UPPER(TRIM(A.PRODUCT)) = UPPER(TRIM(:product))
+ GROUP BY A.STEP_SEQ, A.FACTORY, A.PRODUCT, A.LOT_ID, A.WAFER_ID, A.SLOT_ID, A.STEP_ID, A.RESULTTIMESTAMP, A.SETUP_SEQ, S.TEST_ORDER, S."COMMENT"
+ ORDER BY A.RESULTTIMESTAMP, A.STEP_SEQ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="120">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="200">:lot_like</param>
+            <param direction="Input" dbtype="VarChar" size="40">:slot_no</param>
+            <param direction="Input" dbtype="VarChar" size="14">:from_time</param>
+            <param direction="Input" dbtype="VarChar" size="14">:to_time</param>
+            <param direction="Input" dbtype="VarChar" size="200">:product</param>
         </parameters>
     </query>
 </queryxml>

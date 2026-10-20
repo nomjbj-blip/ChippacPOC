@@ -38,4 +38,75 @@ VALUES
             <param direction="Input" dbtype="Number" size="0">:chain_seq</param>
         </parameters>
     </query>
+    <!-- Map 복사(GdsMapImport.CopyMap, 2026-10-15): 원본 Device 의 행을 새 Device 이름으로 INSERT ... SELECT (Chain 1개씩) -->
+    <query statement="Insert" queryid="COPY_CHAIN_LAYER" commandtype="Text" description="Map 복사: Chain 탐색 Layer" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_GDS_CHAIN_LAYER
+    (FACTORY, DEVICE_ID, CHAIN_SEQ, VERSION_NO, LAYER_ID)
+SELECT FACTORY, :target_device_id, :new_chain_seq, VERSION_NO, LAYER_ID
+  FROM TQP_GDS_CHAIN_LAYER
+ WHERE FACTORY = :factory
+   AND DEVICE_ID = :source_device_id
+   AND CHAIN_SEQ = :source_chain_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="50">:target_device_id</param>
+            <param direction="Input" dbtype="Number" size="0">:new_chain_seq</param>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:source_device_id</param>
+            <param direction="Input" dbtype="Number" size="0">:source_chain_seq</param>
+        </parameters>
+    </query>
+    <!-- 탐색 Layer = Layer 번호 + DataType (2026-10-20). 위 쿼리는 이전 서버용. -->
+    <query statement="Insert" queryid="CREATE_CHAIN_LAYER_DT" commandtype="Text" description="Chain 탐색 Layer(번호 + DataType) 저장 (InsertExecuteMultiple)" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_GDS_CHAIN_LAYER
+    (FACTORY,
+    DEVICE_ID,
+    CHAIN_SEQ,
+    VERSION_NO,
+    LAYER_ID,
+    DATA_TYPE)
+VALUES
+    (:factory,
+    :device_id,
+    :chain_seq,
+    1,
+    :layer_id,
+    :data_type)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
+            <param direction="Input" dbtype="Number" size="0">:chain_seq</param>
+            <param direction="Input" dbtype="Number" size="0">:layer_id</param>
+            <param direction="Input" dbtype="Number" size="0">:data_type</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_CHAIN_LAYER_DT" commandtype="Text" description="Chain 탐색 Layer(번호 + DataType) 조회" commandtimeout="60">
+        <commandtext><![CDATA[SELECT LAYER_ID, DATA_TYPE
+  FROM TQP_GDS_CHAIN_LAYER
+ WHERE FACTORY = :factory
+   AND DEVICE_ID = :device_id
+   AND CHAIN_SEQ = :chain_seq
+   AND VERSION_NO = 1
+ ORDER BY LAYER_ID, DATA_TYPE]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
+            <param direction="Input" dbtype="Number" size="0">:chain_seq</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="COPY_CHAIN_LAYER_DT" commandtype="Text" description="Map 복사: Chain 탐색 Layer(번호 + DataType)" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_GDS_CHAIN_LAYER
+    (FACTORY, DEVICE_ID, CHAIN_SEQ, VERSION_NO, LAYER_ID, DATA_TYPE)
+SELECT FACTORY, :target_device_id, :new_chain_seq, VERSION_NO, LAYER_ID, DATA_TYPE
+  FROM TQP_GDS_CHAIN_LAYER
+ WHERE FACTORY = :factory
+   AND DEVICE_ID = :source_device_id
+   AND CHAIN_SEQ = :source_chain_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="50">:target_device_id</param>
+            <param direction="Input" dbtype="Number" size="0">:new_chain_seq</param>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:source_device_id</param>
+            <param direction="Input" dbtype="Number" size="0">:source_chain_seq</param>
+        </parameters>
+    </query>
 </queryxml>

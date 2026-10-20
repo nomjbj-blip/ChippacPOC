@@ -7,7 +7,7 @@ namespace DACrux.SEMDMS.ENGUI
 {
     /// <summary>
     /// DACrux의 BASIC_FORM 메뉴에서 GDS Map 조회 화면(DB 기반, 읽기 전용)을 여는 호스트다.
-    /// 설계: 문서/2026-10-02_GDS_Map_조회화면_설계.md 3.1절. 등록 화면 호스트(frmGdsMapSetup)와 같은 방식이다.
+    /// 설계: 문서/설계/02_GDS/2026-10-02_GDS_Map_조회화면_설계.md 3.1절. 등록 화면 호스트(frmGdsMapSetup)와 같은 방식이다.
     /// 기존 ENGUI는 .NET 4.0이므로 .NET 4.8 GDS 프로젝트를 직접 참조하지 않고 실행 시 로드한다.
     /// </summary>
     public partial class frmGdsMapView : DACrux.Framework.Base.DACruxUXBasic01
@@ -31,22 +31,25 @@ namespace DACrux.SEMDMS.ENGUI
 
             try
             {
-                string assemblyPath = Path.Combine(Application.StartupPath,
-                    "GdsMap", "NexplantQMS.GdsMap.exe");
-                if (!File.Exists(assemblyPath))
-                    throw new FileNotFoundException("GDS Map 실행 파일을 찾을 수 없습니다.", assemblyPath);
+                using (DACrux.SEMDMS.Control.BusyCursor.Show(this)) // GDS EXE 읽기 + 화면 만들기 동안 모래시계 커서 (2026-10-15)
+                {
+                    string assemblyPath = Path.Combine(Application.StartupPath,
+                        "GdsMap", "NexplantQMS.GdsMap.exe");
+                    if (!File.Exists(assemblyPath))
+                        throw new FileNotFoundException("GDS Map 실행 파일을 찾을 수 없습니다.", assemblyPath);
 
-                Assembly assembly = Assembly.LoadFrom(assemblyPath);
-                Type formType = assembly.GetType("NexplantQMS.GdsMap.GdsMapViewForm", true);
-                gdsForm = Activator.CreateInstance(formType, new object[] { true }) as Form;
-                if (gdsForm == null)
-                    throw new InvalidOperationException("GDS Map 조회 화면을 Form으로 만들 수 없습니다.");
+                    Assembly assembly = Assembly.LoadFrom(assemblyPath);
+                    Type formType = assembly.GetType("NexplantQMS.GdsMap.GdsMapViewForm", true);
+                    gdsForm = Activator.CreateInstance(formType, new object[] { true }) as Form;
+                    if (gdsForm == null)
+                        throw new InvalidOperationException("GDS Map 조회 화면을 Form으로 만들 수 없습니다.");
 
-                gdsForm.TopLevel = false;
-                gdsForm.FormBorderStyle = FormBorderStyle.None;
-                gdsForm.Dock = DockStyle.Fill;
-                pnlGdsMap.Controls.Add(gdsForm);
-                gdsForm.Show();
+                    gdsForm.TopLevel = false;
+                    gdsForm.FormBorderStyle = FormBorderStyle.None;
+                    gdsForm.Dock = DockStyle.Fill;
+                    pnlGdsMap.Controls.Add(gdsForm);
+                    gdsForm.Show();
+                }
             }
             catch (Exception ex)
             {

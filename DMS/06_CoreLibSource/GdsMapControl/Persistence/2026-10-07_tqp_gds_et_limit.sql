@@ -1,5 +1,5 @@
 ﻿-- 2026-10-07: E-Test Para Limit 테이블 TQP_GDS_ET_LIMIT
--- 설계: 문서/2026-10-07_ETest_Limit_설정_설계.md 10절 (결정)
+-- 설계: 문서/설계/04_ETest/2026-10-07_ETest_Limit_설정_설계.md 10절 (결정)
 --   "para 별로 사용자가 구간 선택 / device 별로 설정 / 대소문자가 다를 수 있어 등록 시 Upper / enable 기능 / Limit 는 한쪽만 있을 수 있다"
 -- 키: FACTORY + DEVICE_ID + PARA_NAME (대문자). 조건(iforce) / Chain 구분 없음.
 -- 판정: ENABLE_FLAG = 'Y' 이고 값이 LOWER_LIMIT 미만 또는 UPPER_LIMIT 초과면 Fail (경계값 Pass). 한쪽이 NULL 이면 그쪽은 검사 안 함.

@@ -1,4 +1,4 @@
-﻿# GDS Map Back side(좌우 반전) 저장 검증 스크립트 (설계: 문서/2026-10-06_GDS_반전_BackSide_설계.md 8절)
+﻿# GDS Map Back side(좌우 반전) 저장 검증 스크립트 (설계: 문서/설계/02_GDS/2026-10-06_GDS_반전_BackSide_설계.md 8절)
 # 목적: Setup 화면 DB 저장과 같은 경로(VisitPlacedElements(layer, mirrorX) / GdsMapPlacedRowBuilder / BSL GdsMapImport)로
 #       Back side 저장을 실행하고 확인한다.
 #       1) 반전 좌표 = GDS 원점 기준 X' = -X(비트 일치), Y / 도형 수 / 좌표 수 동일, Bounds = (-MaxX, MinY, -MinX, MaxY)
@@ -135,9 +135,9 @@ public static class BackSideProbe
         string[] info = { factory, device, Lib.Structures[0].Name, "probe.gds", new string('B', 64), "0.001", "1E-09", "probe",
             "", placed.ToString(), pts.ToString(), "BACK" };
         string job = bsl.BeginMapImport(info).Rows[0]["IMPORT_JOB_SEQ"].ToString();
-        var colors = FileMap.GetLayerDisplayItems().Where(i => layers.Contains(i.LayerId)).OrderBy(i => i.LayerId)
-            .Select(i => new KeyValuePair<int, int>(i.LayerId, i.Color.ToArgb())).ToList();
-        bsl.CreateLayerBatch(job, 0, GdsMapLayerRowBuilder.BuildLayerRows(colors), "probe");
+        var colors = FileMap.GetLayerDisplayItems().Where(i => layers.Contains(i.LayerKey)).OrderBy(i => i.LayerKey)
+            .Select(i => new KeyValuePair<int, int>(i.LayerKey, i.Color.ToArgb())).ToList();
+        bsl.CreateLayerBatch(job, 0, GdsMapLayerRowBuilder.BuildLayerKeyRows(colors), "probe");
         long no = 0;
         var pending = new List<string[]>(); no = 0;
         FileMap.VisitPlacedElements(layers, true, d =>
@@ -160,7 +160,7 @@ public static class BackSideProbe
             string after = string.Empty;
             while (true)
             {
-                DataTable page = view.GetPlacedElementPage(factory, device, layer.ToString(), after, 10000);
+                DataTable page = view.GetPlacedElementPage(factory, device, GdsLayerKey.Format(layer), after, 10000);
                 foreach (DataRow row in page.Rows) items.Add(GdsMapPlacedRowReader.Read(row));
                 if (page.Rows.Count > 0) after = page.Rows[page.Rows.Count - 1]["PLACED_ELEMENT_ID"].ToString();
                 if (page.Rows.Count < 10000) break;
@@ -224,6 +224,8 @@ function Check($name, [bool]$ok, $detail) {
 $f = 'PROBE'; $dev = 'BACK_PROBE'
 
 [BackSideProbe]::Load($GdsPath)
+# -Layers 는 GDS Layer 번호(DataType 0). 화면 / 저장 / 조회는 Layer 키(번호 + DataType)로 다룬다 (2026-10-20)
+$Layers = [int[]]@($Layers | ForEach-Object { [NexplantQMS.GdsMap.GdsLayerKey]::Make($_, 0) })
 $m = ([BackSideProbe]::CheckMirror($Layers)).Split('|')
 Check '반전식 X'' = -X / Y / Bounds (비트)' ([long]$m[0] -gt 0 -and $m[2] -eq '0' -and $m[3] -eq '0' -and $m[4] -eq '0') "도형 $($m[0]) / 좌표 $($m[1]) / X 불일치 $($m[2]) / Y 불일치 $($m[3]) / Bounds 불일치 $($m[4])"
 Check '반전 추출 후 화면 도형(원본 공유 배열) 불변 / 두 번 반전 = 원본' ($m[5] -eq 'True' -and $m[6] -eq 'True') "불변=$($m[5]) 두번반전=$($m[6])"

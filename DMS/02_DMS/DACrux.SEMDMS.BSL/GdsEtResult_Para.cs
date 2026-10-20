@@ -9,12 +9,12 @@ using DACrux.SEMDMS.Interface;
 namespace DACrux.SEMDMS.BSL
 {
     /// <summary>
-    /// E-Test Para Setup 서버 처리 (2026-10-14).
-    /// 설계: 문서/2026-10-14_ETest_Para_Setup_설계.md
-    ///  - Parameter 등록: 결과 파일 헤더를 Device + 공정 + Parameter 로 TQP_GDS_ET_ITEM 에 넣는다(TEST_PROGRAM 이 있는 행 = 등록 Parameter).
+    /// E-Test Para 설정 서버 처리 (2026-10-14).
+    /// 설계: 문서/설계/04_ETest/2026-10-14_ETest_Para_Setup_설계.md (등록 / 이름 변환), 문서/설계/04_ETest/2026-10-14_ETest_Para_화면_재구성_설계.md (GDS Chain / Spec 편집)
+    ///  - Parameter 등록: 결과 파일 헤더를 Device + 공정 + Parameter 로 TQP_GDS_ET_ITEM 에 넣는다.
     ///    이름은 EtParameterNameRule 로 다시 분해 / 변환한다(화면이 보낸 값을 그대로 믿지 않는다).
-    ///  - 대표 Chain: 사용자가 단자(E-Test Chain 이름)를 골라 대표 이름을 입력해 묶는다(TQP_GDS_ET_REP_CHAIN, GDS 대표 Device 단위).
-    ///  - GDS 연결: GDS Setup Chain 이름이 대표 이름 또는 구성 단자와 똑같으면 잇고(NAME), 아니면 사용자가 고른다(MANUAL). 1:1.
+    ///  - [등록 Parameter] 탭: Parameter 마다 사용 / 비고 / GDS Chain(Chain 1 의 GDS Setup Chain 이름, 사용자 입력) / Spec 을 같이 편집하고 수정된 행만 저장한다.
+    ///    대표 Chain / GDS 연결(TQP_GDS_ET_REP_CHAIN / TQP_GDS_ET_CHAIN_LINK)은 같은 날 화면 재구성으로 지웠다.
     /// 기존 GdsEtResult 와 같이 문장마다 자동 Commit 이다.
     /// </summary>
     public partial class GdsEtResult
@@ -30,17 +30,24 @@ namespace DACrux.SEMDMS.BSL
             return new TQP_GDS_ET_ITEM().GetData("SELECT_ET_PARA_PROGRAM_LIST", null, new string[] { Required(strFactory, "Factory", 30) });
         }
 
-        /// <summary>
-        /// Device + 공정의 등록 Parameter 목록을 조회한다.
-        /// 대표 Chain / GDS Chain 열은 E-Test Device 의 GDS 대표 Device(Sub Device 연결, 없으면 같은 이름) 기준이다. 쿼리 순서: g1 g2 f d t
-        /// </summary>
+        /// <summary>Device + 공정의 등록 Parameter 목록을 조회한다(업로드 계획 / 조회 창). GDS_CHAIN_NAME 은 Parameter 에 저장된 값 그대로다.</summary>
         public DataTable GetEtParameterList(string strFactory, string strDeviceID, string strTestProgram)
         {
             string f = Required(strFactory, "Factory", 30);
             string d = Required(strDeviceID, "Device ID", 50);
             string t = RequiredTestProgram(strTestProgram);
-            string g = ResolveGdsDevice(f, d);
-            return new TQP_GDS_ET_ITEM().GetData("SELECT_ET_PARA_LIST", null, new string[] { g, g, f, d, t });
+            return new TQP_GDS_ET_ITEM().GetData("SELECT_ET_PARA_LIST", null, new string[] { f, d, t });
+        }
+
+        /// <summary>
+        /// E-Test Para 설정 화면 목록: 등록 Parameter + GDS Chain + Spec. 쿼리 순서: f1 d1 t1 f2 d2 t2
+        /// </summary>
+        public DataTable GetEtParameterSetupList(string strFactory, string strDeviceID, string strTestProgram)
+        {
+            string f = Required(strFactory, "Factory", 30);
+            string d = Required(strDeviceID, "Device ID", 50);
+            string t = RequiredTestProgram(strTestProgram);
+            return new TQP_GDS_ET_ITEM().GetData("SELECT_ET_PARA_SETUP_LIST", null, new string[] { f, d, t, f, d, t });
         }
 
         /// <summary>
@@ -125,7 +132,7 @@ namespace DACrux.SEMDMS.BSL
 
                 lstInsert.Add(new string[] {
                     f, d, t, parts.ParameterName, parts.HeaderText, parts.ParaName, parts.CondValue, parts.MeasType,
-                    parts.Terminal1, parts.Terminal2, parts.ChainType, parts.ForceLeg1, parts.ForceLeg2,
+                    parts.Chain1, parts.Chain2, parts.ChainType, parts.ForceLeg1, parts.ForceLeg2,
                     strUnit, strTestNo, strOrder, strSource, strFileName, strUser, strUser });
             }
             dtExist.Dispose();
@@ -149,10 +156,18 @@ namespace DACrux.SEMDMS.BSL
         }
 
         /// <summary>
-        /// 사용 여부 / 비고를 저장한다. aKey: 0 Factory / 1 Device / 2 공정. aRows 열: 0 Parameter(ITEM_NAME) / 1 USE_FLAG(Y/N) / 2 비고.
-        /// 등록되지 않은 Parameter 가 있으면 거부한다(그 앞 행은 이미 저장됨). 반환: 저장한 행 수
+        /// [등록 Parameter] 탭 저장 (2026-10-14 Para 화면 재구성). 화면에서 수정된 행만 받는다. aKey: 0 Factory / 1 Device / 2 공정.
+        /// aRows 열: 0 Parameter(저장 이름) / 1 사용(Y/N) / 2 비고 / 3 GDS Chain / 4 Lower / 5 Upper / 6 Enable(Y/N)
+        /// 처리 흐름:
+        ///  1) 값 확인: 등록된 Parameter / 같은 행 두 번 / 사용 Y·N / 비고 200자 / GDS Chain 200자 / Lower·Upper 숫자 / Lower ≤ Upper /
+        ///     Enable 이면 Limit 1개 이상. 틀린 것은 모아서 한 번에 거부(아무것도 저장하지 않음)
+        ///  2) 배열 UPDATE (사용 / 비고 / GDS Chain) - 받은 행 전부
+        ///  3) Limit 이 있고 Spec(Lower / Upper / Enable)이 기존과 다른 행: 배열 MERGE(MERGE_ET_LIMIT). 단위 = 기존 Spec 단위, 없으면 등록 단위.
+        ///     Spec 원문 / Spec 비고는 기존 값을 그대로 둔다. 같은 값이면 다시 쓰지 않는다(GDS Chain 만 고친 행의 Spec 수정자 / 시각 유지)
+        ///  4) Limit 이 모두 빈 행 중 Spec 이 있던 것: 배열 DELETE
+        /// 반환 1행: UPDATED / SPEC_SAVED(새로 만들거나 바뀐 Spec) / SPEC_DELETED
         /// </summary>
-        public int SaveEtParameters(string[] aKey, string[,] aRows, string strUpdateUser)
+        public DataTable SaveEtParameterSetup(string[] aKey, string[,] aRows, string strUpdateUser)
         {
             if (aKey == null || aKey.Length != 3)
                 throw new ArgumentException("Parameter 키는 3개 항목(Factory / Device / 공정)이어야 합니다.", "aKey");
@@ -162,35 +177,122 @@ namespace DACrux.SEMDMS.BSL
             string strUser = Required(strUpdateUser, "Update User", 30);
             if (aRows == null || aRows.GetLength(0) == 0)
                 throw new ArgumentException("저장할 Parameter 가 없습니다.", "aRows");
-            if (aRows.GetLength(1) != 3)
-                throw new ArgumentException("저장 열 수는 3개(Parameter / 사용 / 비고)여야 합니다.", "aRows");
-
-            int iRows = aRows.GetLength(0);
-            string[][] aUpdate = new string[iRows][];
-            for (int i = 0; i < iRows; i++)
-            {
-                string strItem = RequiredParameterName(aRows[i, 0]);
-                string strUse = Clean(aRows[i, 1]).ToUpperInvariant();
-                if (strUse != "Y" && strUse != "N")
-                    throw new ArgumentException("사용 여부는 Y 또는 N 이어야 합니다: " + aRows[i, 1], "aRows");
-                aUpdate[i] = new string[] { strUse, OptionalChars(aRows[i, 2], "비고", 200), strUser, f, d, t, strItem };
-            }
+            if (aRows.GetLength(1) != 7)
+                throw new ArgumentException("저장 열 수는 7개(Parameter / 사용 / 비고 / GDS Chain / Lower / Upper / Enable)여야 합니다.", "aRows");
+            if (aRows.GetLength(0) > MaxBatchRows)
+                throw new ArgumentException("한 번에 " + MaxBatchRows + "행 이하로 저장하세요.", "aRows");
 
             TQP_GDS_ET_ITEM oItem = new TQP_GDS_ET_ITEM();
-            int iSaved = 0;
-            foreach (string[] aParam in aUpdate)
+            Dictionary<string, string> dicUnit = new Dictionary<string, string>(StringComparer.Ordinal);
+            using (DataTable dtItem = oItem.GetData("SELECT_ET_PARA_BY_PROGRAM", null, new string[] { f, d, t }))
             {
-                if (oItem.UpdateDataNonQuery("UPDATE_ET_PARA", null, aParam) != 1)
-                    throw new InvalidOperationException("등록되지 않은 Parameter 입니다: " + aParam[6]);
-                iSaved++;
+                foreach (DataRow dr in dtItem.Rows)
+                    dicUnit[dr["ITEM_NAME"].ToString()] = dr["UNIT"].ToString();
             }
-            return iSaved;
+            TQP_GDS_ET_LIMIT oLimit = new TQP_GDS_ET_LIMIT();
+            Dictionary<string, DataRow> dicSpec = new Dictionary<string, DataRow>(StringComparer.Ordinal);
+            DataTable dtSpec = oLimit.GetData("SELECT_ET_LIMIT", null, new string[] { f, d, t });
+            foreach (DataRow dr in dtSpec.Rows)
+                dicSpec[dr["ITEM_NAME"].ToString()] = dr;
+
+            int iRows = aRows.GetLength(0);
+            List<string> lstError = new List<string>();
+            HashSet<string> setItem = new HashSet<string>(StringComparer.Ordinal);
+            List<string[]> lstUpdate = new List<string[]>();
+            List<string[]> lstMerge = new List<string[]>();
+            List<string[]> lstDelete = new List<string[]>();
+            for (int i = 0; i < iRows; i++)
+            {
+                string strItem;
+                try
+                {
+                    strItem = RequiredParameterName(aRows[i, 0]);
+                    if (!setItem.Add(strItem))
+                        throw new ArgumentException("같은 Parameter 가 두 번 있습니다: " + strItem);
+                    string strItemUnit;
+                    if (!dicUnit.TryGetValue(strItem, out strItemUnit))
+                        throw new ArgumentException("등록되지 않은 Parameter 입니다: " + strItem);
+                    string strUse = Clean(aRows[i, 1]).ToUpperInvariant();
+                    if (strUse != "Y" && strUse != "N")
+                        throw new ArgumentException(strItem + " 의 사용은 Y 또는 N 이어야 합니다: " + aRows[i, 1]);
+                    string strRemark = OptionalChars(aRows[i, 2], strItem + " 비고", 200);
+                    string strGds = OptionalChars(aRows[i, 3], strItem + " GDS Chain", 200);
+                    string strLower = OptionalDouble(aRows[i, 4], strItem + " Lower");
+                    string strUpper = OptionalDouble(aRows[i, 5], strItem + " Upper");
+                    string strEnable = Clean(aRows[i, 6]).ToUpperInvariant();
+                    if (strEnable != "Y" && strEnable != "N")
+                        throw new ArgumentException(strItem + " 의 Enable 은 Y 또는 N 이어야 합니다: " + aRows[i, 6]);
+                    if (strLower.Length > 0 && strUpper.Length > 0
+                        && double.Parse(strLower, CultureInfo.InvariantCulture) > double.Parse(strUpper, CultureInfo.InvariantCulture))
+                        throw new ArgumentException(strItem + " 의 Lower(" + strLower + ") 가 Upper(" + strUpper + ") 보다 큽니다.");
+                    if (strEnable == "Y" && strLower.Length == 0 && strUpper.Length == 0)
+                        throw new ArgumentException(strItem + " 은 Enable 인데 Lower / Upper 가 없습니다.");
+
+                    lstUpdate.Add(new string[] { strUse, strRemark, strGds, strUser, f, d, t, strItem });
+                    DataRow drSpec;
+                    dicSpec.TryGetValue(strItem, out drSpec);
+                    if ((strLower.Length > 0 || strUpper.Length > 0) && !SameSpec(drSpec, strLower, strUpper, strEnable))
+                    {
+                        string strUnit = drSpec != null && drSpec["UNIT"].ToString().Length > 0 ? drSpec["UNIT"].ToString() : strItemUnit;
+                        lstMerge.Add(new string[] { f, d, t, strItem, strLower, strUpper, strUnit, strEnable,
+                            drSpec != null ? drSpec["SPEC_TEXT"].ToString() : string.Empty, drSpec != null ? drSpec["REMARK"].ToString() : string.Empty, strUser });
+                    }
+                    else if (strLower.Length == 0 && strUpper.Length == 0 && drSpec != null)
+                        lstDelete.Add(new string[] { f, d, t, strItem });
+                }
+                catch (ArgumentException ex)
+                {
+                    lstError.Add((i + 1) + "행 " + ex.Message.Split(new[] { Environment.NewLine }, StringSplitOptions.None)[0]);
+                }
+            }
+            dtSpec.Dispose();
+            if (lstError.Count > 0)
+                throw new ArgumentException("저장할 수 없는 행이 있습니다(" + lstError.Count + "건, 아무것도 저장하지 않음). " + string.Join(" / ", lstError.Take(10).ToArray()), "aRows");
+
+            oItem.UpdateExecuteMultiple("UPDATE_ET_PARA", ToArray(lstUpdate));
+            if (lstMerge.Count > 0)
+                oLimit.InsertExecuteMultiple("MERGE_ET_LIMIT", ToArray(lstMerge));
+            if (lstDelete.Count > 0)
+                oLimit.DeleteExecuteMultiple("DELETE_ET_LIMIT", ToArray(lstDelete));
+
+            DataTable dtResult = new DataTable("ET_PARA_SETUP_SAVE");
+            dtResult.Columns.Add("UPDATED", typeof(int));
+            dtResult.Columns.Add("SPEC_SAVED", typeof(int));
+            dtResult.Columns.Add("SPEC_DELETED", typeof(int));
+            dtResult.Rows.Add(lstUpdate.Count, lstMerge.Count, lstDelete.Count);
+            return dtResult;
+        }
+
+        /// <summary>저장된 Spec 행이 있고 Lower / Upper(숫자로 비교, 빈 값 = NULL) / Enable 이 모두 같은지.</summary>
+        private static bool SameSpec(DataRow drSpec, string strLower, string strUpper, string strEnable)
+        {
+            return drSpec != null && SameLimit(drSpec["LOWER_LIMIT"], strLower) && SameLimit(drSpec["UPPER_LIMIT"], strUpper)
+                && string.Equals(drSpec["ENABLE_FLAG"].ToString(), strEnable, StringComparison.Ordinal);
+        }
+
+        private static bool SameLimit(object oSaved, string strValue)
+        {
+            if (oSaved == null || oSaved == DBNull.Value)
+                return strValue.Length == 0;
+            return strValue.Length > 0 && Convert.ToDouble(oSaved, CultureInfo.InvariantCulture) == double.Parse(strValue, CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>같은 열 수의 행 목록을 배열 실행용 2차원 배열로 바꾼다.</summary>
+        private static string[,] ToArray(List<string[]> lstRows)
+        {
+            int iCols = lstRows.Count == 0 ? 0 : lstRows[0].Length;
+            string[,] aRows = new string[lstRows.Count, iCols];
+            for (int r = 0; r < lstRows.Count; r++)
+                for (int c = 0; c < iCols; c++)
+                    aRows[r, c] = lstRows[r][c];
+            return aRows;
         }
 
         /// <summary>
         /// Parameter 를 삭제한다. aKey: 0 Factory / 1 Device / 2 공정.
-        /// 처리 흐름: 전부 등록된 Parameter 인지 / 측정값이 없는지 먼저 확인(하나라도 걸리면 아무것도 지우지 않음) ->
-        ///           같은 키의 Spec(새 키 = ITEM_NAME, 예전 키 = 헤더 원문 대문자) 삭제 -> Parameter 삭제. 반환: 지운 Parameter 수
+        /// 처리 흐름: 전부 등록된 Parameter 인지 / 측정값이 없는지 먼저 확인(등록 목록 1회 + 값 수 1회 조회, 하나라도 걸리면 아무것도 지우지 않음) ->
+        ///           같은 키의 Spec 삭제(FK ON DELETE CASCADE 로도 지워지지만 순서를 드러내려고 먼저 지운다) -> Parameter 삭제. 삭제는 각각 배열 DELETE 1회.
+        ///           반환: 지운 Parameter 수 (2026-10-14 Parameter 마다 DB 를 3번 왕복하던 것을 묶음 처리로: 2,755개 = 약 8,300번 -> 4번)
         /// </summary>
         public int DeleteEtParameters(string[] aKey, string[] aParameters, string strUpdateUser)
         {
@@ -204,55 +306,70 @@ namespace DACrux.SEMDMS.BSL
                 throw new ArgumentException("삭제할 Parameter 가 없습니다.", "aParameters");
 
             TQP_GDS_ET_ITEM oItem = new TQP_GDS_ET_ITEM();
-            Dictionary<string, string> dicHeader = new Dictionary<string, string>(StringComparer.Ordinal);
-            using (DataTable dtExist = oItem.GetData("SELECT_ET_PARA_BY_PROGRAM", null, new string[] { f, d, t }))
+            HashSet<string> setExist = RegisteredNames(oItem, f, d, t);
+            Dictionary<string, long> dicValues = new Dictionary<string, long>(StringComparer.Ordinal);
+            using (DataTable dtCount = oItem.GetData("SELECT_ET_PARA_VALUE_COUNTS", null, new string[] { f, d, t }))
             {
-                foreach (DataRow dr in dtExist.Rows)
-                    dicHeader[dr["ITEM_NAME"].ToString()] = dr["HEADER_TEXT"].ToString();
+                foreach (DataRow dr in dtCount.Rows)
+                    dicValues[dr["ITEM_NAME"].ToString()] = Convert.ToInt64(dr["VALUE_COUNT"], CultureInfo.InvariantCulture);
             }
 
             List<string> lstItem = new List<string>();
+            HashSet<string> setItem = new HashSet<string>(StringComparer.Ordinal);
             List<string> lstError = new List<string>();
             foreach (string strValue in aParameters)
             {
                 string strItem = RequiredParameterName(strValue);
-                if (lstItem.Contains(strItem))
+                if (!setItem.Add(strItem))
                     continue;
-                if (!dicHeader.ContainsKey(strItem))
-                {
+                long lValues;
+                if (!setExist.Contains(strItem))
                     lstError.Add("등록되지 않은 Parameter: " + strItem);
-                    continue;
-                }
-                using (DataTable dtCount = oItem.GetData("SELECT_ET_PARA_VALUE_COUNT", null, new string[] { f, d, t, strItem }))
-                {
-                    long lValues = Convert.ToInt64(dtCount.Rows[0]["VALUE_COUNT"], CultureInfo.InvariantCulture);
-                    if (lValues > 0)
-                        lstError.Add("측정값 " + lValues + "개가 저장된 Parameter(사용 안 함으로 바꾸세요): " + strItem);
-                }
-                lstItem.Add(strItem);
+                else if (dicValues.TryGetValue(strItem, out lValues) && lValues > 0)
+                    lstError.Add("측정값 " + lValues + "개가 저장된 Parameter(사용 안 함으로 바꾸세요): " + strItem);
+                else
+                    lstItem.Add(strItem);
             }
             if (lstError.Count > 0)
                 throw new InvalidOperationException("삭제할 수 없습니다(" + lstError.Count + "건). " + string.Join(" / ", lstError.Take(10).ToArray()));
 
-            TQP_GDS_ET_LIMIT oLimit = new TQP_GDS_ET_LIMIT();
-            int iDeleted = 0;
-            foreach (string strItem in lstItem)
+            string[,] aDelete = new string[lstItem.Count, 4];
+            for (int i = 0; i < lstItem.Count; i++)
             {
-                oLimit.DeleteDataNonQuery("DELETE_ET_LIMIT", null, new string[] { f, d, t, strItem });
-                oLimit.DeleteDataNonQuery("DELETE_ET_LIMIT", null, new string[] { f, d, t, dicHeader[strItem].ToUpperInvariant() });
-                iDeleted += oItem.DeleteDataNonQuery("DELETE_ET_PARA", null, new string[] { f, d, t, strItem });
+                aDelete[i, 0] = f;
+                aDelete[i, 1] = d;
+                aDelete[i, 2] = t;
+                aDelete[i, 3] = lstItem[i];
             }
-            return iDeleted;
+            new TQP_GDS_ET_LIMIT().DeleteExecuteMultiple("DELETE_ET_LIMIT", aDelete);
+            oItem.DeleteExecuteMultiple("DELETE_ET_PARA", aDelete);
+            return lstItem.Count;
         }
 
-        /// <summary>E-Test Device 의 GDS 대표 Device: Sub Device 연결 우선, 다음 같은 이름 READY Map, 둘 다 없으면 E-Test Device 이름 그대로.</summary>
+        /// <summary>Device + 공정의 등록 Parameter 이름(저장 이름) 집합. 한 번 조회로 존재 여부를 확인할 때 쓴다.</summary>
+        private static HashSet<string> RegisteredNames(TQP_GDS_ET_ITEM oItem, string f, string d, string t)
+        {
+            HashSet<string> setName = new HashSet<string>(StringComparer.Ordinal);
+            using (DataTable dtExist = oItem.GetData("SELECT_ET_PARA_BY_PROGRAM", null, new string[] { f, d, t }))
+            {
+                foreach (DataRow dr in dtExist.Rows)
+                    setName.Add(dr["ITEM_NAME"].ToString());
+            }
+            return setName;
+        }
+
+        /// <summary>
+        /// E-Test Device 의 GDS Device: 이름이 같은(대소문자 무시) READY Map, 없으면 E-Test Device 이름 그대로.
+        /// Sub Device 연결은 2026-10-15 제거했다. 이름이 다르면 GDS Map 조회 화면 [Map 복사]로 E-Test Device 이름의 Map 을 만든다.
+        /// </summary>
         private static string ResolveGdsDevice(string strFactory, string strDeviceID)
         {
-            using (DataTable dt = new TQP_GDS_MAP_SUB_DEVICE().GetData("SELECT_MAP_DEVICE_BY_SUB", null,
-                new string[] { strFactory, strDeviceID, strFactory, strDeviceID }))
+            using (DataTable dt = new TQP_GDS_MAP().GetData("SELECT_MAP_BY_NAME", null, new string[] { strFactory, strDeviceID }))
             {
-                return dt.Rows.Count > 0 ? dt.Rows[0]["DEVICE_ID"].ToString() : strDeviceID;
+                foreach (DataRow dr in dt.Rows)
+                    if (dr["MAP_STATUS"].ToString() == "READY") return dr["DEVICE_ID"].ToString();
             }
+            return strDeviceID;
         }
 
         /// <summary>공정(Test Type) 필수 검증: 이름 규칙으로 바꾼 뒤(예: tsvet -> TSVET) 영문자로 시작 / 50자 이하.</summary>
@@ -273,439 +390,50 @@ namespace DACrux.SEMDMS.BSL
             return strItem;
         }
 
+        /// <summary>
+        /// Spec 의 Parameter: 헤더 원문('@' 포함)이면 EtParameterNameRule 로 저장 이름을 만들고, 아니면 저장 이름으로 보고 검사한다.
+        /// 고객 Spec 표(헤더 원문)와 Spec 화면(저장 이름)이 같은 키가 되게 한다 (2026-10-14).
+        /// </summary>
+        private static string RequiredSpecParameterName(string strValue)
+        {
+            if (Clean(strValue).IndexOf('@') < 0)
+                return RequiredParameterName(strValue);
+            EtParameterParts parts = EtParameterNameRule.Parse(strValue);
+            if (!parts.IsValid)
+                throw new ArgumentException("Parameter 헤더를 해석할 수 없습니다: " + parts.Error + " [" + strValue + "]", "Parameter");
+            return parts.ParameterName;
+        }
+
         #endregion
 
-        #region [대표 Chain (TQP_GDS_ET_REP_CHAIN) / GDS 연결 (TQP_GDS_ET_CHAIN_LINK)]
+        #region [GDS Chain 참고 목록 / 인계 API]
 
-        /// <summary>
-        /// 단자 목록을 조회한다(등록 Parameter 의 단자 + 대표 Chain 에만 남은 단자). 쿼리 순서: f1 g1 g2 f2 f3 f4 g3.
-        /// 대표 Chain 에만 남은 단자는 Force leg / Chain 종류를 이름 규칙으로 채운다.
-        /// </summary>
-        public DataTable GetEtTerminalList(string strFactory, string strGdsDeviceID)
+        /// <summary>E-Test Device 의 GDS Device (같은 이름 READY Map -> 그대로). 화면 GDS Device 콤보 기본값.</summary>
+        public string GetEtGdsDevice(string strFactory, string strDeviceID)
         {
-            string f = Required(strFactory, "Factory", 30);
-            string g = Required(strGdsDeviceID, "GDS Device", 50);
-            DataTable dt = new TQP_GDS_ET_REP_CHAIN().GetData("SELECT_ET_TERMINAL_LIST", null, new string[] { f, g, g, f, f, f, g });
-            foreach (DataRow dr in dt.Rows)
-            {
-                string strTerminal = dr["TERMINAL_NAME"].ToString();
-                if (dr["FORCE_LEG"] == DBNull.Value)
-                    dr["FORCE_LEG"] = EtParameterNameRule.ForceLegOf(strTerminal);
-                if (dr["CHAIN_TYPE"] == DBNull.Value)
-                    dr["CHAIN_TYPE"] = EtParameterNameRule.ChainTypeOf(strTerminal);
-            }
-            dt.AcceptChanges();
-            return dt;
+            return ResolveGdsDevice(Required(strFactory, "Factory", 30), Required(strDeviceID, "Device ID", 50));
         }
 
-        /// <summary>대표 Chain 목록 + GDS 연결 상태 (LINK_STATUS 의미는 Interface 주석). 상태는 이 서버가 이름 규칙으로 계산한다.</summary>
-        public DataTable GetEtRepChainList(string strFactory, string strGdsDeviceID)
+        /// <summary>GDS Device 의 Setup Chain 목록(ACTIVE + 현재 READY 버전). [등록 Parameter] 탭 오른쪽 목록(이름 복사용).</summary>
+        public DataTable GetEtGdsChainList(string strFactory, string strGdsDeviceID)
         {
-            string f = Required(strFactory, "Factory", 30);
-            string g = Required(strGdsDeviceID, "GDS Device", 50);
-            RepChainSnapshot snap = LoadRepChainSnapshot(f, g);
-
-            DataTable dt = new DataTable("ET_REP_CHAIN");
-            dt.Columns.Add("REP_CHAIN_NAME", typeof(string));
-            dt.Columns.Add("TERMINALS", typeof(string));
-            dt.Columns.Add("TERMINAL_COUNT", typeof(int));
-            dt.Columns.Add("CHAIN_SEQ", typeof(string));
-            dt.Columns.Add("GDS_CHAIN_NAME", typeof(string));
-            dt.Columns.Add("LINK_TYPE", typeof(string));
-            dt.Columns.Add("LINK_STATUS", typeof(string));
-            dt.Columns.Add("CANDIDATES", typeof(string));
-            foreach (KeyValuePair<string, List<string>> rep in snap.Members)
-            {
-                LinkRow link;
-                snap.Links.TryGetValue(rep.Key, out link);
-                List<GdsChainRow> lstCandidate = snap.FindCandidates(rep.Key);
-                string strStatus;
-                string strSeq = string.Empty;
-                string strGdsName = string.Empty;
-                string strType = string.Empty;
-                if (link != null)
-                {
-                    GdsChainRow gds = snap.FindGds(link.ChainSeq);
-                    strSeq = link.ChainSeq.ToString(CultureInfo.InvariantCulture);
-                    strGdsName = gds != null ? gds.Name : link.GdsChainName;
-                    strType = link.LinkType;
-                    if (link.LinkType == "MANUAL")
-                        strStatus = "MANUAL";
-                    else
-                        strStatus = gds != null && snap.NameSet(rep.Key).Contains(gds.Key) ? "NAME" : "NAME_CHANGED";
-                }
-                else if (lstCandidate.Count == 0)
-                    strStatus = "NONE";
-                else if (lstCandidate.Count > 1)
-                    strStatus = "MULTIPLE";
-                else
-                    strStatus = snap.SeqOwner(lstCandidate[0].Seq) != null ? "TAKEN" : "READY";
-                dt.Rows.Add(rep.Key, string.Join(", ", rep.Value.ToArray()), rep.Value.Count, strSeq, strGdsName, strType, strStatus,
-                    string.Join(", ", lstCandidate.Select(c => c.Name).ToArray()));
-            }
-            return dt;
-        }
-
-        /// <summary>GDS Setup Chain 목록 + 연결된 대표. NAME_KEY 는 비교 이름(EtParameterNameRule.ToSafeName).</summary>
-        public DataTable GetEtGdsChainLinkList(string strFactory, string strGdsDeviceID)
-        {
-            string f = Required(strFactory, "Factory", 30);
-            string g = Required(strGdsDeviceID, "GDS Device", 50);
-            RepChainSnapshot snap = LoadRepChainSnapshot(f, g);
-            DataTable dt = new DataTable("ET_GDS_CHAIN_LINK");
-            dt.Columns.Add("CHAIN_SEQ", typeof(string));
-            dt.Columns.Add("CHAIN_CODE", typeof(string));
-            dt.Columns.Add("CHAIN_NAME", typeof(string));
-            dt.Columns.Add("NAME_KEY", typeof(string));
-            dt.Columns.Add("REP_CHAIN_NAME", typeof(string));
-            dt.Columns.Add("LINK_TYPE", typeof(string));
-            foreach (GdsChainRow gds in snap.GdsChains)
-            {
-                string strRep = snap.SeqOwner(gds.Seq);
-                string strType = strRep != null ? snap.Links[strRep].LinkType : string.Empty;
-                dt.Rows.Add(gds.Seq.ToString(CultureInfo.InvariantCulture), gds.Code, gds.Name, gds.Key, strRep ?? string.Empty, strType);
-            }
-            return dt;
+            return new TQP_GDS_ET_ITEM().GetData("SELECT_ET_GDS_SETUP_CHAIN", null,
+                new string[] { Required(strFactory, "Factory", 30), Required(strGdsDeviceID, "GDS Device", 50) });
         }
 
         /// <summary>
-        /// 단자를 대표 Chain 으로 묶는다. aKey: 0 Factory / 1 GDS Device / 2 대표 이름(입력값).
-        /// 처리 흐름: 대표 이름 / 단자 이름을 이름 규칙으로 바꿔 검증 -> MERGE(다른 대표에 있던 단자는 옮김) -> 이름 일치 연결 다시 계산. 반환: 저장한 단자 수
+        /// Setup Chain(GDS Chain 이름)의 E-Test Parameter / Spec 을 찾는다. 인계 API 라 이름 / 인자는 2026-10-12 그대로 둔다.
+        /// 2026-10-14 Para 화면 재구성: Device -> Parameter 의 GDS Chain(Chain 1, 사용자 입력)이 같은(대소문자 무시) 모든 공정 등록 Parameter + Spec.
+        /// 2026-10-15 Sub Device 연결 제거: GDS Device 와 E-Test Device 는 이름이 같으므로(대소문자 무시) 그 Device 의 Parameter 만 찾는다. 쿼리 순서: factory device gds
         /// </summary>
-        public int SaveEtRepChain(string[] aKey, string[] aTerminals, string strUpdateUser)
-        {
-            if (aKey == null || aKey.Length != 3)
-                throw new ArgumentException("대표 Chain 키는 3개 항목(Factory / GDS Device / 대표 이름)이어야 합니다.", "aKey");
-            string f = Required(aKey[0], "Factory", 30);
-            string g = Required(aKey[1], "GDS Device", 50);
-            string strRep = RequiredSafeName(aKey[2], "대표 Chain");
-            string strUser = Required(strUpdateUser, "Update User", 30);
-            if (aTerminals == null || aTerminals.Length == 0)
-                throw new ArgumentException("묶을 단자가 없습니다.", "aTerminals");
-            if (aTerminals.Length > MaxBatchRows)
-                throw new ArgumentException("단자는 한 번에 " + MaxBatchRows + "개 이하로 묶으세요.", "aTerminals");
-
-            List<string> lstTerminal = new List<string>();
-            foreach (string strValue in aTerminals)
-            {
-                string strTerminal = RequiredSafeName(strValue, "단자");
-                if (!lstTerminal.Contains(strTerminal))
-                    lstTerminal.Add(strTerminal);
-            }
-            string[,] aMerge = new string[lstTerminal.Count, 5];
-            for (int i = 0; i < lstTerminal.Count; i++)
-            {
-                aMerge[i, 0] = f;
-                aMerge[i, 1] = g;
-                aMerge[i, 2] = lstTerminal[i];
-                aMerge[i, 3] = strRep;
-                aMerge[i, 4] = strUser;
-            }
-            new TQP_GDS_ET_REP_CHAIN().InsertExecuteMultiple("MERGE_ET_REP_CHAIN", aMerge);
-            LinkByName(f, g, strUser);
-            return lstTerminal.Count;
-        }
-
-        /// <summary>대표 이름을 바꾼다. aKey: 0 Factory / 1 GDS Device / 2 이전 이름 / 3 새 이름. 연결도 같이 바꾼 뒤 이름 일치 연결을 다시 계산한다.</summary>
-        public int RenameEtRepChain(string[] aKey, string strUpdateUser)
-        {
-            if (aKey == null || aKey.Length != 4)
-                throw new ArgumentException("대표 Chain 이름 바꾸기 키는 4개 항목(Factory / GDS Device / 이전 이름 / 새 이름)이어야 합니다.", "aKey");
-            string f = Required(aKey[0], "Factory", 30);
-            string g = Required(aKey[1], "GDS Device", 50);
-            string strOld = RequiredSafeName(aKey[2], "이전 대표 Chain");
-            string strNew = RequiredSafeName(aKey[3], "새 대표 Chain");
-            string strUser = Required(strUpdateUser, "Update User", 30);
-            if (strOld == strNew)
-                return 0;
-
-            RepChainSnapshot snap = LoadRepChainSnapshot(f, g);
-            if (!snap.Members.ContainsKey(strOld))
-                throw new InvalidOperationException("대표 Chain 이 없습니다: " + strOld);
-            if (snap.Members.ContainsKey(strNew))
-                throw new InvalidOperationException("같은 이름의 대표 Chain 이 이미 있습니다: " + strNew);
-
-            TQP_GDS_ET_CHAIN_LINK oLink = new TQP_GDS_ET_CHAIN_LINK();
-            oLink.DeleteDataNonQuery("DELETE_ET_CHAIN_LINK_ORPHAN", null, new string[] { f, g, f, g });
-            int iRows = new TQP_GDS_ET_REP_CHAIN().UpdateDataNonQuery("UPDATE_ET_REP_CHAIN_NAME", null, new string[] { strNew, strUser, f, g, strOld });
-            oLink.UpdateDataNonQuery("UPDATE_ET_CHAIN_LINK_NAME", null, new string[] { strNew, strUser, f, g, strOld });
-            LinkByName(f, g, strUser);
-            return iRows;
-        }
-
-        /// <summary>단자를 대표에서 뺀다. aKey: 0 Factory / 1 GDS Device. 단자가 0 이 된 대표의 연결과 이름이 더 이상 맞지 않는 NAME 연결을 정리한다.</summary>
-        public int RemoveEtRepChainMembers(string[] aKey, string[] aTerminals, string strUpdateUser)
-        {
-            if (aKey == null || aKey.Length != 2)
-                throw new ArgumentException("단자 빼기 키는 2개 항목(Factory / GDS Device)이어야 합니다.", "aKey");
-            string f = Required(aKey[0], "Factory", 30);
-            string g = Required(aKey[1], "GDS Device", 50);
-            string strUser = Required(strUpdateUser, "Update User", 30);
-            if (aTerminals == null || aTerminals.Length == 0)
-                throw new ArgumentException("뺄 단자가 없습니다.", "aTerminals");
-
-            TQP_GDS_ET_REP_CHAIN oRep = new TQP_GDS_ET_REP_CHAIN();
-            int iRows = 0;
-            foreach (string strValue in aTerminals.Distinct())
-                iRows += oRep.DeleteDataNonQuery("DELETE_ET_REP_CHAIN_MEMBER", null, new string[] { f, g, RequiredSafeName(strValue, "단자") });
-            LinkByName(f, g, strUser);
-            return iRows;
-        }
-
-        /// <summary>대표 Chain 을 지운다(연결 -> 단자 순서). aKey: 0 Factory / 1 GDS Device / 2 대표 이름. 반환: 지운 단자 수</summary>
-        public int DeleteEtRepChain(string[] aKey, string strUpdateUser)
-        {
-            if (aKey == null || aKey.Length != 3)
-                throw new ArgumentException("대표 Chain 삭제 키는 3개 항목(Factory / GDS Device / 대표 이름)이어야 합니다.", "aKey");
-            string f = Required(aKey[0], "Factory", 30);
-            string g = Required(aKey[1], "GDS Device", 50);
-            string strRep = RequiredSafeName(aKey[2], "대표 Chain");
-            Required(strUpdateUser, "Update User", 30);
-            new TQP_GDS_ET_CHAIN_LINK().DeleteDataNonQuery("DELETE_ET_CHAIN_LINK", null, new string[] { f, g, strRep });
-            return new TQP_GDS_ET_REP_CHAIN().DeleteDataNonQuery("DELETE_ET_REP_CHAIN", null, new string[] { f, g, strRep });
-        }
-
-        /// <summary>이름 일치 연결을 다시 계산한다 (LinkByName). 반환 1행: LINKED / UPDATED / REMOVED / NONE / MULTIPLE / TAKEN</summary>
-        public DataTable LinkEtRepChainsByName(string strFactory, string strGdsDeviceID, string strUpdateUser)
-        {
-            int[] aCount = LinkByName(Required(strFactory, "Factory", 30), Required(strGdsDeviceID, "GDS Device", 50), Required(strUpdateUser, "Update User", 30));
-            DataTable dt = new DataTable("ET_CHAIN_LINK_RESULT");
-            foreach (string strName in new string[] { "LINKED", "UPDATED", "REMOVED", "NONE", "MULTIPLE", "TAKEN" })
-                dt.Columns.Add(strName, typeof(int));
-            dt.Rows.Add(aCount[0], aCount[1], aCount[2], aCount[3], aCount[4], aCount[5]);
-            return dt;
-        }
-
-        /// <summary>
-        /// 사용자 연결(MANUAL). aKey: 0 Factory / 1 GDS Device / 2 대표 이름 / 3 GDS CHAIN_SEQ.
-        /// 대표 Chain 과 GDS Setup Chain(ACTIVE / READY)이 있어야 한다. 그 GDS Chain 의 다른 대표 연결은 지우고 옮긴다(1:1). 반환 1
-        /// </summary>
-        public int SaveEtChainLink(string[] aKey, string strUpdateUser)
-        {
-            if (aKey == null || aKey.Length != 4)
-                throw new ArgumentException("연결 키는 4개 항목(Factory / GDS Device / 대표 이름 / GDS Chain 번호)이어야 합니다.", "aKey");
-            string f = Required(aKey[0], "Factory", 30);
-            string g = Required(aKey[1], "GDS Device", 50);
-            string strRep = RequiredSafeName(aKey[2], "대표 Chain");
-            string strSeq = RequiredSeq(aKey[3], "GDS Chain 번호");
-            string strUser = Required(strUpdateUser, "Update User", 30);
-
-            RepChainSnapshot snap = LoadRepChainSnapshot(f, g);
-            if (!snap.Members.ContainsKey(strRep))
-                throw new InvalidOperationException("대표 Chain 이 없습니다: " + strRep);
-            GdsChainRow gds = snap.FindGds(long.Parse(strSeq, CultureInfo.InvariantCulture));
-            if (gds == null)
-                throw new InvalidOperationException("GDS Setup Chain(ACTIVE / READY) 이 아닙니다: " + strSeq);
-
-            TQP_GDS_ET_CHAIN_LINK oLink = new TQP_GDS_ET_CHAIN_LINK();
-            oLink.DeleteDataNonQuery("DELETE_ET_CHAIN_LINK_BY_SEQ", null, new string[] { f, g, strSeq });
-            oLink.InsertDataNonQuery("MERGE_ET_CHAIN_LINK", null, new string[] { f, g, strRep, strSeq, gds.Name, "MANUAL", strUser });
-            return 1;
-        }
-
-        /// <summary>연결 해제. aKey: 0 Factory / 1 GDS Device / 2 대표 이름. 반환: 지운 행 수</summary>
-        public int DeleteEtChainLink(string[] aKey, string strUpdateUser)
-        {
-            if (aKey == null || aKey.Length != 3)
-                throw new ArgumentException("연결 해제 키는 3개 항목(Factory / GDS Device / 대표 이름)이어야 합니다.", "aKey");
-            Required(strUpdateUser, "Update User", 30);
-            return new TQP_GDS_ET_CHAIN_LINK().DeleteDataNonQuery("DELETE_ET_CHAIN_LINK", null, new string[] {
-                Required(aKey[0], "Factory", 30), Required(aKey[1], "GDS Device", 50), RequiredSafeName(aKey[2], "대표 Chain") });
-        }
-
-        /// <summary>대표 Chain 의 단자가 들어간 모든 공정의 등록 Parameter + Spec. 쿼리 순서: f1 g1 g2 f2 g3 rep f3</summary>
-        public DataTable GetEtRepChainSpecInfo(string strFactory, string strGdsDeviceID, string strRepChainName)
+        public DataTable GetEtChainSpecInfo(string strFactory, string strDeviceID, string strSetupChain)
         {
             string f = Required(strFactory, "Factory", 30);
-            string g = Required(strGdsDeviceID, "GDS Device", 50);
-            string strRep = RequiredSafeName(strRepChainName, "대표 Chain");
-            return new TQP_GDS_ET_REP_CHAIN().GetData("SELECT_ET_PARA_BY_REP_CHAIN", null, new string[] { f, g, g, f, g, strRep, f });
-        }
-
-        /// <summary>
-        /// 이름 일치 연결 계산 (설계 7.1절).
-        /// 1) 단자가 없는 대표의 연결을 지운다
-        /// 2) NAME 연결 중 GDS 지금 이름(비교 이름)이 대표 이름 / 구성 단자와 맞지 않는 것은 지우고, 맞지만 저장된 이름이 다르면 갱신한다
-        /// 3) 연결 없는 대표: 이름이 같은 GDS Chain 이 1개이고 다른 대표가 쓰지 않으면 NAME 연결. 0개 NONE / 2개 이상 MULTIPLE / 다른 대표가 씀 TAKEN
-        /// MANUAL 연결은 건드리지 않는다. 반환: LINKED / UPDATED / REMOVED / NONE / MULTIPLE / TAKEN
-        /// </summary>
-        private int[] LinkByName(string f, string g, string strUser)
-        {
-            TQP_GDS_ET_CHAIN_LINK oLink = new TQP_GDS_ET_CHAIN_LINK();
-            int iLinked = 0, iUpdated = 0, iNone = 0, iMultiple = 0, iTaken = 0;
-            int iRemoved = oLink.DeleteDataNonQuery("DELETE_ET_CHAIN_LINK_ORPHAN", null, new string[] { f, g, f, g });
-
-            RepChainSnapshot snap = LoadRepChainSnapshot(f, g);
-            foreach (LinkRow link in snap.Links.Values.ToList())
-            {
-                if (link.LinkType != "NAME")
-                    continue;
-                GdsChainRow gds = snap.FindGds(link.ChainSeq);
-                if (gds == null || !snap.NameSet(link.RepChainName).Contains(gds.Key))
-                {
-                    iRemoved += oLink.DeleteDataNonQuery("DELETE_ET_CHAIN_LINK", null, new string[] { f, g, link.RepChainName });
-                    snap.Links.Remove(link.RepChainName);
-                    continue;
-                }
-                if (!string.Equals(link.GdsChainName, gds.Name, StringComparison.Ordinal))
-                {
-                    oLink.InsertDataNonQuery("MERGE_ET_CHAIN_LINK", null, new string[] {
-                        f, g, link.RepChainName, link.ChainSeq.ToString(CultureInfo.InvariantCulture), gds.Name, "NAME", strUser });
-                    iUpdated++;
-                }
-            }
-
-            foreach (string strRep in snap.Members.Keys)
-            {
-                if (snap.Links.ContainsKey(strRep))
-                    continue;
-                List<GdsChainRow> lstCandidate = snap.FindCandidates(strRep);
-                if (lstCandidate.Count == 0)
-                {
-                    iNone++;
-                    continue;
-                }
-                if (lstCandidate.Count > 1)
-                {
-                    iMultiple++;
-                    continue;
-                }
-                GdsChainRow gds = lstCandidate[0];
-                if (snap.SeqOwner(gds.Seq) != null)
-                {
-                    iTaken++;
-                    continue;
-                }
-                oLink.InsertDataNonQuery("MERGE_ET_CHAIN_LINK", null, new string[] {
-                    f, g, strRep, gds.Seq.ToString(CultureInfo.InvariantCulture), gds.Name, "NAME", strUser });
-                snap.Links[strRep] = new LinkRow(strRep, gds.Seq, gds.Name, "NAME");
-                iLinked++;
-            }
-            return new int[] { iLinked, iUpdated, iRemoved, iNone, iMultiple, iTaken };
-        }
-
-        /// <summary>대표 Chain 구성 / 연결 / GDS Setup Chain 을 한 번에 읽는다.</summary>
-        private static RepChainSnapshot LoadRepChainSnapshot(string f, string g)
-        {
-            RepChainSnapshot snap = new RepChainSnapshot();
-            using (DataTable dt = new TQP_GDS_ET_REP_CHAIN().GetData("SELECT_ET_REP_CHAIN_MEMBER_LIST", null, new string[] { f, g }))
-            {
-                foreach (DataRow dr in dt.Rows)
-                {
-                    string strRep = dr["REP_CHAIN_NAME"].ToString();
-                    List<string> lst;
-                    if (!snap.Members.TryGetValue(strRep, out lst))
-                    {
-                        lst = new List<string>();
-                        snap.Members.Add(strRep, lst);
-                    }
-                    lst.Add(dr["TERMINAL_NAME"].ToString());
-                }
-            }
-            using (DataTable dt = new TQP_GDS_ET_CHAIN_LINK().GetData("SELECT_ET_CHAIN_LINK_LIST", null, new string[] { f, g }))
-            {
-                foreach (DataRow dr in dt.Rows)
-                {
-                    LinkRow link = new LinkRow(dr["REP_CHAIN_NAME"].ToString(), Convert.ToInt64(dr["CHAIN_SEQ"], CultureInfo.InvariantCulture),
-                        dr["GDS_CHAIN_NAME"].ToString(), dr["LINK_TYPE"].ToString());
-                    snap.Links[link.RepChainName] = link;
-                }
-            }
-            using (DataTable dt = new TQP_GDS_ET_REP_CHAIN().GetData("SELECT_ET_GDS_SETUP_CHAIN", null, new string[] { f, g }))
-            {
-                foreach (DataRow dr in dt.Rows)
-                {
-                    string strName = dr["CHAIN_NAME"].ToString();
-                    snap.GdsChains.Add(new GdsChainRow(Convert.ToInt64(dr["CHAIN_SEQ"], CultureInfo.InvariantCulture),
-                        dr["CHAIN_CODE"].ToString(), strName, EtParameterNameRule.ToSafeName(strName)));
-                }
-            }
-            return snap;
-        }
-
-        /// <summary>이름 규칙으로 바꾼 이름이 저장 가능한지 확인하고 돌려준다(영문자로 시작, 64자 이하).</summary>
-        private static string RequiredSafeName(string strValue, string strName)
-        {
-            string strSafe = EtParameterNameRule.ToSafeName(strValue);
-            if (!EtParameterNameRule.IsSafeName(strSafe, EtParameterNameRule.MaxChainNameLength))
-                throw new ArgumentException(strName + " 이름을 만들 수 없습니다(영문자로 시작, A~Z / 0~9 / '_', "
-                    + EtParameterNameRule.MaxChainNameLength + "자 이하): " + strValue, strName);
-            return strSafe;
-        }
-
-        /// <summary>대표 Chain 구성 / 연결 / GDS Setup Chain 을 메모리에 들고 이름 비교를 돕는다.</summary>
-        private sealed class RepChainSnapshot
-        {
-            /// <summary>대표 이름 -> 구성 단자 (이름 순)</summary>
-            public readonly SortedDictionary<string, List<string>> Members = new SortedDictionary<string, List<string>>(StringComparer.Ordinal);
-            /// <summary>대표 이름 -> 연결</summary>
-            public readonly Dictionary<string, LinkRow> Links = new Dictionary<string, LinkRow>(StringComparer.Ordinal);
-            /// <summary>GDS Setup Chain (이름 순)</summary>
-            public readonly List<GdsChainRow> GdsChains = new List<GdsChainRow>();
-
-            /// <summary>대표 이름 + 구성 단자 이름 (GDS 이름과 비교할 이름들)</summary>
-            public HashSet<string> NameSet(string strRep)
-            {
-                HashSet<string> set = new HashSet<string>(StringComparer.Ordinal) { strRep };
-                List<string> lst;
-                if (Members.TryGetValue(strRep, out lst))
-                    set.UnionWith(lst);
-                return set;
-            }
-
-            /// <summary>이름(비교 이름)이 대표 이름 또는 구성 단자와 같은 GDS Chain</summary>
-            public List<GdsChainRow> FindCandidates(string strRep)
-            {
-                HashSet<string> set = NameSet(strRep);
-                return GdsChains.Where(c => set.Contains(c.Key)).ToList();
-            }
-
-            public GdsChainRow FindGds(long lSeq)
-            {
-                return GdsChains.FirstOrDefault(c => c.Seq == lSeq);
-            }
-
-            /// <summary>GDS Chain 을 연결해 쓰고 있는 대표 이름. 없으면 null</summary>
-            public string SeqOwner(long lSeq)
-            {
-                foreach (LinkRow link in Links.Values)
-                    if (link.ChainSeq == lSeq)
-                        return link.RepChainName;
-                return null;
-            }
-        }
-
-        private sealed class LinkRow
-        {
-            public readonly string RepChainName;
-            public readonly long ChainSeq;
-            public readonly string GdsChainName;
-            public readonly string LinkType;
-
-            public LinkRow(string strRep, long lSeq, string strGdsName, string strType)
-            {
-                RepChainName = strRep;
-                ChainSeq = lSeq;
-                GdsChainName = strGdsName;
-                LinkType = strType;
-            }
-        }
-
-        private sealed class GdsChainRow
-        {
-            public readonly long Seq;
-            public readonly string Code;
-            public readonly string Name;
-            /// <summary>비교 이름 (EtParameterNameRule.ToSafeName)</summary>
-            public readonly string Key;
-
-            public GdsChainRow(long lSeq, string strCode, string strName, string strKey)
-            {
-                Seq = lSeq;
-                Code = strCode;
-                Name = strName;
-                Key = strKey;
-            }
+            string g = ResolveGdsDevice(f, Required(strDeviceID, "Device ID", 50));
+            string strChain = RequiredChars(strSetupChain, "Setup Chain", 200);
+            DataTable dt = new TQP_GDS_ET_ITEM().GetData("SELECT_ET_PARA_BY_GDS_CHAIN", null, new string[] { f, g, strChain });
+            dt.TableName = "ET_CHAIN_SPEC_INFO";
+            return dt;
         }
 
         #endregion

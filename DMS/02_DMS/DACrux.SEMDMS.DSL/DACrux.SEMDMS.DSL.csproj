@@ -65,7 +65,7 @@
   <ItemGroup Condition="'$(Configuration)' == 'Release'">
     <Reference Include="Miracom.Middleware">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\07_CoreLib\Miracom.Middleware\x64\Miracom.Middleware.dll</HintPath>
+      <HintPath>..\..\07_CoreLib\Miracom.Middleware.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -87,7 +87,6 @@
     <Compile Include="TQP_GDS_LAYER.cs" />
     <Compile Include="TQP_GDS_PLACED_EL.cs" />
     <Compile Include="TQP_GDS_MAP.cs" />
-    <Compile Include="TQP_GDS_MAP_SUB_DEVICE.cs" />
     <Compile Include="TQP_GDS_CHAIN.cs" />
     <Compile Include="TQP_GDS_CHAIN_VER.cs" />
     <Compile Include="TQP_GDS_CHAIN_MEMBER.cs" />
@@ -96,9 +95,6 @@
     <Compile Include="TQP_GDS_ET_DIE.cs" />
     <Compile Include="TQP_GDS_ET_VALUE.cs" />
     <Compile Include="TQP_GDS_ET_LIMIT.cs" />
-    <Compile Include="TQP_GDS_ET_CHAIN_GROUP.cs" />
-    <Compile Include="TQP_GDS_ET_REP_CHAIN.cs" />
-    <Compile Include="TQP_GDS_ET_CHAIN_LINK.cs" />
     <Compile Include="TQP_GDS_ET_YMS.cs" />
     <Compile Include="TQP_GDS_CHAIN_LAYER.cs" />
     <Compile Include="TQP_GDS_CHAIN_RULE.cs" />

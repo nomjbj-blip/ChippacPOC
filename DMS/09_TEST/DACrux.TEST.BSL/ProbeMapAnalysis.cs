@@ -1507,6 +1507,9 @@ namespace DACrux.TEST.BSL
 
                 oMapdef = new DACrux.TEST.DSL.TQP_MAPDEF();
                 dtTemp = oMapdef.GetData("GET_MAPDEF_MAP", null, new string[] { strDevice });
+                // 2026-10-14 File Map Setup Map 은 저장 원점(선택 XY 방향 기준)을 LeftBottom 으로 되돌린다(DMS 화면과 같은 위치). 기존 Map 은 그대로.
+                if (dtTemp != null && dtTemp.Rows.Count > 0)
+                    FileMapSetupMap.ToLeftBottomOrigin(dtTemp.Rows[0], strDevice);
                 if (dtTemp != null && dtTemp.Rows.Count > 0 && strTESTAREA != "PARAMETRIC" && strTESTAREA != "INLINE")
                 {
                     dtTable.Rows.Add(new object[] { 

@@ -25,6 +25,8 @@ namespace NexplantQMS.GdsMap.Chain
         public string ElementKey { get; private set; }
         public int LayerId { get; private set; }
         public int DataType { get; private set; }
+        /// <summary>Layer 키 = 번호 + DataType(GdsLayerKey). 화면 Layer 체크와 비교할 때 쓴다 (2026-10-20)</summary>
+        public int LayerKey { get { return GdsLayerKey.Make(LayerId, DataType); } }
         public string ElementType { get; private set; }
         public GBox Bounds { get; private set; }
         public int PointCount { get; private set; }
@@ -71,6 +73,8 @@ namespace NexplantQMS.GdsMap.Chain
         public string ElementKey { get; private set; }
         public int LayerId { get; private set; }
         public int DataType { get; private set; }
+        /// <summary>탐색 Layer / 연결 규칙 비교 키 = Layer 번호 + DataType(GdsLayerKey, 2026-10-20)</summary>
+        public int LayerKey { get { return GdsLayerKey.Make(LayerId, DataType); } }
         public GBox Bounds { get; private set; }
         public string ElementType { get; private set; }
         public GPoint[] WorldPoints { get; private set; }
@@ -81,6 +85,7 @@ namespace NexplantQMS.GdsMap.Chain
     /// 두 Layer 사이에서 Element 연결 후보를 판단할 수 있는 규칙이다.
     /// 같은 Layer 연결도 명시적으로 등록해야 하며, 규칙에 없는 Layer 조합은 연결하지 않는다.
     /// </summary>
+    /// <summary>두 Layer 연결 규칙. First / SecondLayerId 는 Layer 키(번호 + DataType, GdsLayerKey)다 (2026-10-20).</summary>
     public sealed class ChainLayerConnectionRule
     {
         public ChainLayerConnectionRule(int firstLayerId, int secondLayerId, double tolerance)
@@ -147,6 +152,7 @@ namespace NexplantQMS.GdsMap.Chain
         public IEnumerable<ChainLayerConnectionRule> LayerRules { get; private set; }
         public double SpatialCellSize { get; private set; }
         public GBox? WorkArea { get; set; }
+        /// <summary>탐색 Layer 키(번호 + DataType, GdsLayerKey). null 이면 전체 (2026-10-20 번호 -> 키)</summary>
         public ISet<int> SelectedLayerIds { get; set; }
         public bool ApplyLayerRules { get; set; } = true;
     }

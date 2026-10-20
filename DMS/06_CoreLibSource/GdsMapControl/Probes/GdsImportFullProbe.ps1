@@ -7,15 +7,20 @@
 #       시작 전에 같은 Device의 기존 데이터를 삭제한다. 불일치 확인용 FULLMIS_PROBE는 마지막에 삭제한다. (아래 원래 문구)
 # 이전:
 #       불일치 확인용 DRAFT 개정본 1건이 남는다.
-# 실행: powershell -NoProfile -ExecutionPolicy Bypass -File GdsImportFullProbe.ps1 [-GdsPath 경로] [-BatchRows 2000]
+# 실행: powershell -NoProfile -ExecutionPolicy Bypass -File GdsImportFullProbe.ps1 [-GdsPath 경로] [-BatchRows 2000] [-BinDir <BSL/DSL/Interface 폴더>] [-GdsExe <EXE>]
+#       -BinDir 생략 시 101_ServerBin, -GdsExe 생략 시 bin\Debug. 배포 전에는 TEMP 빌드 폴더를 넘긴다.
+# Layer 는 번호 + DataType(TEXT 는 TEXTTYPE) 단위로 저장한다(화면 저장과 같은 BuildLayerKeyRows, 2026-10-20).
 param(
     [string]$GdsPath = '',
-    [int]$BatchRows = 2000
+    [int]$BatchRows = 2000,
+    [string]$BinDir = '',
+    [string]$GdsExe = ''
 )
 $ErrorActionPreference = 'Stop'
 $dms = (Resolve-Path (Join-Path $PSScriptRoot '..\..\..')).Path
 $serverBin = Join-Path $dms '101_ServerBin'
-$gdsExe = Join-Path $dms '06_CoreLibSource\GdsMapControl\bin\Debug\NexplantQMS.GdsMap.exe'
+if ($BinDir -eq '') { $BinDir = $serverBin }
+$gdsExe = if ($GdsExe -ne '') { $GdsExe } else { Join-Path $dms '06_CoreLibSource\GdsMapControl\bin\Debug\NexplantQMS.GdsMap.exe' }
 if ($GdsPath -eq '') { $GdsPath = Join-Path (Split-Path $dms -Parent) 'SampleFile\OMM all layer2.gds\OMM all layer2.gds' }
 
 # BSL / DSL이 ConfigurationManager.AppSettings["DMS_CONNECT_ID"]를 읽으므로 Service 설정 파일을 이 프로세스 설정으로 지정한다.
@@ -25,9 +30,13 @@ $flags = [Reflection.BindingFlags]'NonPublic,Static'
 $cm = [Configuration.ConfigurationManager]
 $cm.GetField('s_initState', $flags).SetValue($null, 0)
 $cm.GetField('s_configSystem', $flags).SetValue($null, $null)
-foreach ($d in 'Oracle.ManagedDataAccess', 'Miracom.Middleware', 'DACrux.SEMDMS.Interface', 'DACrux.SEMDMS.DSL', 'DACrux.SEMDMS.BSL') {
+foreach ($d in 'Oracle.ManagedDataAccess', 'Miracom.Middleware') {
     [void][Reflection.Assembly]::LoadFrom((Join-Path $serverBin "$d.dll"))
 }
+foreach ($d in 'DACrux.SEMDMS.Interface', 'DACrux.SEMDMS.DSL', 'DACrux.SEMDMS.BSL') {
+    [void][Reflection.Assembly]::LoadFrom((Join-Path $BinDir "$d.dll"))
+}
+Write-Host "BSL: $(Join-Path $BinDir 'DACrux.SEMDMS.BSL.dll') / EXE: $gdsExe"
 # Add-Type(CodeDom)은 .exe를 참조로 받지 못하므로 시험용 임시 폴더에 같은 어셈블리를 .dll 이름으로 복사해 참조 / 로드한다.
 $probeDir = Join-Path $env:TEMP 'chippac\gdsfullprobe'
 New-Item -ItemType Directory -Force $probeDir | Out-Null
@@ -56,11 +65,11 @@ public static class GdsFullProbe
         return reader.Read(path);
     }
 
-    /// <summary>화면 저장과 같이 Flatten 결과의 배치 도형 수 / 좌표 수 / Layer 목록을 센다.</summary>
+    /// <summary>화면 저장과 같이 Flatten 결과의 배치 도형 수 / 좌표 수 / Layer 키(번호 + DataType) 목록을 센다.</summary>
     public static long[] CountPlaced(GdsMapControl map, SortedSet<int> layers)
     {
         long points = 0;
-        int count = map.VisitPlacedElements(d => { points += d.WorldPoints.Length; layers.Add(d.LayerId); });
+        int count = map.VisitPlacedElements(d => { points += d.WorldPoints.Length; layers.Add(GdsLayerKey.Make(d.LayerId, d.DataType)); });
         return new long[] { count, points };
     }
 
@@ -93,7 +102,7 @@ public static class GdsFullProbe
     }
 }
 "@
-Add-Type -TypeDefinition $helper -ReferencedAssemblies @($gdsExe, (Join-Path $serverBin 'DACrux.SEMDMS.BSL.dll'), (Join-Path $serverBin 'DACrux.SEMDMS.Interface.dll'), (Join-Path $serverBin 'Miracom.Middleware.dll'),
+Add-Type -TypeDefinition $helper -ReferencedAssemblies @($gdsExe, (Join-Path $BinDir 'DACrux.SEMDMS.BSL.dll'), (Join-Path $BinDir 'DACrux.SEMDMS.Interface.dll'), (Join-Path $serverBin 'Miracom.Middleware.dll'),
     (Join-Path (Split-Path $gdsExe) 'OpenTK.GLControl.dll'), (Join-Path (Split-Path $gdsExe) 'OpenTK.dll'), 'System.Data', 'System.Windows.Forms', 'System.Drawing', 'System.Xml')
 
 $results = New-Object Collections.Generic.List[string]
@@ -109,9 +118,10 @@ $map = New-Object NexplantQMS.GdsMap.GdsMapControl
 $map.ShowStructure($lib)
 $flattenMs = $sw.ElapsedMilliseconds
 $layers = New-Object 'Collections.Generic.SortedSet[int]'
-foreach ($id in [NexplantQMS.GdsMap.Persistence.GdsMapLayerRowBuilder]::CollectLayerIds($lib)) { [void]$layers.Add($id) }
+foreach ($item in $map.GetLayerDisplayItems()) { [void]$layers.Add($item.LayerKey) }
 $counts = [GdsFullProbe]::CountPlaced($map, $layers)
-Check '파싱 / Flatten' ($counts[0] -gt 0) "placed=$($counts[0]) points=$($counts[1]) layers=$($layers.Count) parse ms=$parseMs flatten ms=$flattenMs"
+$layerText = ($layers | ForEach-Object { [NexplantQMS.GdsMap.GdsLayerKey]::Format($_) }) -join ','
+Check '파싱 / Flatten' ($counts[0] -gt 0) "placed=$($counts[0]) points=$($counts[1]) layers=$layerText parse ms=$parseMs flatten ms=$flattenMs"
 
 # 2. 저장 작업 시작
 $sha = (Get-FileHash -Algorithm SHA256 -LiteralPath $GdsPath).Hash
@@ -128,7 +138,7 @@ Check '기존 데이터 삭제 후 저장 시작' ($job -match '^\d+$') ("job={0
 # 3. LAYER
 $pairs = New-Object 'Collections.Generic.List[Collections.Generic.KeyValuePair[int,int]]'
 foreach ($id in $layers) { $pairs.Add((New-Object 'Collections.Generic.KeyValuePair[int,int]'($id, -16777216))) }
-$n = $bsl.CreateLayerBatch($job, 0, [NexplantQMS.GdsMap.Persistence.GdsMapLayerRowBuilder]::BuildLayerRows($pairs), 'probe')
+$n = $bsl.CreateLayerBatch($job, 0, [NexplantQMS.GdsMap.Persistence.GdsMapLayerRowBuilder]::BuildLayerKeyRows($pairs), 'probe')
 Check 'LAYER 저장' ($n -eq $layers.Count) "rows=$n"
 
 # 4. PLACED
@@ -170,7 +180,7 @@ Check '좌표 / Bounds / TEXT 재조회 일치' ($okCount -eq $sample.Count) "sa
 # 7. 건수 불일치 감지: PLACED를 보내지 않은 작업은 MISMATCH이고 UPLOADING으로 남아야 한다
 if ($bsl.GetMapInfo('PROBE', 'FULLMIS_PROBE').Rows.Count -gt 0) { [void]$bsl.DeleteMap('PROBE', 'FULLMIS_PROBE', 'probe') }
 $job2 = [string]$bsl.BeginMapImport([string[]]@('PROBE', 'FULLMIS_PROBE', 'TOP', 'mismatch.gds', ('F' * 64), '0.001', '1E-09', 'probe', '', '1', '5')).Rows[0]['IMPORT_JOB_SEQ']
-[void]$bsl.CreateLayerBatch($job2, 0, [NexplantQMS.GdsMap.Persistence.GdsMapLayerRowBuilder]::BuildLayerRows($pairs), 'probe')
+[void]$bsl.CreateLayerBatch($job2, 0, [NexplantQMS.GdsMap.Persistence.GdsMapLayerRowBuilder]::BuildLayerKeyRows($pairs), 'probe')
 $m = $bsl.CompleteMapImport($job2, 'probe').Rows[0]
 $st2 = $bsl.GetImportJob($job2).Rows[0]
 Check 'PLACED 누락은 MISMATCH / UPLOADING 유지' ($m['RESULT'] -eq 'MISMATCH' -and $st2['JOB_STATUS'] -eq 'UPLOADING') "$($m['MESSAGE']) / job=$($st2['JOB_STATUS'])"

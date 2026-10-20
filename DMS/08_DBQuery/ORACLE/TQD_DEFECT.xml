@@ -647,4 +647,15 @@ ORDER BY DEFECTID]]></commandtext>
             <param direction="Input" dbtype="VarChar" size="0" value="STEP_SEQ">:STEP_SEQ</param>
         </parameters>
     </query>
+    <!-- 2026-10-16 추가: 통합 연관 분석(BSL GdsKlarfAnalysis.Analyze)이 Step 마다 판정에 필요한 컬럼만 읽는다
+         (설계 05_연관분석/2026-10-15_GDS_KLARF_ETest_통합분석_데이터_설계.md 5.1절). GET_DEFECT 는 28 컬럼을 모두 읽는다. -->
+    <query statement="Select" queryid="SELECT_DEFECT_FOR_GDS" commandtype="Text" description="연관 분석: Step 의 Defect 위치 / 크기 / 분류" commandtimeout="600">
+        <commandtext><![CDATA[SELECT DEFECTID, XINDEX, YINDEX, XREL, YREL, XSIZE, YSIZE, CLASSNUMBER, ROUGHBINNUMBER, IMAGECOUNT
+  FROM TQD_DEFECT
+ WHERE STEP_SEQ = :step_seq
+ ORDER BY DEFECTID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:step_seq</param>
+        </parameters>
+    </query>
 </queryxml>

@@ -5,7 +5,7 @@
 --   3) 헤더 원문을 항목명으로 쓰고 뒤의 '#번호' 는 지운다 (FT: ...@TSVDC_HBM_C_P_FH #717)
 --   기존 결정 유지: 등록 시 대문자 / Enable / Limit 한쪽만 가능
 -- 2026-10-07 Para 단위 테이블(키 FACTORY + DEVICE_ID + PARA_NAME)을 대체한다. 적용 전 0행 확인.
--- 설계: 문서/2026-10-07_ETest_Limit_설정_설계.md 12절
+-- 설계: 문서/설계/04_ETest/2026-10-07_ETest_Limit_설정_설계.md 12절
 -- 적용: 2026-10-12 로컬 docker oracle19c DMSMGR. 고객 DB 적용 여부는 별도 확인.
 
 WHENEVER SQLERROR EXIT SQL.SQLCODE ROLLBACK

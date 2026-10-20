@@ -3,9 +3,9 @@
 #  1) 운영 폴더(100_ClientBin / 101_ServerBin)는 바꾸지 않고 %TEMP% 에 Interface / DSL / BSL / RO / ENGUI / GdsMap 을 따로 빌드한다.
 #  2) Service(Remoting) 대신 RO 원격 연결 필드를 같은 프로세스 BSL 로 바꿔 화면 -> RO -> BSL -> 로컬 DB 를 실제로 거친다(조회만).
 #  3) 결과 화면 이미지: %TEMP%\ChippacGdsKlarfAnalysisVerification\analysis.png
-# 전제: -Factory / -Device 에 READY GDS Map + READY Chain, -StepSeq 에 KLARF 업로드 Step (기본 SCK / U9 / 501 = XD106.02)
-# 실행: powershell -NoProfile -ExecutionPolicy Bypass -File Verify-GdsKlarfAnalysis.ps1 [-StepSeq 501] [-Factory SCK] [-Device U9]
-param([long]$StepSeq = 501, [string]$Factory = 'SCK', [string]$Device = 'U9')
+# 전제: -Factory / -Device 에 READY GDS Map + READY Chain, -StepSeq 에 KLARF 업로드 Step (기본 SCK / OMM_Hybrid / 528 = XD106.02, 2026-10-16 재업로드 기준)
+# 실행: powershell -NoProfile -ExecutionPolicy Bypass -File Verify-GdsKlarfAnalysis.ps1 [-StepSeq 528] [-Factory SCK] [-Device OMM_Hybrid]
+param([long]$StepSeq = 528, [string]$Factory = 'SCK', [string]$Device = 'OMM_Hybrid')
 $ErrorActionPreference = 'Stop'
 $projectDir = Split-Path $PSScriptRoot -Parent
 $dmsDir = Split-Path (Split-Path $projectDir -Parent) -Parent
@@ -32,7 +32,8 @@ function Build-Temp($proj, $refDir) {
 # 0) 코어 DLL (이후 71_CoreLib, BuildProjectReferences=false 라 OutDir 에 먼저 둔다)
 $coreLib = Join-Path $dmsDir '71_CoreLib'
 if (Test-Path $coreLib) { Get-ChildItem $coreLib -Filter '*.dll' | ForEach-Object { Copy-Item $_.FullName $out -Force } }
-foreach ($d in 'DACrux.Data.Parser', 'DACrux.Common.DSL', 'DACrux.TEST.DSL', 'DACrux.Base', 'Miracom.Middleware') {
+# DACrux.TEST.BSL: 2026-10-14 SEMDMS.BSL 이 YMS 적재 때문에 참조한다(BuildProjectReferences=false 빌드에 DLL 이 필요)
+foreach ($d in 'DACrux.Data.Parser', 'DACrux.Common.DSL', 'DACrux.TEST.DSL', 'DACrux.TEST.BSL', 'DACrux.Base', 'Miracom.Middleware') {
     $p = Join-Path $serverBin "$d.dll"; if (Test-Path $p) { Copy-Item $p $out -Force }
 }
 foreach ($d in 'DACrux.Common.RO', 'DACrux.Common.Interface', 'DACrux.Utility') { Copy-Item (Join-Path $clientBin "$d.dll") $out -Force }
@@ -42,9 +43,11 @@ Build-Temp "$dmsDir\02_DMS\DACrux.SEMDMS.Interface\DACrux.SEMDMS.Interface.cspro
 Build-Temp "$dmsDir\02_DMS\DACrux.SEMDMS.DSL\DACrux.SEMDMS.DSL.csproj" $serverBin
 Build-Temp "$dmsDir\02_DMS\DACrux.SEMDMS.BSL\DACrux.SEMDMS.BSL.csproj" $serverBin
 Build-Temp "$dmsDir\02_DMS\DACrux.SEMDMS.RO\DACrux.SEMDMS.RO.csproj" $clientBin
-foreach ($d in 'DACrux.Data.Handler', 'DACrux.SEMDMS.Control', 'DACrux.TEST.Control', 'DACrux.TEST.ENGUI', 'DACrux.TEST.Interface', 'DACrux.TEST.RO') {
+foreach ($d in 'DACrux.Data.Handler', 'DACrux.TEST.Control', 'DACrux.TEST.ENGUI', 'DACrux.TEST.Interface', 'DACrux.TEST.RO') {
     Copy-Item (Join-Path $clientBin "$d.dll") $out -Force
 }
+# DACrux.SEMDMS.Control: 2026-10-14 공통 진행 표시줄(ProgressStatusBar)이 들어 있어 운영 폴더 DLL 대신 새로 빌드한다
+Build-Temp "$dmsDir\02_DMS\DACrux.SEMDMS.Control\DACrux.SEMDMS.Control.csproj" $clientBin
 Build-Temp "$projectDir\DACrux.SEMDMS.ENGUI.csproj" $clientBin
 
 # 2) GdsMap (.NET 4.8). OpenTK 등 GDS 전용 DLL 은 100_ClientBin\GdsMap 에서 가져온다(build.md: OutDir 를 바꾸면 OpenTK 를 먼저 복사)

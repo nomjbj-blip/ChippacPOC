@@ -18,6 +18,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmKlarfFileViewer));
             this.fileBar = new System.Windows.Forms.Panel();
             this.txtFile = new System.Windows.Forms.TextBox();
             this.btnBrowse = new System.Windows.Forms.Button();
@@ -47,12 +48,15 @@
             this.lblLegend = new System.Windows.Forms.Label();
             this.txtInfo = new System.Windows.Forms.TextBox();
             this.lblMouse = new System.Windows.Forms.Label();
+            this.pnlStatus = new System.Windows.Forms.Panel();
             this.lblStatus = new System.Windows.Forms.Label();
+            this.busyBar = new DACrux.SEMDMS.Control.ProgressStatusBar();
             this.m_dMap = new DACrux.SEMDMS.ENGUI.KlarfDefectMap();
             this.fileBar.SuspendLayout();
             this.rightPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvDefect)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvLegend)).BeginInit();
+            this.pnlStatus.SuspendLayout();
             this.SuspendLayout();
             //
             // fileBar
@@ -75,17 +79,19 @@
             //
             this.txtFile.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtFile.Location = new System.Drawing.Point(12, 12);
+            this.txtFile.Location = new System.Drawing.Point(12, 10);
             this.txtFile.Name = "txtFile";
-            this.txtFile.Size = new System.Drawing.Size(1152, 23);
+            this.txtFile.Size = new System.Drawing.Size(1168, 23);
             this.txtFile.TabIndex = 0;
             //
             // btnBrowse
             //
             this.btnBrowse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnBrowse.Location = new System.Drawing.Point(1174, 9);
+            this.btnBrowse.Location = new System.Drawing.Point(1190, 8);
             this.btnBrowse.Name = "btnBrowse";
-            this.btnBrowse.Size = new System.Drawing.Size(102, 30);
+            this.btnBrowse.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.btnBrowse.Image = ((System.Drawing.Image)(resources.GetObject("btnBrowse.Image")));
+            this.btnBrowse.Size = new System.Drawing.Size(96, 28);
             this.btnBrowse.TabIndex = 1;
             this.btnBrowse.Text = "파일 선택";
             this.btnBrowse.Click += new System.EventHandler(this.btnBrowse_Click);
@@ -93,9 +99,11 @@
             // btnReload
             //
             this.btnReload.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnReload.Location = new System.Drawing.Point(1284, 9);
+            this.btnReload.Location = new System.Drawing.Point(1292, 8);
             this.btnReload.Name = "btnReload";
-            this.btnReload.Size = new System.Drawing.Size(102, 30);
+            this.btnReload.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.btnReload.Image = ((System.Drawing.Image)(resources.GetObject("btnReload.Image")));
+            this.btnReload.Size = new System.Drawing.Size(96, 28);
             this.btnReload.TabIndex = 2;
             this.btnReload.Text = "다시 읽기";
             this.btnReload.Click += new System.EventHandler(this.btnReload_Click);
@@ -149,7 +157,7 @@
             this.chkDieLabel.Name = "chkDieLabel";
             this.chkDieLabel.Size = new System.Drawing.Size(200, 23);
             this.chkDieLabel.TabIndex = 7;
-            this.chkDieLabel.Text = "Die Index 표시 (확대 시)";
+            this.chkDieLabel.Text = "Die Index 표시";
             this.chkDieLabel.CheckedChanged += new System.EventHandler(this.chkDieLabel_CheckedChanged);
             //
             // rightPanel
@@ -263,7 +271,7 @@
             this.lblDefect.Name = "lblDefect";
             this.lblDefect.Size = new System.Drawing.Size(368, 26);
             this.lblDefect.TabIndex = 3;
-            this.lblDefect.Text = "Defect 목록 (행 선택 시 Map 강조 / Index 는 KLARF 원본)";
+            this.lblDefect.Text = "Defect 목록";
             this.lblDefect.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
             //
             // dgvLegend
@@ -322,7 +330,7 @@
             this.lblLegend.Name = "lblLegend";
             this.lblLegend.Size = new System.Drawing.Size(368, 26);
             this.lblLegend.TabIndex = 1;
-            this.lblLegend.Text = "범례 (색상 기준별 Defect 개수)";
+            this.lblLegend.Text = "범례";
             this.lblLegend.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
             //
             // txtInfo
@@ -334,7 +342,7 @@
             this.txtInfo.Name = "txtInfo";
             this.txtInfo.ReadOnly = true;
             this.txtInfo.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtInfo.Size = new System.Drawing.Size(368, 281);
+            this.txtInfo.Size = new System.Drawing.Size(368, 120);
             this.txtInfo.TabIndex = 0;
             //
             // lblMouse
@@ -345,13 +353,29 @@
             this.lblMouse.Location = new System.Drawing.Point(0, 796);
             this.lblMouse.Name = "lblMouse";
             this.lblMouse.Padding = new System.Windows.Forms.Padding(6, 4, 6, 4);
-            this.lblMouse.Size = new System.Drawing.Size(1400, 66);
+            this.lblMouse.Size = new System.Drawing.Size(1400, 44);
             this.lblMouse.TabIndex = 3;
-            this.lblMouse.Text = "Wafer 좌표: -";
+            this.lblMouse.Text = "";
+            //
+            // pnlStatus
+            //
+            this.pnlStatus.Controls.Add(this.lblStatus);
+            this.pnlStatus.Controls.Add(this.busyBar);
+            this.pnlStatus.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.pnlStatus.Name = "pnlStatus";
+            this.pnlStatus.Size = new System.Drawing.Size(1300, 26);
+            this.pnlStatus.TabIndex = 90;
+            //
+            // busyBar
+            //
+            this.busyBar.Dock = System.Windows.Forms.DockStyle.Right;
+            this.busyBar.Name = "busyBar";
+            this.busyBar.Size = new System.Drawing.Size(420, 26);
+            this.busyBar.TabIndex = 1;
             //
             // lblStatus
             //
-            this.lblStatus.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.lblStatus.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lblStatus.Location = new System.Drawing.Point(0, 862);
             this.lblStatus.Name = "lblStatus";
             this.lblStatus.Padding = new System.Windows.Forms.Padding(6, 0, 0, 0);
@@ -458,7 +482,7 @@
             this.Controls.Add(this.rightPanel);
             this.Controls.Add(this.fileBar);
             this.Controls.Add(this.lblMouse);
-            this.Controls.Add(this.lblStatus);
+            this.Controls.Add(this.pnlStatus);
             this.Font = new System.Drawing.Font("맑은 고딕", 9F);
             this.MinimumSize = new System.Drawing.Size(1000, 680);
             this.Name = "frmKlarfFileViewer";
@@ -469,6 +493,7 @@
             this.rightPanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvDefect)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvLegend)).EndInit();
+            this.pnlStatus.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -502,7 +527,9 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn colRoughBin;
         private System.Windows.Forms.DataGridViewTextBoxColumn colSize;
         private System.Windows.Forms.Label lblMouse;
+        private System.Windows.Forms.Panel pnlStatus;
         private System.Windows.Forms.Label lblStatus;
+        private DACrux.SEMDMS.Control.ProgressStatusBar busyBar;
         private KlarfDefectMap m_dMap;
     }
 }

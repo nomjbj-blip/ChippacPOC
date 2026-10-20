@@ -240,7 +240,7 @@ namespace NexplantQMS.GdsMap
             }
             finally { _switchingChain = false; }
             RestoreActiveChain(chain);
-            SetChainStatus(chain.Name + " 을(를) 만들었습니다. [Input 지정]을 누르고 지도에서 Input 도형을 클릭하세요.");
+            SetChainStatus(chain.Name + " 을(를) 만들었습니다.");
         }
 
         /// <summary>
@@ -381,7 +381,7 @@ namespace NexplantQMS.GdsMap
             var layers = new HashSet<int>();
             for (int i = 0; i < chkLayerItems.Items.Count; i++)
                 if (chkLayerItems.GetItemChecked(i))
-                    layers.Add(((LayerDisplayItem)chkLayerItems.Items[i]).LayerId);
+                    layers.Add(((LayerDisplayItem)chkLayerItems.Items[i]).LayerKey);
             return layers;
         }
 
@@ -409,7 +409,7 @@ namespace NexplantQMS.GdsMap
                 map.SetChainEndpointPoints(new GPoint[0], new GPoint[0]);
                 if (!_activeChain.Visible)
                 {
-                    SetChainStatus(_activeChain.Name + " 은(는) 표시가 꺼져 있습니다. 체크하면 편집할 수 있습니다.");
+                    SetChainStatus(_activeChain.Name + " 은(는) 표시가 꺼져 있습니다.");
                     _showingHiddenChainStatus = true;
                 }
             }
@@ -513,9 +513,7 @@ namespace NexplantQMS.GdsMap
                     && ChainColorPicker.Difference(other.Color, selected) < 15);
                 RefreshChainDisplay();
                 SetChainStatus(chain.Name + " 의 색을 바꿨습니다."
-                    + (similar == null ? "" : " " + similar.Name + " 와(과) 색이 비슷합니다.")
-                    + (ChainColorPicker.IsNearSimilarPreviewColor(selected) ? " 흰색 계열은 유사 묶음 표시 색과 겹쳐 구분이 어렵습니다." : "")
-                    + (chain.ChainSeq == null ? "" : " 저장하려면 [Chain 저장(DB)]을 누르세요."));
+                    + (similar == null ? "" : " " + similar.Name + " 와(과) 색이 비슷합니다."));
             }
         }
 

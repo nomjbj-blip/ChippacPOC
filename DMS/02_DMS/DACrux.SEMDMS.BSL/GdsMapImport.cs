@@ -10,7 +10,7 @@ namespace DACrux.SEMDMS.BSL
 {
     /// <summary>
     /// GDS Map 전체 도형 DB 저장(Import)의 업무 검증과 DSL 호출을 담당한다.
-    /// 설계: 문서/2026-10-02_GDS_Map_DB저장_설계.md 4절 / 20절.
+    /// 설계: 문서/설계/02_GDS/2026-10-02_GDS_Map_DB저장_설계.md 4절 / 20절.
     /// 리비전을 관리하지 않는다(2026-10-02). Map은 Factory + Device(제품)당 1개(TQP_GDS_MAP)이고,
     /// 기존 데이터가 있으면 화면이 사용자에게 묻고 DeleteMap으로 지운 뒤 다시 등록한다.
     /// 저장 작업(IMPORT_JOB)은 Device당 1건이며 작업 번호(IMPORT_JOB_SEQ)는 시퀀스다.
@@ -51,82 +51,111 @@ namespace DACrux.SEMDMS.BSL
             return iPlaced;
         }
 
-        #endregion
-
-        #region [TQP_GDS_MAP_SUB_DEVICE]
-
         /// <summary>
-        /// 대표 Device의 Sub Device 목록을 통째로 바꾼다(2026-10-12).
-        /// 처리: 입력 검증 -> 대표 Map 확인 -> 입력 정리(빈 값 / 대표 자신 제외, 대소문자만 다른 중복 오류)
-        ///       -> 다른 대표에 등록된 Sub / 다른 Map의 대표 Device 이름 오류 -> 기존 삭제 -> 일괄 등록(InsertExecuteMultiple 1회).
-        /// 검사를 모두 끝낸 뒤 지우므로 검사 오류로 기존 설정이 사라지지 않는다. 반환: 저장한 Sub 수
+        /// 저장이 끝난(READY) Map 을 새 Device 이름으로 복사한다(2026-10-15). 설계: 문서/설계/02_GDS/2026-10-15_GDS_Map_복사_설계.md
+        /// 처리: 입력 검사 -> 원본 READY 확인 -> 새 이름 중복(대소문자 무시) 확인 -> 헤더(DRAFT) -> Layer -> 도형 -> 저장 작업 건수
+        ///       -> Chain 마다 새 Chain 번호로 마스터 / 버전 / 탐색 Layer / 연결 규칙 / 포함 도형 / 편집 기록 -> 도형 수 비교 -> 헤더 READY.
+        /// DB 안에서 INSERT ... SELECT 로 복사하므로 도형을 내려받지 않는다. E-Test / KLARF 데이터는 복사하지 않는다.
+        /// 문장마다 자동 Commit 이라 중간에 실패하면 새 Device 를 DeleteMap 으로 지우고 오류를 다시 던진다(원본은 바뀌지 않음).
+        /// 반환 1행: TARGET_DEVICE_ID / LAYER_COUNT / PLACED_COUNT / CHAIN_COUNT
         /// </summary>
-        public int SaveSubDeviceList(string strFactory, string strDeviceID, string[] aSubDeviceIDs, string[] aRemarks, string strUpdateUser)
+        public DataTable CopyMap(string strFactory, string strSourceDeviceID, string strTargetDeviceID, string strUser)
         {
             string strFac = Required(strFactory, "Factory", 30);
-            string strDevice = Required(strDeviceID, "Device ID", 50);
-            string strUser = Required(strUpdateUser, "Update User", 30);
-            if (aSubDeviceIDs == null) aSubDeviceIDs = new string[0];
-            if (aRemarks != null && aRemarks.Length != aSubDeviceIDs.Length)
-                throw new ArgumentException("Sub Device 와 비고 개수가 다릅니다.", "aRemarks");
+            string strSource = Required(strSourceDeviceID, "원본 Device ID", 50);
+            string strTarget = Required(strTargetDeviceID, "새 Device ID", 50);
+            string strCleanUser = Required(strUser, "User", 30);
+            if (string.Equals(strSource, strTarget, StringComparison.OrdinalIgnoreCase))
+                throw new ArgumentException("새 Device 이름이 원본과 같습니다: " + strTarget, "strTargetDeviceID");
 
-            DataTable dtMap = GetMapInfo(strFac, strDevice);
-            if (dtMap.Rows.Count == 0)
-                throw new InvalidOperationException("대표 Device 의 GDS Map 이 없습니다: " + strFac + " / " + strDevice);
-            strDevice = dtMap.Rows[0]["DEVICE_ID"].ToString();
-
-            // 입력 정리: 대표 자신은 언제나 포함이라 저장하지 않는다.
-            var lstSub = new List<string[]>();
-            var setUpper = new HashSet<string>(StringComparer.Ordinal);
-            for (int i = 0; i < aSubDeviceIDs.Length; i++)
+            using (DataTable dtSource = GetMapInfo(strFac, strSource))
             {
-                string strSub = aSubDeviceIDs[i] == null ? string.Empty : aSubDeviceIDs[i].Trim();
-                if (strSub.Length == 0 || string.Equals(strSub, strDevice, StringComparison.OrdinalIgnoreCase)) continue;
-                Required(strSub, "Sub Device ID", 50);
-                string strRemark = aRemarks == null || aRemarks[i] == null ? string.Empty : aRemarks[i].Trim();
-                if (strRemark.Length > 200) throw new ArgumentException("비고는 200자 이하여야 합니다: " + strSub, "aRemarks");
-                if (!setUpper.Add(strSub.ToUpperInvariant()))
-                    throw new ArgumentException("Sub Device 가 중복되었습니다(대소문자 무시): " + strSub, "aSubDeviceIDs");
-                lstSub.Add(new string[] { strSub, strRemark });
+                if (dtSource.Rows.Count == 0)
+                    throw new InvalidOperationException("원본 GDS Map 이 없습니다: " + strSource);
+                string strStatus = dtSource.Rows[0]["MAP_STATUS"].ToString();
+                if (!string.Equals(strStatus, "READY", StringComparison.Ordinal))
+                    throw new InvalidOperationException("저장이 끝나지 않은 Map(" + strStatus + ")은 복사할 수 없습니다: " + strSource);
+            }
+            using (DataTable dtSame = new DACrux.SEMDMS.DSL.TQP_GDS_MAP().GetData("SELECT_MAP_BY_NAME", null, new string[] { strFac, strTarget }))
+            {
+                if (dtSame.Rows.Count > 0)
+                    throw new InvalidOperationException("이미 있는 Device 입니다: " + dtSame.Rows[0]["DEVICE_ID"]
+                        + ". 다른 이름을 입력하거나 그 Device 의 Map 을 먼저 삭제하세요.");
             }
 
-            // 다른 대표에 이미 등록된 Sub 확인
-            var lstConflict = new List<string>();
-            DataTable dtAll = new DACrux.SEMDMS.DSL.TQP_GDS_MAP_SUB_DEVICE().GetData("SELECT_SUB_DEVICE_FACTORY", null, new string[] { strFac });
-            foreach (DataRow row in dtAll.Rows)
+            long lSourcePlaced, lSourcePoint;
+            CountMapRows(strFac, strSource, out lSourcePlaced, out lSourcePoint);
+            List<string> lstChainSeq = new List<string>();
+            using (DataTable dtChain = new DACrux.SEMDMS.DSL.TQP_GDS_CHAIN().GetData("SELECT_CHAIN_LIST", null, new string[] { strFac, strSource }))
             {
-                string strOwner = row["DEVICE_ID"].ToString();
-                if (strOwner == strDevice) continue;
-                string strSub = row["SUB_DEVICE_ID"].ToString();
-                if (setUpper.Contains(strSub.ToUpperInvariant()))
-                    lstConflict.Add(strSub + " (대표 " + strOwner + ")");
+                foreach (DataRow row in dtChain.Rows)
+                    lstChainSeq.Add(row["CHAIN_SEQ"].ToString());
             }
-            // 다른 Map 의 대표 Device 이름이면 어느 Map 을 쓸지 모호해진다.
-            DataTable dtMaps = new DACrux.SEMDMS.DSL.TQP_GDS_MAP().GetData("SELECT_MAP_DEVICE_LIST", null, null);
-            foreach (DataRow row in dtMaps.Rows)
-            {
-                if (row["FACTORY"].ToString() != strFac) continue;
-                string strMapDevice = row["DEVICE_ID"].ToString();
-                if (strMapDevice != strDevice && setUpper.Contains(strMapDevice.ToUpperInvariant()))
-                    lstConflict.Add(strMapDevice + " (자기 GDS Map 이 있는 대표 Device)");
-            }
-            if (lstConflict.Count > 0)
-                throw new InvalidOperationException("다른 대표에 쓰이는 이름이라 저장할 수 없습니다: " + string.Join(", ", lstConflict.ToArray()));
 
-            DACrux.SEMDMS.DSL.TQP_GDS_MAP_SUB_DEVICE oSub = new DACrux.SEMDMS.DSL.TQP_GDS_MAP_SUB_DEVICE();
-            oSub.DeleteDataNonQuery("DELETE_SUB_DEVICE_BY_MAP", null, new string[] { strFac, strDevice });
-            if (lstSub.Count == 0) return 0;
-            string[,] aParas = new string[lstSub.Count, 5];
-            for (int i = 0; i < lstSub.Count; i++)
+            bool bCreated = false;
+            try
             {
-                aParas[i, 0] = strFac;
-                aParas[i, 1] = lstSub[i][0];
-                aParas[i, 2] = strDevice;
-                aParas[i, 3] = lstSub[i][1];
-                aParas[i, 4] = strUser;
+                // 헤더를 넣은 뒤부터 실패하면 새 Device 를 지운다. 헤더가 들어가지 않았으면(같은 이름을 다른 사용자가 먼저 등록 등) 지우지 않는다.
+                if (new DACrux.SEMDMS.DSL.TQP_GDS_MAP().InsertDataNonQuery("COPY_MAP", null, new string[] { strTarget, strCleanUser, strFac, strSource }) != 1)
+                    throw new DataException("새 Map 헤더가 한 건 생성되지 않았습니다. 원본 Map 상태를 다시 확인하세요.");
+                bCreated = true;
+
+                string[] aCopy = new string[] { strTarget, strFac, strSource };
+                int iLayer = new DACrux.SEMDMS.DSL.TQP_GDS_LAYER().InsertDataNonQuery("COPY_LAYER_DT", null, aCopy);
+                new DACrux.SEMDMS.DSL.TQP_GDS_PLACED_EL().InsertDataNonQuery("COPY_PLACED_EL", null, aCopy);
+
+                DACrux.SEMDMS.DSL.TQP_GDS_IMPORT_JOB oJob = new DACrux.SEMDMS.DSL.TQP_GDS_IMPORT_JOB();
+                string strJobSeq;
+                using (DataTable dtSeq = oJob.GetData("SELECT_NEXT_IMPORT_JOB_SEQ", null, null))
+                    strJobSeq = dtSeq.Rows[0][0].ToString();
+                oJob.InsertDataNonQuery("COPY_IMPORT_JOB", null, new string[] { strJobSeq, strTarget, strCleanUser, strCleanUser, strFac, strSource });
+
+                foreach (string strOldSeq in lstChainSeq)
+                    CopyChain(strFac, strSource, strTarget, strOldSeq, strCleanUser);
+
+                long lPlaced, lPoint;
+                CountMapRows(strFac, strTarget, out lPlaced, out lPoint);
+                if (lPlaced != lSourcePlaced || lPoint != lSourcePoint)
+                    throw new DataException("복사한 도형 수가 원본과 다릅니다(원본 " + lSourcePlaced + " / 복사 " + lPlaced + "). 다시 시도하세요.");
+                SetMapReady(strFac, strTarget, strCleanUser);
+
+                DataTable dt = new DataTable("COPY_RESULT");
+                dt.Columns.Add("TARGET_DEVICE_ID", typeof(string));
+                dt.Columns.Add("LAYER_COUNT", typeof(int));
+                dt.Columns.Add("PLACED_COUNT", typeof(long));
+                dt.Columns.Add("CHAIN_COUNT", typeof(int));
+                dt.Rows.Add(strTarget, iLayer, lPlaced, lstChainSeq.Count);
+                return dt;
             }
-            oSub.InsertExecuteMultiple("CREATE_SUB_DEVICE", aParas);
-            return lstSub.Count;
+            catch
+            {
+                if (bCreated)
+                {
+                    try { DeleteMap(strFac, strTarget, strCleanUser); }
+                    catch { } // 정리 실패는 원래 오류를 가리지 않게 무시한다. 남은 데이터는 Map 삭제로 지울 수 있다.
+                }
+                throw;
+            }
+        }
+
+        /// <summary>Chain 하나를 새 Chain 번호로 복사한다(마스터 -> 버전 -> 탐색 Layer / 연결 규칙 / 포함 도형 / 편집 기록). Chain Code / 이름 / 색은 그대로다.</summary>
+        private void CopyChain(string strFac, string strSource, string strTarget, string strOldSeq, string strUser)
+        {
+            DACrux.SEMDMS.DSL.TQP_GDS_CHAIN oChain = new DACrux.SEMDMS.DSL.TQP_GDS_CHAIN();
+            string strNewSeq;
+            using (DataTable dtSeq = oChain.GetData("SELECT_NEXT_CHAIN_SEQ", null, null))
+                strNewSeq = dtSeq.Rows[0][0].ToString();
+
+            string[] aWithUser = new string[] { strTarget, strNewSeq, strUser, strFac, strSource, strOldSeq };
+            if (oChain.InsertDataNonQuery("COPY_CHAIN", null, aWithUser) != 1)
+                throw new DataException("Chain 이 한 건 복사되지 않았습니다(Chain 번호 " + strOldSeq + ").");
+            new DACrux.SEMDMS.DSL.TQP_GDS_CHAIN_VER().InsertDataNonQuery("COPY_CHAIN_VER", null, aWithUser);
+
+            string[] aChain = new string[] { strTarget, strNewSeq, strFac, strSource, strOldSeq };
+            new DACrux.SEMDMS.DSL.TQP_GDS_CHAIN_LAYER().InsertDataNonQuery("COPY_CHAIN_LAYER_DT", null, aChain);
+            new DACrux.SEMDMS.DSL.TQP_GDS_CHAIN_RULE().InsertDataNonQuery("COPY_CHAIN_RULE_DT", null, aChain);
+            new DACrux.SEMDMS.DSL.TQP_GDS_CHAIN_MEMBER().InsertDataNonQuery("COPY_CHAIN_MEMBER", null, aChain);
+            new DACrux.SEMDMS.DSL.TQP_GDS_CHAIN_EDIT().InsertDataNonQuery("COPY_CHAIN_EDIT", null, aChain);
         }
 
         #endregion
@@ -337,27 +366,35 @@ namespace DACrux.SEMDMS.BSL
         /// <summary>
         /// Layer 배치 하나를 저장한다. DefectDefine.CreateDefect와 같은 Bulk Insert 방식(InsertExecuteMultiple 1회)이다.
         /// 처리 흐름: 작업 상태 확인(Map 키) -> 배열 크기 확인 -> 행 저장. 행 검증 / 배치 기록은 하지 않고 건수는 CompleteMapImport가 DB에서 확인한다.
+        /// 열: LAYER_ID / DATA_TYPE / COLOR_ARGB / DISPLAY_NAME 4개 (2026-10-20 DataType 분리).
+        ///     예전 3개(LAYER_ID / COLOR_ARGB / DISPLAY_NAME)로 부르면 DATA_TYPE 0 으로 저장한다(기존 호출 / Probe 호환).
         /// </summary>
         public int CreateLayerBatch(string strImportJobSeq, long lBatchNo, string[,] aParas, string strUpdateUser)
         {
             string[] aMapKey = GetUploadingMapKey(strImportJobSeq);
-            CheckBatchParas(aParas, 3, lBatchNo);
+            bool bDataType = aParas != null && aParas.GetLength(1) == 4;
+            CheckBatchParas(aParas, bDataType ? 4 : 3, lBatchNo);
             int iRows = aParas.GetLength(0);
 
-            string[,] aLayer = new string[iRows, 8];
+            string[,] aLayer = new string[iRows, 10];
             for (int i = 0; i < iRows; i++)
             {
+                string strLayer = aParas[i, 0].Trim();
+                string strDataType = bDataType ? aParas[i, 1].Trim() : "0";
+                int iOffset = bDataType ? 1 : 0;
                 aLayer[i, 0] = aMapKey[0];
                 aLayer[i, 1] = aMapKey[1];
-                aLayer[i, 2] = aParas[i, 0].Trim();
-                aLayer[i, 3] = aParas[i, 1].Trim();
-                aLayer[i, 4] = aParas[i, 2];
-                aLayer[i, 5] = aMapKey[0];
-                aLayer[i, 6] = aMapKey[1];
-                aLayer[i, 7] = aParas[i, 0].Trim();
+                aLayer[i, 2] = strLayer;
+                aLayer[i, 3] = strDataType;
+                aLayer[i, 4] = aParas[i, 1 + iOffset].Trim();
+                aLayer[i, 5] = aParas[i, 2 + iOffset];
+                aLayer[i, 6] = aMapKey[0];
+                aLayer[i, 7] = aMapKey[1];
+                aLayer[i, 8] = strLayer;
+                aLayer[i, 9] = strDataType;
             }
             DACrux.SEMDMS.DSL.TQP_GDS_LAYER oTQP_GDS_LAYER = new DACrux.SEMDMS.DSL.TQP_GDS_LAYER();
-            oTQP_GDS_LAYER.InsertExecuteMultiple("CREATE_LAYER", aLayer);
+            oTQP_GDS_LAYER.InsertExecuteMultiple("CREATE_LAYER_DT", aLayer);
             return iRows;
         }
 

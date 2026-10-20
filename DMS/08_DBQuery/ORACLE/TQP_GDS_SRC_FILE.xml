@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!--
   TQP_GDS_SRC_FILE: E-Test 결과 파일 기준 정보 (한 행 = 파일 1개). 2026-10-07 추가.
-  설계: 문서/2026-10-07_ETest_결과파일_Parsing_DB설계.md 9절 / 10절.
+  설계: 문서/설계/04_ETest/2026-10-07_ETest_결과파일_Parsing_DB설계.md 9절 / 10절.
   WAFER_ID 는 LOT_ID + '-' + 2자리 SLOT_NO 가상 컬럼이라 INSERT / UPDATE 에 넣지 않는다 (ORA-54013).
   TEST_TIME 은 yyyyMMddHHmmss 문자열 + TO_DATE. LOAD_STATUS 는 LOADING 으로 만들고 CompleteEtFile 이 건수 확인 후 READY 로 바꾼다.
 -->
@@ -141,7 +141,8 @@ VALUES
        TO_CHAR(TEST_TIME, 'YYYYMMDDHH24MISS') AS TEST_TIME, FILE_PREFIX, SHEET_NAME,
        DIE_COUNT, ITEM_COUNT, VALUE_COUNT, LOAD_STATUS, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME,
        CUSTOMER, FILE_DEVICE, WAFER_TYPE, WAFER_REV, LOT_WAFER_NO, FAB_NAME,
-       PASS_DIE_COUNT, FAIL_DIE_COUNT, NOT_TESTED_COUNT, PARSE_RULE_VER, VIEW_SIDE
+       PASS_DIE_COUNT, FAIL_DIE_COUNT, NOT_TESTED_COUNT, PARSE_RULE_VER, VIEW_SIDE,
+       HEADER_COUNT, DEFINED_COUNT, MISSING_COUNT, JUDGE_TIME, MAP_ID, MAP_TIME
   FROM TQP_GDS_SRC_FILE
  WHERE SRC_FILE_SEQ = :src_file_seq]]></commandtext>
         <parameters>
@@ -191,14 +192,16 @@ VALUES
         </parameters>
     </query>
     <query statement="Select" queryid="SELECT_SRC_FILE_LIST" commandtype="Text" description="Device 의 E-Test 파일 목록 (최근 시험 순)" commandtimeout="60">
-        <commandtext><![CDATA[SELECT SRC_FILE_SEQ, FILE_NAME, LOT_ID, SLOT_NO, WAFER_ID, TEST_PROGRAM,
-       TO_CHAR(TEST_TIME, 'YYYYMMDDHH24MISS') AS TEST_TIME, CUSTOMER, FILE_DEVICE, WAFER_TYPE, WAFER_REV, FAB_NAME,
-       DIE_COUNT, PASS_DIE_COUNT, FAIL_DIE_COUNT, ITEM_COUNT, VALUE_COUNT, NOT_TESTED_COUNT, LOAD_STATUS,
-       CREATE_USER, CREATE_TIME
-  FROM TQP_GDS_SRC_FILE
- WHERE FACTORY = :factory
-   AND DEVICE_ID = :device_id
- ORDER BY TEST_TIME DESC, SRC_FILE_SEQ DESC]]></commandtext>
+        <commandtext><![CDATA[SELECT F.SRC_FILE_SEQ, F.FILE_NAME, F.LOT_ID, F.SLOT_NO, F.WAFER_ID, F.TEST_PROGRAM,
+       TO_CHAR(F.TEST_TIME, 'YYYYMMDDHH24MISS') AS TEST_TIME, F.CUSTOMER, F.FILE_DEVICE, F.WAFER_TYPE, F.WAFER_REV, F.LOT_WAFER_NO,
+       F.DIE_COUNT, F.PASS_DIE_COUNT, F.FAIL_DIE_COUNT, F.HEADER_COUNT, F.DEFINED_COUNT, F.ITEM_COUNT, F.MISSING_COUNT,
+       F.VALUE_COUNT, F.NOT_TESTED_COUNT, F.MAP_ID,
+       (SELECT COUNT(*) FROM TQP_GDS_ET_DIE D WHERE D.SRC_FILE_SEQ = F.SRC_FILE_SEQ AND D.MAP_X IS NOT NULL) AS MAP_DIE_COUNT,
+       F.JUDGE_TIME, F.MAP_TIME, F.PARSE_RULE_VER, F.LOAD_STATUS, F.CREATE_USER, F.CREATE_TIME
+  FROM TQP_GDS_SRC_FILE F
+ WHERE F.FACTORY = :factory
+   AND F.DEVICE_ID = :device_id
+ ORDER BY F.TEST_TIME DESC, F.SRC_FILE_SEQ DESC]]></commandtext>
         <parameters>
             <param direction="Input" dbtype="VarChar" size="120">:factory</param>
             <param direction="Input" dbtype="VarChar" size="200">:device_id</param>
@@ -240,6 +243,137 @@ VALUES
     </query>
     <query statement="Delete" queryid="DELETE_SRC_FILE" commandtype="Text" description="파일 헤더 삭제 (Die / 측정값은 BSL 이 먼저 지운다)" commandtimeout="600">
         <commandtext><![CDATA[DELETE FROM TQP_GDS_SRC_FILE WHERE SRC_FILE_SEQ = :src_file_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:src_file_seq</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="CREATE_SRC_FILE_V3" commandtype="Text" description="E-Test 파일 헤더 생성 - 등록 Parameter 만 저장 (2026-10-14 PARSE_RULE_VER 3: Fab / 면은 저장하지 않음, 헤더 / 등록 / 누락 수)" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_GDS_SRC_FILE
+    (SRC_FILE_SEQ, FILE_NAME, FACTORY, DEVICE_ID, LOT_ID, SLOT_NO, TEST_PROGRAM, TEST_TIME, SHEET_NAME, DIE_COUNT, ITEM_COUNT,
+    CUSTOMER, FILE_DEVICE, WAFER_TYPE, WAFER_REV, LOT_WAFER_NO, HEADER_COUNT, DEFINED_COUNT, MISSING_COUNT,
+    FAB_NAME, VIEW_SIDE, PARSE_RULE_VER, LOAD_STATUS, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+VALUES
+    (:src_file_seq, :file_name, :factory, :device_id, :lot_id, :slot_no, :test_program, TO_DATE(:test_time, 'YYYYMMDDHH24MISS'), :sheet_name, :die_count, :item_count,
+    :customer, :file_device, :wafer_type, :wafer_rev, :lot_wafer_no, :header_count, :defined_count, :missing_count,
+    NULL, NULL, 3, 'LOADING', :create_user, SYSDATE, :update_user, SYSDATE)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:src_file_seq</param>
+            <param direction="Input" dbtype="VarChar" size="1040">:file_name</param>
+            <param direction="Input" dbtype="VarChar" size="120">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="200">:device_id</param>
+            <param direction="Input" dbtype="VarChar" size="200">:lot_id</param>
+            <param direction="Input" dbtype="Number" size="0">:slot_no</param>
+            <param direction="Input" dbtype="VarChar" size="200">:test_program</param>
+            <param direction="Input" dbtype="VarChar" size="14">:test_time</param>
+            <param direction="Input" dbtype="VarChar" size="200">:sheet_name</param>
+            <param direction="Input" dbtype="Number" size="0">:die_count</param>
+            <param direction="Input" dbtype="Number" size="0">:item_count</param>
+            <param direction="Input" dbtype="VarChar" size="120">:customer</param>
+            <param direction="Input" dbtype="VarChar" size="200">:file_device</param>
+            <param direction="Input" dbtype="VarChar" size="120">:wafer_type</param>
+            <param direction="Input" dbtype="VarChar" size="80">:wafer_rev</param>
+            <param direction="Input" dbtype="VarChar" size="240">:lot_wafer_no</param>
+            <param direction="Input" dbtype="Number" size="0">:header_count</param>
+            <param direction="Input" dbtype="Number" size="0">:defined_count</param>
+            <param direction="Input" dbtype="Number" size="0">:missing_count</param>
+            <param direction="Input" dbtype="VarChar" size="30">:create_user</param>
+            <param direction="Input" dbtype="VarChar" size="30">:update_user</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_SRC_FILE_JUDGE" commandtype="Text" description="파일 판정 요약: Spec 판정 Pass / Fail Die 수 + '-' 값 수 + 판정 시각 (Die 판정 뒤, 업로드 확정 / 다시 판정 공용)" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_GDS_SRC_FILE F
+   SET (PASS_DIE_COUNT, FAIL_DIE_COUNT, NOT_TESTED_COUNT) =
+       (SELECT NVL(SUM(CASE WHEN D.JUDGE_FLAG = 'P' THEN 1 ELSE 0 END), 0),
+               NVL(SUM(CASE WHEN D.JUDGE_FLAG = 'F' THEN 1 ELSE 0 END), 0),
+               NVL(SUM(D.NOT_TESTED_COUNT), 0)
+          FROM TQP_GDS_ET_DIE D
+         WHERE D.SRC_FILE_SEQ = F.SRC_FILE_SEQ),
+       JUDGE_TIME = SYSDATE,
+       UPDATE_USER = :update_user,
+       UPDATE_TIME = SYSDATE
+ WHERE F.SRC_FILE_SEQ = :src_file_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:update_user</param>
+            <param direction="Input" dbtype="Number" size="0">:src_file_seq</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_SRC_FILE_MAP" commandtype="Text" description="파일 Map 좌표 계산 기록: 쓴 Map ID(없으면 NULL) / 계산 시각" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_GDS_SRC_FILE
+   SET MAP_ID = :map_id,
+       MAP_TIME = SYSDATE,
+       UPDATE_USER = :update_user,
+       UPDATE_TIME = SYSDATE
+ WHERE SRC_FILE_SEQ = :src_file_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="200">:map_id</param>
+            <param direction="Input" dbtype="VarChar" size="30">:update_user</param>
+            <param direction="Input" dbtype="Number" size="0">:src_file_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_SRC_FILE_BROWSE" commandtype="Text" description="E-Test 결과 조회 화면 파일 목록 (2026-10-15): Device + 공정(빈 값 = 전체) + Lot 글자(빈 값 = 전체). 추가 Para = 지금 등록 Parameter(사용 Y) 중 업로드 뒤 등록 / 변경되었고 이 파일에 저장 안 된 수(업로드 때 이미 파일에 없던 누락은 빼려고 시각 비교), Spec 바뀜 = 판정 뒤 Spec 수정" commandtimeout="120">
+        <commandtext><![CDATA[SELECT F.SRC_FILE_SEQ, F.WAFER_ID, F.LOT_ID, F.SLOT_NO, F.TEST_PROGRAM,
+       TO_CHAR(F.TEST_TIME, 'YYYYMMDDHH24MISS') AS TEST_TIME, F.DEVICE_ID,
+       F.DIE_COUNT, F.PASS_DIE_COUNT, F.FAIL_DIE_COUNT, F.ITEM_COUNT, F.VALUE_COUNT,
+       (SELECT COUNT(*) FROM TQP_GDS_ET_ITEM I
+         WHERE I.FACTORY = F.FACTORY AND I.DEVICE_ID = F.DEVICE_ID AND I.TEST_PROGRAM = F.TEST_PROGRAM AND I.USE_FLAG = 'Y'
+           AND NVL(I.UPDATE_TIME, I.CREATE_TIME) > F.CREATE_TIME
+           AND NOT EXISTS (SELECT 1 FROM TQP_GDS_ET_VALUE V WHERE V.SRC_FILE_SEQ = F.SRC_FILE_SEQ AND V.ET_ITEM_SEQ = I.ET_ITEM_SEQ)) AS ADDED_PARA_COUNT,
+       CASE WHEN F.JUDGE_TIME IS NOT NULL AND EXISTS (SELECT 1 FROM TQP_GDS_ET_LIMIT L
+                 WHERE L.FACTORY = F.FACTORY AND L.DEVICE_ID = F.DEVICE_ID AND L.TEST_PROGRAM = F.TEST_PROGRAM
+                   AND NVL(L.UPDATE_TIME, L.CREATE_TIME) > F.JUDGE_TIME) THEN 'Y' ELSE 'N' END AS SPEC_CHANGED,
+       F.MAP_ID,
+       (SELECT COUNT(*) FROM TQP_GDS_ET_DIE D WHERE D.SRC_FILE_SEQ = F.SRC_FILE_SEQ AND D.MAP_X IS NOT NULL) AS MAP_DIE_COUNT,
+       F.JUDGE_TIME, F.YMS_STATUS, F.YMS_TIME, F.YMS_MESSAGE, F.LOAD_STATUS, F.CREATE_USER, F.CREATE_TIME, F.FILE_NAME
+  FROM TQP_GDS_SRC_FILE F
+ WHERE F.FACTORY = :factory
+   AND F.DEVICE_ID = :device_id
+   AND (:p1 IS NULL OR F.TEST_PROGRAM = :p2)
+   AND (:l1 IS NULL OR UPPER(F.LOT_ID) LIKE '%' || :l2 || '%')
+ ORDER BY F.TEST_TIME DESC, F.SRC_FILE_SEQ DESC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="120">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="200">:device_id</param>
+            <param direction="Input" dbtype="VarChar" size="200">:p1</param>
+            <param direction="Input" dbtype="VarChar" size="200">:p2</param>
+            <param direction="Input" dbtype="VarChar" size="200">:l1</param>
+            <param direction="Input" dbtype="VarChar" size="200">:l2</param>
+        </parameters>
+    </query>
+    <!-- 2026-10-16 추가: 통합 연관 분석 Ready 조회(BSL GdsKlarfAnalysis.GetWaferReady)가 같은 Wafer 의 E-Test 파일 후보를 넓게 읽는다
+         (설계 05_연관분석/2026-10-15_GDS_KLARF_ETest_통합분석_데이터_설계.md 16.4절). 같은 Wafer 인지는 BSL 이 WaferKeyRule 로 판단한다.
+         Spec 바뀜은 SELECT_SRC_FILE_BROWSE 와 같은 식이다. -->
+    <query statement="Select" queryid="SELECT_ET_FILE_BY_WAFER" commandtype="Text" description="연관 분석 Ready: 같은 Wafer 후보 E-Test 파일 (Lot 글자 / Slot, 저장 완료만)" commandtimeout="120">
+        <commandtext><![CDATA[SELECT F.SRC_FILE_SEQ, F.FACTORY, F.WAFER_ID, F.LOT_ID, F.SLOT_NO, F.LOT_WAFER_NO, F.DEVICE_ID, F.TEST_PROGRAM,
+       TO_CHAR(F.TEST_TIME, 'YYYY-MM-DD HH24:MI:SS') AS TEST_TIME,
+       F.DIE_COUNT, F.PASS_DIE_COUNT, F.FAIL_DIE_COUNT,
+       TO_CHAR(F.JUDGE_TIME, 'YYYY-MM-DD HH24:MI:SS') AS JUDGE_TIME, F.MAP_ID,
+       CASE WHEN F.JUDGE_TIME IS NOT NULL AND EXISTS (SELECT 1 FROM TQP_GDS_ET_LIMIT L
+                 WHERE L.FACTORY = F.FACTORY AND L.DEVICE_ID = F.DEVICE_ID AND L.TEST_PROGRAM = F.TEST_PROGRAM
+                   AND NVL(L.UPDATE_TIME, L.CREATE_TIME) > F.JUDGE_TIME) THEN 'Y' ELSE 'N' END AS SPEC_CHANGED
+  FROM TQP_GDS_SRC_FILE F
+ WHERE F.FACTORY = :factory
+   AND UPPER(F.LOT_ID) LIKE :lot_like
+   AND F.SLOT_NO = :slot_no
+   AND F.LOAD_STATUS = 'READY'
+ ORDER BY F.TEST_TIME DESC, F.SRC_FILE_SEQ DESC]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="120">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="200">:lot_like</param>
+            <param direction="Input" dbtype="Number" size="0">:slot_no</param>
+        </parameters>
+    </query>
+    <!-- 2026-10-16 추가: 통합 연관 분석(BSL GdsKlarfAnalysis.Analyze)이 고른 E-Test 파일 1건을 Spec 바뀜과 함께 읽는다.
+         열 / Spec 바뀜 식은 SELECT_ET_FILE_BY_WAFER 와 같다. -->
+    <query statement="Select" queryid="SELECT_ET_FILE_FOR_GDS" commandtype="Text" description="연관 분석: E-Test 파일 1건 + Spec 바뀜" commandtimeout="60">
+        <commandtext><![CDATA[SELECT F.SRC_FILE_SEQ, F.FACTORY, F.WAFER_ID, F.LOT_ID, F.SLOT_NO, F.LOT_WAFER_NO, F.DEVICE_ID, F.TEST_PROGRAM,
+       TO_CHAR(F.TEST_TIME, 'YYYY-MM-DD HH24:MI:SS') AS TEST_TIME,
+       F.DIE_COUNT, F.PASS_DIE_COUNT, F.FAIL_DIE_COUNT,
+       TO_CHAR(F.JUDGE_TIME, 'YYYY-MM-DD HH24:MI:SS') AS JUDGE_TIME, F.MAP_ID, F.LOAD_STATUS,
+       CASE WHEN F.JUDGE_TIME IS NOT NULL AND EXISTS (SELECT 1 FROM TQP_GDS_ET_LIMIT L
+                 WHERE L.FACTORY = F.FACTORY AND L.DEVICE_ID = F.DEVICE_ID AND L.TEST_PROGRAM = F.TEST_PROGRAM
+                   AND NVL(L.UPDATE_TIME, L.CREATE_TIME) > F.JUDGE_TIME) THEN 'Y' ELSE 'N' END AS SPEC_CHANGED
+  FROM TQP_GDS_SRC_FILE F
+ WHERE F.SRC_FILE_SEQ = :src_file_seq]]></commandtext>
         <parameters>
             <param direction="Input" dbtype="Number" size="0">:src_file_seq</param>
         </parameters>

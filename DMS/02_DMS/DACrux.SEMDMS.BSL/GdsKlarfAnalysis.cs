@@ -11,7 +11,7 @@ namespace DACrux.SEMDMS.BSL
     /// <summary>
     /// GDS × KLARF 연관 분석(읽기 전용) 서비스다. KLARF Wafer 1장의 Defect가 GDS Chain Member 영역에 걸리는지 계산해
     /// Die / (Die, Chain) / Defect 단위로 집계한다. 결과는 저장하지 않는다(설계 결정 A7).
-    /// 설계: 문서/2026-10-12_GDS_KLARF_연관분석_화면_설계.md 6 / 7절
+    /// 설계: 문서/설계/05_연관분석/2026-10-12_GDS_KLARF_연관분석_화면_설계.md 6 / 7절
     ///
     /// 처리 흐름 (AnalyzeWafer)
     ///  1) KLARF Step 정보 / Die Pitch (TQD_INSP_INFO.SELECT_DMS_WAFER_INFO, 기존 쿼리)
@@ -23,15 +23,16 @@ namespace DACrux.SEMDMS.BSL
     ///
     /// 결과 테이블
     ///  ANL_INFO   1행: 분석 기준 / 건수 / 시간 (화면 상태줄 / Excel 머리말)
-    ///  CHAIN      Chain: CHAIN_SEQ / CHAIN_CODE / CHAIN_NAME / COLOR_ARGB / MEMBER_COUNT / LAYER_IDS / HIT_DIE_COUNT / HIT_DEFECT_COUNT / UPDATE_TIME
+    ///  CHAIN      Chain: CHAIN_SEQ / CHAIN_CODE / CHAIN_NAME / COLOR_ARGB / MEMBER_COUNT / LAYER_IDS("번호/DataType" 목록, 2026-10-20) / HIT_DIE_COUNT / HIT_DEFECT_COUNT / UPDATE_TIME
     ///  DIE        Die: XINDEX / YINDEX / IN_PLAN(Y/N) / DEFECT_COUNT / IN_CHAIN_COUNT / OUT_CHAIN_COUNT / HIT_CHAIN_COUNT / TOP_CHAINS
     ///  DIE_CHAIN  (Die, Chain): XINDEX / YINDEX / CHAIN_SEQ / CHAIN_CODE / DEFECT_COUNT / DEFECT_IDS  ← 판정 단위, E-Test 확장 키
     ///  DEFECT     Defect: DEFECTID / XINDEX / YINDEX / CLASSNUMBER / XSIZE / YSIZE / XREL / YREL / GDS_X / GDS_Y(보기 기준) / IN_CHAIN / CHAIN_CODES / HIT_MEMBER_COUNT
     ///  DEFECT_HIT (Defect, Member): DEFECTID / CHAIN_SEQ / CHAIN_CODE / PLACED_ELEMENT_ID / LAYER_ID / ROLE_CODE / MIN_X / MIN_Y / MAX_X / MAX_Y(저장 기준)
     ///
     /// IN_CHAIN_COUNT는 Chain이 1개 이상 걸린 Defect 수다. 한 Defect가 Chain 2개에 걸려도 1로 센다(설계 결정 A1).
+    /// 통합 연관 분석 Analyze / AnalyzeDie 는 GdsKlarfAnalysis_Analyze.cs (2026-10-16)
     /// </summary>
-    public class GdsKlarfAnalysis : Miracom.Middleware.BaseComponent, DACrux.SEMDMS.Interface.iGdsKlarfAnalysis
+    public partial class GdsKlarfAnalysis : Miracom.Middleware.BaseComponent, DACrux.SEMDMS.Interface.iGdsKlarfAnalysis
     {
         private const string SideBack = "BACK";
         private const string SideFront = "FRONT";
@@ -65,7 +66,7 @@ namespace DACrux.SEMDMS.BSL
             if (!(pitchX > 0) || !(pitchY > 0))
                 throw new InvalidOperationException("KLARF Die Pitch가 없습니다(TQD_SETUP.DIE_PITCH_X / Y). STEP_SEQ=" + lStepSeq);
             string product = Text(step["PRODUCT"]);
-            // Device 인자가 비면 Product 로 GDS 대표 Device 를 찾는다(2026-10-12: Sub Device 등록 -> 같은 이름 Map 순, 없으면 Product 그대로).
+            // Device 인자가 비면 Product 와 이름이 같은(대소문자 무시) READY GDS Device 를 쓴다. 없으면 Product 그대로 (2026-10-15 Sub Device 연결 제거).
             string deviceId = String.IsNullOrEmpty(strDeviceID == null ? null : strDeviceID.Trim()) ? ResolveMapDevice(factory, product) : strDeviceID;
             deviceId = Required(deviceId, "GDS Device ID", 50);
 
@@ -101,6 +102,7 @@ namespace DACrux.SEMDMS.BSL
                     ChainSeq = seq,
                     PlacedElementId = Text(row["PLACED_ELEMENT_ID"]),
                     LayerId = (int)ToLong(row["LAYER_ID"]),
+                    DataType = RowDataType(row),
                     RoleCode = Text(row["ROLE_CODE"]),
                     MinX = ToDouble(row["MIN_X"]),
                     MinY = ToDouble(row["MIN_Y"]),
@@ -228,7 +230,7 @@ namespace DACrux.SEMDMS.BSL
                 "UPDATE_TIME", typeof(string));
             var memberCount = members.GroupBy(b => b.ChainSeq).ToDictionary(g => g.Key, g => g.Count());
             var layerIds = members.GroupBy(b => b.ChainSeq).ToDictionary(g => g.Key,
-                g => String.Join(",", g.Select(b => b.LayerId).Distinct().OrderBy(l => l).Select(l => l.ToString(CultureInfo.InvariantCulture)).ToArray()));
+                g => FormatLayerIds(g.Select(b => new KeyValuePair<int, int>(b.LayerId, b.DataType))));
             foreach (KeyValuePair<long, DataRow> p in chains)
             {
                 int mc, colorArgb = 0;
@@ -364,16 +366,31 @@ namespace DACrux.SEMDMS.BSL
             return value == null || value == DBNull.Value ? 0 : Convert.ToInt64(value, CultureInfo.InvariantCulture);
         }
 
+        /// <summary>행의 DATA_TYPE. 컬럼이 없거나(이전 쿼리) 비어 있으면 0 (2026-10-20).</summary>
+        internal static int RowDataType(DataRow row)
+        {
+            return row.Table.Columns.Contains("DATA_TYPE") ? (int)ToLong(row["DATA_TYPE"]) : 0;
+        }
+
+        /// <summary>Chain Layer 목록 "번호/DataType"(예 3/0,18/3). 번호 -> DataType 순서, 중복 제외 (2026-10-20).</summary>
+        internal static string FormatLayerIds(IEnumerable<KeyValuePair<int, int>> layers)
+        {
+            return String.Join(",", layers.Distinct().OrderBy(l => l.Key).ThenBy(l => l.Value)
+                .Select(l => l.Key.ToString(CultureInfo.InvariantCulture) + "/" + l.Value.ToString(CultureInfo.InvariantCulture)).ToArray());
+        }
+
         /// <summary>
-        /// KLARF Product 이름으로 GDS 대표 Device 를 찾는다(2026-10-12, TQP_GDS_MAP_SUB_DEVICE.SELECT_MAP_DEVICE_BY_SUB).
+        /// KLARF Product 와 이름이 같은(대소문자 무시) READY GDS Device 를 찾는다(2026-10-15, TQP_GDS_MAP.SELECT_MAP_BY_NAME).
+        /// 이름이 다른 Device 는 GDS Map 조회 화면 [Map 복사]로 Product 이름의 Map 을 만들어 연결한다.
         /// 없으면 Product 를 그대로 돌려준다(이후 READY Map 확인에서 오류 안내).
         /// </summary>
         private static string ResolveMapDevice(string factory, string product)
         {
             if (String.IsNullOrEmpty(product)) return product;
-            DataTable found = new DACrux.SEMDMS.DSL.TQP_GDS_MAP_SUB_DEVICE().GetData("SELECT_MAP_DEVICE_BY_SUB", null,
-                new string[] { factory, product, factory, product });
-            return found.Rows.Count == 0 ? product : Text(found.Rows[0]["DEVICE_ID"]);
+            DataTable found = new DACrux.SEMDMS.DSL.TQP_GDS_MAP().GetData("SELECT_MAP_BY_NAME", null, new string[] { factory, product });
+            foreach (DataRow row in found.Rows)
+                if (Text(row["MAP_STATUS"]) == "READY") return Text(row["DEVICE_ID"]);
+            return product;
         }
 
         /// <summary>Oracle 컬럼 바이트 길이에 맞는 필수 문자열인지 확인한다(GdsChain과 같은 규칙).</summary>

@@ -310,6 +310,15 @@ AND NVL(A.DELETE_FLAG,'N') <> 'Y'
             <param direction="Input" dbtype="VarChar" size="40">:MAPID</param>
         </parameters>
     </query>
+    <query statement="Select" queryid="SELECT_MAP_DIE_SOURCE" commandtype="Text" description="Map 의 Mark Die(TQP_MAPDEF_DIE) 수와 Map Die(TQP_USEMAP) 수. Mark Die 가 없고 Map Die 가 있으면 File Map Setup Map (2026-10-14)" commandtimeout="60">
+        <commandtext><![CDATA[SELECT (SELECT COUNT(*) FROM TQP_MAPDEF_DIE WHERE MAPID = :m1 AND DIE_TYPE = 'DIE') AS MARK_DIE_COUNT,
+       (SELECT COUNT(*) FROM TQP_USEMAP WHERE MAPID = :m2) AS USE_DIE_COUNT
+  FROM DUAL]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:m1</param>
+            <param direction="Input" dbtype="VarChar" size="40">:m2</param>
+        </parameters>
+    </query>
     <query statement="Select" queryid="GET_MAPDEF_DIE_DM" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[SELECT INDEX_X, INDEX_Y, 1 AS TEST
   FROM TQP_MAPDEF_DIE 

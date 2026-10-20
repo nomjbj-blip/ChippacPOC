@@ -3,6 +3,7 @@
   TQP_GDS_ET_VALUE: E-Test 측정값 (Die x 항목 1행). 2026-10-07 추가.
   double 은 G17 문자열 + TO_BINARY_DOUBLE (Middleware dbtype="Double" 은 15자리 반올림이라 쓰지 않음).
   VALUE_STATUS V 숫자 / N 미측정(-) / E 빈 값. N / E 는 MEAS_VALUE 빈 문자열 -> NULL (CHECK 제약으로 검사).
+  2026-10-14 Upload 재설계: 값은 파일 Device + 공정의 등록 Parameter(사용 Y)만 들어온다. JUDGE_FLAG = Spec 판정(UPDATE_ET_VALUE_JUDGE).
 -->
 <queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
     <query statement="Insert" queryid="CREATE_ET_VALUE" commandtype="Text" description="측정값 저장 (InsertExecuteMultiple, 10,000행 배치)" commandtimeout="600">
@@ -27,7 +28,8 @@ VALUES
         </parameters>
     </query>
     <query statement="Select" queryid="SELECT_ET_VALUE" commandtype="Text" description="파일의 측정값 전체 (Die / 항목 순, 원문 헤더 포함)" commandtimeout="600">
-        <commandtext><![CDATA[SELECT V.DUT_NO, V.ET_ITEM_SEQ, I.ITEM_NAME, V.MEAS_VALUE, V.VALUE_STATUS
+        <commandtext><![CDATA[SELECT V.DUT_NO, V.ET_ITEM_SEQ, I.ITEM_NAME, V.MEAS_VALUE, V.VALUE_STATUS, V.JUDGE_FLAG,
+       I.HEADER_TEXT, I.PARA_NAME, I.COND_VALUE, I.CHAIN_NAME, I.CHAIN_NAME2, I.UNIT, I.TEST_NO, I.DISPLAY_ORDER
   FROM TQP_GDS_ET_VALUE V
   JOIN TQP_GDS_ET_ITEM I ON I.ET_ITEM_SEQ = V.ET_ITEM_SEQ
  WHERE V.SRC_FILE_SEQ = :src_file_seq
@@ -50,6 +52,81 @@ VALUES
         <commandtext><![CDATA[DELETE FROM TQP_GDS_ET_VALUE WHERE SRC_FILE_SEQ = :src_file_seq]]></commandtext>
         <parameters>
             <param direction="Input" dbtype="Number" size="0">:src_file_seq</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_ET_VALUE_JUDGE" commandtype="Text" description="값 판정 (Upload 재설계 9.2절): Spec 없음 / Enable N / 빈 칸 = NULL, '-' = F, 범위 밖 = F (경계값 Pass), 나머지 P" commandtimeout="600">
+        <commandtext><![CDATA[UPDATE TQP_GDS_ET_VALUE V
+   SET JUDGE_FLAG =
+       (SELECT CASE WHEN L.ENABLE_FLAG IS NULL OR L.ENABLE_FLAG <> 'Y' THEN NULL
+                    WHEN V.VALUE_STATUS = 'N' THEN 'F'
+                    WHEN V.VALUE_STATUS <> 'V' THEN NULL
+                    WHEN (L.LOWER_LIMIT IS NOT NULL AND V.MEAS_VALUE < L.LOWER_LIMIT)
+                      OR (L.UPPER_LIMIT IS NOT NULL AND V.MEAS_VALUE > L.UPPER_LIMIT) THEN 'F'
+                    ELSE 'P' END
+          FROM TQP_GDS_ET_ITEM I
+          LEFT JOIN TQP_GDS_ET_LIMIT L
+            ON L.FACTORY = I.FACTORY AND L.DEVICE_ID = I.DEVICE_ID AND L.TEST_PROGRAM = I.TEST_PROGRAM AND L.ITEM_NAME = I.ITEM_NAME
+         WHERE I.ET_ITEM_SEQ = V.ET_ITEM_SEQ)
+ WHERE V.SRC_FILE_SEQ = :src_file_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:src_file_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ET_UPLOAD_ITEM_SEQ" commandtype="Text" description="파일에 값을 넣을 수 있는 측정 항목 번호 = 파일 Device + 공정의 등록 Parameter(사용 Y)" commandtimeout="60">
+        <commandtext><![CDATA[SELECT I.ET_ITEM_SEQ
+  FROM TQP_GDS_SRC_FILE F
+  JOIN TQP_GDS_ET_ITEM I
+    ON I.FACTORY = F.FACTORY AND I.DEVICE_ID = F.DEVICE_ID AND I.TEST_PROGRAM = F.TEST_PROGRAM AND I.USE_FLAG = 'Y'
+ WHERE F.SRC_FILE_SEQ = :src_file_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:src_file_seq</param>
+        </parameters>
+    </query>
+    <!-- 2026-10-16 추가: 통합 연관 분석이 E-Test 판정을 (Die, GDS Chain 이름) 단위로 SQL 에서 묶어 읽는다
+         (설계 05_연관분석/2026-10-15_GDS_KLARF_ETest_통합분석_데이터_설계.md 6.2절). 값 행(Die x Parameter)은 보내지 않는다.
+         판정은 저장된 JUDGE_FLAG(결정 B12). GDS_CHAIN_NAME 이 있고 사용 N 이 아닌 등록 Parameter 만.
+         FIRST_FAIL_ITEM / VALUE / STATUS = Fail 항목 중 이름 순 첫 번째와 그 값 / 값 상태(N = '-' 측정). 값은 숫자 그대로(문구는 BSL). -->
+    <query statement="Select" queryid="SELECT_ET_DIE_CHAIN_JUDGE" commandtype="Text" description="연관 분석: (Die, GDS Chain 이름) 별 Parameter / Fail / Pass 수 + 첫 Fail 항목 / 값" commandtimeout="600">
+        <commandtext><![CDATA[SELECT D.DUT_NO, D.MAP_X, D.MAP_Y, D.JUDGE_FLAG AS DIE_JUDGE,
+       UPPER(TRIM(I.GDS_CHAIN_NAME)) AS GDS_CHAIN_KEY,
+       COUNT(*) AS PARA_COUNT,
+       SUM(CASE WHEN V.JUDGE_FLAG = 'F' THEN 1 ELSE 0 END) AS FAIL_COUNT,
+       SUM(CASE WHEN V.JUDGE_FLAG = 'P' THEN 1 ELSE 0 END) AS PASS_COUNT,
+       MIN(CASE WHEN V.JUDGE_FLAG = 'F' THEN I.ITEM_NAME END) AS FIRST_FAIL_ITEM,
+       MIN(CASE WHEN V.JUDGE_FLAG = 'F' THEN V.MEAS_VALUE END)
+           KEEP (DENSE_RANK FIRST ORDER BY CASE WHEN V.JUDGE_FLAG = 'F' THEN 0 ELSE 1 END, I.ITEM_NAME) AS FIRST_FAIL_VALUE,
+       MIN(CASE WHEN V.JUDGE_FLAG = 'F' THEN V.VALUE_STATUS END)
+           KEEP (DENSE_RANK FIRST ORDER BY CASE WHEN V.JUDGE_FLAG = 'F' THEN 0 ELSE 1 END, I.ITEM_NAME) AS FIRST_FAIL_STATUS
+  FROM TQP_GDS_ET_DIE D
+  JOIN TQP_GDS_ET_VALUE V ON V.SRC_FILE_SEQ = D.SRC_FILE_SEQ AND V.DUT_NO = D.DUT_NO
+  JOIN TQP_GDS_ET_ITEM I ON I.ET_ITEM_SEQ = V.ET_ITEM_SEQ
+ WHERE D.SRC_FILE_SEQ = :src_file_seq
+   AND I.GDS_CHAIN_NAME IS NOT NULL
+   AND NVL(I.USE_FLAG, 'Y') <> 'N'
+ GROUP BY D.DUT_NO, D.MAP_X, D.MAP_Y, D.JUDGE_FLAG, UPPER(TRIM(I.GDS_CHAIN_NAME))
+ ORDER BY D.DUT_NO, GDS_CHAIN_KEY]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:src_file_seq</param>
+        </parameters>
+    </query>
+    <!-- 2026-10-16 추가: 통합 연관 분석 Die 상세(AnalyzeDie)가 그 Die 의 GDS Chain 연결 Parameter 값 / 지금 Spec / 판정을 읽는다(설계 8.2절).
+         값 / Limit 은 숫자 그대로 돌려주고 문구('-' 측정 포함)는 BSL 이 만든다. -->
+    <query statement="Select" queryid="SELECT_ET_VALUE_OF_DIE" commandtype="Text" description="연관 분석 Die 상세: Die 1개의 GDS Chain 연결 Parameter 값 + Spec + 판정" commandtimeout="60">
+        <commandtext><![CDATA[SELECT V.DUT_NO, I.ITEM_NAME, I.HEADER_TEXT, I.CHAIN_NAME, I.CHAIN_NAME2, I.GDS_CHAIN_NAME,
+       UPPER(TRIM(I.GDS_CHAIN_NAME)) AS GDS_CHAIN_KEY,
+       V.MEAS_VALUE, V.VALUE_STATUS, L.LOWER_LIMIT, L.UPPER_LIMIT, V.JUDGE_FLAG, I.UNIT
+  FROM TQP_GDS_ET_VALUE V
+  JOIN TQP_GDS_ET_ITEM I ON I.ET_ITEM_SEQ = V.ET_ITEM_SEQ
+  LEFT JOIN TQP_GDS_ET_LIMIT L
+    ON L.FACTORY = I.FACTORY AND L.DEVICE_ID = I.DEVICE_ID AND L.TEST_PROGRAM = I.TEST_PROGRAM AND L.ITEM_NAME = I.ITEM_NAME
+ WHERE V.SRC_FILE_SEQ = :src_file_seq
+   AND V.DUT_NO = :dut_no
+   AND I.GDS_CHAIN_NAME IS NOT NULL
+   AND NVL(I.USE_FLAG, 'Y') <> 'N'
+ ORDER BY I.DISPLAY_ORDER, I.ITEM_NAME]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:src_file_seq</param>
+            <param direction="Input" dbtype="Number" size="0">:dut_no</param>
         </parameters>
     </query>
 </queryxml>

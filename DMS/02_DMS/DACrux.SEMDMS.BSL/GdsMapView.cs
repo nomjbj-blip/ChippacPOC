@@ -9,7 +9,7 @@ namespace DACrux.SEMDMS.BSL
 {
     /// <summary>
     /// GDS Map 조회 화면의 읽기 전용 업무 검증과 DSL 호출을 담당한다.
-    /// 설계: 문서/2026-10-02_GDS_Map_조회화면_설계.md 4~5절 / 15절.
+    /// 설계: 문서/설계/02_GDS/2026-10-02_GDS_Map_조회화면_설계.md 4~5절 / 15절.
     /// 2026-10-02 리비전 관리 제거로 조회 키는 Factory + Device다(Device당 Map 1개).
     /// 저장 중이거나 실패한 Map(DRAFT)은 도형 일부만 있을 수 있으므로 READY Map만 조회한다.
     /// </summary>
@@ -46,12 +46,15 @@ namespace DACrux.SEMDMS.BSL
 
         #region [TQP_GDS_LAYER]
 
-        /// <summary>READY Map인지 확인한 뒤 Layer 목록과 Layer별 도형 수 / 좌표 수를 조회한다.</summary>
+        /// <summary>
+        /// READY Map인지 확인한 뒤 Layer 목록과 Layer별 도형 수 / 좌표 수를 조회한다.
+        /// Layer 는 번호 + DataType 단위다(KLayout 18/0, 18/3 처럼 나뉨). 결과에 DATA_TYPE 컬럼이 더 있다 (2026-10-20).
+        /// </summary>
         public DataTable GetMapLayerList(string strFactory, string strDeviceID)
         {
             string[] key = RequireReadyMap(strFactory, strDeviceID);
             DACrux.SEMDMS.DSL.TQP_GDS_LAYER oTQP_GDS_LAYER = new DACrux.SEMDMS.DSL.TQP_GDS_LAYER();
-            return oTQP_GDS_LAYER.GetData("SELECT_LAYER_WITH_COUNT", null, new string[] { key[0], key[1], key[0], key[1] });
+            return oTQP_GDS_LAYER.GetData("SELECT_LAYER_WITH_COUNT_DT", null, new string[] { key[0], key[1], key[0], key[1] });
         }
 
         #endregion
@@ -62,12 +65,14 @@ namespace DACrux.SEMDMS.BSL
         /// Layer 배치 도형 한 페이지를 조회한다.
         /// 처리 흐름: 입력 검증 -> READY Map 확인 -> 첫 페이지 / 다음 페이지 쿼리 선택 -> PLACED_ELEMENT_ID 순서 최대 iMaxRows건.
         /// 다음 페이지는 이전 페이지 마지막 ID보다 큰 키부터 읽는다(OFFSET 방식은 뒤 페이지로 갈수록 느려짐).
+        /// strLayerID: "18/3"(Layer 번호 / DataType)이면 그 DataType 만, "18"(번호만)이면 번호 전체를 읽는다(기존 호출 호환) (2026-10-20).
         /// </summary>
         public DataTable GetPlacedElementPage(string strFactory, string strDeviceID, string strLayerID, string strAfterPlacedID, int iMaxRows)
         {
             if (iMaxRows < 1 || iMaxRows > MaxPageRows)
                 throw new ArgumentException("페이지 행 수는 1 ~ " + MaxPageRows + " 사이여야 합니다: " + iMaxRows, "iMaxRows");
-            string strLayer = RequiredLayerId(strLayerID);
+            string strDataType;
+            string strLayer = RequiredLayerId(strLayerID, out strDataType);
             string[] key = RequireReadyMap(strFactory, strDeviceID);
             string strMaxRows = iMaxRows.ToString(CultureInfo.InvariantCulture);
 
@@ -75,15 +80,23 @@ namespace DACrux.SEMDMS.BSL
             DataTable dt;
             if (string.IsNullOrEmpty(strAfterPlacedID))
             {
-                dt = oTQP_GDS_PLACED_EL.GetData("SELECT_PLACED_EL_PAGE_FIRST", null,
-                    new string[] { key[0], key[1], strLayer, strMaxRows });
+                if (strDataType == null)
+                    dt = oTQP_GDS_PLACED_EL.GetData("SELECT_PLACED_EL_PAGE_FIRST", null,
+                        new string[] { key[0], key[1], strLayer, strMaxRows });
+                else
+                    dt = oTQP_GDS_PLACED_EL.GetData("SELECT_PLACED_EL_PAGE_FIRST_DT", null,
+                        new string[] { key[0], key[1], strLayer, strDataType, strMaxRows });
             }
             else
             {
                 if (Encoding.UTF8.GetByteCount(strAfterPlacedID) > 1024)
                     throw new ArgumentException("이전 페이지 마지막 ID가 1024바이트를 넘습니다.", "strAfterPlacedID");
-                dt = oTQP_GDS_PLACED_EL.GetData("SELECT_PLACED_EL_PAGE", null,
-                    new string[] { key[0], key[1], strLayer, strAfterPlacedID, strMaxRows });
+                if (strDataType == null)
+                    dt = oTQP_GDS_PLACED_EL.GetData("SELECT_PLACED_EL_PAGE", null,
+                        new string[] { key[0], key[1], strLayer, strAfterPlacedID, strMaxRows });
+                else
+                    dt = oTQP_GDS_PLACED_EL.GetData("SELECT_PLACED_EL_PAGE_DT", null,
+                        new string[] { key[0], key[1], strLayer, strDataType, strAfterPlacedID, strMaxRows });
             }
 
             // 좌표 BLOB이 있어 기본 XML 직렬화는 Base64 문자열로 커진다.
@@ -103,30 +116,6 @@ namespace DACrux.SEMDMS.BSL
             DataTable dt = oTQP_GDS_PLACED_EL.GetData("SELECT_PLACED_TEXT_INDEX", null, new string[] { key[0], key[1] });
             dt.RemotingFormat = SerializationFormat.Binary;
             return dt;
-        }
-
-        #endregion
-
-        #region [TQP_GDS_MAP_SUB_DEVICE]
-
-        /// <summary>대표 Device의 Sub Device 목록(2026-10-12). Map 상태와 관계없이 저장된 설정을 그대로 돌려준다.</summary>
-        public DataTable GetSubDeviceList(string strFactory, string strDeviceID)
-        {
-            DACrux.SEMDMS.DSL.TQP_GDS_MAP_SUB_DEVICE oSub = new DACrux.SEMDMS.DSL.TQP_GDS_MAP_SUB_DEVICE();
-            return oSub.GetData("SELECT_SUB_DEVICE_LIST", null,
-                new string[] { Required(strFactory, "Factory", 30), Required(strDeviceID, "Device ID", 50) });
-        }
-
-        /// <summary>
-        /// 다른 데이터의 Device 이름으로 READY 대표 Map Device를 찾는다(2026-10-12).
-        /// 처리: 입력 정리 -> Sub 등록(SUB) 우선, 없으면 같은 이름 Map(SELF). 대소문자 무시. 없으면 0행.
-        /// </summary>
-        public DataTable GetMapDeviceBySub(string strFactory, string strSubDeviceID)
-        {
-            string strFac = Required(strFactory, "Factory", 30);
-            string strSub = Required(strSubDeviceID, "Device ID", 50);
-            DACrux.SEMDMS.DSL.TQP_GDS_MAP_SUB_DEVICE oSub = new DACrux.SEMDMS.DSL.TQP_GDS_MAP_SUB_DEVICE();
-            return oSub.GetData("SELECT_MAP_DEVICE_BY_SUB", null, new string[] { strFac, strSub, strFac, strSub });
         }
 
         #endregion
@@ -154,12 +143,27 @@ namespace DACrux.SEMDMS.BSL
             }
         }
 
-        /// <summary>GDS Layer 번호(0 이상의 정수)인지 확인한다.</summary>
-        private static string RequiredLayerId(string strValue)
+        /// <summary>
+        /// GDS Layer 값을 확인한다. "18"(번호만) 또는 "18/3"(번호 / DataType 0 ~ 65535) 형식이다.
+        /// 번호를 반환하고 DataType 은 strDataType 으로 준다(번호만이면 null) (2026-10-20).
+        /// </summary>
+        private static string RequiredLayerId(string strValue, out string strDataType)
         {
+            strDataType = null;
+            string strText = strValue == null ? string.Empty : strValue.Trim();
+            int iSlash = strText.IndexOf('/');
+            string strLayerText = iSlash < 0 ? strText : strText.Substring(0, iSlash).Trim();
             int iValue;
-            if (!int.TryParse(strValue == null ? null : strValue.Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out iValue) || iValue < 0)
+            if (!int.TryParse(strLayerText, NumberStyles.Integer, CultureInfo.InvariantCulture, out iValue) || iValue < 0)
                 throw new ArgumentException("Layer 번호는 0 이상의 정수여야 합니다: " + strValue, "strLayerID");
+            if (iSlash >= 0)
+            {
+                int iDataType;
+                if (!int.TryParse(strText.Substring(iSlash + 1).Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out iDataType)
+                    || iDataType < 0 || iDataType > 65535)
+                    throw new ArgumentException("Layer DataType 은 0 ~ 65535 정수여야 합니다: " + strValue, "strLayerID");
+                strDataType = iDataType.ToString(CultureInfo.InvariantCulture);
+            }
             return iValue.ToString(CultureInfo.InvariantCulture);
         }
 

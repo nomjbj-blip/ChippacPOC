@@ -7,7 +7,7 @@ namespace NexplantQMS.GdsMap.Persistence
 {
     /// <summary>
     /// 조회 서비스(iGdsMapView.GetPlacedElementPage)가 돌려준 PLACED 행을 화면 도형 데이터(MapPlacedElementData)로 바꾼다.
-    /// 설계: 문서/2026-10-02_GDS_Map_조회화면_설계.md 6절. GdsMapPlacedRowBuilder(저장)의 역변환이다.
+    /// 설계: 문서/설계/02_GDS/2026-10-02_GDS_Map_조회화면_설계.md 6절. GdsMapPlacedRowBuilder(저장)의 역변환이다.
     ///  - POINTS_BIN v1 = 월드 X/Y double little-endian 반복(점당 16바이트)
     ///  - PATH가 아닌 행의 PATH_WIDTH / PATH_TYPE, TEXT가 아닌 행의 TEXT 속성은 NULL로 저장되어 있다.
     /// 이 클래스는 DataRow만 다루며 UI 컨트롤에 접근하지 않으므로 백그라운드 스레드에서 호출할 수 있다.

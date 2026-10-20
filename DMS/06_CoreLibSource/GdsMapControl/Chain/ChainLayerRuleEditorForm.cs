@@ -75,17 +75,32 @@ namespace NexplantQMS.GdsMap.Chain
             return grid;
         }
 
-        /// <summary>현재 GDS Layer 번호만 선택할 수 있는 표의 Layer 열을 만든다.</summary>
+        /// <summary>현재 GDS Layer 만 선택할 수 있는 표의 Layer 열을 만든다. 값은 Layer 키(번호 + DataType), 표시는 "18/0" (2026-10-20)</summary>
         private DataGridViewComboBoxColumn CreateLayerColumn(string name, string headerText)
         {
             return new DataGridViewComboBoxColumn
             {
                 Name = name,
                 HeaderText = headerText,
-                DataSource = _layerIds.ToList(),
+                DataSource = _layerIds.Select(id => new LayerChoice(id)).ToList(),
+                ValueMember = "Key",
+                DisplayMember = "Text",
                 Width = 150,
                 FlatStyle = FlatStyle.Flat
             };
+        }
+
+        /// <summary>Layer 콤보 항목: 값 = Layer 키, 표시 = "번호/DataType"</summary>
+        private sealed class LayerChoice
+        {
+            public LayerChoice(int key)
+            {
+                Key = key;
+                Text = GdsLayerKey.Format(key);
+            }
+
+            public int Key { get; private set; }
+            public string Text { get; private set; }
         }
 
         /// <summary>규칙 추가, 선택 행 삭제, 적용과 취소 버튼을 배치한다.</summary>
@@ -190,7 +205,7 @@ namespace NexplantQMS.GdsMap.Chain
                 if (!pairKeys.Add(pairKey))
                 {
                     message = "같은 Layer 조합이 중복되어 있습니다: Layer "
-                        + firstLayerId + " / Layer " + secondLayerId;
+                        + GdsLayerKey.Format(firstLayerId) + " / Layer " + GdsLayerKey.Format(secondLayerId);
                     return false;
                 }
 

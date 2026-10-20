@@ -30,22 +30,25 @@ namespace DACrux.SEMDMS.ENGUI
 
             try
             {
-                string assemblyPath = Path.Combine(Application.StartupPath,
-                    "GdsMap", "NexplantQMS.GdsMap.exe");
-                if (!File.Exists(assemblyPath))
-                    throw new FileNotFoundException("GDS Map 실행 파일을 찾을 수 없습니다.", assemblyPath);
+                using (DACrux.SEMDMS.Control.BusyCursor.Show(this)) // GDS EXE 읽기 + 화면 만들기 동안 모래시계 커서 (2026-10-15)
+                {
+                    string assemblyPath = Path.Combine(Application.StartupPath,
+                        "GdsMap", "NexplantQMS.GdsMap.exe");
+                    if (!File.Exists(assemblyPath))
+                        throw new FileNotFoundException("GDS Map 실행 파일을 찾을 수 없습니다.", assemblyPath);
 
-                Assembly assembly = Assembly.LoadFrom(assemblyPath);
-                Type formType = assembly.GetType("NexplantQMS.GdsMap.GdsMapForm", true);
-                gdsForm = Activator.CreateInstance(formType, new object[] { true }) as Form;
-                if (gdsForm == null)
-                    throw new InvalidOperationException("GDS Map 화면을 Form으로 만들 수 없습니다.");
+                    Assembly assembly = Assembly.LoadFrom(assemblyPath);
+                    Type formType = assembly.GetType("NexplantQMS.GdsMap.GdsMapForm", true);
+                    gdsForm = Activator.CreateInstance(formType, new object[] { true }) as Form;
+                    if (gdsForm == null)
+                        throw new InvalidOperationException("GDS Map 화면을 Form으로 만들 수 없습니다.");
 
-                gdsForm.TopLevel = false;
-                gdsForm.FormBorderStyle = FormBorderStyle.None;
-                gdsForm.Dock = DockStyle.Fill;
-                pnlGdsMap.Controls.Add(gdsForm);
-                gdsForm.Show();
+                    gdsForm.TopLevel = false;
+                    gdsForm.FormBorderStyle = FormBorderStyle.None;
+                    gdsForm.Dock = DockStyle.Fill;
+                    pnlGdsMap.Controls.Add(gdsForm);
+                    gdsForm.Show();
+                }
             }
             catch (Exception ex)
             {

@@ -29,7 +29,7 @@ namespace NexplantQMS.GdsMap.Chain
                 throw new ArgumentOutOfRangeException(nameof(request), "SpatialCellSize는 0보다 커야 합니다.");
 
             List<ChainTraceElement> elements = request.Elements
-                .Where(element => request.SelectedLayerIds == null || request.SelectedLayerIds.Contains(element.LayerId))
+                .Where(element => request.SelectedLayerIds == null || request.SelectedLayerIds.Contains(element.LayerKey))
                 .Where(element => !request.WorkArea.HasValue || request.WorkArea.Value.IntersectsWith(element.Bounds))
                 .ToList();
             Dictionary<string, ChainTraceElement> elementsByKey = BuildElementDictionary(elements);
@@ -137,7 +137,7 @@ namespace NexplantQMS.GdsMap.Chain
                 throw new ArgumentOutOfRangeException(nameof(request), "SpatialCellSize는 0보다 커야 합니다.");
 
             List<ChainTraceElement> elements = request.Elements
-                .Where(element => request.SelectedLayerIds == null || request.SelectedLayerIds.Contains(element.LayerId))
+                .Where(element => request.SelectedLayerIds == null || request.SelectedLayerIds.Contains(element.LayerKey))
                 .ToList();
             Dictionary<string, ChainTraceElement> byKey = BuildElementDictionary(elements);
             if (request.InputElementKeys.Count == 0
@@ -227,7 +227,7 @@ namespace NexplantQMS.GdsMap.Chain
             ChainTraceElement second, IList<ChainLayerConnectionRule> rules, bool applyLayerRules)
         {
             ChainLayerConnectionRule rule = applyLayerRules
-                ? FindRule(rules, first.LayerId, second.LayerId) : null;
+                ? FindRule(rules, first.LayerKey, second.LayerKey) : null;
             if (applyLayerRules && rule == null)
                 return false;
             double tolerance = rule == null ? 0 : rule.Tolerance;

@@ -2426,6 +2426,9 @@ namespace DACrux.TEST.BSL
                 if (dtTemp == null || dtTemp.Rows.Count <= 0)
                     throw new Exception("Shot Map 정보가 없습니다.");
 
+                // 2026-10-14 File Map Setup Map 은 저장 원점(선택 XY 방향 기준)을 LeftBottom 으로 되돌린다(DMS 화면과 같은 위치). 기존 Map 은 그대로.
+                FileMapSetupMap.ToLeftBottomOrigin(dtTemp.Rows[0], strProduct);
+
                 //Map Direction 은 LeftBottom 고정이다.
                 dtTemp.Rows[0]["XY_DIRECTION"] = 1;
                 dtTemp.AcceptChanges();

@@ -105,13 +105,8 @@ D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\100_ClientBin\APP
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\100_ClientBin\DACruxConfig.ini
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\100_ClientBin\Global.Lng
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\100_ClientBin\MenuFile.mnu
-D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\100_ClientBin\DACruxV5.exe.manifest
-D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\100_ClientBin\DACruxV5.application
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\100_ClientBin\DACruxV5.exe
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\100_ClientBin\DACruxV5.pdb
-D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\01_WinApp\DACruxV5\obj\Debug\DACruxV5.TrustInfo.xml
-D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\01_WinApp\DACruxV5\obj\Debug\DACruxV5.exe.manifest
-D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\01_WinApp\DACruxV5\obj\Debug\DACruxV5.application
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\01_WinApp\DACruxV5\obj\Debug\DACruxV5.csproj.Up2Date
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\01_WinApp\DACruxV5\obj\Debug\DACruxV5.exe
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\01_WinApp\DACruxV5\obj\Debug\DACruxV5.pdb

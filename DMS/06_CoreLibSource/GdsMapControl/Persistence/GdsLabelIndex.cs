@@ -29,7 +29,7 @@ namespace NexplantQMS.GdsMap.Persistence
     }
 
     /// <summary>
-    /// GDS Map View Label 검색 색인(설계: 문서/2026-10-07_GDS_Label_검색_설계.md 3 / 4절).
+    /// GDS Map View Label 검색 색인(설계: 문서/설계/02_GDS/2026-10-07_GDS_Label_검색_설계.md 3 / 4절).
     /// [조회] 때 서비스 GetMapTextIndex로 Device의 TEXT 도형 전체(Layer 무관 = 속성 기준)를 한 번 받아 두고 메모리에서 찾는다.
     /// 화면과 분리해 둔 이유: Probe가 화면 없이 같은 검색 규칙을 확인하기 위해서다.
     /// </summary>

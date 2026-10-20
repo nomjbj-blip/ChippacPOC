@@ -14,7 +14,7 @@ namespace NexplantQMS.GdsMap
 {
     /// <summary>
     /// DB에 저장된 GDS Map(READY)을 GDS 파일 없이 조회하고, Chain을 설정해 DB에 반영하는 화면이다.
-    /// 설계: 문서/2026-10-02_GDS_Map_조회화면_설계.md 3절 / 15절, 문서/2026-10-06_GDS_Map_화면역할_재정의_설계.md.
+    /// 설계: 문서/설계/02_GDS/2026-10-02_GDS_Map_조회화면_설계.md 3절 / 15절, 문서/설계/02_GDS/2026-10-06_GDS_Map_화면역할_재정의_설계.md.
     /// Chain 설정 / Chain DB 반영은 이 화면에서 한다(2026-10-06, Chain 동작은 GdsMapViewForm_Chain*.cs).
     /// Map 도형(LAYER / PLACED)은 바꾸지 않고 Chain 테이블만 저장한다.
     /// DACrux 메뉴(frmGdsMapView)가 이 EXE를 같은 프로세스에 올려 표시하므로 DMS Service(RO GdsMapView)를 호출할 수 있다.
@@ -82,18 +82,22 @@ namespace NexplantQMS.GdsMap
                 SetStatus("보기 기준: " + GdsSideTransform.Text(view) + (_shownItems == null ? " (다음 [조회]에 적용)" : ""));
                 return;
             }
-            CaptureActiveChain();
-            List<MapPlacedElementData> items = GdsSideTransform.MirrorAll(_shownItems);
-            map.ShowPlacedElements(_shownMap.TopStructure, _shownColors, items);
-            ApplyLoadedLayerVisibility();
-            _shownItems = items;
-            _displaySide = view;
-            map.RebuildChainTraceItems();
-            MirrorChainsForSideChange();
-            ReattachChainsAfterMapReload();
-            // Label 검색 결과도 새 기준 X로 다시 표시한다.
-            RefreshLabelResultsForSide();
-            UpdateMapInfoText();
+            // 전체 도형 반전 + 다시 그리기 + Chain 다시 연결 동안 모래시계 커서 (2026-10-15)
+            using (ViewBusy.Busy())
+            {
+                CaptureActiveChain();
+                List<MapPlacedElementData> items = GdsSideTransform.MirrorAll(_shownItems);
+                map.ShowPlacedElements(_shownMap.TopStructure, _shownColors, items);
+                ApplyLoadedLayerVisibility();
+                _shownItems = items;
+                _displaySide = view;
+                map.RebuildChainTraceItems();
+                MirrorChainsForSideChange();
+                ReattachChainsAfterMapReload();
+                // Label 검색 결과도 새 기준 X로 다시 표시한다.
+                RefreshLabelResultsForSide();
+                UpdateMapInfoText();
+            }
             // 성능 확인용 정보(전환 시간 / 도형 수)는 화면에 보이지 않는다 (2026-10-12).
             SetStatus("보기 기준: " + GdsSideTransform.Text(view));
         }
@@ -103,8 +107,8 @@ namespace NexplantQMS.GdsMap
         {
             var visibility = new Dictionary<int, bool>();
             foreach (LayerDisplayItem item in chkLayerItems.Items)
-                if (_loadedLayers.Contains(item.LayerId))
-                    visibility[item.LayerId] = chkLayerItems.CheckedItems.Contains(item);
+                if (_loadedLayers.Contains(item.LayerKey))
+                    visibility[item.LayerKey] = chkLayerItems.CheckedItems.Contains(item);
             if (visibility.Count > 0) map.SetLayerVisibility(visibility);
         }
 
@@ -123,8 +127,8 @@ namespace NexplantQMS.GdsMap
             InitializeChainDbState(hostedByDms);
             // Map 삭제도 DMS Service(RO GdsMapImport.DeleteMap)를 쓰므로 호스트 모드에서만 보인다 (2026-10-08).
             mnuDeleteMap.Visible = hostedByDms;
-            // Sub Device 설정도 DMS Service(RO)를 쓰므로 호스트 모드에서만 보인다 (2026-10-12).
-            mnuSubDevice.Visible = hostedByDms;
+            // Map 복사도 DMS Service(RO GdsMapImport.CopyMap)를 쓰므로 호스트 모드에서만 보인다 (2026-10-15).
+            btnCopyMap.Visible = hostedByDms;
             mnuMapSep.Visible = hostedByDms;
         }
 
@@ -149,9 +153,10 @@ namespace NexplantQMS.GdsMap
             SetStatus("Device 목록 조회 중 (Factory " + _factory + ")");
             try
             {
-                _deviceTable = await Task.Run(() => new DACrux.SEMDMS.RO.GdsMapView().GetMapDeviceList());
+                using (ViewBusy.Busy()) // 서버 조회 / 계산 동안 모래시계 커서 (2026-10-15)
+                    _deviceTable = await Task.Run(() => new DACrux.SEMDMS.RO.GdsMapView().GetMapDeviceList());
                 FillDeviceList();
-                SetStatus(cboDevice.Items.Count == 0 ? "Factory " + _factory + "에 조회 가능한 GDS Map이 없습니다." : "Device를 선택하세요. (Factory " + _factory + ")");
+                SetStatus(cboDevice.Items.Count == 0 ? "Factory " + _factory + "에 조회 가능한 GDS Map이 없습니다." : "Device " + cboDevice.Items.Count + "개 (Factory " + _factory + ")");
             }
             catch (Exception ex)
             {
@@ -245,48 +250,49 @@ namespace NexplantQMS.GdsMap
             SetStatus("Map 정보 조회 중");
             try
             {
-                var service = new DACrux.SEMDMS.RO.GdsMapView();
-                DataTable info = await Task.Run(() => service.GetMapInfo(factory, device));
-                if (device != cboDevice.Text.Trim()) return;
-                if (info.Rows.Count == 0)
+                using (ViewBusy.Busy()) // Map 정보 / Layer 목록 조회 동안 모래시계 커서 (2026-10-15)
                 {
-                    // 입력한 이름이 Sub Device면 대표 Device Map을 연다 (2026-10-12).
-                    if (await RedirectToRepresentativeAsync(factory, device)) return;
-                    SetMapInfo("등록된 GDS Map이 없습니다.");
-                    SetStatus("등록된 GDS Map이 없습니다: " + factory + " / " + device);
-                    return;
-                }
-                var item = new MapItem(info.Rows[0]);
-                SetMapInfo(item.Describe());
-                if (!item.IsReady)
-                {
-                    SetStatus("저장이 끝나지 않은 Map입니다(상태 " + item.Status + "). 등록 화면에서 저장을 마친 뒤 조회하세요.");
-                    return;
-                }
-
-                DataTable layers = await Task.Run(() => service.GetMapLayerList(factory, device));
-                if (device != cboDevice.Text.Trim()) return;
-                _updatingLayerChecks = true;
-                chkLayerItems.BeginUpdate();
-                try
-                {
-                    foreach (DataRow row in layers.Rows)
+                    var service = new DACrux.SEMDMS.RO.GdsMapView();
+                    DataTable info = await Task.Run(() => service.GetMapInfo(factory, device));
+                    if (device != cboDevice.Text.Trim()) return;
+                    if (info.Rows.Count == 0)
                     {
-                        int layerId = Convert.ToInt32(row["LAYER_ID"], CultureInfo.InvariantCulture);
-                        _layerCounts[layerId] = Convert.ToInt64(row["PLACED_COUNT"], CultureInfo.InvariantCulture);
-                        var color = Color.FromArgb(Convert.ToInt32(row["COLOR_ARGB"], CultureInfo.InvariantCulture));
-                        chkLayerItems.Items.Add(new LayerDisplayItem(layerId, color, true), true);
+                        SetMapInfo("등록된 GDS Map이 없습니다.");
+                        SetStatus("등록된 GDS Map이 없습니다: " + factory + " / " + device);
+                        return;
                     }
+                    var item = new MapItem(info.Rows[0]);
+                    SetMapInfo(item.Describe());
+                    if (!item.IsReady)
+                    {
+                        SetStatus("저장이 끝나지 않은 Map (상태 " + item.Status + ")");
+                        return;
+                    }
+
+                    DataTable layers = await Task.Run(() => service.GetMapLayerList(factory, device));
+                    if (device != cboDevice.Text.Trim()) return;
+                    _updatingLayerChecks = true;
+                    chkLayerItems.BeginUpdate();
+                    try
+                    {
+                        foreach (DataRow row in layers.Rows)
+                        {
+                            // Layer 키 = 번호 + DataType(TEXT 는 TEXTTYPE). KLayout 처럼 18/0 / 18/3 / 18/4 를 따로 보인다 (2026-10-20)
+                            int layerKey = GdsLayerKey.FromRow(row);
+                            _layerCounts[layerKey] = Convert.ToInt64(row["PLACED_COUNT"], CultureInfo.InvariantCulture);
+                            var color = Color.FromArgb(Convert.ToInt32(row["COLOR_ARGB"], CultureInfo.InvariantCulture));
+                            chkLayerItems.Items.Add(new LayerDisplayItem(layerKey, color, true), true);
+                        }
+                    }
+                    finally
+                    {
+                        chkLayerItems.EndUpdate();
+                        _updatingLayerChecks = false;
+                    }
+                    _currentMap = item;
+                    btnCopyMap.Enabled = true;
+                    SetStatus("Layer " + chkLayerItems.Items.Count + "개");
                 }
-                finally
-                {
-                    chkLayerItems.EndUpdate();
-                    _updatingLayerChecks = false;
-                }
-                _currentMap = item;
-                mnuSubDevice.Enabled = true;
-                SetStatus(TakeSubRedirectNote() + "체크한 Layer만 조회합니다. [조회]를 누르세요.");
-                await LoadSubDeviceTextAsync(item);
             }
             catch (Exception ex)
             {
@@ -297,14 +303,14 @@ namespace NexplantQMS.GdsMap
         private void ClearMapInfo()
         {
             _currentMap = null;
-            mnuSubDevice.Enabled = false;
+            btnCopyMap.Enabled = false;
             _shownMap = null;
             _shownItems = null;
             _shownColors = null;
             // 다른 Device로 바뀌면 이전 도면의 Chain 편집 상태를 비운다(미저장 변경은 ConfirmConditionChange에서 먼저 확인).
             ResetChainSetupAfterMapLoad(false);
             ClearLabelIndex();
-            SetMapInfo("Device를 선택하세요.");
+            SetMapInfo(string.Empty);
             ClearLayerList();
         }
 
@@ -353,7 +359,8 @@ namespace NexplantQMS.GdsMap
                 try
                 {
                     var chainProgress = new Progress<string>(SetStatus);
-                    dbChains = await Task.Run(() => ReadDbChains(target.Factory, target.DeviceId, chainProgress));
+                    using (ViewBusy.Busy()) // 서버 조회 / 계산 동안 모래시계 커서 (2026-10-15)
+                        dbChains = await Task.Run(() => ReadDbChains(target.Factory, target.DeviceId, chainProgress));
                 }
                 catch (Exception ex)
                 {
@@ -373,7 +380,8 @@ namespace NexplantQMS.GdsMap
                 btnSearch.Enabled = false;
                 try
                 {
-                    labelIndex = await Task.Run(() => ReadLabelIndex(target.Factory, target.DeviceId));
+                    using (ViewBusy.Busy()) // 서버 조회 / 계산 동안 모래시계 커서 (2026-10-15)
+                        labelIndex = await Task.Run(() => ReadLabelIndex(target.Factory, target.DeviceId));
                 }
                 catch (Exception ex)
                 {
@@ -390,8 +398,8 @@ namespace NexplantQMS.GdsMap
             if (layersAdded)
                 layers = chkLayerItems.CheckedItems.Cast<LayerDisplayItem>().ToList();
 
-            long total = layers.Sum(l => _layerCounts.ContainsKey(l.LayerId) ? _layerCounts[l.LayerId] : 0);
-            var colors = layers.ToDictionary(l => l.LayerId, l => l.Color);
+            long total = layers.Sum(l => _layerCounts.ContainsKey(l.LayerKey) ? _layerCounts[l.LayerKey] : 0);
+            var colors = layers.ToDictionary(l => l.LayerKey, l => l.Color);
             var progress = new Progress<long>(received => ReportLoadProgress(received, total));
             // 지도를 다시 그리기 전에 편집 중인 Chain 상태를 Chain 정의에 보관한다.
             CaptureActiveChain();
@@ -401,7 +409,7 @@ namespace NexplantQMS.GdsMap
             try
             {
                 List<MapPlacedElementData> items = await Task.Run(
-                    () => LoadPlacedElements(target.Factory, target.DeviceId, layers.Select(l => l.LayerId).ToList(), progress, token));
+                    () => LoadPlacedElements(target.Factory, target.DeviceId, layers.Select(l => l.LayerKey).ToList(), progress, token));
 
                 // 보기 기준: DB 좌표는 저장 기준. 고른 보기 기준과 다르면 좌우 반전해 그린다.
                 string view = SelectedViewSide;
@@ -412,7 +420,7 @@ namespace NexplantQMS.GdsMap
                 map.ShowPlacedElements(target.TopStructure, colors, items);
 
                 _loadedLayers.Clear();
-                foreach (var layer in layers) _loadedLayers.Add(layer.LayerId);
+                foreach (var layer in layers) _loadedLayers.Add(layer.LayerKey);
                 // 같은 Map을 다시 조회(Layer 추가 / 변경)했으면 Chain 목록과 편집 내용을 유지하고 새 지도에 다시 연결한다.
                 // 다른 Map이면 Chain 설정을 새로 시작하고 DB Chain을 불러온다 (2026-10-06).
                 _shownMap = target;
@@ -436,7 +444,7 @@ namespace NexplantQMS.GdsMap
                 int partialChains = _chains.Count(chain => chain.DbIncomplete != null);
                 _loadSummary = "조회 완료: " + target.DeviceId + " / 도형 " + items.Count.ToString("N0")
                     + " / Chain " + _chains.Count + "개"
-                    + (partialChains > 0 ? "(그중 " + partialChains + "개는 Layer 를 조회하지 않아 저장에서 빠집니다)" : "");
+                    + (partialChains > 0 ? " (Layer 미조회 " + partialChains + "개)" : "");
                 SetStatus(_loadSummary);
             }
             catch (OperationCanceledException)
@@ -456,7 +464,8 @@ namespace NexplantQMS.GdsMap
         }
 
         /// <summary>
-        /// Layer마다 이전 페이지 마지막 ID 다음부터 PageRows씩 받아 행을 해석한다. 백그라운드 스레드에서 실행한다.
+        /// Layer 키(번호 + DataType)마다 이전 페이지 마지막 ID 다음부터 PageRows씩 받아 행을 해석한다. 백그라운드 스레드에서 실행한다.
+        /// 서버에는 Layer 를 "번호/DataType" 문자열로 보낸다 (2026-10-20).
         /// 받은 페이지는 해석 후 바로 해제해 DataTable과 해석 결과를 동시에 오래 들고 있지 않는다.
         /// </summary>
         private static List<MapPlacedElementData> LoadPlacedElements(string factory, string deviceId, IList<int> layerIds,
@@ -464,7 +473,7 @@ namespace NexplantQMS.GdsMap
         {
             var service = new DACrux.SEMDMS.RO.GdsMapView();
             var items = new List<MapPlacedElementData>();
-            foreach (int layerId in layerIds)
+            foreach (int layerKey in layerIds)
             {
                 string after = string.Empty;
                 while (true)
@@ -472,7 +481,7 @@ namespace NexplantQMS.GdsMap
                     token.ThrowIfCancellationRequested();
                     int rowCount;
                     using (DataTable page = service.GetPlacedElementPage(factory, deviceId,
-                        layerId.ToString(CultureInfo.InvariantCulture), after, PageRows))
+                        GdsLayerKey.Format(layerKey), after, PageRows))
                     {
                         foreach (DataRow row in page.Rows)
                             items.Add(GdsMapPlacedRowReader.Read(row));
@@ -524,7 +533,9 @@ namespace NexplantQMS.GdsMap
             try
             {
                 SetStatus("삭제할 Map 정보 확인 중");
-                DataTable info = await Task.Run(() => service.GetMapInfo(factory, device));
+                DataTable info;
+                using (ViewBusy.Busy()) // 서버 조회 / 계산 동안 모래시계 커서 (2026-10-15)
+                    info = await Task.Run(() => service.GetMapInfo(factory, device));
                 if (info.Rows.Count == 0)
                 {
                     SetStatus("삭제할 GDS Map이 없습니다: " + factory + " / " + device);
@@ -597,9 +608,18 @@ namespace NexplantQMS.GdsMap
             SetStatus("도면을 불러오는 중입니다.");
         }
 
+        /// <summary>작업 중 표시 (2026-10-15): 조회 / 삭제 / Chain 저장 중 상태 칸 "작업 중..." + 모래시계 커서, 그 밖의 서버 조회 / 계산은 Busy() 로 커서만. 처리 시간은 보이지 않는다.</summary>
+        private BusyStatus ViewBusy
+        {
+            get { return _viewBusy ?? (_viewBusy = new BusyStatus(this, lblElapsed)); }
+        }
+        private BusyStatus _viewBusy;
+
         /// <summary>조회 중에는 조건 / 옵션 / Layer 체크를 막는다.</summary>
         private void SetLoading(bool loading)
         {
+            if (loading) ViewBusy.Start();
+            else ViewBusy.Stop();
             cboDevice.Enabled = !loading;
             btnSearch.Enabled = !loading;
             btnStop.Enabled = loading;
@@ -607,7 +627,7 @@ namespace NexplantQMS.GdsMap
             progressLoad.Value = 0;
             progressLoad.Visible = loading;
             cboViewSide.Enabled = !loading;
-            mnuSubDevice.Enabled = !loading && _currentMap != null;
+            btnCopyMap.Enabled = !loading && _currentMap != null;
             // Label 검색은 조회 중 막고, 끝나면 색인이 있을 때만 연다.
             SetLabelSearchEnabled(!loading);
             // 조회 중에는 Chain 조작을 막는다. 조회가 끝나면 ResetChainSetupAfterMapLoad 또는 아래에서 다시 연다.
@@ -634,8 +654,8 @@ namespace NexplantQMS.GdsMap
             var item = e.ListItem as LayerDisplayItem;
             if (item == null) return;
             long count;
-            string text = "Layer " + item.LayerId + " (" + (_layerCounts.TryGetValue(item.LayerId, out count) ? count.ToString("N0") : "-") + ")";
-            if (_loadedLayers.Count > 0 && !_loadedLayers.Contains(item.LayerId)) text += " 미조회";
+            string text = "Layer " + GdsLayerKey.Format(item.LayerKey) + " (" + (_layerCounts.TryGetValue(item.LayerKey, out count) ? count.ToString("N0") : "-") + ")";
+            if (_loadedLayers.Count > 0 && !_loadedLayers.Contains(item.LayerKey)) text += " 미조회";
             e.Value = text;
         }
 
@@ -648,10 +668,10 @@ namespace NexplantQMS.GdsMap
             if (_updatingLayerChecks) return;
             var item = chkLayerItems.Items[e.Index] as LayerDisplayItem;
             if (item == null) return;
-            if (_loadedLayers.Contains(item.LayerId))
-                map.SetLayerVisibility(new Dictionary<int, bool> { { item.LayerId, e.NewValue == CheckState.Checked } });
+            if (_loadedLayers.Contains(item.LayerKey))
+                map.SetLayerVisibility(new Dictionary<int, bool> { { item.LayerKey, e.NewValue == CheckState.Checked } });
             else if (_loadedLayers.Count > 0 && e.NewValue == CheckState.Checked)
-                SetStatus("Layer " + item.LayerId + "는 조회하지 않은 Layer입니다. 표시하려면 [조회]를 다시 누르세요.");
+                SetStatus("Layer " + GdsLayerKey.Format(item.LayerKey) + " 미조회");
         }
 
         private void btnLayerAll_Click(object sender, EventArgs e)
@@ -772,23 +792,16 @@ namespace NexplantQMS.GdsMap
                 // 저장 기준(2026-10-06): BACK이면 PLACED가 GDS 원점 기준 좌우 반전 좌표로 저장되어 있다(그대로 그림).
                 string side = GdsSideTransform.Normalize(row.Table.Columns.Contains("VIEW_SIDE") ? row["VIEW_SIDE"].ToString() : null);
                 ViewSide = side;
+                // 핵심 항목만 (2026-10-15): Factory / Device, 상태, GDS 파일, 도형 수
                 _description = "Factory / Device: " + Factory + " / " + DeviceId
                     + "\r\n상태: " + Status
-                    + "\r\n저장 기준: " + GdsSideTransform.Text(side)
                     + "\r\nGDS 파일: " + row["GDS_FILE_NAME"]
-                    + "\r\nTop Structure: " + TopStructure
-                    + "\r\nPLACED: " + FormatCount(row["PLACED_COUNT"])
-                    + "\r\n좌표: " + FormatCount(row["POINT_COUNT"])
-                    + "\r\n등록: " + row["CREATE_USER"] + " / " + row["CREATE_TIME"];
+                    + "\r\n도형: " + FormatCount(row["PLACED_COUNT"]);
             }
-
-            /// <summary>대표 Device를 같이 쓰는 Sub Device 이름(쉼표 구분, 대표 제외). null = 아직 읽지 않음 (2026-10-12).</summary>
-            public string SubDevices { get; set; }
 
             public string Describe()
             {
-                if (SubDevices == null) return _description;
-                return _description + "\r\nSub Device: " + (SubDevices.Length == 0 ? "(없음)" : SubDevices);
+                return _description;
             }
 
             private static string FormatCount(object value)

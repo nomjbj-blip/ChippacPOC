@@ -7,7 +7,7 @@ namespace DACrux.SEMDMS.Interface
 {
     /// <summary>
     /// DB에 저장된 GDS Map을 조회하는 읽기 전용 원격 호출 계약이다.
-    /// 설계: 문서/2026-10-02_GDS_Map_조회화면_설계.md 4절 / 15절.
+    /// 설계: 문서/설계/02_GDS/2026-10-02_GDS_Map_조회화면_설계.md 4절 / 15절.
     /// 2026-10-02 결정으로 리비전 관리가 없어져 Map은 Factory + Device(제품)당 1개다. 조회 키도 Factory + Device다.
     /// 저장(iGdsMapImport)과 분리해 조회 화면은 DB를 바꾸지 않는다. 저장이 끝난(READY) Map만 조회한다.
     /// </summary>
@@ -29,7 +29,7 @@ namespace DACrux.SEMDMS.Interface
 
         #region [TQP_GDS_LAYER]
 
-        /// <summary>READY Map의 Layer 목록. 열: LAYER_ID / COLOR_ARGB / DISPLAY_NAME / PLACED_COUNT / POINT_COUNT</summary>
+        /// <summary>READY Map의 Layer(번호 + DataType) 목록. 열: LAYER_ID / DATA_TYPE / COLOR_ARGB / DISPLAY_NAME / PLACED_COUNT / POINT_COUNT (2026-10-20 DATA_TYPE 추가)</summary>
         DataTable GetMapLayerList(string strFactory, string strDeviceID);
 
         #endregion
@@ -38,6 +38,7 @@ namespace DACrux.SEMDMS.Interface
 
         /// <summary>
         /// READY Map의 한 Layer 배치 도형을 PLACED_ELEMENT_ID 순서로 최대 iMaxRows건 조회한다.
+        /// strLayerID: "18/3"(번호 / DataType)이면 그 DataType 만, "18"(번호만)이면 번호 전체 (2026-10-20).
         /// strAfterPlacedID: 이전 페이지의 마지막 PLACED_ELEMENT_ID (첫 페이지는 빈 값). 반환 행 수가 iMaxRows보다 작으면 마지막 페이지다.
         /// 열: PLACED_ELEMENT_ID / SOURCE_ELEMENT_ID / LAYER_ID / DATA_TYPE / ELEMENT_TYPE / CLOSED_FLAG / PATH_WIDTH / PATH_TYPE /
         ///     MIN_X / MIN_Y / MAX_X / MAX_Y / POINT_COUNT / POINTS_FORMAT_VERSION / POINTS_BIN(byte[], X/Y double LE) /
@@ -50,22 +51,6 @@ namespace DACrux.SEMDMS.Interface
         /// 반환 열: PLACED_ELEMENT_ID / LAYER_ID / TEXT_TYPE / TEXT_VALUE / MIN_X / MIN_Y (TEXT는 점 하나라 MIN = 위치, 저장 기준 좌표)
         /// </summary>
         DataTable GetMapTextIndex(string strFactory, string strDeviceID);
-
-        #endregion
-
-        #region [TQP_GDS_MAP_SUB_DEVICE]
-
-        /// <summary>
-        /// 대표 Device(Map)의 Sub Device 목록(2026-10-12). 대표 자신은 들어 있지 않다(언제나 자기 Sub).
-        /// 열: SUB_DEVICE_ID / REMARK / CREATE_USER / CREATE_TIME
-        /// </summary>
-        DataTable GetSubDeviceList(string strFactory, string strDeviceID);
-
-        /// <summary>
-        /// 다른 데이터의 Device 이름(KLARF Product / E-Test Device 등)으로 GDS 대표 Device를 찾는다(2026-10-12).
-        /// 순서: Sub 등록 -> 같은 이름 Map. 대소문자 무시, READY Map만. 열: DEVICE_ID / MATCH_TYPE(SUB / SELF), 없으면 0행.
-        /// </summary>
-        DataTable GetMapDeviceBySub(string strFactory, string strSubDeviceID);
 
         #endregion
     }

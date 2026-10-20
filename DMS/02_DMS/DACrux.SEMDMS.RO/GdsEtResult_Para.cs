@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Data;
 
 namespace DACrux.SEMDMS.RO
 {
     /// <summary>
-    /// E-Test Para Setup 원격 호출 (2026-10-14): Parameter 등록 / 대표 Chain / GDS 연결.
+    /// E-Test Para 설정 원격 호출 (2026-10-14): Parameter 등록 / GDS Chain + Spec 편집 / GDS Chain 참고 목록.
     /// 계약 설명은 DACrux.SEMDMS.Interface.iGdsEtResult (iGdsEtResult_Para.cs) 를 본다.
     /// </summary>
     public partial class GdsEtResult
@@ -35,6 +35,18 @@ namespace DACrux.SEMDMS.RO
             }
         }
 
+        public DataTable GetEtParameterSetupList(string strFactory, string strDeviceID, string strTestProgram)
+        {
+            try
+            {
+                return m_OBJ.GetEtParameterSetupList(strFactory, strDeviceID, strTestProgram);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         public DataTable RegisterEtParameters(string[] aKey, string[,] aRows, string strUpdateUser)
         {
             try
@@ -47,11 +59,11 @@ namespace DACrux.SEMDMS.RO
             }
         }
 
-        public int SaveEtParameters(string[] aKey, string[,] aRows, string strUpdateUser)
+        public DataTable SaveEtParameterSetup(string[] aKey, string[,] aRows, string strUpdateUser)
         {
             try
             {
-                return m_OBJ.SaveEtParameters(aKey, aRows, strUpdateUser);
+                return m_OBJ.SaveEtParameterSetup(aKey, aRows, strUpdateUser);
             }
             catch (Exception ex)
             {
@@ -73,13 +85,13 @@ namespace DACrux.SEMDMS.RO
 
         #endregion
 
-        #region [대표 Chain / GDS 연결]
+        #region [GDS Chain 참고 목록]
 
-        public DataTable GetEtTerminalList(string strFactory, string strGdsDeviceID)
+        public string GetEtGdsDevice(string strFactory, string strDeviceID)
         {
             try
             {
-                return m_OBJ.GetEtTerminalList(strFactory, strGdsDeviceID);
+                return m_OBJ.GetEtGdsDevice(strFactory, strDeviceID);
             }
             catch (Exception ex)
             {
@@ -87,119 +99,11 @@ namespace DACrux.SEMDMS.RO
             }
         }
 
-        public DataTable GetEtRepChainList(string strFactory, string strGdsDeviceID)
+        public DataTable GetEtGdsChainList(string strFactory, string strGdsDeviceID)
         {
             try
             {
-                return m_OBJ.GetEtRepChainList(strFactory, strGdsDeviceID);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public DataTable GetEtGdsChainLinkList(string strFactory, string strGdsDeviceID)
-        {
-            try
-            {
-                return m_OBJ.GetEtGdsChainLinkList(strFactory, strGdsDeviceID);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public int SaveEtRepChain(string[] aKey, string[] aTerminals, string strUpdateUser)
-        {
-            try
-            {
-                return m_OBJ.SaveEtRepChain(aKey, aTerminals, strUpdateUser);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public int RenameEtRepChain(string[] aKey, string strUpdateUser)
-        {
-            try
-            {
-                return m_OBJ.RenameEtRepChain(aKey, strUpdateUser);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public int RemoveEtRepChainMembers(string[] aKey, string[] aTerminals, string strUpdateUser)
-        {
-            try
-            {
-                return m_OBJ.RemoveEtRepChainMembers(aKey, aTerminals, strUpdateUser);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public int DeleteEtRepChain(string[] aKey, string strUpdateUser)
-        {
-            try
-            {
-                return m_OBJ.DeleteEtRepChain(aKey, strUpdateUser);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public DataTable LinkEtRepChainsByName(string strFactory, string strGdsDeviceID, string strUpdateUser)
-        {
-            try
-            {
-                return m_OBJ.LinkEtRepChainsByName(strFactory, strGdsDeviceID, strUpdateUser);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public int SaveEtChainLink(string[] aKey, string strUpdateUser)
-        {
-            try
-            {
-                return m_OBJ.SaveEtChainLink(aKey, strUpdateUser);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public int DeleteEtChainLink(string[] aKey, string strUpdateUser)
-        {
-            try
-            {
-                return m_OBJ.DeleteEtChainLink(aKey, strUpdateUser);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public DataTable GetEtRepChainSpecInfo(string strFactory, string strGdsDeviceID, string strRepChainName)
-        {
-            try
-            {
-                return m_OBJ.GetEtRepChainSpecInfo(strFactory, strGdsDeviceID, strRepChainName);
+                return m_OBJ.GetEtGdsChainList(strFactory, strGdsDeviceID);
             }
             catch (Exception ex)
             {

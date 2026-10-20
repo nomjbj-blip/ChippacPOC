@@ -1,4 +1,4 @@
-﻿# GDS Map View Label 검색 검증 스크립트 (설계: 문서/2026-10-07_GDS_Label_검색_설계.md 6절 1~2단계)
+﻿# GDS Map View Label 검색 검증 스크립트 (설계: 문서/설계/02_GDS/2026-10-07_GDS_Label_검색_설계.md 6절 1~2단계)
 # 목적: 서비스 GetMapTextIndex(BSL 직접 호출)로 받은 Label 색인이 샘플 GDS 파일의 배치 TEXT와 같은지,
 #       검색 규칙(정확히 / 시작 / 포함, 대소문자 무시, 앞뒤 공백 제거)과 View 화면 검색(결과 목록 / 첫 건 위치로 이동 / Back 보기 X 반전)을 확인한다.
 #       2026-10-07 지도 검색 표시(과녁 / 글자) 제거 -> 이동 확인은 지도 화면 중심(GdsMapControl._offset)으로 한다.

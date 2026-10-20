@@ -81,6 +81,12 @@ namespace DACrux.SEMDMS.DSL
                 throw ex;
             }
         }
+
+        /// <summary>같은 쿼리를 여러 행에 한 번에 실행한다(배열 바인딩, DB 왕복 1회).</summary>
+        public int DeleteExecuteMultiple(string sqlName, string[,] paras)
+        {
+            return this.ExecuteMultiple(sqlName, null, paras);
+        }
         #endregion
 
         #region [Common Update]
@@ -94,6 +100,12 @@ namespace DACrux.SEMDMS.DSL
             {
                 throw ex;
             }
+        }
+
+        /// <summary>같은 쿼리를 여러 행에 한 번에 실행한다(배열 바인딩, DB 왕복 1회).</summary>
+        public int UpdateExecuteMultiple(string sqlName, string[,] paras)
+        {
+            return this.ExecuteMultiple(sqlName, null, paras);
         }
         #endregion
     }

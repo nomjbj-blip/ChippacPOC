@@ -10,7 +10,7 @@ namespace DACrux.SEMDMS.BSL
 {
     /// <summary>
     /// E-Test 결과 파일 저장의 업무 검증과 DSL 호출을 담당한다.
-    /// 설계: 문서/2026-10-07_ETest_결과파일_Parsing_DB설계.md 9절 / 10절
+    /// 설계: 문서/설계/04_ETest/2026-10-07_ETest_결과파일_Parsing_DB설계.md 9절 / 10절
     /// 파일 Parsing은 클라이언트가 하고, 서버는 받은 행을 검증해 DefectDefine.CreateDefect와 같은 Bulk Insert(InsertExecuteMultiple)로 저장한다.
     /// 문장마다 자동 Commit이다. 중간에 끊기면 헤더가 LOADING으로 남고, 다음 저장 때 화면이 삭제 여부를 묻는다.
     /// </summary>
@@ -55,7 +55,7 @@ namespace DACrux.SEMDMS.BSL
             return oTQP_GDS_SRC_FILE.GetData("SELECT_SRC_FILE", null, new string[] { RequiredSeq(strSrcFileSeq, "파일 번호") });
         }
 
-        /// <summary>Device의 파일 목록을 최근 시험 순으로 조회한다.</summary>
+        /// <summary>Device의 파일 목록을 최근 시험 순으로 조회한다(2026-10-14: 헤더 / 등록 / 누락 수, Map ID / 좌표 Die 수, 판정 시각 포함).</summary>
         public DataTable GetEtFileList(string strFactory, string strDeviceID)
         {
             DACrux.SEMDMS.DSL.TQP_GDS_SRC_FILE oTQP_GDS_SRC_FILE = new DACrux.SEMDMS.DSL.TQP_GDS_SRC_FILE();
@@ -64,14 +64,29 @@ namespace DACrux.SEMDMS.BSL
         }
 
         /// <summary>
+        /// E-Test 결과 조회 화면 파일 목록 (2026-10-15). 공정은 대문자로 맞추고, Lot 은 대문자 포함 검색. 빈 값이면 조건을 걸지 않는다(NULL 바인딩).
+        /// 쿼리 순서: factory / device_id / p1 / p2 / l1 / l2 (같은 값을 이름을 나눠 두 번 넘긴다).
+        /// </summary>
+        public DataTable GetEtFileBrowseList(string strFactory, string strDeviceID, string strTestProgram, string strLot)
+        {
+            string strProgram = OptionalChars(strTestProgram, "공정(Test Type)", 50).ToUpperInvariant();
+            string strLotText = OptionalChars(strLot, "Lot", 50).ToUpperInvariant();
+            DACrux.SEMDMS.DSL.TQP_GDS_SRC_FILE oTQP_GDS_SRC_FILE = new DACrux.SEMDMS.DSL.TQP_GDS_SRC_FILE();
+            return oTQP_GDS_SRC_FILE.GetData("SELECT_SRC_FILE_BROWSE", null, new string[] {
+                Required(strFactory, "Factory", 30), Required(strDeviceID, "Device ID", 50), strProgram, strProgram, strLotText, strLotText });
+        }
+
+        /// <summary>
         /// 파일 1건을 실제로 삭제한다(기존 데이터 삭제 후 재등록).
         /// 처리 순서: 측정값 -> Die -> 헤더. FK가 CASCADE이지만 부모 행마다 내부 DELETE가 도는 것을 피하려고 자식부터 직접 지운다(GdsMapImport.DeleteMap과 같은 이유).
-        /// 측정 항목(TQP_GDS_ET_ITEM)은 Device 단위라 지우지 않는다. 반환: 지운 측정값 수
+        /// 측정 항목(TQP_GDS_ET_ITEM = 등록 Parameter)은 지우지 않는다. 반환: 지운 측정값 수
         /// </summary>
         public int DeleteEtFile(string strSrcFileSeq, string strUpdateUser)
         {
             string[] aKey = new string[] { RequiredSeq(strSrcFileSeq, "파일 번호") };
             Required(strUpdateUser, "Update User", 30);
+            // YMS 반영을 먼저 지운다. 실패하면 E-Test 파일도 지우지 않는다 (2026-10-14, GdsEtResult_Yms.cs)
+            DeleteYmsOfFile(aKey[0]);
             int iValues = new DACrux.SEMDMS.DSL.TQP_GDS_ET_VALUE().DeleteDataNonQuery("DELETE_ET_VALUE", null, aKey);
             new DACrux.SEMDMS.DSL.TQP_GDS_ET_DIE().DeleteDataNonQuery("DELETE_ET_DIE", null, aKey);
             new DACrux.SEMDMS.DSL.TQP_GDS_SRC_FILE().DeleteDataNonQuery("DELETE_SRC_FILE", null, aKey);
@@ -79,136 +94,293 @@ namespace DACrux.SEMDMS.BSL
         }
 
         /// <summary>
-        /// 저장을 시작한다.
-        /// FileInfo 순서: 0 Factory / 1 Device ID / 2 파일 이름 / 3 Lot ID / 4 Slot 번호 / 5 시험 프로그램 / 6 시험 일시(yyyyMMddHHmmss) /
-        ///                7 파일 접두어(선택) / 8 시트 이름 / 9 Die 수 / 10 항목 수 / 11 User
-        /// [12 Customer / 13 File Device / 14 Wafer Type / 15 Wafer Rev / 16 Lot-Wafer No / 17 Fab(선택)] - 2026-10-12 파일명 8칸 규칙(PARSE_RULE_VER 2).
-        ///   18항목이면 CREATE_SRC_FILE_V2 로 저장하고 7 파일 접두어는 쓰지 않는다. 12항목으로 부르면 이전 방식(PARSE_RULE_VER 1, 배포된 화면 / Probe 호환).
-        /// Slot 번호는 파일에 없어 화면에서 사용자가 입력한다 (2026-10-07).
-        /// 처리: 입력 검증 -> 같은 Wafer 파일 확인(Factory + WAFER_ID, 있으면 거부, 화면이 먼저 묻고 DeleteEtFile 호출) -> 번호 채번 -> 헤더 생성(LOADING) -> 헤더 1행 반환
+        /// 저장을 시작한다 (2026-10-14 Upload 재설계: 등록 Parameter 만 저장, PARSE_RULE_VER 3).
+        /// FileInfo 21항목: 0 Factory / 1 Device ID / 2 파일 이름 / 3 Lot ID / 4 Slot 번호 / 5 공정(Test Type) / 6 시험 일시(yyyyMMddHHmmss) /
+        ///   7 파일 접두어(쓰지 않음) / 8 시트 이름 / 9 Die 수 / 10 저장할 등록 Parameter 수 / 11 User /
+        ///   12 Customer / 13 File Device / 14 Wafer Type / 15 Wafer Rev / 16 Lot-Wafer No / 17 Fab(받지만 저장하지 않음) /
+        ///   18 파일 전체 헤더 수 / 19 화면이 본 등록 Parameter(사용 Y) 수 / 20 등록됐는데 파일에 없는 수
+        /// 처리 흐름:
+        ///  1) 입력 검증. 12 / 18항목(헤더 전체를 저장하던 이전 방식)은 거부한다.
+        ///  2) Device + 공정의 등록 Parameter(사용 Y)를 센다. 0건이면 거부(Setup 우선, 재설계 S1 / 10.1). 화면이 본 수와 다르면 다시 분석하라고 거부한다.
+        ///  3) 같은 Wafer + 공정 파일이 있으면 거부(화면이 먼저 묻고 DeleteEtFile 호출).
+        ///  4) 번호 채번 -> 헤더 생성(LOADING, FAB_NAME / VIEW_SIDE 없음) -> 헤더 1행 반환
         /// </summary>
         public DataTable BeginEtFile(string[] FileInfo)
         {
-            if (FileInfo == null || (FileInfo.Length != 12 && FileInfo.Length != 18))
-                throw new ArgumentException("저장 시작 정보는 12개 또는 18개(파일명 규칙 포함) 항목이어야 합니다.", "FileInfo");
+            if (FileInfo == null || FileInfo.Length != 21)
+                throw new ArgumentException("저장 시작 정보는 21개 항목이어야 합니다(2026-10-14 등록 Parameter 저장 방식). 업로드 화면을 새 버전으로 바꾸세요.", "FileInfo");
             string strFactory = Required(FileInfo[0], "Factory", 30);
             string strDevice = Required(FileInfo[1], "Device ID", 50);
             string strFileName = RequiredChars(FileInfo[2], "파일 이름", 260);
             string strLot = Required(FileInfo[3], "Lot ID", 50);
             string strSlot = RequiredSlot(FileInfo[4]);
-            string strProgram = Required(FileInfo[5], "시험 프로그램", 50);
+            string strProgram = RequiredTestProgram(FileInfo[5]);
             string strTestTime = RequiredTestTime(FileInfo[6]);
-            string strPrefix = OptionalChars(FileInfo[7], "파일 접두어", 100);
             string strSheet = OptionalChars(FileInfo[8], "시트 이름", 50);
             long lDieCount = ParseCount(FileInfo[9], "Die 수");
-            long lItemCount = ParseCount(FileInfo[10], "항목 수");
-            if (lDieCount == 0 || lItemCount == 0)
-                throw new ArgumentException("Die 수와 항목 수는 1 이상이어야 합니다.", "FileInfo");
+            long lItemCount = ParseCount(FileInfo[10], "저장 Parameter 수");
             string strUser = Required(FileInfo[11], "Create User", 30);
-            bool bRuleV2 = FileInfo.Length == 18;
-            string[] aRule = null;
-            if (bRuleV2)
-                aRule = new string[] {
-                    RequiredChars(FileInfo[12], "Customer", 30), RequiredChars(FileInfo[13], "File Device", 50),
-                    RequiredChars(FileInfo[14], "Wafer Type", 30), RequiredChars(FileInfo[15], "Wafer Rev", 20),
-                    RequiredChars(FileInfo[16], "Lot-Wafer No", 60), OptionalChars(FileInfo[17], "Fab", 50) };
+            string[] aRule = new string[] {
+                RequiredChars(FileInfo[12], "Customer", 30), RequiredChars(FileInfo[13], "File Device", 50),
+                RequiredChars(FileInfo[14], "Wafer Type", 30), RequiredChars(FileInfo[15], "Wafer Rev", 20),
+                RequiredChars(FileInfo[16], "Lot-Wafer No", 60) };
+            long lHeader = ParseCount(FileInfo[18], "헤더 수");
+            long lDefined = ParseCount(FileInfo[19], "등록 Parameter 수");
+            long lMissing = ParseCount(FileInfo[20], "누락 Parameter 수");
 
-            DataTable dtExist = null;
-            try
+            int iUsed = CountUsedParameters(strFactory, strDevice, strProgram);
+            if (iUsed == 0)
+                throw new InvalidOperationException("Device " + strDevice + " / 공정 " + strProgram
+                    + " 에 등록 Parameter(사용 Y)가 없습니다. E-Test Para 설정에서 먼저 등록하세요.");
+            if (lDieCount == 0 || lItemCount == 0)
+                throw new ArgumentException("Die 수와 저장 Parameter 수는 1 이상이어야 합니다(파일에 등록 Parameter 가 하나도 없으면 저장할 수 없습니다).", "FileInfo");
+            if (lDefined != iUsed || lItemCount > iUsed)
+                throw new InvalidOperationException("Device " + strDevice + " / 공정 " + strProgram + " 의 등록 Parameter 가 분석한 뒤 바뀌었습니다(분석 "
+                    + lDefined + " / 지금 " + iUsed + "). 파일을 다시 분석하세요.");
+
+            using (DataTable dtExist = GetEtFileByKey(new string[] { strFactory, strLot, strSlot, strProgram }))
             {
-                dtExist = GetEtFileByKey(new string[] { strFactory, strLot, strSlot, strProgram });
                 if (dtExist.Rows.Count > 0)
                     throw new InvalidOperationException("같은 Wafer / 같은 공정 파일이 이미 있습니다(WAFER_ID " + dtExist.Rows[0]["WAFER_ID"]
                         + " / 공정 " + dtExist.Rows[0]["TEST_PROGRAM"] + " / Device " + dtExist.Rows[0]["DEVICE_ID"]
                         + " / 파일 번호 " + dtExist.Rows[0]["SRC_FILE_SEQ"] + "). 삭제한 뒤 다시 저장하세요.");
             }
-            finally
-            {
-                if (dtExist != null)
-                    dtExist.Dispose();
-            }
 
             DACrux.SEMDMS.DSL.TQP_GDS_SRC_FILE oTQP_GDS_SRC_FILE = new DACrux.SEMDMS.DSL.TQP_GDS_SRC_FILE();
-            DataTable dtSeq = oTQP_GDS_SRC_FILE.GetData("SELECT_NEXT_SRC_FILE_SEQ", null, null);
-            string strSrcFileSeq = dtSeq.Rows[0][0].ToString();
-            dtSeq.Dispose();
-            int iRows = bRuleV2
-                ? oTQP_GDS_SRC_FILE.InsertDataNonQuery("CREATE_SRC_FILE_V2", null, new string[] {
-                    strSrcFileSeq, strFileName, strFactory, strDevice, strLot, strSlot, strProgram, strTestTime, strSheet,
-                    lDieCount.ToString(CultureInfo.InvariantCulture), lItemCount.ToString(CultureInfo.InvariantCulture),
-                    aRule[0], aRule[1], aRule[2], aRule[3], aRule[4], aRule[5], strUser, strUser })
-                : oTQP_GDS_SRC_FILE.InsertDataNonQuery("CREATE_SRC_FILE", null, new string[] {
-                    strSrcFileSeq, strFileName, strFactory, strDevice, strLot, strSlot, strProgram, strTestTime, strPrefix, strSheet,
-                    lDieCount.ToString(CultureInfo.InvariantCulture), lItemCount.ToString(CultureInfo.InvariantCulture),
-                    strUser, strUser });
+            string strSrcFileSeq;
+            using (DataTable dtSeq = oTQP_GDS_SRC_FILE.GetData("SELECT_NEXT_SRC_FILE_SEQ", null, null))
+                strSrcFileSeq = dtSeq.Rows[0][0].ToString();
+            int iRows = oTQP_GDS_SRC_FILE.InsertDataNonQuery("CREATE_SRC_FILE_V3", null, new string[] {
+                strSrcFileSeq, strFileName, strFactory, strDevice, strLot, strSlot, strProgram, strTestTime, strSheet,
+                lDieCount.ToString(CultureInfo.InvariantCulture), lItemCount.ToString(CultureInfo.InvariantCulture),
+                aRule[0], aRule[1], aRule[2], aRule[3], aRule[4],
+                lHeader.ToString(CultureInfo.InvariantCulture), iUsed.ToString(CultureInfo.InvariantCulture), lMissing.ToString(CultureInfo.InvariantCulture),
+                strUser, strUser });
             if (iRows != 1)
                 throw new DataException("E-Test 파일 헤더가 한 건 생성되지 않았습니다.");
             return GetEtFile(strSrcFileSeq);
         }
 
+        /// <summary>Device + 공정의 등록 Parameter 중 사용(Y) 수</summary>
+        private static int CountUsedParameters(string strFactory, string strDevice, string strProgram)
+        {
+            using (DataTable dt = new DACrux.SEMDMS.DSL.TQP_GDS_ET_ITEM().GetData("SELECT_ET_PARA_BY_PROGRAM", null, new string[] { strFactory, strDevice, strProgram }))
+                return dt.Rows.Cast<DataRow>().Count(r => r["USE_FLAG"].ToString() == "Y");
+        }
+
         /// <summary>
-        /// 저장 완료 확정.
+        /// 저장 완료 확정 (2026-10-14: 판정 + Map 좌표 추가).
         /// 처리 흐름:
-        ///  1) 헤더 조회. 이미 READY면 OK를 돌려준다.
-        ///  2) DB에서 Die 수 / 측정값 수를 다시 센다. 배치 저장은 Bulk Insert만 하므로 이 DB 건수가 유일한 확인이다.
-        ///  3) Die 수 = 헤더 Die 수, 측정값 수 = Die 수 x 항목 수이면 READY(VALUE_COUNT / PASS·FAIL Die 수 / 미측정 수 기록). 다르면 LOADING 그대로 두고 MISMATCH 반환.
+        ///  1) 헤더 조회. 이미 READY 면 그 요약으로 OK 를 돌려준다.
+        ///  2) DB 에서 Die 수 / 측정값 수를 다시 센다. 배치 저장은 Bulk Insert 만 하므로 이 DB 건수가 유일한 확인이다.
+        ///     Die 수 = 헤더 Die 수, 측정값 수 = Die 수 x 저장 Parameter 수가 아니면 LOADING 그대로 두고 MISMATCH 반환.
+        ///  3) Spec 판정(값 -> Die -> 파일, Upload 재설계 9.2절) -> Map 좌표(9.5절, Map ID = Device) -> READY.
+        /// 반환 1행: RESULT / LOAD_STATUS / EXPECTED_DIE / DB_DIE / FAIL_DIE(Spec 판정) / EXPECTED_VALUE / DB_VALUE / NOT_TESTED / EMPTY / MESSAGE /
+        ///          SPEC_FAIL_DIE / MAP_ID(없으면 빈 값) / MAP_DIE(좌표를 찾은 Die) / OUT_OF_MAP(Map 사용 Die 밖)
         /// </summary>
         public DataTable CompleteEtFile(string strSrcFileSeq, string strUpdateUser)
         {
             string strSeq = RequiredSeq(strSrcFileSeq, "파일 번호");
             string strUser = Required(strUpdateUser, "Update User", 30);
-            DataTable dtFile = null;
-            DataTable dtDie = null;
-            DataTable dtValue = null;
-            try
+            DataRow drFile;
+            using (DataTable dtFile = GetEtFile(strSeq))
             {
-                dtFile = GetEtFile(strSeq);
                 if (dtFile.Rows.Count == 0)
                     throw new InvalidOperationException("E-Test 파일을 찾을 수 없습니다: " + strSeq);
-                DataRow drFile = dtFile.Rows[0];
-                string strStatus = drFile["LOAD_STATUS"].ToString();
-                long lExpectedDie = DACrux.Base.Convert.longParse(drFile["DIE_COUNT"].ToString());
-                long lExpectedValue = lExpectedDie * DACrux.Base.Convert.longParse(drFile["ITEM_COUNT"].ToString());
-
-                string[] aKey = new string[] { strSeq };
-                dtDie = new DACrux.SEMDMS.DSL.TQP_GDS_ET_DIE().GetData("SELECT_ET_DIE_COUNT", null, aKey);
-                dtValue = new DACrux.SEMDMS.DSL.TQP_GDS_ET_VALUE().GetData("SELECT_ET_VALUE_COUNT", null, aKey);
-                long lDbDie = DACrux.Base.Convert.longParse(dtDie.Rows[0]["DIE_COUNT"].ToString());
-                long lFailDie = DACrux.Base.Convert.longParse(dtDie.Rows[0]["FAIL_DIE_COUNT"].ToString());
-                long lDbValue = DACrux.Base.Convert.longParse(dtValue.Rows[0]["VALUE_COUNT"].ToString());
-                long lNotTested = DACrux.Base.Convert.longParse(dtValue.Rows[0]["NOT_TESTED_COUNT"].ToString());
-                long lEmpty = DACrux.Base.Convert.longParse(dtValue.Rows[0]["EMPTY_COUNT"].ToString());
-
-                if (string.Equals(strStatus, "READY", StringComparison.Ordinal))
-                    return CompleteResult("OK", "READY", lExpectedDie, lDbDie, lFailDie, lExpectedValue, lDbValue, lNotTested, lEmpty, "이미 확정된 파일입니다.");
-
-                StringBuilder sbMessage = new StringBuilder();
-                if (lDbDie != lExpectedDie) sbMessage.Append("Die 건수 불일치 / ");
-                if (lDbValue != lExpectedValue) sbMessage.Append("측정값 건수 불일치 / ");
-                if (sbMessage.Length > 0)
-                    return CompleteResult("MISMATCH", strStatus, lExpectedDie, lDbDie, lFailDie, lExpectedValue, lDbValue, lNotTested, lEmpty,
-                        sbMessage.ToString().TrimEnd(' ', '/'));
-
-                DACrux.SEMDMS.DSL.TQP_GDS_SRC_FILE oTQP_GDS_SRC_FILE = new DACrux.SEMDMS.DSL.TQP_GDS_SRC_FILE();
-                // 2026-10-12: READY 로 바꿀 때 파일 요약(Pass / Fail Die 수, 미측정 셀 수)을 함께 기록한다(등록 목록에서 바로 보이도록).
-                int iRows = oTQP_GDS_SRC_FILE.UpdateDataNonQuery("UPDATE_SRC_FILE_READY_V2", null, new string[] {
-                    lDbValue.ToString(CultureInfo.InvariantCulture), (lDbDie - lFailDie).ToString(CultureInfo.InvariantCulture),
-                    lFailDie.ToString(CultureInfo.InvariantCulture), lNotTested.ToString(CultureInfo.InvariantCulture), strUser, strSeq });
-                if (iRows != 1)
-                    throw new InvalidOperationException("파일 상태가 바뀌어 확정하지 못했습니다. 다시 조회하세요.");
-                return CompleteResult("OK", "READY", lExpectedDie, lDbDie, lFailDie, lExpectedValue, lDbValue, lNotTested, lEmpty, "저장이 확정되었습니다.");
+                drFile = dtFile.Rows[0];
             }
-            finally
+            string strStatus = drFile["LOAD_STATUS"].ToString();
+            long lExpectedDie = DACrux.Base.Convert.longParse(drFile["DIE_COUNT"].ToString());
+            long lExpectedValue = lExpectedDie * DACrux.Base.Convert.longParse(drFile["ITEM_COUNT"].ToString());
+            DieSummary sum = ReadDieSummary(strSeq);
+
+            if (string.Equals(strStatus, "READY", StringComparison.Ordinal))
+                return CompleteResult("OK", "READY", lExpectedDie, lExpectedValue, sum, drFile["MAP_ID"].ToString(), "이미 확정된 파일입니다.");
+
+            StringBuilder sbMessage = new StringBuilder();
+            if (sum.Die != lExpectedDie) sbMessage.Append("Die 건수 불일치 / ");
+            if (sum.Value != lExpectedValue) sbMessage.Append("측정값 건수 불일치 / ");
+            if (sbMessage.Length > 0)
+                return CompleteResult("MISMATCH", strStatus, lExpectedDie, lExpectedValue, sum, string.Empty, sbMessage.ToString().TrimEnd(' ', '/'));
+
+            JudgeFile(strSeq, strUser);
+            string strMapId = ApplyFileMap(strSeq, drFile["FACTORY"].ToString(), drFile["DEVICE_ID"].ToString(), strUser);
+            int iRows = new DACrux.SEMDMS.DSL.TQP_GDS_SRC_FILE().UpdateDataNonQuery("UPDATE_SRC_FILE_READY", null, new string[] {
+                sum.Value.ToString(CultureInfo.InvariantCulture), strUser, strSeq });
+            if (iRows != 1)
+                throw new InvalidOperationException("파일 상태가 바뀌어 확정하지 못했습니다. 다시 조회하세요.");
+            DataTable dtDone = CompleteResult("OK", "READY", lExpectedDie, lExpectedValue, ReadDieSummary(strSeq), strMapId, "저장이 확정되었습니다.");
+            // YMS 테이블 반영 (2026-10-14, GdsEtResult_Yms.cs). 실패해도 확정은 그대로 두고 결과 열(YMS_STATUS 등)로만 알린다.
+            AppendYmsResult(dtDone, PublishToYms(strSeq, strUser));
+            return dtDone;
+        }
+
+        /// <summary>
+        /// Device + 공정의 READY 파일을 지금 Spec 으로 다시 판정한다(Spec 화면 저장 뒤). aKey: 0 Factory / 1 Device / 2 공정.
+        /// Spec 에 새로 넣은 Parameter 는 저장된 값이 있을 때만 판정된다(값이 없으면 파일을 다시 올려야 한다). 반환: 다시 판정한 파일 수
+        /// </summary>
+        public int RejudgeEtFiles(string[] aKey, string strUpdateUser)
+        {
+            if (aKey == null || aKey.Length != 3)
+                throw new ArgumentException("다시 판정 키는 3개 항목(Factory / Device / 공정)이어야 합니다.", "aKey");
+            string f = Required(aKey[0], "Factory", 30);
+            string d = Required(aKey[1], "Device ID", 50);
+            string t = RequiredTestProgram(aKey[2]);
+            string strUser = Required(strUpdateUser, "Update User", 30);
+            int iFiles = 0;
+            foreach (DataRow dr in ReadyFiles(f, d))
             {
-                if (dtFile != null) dtFile.Dispose();
-                if (dtDie != null) dtDie.Dispose();
-                if (dtValue != null) dtValue.Dispose();
+                if (!string.Equals(dr["TEST_PROGRAM"].ToString(), t, StringComparison.Ordinal))
+                    continue;
+                JudgeFile(dr["SRC_FILE_SEQ"].ToString(), strUser);
+                PublishToYms(dr["SRC_FILE_SEQ"].ToString(), strUser);   // 판정이 바뀌면 YMS BIN / 수율도 다시 반영 (2026-10-14)
+                iFiles++;
             }
+            return iFiles;
+        }
+
+        /// <summary>
+        /// Device 의 READY 파일 Map 좌표를 다시 계산한다(File Map Setup 에 Map 을 나중에 만들었을 때). aKey: 0 Factory / 1 Device.
+        /// 반환 1행: FILE_COUNT / MAP_ID(없으면 빈 값) / MAP_DIE(좌표를 찾은 Die 합) / OUT_OF_MAP(Map 사용 Die 밖 Die 합)
+        /// 2026-10-15: 화면 기능([Map 좌표 다시 계산])과 원격 호출(iGdsEtResult)은 삭제했다(업로드 때 Map 필수).
+        ///   서버 검사 스크립트(GdsEtResultProbe / EtYmsServiceProbe)가 Map 좌표 계산 · YMS 다시 반영 확인에만 BSL 을 직접 불러 쓴다.
+        /// </summary>
+        public DataTable RemapEtFiles(string[] aKey, string strUpdateUser)
+        {
+            if (aKey == null || aKey.Length != 2)
+                throw new ArgumentException("좌표 다시 계산 키는 2개 항목(Factory / Device)이어야 합니다.", "aKey");
+            string f = Required(aKey[0], "Factory", 30);
+            string d = Required(aKey[1], "Device ID", 50);
+            string strUser = Required(strUpdateUser, "Update User", 30);
+            int iFiles = 0, iYmsFail = 0;
+            long lMapDie = 0, lOut = 0;
+            string strMapId = string.Empty;
+            foreach (DataRow dr in ReadyFiles(f, d))
+            {
+                string strSeq = dr["SRC_FILE_SEQ"].ToString();
+                strMapId = ApplyFileMap(strSeq, f, d, strUser);
+                DieSummary sum = ReadDieSummary(strSeq);
+                lMapDie += sum.MapDie;
+                if (strMapId.Length > 0)
+                    lOut += sum.Die - sum.MapDie;
+                // 좌표가 바뀌면 YMS 도 다시 반영 (Map 이 새로 생겨 보류가 풀린 파일 포함, 2026-10-14)
+                if (string.Equals(PublishToYms(strSeq, strUser).Status, EtYmsPublisher.StatusFail, StringComparison.Ordinal))
+                    iYmsFail++;
+                iFiles++;
+            }
+            DataTable dt = new DataTable("ET_REMAP_RESULT");
+            dt.Columns.Add("FILE_COUNT", typeof(int));
+            dt.Columns.Add("MAP_ID", typeof(string));
+            dt.Columns.Add("MAP_DIE", typeof(long));
+            dt.Columns.Add("OUT_OF_MAP", typeof(long));
+            dt.Columns.Add("YMS_FAIL", typeof(int));
+            dt.Rows.Add(iFiles, strMapId, lMapDie, lOut, iYmsFail);
+            return dt;
+        }
+
+        /// <summary>
+        /// Map 사용 Die 목록 (File Map Setup 의 TQP_USEMAP, 가장 큰 PROGRAM_REV). 열: X / Y / USECODE(1 = 사용 Die). 없으면 0행.
+        /// 업로드 화면이 저장 전에 Map 밖 Die 를 미리 보는 데 쓴다(Map ID = E-Test 파일 Device).
+        /// </summary>
+        public DataTable GetEtMapDieList(string strFactory, string strMapId)
+        {
+            string f = Required(strFactory, "Factory", 30);
+            string m = Required(strMapId, "Map ID", 50);
+            return new DACrux.SEMDMS.DSL.TQP_GDS_ET_DIE().GetData("SELECT_ET_MAP_DIE", null, new string[] { f, m, f, m });
+        }
+
+        /// <summary>Spec 판정: 값 -> Die -> 파일 요약 (Upload 재설계 9.2절, 업로드 확정 / 다시 판정 공용). 문장마다 자동 Commit.</summary>
+        private static void JudgeFile(string strSeq, string strUser)
+        {
+            string[] aKey = new string[] { strSeq };
+            new DACrux.SEMDMS.DSL.TQP_GDS_ET_VALUE().UpdateDataNonQuery("UPDATE_ET_VALUE_JUDGE", null, aKey);
+            new DACrux.SEMDMS.DSL.TQP_GDS_ET_DIE().UpdateDataNonQuery("UPDATE_ET_DIE_JUDGE", null, aKey);
+            new DACrux.SEMDMS.DSL.TQP_GDS_SRC_FILE().UpdateDataNonQuery("UPDATE_SRC_FILE_JUDGE", null, new string[] { strUser, strSeq });
+        }
+
+        /// <summary>
+        /// Die 시스템 Map 좌표 (Upload 재설계 9.5절): Map ID = Device 의 사용 Die 로 DieCoordinateMapper(ETest 종류, KLARF 원점 안 씀)를 만들어
+        /// 파일 (X, Y) -> 시스템 좌표. Map 사용 Die 가 아니면 NULL. Map 이 없으면 모든 Die 좌표를 비운다. 반환: 쓴 Map ID(없으면 빈 문자열)
+        /// </summary>
+        private string ApplyFileMap(string strSeq, string strFactory, string strDevice, string strUser)
+        {
+            DACrux.SEMDMS.DSL.TQP_GDS_ET_DIE oDie = new DACrux.SEMDMS.DSL.TQP_GDS_ET_DIE();
+            DACrux.SEMDMS.Interface.DieCoordinateMapper mapper = null;
+            using (DataTable dtMap = GetEtMapDieList(strFactory, strDevice))
+            {
+                if (dtMap.Rows.Cast<DataRow>().Any(r => r["USECODE"] != DBNull.Value
+                    && Convert.ToInt32(r["USECODE"], CultureInfo.InvariantCulture) == DACrux.SEMDMS.Interface.DieCoordinateMapper.UsedDieCode))
+                    mapper = DACrux.SEMDMS.Interface.DieCoordinateMapper.FromDieTable(dtMap, new DACrux.SEMDMS.Interface.DiePoint(0, 0));
+            }
+            DACrux.SEMDMS.DSL.TQP_GDS_SRC_FILE oFile = new DACrux.SEMDMS.DSL.TQP_GDS_SRC_FILE();
+            if (mapper == null)
+            {
+                oDie.UpdateDataNonQuery("UPDATE_ET_DIE_MAP_CLEAR", null, new string[] { strSeq });
+                oFile.UpdateDataNonQuery("UPDATE_SRC_FILE_MAP", null, new string[] { string.Empty, strUser, strSeq });
+                return string.Empty;
+            }
+            using (DataTable dtDie = GetEtDieList(strSeq))
+            {
+                if (dtDie.Rows.Count > 0)
+                {
+                    string[,] aRows = new string[dtDie.Rows.Count, 4];
+                    for (int i = 0; i < dtDie.Rows.Count; i++)
+                    {
+                        DataRow dr = dtDie.Rows[i];
+                        DACrux.SEMDMS.Interface.DiePoint sys;
+                        bool bIn = mapper.TryToSystem(DACrux.SEMDMS.Interface.DieCoordType.ETest,
+                            new DACrux.SEMDMS.Interface.DiePoint(Convert.ToInt32(dr["DIE_X"], CultureInfo.InvariantCulture), Convert.ToInt32(dr["DIE_Y"], CultureInfo.InvariantCulture)), out sys);
+                        aRows[i, 0] = bIn ? sys.X.ToString(CultureInfo.InvariantCulture) : string.Empty;
+                        aRows[i, 1] = bIn ? sys.Y.ToString(CultureInfo.InvariantCulture) : string.Empty;
+                        aRows[i, 2] = strSeq;
+                        aRows[i, 3] = dr["DUT_NO"].ToString();
+                    }
+                    oDie.UpdateExecuteMultiple("UPDATE_ET_DIE_MAP", aRows);
+                }
+            }
+            oFile.UpdateDataNonQuery("UPDATE_SRC_FILE_MAP", null, new string[] { strDevice, strUser, strSeq });
+            return strDevice;
+        }
+
+        /// <summary>Device 의 READY 파일 (파일 목록 조회에서 거른다)</summary>
+        private List<DataRow> ReadyFiles(string strFactory, string strDevice)
+        {
+            DataTable dt = GetEtFileList(strFactory, strDevice);
+            return dt.Rows.Cast<DataRow>().Where(r => r["LOAD_STATUS"].ToString() == "READY").ToList();
+        }
+
+        /// <summary>파일의 Die / 값 건수와 판정 / 좌표 요약</summary>
+        private sealed class DieSummary
+        {
+            public long Die;
+            public long SpecFailDie;
+            public long MapDie;
+            public long Value;
+            public long NotTested;
+            public long Empty;
+        }
+
+        private static DieSummary ReadDieSummary(string strSeq)
+        {
+            string[] aKey = new string[] { strSeq };
+            DieSummary sum = new DieSummary();
+            using (DataTable dtDie = new DACrux.SEMDMS.DSL.TQP_GDS_ET_DIE().GetData("SELECT_ET_DIE_COUNT", null, aKey))
+            {
+                sum.Die = DACrux.Base.Convert.longParse(dtDie.Rows[0]["DIE_COUNT"].ToString());
+                sum.SpecFailDie = DACrux.Base.Convert.longParse(dtDie.Rows[0]["SPEC_FAIL_DIE_COUNT"].ToString());
+                sum.MapDie = DACrux.Base.Convert.longParse(dtDie.Rows[0]["MAP_DIE_COUNT"].ToString());
+            }
+            using (DataTable dtValue = new DACrux.SEMDMS.DSL.TQP_GDS_ET_VALUE().GetData("SELECT_ET_VALUE_COUNT", null, aKey))
+            {
+                sum.Value = DACrux.Base.Convert.longParse(dtValue.Rows[0]["VALUE_COUNT"].ToString());
+                sum.NotTested = DACrux.Base.Convert.longParse(dtValue.Rows[0]["NOT_TESTED_COUNT"].ToString());
+                sum.Empty = DACrux.Base.Convert.longParse(dtValue.Rows[0]["EMPTY_COUNT"].ToString());
+            }
+            return sum;
         }
 
         /// <summary>CompleteEtFile 반환 1행을 만든다.</summary>
-        private static DataTable CompleteResult(string strResult, string strStatus, long lExpectedDie, long lDbDie, long lFailDie,
-            long lExpectedValue, long lDbValue, long lNotTested, long lEmpty, string strMessage)
+        private static DataTable CompleteResult(string strResult, string strStatus, long lExpectedDie, long lExpectedValue, DieSummary sum, string strMapId, string strMessage)
         {
             DataTable dt = new DataTable("COMPLETE_RESULT");
             dt.Columns.Add("RESULT", typeof(string));
@@ -221,7 +393,13 @@ namespace DACrux.SEMDMS.BSL
             dt.Columns.Add("NOT_TESTED", typeof(long));
             dt.Columns.Add("EMPTY", typeof(long));
             dt.Columns.Add("MESSAGE", typeof(string));
-            dt.Rows.Add(strResult, strStatus, lExpectedDie, lDbDie, lFailDie, lExpectedValue, lDbValue, lNotTested, lEmpty, strMessage);
+            dt.Columns.Add("SPEC_FAIL_DIE", typeof(long));
+            dt.Columns.Add("MAP_ID", typeof(string));
+            dt.Columns.Add("MAP_DIE", typeof(long));
+            dt.Columns.Add("OUT_OF_MAP", typeof(long));
+            long lOut = strMapId.Length > 0 ? sum.Die - sum.MapDie : 0;
+            dt.Rows.Add(strResult, strStatus, lExpectedDie, sum.Die, sum.SpecFailDie, lExpectedValue, sum.Value, sum.NotTested, sum.Empty, strMessage,
+                sum.SpecFailDie, strMapId, sum.MapDie, lOut);
             return dt;
         }
 
@@ -252,98 +430,9 @@ namespace DACrux.SEMDMS.BSL
         #region [TQP_GDS_ET_ITEM]
 
         /// <summary>
-        /// 파일의 측정 항목을 Device 항목 마스터에 맞춘다.
-        /// 처리 흐름:
-        ///  1) 입력 검증(열 수 / 필수 값 / 파일 안 중복 헤더)
-        ///  2) Device 기존 항목 조회 -> 같은 ITEM_NAME인데 단위가 다르면 거부(어느 항목인지 최대 10개 표시)
-        ///  3) 없는 항목만 InsertExecuteMultiple로 추가(10,000행씩)
-        ///  4) Device 전체 항목을 다시 조회해 반환(화면은 ITEM_NAME -> ET_ITEM_SEQ로 측정값 행을 만든다)
+        /// Device 의 측정 항목 목록을 조회한다. 2026-10-14 부터 측정 항목 = 등록 Parameter(모든 공정)다.
+        /// 업로드는 측정 항목을 만들지 않는다(예전 MergeEtItem 삭제). 등록은 E-Test Para 설정(RegisterEtParameters)에서만 한다.
         /// </summary>
-        public DataTable MergeEtItem(string[] aKey, string[,] aItems, string strUpdateUser)
-        {
-            if (aKey == null || aKey.Length != 2)
-                throw new ArgumentException("항목 키는 2개 항목(Factory / Device)이어야 합니다.", "aKey");
-            string strFactory = Required(aKey[0], "Factory", 30);
-            string strDevice = Required(aKey[1], "Device ID", 50);
-            string strUser = Required(strUpdateUser, "Update User", 30);
-            if (aItems == null || aItems.GetLength(0) == 0)
-                throw new ArgumentException("측정 항목이 없습니다.", "aItems");
-            if (aItems.GetLength(1) != 8)
-                throw new ArgumentException("측정 항목 열 수는 8개여야 합니다.", "aItems");
-
-            int iRows = aItems.GetLength(0);
-            HashSet<string> setName = new HashSet<string>(StringComparer.Ordinal);
-            for (int i = 0; i < iRows; i++)
-            {
-                string strName = RequiredChars(aItems[i, 0], "ITEM_NAME", 200);
-                if (!setName.Add(strName))
-                    throw new ArgumentException("파일 안에 같은 측정 항목 헤더가 두 번 있습니다: " + strName, "aItems");
-                RequiredChars(aItems[i, 1], "PARA_NAME", 50);
-                RequiredChars(aItems[i, 3], "CHAIN_NAME", 64);
-                OptionalChars(aItems[i, 2], "COND_VALUE", 20);
-                OptionalChars(aItems[i, 4], "CHAIN_NAME2", 64);
-                OptionalChars(aItems[i, 5], "UNIT", 10);
-                OptionalNumber(aItems[i, 6], "TEST_NO");
-                OptionalNumber(aItems[i, 7], "DISPLAY_ORDER");
-            }
-
-            DACrux.SEMDMS.DSL.TQP_GDS_ET_ITEM oTQP_GDS_ET_ITEM = new DACrux.SEMDMS.DSL.TQP_GDS_ET_ITEM();
-            Dictionary<string, string> dicUnit = new Dictionary<string, string>(StringComparer.Ordinal);
-            DataTable dtExist = null;
-            try
-            {
-                dtExist = GetEtItemList(strFactory, strDevice);
-                foreach (DataRow dr in dtExist.Rows)
-                    dicUnit[dr["ITEM_NAME"].ToString()] = dr["UNIT"].ToString();
-            }
-            finally
-            {
-                if (dtExist != null)
-                    dtExist.Dispose();
-            }
-
-            List<int> lstNew = new List<int>();
-            List<string> lstUnitDiff = new List<string>();
-            for (int i = 0; i < iRows; i++)
-            {
-                string strName = aItems[i, 0].Trim();
-                string strUnit = Clean(aItems[i, 5]);
-                string strOldUnit;
-                if (!dicUnit.TryGetValue(strName, out strOldUnit))
-                    lstNew.Add(i);
-                else if (!string.Equals(strOldUnit, strUnit, StringComparison.Ordinal))
-                    lstUnitDiff.Add(strName + " (" + strOldUnit + " -> " + strUnit + ")");
-            }
-            if (lstUnitDiff.Count > 0)
-                throw new InvalidOperationException("등록된 측정 항목과 단위가 다릅니다(" + lstUnitDiff.Count + "건): "
-                    + string.Join(" / ", lstUnitDiff.Take(10).ToArray()));
-
-            for (int iStart = 0; iStart < lstNew.Count; iStart += MaxBatchRows)
-            {
-                int iCount = Math.Min(MaxBatchRows, lstNew.Count - iStart);
-                string[,] aInsert = new string[iCount, 12];
-                for (int k = 0; k < iCount; k++)
-                {
-                    int i = lstNew[iStart + k];
-                    aInsert[k, 0] = strFactory;
-                    aInsert[k, 1] = strDevice;
-                    aInsert[k, 2] = aItems[i, 0].Trim();
-                    aInsert[k, 3] = aItems[i, 1].Trim();
-                    aInsert[k, 4] = Clean(aItems[i, 2]);
-                    aInsert[k, 5] = aItems[i, 3].Trim();
-                    aInsert[k, 6] = Clean(aItems[i, 4]);
-                    aInsert[k, 7] = Clean(aItems[i, 5]);
-                    aInsert[k, 8] = Clean(aItems[i, 6]);
-                    aInsert[k, 9] = Clean(aItems[i, 7]);
-                    aInsert[k, 10] = strUser;
-                    aInsert[k, 11] = strUser;
-                }
-                oTQP_GDS_ET_ITEM.InsertExecuteMultiple("CREATE_ET_ITEM", aInsert);
-            }
-            return GetEtItemList(strFactory, strDevice);
-        }
-
-        /// <summary>Device의 측정 항목 목록을 조회한다.</summary>
         public DataTable GetEtItemList(string strFactory, string strDeviceID)
         {
             DACrux.SEMDMS.DSL.TQP_GDS_ET_ITEM oTQP_GDS_ET_ITEM = new DACrux.SEMDMS.DSL.TQP_GDS_ET_ITEM();
@@ -357,7 +446,7 @@ namespace DACrux.SEMDMS.BSL
 
         /// <summary>
         /// Die 정보 배치를 저장한다. 처리 흐름: 파일 LOADING 확인 -> 열 수 / 필수 값 확인 -> InsertExecuteMultiple 1회.
-        /// 같은 DUT 번호 / 같은 (X, Y)가 섞이면 DB 제약으로 배치 전체가 거부된다.
+        /// 같은 DUT 번호 / 같은 (X, Y)가 섞이면 DB 제약으로 배치 전체가 거부된다. PASS_FLAG 는 파일 DUT Flag(참고)이고 판정은 CompleteEtFile 이 한다.
         /// </summary>
         public int CreateEtDieBatch(string strSrcFileSeq, string[,] aParas, string strUpdateUser)
         {
@@ -389,7 +478,7 @@ namespace DACrux.SEMDMS.BSL
             return iRows;
         }
 
-        /// <summary>파일의 Die 목록을 조회한다.</summary>
+        /// <summary>파일의 Die 목록을 조회한다. 2026-10-14: MAP_X / MAP_Y / JUDGE_FLAG / FAIL_COUNT / NOT_TESTED_COUNT 포함 (Map 표시용 Die 데이터).</summary>
         public DataTable GetEtDieList(string strSrcFileSeq)
         {
             DACrux.SEMDMS.DSL.TQP_GDS_ET_DIE oTQP_GDS_ET_DIE = new DACrux.SEMDMS.DSL.TQP_GDS_ET_DIE();
@@ -401,9 +490,9 @@ namespace DACrux.SEMDMS.BSL
         #region [TQP_GDS_ET_VALUE]
 
         /// <summary>
-        /// 측정값 배치를 저장한다. 처리 흐름: 파일 LOADING 확인 -> 열 수 / 상태 값 확인 -> InsertExecuteMultiple 1회.
+        /// 측정값 배치를 저장한다. 처리 흐름: 파일 LOADING 확인 -> 열 수 / 상태 값 / 항목 번호 확인 -> InsertExecuteMultiple 1회.
         /// 값은 클라이언트가 G17 문자열로 보내고 XML이 TO_BINARY_DOUBLE로 바꾼다. 미측정(N) / 빈 값(E)은 값을 빈 문자열로 보낸다(NULL 저장).
-        /// 없는 Die / 항목 번호가 섞이면 FK로 배치 전체가 거부된다. 건수는 CompleteEtFile이 DB에서 확인한다.
+        /// 2026-10-14: 항목 번호는 파일 Device + 공정의 등록 Parameter(사용 Y)만 받는다(아니면 배치 거부). 건수는 CompleteEtFile이 DB에서 확인한다.
         /// </summary>
         public int CreateEtValueBatch(string strSrcFileSeq, string[,] aParas, string strUpdateUser)
         {
@@ -411,6 +500,13 @@ namespace DACrux.SEMDMS.BSL
             Required(strUpdateUser, "Update User", 30);
             CheckBatchParas(aParas, 4);
             int iRows = aParas.GetLength(0);
+
+            HashSet<string> setItem = new HashSet<string>(StringComparer.Ordinal);
+            using (DataTable dtItem = new DACrux.SEMDMS.DSL.TQP_GDS_ET_VALUE().GetData("SELECT_ET_UPLOAD_ITEM_SEQ", null, new string[] { strSeq }))
+            {
+                foreach (DataRow dr in dtItem.Rows)
+                    setItem.Add(Convert.ToInt64(dr["ET_ITEM_SEQ"], CultureInfo.InvariantCulture).ToString(CultureInfo.InvariantCulture));
+            }
 
             string[,] aValue = new string[iRows, 5];
             for (int i = 0; i < iRows; i++)
@@ -427,9 +523,12 @@ namespace DACrux.SEMDMS.BSL
                     strValue = string.Empty;
                 else
                     throw new ArgumentException("VALUE_STATUS는 V / N / E여야 합니다: " + aParas[i, 3], "aParas");
+                string strItem = Clean(aParas[i, 1]);
+                if (!setItem.Contains(strItem))
+                    throw new ArgumentException("파일 Device + 공정의 등록 Parameter(사용 Y)가 아닌 측정 항목 번호입니다: " + aParas[i, 1], "aParas");
                 aValue[i, 0] = strSeq;
                 aValue[i, 1] = Clean(aParas[i, 0]);
-                aValue[i, 2] = Clean(aParas[i, 1]);
+                aValue[i, 2] = strItem;
                 aValue[i, 3] = strValue;
                 aValue[i, 4] = strStatus;
             }
@@ -438,7 +537,7 @@ namespace DACrux.SEMDMS.BSL
             return iRows;
         }
 
-        /// <summary>파일의 측정값 전체를 조회한다.</summary>
+        /// <summary>파일의 측정값 전체를 조회한다. 2026-10-14: JUDGE_FLAG + 등록 Parameter 정보(헤더 원문 / Para / 조건 / Chain / 단위 / 순서) 포함.</summary>
         public DataTable GetEtValueList(string strSrcFileSeq)
         {
             DACrux.SEMDMS.DSL.TQP_GDS_ET_VALUE oTQP_GDS_ET_VALUE = new DACrux.SEMDMS.DSL.TQP_GDS_ET_VALUE();
@@ -449,13 +548,6 @@ namespace DACrux.SEMDMS.BSL
 
         #region [TQP_GDS_ET_LIMIT]
 
-        /// <summary>Spec 항목 이름 최대 길이(TQP_GDS_ET_LIMIT.ITEM_NAME VARCHAR2(200 CHAR)).</summary>
-        private const int MaxItemNameChars = 200;
-
-        /// <summary>헤더 끝의 '#번호'(FT: "...@TSVDC_HBM_C_P_FH #717"). 헤더 원문을 그대로 항목명으로 쓰고 '#번호' 만 지운다 (2026-10-12).</summary>
-        private static readonly System.Text.RegularExpressions.Regex ItemSuffixRegex =
-            new System.Text.RegularExpressions.Regex(@"\s*#\S*\s*$", System.Text.RegularExpressions.RegexOptions.CultureInvariant);
-
         /// <summary>측정 항목이 있는 Device 목록을 조회한다.</summary>
         public DataTable GetEtDeviceList(string strFactory)
         {
@@ -463,30 +555,14 @@ namespace DACrux.SEMDMS.BSL
             return oTQP_GDS_ET_ITEM.GetData("SELECT_ET_ITEM_DEVICE_LIST", null, new string[] { Required(strFactory, "Factory", 30) });
         }
 
-        /// <summary>Device 의 공정 목록(업로드된 파일 + Spec 이 있는 공정)을 조회한다.</summary>
+        /// <summary>Device 의 공정 목록(업로드된 파일 + Spec + 등록 Parameter 가 있는 공정)을 조회한다.</summary>
         public DataTable GetEtTestProgramList(string strFactory, string strDeviceID)
         {
             string strCleanFactory = Required(strFactory, "Factory", 30);
             string strCleanDevice = Required(strDeviceID, "Device ID", 50);
             DACrux.SEMDMS.DSL.TQP_GDS_ET_LIMIT oTQP_GDS_ET_LIMIT = new DACrux.SEMDMS.DSL.TQP_GDS_ET_LIMIT();
-            return oTQP_GDS_ET_LIMIT.GetData("SELECT_ET_TEST_PROGRAM_LIST", null, new string[] { strCleanFactory, strCleanDevice, strCleanFactory, strCleanDevice });
-        }
-
-        /// <summary>
-        /// Spec 화면 목록(정의 Parameter + 대표 Chain + 데이터 유무 + 그 공정 READY 파일 값 통계 + Fail 수)을 조회한다.
-        /// 같은 Factory / Device / 공정을 이름이 다른 바인딩 변수로 여러 번 넘긴다(쿼리 순서: f1 d1 t1 f2 d2 f3 d3 t3).
-        /// 2026-10-12 묶음 기능: 대표 Chain 조인(f4 d4)을 뺐다. 묶음 / Setup Chain 은 화면이 Chain 묶음 목록으로 계산한다.
-        /// </summary>
-        public DataTable GetEtLimitList(string strFactory, string strDeviceID, string strTestProgram)
-        {
-            string strCleanFactory = Required(strFactory, "Factory", 30);
-            string strCleanDevice = Required(strDeviceID, "Device ID", 50);
-            string strCleanProgram = RequiredChars(strTestProgram, "공정(Test Type)", 50).ToUpperInvariant();
-            DACrux.SEMDMS.DSL.TQP_GDS_ET_LIMIT oTQP_GDS_ET_LIMIT = new DACrux.SEMDMS.DSL.TQP_GDS_ET_LIMIT();
-            return oTQP_GDS_ET_LIMIT.GetData("SELECT_ET_LIMIT_LIST", null, new string[] {
-                strCleanFactory, strCleanDevice, strCleanProgram,
-                strCleanFactory, strCleanDevice,
-                strCleanFactory, strCleanDevice, strCleanProgram });
+            return oTQP_GDS_ET_LIMIT.GetData("SELECT_ET_TEST_PROGRAM_LIST", null, new string[] {
+                strCleanFactory, strCleanDevice, strCleanFactory, strCleanDevice, strCleanFactory, strCleanDevice });
         }
 
         /// <summary>Device + 공정의 저장된 Spec 을 조회한다(판정용).</summary>
@@ -494,16 +570,17 @@ namespace DACrux.SEMDMS.BSL
         {
             DACrux.SEMDMS.DSL.TQP_GDS_ET_LIMIT oTQP_GDS_ET_LIMIT = new DACrux.SEMDMS.DSL.TQP_GDS_ET_LIMIT();
             return oTQP_GDS_ET_LIMIT.GetData("SELECT_ET_LIMIT", null, new string[] {
-                Required(strFactory, "Factory", 30), Required(strDeviceID, "Device ID", 50), RequiredChars(strTestProgram, "공정(Test Type)", 50).ToUpperInvariant() });
+                Required(strFactory, "Factory", 30), Required(strDeviceID, "Device ID", 50), RequiredTestProgram(strTestProgram) });
         }
 
         /// <summary>
         /// Spec 을 저장한다(있으면 수정 / 없으면 추가).
-        /// 기준 (2026-10-12): 키 = Device + 공정 + Parameter(헤더 전체) / 고객 Spec 표에 있는 Parameter 만 정의 / 정의된 항목의 '-' 만 Fail / '#번호' 제거 / 대문자.
+        /// 기준 (2026-10-14): 키 = Device + 공정 + 등록 Parameter 저장 이름. Spec 은 등록 Parameter 에만 둔다(DB FK, Para Setup 설계 4.5절).
         /// 처리 흐름:
-        ///  1) 입력 검증: Parameter 는 공백 정리 + 끝 '#번호' 제거 + 대문자, '@' 가 있어야 한다. 같은 Parameter 가 두 번 오면 거부.
+        ///  1) 입력 검증: Parameter 는 저장 이름 또는 헤더 원문('@' 포함 -> EtParameterNameRule 로 저장 이름). 같은 Parameter 가 두 번 오면 거부.
         ///     Lower / Upper 는 숫자 또는 빈 값, 하나는 있어야 하고 둘 다 있으면 Lower &lt;= Upper. Enable 은 Y / N.
-        ///  2) 아직 업로드되지 않은 Parameter 도 저장한다(고객 Spec 표를 먼저 등록할 수 있게). 단위가 비어 있으면 측정 항목 단위로 채운다.
+        ///  2) 등록되지 않은 Parameter 가 하나라도 있으면 모아서 거부한다(Para 설정 화면에서 등록하거나 Spec 표 붙여넣기가 먼저 등록한다).
+        ///     단위가 비어 있으면 등록 Parameter 단위로 채운다.
         ///  3) MERGE 로 한 번에 저장한다(InsertExecuteMultiple).
         /// </summary>
         public int SaveEtLimit(string[] aKey, string[,] aRows, string strUpdateUser)
@@ -512,7 +589,7 @@ namespace DACrux.SEMDMS.BSL
                 throw new ArgumentException("Spec 키는 3개 항목(Factory / Device / 공정)이어야 합니다.", "aKey");
             string strFactory = Required(aKey[0], "Factory", 30);
             string strDevice = Required(aKey[1], "Device ID", 50);
-            string strProgram = RequiredChars(aKey[2], "공정(Test Type)", 50).ToUpperInvariant();
+            string strProgram = RequiredTestProgram(aKey[2]);
             string strUser = Required(strUpdateUser, "Update User", 30);
             if (aRows == null || aRows.GetLength(0) == 0)
                 throw new ArgumentException("저장할 Spec 이 없습니다.", "aRows");
@@ -522,31 +599,27 @@ namespace DACrux.SEMDMS.BSL
                 throw new ArgumentException("Spec 열 수는 7개여야 합니다.", "aRows");
 
             Dictionary<string, string> dicUnit = new Dictionary<string, string>(StringComparer.Ordinal);
-            DataTable dtItem = null;
-            try
+            using (DataTable dtItem = new DACrux.SEMDMS.DSL.TQP_GDS_ET_ITEM().GetData("SELECT_ET_PARA_BY_PROGRAM", null, new string[] { strFactory, strDevice, strProgram }))
             {
-                dtItem = GetEtItemList(strFactory, strDevice);
                 foreach (DataRow dr in dtItem.Rows)
-                {
-                    string strKey = NormalizeItemName(dr["ITEM_NAME"].ToString());
-                    if (!dicUnit.ContainsKey(strKey))
-                        dicUnit[strKey] = dr["UNIT"].ToString();
-                }
-            }
-            finally
-            {
-                if (dtItem != null)
-                    dtItem.Dispose();
+                    dicUnit[dr["ITEM_NAME"].ToString()] = dr["UNIT"].ToString();
             }
 
             int iRows = aRows.GetLength(0);
             string[,] aMerge = new string[iRows, 11];
             HashSet<string> setItem = new HashSet<string>(StringComparer.Ordinal);
+            List<string> lstMissing = new List<string>();
             for (int i = 0; i < iRows; i++)
             {
-                string strItem = RequiredItemName(aRows[i, 0]);
+                string strItem = RequiredSpecParameterName(aRows[i, 0]);
                 if (!setItem.Add(strItem))
                     throw new ArgumentException("같은 Parameter 가 두 번 있습니다: " + strItem, "aRows");
+                string strItemUnit;
+                if (!dicUnit.TryGetValue(strItem, out strItemUnit))
+                {
+                    lstMissing.Add(strItem);
+                    continue;
+                }
                 string strLower = OptionalDouble(aRows[i, 1], strItem + " Lower");
                 string strUpper = OptionalDouble(aRows[i, 2], strItem + " Upper");
                 if (strLower.Length == 0 && strUpper.Length == 0)
@@ -558,8 +631,7 @@ namespace DACrux.SEMDMS.BSL
                 if (strEnable != "Y" && strEnable != "N")
                     throw new ArgumentException("Enable 은 Y 또는 N 이어야 합니다: " + aRows[i, 3], "aRows");
                 string strUnit = OptionalChars(aRows[i, 4], strItem + " 단위", 10);
-                string strItemUnit;
-                if (strUnit.Length == 0 && dicUnit.TryGetValue(strItem, out strItemUnit))
+                if (strUnit.Length == 0)
                     strUnit = strItemUnit;
                 aMerge[i, 0] = strFactory;
                 aMerge[i, 1] = strDevice;
@@ -573,12 +645,15 @@ namespace DACrux.SEMDMS.BSL
                 aMerge[i, 9] = OptionalChars(aRows[i, 6], "비고", 200);
                 aMerge[i, 10] = strUser;
             }
+            if (lstMissing.Count > 0)
+                throw new ArgumentException("등록되지 않은 Parameter 에는 Spec 을 저장할 수 없습니다(" + lstMissing.Count + "건, E-Test Para 설정에서 등록하세요): "
+                    + string.Join(", ", lstMissing.Take(5).ToArray()) + (lstMissing.Count > 5 ? " ..." : string.Empty), "aRows");
             DACrux.SEMDMS.DSL.TQP_GDS_ET_LIMIT oTQP_GDS_ET_LIMIT = new DACrux.SEMDMS.DSL.TQP_GDS_ET_LIMIT();
             oTQP_GDS_ET_LIMIT.InsertExecuteMultiple("MERGE_ET_LIMIT", aMerge);
             return iRows;
         }
 
-        /// <summary>Spec 1행을 삭제한다. aKey: 0 Factory / 1 Device / 2 공정 / 3 Parameter(저장 때와 같은 규칙으로 정리해 찾는다).</summary>
+        /// <summary>Spec 1행을 삭제한다. aKey: 0 Factory / 1 Device / 2 공정 / 3 Parameter(저장 이름 또는 헤더 원문, 저장 때와 같은 규칙으로 찾는다).</summary>
         public int DeleteEtLimit(string[] aKey, string strUpdateUser)
         {
             if (aKey == null || aKey.Length != 4)
@@ -586,27 +661,7 @@ namespace DACrux.SEMDMS.BSL
             Required(strUpdateUser, "Update User", 30);
             DACrux.SEMDMS.DSL.TQP_GDS_ET_LIMIT oTQP_GDS_ET_LIMIT = new DACrux.SEMDMS.DSL.TQP_GDS_ET_LIMIT();
             return oTQP_GDS_ET_LIMIT.DeleteDataNonQuery("DELETE_ET_LIMIT", null, new string[] {
-                Required(aKey[0], "Factory", 30), Required(aKey[1], "Device ID", 50),
-                RequiredChars(aKey[2], "공정(Test Type)", 50).ToUpperInvariant(), RequiredItemName(aKey[3]) });
-        }
-
-        /// <summary>Parameter 이름 정리: 연속 공백 1칸 / 끝 '#번호' 제거 / 대문자. 화면 EtSpecTable.NormalizeItemName 과 같은 규칙이다.</summary>
-        private static string NormalizeItemName(string strValue)
-        {
-            string strClean = System.Text.RegularExpressions.Regex.Replace(Clean(strValue), @"\s+", " ");
-            return ItemSuffixRegex.Replace(strClean, string.Empty).Trim().ToUpperInvariant();
-        }
-
-        /// <summary>Spec Parameter 필수 검증: 정리 후 1~200자, '@'(Chain 구분) 포함.</summary>
-        private static string RequiredItemName(string strValue)
-        {
-            string strItem = NormalizeItemName(strValue);
-            if (strItem.Length == 0 || strItem.Length > MaxItemNameChars)
-                throw new ArgumentException("Parameter 는 1~" + MaxItemNameChars + "자로 입력하세요: " + strValue, "Parameter");
-            int iAt = strItem.IndexOf('@');
-            if (iAt <= 0 || iAt == strItem.Length - 1)
-                throw new ArgumentException("Parameter 는 측정 헤더 전체(예: RESISTANCE_IFORCE=8.0MA@TSVDC_TL_FH)여야 합니다: " + strValue, "Parameter");
-            return strItem;
+                Required(aKey[0], "Factory", 30), Required(aKey[1], "Device ID", 50), RequiredTestProgram(aKey[2]), RequiredSpecParameterName(aKey[3]) });
         }
 
         /// <summary>빈 값이면 빈 문자열(NULL), 아니면 유한한 숫자인지 확인해 R 형식(왕복 가능) 문자열로 돌려준다.</summary>
@@ -619,239 +674,6 @@ namespace DACrux.SEMDMS.BSL
             if (!double.TryParse(strClean, NumberStyles.Float, CultureInfo.InvariantCulture, out dValue) || double.IsNaN(dValue) || double.IsInfinity(dValue))
                 throw new ArgumentException(strName + " 값이 숫자가 아닙니다: " + strValue, strName);
             return dValue.ToString("R", CultureInfo.InvariantCulture);
-        }
-
-        #endregion
-
-        #region [TQP_GDS_ET_CHAIN_GROUP]
-
-        /// <summary>Chain 이름 최대 길이(TQP_GDS_ET_ITEM.CHAIN_NAME / TQP_GDS_ET_CHAIN_GROUP.CHAIN_NAME VARCHAR2(64 CHAR)).</summary>
-        private const int MaxChainNameChars = 64;
-
-        /// <summary>
-        /// Chain 묶기 목록: 측정 항목에서 뽑은 E-Test Chain(CHAIN_NAME / CHAIN_NAME2, 대문자) + 묶음 번호 / 묶음 Chain 목록 / 묶음 수.
-        /// 쿼리 순서: f1 d1 f2 d2 f3 d3.
-        /// </summary>
-        public DataTable GetEtChainGroupList(string strFactory, string strDeviceID)
-        {
-            string strCleanFactory = Required(strFactory, "Factory", 30);
-            string strCleanDevice = Required(strDeviceID, "Device ID", 50);
-            DACrux.SEMDMS.DSL.TQP_GDS_ET_CHAIN_GROUP oTQP_GDS_ET_CHAIN_GROUP = new DACrux.SEMDMS.DSL.TQP_GDS_ET_CHAIN_GROUP();
-            return oTQP_GDS_ET_CHAIN_GROUP.GetData("SELECT_ET_CHAIN_GROUP_LIST", null, new string[] {
-                strCleanFactory, strCleanDevice, strCleanFactory, strCleanDevice, strCleanFactory, strCleanDevice });
-        }
-
-        /// <summary>Setup Chain 목록: Factory 의 GDS Chain 이름(현재 READY 버전). GDS Device 는 화면이 Sub Device 연결(GdsMapView.GetMapDeviceBySub)로 거른다.</summary>
-        public DataTable GetEtGdsChainList(string strFactory)
-        {
-            DACrux.SEMDMS.DSL.TQP_GDS_ET_CHAIN_GROUP oTQP_GDS_ET_CHAIN_GROUP = new DACrux.SEMDMS.DSL.TQP_GDS_ET_CHAIN_GROUP();
-            return oTQP_GDS_ET_CHAIN_GROUP.GetData("SELECT_ET_GDS_CHAIN_LIST", null, new string[] { Required(strFactory, "Factory", 30) });
-        }
-
-        /// <summary>
-        /// Chain 을 묶는다. 대표 Chain 이름 없이 묶음 번호만 둔다 (2026-10-12).
-        /// aKey: 0 Factory / 1 Device. aRows 열: 0 묶음 구분값(같은 값끼리 한 묶음, 화면 임시 값) / 1 E-Test Chain(대문자로 저장) / 2 비고
-        /// 처리 흐름:
-        ///  1) 입력 검증: Chain 대문자, ':' / '@' 거부, 같은 Chain 두 번 거부, 묶음마다 Chain 2개 이상.
-        ///  2) 새 묶음 번호를 묶음 수만큼 받는다(ET_CHAIN_GROUP_SEQ).
-        ///  3) MERGE 로 한 번에 넣는다. 이미 다른 묶음에 있던 Chain 은 새 묶음으로 옮긴다.
-        ///  4) 옮긴 뒤 1개만 남은 이전 묶음은 지운다.
-        /// 측정 항목에 아직 없는 Chain 도 받는다. 반환: 만든 묶음 수
-        /// </summary>
-        public int CreateEtChainGroups(string[] aKey, string[,] aRows, string strUpdateUser)
-        {
-            if (aKey == null || aKey.Length != 2)
-                throw new ArgumentException("Chain 묶음 키는 2개 항목(Factory / Device)이어야 합니다.", "aKey");
-            string strFactory = Required(aKey[0], "Factory", 30);
-            string strDevice = Required(aKey[1], "Device ID", 50);
-            string strUser = Required(strUpdateUser, "Update User", 30);
-            if (aRows == null || aRows.GetLength(0) == 0)
-                throw new ArgumentException("묶을 Chain 이 없습니다.", "aRows");
-            if (aRows.GetLength(0) > MaxBatchRows)
-                throw new ArgumentException("Chain 묶음은 한 번에 " + MaxBatchRows + "행 이하로 저장하세요.", "aRows");
-            if (aRows.GetLength(1) != 3)
-                throw new ArgumentException("Chain 묶음 열 수는 3개여야 합니다.", "aRows");
-
-            int iRows = aRows.GetLength(0);
-            List<string> lstGroupKey = new List<string>();
-            Dictionary<string, int> dicGroupSize = new Dictionary<string, int>(StringComparer.Ordinal);
-            HashSet<string> setChain = new HashSet<string>(StringComparer.Ordinal);
-            string[] aChain = new string[iRows];
-            string[] aGroupKey = new string[iRows];
-            for (int i = 0; i < iRows; i++)
-            {
-                aGroupKey[i] = RequiredChars(aRows[i, 0], "묶음 구분값", 100);
-                aChain[i] = RequiredChainName(aRows[i, 1]);
-                if (!setChain.Add(aChain[i]))
-                    throw new ArgumentException("같은 Chain 이 두 번 있습니다: " + aChain[i], "aRows");
-                int iSize;
-                if (!dicGroupSize.TryGetValue(aGroupKey[i], out iSize))
-                    lstGroupKey.Add(aGroupKey[i]);
-                dicGroupSize[aGroupKey[i]] = iSize + 1;
-            }
-            foreach (KeyValuePair<string, int> kv in dicGroupSize)
-                if (kv.Value < 2)
-                    throw new ArgumentException("묶음에는 Chain 이 2개 이상 있어야 합니다(구분값 " + kv.Key + ").", "aRows");
-
-            DACrux.SEMDMS.DSL.TQP_GDS_ET_CHAIN_GROUP oTQP_GDS_ET_CHAIN_GROUP = new DACrux.SEMDMS.DSL.TQP_GDS_ET_CHAIN_GROUP();
-            Dictionary<string, string> dicSeq = new Dictionary<string, string>(StringComparer.Ordinal);
-            DataTable dtSeq = null;
-            try
-            {
-                dtSeq = oTQP_GDS_ET_CHAIN_GROUP.GetData("SELECT_NEXT_ET_CHAIN_GROUP_SEQ", null,
-                    new string[] { lstGroupKey.Count.ToString(CultureInfo.InvariantCulture) });
-                if (dtSeq.Rows.Count != lstGroupKey.Count)
-                    throw new InvalidOperationException("묶음 번호를 받지 못했습니다.");
-                for (int g = 0; g < lstGroupKey.Count; g++)
-                    dicSeq[lstGroupKey[g]] = Convert.ToInt64(dtSeq.Rows[g]["GROUP_SEQ"], CultureInfo.InvariantCulture).ToString(CultureInfo.InvariantCulture);
-            }
-            finally
-            {
-                if (dtSeq != null)
-                    dtSeq.Dispose();
-            }
-
-            string[,] aMerge = new string[iRows, 6];
-            for (int i = 0; i < iRows; i++)
-            {
-                aMerge[i, 0] = strFactory;
-                aMerge[i, 1] = strDevice;
-                aMerge[i, 2] = aChain[i];
-                aMerge[i, 3] = dicSeq[aGroupKey[i]];
-                aMerge[i, 4] = OptionalChars(aRows[i, 2], "비고", 200);
-                aMerge[i, 5] = strUser;
-            }
-            oTQP_GDS_ET_CHAIN_GROUP.InsertExecuteMultiple("MERGE_ET_CHAIN_GROUP", aMerge);
-            oTQP_GDS_ET_CHAIN_GROUP.DeleteDataNonQuery("DELETE_ET_CHAIN_GROUP_SINGLE", null, new string[] { strFactory, strDevice, strFactory, strDevice });
-            return lstGroupKey.Count;
-        }
-
-        /// <summary>묶음 해제: Chain 이 들어 있는 묶음 전체를 지운다. aKey: 0 Factory / 1 Device / 2 E-Test Chain. 반환: 지운 행 수(묶여 있지 않으면 0)</summary>
-        public int DeleteEtChainGroup(string[] aKey, string strUpdateUser)
-        {
-            if (aKey == null || aKey.Length != 3)
-                throw new ArgumentException("Chain 묶음 해제 키는 3개 항목(Factory / Device / Chain)이어야 합니다.", "aKey");
-            Required(strUpdateUser, "Update User", 30);
-            string strFactory = Required(aKey[0], "Factory", 30);
-            string strDevice = Required(aKey[1], "Device ID", 50);
-            DACrux.SEMDMS.DSL.TQP_GDS_ET_CHAIN_GROUP oTQP_GDS_ET_CHAIN_GROUP = new DACrux.SEMDMS.DSL.TQP_GDS_ET_CHAIN_GROUP();
-            return oTQP_GDS_ET_CHAIN_GROUP.DeleteDataNonQuery("DELETE_ET_CHAIN_GROUP_BY_CHAIN", null, new string[] {
-                strFactory, strDevice, strFactory, strDevice, RequiredChainName(aKey[2]) });
-        }
-
-        /// <summary>
-        /// Setup Chain(GDS Chain 이름)으로 E-Test Chain 을 찾는다. 묶인 Chain 까지 넓혀 Limit 등 정보를 모두 찾는 데 쓴다 (2026-10-12).
-        /// 찾는 순서:
-        ///  1) EXACT: E-Test Chain 이름이 Setup Chain 이름과 같다(대소문자 무시). 예: TSVDC_ASIC1_P_FL (Input Label 이 그대로 Chain 이름인 경우)
-        ///  2) SUFFIX: 1) 이 없을 때만, Setup Chain 이름 + _FH / _FL. 예: PIC_COMB12_M4 -> PIC_COMB12_M4_FH / _FL
-        ///  3) GROUP: 찾은 Chain 이 묶여 있으면 같은 묶음의 나머지 Chain
-        /// E-Test Chain 은 측정 항목 / 묶음 / Spec 에 나온 Chain 에서 찾는다.
-        /// 반환 열: CHAIN_NAME / MATCH_TYPE(EXACT / SUFFIX / GROUP) / GROUP_SEQ(빈 값 = 묶음 없음). 없으면 0행.
-        /// </summary>
-        public DataTable GetEtChainMatch(string strFactory, string strDeviceID, string strSetupChain)
-        {
-            string f = Required(strFactory, "Factory", 30);
-            string d = Required(strDeviceID, "Device ID", 50);
-            string k = RequiredChars(strSetupChain, "Setup Chain", 200).ToUpperInvariant();
-            DACrux.SEMDMS.DSL.TQP_GDS_ET_CHAIN_GROUP oTQP_GDS_ET_CHAIN_GROUP = new DACrux.SEMDMS.DSL.TQP_GDS_ET_CHAIN_GROUP();
-            DataTable dtHit = oTQP_GDS_ET_CHAIN_GROUP.GetData("SELECT_ET_CHAIN_MATCH", null, new string[] {
-                f, d, f, d, f, d, f, d, f, d, k, f, d, k, k, k });
-
-            DataTable dtResult = new DataTable("ET_CHAIN_MATCH");
-            dtResult.Columns.Add("CHAIN_NAME", typeof(string));
-            dtResult.Columns.Add("MATCH_TYPE", typeof(string));
-            dtResult.Columns.Add("GROUP_SEQ", typeof(string));
-            bool bExact = dtHit.Rows.Cast<DataRow>().Any(r => r["MATCH_TYPE"].ToString() == "EXACT");
-            HashSet<string> setChain = new HashSet<string>(StringComparer.Ordinal);
-            List<string> lstGroup = new List<string>();
-            foreach (DataRow dr in dtHit.Rows)
-            {
-                if (bExact && dr["MATCH_TYPE"].ToString() != "EXACT")
-                    continue;
-                string strGroup = dr["GROUP_SEQ"] == DBNull.Value ? string.Empty : Convert.ToInt64(dr["GROUP_SEQ"], CultureInfo.InvariantCulture).ToString(CultureInfo.InvariantCulture);
-                if (setChain.Add(dr["CHAIN_NAME"].ToString()))
-                    dtResult.Rows.Add(dr["CHAIN_NAME"].ToString(), dr["MATCH_TYPE"].ToString(), strGroup);
-                if (strGroup.Length > 0 && !lstGroup.Contains(strGroup))
-                    lstGroup.Add(strGroup);
-            }
-            dtHit.Dispose();
-            foreach (string strGroup in lstGroup)
-            {
-                using (DataTable dtMember = oTQP_GDS_ET_CHAIN_GROUP.GetData("SELECT_ET_CHAIN_GROUP_MEMBER", null, new string[] { f, d, strGroup }))
-                {
-                    foreach (DataRow dr in dtMember.Rows)
-                        if (setChain.Add(dr["CHAIN_NAME"].ToString()))
-                            dtResult.Rows.Add(dr["CHAIN_NAME"].ToString(), "GROUP", strGroup);
-                }
-            }
-            return dtResult;
-        }
-
-        /// <summary>
-        /// Setup Chain 으로 찾은 E-Test Chain(GetEtChainMatch, 묶음 포함)의 Spec / 측정 항목 정보를 모두 모은다.
-        /// Chain 마다 SELECT_ET_LIMIT_BY_CHAIN 을 부르고 같은 (공정, Parameter) 는 한 행으로 합친다(Leakage_Serial 처럼 Chain 2개가 모두 걸리는 항목).
-        /// 반환 열: TEST_PROGRAM(빈 값 = Spec 없는 측정 항목) / ITEM_NAME / CHAIN_NAME / CHAIN_NAME2 / DEFINED(Y/N) / LOWER_LIMIT / UPPER_LIMIT / UNIT / ENABLE_FLAG / SPEC_TEXT / REMARK /
-        ///          FILE_COUNT / VALUE_COUNT / NOT_TESTED_COUNT / MIN_VALUE / MAX_VALUE / FAIL_COUNT / MATCH_CHAIN(이 행을 찾게 한 E-Test Chain, 여러 개면 ", ")
-        /// 통계는 READY 파일 기준. Spec 행은 그 공정 파일, Spec 없는 측정 항목은 모든 공정 파일. Fail 수는 Enable Spec 기준 범위 밖 + '-'.
-        /// </summary>
-        public DataTable GetEtChainSpecInfo(string strFactory, string strDeviceID, string strSetupChain)
-        {
-            string f = Required(strFactory, "Factory", 30);
-            string d = Required(strDeviceID, "Device ID", 50);
-            DataTable dtMatch = GetEtChainMatch(f, d, strSetupChain);
-            DACrux.SEMDMS.DSL.TQP_GDS_ET_LIMIT oTQP_GDS_ET_LIMIT = new DACrux.SEMDMS.DSL.TQP_GDS_ET_LIMIT();
-            DataTable dtResult = null;
-            Dictionary<string, DataRow> dicRow = new Dictionary<string, DataRow>(StringComparer.Ordinal);
-            foreach (DataRow drMatch in dtMatch.Rows)
-            {
-                string c = drMatch["CHAIN_NAME"].ToString();
-                DataTable dt = oTQP_GDS_ET_LIMIT.GetData("SELECT_ET_LIMIT_BY_CHAIN", null, new string[] { f, d, c, c, f, d, c, c, f, d });
-                if (dtResult == null)
-                {
-                    dtResult = dt.Clone();
-                    dtResult.TableName = "ET_CHAIN_SPEC_INFO";
-                    dtResult.Columns.Add("MATCH_CHAIN", typeof(string));
-                }
-                foreach (DataRow dr in dt.Rows)
-                {
-                    string strKey = dr["TEST_PROGRAM"] + "\t" + dr["ITEM_NAME"].ToString().ToUpperInvariant();
-                    DataRow drOld;
-                    if (dicRow.TryGetValue(strKey, out drOld))
-                    {
-                        drOld["MATCH_CHAIN"] = drOld["MATCH_CHAIN"] + ", " + c;
-                        continue;
-                    }
-                    DataRow drNew = dtResult.NewRow();
-                    foreach (DataColumn col in dt.Columns)
-                        drNew[col.ColumnName] = dr[col];
-                    drNew["MATCH_CHAIN"] = c;
-                    dtResult.Rows.Add(drNew);
-                    dicRow[strKey] = drNew;
-                }
-                dt.Dispose();
-            }
-            dtMatch.Dispose();
-            if (dtResult == null)
-            {
-                // 찾은 Chain 이 없으면 열만 있는 빈 표를 돌려준다(화면이 열 이름을 그대로 쓰게).
-                dtResult = oTQP_GDS_ET_LIMIT.GetData("SELECT_ET_LIMIT_BY_CHAIN", null, new string[] { f, d, string.Empty, string.Empty, f, d, string.Empty, string.Empty, f, d });
-                dtResult.TableName = "ET_CHAIN_SPEC_INFO";
-                dtResult.Columns.Add("MATCH_CHAIN", typeof(string));
-                return dtResult;
-            }
-            DataView dv = new DataView(dtResult) { Sort = "DEFINED DESC, TEST_PROGRAM ASC, ITEM_NAME ASC" };
-            DataTable dtSorted = dv.ToTable("ET_CHAIN_SPEC_INFO");
-            dtResult.Dispose();
-            return dtSorted;
-        }
-
-        /// <summary>E-Test Chain 이름 필수 검증: 1~64자, 대문자. ':' / '@' 는 Chain 구분자라 거부한다.</summary>
-        private static string RequiredChainName(string strValue)
-        {
-            string strChain = RequiredChars(strValue, "Chain", MaxChainNameChars).ToUpperInvariant();
-            if (strChain.IndexOf(':') >= 0 || strChain.IndexOf('@') >= 0)
-                throw new ArgumentException("Chain 이름에 ':' 또는 '@' 를 쓸 수 없습니다: " + strValue, "Chain");
-            return strChain;
         }
 
         #endregion

@@ -35,3 +35,6 @@ AOI 데이터를 GDS와 비교하기 전에 KLARF 자체의 Wafer / 검사 Die /
 이번에는 화면을 실행하지 않았다. 기존 공통 Parser 파일에 미커밋 변경이 있으므로 후속 작업자는 해당 차이를 확인하되 이 화면 작업이라는 이유로 되돌리지 않는다.
 
 - 우클릭 메뉴 (2026-10-13, CLAUDE-076): `KlarfDefectMap` (KLARF File View / KLARF Upload) 은 Free Zoom / Fit Size / Move View Center 만 보인다. 상속한 GDS-KLARF Analysis Map 은 자기 메뉴 구성 유지. `Verify-KlarfFileViewer.ps1` 참조 DLL 목록 보강.
+- 2026-10-14 CLAUDE-094: 화면 아래 공통 진행 표시줄(KLARF 읽기 = 파일 읽기 + 원본 WaferID 를 작업 스레드에서). `Verify-KlarfFileViewer.ps1` 통과. 배포 / DMS 화면 확인 대기. [POC 화면 진행 표시줄](../../../문서/설계/06_환경_운영/2026-10-14_POC_화면_진행표시줄.md)
+
+- KLARF 숫자 NaN 표기 (2026-10-14, CLAUDE-099): Core `ParserKlarf.AppendDefectData` 가 Windows C 런타임 NaN / 무한대 표기(`-1.#IND000000e+000` 등)를 읽도록 이 부분만 수정 (사용자 허락). 원인 파일 `SampleFile/26_10_14 Sample File/1107236219.SINF` (SummaryList Test 80 DEFDENSITY).

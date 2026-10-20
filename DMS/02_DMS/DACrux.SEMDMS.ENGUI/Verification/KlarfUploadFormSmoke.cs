@@ -62,12 +62,12 @@ internal static class KlarfUploadFormSmoke
             var save = (Button)Get(type, form, "btnSave");
             var browse = (Button)Get(type, form, "btnBrowse");
             var folder = (Button)Get(type, form, "btnImageDir");
-            var cmb = (ComboBox)Get(type, form, "cmbClassSource");
 
             // ---- 1) 화면 구성 (2026-10-08 재배치) ----
             Check("[분석] 버튼 / 처리 기록 없음", !HasField(type, "btnAnalyze") && !HasField(type, "txtLog"), "");
-            Check("버튼 아이콘(11_Resource/ByModule/POC) 파일 선택 24 / 폴더 선택 24 / DB 저장 48",
-                browse.Image != null && browse.Image.Width == 24 && folder.Image != null && folder.Image.Width == 24 && save.Image != null && save.Image.Width == 48,
+            // POC 버튼 기준: 모든 버튼 16x16 아이콘(99_Resource/ByModule/POC/Button) / 높이 28 (2026-10-16)
+            Check("버튼 아이콘(99_Resource/ByModule/POC/Button) 파일 선택 16 / 폴더 선택 16 / DB 저장 16",
+                browse.Image != null && browse.Image.Width == 16 && folder.Image != null && folder.Image.Width == 16 && save.Image != null && save.Image.Width == 16,
                 Size(browse.Image) + " / " + Size(folder.Image) + " / " + Size(save.Image));
             Check("파일 / 폴더 입력란은 선택 창으로만 지정(읽기 전용)", txtFile.ReadOnly && txtImageDir.ReadOnly, "");
             Check("읽기 전 [DB 저장] 비활성", !save.Enabled, "");
@@ -80,7 +80,7 @@ internal static class KlarfUploadFormSmoke
             Call(type, form, "Analyze");
             Console.WriteLine("Status: " + status.Text);
             Console.WriteLine("Summary: " + summary.Text);
-            Check("파일 선택 후 바로 읽기 완료", status.Text.StartsWith("읽기 완료") && status.Text.Contains("[폴더 선택]"), status.Text);
+            Check("파일 선택 후 바로 읽기 완료(결과만, 사용법 안내 없음)", status.Text.StartsWith("읽기 완료 / Wafer ") && !status.Text.Contains("["), status.Text);
             // 샘플 KLARF 는 사용자 / 다른 작업이 고칠 수 있어(2026-10-08 DeviceID 변경 확인) Device / Step 은 파일에서 읽은 값과 비교한다.
             string fileDevice = KlarfValue(klarf, "DeviceID");
             string fileStep = KlarfValue(klarf, "StepID");
@@ -89,11 +89,11 @@ internal static class KlarfUploadFormSmoke
             Check("이미지 폴더 미지정 -> 찾음 0 / 15", Cell(grid, "colImages") == "0 / 15", Cell(grid, "colImages"));
             Check("KLARF Defect Grid 15행", defects.Rows.Count == 15, defects.Rows.Count.ToString());
             var d1 = (DACrux.Base.Defect)defects.Rows[0].Tag;
-            Check("Defect 1: KLARF Index (-1, 3) / X = Parser 값 / RoughBin 54 / 저장 Class 54 / 분류명 RDLshort / 이미지 없음",
+            Check("Defect 1: KLARF Index (-1, 3) / X = Parser 값 / Class 0 / 분류명 Unclassified (ClassLookup = CLASSNUMBER, KLARF 표준) / RoughBin 54 그대로 / 이미지 없음",
                 Cell(defects, 0, "colDefectId") == "1" && Cell(defects, 0, "colIndexX") == "-1" && Cell(defects, 0, "colIndexY") == "3"
                 && Cell(defects, 0, "colX") == d1.X.ToString("#,0.###", System.Globalization.CultureInfo.InvariantCulture)
-                && Math.Abs(d1.X + 23229.42) < 0.01 && Cell(defects, 0, "colRoughBin") == "54" && Cell(defects, 0, "colSaveClass") == "54"
-                && Cell(defects, 0, "colClassName") == "RDLshort" && Cell(defects, 0, "colImageFound") == "없음",
+                && Math.Abs(d1.X + 23229.42) < 0.01 && Cell(defects, 0, "colRoughBin") == "54" && Cell(defects, 0, "colClass") == "0"
+                && Cell(defects, 0, "colClassName") == "Unclassified" && Cell(defects, 0, "colImageFound") == "없음",
                 RowText(defects, 0));
             Check("Map 미리보기 Defect 15", map.Defects.Count == 15, map.Defects.Count.ToString());
             Check("저장 값 기본(KLARF Device / Step)", txtProduct.Text == fileDevice && ((TextBox)Get(type, form, "txtStepId")).Text == fileStep, txtProduct.Text + " / " + fileDevice);
@@ -107,15 +107,11 @@ internal static class KlarfUploadFormSmoke
             txtProduct.Text = fileDevice;
             Check("읽은 후 [DB 저장] 활성", save.Enabled, "");
 
-            // ---- 4) Defect Grid 선택 -> Map 강조 / 분류 기준 변경 -> 저장 Class 다시 계산 ----
+            // ---- 4) Defect Grid 선택은 Map 에 표시하지 않음(2026-10-14 기능 최소화) / 분류 기준 선택 없음, Map 색 = Class (2026-10-15 KLARF 표준) ----
             defects.Rows[0].Selected = true;
             Application.DoEvents();
-            Check("Defect 행 선택 -> Map 선택 강조 1건", map.SelectedDefect.Count == 1, map.SelectedDefect.Count.ToString());
-            cmb.SelectedIndex = 1; // FineBin
-            Application.DoEvents();
-            Check("분류 기준 FineBin -> MapType FINEBIN / 저장 Class = FineBin 1", map.MapType == DACrux.Base.MAP_TYPE.FINEBIN && Cell(defects, 0, "colSaveClass") == "1", map.MapType + " / " + Cell(defects, 0, "colSaveClass"));
-            cmb.SelectedIndex = 0;
-            Application.DoEvents();
+            Check("Defect 행 선택 -> Map 선택 강조 없음", map.SelectedDefect.Count == 0, map.SelectedDefect.Count.ToString());
+            Check("분류 기준 콤보 / 저장 Class 열 없음, Map 색 = CLASS", !HasField(type, "cmbClassSource") && !HasField(type, "colSaveClass") && map.MapType == DACrux.Base.MAP_TYPE.CLASS, map.MapType.ToString());
 
             // ---- 4-1) Map Setup 에 없는 Device -> [DB 저장] 오류 안내, 저장 안 함 (2026-10-13) ----
             // 서버 미리보기(BeginUpload)에서 INVALID 로 멈추고 작업 폴더를 지우므로 DB 는 바뀌지 않는다(사용자 데이터가 있어도 안전).
@@ -187,7 +183,7 @@ internal static class KlarfUploadFormSmoke
     private static string CheckUserData(string klarfPath)
     {
         var bsl = new DACrux.SEMDMS.BSL.KlarfUpload();
-        DataTable pv = bsl.BeginUpload(new string[] { "SCK", "SMOKE", Path.GetFileName(klarfPath), "", "", "", "ROUGHBIN" }, File.ReadAllBytes(klarfPath));
+        DataTable pv = bsl.BeginUpload(new string[] { "SCK", "SMOKE", Path.GetFileName(klarfPath), "", "", "", "" }, File.ReadAllBytes(klarfPath));
         string key = pv.Rows[0]["UPLOAD_KEY"].ToString();
         try
         {

@@ -1,5 +1,5 @@
 -- 2026-10-07: E-Test 결과 Data 테이블 (측정 항목 / Die / 측정값) + 파일 헤더 보강
--- 설계: 문서/2026-10-07_ETest_결과파일_Parsing_DB설계.md 10절
+-- 설계: 문서/설계/04_ETest/2026-10-07_ETest_결과파일_Parsing_DB설계.md 10절
 -- 선행: 2026-10-07_tqp_gds_src_file.sql (TQP_GDS_SRC_FILE) 적용 완료 상태여야 한다.
 -- 범위: E-Test 결과만. Limit (판정 기준) 은 Limit 설정 화면과 함께 나중에 설계한다.
 -- 적용: 미적용 (로컬 docker oracle19c DMSMGR 적용은 승인 후). 고객 DB 적용 여부는 별도 확인.

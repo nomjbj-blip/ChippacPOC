@@ -1,58 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!--
-  TQP_GDS_ET_ITEM: E-Test 측정 항목 마스터 (Device 단위). 2026-10-07 추가.
-  헤더 {PARA_NAME}[={COND_VALUE}]@{CHAIN_NAME}[:{CHAIN_NAME2}] 를 클라이언트가 나눠 보낸다. ITEM_NAME 은 원문 헤더.
+  TQP_GDS_ET_ITEM: E-Test 측정 항목 마스터. 2026-10-07 추가.
+  2026-10-14: 모든 행 = 등록 Parameter (Device + 공정 + 저장 이름, E-Test Para 설정에서만 등록, TEST_PROGRAM NOT NULL). ITEM_NAME = 저장 이름, HEADER_TEXT = 헤더 원문.
+  예전 업로드가 헤더 원문으로 만들던 CREATE_ET_ITEM(MergeEtItem)은 지웠다.
+  2026-10-14 Para 화면 재구성: GDS_CHAIN_NAME = Chain 1 의 GDS Setup Chain 이름(사용자 입력). 대표 Chain / GDS 연결 테이블 조인은 지웠다.
+    SELECT_ET_PARA_SETUP_LIST = E-Test Para 설정 화면(등록 + GDS Chain + Spec), UPDATE_ET_PARA = 사용 / 비고 / GDS Chain 저장.
+  같은 :이름 을 두 번 쓰지 않는다(Middleware 는 순서대로 바인딩) -> f1 / f2 / f3 처럼 이름을 나눴다.
   빈 값 숫자(TEST_NO / DISPLAY_ORDER)는 VarChar + TO_NUMBER 로 받아 NULL 로 저장한다.
 -->
 <queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
-    <query statement="Insert" queryid="CREATE_ET_ITEM" commandtype="Text" description="측정 항목 추가 (InsertExecuteMultiple, 번호는 시퀀스 ET_ITEM_SEQ)" commandtimeout="600">
-        <commandtext><![CDATA[INSERT INTO TQP_GDS_ET_ITEM
-    (ET_ITEM_SEQ,
-    FACTORY,
-    DEVICE_ID,
-    ITEM_NAME,
-    PARA_NAME,
-    COND_VALUE,
-    CHAIN_NAME,
-    CHAIN_NAME2,
-    UNIT,
-    TEST_NO,
-    DISPLAY_ORDER,
-    CREATE_USER,
-    CREATE_TIME,
-    UPDATE_USER,
-    UPDATE_TIME)
-VALUES
-    (ET_ITEM_SEQ.NEXTVAL,
-    :factory,
-    :device_id,
-    :item_name,
-    :para_name,
-    :cond_value,
-    :chain_name,
-    :chain_name2,
-    :unit,
-    TO_NUMBER(:test_no),
-    TO_NUMBER(:display_order),
-    :create_user,
-    SYSDATE,
-    :update_user,
-    SYSDATE)]]></commandtext>
-        <parameters>
-            <param direction="Input" dbtype="VarChar" size="120">:factory</param>
-            <param direction="Input" dbtype="VarChar" size="200">:device_id</param>
-            <param direction="Input" dbtype="VarChar" size="800">:item_name</param>
-            <param direction="Input" dbtype="VarChar" size="200">:para_name</param>
-            <param direction="Input" dbtype="VarChar" size="80">:cond_value</param>
-            <param direction="Input" dbtype="VarChar" size="256">:chain_name</param>
-            <param direction="Input" dbtype="VarChar" size="256">:chain_name2</param>
-            <param direction="Input" dbtype="VarChar" size="40">:unit</param>
-            <param direction="Input" dbtype="VarChar" size="20">:test_no</param>
-            <param direction="Input" dbtype="VarChar" size="20">:display_order</param>
-            <param direction="Input" dbtype="VarChar" size="30">:create_user</param>
-            <param direction="Input" dbtype="VarChar" size="30">:update_user</param>
-        </parameters>
-    </query>
     <query statement="Select" queryid="SELECT_ET_ITEM" commandtype="Text" description="Device 의 측정 항목 목록 (등록 순)" commandtimeout="60">
         <commandtext><![CDATA[SELECT ET_ITEM_SEQ, ITEM_NAME, PARA_NAME, COND_VALUE, CHAIN_NAME, CHAIN_NAME2, UNIT, TEST_NO, DISPLAY_ORDER
   FROM TQP_GDS_ET_ITEM
@@ -85,40 +41,53 @@ VALUES
             <param direction="Input" dbtype="VarChar" size="120">:factory</param>
         </parameters>
     </query>
-    <query statement="Select" queryid="SELECT_ET_PARA_LIST" commandtype="Text" description="Para Setup: Device + 공정의 등록 Parameter + 대표 Chain / GDS Chain + Spec 요약 + 값 있는 파일 수. Spec 은 새 키(ITEM_NAME)와 예전 키(헤더 원문 대문자)를 둘 다 본다 (2026-10-14)" commandtimeout="120">
+    <query statement="Select" queryid="SELECT_ET_PARA_LIST" commandtype="Text" description="등록 Parameter 목록 + GDS Chain(Chain 1, 사용자 입력) + Spec 요약 + 값 있는 파일 수 (업로드 계획 / 조회 창). 2026-10-14 대표 Chain 조인 삭제" commandtimeout="120">
         <commandtext><![CDATA[SELECT I.ET_ITEM_SEQ, I.ITEM_NAME, I.HEADER_TEXT, I.MEAS_TYPE, I.PARA_NAME, I.COND_VALUE, I.CHAIN_NAME, I.CHAIN_NAME2,
-       I.FORCE_LEG, I.FORCE_LEG2, I.CHAIN_TYPE, I.UNIT, I.TEST_NO, I.DISPLAY_ORDER, I.USE_FLAG, I.REG_SOURCE, I.REG_FILE_NAME, I.REMARK,
-       R1.REP_CHAIN_NAME AS REP_CHAIN_NAME, R2.REP_CHAIN_NAME AS REP_CHAIN_NAME2,
-       NVL(V1.CHAIN_NAME, L1.GDS_CHAIN_NAME) AS GDS_CHAIN_NAME, NVL(V2.CHAIN_NAME, L2.GDS_CHAIN_NAME) AS GDS_CHAIN_NAME2,
-       CASE WHEN SN.ITEM_NAME IS NOT NULL OR SO.ITEM_NAME IS NOT NULL THEN 'Y' ELSE 'N' END AS HAS_SPEC,
-       CASE WHEN SN.ITEM_NAME IS NOT NULL THEN SN.LOWER_LIMIT ELSE SO.LOWER_LIMIT END AS LOWER_LIMIT,
-       CASE WHEN SN.ITEM_NAME IS NOT NULL THEN SN.UPPER_LIMIT ELSE SO.UPPER_LIMIT END AS UPPER_LIMIT,
-       CASE WHEN SN.ITEM_NAME IS NOT NULL THEN SN.ENABLE_FLAG ELSE SO.ENABLE_FLAG END AS ENABLE_FLAG,
+       I.FORCE_LEG, I.FORCE_LEG2, I.CHAIN_TYPE, I.UNIT, I.TEST_NO, I.DISPLAY_ORDER, I.USE_FLAG, I.REG_SOURCE, I.REG_FILE_NAME, I.REMARK, I.GDS_CHAIN_NAME,
+       CASE WHEN SN.ITEM_NAME IS NOT NULL THEN 'Y' ELSE 'N' END AS HAS_SPEC,
+       SN.LOWER_LIMIT, SN.UPPER_LIMIT, SN.ENABLE_FLAG,
        (SELECT COUNT(DISTINCT V.SRC_FILE_SEQ) FROM TQP_GDS_ET_VALUE V WHERE V.ET_ITEM_SEQ = I.ET_ITEM_SEQ) AS FILE_COUNT,
        NVL(I.UPDATE_USER, I.CREATE_USER) AS UPDATE_USER, NVL(I.UPDATE_TIME, I.CREATE_TIME) AS UPDATE_TIME
   FROM TQP_GDS_ET_ITEM I
-  LEFT JOIN TQP_GDS_ET_REP_CHAIN R1 ON R1.FACTORY = I.FACTORY AND R1.DEVICE_ID = :g1 AND R1.TERMINAL_NAME = I.CHAIN_NAME
-  LEFT JOIN TQP_GDS_ET_REP_CHAIN R2 ON R2.FACTORY = I.FACTORY AND R2.DEVICE_ID = :g2 AND R2.TERMINAL_NAME = I.CHAIN_NAME2
-  LEFT JOIN TQP_GDS_ET_CHAIN_LINK L1 ON L1.FACTORY = R1.FACTORY AND L1.DEVICE_ID = R1.DEVICE_ID AND L1.REP_CHAIN_NAME = R1.REP_CHAIN_NAME
-  LEFT JOIN TQP_GDS_ET_CHAIN_LINK L2 ON L2.FACTORY = R2.FACTORY AND L2.DEVICE_ID = R2.DEVICE_ID AND L2.REP_CHAIN_NAME = R2.REP_CHAIN_NAME
-  LEFT JOIN TQP_GDS_CHAIN_VER V1 ON V1.FACTORY = L1.FACTORY AND V1.DEVICE_ID = L1.DEVICE_ID AND V1.CHAIN_SEQ = L1.CHAIN_SEQ AND V1.IS_CURRENT = 1
-  LEFT JOIN TQP_GDS_CHAIN_VER V2 ON V2.FACTORY = L2.FACTORY AND V2.DEVICE_ID = L2.DEVICE_ID AND V2.CHAIN_SEQ = L2.CHAIN_SEQ AND V2.IS_CURRENT = 1
   LEFT JOIN TQP_GDS_ET_LIMIT SN ON SN.FACTORY = I.FACTORY AND SN.DEVICE_ID = I.DEVICE_ID AND SN.TEST_PROGRAM = I.TEST_PROGRAM AND SN.ITEM_NAME = I.ITEM_NAME
-  LEFT JOIN TQP_GDS_ET_LIMIT SO ON SO.FACTORY = I.FACTORY AND SO.DEVICE_ID = I.DEVICE_ID AND SO.TEST_PROGRAM = I.TEST_PROGRAM AND SO.ITEM_NAME = UPPER(I.HEADER_TEXT)
  WHERE I.FACTORY = :factory
    AND I.DEVICE_ID = :device_id
    AND I.TEST_PROGRAM = :test_program
  ORDER BY I.DISPLAY_ORDER, I.ITEM_NAME]]></commandtext>
         <parameters>
-            <param direction="Input" dbtype="VarChar" size="200">:g1</param>
-            <param direction="Input" dbtype="VarChar" size="200">:g2</param>
             <param direction="Input" dbtype="VarChar" size="120">:factory</param>
             <param direction="Input" dbtype="VarChar" size="200">:device_id</param>
             <param direction="Input" dbtype="VarChar" size="200">:test_program</param>
         </parameters>
     </query>
+    <query statement="Select" queryid="SELECT_ET_PARA_SETUP_LIST" commandtype="Text" description="Para 설정 화면: 등록 Parameter + GDS Chain + Spec (2026-10-14, 같은 날 값 통계 열은 화면에서 쓰지 않아 삭제)" commandtimeout="120">
+        <commandtext><![CDATA[WITH L AS (SELECT S.ITEM_NAME, S.LOWER_LIMIT, S.UPPER_LIMIT, S.ENABLE_FLAG, S.UNIT, S.SPEC_TEXT,
+                  NVL(S.UPDATE_USER, S.CREATE_USER) AS SPEC_USER, NVL(S.UPDATE_TIME, S.CREATE_TIME) AS SPEC_TIME
+             FROM TQP_GDS_ET_LIMIT S
+            WHERE S.FACTORY = :f1 AND S.DEVICE_ID = :d1 AND S.TEST_PROGRAM = :t1)
+SELECT I.ET_ITEM_SEQ, I.ITEM_NAME, I.HEADER_TEXT, I.MEAS_TYPE, I.PARA_NAME, I.COND_VALUE, I.CHAIN_NAME, I.CHAIN_NAME2,
+       I.UNIT AS ITEM_UNIT, I.TEST_NO, I.DISPLAY_ORDER, I.USE_FLAG, I.REG_SOURCE, I.REG_FILE_NAME, I.REMARK, I.GDS_CHAIN_NAME,
+       CASE WHEN L.ITEM_NAME IS NOT NULL THEN 'Y' ELSE 'N' END AS HAS_SPEC,
+       L.LOWER_LIMIT, L.UPPER_LIMIT, L.ENABLE_FLAG, NVL(L.UNIT, I.UNIT) AS UNIT, L.SPEC_TEXT,
+       CASE WHEN L.SPEC_TIME > NVL(I.UPDATE_TIME, I.CREATE_TIME) THEN L.SPEC_USER ELSE NVL(I.UPDATE_USER, I.CREATE_USER) END AS UPDATE_USER,
+       GREATEST(NVL(I.UPDATE_TIME, I.CREATE_TIME), NVL(L.SPEC_TIME, NVL(I.UPDATE_TIME, I.CREATE_TIME))) AS UPDATE_TIME
+  FROM TQP_GDS_ET_ITEM I
+  LEFT JOIN L ON L.ITEM_NAME = I.ITEM_NAME
+ WHERE I.FACTORY = :f2
+   AND I.DEVICE_ID = :d2
+   AND I.TEST_PROGRAM = :t2
+ ORDER BY I.DISPLAY_ORDER, I.ITEM_NAME]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="120">:f1</param>
+            <param direction="Input" dbtype="VarChar" size="200">:d1</param>
+            <param direction="Input" dbtype="VarChar" size="200">:t1</param>
+            <param direction="Input" dbtype="VarChar" size="120">:f2</param>
+            <param direction="Input" dbtype="VarChar" size="200">:d2</param>
+            <param direction="Input" dbtype="VarChar" size="200">:t2</param>
+        </parameters>
+    </query>
     <query statement="Select" queryid="SELECT_ET_PARA_BY_PROGRAM" commandtype="Text" description="Para 등록 검사: Device + 공정의 등록 Parameter 이름 / 원문 / 단위 (2026-10-14)" commandtimeout="60">
-        <commandtext><![CDATA[SELECT ET_ITEM_SEQ, ITEM_NAME, HEADER_TEXT, UNIT
+        <commandtext><![CDATA[SELECT ET_ITEM_SEQ, ITEM_NAME, HEADER_TEXT, UNIT, USE_FLAG
   FROM TQP_GDS_ET_ITEM
  WHERE FACTORY = :factory
    AND DEVICE_ID = :device_id
@@ -203,10 +172,11 @@ VALUES
             <param direction="Input" dbtype="VarChar" size="30">:update_user</param>
         </parameters>
     </query>
-    <query statement="Update" queryid="UPDATE_ET_PARA" commandtype="Text" description="Parameter 사용 여부 / 비고 저장 (2026-10-14)" commandtimeout="60">
+    <query statement="Update" queryid="UPDATE_ET_PARA" commandtype="Text" description="Para 설정 저장: 사용 여부 / 비고 / GDS Chain (수정된 행만, UpdateExecuteMultiple 1회, 2026-10-14)" commandtimeout="300">
         <commandtext><![CDATA[UPDATE TQP_GDS_ET_ITEM
    SET USE_FLAG = :use_flag,
        REMARK = :remark,
+       GDS_CHAIN_NAME = :gds_chain_name,
        UPDATE_USER = :update_user,
        UPDATE_TIME = SYSDATE
  WHERE FACTORY = :factory
@@ -216,29 +186,60 @@ VALUES
         <parameters>
             <param direction="Input" dbtype="VarChar" size="4">:use_flag</param>
             <param direction="Input" dbtype="VarChar" size="800">:remark</param>
-            <param direction="Input" dbtype="VarChar" size="30">:update_user</param>
+            <param direction="Input" dbtype="VarChar" size="800">:gds_chain_name</param>
+            <param direction="Input" dbtype="VarChar" size="120">:update_user</param>
             <param direction="Input" dbtype="VarChar" size="120">:factory</param>
             <param direction="Input" dbtype="VarChar" size="200">:device_id</param>
             <param direction="Input" dbtype="VarChar" size="200">:test_program</param>
             <param direction="Input" dbtype="VarChar" size="800">:item_name</param>
         </parameters>
     </query>
-    <query statement="Select" queryid="SELECT_ET_PARA_VALUE_COUNT" commandtype="Text" description="Parameter 삭제 전 확인: 저장된 측정값 수 (2026-10-14)" commandtimeout="60">
-        <commandtext><![CDATA[SELECT COUNT(*) AS VALUE_COUNT
+    <query statement="Select" queryid="SELECT_ET_GDS_SETUP_CHAIN" commandtype="Text" description="Para 설정 오른쪽 목록: GDS Device 의 Setup Chain (ACTIVE + 현재 READY 버전) (2026-10-14, 대표 Chain XML 에서 옮김)" commandtimeout="60">
+        <commandtext><![CDATA[SELECT C.CHAIN_SEQ, C.CHAIN_CODE, V.CHAIN_NAME
+  FROM TQP_GDS_CHAIN C
+  JOIN TQP_GDS_CHAIN_VER V ON V.FACTORY = C.FACTORY AND V.DEVICE_ID = C.DEVICE_ID AND V.CHAIN_SEQ = C.CHAIN_SEQ AND V.IS_CURRENT = 1
+ WHERE C.FACTORY = :factory
+   AND C.DEVICE_ID = :device_id
+   AND C.CHAIN_STATUS = 'ACTIVE'
+   AND V.VERSION_STATUS = 'READY'
+ ORDER BY V.CHAIN_NAME, C.CHAIN_CODE]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="120">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="200">:device_id</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ET_PARA_BY_GDS_CHAIN" commandtype="Text" description="인계 API GetEtChainSpecInfo: GDS Chain 이름(대소문자 무시)을 GDS Chain 으로 넣은 모든 공정 등록 Parameter + Spec. Device = GDS Device 와 이름이 같은(대소문자 무시) E-Test Device (2026-10-15 Sub Device 연결 제거)" commandtimeout="120">
+        <commandtext><![CDATA[SELECT I.DEVICE_ID, I.TEST_PROGRAM, I.ITEM_NAME, I.HEADER_TEXT, I.CHAIN_NAME, I.CHAIN_NAME2, I.GDS_CHAIN_NAME, I.UNIT, I.USE_FLAG,
+       CASE WHEN SN.ITEM_NAME IS NOT NULL THEN 'Y' ELSE 'N' END AS HAS_SPEC,
+       SN.LOWER_LIMIT, SN.UPPER_LIMIT, SN.ENABLE_FLAG, SN.SPEC_TEXT
+  FROM TQP_GDS_ET_ITEM I
+  LEFT JOIN TQP_GDS_ET_LIMIT SN ON SN.FACTORY = I.FACTORY AND SN.DEVICE_ID = I.DEVICE_ID AND SN.TEST_PROGRAM = I.TEST_PROGRAM AND SN.ITEM_NAME = I.ITEM_NAME
+ WHERE I.FACTORY = :factory
+   AND I.TEST_PROGRAM IS NOT NULL
+   AND UPPER(I.DEVICE_ID) = UPPER(:device_id)
+   AND UPPER(I.GDS_CHAIN_NAME) = UPPER(:gds_chain_name)
+ ORDER BY I.TEST_PROGRAM, I.DISPLAY_ORDER, I.ITEM_NAME]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="120">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="200">:device_id</param>
+            <param direction="Input" dbtype="VarChar" size="800">:gds_chain_name</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ET_PARA_VALUE_COUNTS" commandtype="Text" description="Parameter 삭제 전 확인: Device + 공정에서 측정값이 저장된 Parameter 와 값 수 (한 번에 조회, 2026-10-14)" commandtimeout="120">
+        <commandtext><![CDATA[SELECT I.ITEM_NAME, COUNT(*) AS VALUE_COUNT
   FROM TQP_GDS_ET_ITEM I
   JOIN TQP_GDS_ET_VALUE V ON V.ET_ITEM_SEQ = I.ET_ITEM_SEQ
  WHERE I.FACTORY = :factory
    AND I.DEVICE_ID = :device_id
    AND I.TEST_PROGRAM = :test_program
-   AND I.ITEM_NAME = :item_name]]></commandtext>
+ GROUP BY I.ITEM_NAME]]></commandtext>
         <parameters>
             <param direction="Input" dbtype="VarChar" size="120">:factory</param>
             <param direction="Input" dbtype="VarChar" size="200">:device_id</param>
             <param direction="Input" dbtype="VarChar" size="200">:test_program</param>
-            <param direction="Input" dbtype="VarChar" size="800">:item_name</param>
         </parameters>
     </query>
-    <query statement="Delete" queryid="DELETE_ET_PARA" commandtype="Text" description="등록 Parameter 삭제 (측정값이 없을 때만, 2026-10-14)" commandtimeout="60">
+    <query statement="Delete" queryid="DELETE_ET_PARA" commandtype="Text" description="등록 Parameter 삭제 (측정값이 없을 때만, DeleteExecuteMultiple 1회, 2026-10-14)" commandtimeout="300">
         <commandtext><![CDATA[DELETE FROM TQP_GDS_ET_ITEM
  WHERE FACTORY = :factory
    AND DEVICE_ID = :device_id

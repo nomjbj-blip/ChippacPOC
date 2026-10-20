@@ -13,7 +13,7 @@ using System.Windows.Forms;
 namespace NexplantQMS.GdsMap
 {
     /// <summary>
-    /// GDS Map Setup 화면의 "DB 저장" 기능이다. (설계: 문서/2026-10-02_GDS_Map_DB저장_설계.md 7절 / 20절)
+    /// GDS Map Setup 화면의 "DB 저장" 기능이다. (설계: 문서/설계/02_GDS/2026-10-02_GDS_Map_DB저장_설계.md 7절 / 20절)
     /// 화면에 읽은 GDS 중 Layer 목록에서 체크된(화면에 그려진) Layer의 LAYER / 화면 배치 도형 PLACED를
     /// DMS Service(RO GdsMapImport)로 나눠 보내고,
     /// 마지막에 서버가 DB 건수를 다시 세어 확정(READY)한다. DB 접속은 Service(Miracom.Middleware)만 사용한다.
@@ -57,7 +57,8 @@ namespace NexplantQMS.GdsMap
         private void SetDbSaveRunning(bool running)
         {
             button1.Enabled = !running;
-            btnLayer.Enabled = !running;
+            // 저장 중 Cell 을 바꾸면 저장 중인 도형과 화면 도형이 달라진다 (2026-10-20)
+            cboTopCell.Enabled = !running && cboTopCell.Items.Count > 1;
             btnLayerCheckAll.Enabled = !running;
             btnLayerCheckNone.Enabled = !running;
             chkLayerItems.Enabled = !running;
@@ -69,6 +70,11 @@ namespace NexplantQMS.GdsMap
             {
                 progressMapLoad.Style = ProgressBarStyle.Continuous;
                 progressMapLoad.Value = 0;
+                MapBusy.Start();
+            }
+            else
+            {
+                MapBusy.Stop();
             }
         }
 
@@ -103,7 +109,8 @@ namespace NexplantQMS.GdsMap
 
             // 1-1) 저장 Layer: 지금 체크된 Layer를 복사해 저장 도중 체크가 바뀌어도 예상 건수와 실제 전송이 같게 한다.
             var layerItems = map.GetLayerDisplayItems();
-            var saveLayerIds = new HashSet<int>(layerItems.Where(item => item.Visible).Select(item => item.LayerId));
+            // 저장 Layer 는 Layer 키(번호 + DataType). 18/0 만 저장하고 18/3 Label 은 빼는 식으로 고를 수 있다 (2026-10-20)
+            var saveLayerIds = new HashSet<int>(layerItems.Where(item => item.Visible).Select(item => item.LayerKey));
             if (saveLayerIds.Count == 0)
             {
                 MessageBox.Show(this, "저장할 Layer가 없습니다. Layer 목록에서 저장할 Layer를 체크하세요.", "DB 저장",
@@ -118,10 +125,6 @@ namespace NexplantQMS.GdsMap
             string user = Environment.UserName;
             _dbSaveCancel = new CancellationTokenSource();
             CancellationToken token = _dbSaveCancel.Token;
-            var watch = System.Diagnostics.Stopwatch.StartNew();
-            // 구간별 시간: 어디서 시간이 걸리는지 완료 창에서 바로 보기 위한 측정(2026-10-06 요청)
-            var timing = new DbSaveTiming();
-            var phase = System.Diagnostics.Stopwatch.StartNew();
             string jobSeq = null;
             SetDbSaveRunning(true);
             try
@@ -134,86 +137,61 @@ namespace NexplantQMS.GdsMap
                 string path = _dbSaveGdsPath;
                 // 원본 파일 SHA-256 은 계산하지 않는다 (2026-10-06 요청). 재등록 확인창의 같은 파일 표시에만 쓰였다.
                 DataTable existing = await Task.Run(() => service.GetMapInfo(factory, deviceId));
-                timing.CheckMs = phase.ElapsedMilliseconds;
                 if (existing.Rows.Count > 0)
                 {
-                    phase.Restart();
                     bool delete = AskDeleteExistingMap(existing.Rows[0], factory, deviceId);
-                    timing.AskMs = phase.ElapsedMilliseconds;
                     if (!delete)
                     {
                         SetDbSaveStatus("DB 저장 취소 (기존 데이터 유지)", 0);
                         return;
                     }
                     SetDbSaveStatus("기존 데이터 삭제 중", 0);
-                    phase.Restart();
                     await Task.Run(() => service.DeleteMap(factory, deviceId, user));
-                    timing.DeleteMs = phase.ElapsedMilliseconds;
                 }
 
                 // 3) 예상 건수. 서버가 확정 시 DB 건수와 비교한다.
-                phase.Restart();
                 long placedCount = 0, pointCount = 0;
                 map.VisitPlacedElements(saveLayerIds, d => { placedCount++; pointCount += d.WorldPoints.Length; });
 
                 // 4) 저장 시작. 5번째(예전 GDS SHA-256 자리)와 9번째(예전 원본 행 수 자리) 빈 값은 서버가 무시한다.
+                // 단위는 µm 로 바꾸기 전 파일 UNITS 원값을 보낸다(보통 0.001 / 1E-9). 좌표는 이미 µm 다 (2026-10-16)
                 string[] info = {
                     factory, deviceId, map.Structure.Name, Path.GetFileName(path), string.Empty,
-                    library.UserUnit.ToString("G17", CultureInfo.InvariantCulture),
-                    library.DatabaseUnit.ToString("G17", CultureInfo.InvariantCulture), user,
+                    library.FileUserUnit.ToString("G17", CultureInfo.InvariantCulture),
+                    library.FileDatabaseUnit.ToString("G17", CultureInfo.InvariantCulture), user,
                     string.Empty, placedCount.ToString(CultureInfo.InvariantCulture),
                     pointCount.ToString(CultureInfo.InvariantCulture), "FRONT" };
                 DataTable job = await Task.Run(() => service.BeginMapImport(info));
                 jobSeq = job.Rows[0]["IMPORT_JOB_SEQ"].ToString();
-                timing.BeginMs = phase.ElapsedMilliseconds;
                 long totalBatches = 1 + (placedCount + DbSaveBatchRows - 1) / DbSaveBatchRows;
                 long sentBatches = 0;
 
                 // 5) LAYER: 저장 Layer만(PLACED FK 대상).
                 token.ThrowIfCancellationRequested();
-                phase.Restart();
-                var colors = layerItems.Where(item => saveLayerIds.Contains(item.LayerId))
-                    .ToDictionary(item => item.LayerId, item => item.Color.ToArgb());
-                string[,] layerRows = GdsMapLayerRowBuilder.BuildLayerRows(colors.OrderBy(pair => pair.Key).ToList());
+                var colors = layerItems.Where(item => saveLayerIds.Contains(item.LayerKey))
+                    .ToDictionary(item => item.LayerKey, item => item.Color.ToArgb());
+                string[,] layerRows = GdsMapLayerRowBuilder.BuildLayerKeyRows(colors.OrderBy(pair => pair.Key).ToList());
                 await Task.Run(() => service.CreateLayerBatch(jobSeq, 0, layerRows, user));
-                timing.LayerMs = phase.ElapsedMilliseconds;
                 SetDbSaveStatus("LAYER 저장 완료", ++sentBatches * 100 / totalBatches);
 
                 // 6) PLACED: 저장 Layer의 화면 배치 도형. UI 스레드에서 한 배치만 복사하고 서버 응답을 기다린 뒤 다음 배치를 만든다.
-                //    전체 - 행 생성 - Service 호출 = UI 스레드 배치 복사 / 대기 시간
-                var build = new System.Diagnostics.Stopwatch();
-                var call = new System.Diagnostics.Stopwatch();
-                long placedBatches = 0;
-                phase.Restart();
                 await map.VisitPlacedElementBatchesAsync(saveLayerIds, async batch =>
                 {
                     long no = batch.BatchNo;
-                    build.Start();
                     string[,] rows = await Task.Run(() => GdsMapPlacedRowBuilder.BuildRows(batch.Elements));
-                    build.Stop();
-                    call.Start();
                     await Task.Run(() => service.CreatePlacedBatch(jobSeq, no, rows, user));
-                    call.Stop();
-                    placedBatches++;
                     SetDbSaveStatus("도형 저장 " + (no + 1) + "배치", ++sentBatches * 100 / totalBatches);
                 }, DbSaveBatchRows, 8L * 1024 * 1024, token);
-                timing.PlacedMs = phase.ElapsedMilliseconds;
-                timing.PlacedBuildMs = build.ElapsedMilliseconds;
-                timing.PlacedCallMs = call.ElapsedMilliseconds;
-                timing.PlacedBatches = placedBatches;
 
                 // 7) 확정: 서버가 DB 건수를 다시 확인한다.
                 SetDbSaveStatus("저장 확정 중", 100);
                 string finalSeq = jobSeq;
-                phase.Restart();
                 DataRow result = (await Task.Run(() => service.CompleteMapImport(finalSeq, user))).Rows[0];
-                timing.CompleteMs = phase.ElapsedMilliseconds;
                 bool ok = result["RESULT"].ToString() == "OK";
                 string message = "Factory " + factory + " / Device " + deviceId + " / 작업 번호(IMPORT_JOB_SEQ) " + jobSeq + "\r\n"
                     + "저장 Layer " + saveLayerIds.Count + " / " + layerItems.Count + "개\r\n"
                     + "도형 " + result["DB_PLACED"] + " / 좌표 " + result["DB_POINT"] + "\r\n"
-                    + "소요 " + watch.Elapsed.TotalSeconds.ToString("0.0") + "초 (삭제 확인 창 대기 " + Sec(timing.AskMs) + "초 포함)\r\n"
-                    + result["MESSAGE"] + "\r\n\r\n" + timing.ToText();
+                    + result["MESSAGE"];
                 SetDbSaveStatus(ok ? "DB 저장 완료 / " + factory + " / " + deviceId : "DB 저장 확인 필요 / " + result["MESSAGE"], 100);
                 MessageBox.Show(this, message, ok ? "DB 저장 완료" : "DB 저장 건수 불일치", MessageBoxButtons.OK,
                     ok ? MessageBoxIcon.Information : MessageBoxIcon.Warning);
@@ -262,10 +240,10 @@ namespace NexplantQMS.GdsMap
         private bool AskSaveSelectedLayers(IList<LayerDisplayItem> layerItems, ISet<int> saveLayerIds)
         {
             const int maxShown = 30;
-            List<int> excluded = layerItems.Select(item => item.LayerId).Where(id => !saveLayerIds.Contains(id)).OrderBy(id => id).ToList();
-            string excludedText = String.Join(", ", excluded.Take(maxShown)) + (excluded.Count > maxShown ? " 외 " + (excluded.Count - maxShown) + "개" : "");
+            List<int> excluded = layerItems.Select(item => item.LayerKey).Where(id => !saveLayerIds.Contains(id)).OrderBy(id => id).ToList();
+            string excludedText = String.Join(", ", excluded.Take(maxShown).Select(GdsLayerKey.Format)) + (excluded.Count > maxShown ? " 외 " + (excluded.Count - maxShown) + "개" : "");
             string text = "전체 " + layerItems.Count + "개 Layer 중 체크된 " + saveLayerIds.Count + "개 Layer만 저장합니다.\r\n\r\n"
-                + "저장: " + String.Join(", ", saveLayerIds.OrderBy(id => id)) + "\r\n"
+                + "저장: " + String.Join(", ", saveLayerIds.OrderBy(id => id).Select(GdsLayerKey.Format)) + "\r\n"
                 + "제외: " + excludedText + "\r\n\r\n"
                 + "제외한 Layer는 조회 화면과 Chain에서 사용할 수 없습니다.\r\n"
                 + "나중에 필요하면 삭제 후 다시 등록해야 하며, 이때 Chain 설정도 함께 삭제됩니다.\r\n\r\n"
@@ -312,33 +290,6 @@ namespace NexplantQMS.GdsMap
             lblMapStatus.Text = text;
             progressMapLoad.Value = (int)Math.Max(progressMapLoad.Minimum, Math.Min(progressMapLoad.Maximum, percent));
             statusStripMap.Refresh();
-        }
-
-        /// <summary>밀리초를 "0.0" 초 문자열로 바꾼다.</summary>
-        private static string Sec(long ms)
-        {
-            return (ms / 1000.0).ToString("0.0", CultureInfo.InvariantCulture);
-        }
-
-        /// <summary>
-        /// DB 저장 구간별 시간(밀리초). 완료 창에 표시해 어디서 시간이 걸리는지 바로 보게 한다.
-        /// Service 호출 시간 = Remoting 직렬화 / 전송 + 서버 BSL + DB Insert(DB 대기 포함).
-        /// </summary>
-        private sealed class DbSaveTiming
-        {
-            public long CheckMs, AskMs, DeleteMs, BeginMs, LayerMs;
-            public long PlacedMs, PlacedBuildMs, PlacedCallMs, PlacedBatches;
-            public long CompleteMs;
-
-            public string ToText()
-            {
-                return "[구간별 시간]\r\n"
-                    + "기존 데이터 확인 " + Sec(CheckMs) + "초 / 기존 데이터 삭제 " + Sec(DeleteMs) + "초\r\n"
-                    + "건수 계산 + 저장 시작 " + Sec(BeginMs) + "초 / LAYER " + Sec(LayerMs) + "초\r\n"
-                    + "도형 " + Sec(PlacedMs) + "초 (" + PlacedBatches + "배치 / Service 호출 " + Sec(PlacedCallMs)
-                    + "초 / 행 생성 " + Sec(PlacedBuildMs) + "초 / 배치 복사 " + Sec(PlacedMs - PlacedCallMs - PlacedBuildMs) + "초)\r\n"
-                    + "저장 확정(DB 건수 확인) " + Sec(CompleteMs) + "초";
-            }
         }
     }
 }

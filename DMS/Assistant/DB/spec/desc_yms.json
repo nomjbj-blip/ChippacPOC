@@ -1,0 +1,1889 @@
+{
+ "tables": {
+  "TQP_LOT": {
+   "desc": "YMS Test Lot 정보 (Factory + TestArea + Lot + Program 당 1건)",
+   "basis": "소스",
+   "used_by": "CP / PCM / AVI DataService 적재, E-Test 업로드 YMS 적재, TEST Data Maint, TEST Analysis 조회 조건, RPNet TSK Map 생성"
+  },
+  "TQP_WAFER": {
+   "desc": "YMS Test Wafer 정보 (Wafer 1회 측정 = 1건, 재측정은 PROBE_CNT 로 구분)",
+   "basis": "소스",
+   "used_by": "CP / PCM / AVI DataService 적재, E-Test 업로드 YMS 적재, Scope 수동 업로드, TEST Data Maint, Param Analysis / Test Report 조회, RPNet TSK Map 생성"
+  },
+  "TQP_WAFER_SUM": {
+   "desc": "Wafer 별 Test 요약 (수율 / Bin 별 Die 수, 분석 화면 Wafer 목록)",
+   "basis": "소스",
+   "used_by": "적재 후 요약 생성 (TestCommon.SummaryData), TEST Analysis Wafer 선택 목록, Yield / Wafer Cum / Wafer Bin Report, Map Control Update, DMS Defect-Test 매칭"
+  },
+  "TQP_LOT_SUM": {
+   "desc": "Lot 별 Test 요약 (Wafer 요약을 Lot 으로 집계)",
+   "basis": "소스",
+   "used_by": "적재 후 요약 생성 (TestCommon.SummaryData), Wafer 삭제 후 재생성 (TestDataMaint), Lot 목록 조회 (DataSelect.GetLotList)"
+  },
+  "TQP_PROGRAM": {
+   "desc": "Test Program 정보 (Program 별 TestArea / Device)",
+   "basis": "소스",
+   "used_by": "적재 때 자동 등록 (TestCommon.InsertProgramInfo), TestArea / Program 조회 조건 목록, Program Define, Standard Report"
+  },
+  "TQP_PRODUCT": {
+   "desc": "Wafer Map 별 Product 관리 (Product 와 Map ID 연결)",
+   "basis": "원본 정의서",
+   "used_by": "적재 때 자동 등록 (TestCommon.InsertProductInfo), Device 조회 조건, Wafer 조회 (SELECT_WAFER_INFO_05 / 06), YMS MAP Parser"
+  },
+  "TQP_DATA_TABLES": {
+   "desc": "Program 별 Die 측정 데이터 테이블(TD_*) 목록",
+   "basis": "소스",
+   "used_by": "TD 테이블 생성 때 등록 (TD_TABLE.CreateNewTable), Wafer 데이터 조회 / 삭제 때 TD 테이블 찾기"
+  },
+  "TQP_PARASPEC": {
+   "desc": "Program 별 Parameter 정의와 Spec (TD 테이블 컬럼 목록 겸용)",
+   "basis": "소스",
+   "used_by": "TD 컬럼 자동 등록 (TD_TABLE), Program Parameter Spec Define, Map View / Param Analysis / PCM Report Spec 표시, E-Test LSL / USL 보정"
+  },
+  "TQP_BINDESC": {
+   "desc": "Program 별 Bin 정의 (Bin 이름 / 양품 여부 / Map 색)",
+   "basis": "소스",
+   "used_by": "Bin Define (frmSetupBin), 요약 수율 Good Bin, Map Bin 색 / 분포, E-Test YMS 적재 Bin 등록, DMS Defect-Test 매칭"
+  },
+  "TQP_MAPDEF": {
+   "desc": "Wafer Map 기준 정보 (Map ID 별 Wafer / Die 크기 / 원점 / 방향)",
+   "basis": "원본 정의서",
+   "used_by": "Map Define, File Map Setup, Wafer Map View, TEST Map 그리기, Wafer 요약 NETDIE, KLARF 업로드 Map 기준, RPNet TSK Map 생성"
+  },
+  "TQP_MAPDEF_DIE": {
+   "desc": "Map 정의 Die / Shot 위치 (Mark Die 표시 / Shot Map 용)",
+   "basis": "소스",
+   "used_by": "TEST Map View / Map Edit Mark Die 표시, Shot Map View, DMS Defect Map (GET_MAPDEF_DIE_DM)"
+  },
+  "TQP_USEMAP": {
+   "desc": "Map 의 Die 목록 (Die Index / 사용 구분)",
+   "basis": "소스",
+   "used_by": "Map Define / File Map Setup 저장 (CreateUseMap), Wafer Map View, KLARF 업로드 Map 기준, AVI Map 조회"
+  },
+  "TQP_MAPCFG": {
+   "desc": "Map 좌표 보정 설정 (TestArea + Device + Program 별 방향 / 회전 / 이동)",
+   "basis": "소스",
+   "used_by": "Map Control 저장 (ProbeMapAnalysis), Map Control Update (frmMapConfigUpdate), CP 적재 좌표 보정 (GetCorrectionData)"
+  },
+  "TQP_CHANGE_HIS": {
+   "desc": "YMS Test 데이터 수정 / 삭제 이력",
+   "basis": "소스",
+   "used_by": "TEST Data Maint (frmTestDataMaint) 변경 이력 기록 / 조회"
+  },
+  "TQP_PCM_INPUT_HIS": {
+   "desc": "PCM 설비 Probe Card / 작업자 입력 이력",
+   "basis": "소스",
+   "used_by": "PCM Equip Status (frmPcmEquipStatus) 입력 / 조회, Probe Card 사용 시간 계산 (TQC_EQUIP.xml)"
+  },
+  "TQP_FOI_DIE": {
+   "desc": "AVI / Scope 외관검사 Die 결과 (Die 별 Bin / 이미지)",
+   "basis": "소스",
+   "used_by": "AVI DataService 적재, Scope 수동 업로드 (TestCommon.ScopeDataSet), AVI Cum Map / FOI Cum Report 조회"
+  },
+  "TQP_FOI_IMAGES": {
+   "desc": "Scope 외관검사 이미지 목록 (Die 위치 별)",
+   "basis": "소스",
+   "used_by": "Scope 수동 업로드 (TestCommon.ScopeDataSet), FOI 이미지 조회 (ProbeMapAnalysis)"
+  },
+  "TQP_VISUALINSPSPEC": {
+   "desc": "육안 / 외관검사 불량 코드(Bin) 정의 (검사 유형 별)",
+   "basis": "소스",
+   "used_by": "Visual Inspection Define (frmVisualInspDefine), 육안검사 Map 편집 단축키, AVI / IQC Bin 분포 (T_AVI_TABLE.xml)"
+  },
+  "TQP_CUSTOMER": {
+   "desc": "고객 정보 (이전 MAP Parser 용, 현재 데이터 / 화면 없음)",
+   "basis": "소스",
+   "used_by": "YMS MAP Parser (YMSFileMonitor) 고객 조회, ProbeAdmin 고객 관리 함수 (화면 호출 없음)"
+  },
+  "TD_08EYP1": {
+   "desc": "Program 08EYP1 Die 데이터 (POSTLASER, Device EY08, PST 파일)",
+   "basis": "소스",
+   "used_by": "CP DataService 적재 (PST 파일), TEST Analysis 화면 (Map View / Gallery / Report)"
+  },
+  "TD_52PX": {
+   "desc": "Program 52PX Die 데이터 (POSTLASER, Device PX52, PST 파일)",
+   "basis": "소스",
+   "used_by": "CP DataService 적재 (PST 파일), TEST Analysis 화면 (Map View / Gallery / Report)"
+  },
+  "TD_89CP": {
+   "desc": "Program 89CP Die 데이터 (MULTIPROBE, Device CP89, CP3 파일)",
+   "basis": "소스",
+   "used_by": "CP DataService 적재 (CP3 파일), TEST Analysis 화면 (Map View / Gallery / Report)"
+  },
+  "TD_KA36_CP2": {
+   "desc": "Program KA36_CP2 Die 데이터 (MULTIPROBE, Device KA36, CP3 파일)",
+   "basis": "소스",
+   "used_by": "CP DataService 적재 (CP3 파일), TEST Analysis 화면 (Map View / Gallery / Report)"
+  },
+  "TD_OMM_TSVET": {
+   "desc": "Program OMM_TSVET Die 데이터 (E-Test TSVET 공정, Device OMM, Parameter 109개)",
+   "basis": "소스",
+   "used_by": "E-Test 업로드 YMS 적재 (EtYmsPublisher), TEST Analysis 화면 (Map View / Param Analysis / Report)"
+  }
+ },
+ "columns": {
+  "TQP_LOT": {
+   "FACTORY": [
+    "Factory (서비스 / 로그인 Factory, 예 SCK)",
+    "소스"
+   ],
+   "LOT_SEQ": [
+    "Lot 번호 (LOT_SEQ 시퀀스, DMS TQD_LOT 과 같은 시퀀스)",
+    "소스"
+   ],
+   "LOT_ID": [
+    "Lot ID (STDF MIR.LOT_ID)",
+    "소스"
+   ],
+   "LOT_TYPE": [
+    "Lot 유형 (이관 컬럼, 현재 값 없음)",
+    "이름 추정"
+   ],
+   "FABLOT": [
+    "Fab Lot ID (이관 데이터만 값 있음)",
+    "이름 추정"
+   ],
+   "TEST_AREA": [
+    "Test 공정 (MULTIPROBE / PARAMETRIC / POSTLASER / AVI / TSVET 등)",
+    "소스"
+   ],
+   "TEST_TYPE": [
+    "Test 유형 (이관 데이터만, STDF MIR.TEST_COD)",
+    "이름 추정"
+   ],
+   "LOG_POINT": [
+    "Log Point (이관 데이터만 값 있음)",
+    "이름 추정"
+   ],
+   "OPERATION": [
+    "공정 Operation (현재 값 없음)",
+    "이름 추정"
+   ],
+   "PROGRAM": [
+    "Test Program (TQP_PROGRAM.PROGRAM, E-Test 는 Device_공정)",
+    "소스"
+   ],
+   "DEVICE": [
+    "Device (CP / PCM: MES MAT_ID, E-Test: 파일 Device)",
+    "소스"
+   ],
+   "SMS_DEVICE": [
+    "SMS Device (이관 데이터만 값 있음)",
+    "이름 추정"
+   ],
+   "SMS_ITEM_ID": [
+    "SMS Item ID (이관 컬럼)",
+    "이름 추정"
+   ],
+   "DEVICE_ALIAS": [
+    "Device Alias = Map ID (CP: MES MASK_ID, E-Test: Map ID)",
+    "소스"
+   ],
+   "FAMILY": [
+    "Device Family (STDF MIR.FAMLY_ID, 현재 값 없음)",
+    "이름 추정"
+   ],
+   "START_TIME": [
+    "Lot 시작 일시 (처음 적재한 Wafer 의 시작 일시)",
+    "소스"
+   ],
+   "END_TIME": [
+    "Lot 종료 일시 (마지막 적재 Wafer 의 종료 일시로 갱신)",
+    "소스"
+   ],
+   "WAFER_DIAM": [
+    "Wafer 지름 mm (200 / 300, E-Test 는 Map WAFER_SIZE / 1000)",
+    "소스"
+   ],
+   "COMMENTS": [
+    "비고 (이관 컬럼, 현재 값 없음)",
+    "이름 추정"
+   ],
+   "MERGE_FLAG": [
+    "Merge 여부 (이관 컬럼, 현재 값 없음)",
+    "이름 추정"
+   ],
+   "CMF_FIELD*": [
+    "사용자 정의 필드 01 ~ 05 (현재 미사용)",
+    "이름 추정"
+   ],
+   "OLD_LOT_SEQ": [
+    "이전 YMS LOT_SEQ (이관 원본 LOT.LOT_SEQ)",
+    "소스"
+   ]
+  },
+  "TQP_WAFER": {
+   "FACTORY": [
+    "Factory (예 SCK)",
+    "소스"
+   ],
+   "WAFER_SEQ": [
+    "Wafer 번호 (WAFER_SEQ 시퀀스, DMS TQD_WAFER 와 같은 시퀀스)",
+    "소스"
+   ],
+   "LOT_SEQ": [
+    "Lot 번호 (TQP_LOT.LOT_SEQ)",
+    "소스"
+   ],
+   "WAFER_ID": [
+    "Wafer ID (Lot ID-Slot 2자리, 예 188648-17)",
+    "소스"
+   ],
+   "PROBE_CNT": [
+    "재측정 순번 (0 = 최신, 새 측정이 들어오면 이전 행 +1)",
+    "소스"
+   ],
+   "START_TIME": [
+    "Wafer 시험 시작 일시 (STDF WIR.START_T)",
+    "소스"
+   ],
+   "END_TIME": [
+    "Wafer 시험 종료 일시 (STDF WRR.FINISH_T)",
+    "소스"
+   ],
+   "LOAD_TIME": [
+    "YMS 적재 일시 (MERGE 때 SYSDATE)",
+    "소스"
+   ],
+   "TESTER": [
+    "Tester ID (CP: 파일 Tester 또는 설비 ID, PCM: 설비 ID)",
+    "소스"
+   ],
+   "PROBER": [
+    "Prober ID (CP 파일 값 / PCM ProbeID)",
+    "소스"
+   ],
+   "PROBE_CARD": [
+    "Probe Card ID (STDF SDR.CARD_ID)",
+    "소스"
+   ],
+   "HANDLER_ID": [
+    "Handler ID (이관 데이터만, STDF SDR.HAND_ID)",
+    "이름 추정"
+   ],
+   "OPERATOR": [
+    "작업자 (STDF MIR.OPER_NAM, AVI 는 'Parser')",
+    "소스"
+   ],
+   "PROGRAM": [
+    "Test Program (TQP_PROGRAM.PROGRAM, STDF MIR.JOB_NAM)",
+    "소스"
+   ],
+   "PROGRAM_REV": [
+    "Parameter 정의 Revision (TQP_PARASPEC.PROGRAM_REV, 현재 0)",
+    "소스"
+   ],
+   "START_QTY": [
+    "시작 수량 (CP / AVI: 측정 Die 수, PCM / E-Test: -1)",
+    "소스"
+   ],
+   "PARENT": [
+    "부모 Wafer (이관 컬럼, 값 없음)",
+    "이름 추정"
+   ],
+   "FLAGS": [
+    "Wafer Flag (이관 데이터 0)",
+    "이름 추정"
+   ],
+   "SCREEN_FLAG": [
+    "Screen 여부 (이관 컬럼, 값 없음)",
+    "이름 추정"
+   ],
+   "SCRAP_FLAG": [
+    "Scrap 여부 (이관 컬럼, 값 없음)",
+    "이름 추정"
+   ],
+   "DGRADE_FLAG": [
+    "Downgrade 여부 (이관 컬럼, 값 없음)",
+    "이름 추정"
+   ],
+   "VENDOR_ID": [
+    "Vendor ID (AVI / Scope 는 'Unknown', 그 외 비움)",
+    "이름 추정"
+   ],
+   "LOADBD": [
+    "Load Board ID (STDF SDR.LOAD_ID)",
+    "이름 추정"
+   ],
+   "HOSTNAME": [
+    "Tester Host 이름 (STDF MIR.NODE_NAM, 이관 값 EDAS)",
+    "이름 추정"
+   ],
+   "TESTHEAD": [
+    "Test Head 번호 (STDF WIR.HEAD_NUM, 이관 값 1)",
+    "이름 추정"
+   ],
+   "SW_REV": [
+    "Tester S/W 버전 (STDF MIR.EXEC_VER)",
+    "이름 추정"
+   ],
+   "USP_REV": [
+    "사용자 Program Revision (STDF MIR.JOB_REV 대응 추정)",
+    "이름 추정"
+   ],
+   "MAX_X": [
+    "Die X Index 최대값",
+    "소스"
+   ],
+   "MAX_Y": [
+    "Die Y Index 최대값",
+    "소스"
+   ],
+   "WAF_FLAT": [
+    "Flat / Notch 방향 (0 고정, Fab2 MEMS PCM 만 각도, STDF WCR.WF_FLAT)",
+    "소스"
+   ],
+   "COMMENTS": [
+    "비고 (E-Test: Lot-Wafer No 원문, AVI: 'Parsing')",
+    "소스"
+   ],
+   "SCRIBE_LOT": [
+    "Scribe Lot (적재 때 LOT_ID 저장, Lot ID 변경 때 같이 변경)",
+    "소스"
+   ],
+   "TEMP": [
+    "시험 온도 (PCM 파일 값, STDF MIR.TST_TEMP)",
+    "소스"
+   ],
+   "TEMP_TYPE": [
+    "온도 구분 (이관 컬럼, 값 없음)",
+    "이름 추정"
+   ],
+   "OVERDRIVE": [
+    "Probe Overdrive (PCM 파일 값)",
+    "소스"
+   ],
+   "PGMPATH": [
+    "원본 파일 백업 폴더 상대 경로 (적재 파서 FtpRelativePath)",
+    "소스"
+   ],
+   "SPC_FLAG": [
+    "SPC 결과 Flag (이관 컬럼, 값 없음)",
+    "이름 추정"
+   ],
+   "SPC_RULE": [
+    "적용 SPC Rule (이관 컬럼, 값 없음)",
+    "이름 추정"
+   ],
+   "DATA_SOURCE": [
+    "원본 파일 이름 (예 188648w17.cp3, 이관 데이터는 ascii2tf)",
+    "소스"
+   ],
+   "LOT_MODE": [
+    "Lot 모드 (이관 값 PRODUCTION, STDF MIR.MODE_COD)",
+    "이름 추정"
+   ],
+   "IMMED_REPROBE": [
+    "즉시 재Probe 정보 (이관 컬럼)",
+    "이름 추정"
+   ],
+   "DELAYED_REPROBE": [
+    "지연 재Probe 정보 (이관 컬럼)",
+    "이름 추정"
+   ],
+   "TRUNCATION": [
+    "Truncation 정보 (이관 컬럼, 값 없음)",
+    "이름 추정"
+   ],
+   "REF_DIE_X": [
+    "기준 Die X Index (이관 값 0)",
+    "이름 추정"
+   ],
+   "REF_DIE_Y": [
+    "기준 Die Y Index (이관 값 0)",
+    "이름 추정"
+   ],
+   "T7SCRIBE": [
+    "SEMI T7 형식 Wafer Scribe ID (이관 컬럼)",
+    "이름 추정"
+   ],
+   "M12SCRIBE": [
+    "SEMI M12 형식 Wafer Scribe ID (이관 컬럼)",
+    "이름 추정"
+   ],
+   "MERGE_FLAG": [
+    "Merge 여부 (이관 값 Y)",
+    "이름 추정"
+   ],
+   "TWFLAGS": [
+    "이전 시스템 Wafer Flag (이관 값 2)",
+    "이름 추정"
+   ],
+   "TFVERSION": [
+    "원본 Test 파일(TF) 형식 버전 (CP 파서 TFVersion, 이관 값 9)",
+    "소스"
+   ],
+   "ESDA_ID": [
+    "ESDA ID (이관 컬럼, 값 없음)",
+    "이름 추정"
+   ],
+   "WAF_DIAM_MEAS": [
+    "측정 Wafer 지름 (STDF WCR.WAFR_SIZ 대응, 이관 값 0)",
+    "이름 추정"
+   ],
+   "XREF_VECTOR_MEAS": [
+    "X Ref Vector 측정값 (이관 값 0)",
+    "이름 추정"
+   ],
+   "YREF_VECTOR_MEAS": [
+    "Y Ref Vector 측정값 (이관 값 0)",
+    "이름 추정"
+   ],
+   "SETUP_TIMESIZE": [
+    "Program Setup 시각 (STDF MIR.SETUP_T 대응 추정)",
+    "이름 추정"
+   ],
+   "LOTDEF_DATABASE": [
+    "Lot 정의 DB 이름 (이관 컬럼)",
+    "이름 추정"
+   ],
+   "MAXSITE": [
+    "최대 Site 수 (PCM: Die 당 Site 수 최대, STDF SDR.SITE_CNT)",
+    "소스"
+   ],
+   "AC_RULE_SEQ": [
+    "AC Rule 번호 (이관 컬럼)",
+    "이름 추정"
+   ],
+   "PROBECARD_TOUCHDOWNS": [
+    "Probe Card Touchdown 수 (이관 값 5, AVI / Scope -1)",
+    "이름 추정"
+   ],
+   "STEPSIZE_X": [
+    "Prober Step 크기 X (STDF WCR.DIE_WID, 이관 값 0)",
+    "이름 추정"
+   ],
+   "STEPSIZE_Y": [
+    "Prober Step 크기 Y (STDF WCR.DIE_HT, 이관 값 0)",
+    "이름 추정"
+   ],
+   "BURNIN_TYPE": [
+    "Burn-in 구분 (STDF MIR.BURN_TIM 대응 추정)",
+    "이름 추정"
+   ],
+   "PROGRAM_MODE": [
+    "Program 모드 (이관 컬럼)",
+    "이름 추정"
+   ],
+   "LOTCONTROL_MODE": [
+    "Lot Control 모드 (이관 컬럼)",
+    "이름 추정"
+   ],
+   "LC_FLAGS": [
+    "Lot Control Flag (이관 값 0)",
+    "이름 추정"
+   ],
+   "AC_FLAGS": [
+    "AC Flag (이관 값 0)",
+    "이름 추정"
+   ],
+   "SMSFAMILY_NAME": [
+    "SMS Family 이름 (STDF MIR.FAMLY_ID 대응, AVI / Scope 'Unknown')",
+    "이름 추정"
+   ],
+   "LOT_CLOSE": [
+    "Lot Close 정보 (이관 컬럼)",
+    "이름 추정"
+   ],
+   "SPC_ENABLE": [
+    "SPC 사용 여부 (이관 컬럼)",
+    "이름 추정"
+   ],
+   "SPC_STATUS": [
+    "SPC 상태 (이관 컬럼)",
+    "이름 추정"
+   ],
+   "SCREEN_TYPE": [
+    "Screen 구분 (이관 컬럼)",
+    "이름 추정"
+   ],
+   "NUM_DIE": [
+    "적재 Die 수 (TD 테이블 행 수)",
+    "소스"
+   ],
+   "TW_VALID_DATA_CNT": [
+    "유효 데이터 Die 수 (이관 값 = NUM_DIE)",
+    "이름 추정"
+   ],
+   "DATATYPE_FLAG": [
+    "데이터 유형 Flag (이관 값 1)",
+    "이름 추정"
+   ],
+   "FORCE_SPCFAIL": [
+    "SPC Fail 강제 여부 (이관 컬럼)",
+    "이름 추정"
+   ],
+   "LOTINFO_SEQ": [
+    "Lot 정보 번호 (이관 컬럼)",
+    "이름 추정"
+   ],
+   "AC_DIE_CNT": [
+    "AC Die 수 (이관 컬럼)",
+    "이름 추정"
+   ],
+   "MOD_TIME": [
+    "원본 데이터 수정 일시 (이관 컬럼)",
+    "이름 추정"
+   ],
+   "OLD_LOT_SEQ": [
+    "이전 YMS LOT_SEQ (이관 원본 LOT.LOT_SEQ)",
+    "소스"
+   ],
+   "OLD_WAFER_SEQ": [
+    "이전 YMS WAFER_SEQ (이관 원본 WAFER.WAFER_SEQ)",
+    "소스"
+   ],
+   "MAP_CFG_SEQ": [
+    "적용한 Map 보정 설정 번호 (TQP_MAPCFG.MAP_CFG_SEQ)",
+    "소스"
+   ]
+  },
+  "TQP_WAFER_SUM": {
+   "CUSTOMER": [
+    "고객 (생성 때 'DB', CP 적재는 MES Lot 고객으로 갱신)",
+    "소스"
+   ],
+   "FACILITY": [
+    "Factory (TQP_WAFER.FACTORY, 예 SCK)",
+    "소스"
+   ],
+   "PRODUCT": [
+    "Device (TQP_LOT.DEVICE)",
+    "소스"
+   ],
+   "DEVICE_ALIAS": [
+    "Device Alias = Map ID (TQP_LOT 값, CP 는 MES MASK_ID 로 갱신)",
+    "소스"
+   ],
+   "TESTAREA": [
+    "TestArea (TQP_LOT.TEST_AREA)",
+    "소스"
+   ],
+   "PROGRAM": [
+    "Test Program (TQP_LOT.PROGRAM)",
+    "소스"
+   ],
+   "MOTHER_LOT_ID": [
+    "모 Lot ID (LOT_ID 와 같은 값 저장)",
+    "소스"
+   ],
+   "LOT_ID": [
+    "Lot ID",
+    "소스"
+   ],
+   "LOT_SEQ": [
+    "Lot 번호 (TQP_LOT.LOT_SEQ)",
+    "소스"
+   ],
+   "WAFER_ID": [
+    "Wafer ID",
+    "소스"
+   ],
+   "WAFER_SEQ": [
+    "Wafer 번호 (TQP_WAFER.WAFER_SEQ)",
+    "소스"
+   ],
+   "TESTER": [
+    "Tester ID (TQP_WAFER 값)",
+    "소스"
+   ],
+   "PROBE_CARD": [
+    "Probe Card ID (TQP_WAFER 값)",
+    "소스"
+   ],
+   "OPERATOR": [
+    "작업자 (TQP_WAFER 값)",
+    "소스"
+   ],
+   "PROBE_CNT": [
+    "재측정 순번 (0 = 최신, 목록은 0 만 조회)",
+    "소스"
+   ],
+   "NETDIE": [
+    "Map 사용 Die 수 (TQP_MAPDEF.NETDIE, 수율 분모)",
+    "소스"
+   ],
+   "START_TIME": [
+    "Wafer 시험 시작 일시",
+    "소스"
+   ],
+   "END_TIME": [
+    "Wafer 시험 종료 일시 (목록 기간 조회 기준)",
+    "소스"
+   ],
+   "WAFER_CAT": [
+    "Wafer 분류 (요약 생성 때 0 고정)",
+    "소스"
+   ],
+   "LOSS_DIE": [
+    "Loss Die 수 (갱신 함수만 있고 화면 호출 없음)",
+    "이름 추정"
+   ],
+   "TESTED_DIE": [
+    "측정 Die 수 (TD BIN 0 ~ 99 Die 합)",
+    "소스"
+   ],
+   "YIELD": [
+    "수율 % (GEC / NETDIE x 100, 1.5배 넘게 다르면 측정 Die 수 기준)",
+    "소스"
+   ],
+   "FTA": [
+    "FTA 수치 (용도 미확인, 값 없음)",
+    "이름 추정"
+   ],
+   "GEC": [
+    "Good Die 수 (HIGH_GEC = Y Bin 합, Bin 정의 없으면 BIN1)",
+    "소스"
+   ],
+   "MAP_CFG_SEQ": [
+    "적용한 Map 보정 설정 번호 (TQP_MAPCFG.MAP_CFG_SEQ)",
+    "소스"
+   ],
+   "BIN*": [
+    "Bin 번호별 Die 수 (BIN0 = Bin 0 ~ BIN150, 요약은 Bin 0 ~ 99 만 집계)",
+    "소스"
+   ]
+  },
+  "TQP_LOT_SUM": {
+   "CUSTOMER": [
+    "고객 (생성 때 'DB', CP 적재는 MES Lot 고객으로 갱신)",
+    "소스"
+   ],
+   "FACILITY": [
+    "Factory (예 SCK)",
+    "소스"
+   ],
+   "PRODUCT": [
+    "Device (TQP_LOT.DEVICE)",
+    "소스"
+   ],
+   "DEVICE_ALIAS": [
+    "Device Alias = Map ID",
+    "소스"
+   ],
+   "TESTAREA": [
+    "TestArea",
+    "소스"
+   ],
+   "PROGRAM": [
+    "Test Program",
+    "소스"
+   ],
+   "MOTHER_LOT_ID": [
+    "모 Lot ID (LOT_ID 와 같은 값 저장)",
+    "소스"
+   ],
+   "LOT_ID": [
+    "Lot ID",
+    "소스"
+   ],
+   "LOT_SEQ": [
+    "Lot 번호 (TQP_LOT.LOT_SEQ)",
+    "소스"
+   ],
+   "START_TIME": [
+    "Lot 첫 Wafer 시작 일시 (Wafer 요약 MIN)",
+    "소스"
+   ],
+   "END_TIME": [
+    "Lot 마지막 Wafer 종료 일시 (Wafer 요약 MAX)",
+    "소스"
+   ],
+   "LOSS_DIE": [
+    "Loss Die 수 합 (Wafer 요약 LOSS_DIE 합)",
+    "소스"
+   ],
+   "TESTED_DIE": [
+    "측정 Die 수 합",
+    "소스"
+   ],
+   "YIELD": [
+    "Lot 수율 % (BIN1 합 / 측정 Die 합 x 100)",
+    "소스"
+   ],
+   "FTA": [
+    "FTA 수치 (용도 미확인, 값 없음)",
+    "이름 추정"
+   ],
+   "GEC": [
+    "Good Die 수 합",
+    "소스"
+   ],
+   "WAFERS": [
+    "Wafer 수 (PROBE_CNT 0 기준)",
+    "소스"
+   ],
+   "BIN*": [
+    "Bin 번호별 Die 수 합 (BIN0 ~ BIN150, 생성 때 Bin 0 ~ 99 만 채움)",
+    "소스"
+   ]
+  },
+  "TQP_PROGRAM": {
+   "FACTORY": [
+    "Factory (예 SCK)",
+    "소스"
+   ],
+   "PROGRAM": [
+    "Test Program 이름 (TD 테이블 = TD_<PROGRAM>)",
+    "소스"
+   ],
+   "TESTAREA": [
+    "TestArea (MULTIPROBE / PARAMETRIC / TSVET 등)",
+    "소스"
+   ],
+   "DEVICE": [
+    "Device (TQP_PRODUCT.PRODUCT, CP / PCM 은 MES MASK_ID)",
+    "소스"
+   ],
+   "CREATE_TIME": [
+    "생성 일시",
+    "소스"
+   ],
+   "CREATE_USER": [
+    "생성 사용자 ID",
+    "소스"
+   ],
+   "UPDATE_TIME": [
+    "수정 일시",
+    "이름 추정"
+   ],
+   "UPDATE_USER": [
+    "수정 사용자 ID",
+    "이름 추정"
+   ],
+   "CMF_FIELD*": [
+    "사용자 정의 필드 (01 ~ 05 문자, 06 ~ 10 숫자, 미사용)",
+    "이름 추정"
+   ]
+  },
+  "TQP_PRODUCT": {
+   "FACTORY": [
+    "Factory (예 SCK)",
+    "소스"
+   ],
+   "PRODUCT": [
+    "Product (보통 Device Alias = MES MASK_ID, E-Test: Device)",
+    "소스"
+   ],
+   "CUSTOMER_ID": [
+    "고객 ID (MAP Parser 만 채움, 현재 값 없음)",
+    "소스"
+   ],
+   "CUSTOMER_PROD": [
+    "고객 제품명 (현재 값 없음)",
+    "이름 추정"
+   ],
+   "MAPID": [
+    "Wafer Map ID (TQP_MAPDEF.MAPID, 보통 PRODUCT 와 같음)",
+    "소스"
+   ],
+   "DELETE_FLAG": [
+    "삭제(숨김) 여부 (Y 숨김, 기본 N)",
+    "소스"
+   ]
+  },
+  "TQP_DATA_TABLES": {
+   "FACTORY": [
+    "Factory (예 SCK)",
+    "소스"
+   ],
+   "PROGRAM": [
+    "Test Program (TQP_PROGRAM.PROGRAM)",
+    "소스"
+   ],
+   "TABLE_NAME": [
+    "TD 테이블 이름 (TD_<PROGRAM>, 900 컬럼 넘으면 A / B 접미어)",
+    "소스"
+   ]
+  },
+  "TQP_PARASPEC": {
+   "FACTORY": [
+    "Factory (예 SCK)",
+    "소스"
+   ],
+   "PROGRAM": [
+    "Test Program (TQP_PROGRAM.PROGRAM)",
+    "소스"
+   ],
+   "PROGRAM_REV": [
+    "Parameter 정의 Revision (현재 0, TQP_WAFER.PROGRAM_REV 와 연결)",
+    "소스"
+   ],
+   "PARAM_INDEX": [
+    "TD 테이블 안 컬럼 순번 (1부터, 이관 데이터는 X -1 / Y 0)",
+    "소스"
+   ],
+   "PARAM_NAME": [
+    "Parameter 이름 = TD 테이블 컬럼 이름 (X / Y / BIN 포함)",
+    "소스"
+   ],
+   "USER_PROGRAM_NAME": [
+    "사용자 Parameter 이름 (화면 'User Parameter Name', 값 없음)",
+    "소스"
+   ],
+   "PARAM_TYPE": [
+    "값 형식 (FLOAT / INT, X / Y / BIN 은 INT)",
+    "소스"
+   ],
+   "PARAM_DESC": [
+    "Parameter 설명 (E-Test 는 파일 헤더 원문)",
+    "소스"
+   ],
+   "CREATE_TIME": [
+    "생성 일시",
+    "소스"
+   ],
+   "CREATE_USER": [
+    "생성 사용자 ID",
+    "소스"
+   ],
+   "UPDATE_TIME": [
+    "수정 일시",
+    "소스"
+   ],
+   "UPDATE_USER": [
+    "수정 사용자 ID",
+    "소스"
+   ],
+   "TABLE_NAME": [
+    "Parameter 컬럼이 있는 TD 테이블 이름",
+    "소스"
+   ],
+   "DECIMAL_PLACES": [
+    "표시 소수 자리수 (자동 등록 0)",
+    "소스"
+   ],
+   "RUNTIME_DEFINED": [
+    "적재 중 자동 등록 여부 (자동 등록 1)",
+    "소스"
+   ],
+   "UOM": [
+    "단위 (예 V / uA)",
+    "소스"
+   ],
+   "LSL": [
+    "Spec 하한 (Map Spec 색 / 차트 선)",
+    "소스"
+   ],
+   "TARGET": [
+    "목표값 (PCM Report 표시)",
+    "소스"
+   ],
+   "USL": [
+    "Spec 상한 (Map Spec 색 / 차트 선)",
+    "소스"
+   ],
+   "LCL": [
+    "관리 하한 (Map View / PCM Report 표시)",
+    "소스"
+   ],
+   "UCL": [
+    "관리 상한 (Map View / PCM Report 표시)",
+    "소스"
+   ],
+   "LOL": [
+    "Outlier 하한 추정 (설정 화면 속성만, 값 없음)",
+    "이름 추정"
+   ],
+   "UOL": [
+    "Outlier 상한 추정 (설정 화면 속성만, 값 없음)",
+    "이름 추정"
+   ],
+   "LTL": [
+    "Test Limit 하한 (Map View 표시, FAB2 PCM 재측정 값 치환 판정)",
+    "소스"
+   ],
+   "UTL": [
+    "Test Limit 상한 (Map View 표시, FAB2 PCM 재측정 값 치환 판정)",
+    "소스"
+   ],
+   "TEST_LOW": [
+    "통계 대상 값 하한 (밖의 값은 통계 제외)",
+    "소스"
+   ],
+   "TEST_HIGH": [
+    "통계 대상 값 상한 (밖의 값은 통계 제외)",
+    "소스"
+   ],
+   "PPD_SEQ": [
+    "이전 YMS Parameter 정의 번호 (이관 원본 PROGRAM_PARM_DEF.PPD_SEQ)",
+    "소스"
+   ],
+   "USE_FLAG": [
+    "사용 여부 (Y / N, 기본 Y)",
+    "소스"
+   ],
+   "ITEM_LEVEL": [
+    "Parameter 등급 (이관 값 WAC / IWAC / ENG / MON, 소스 미사용)",
+    "이름 추정"
+   ]
+  },
+  "TQP_BINDESC": {
+   "PROGRAM": [
+    "Test Program (TQP_PROGRAM.PROGRAM, AVI 는 'AVI')",
+    "소스"
+   ],
+   "BIN": [
+    "Bin 번호 (TD 테이블 BIN 값)",
+    "소스"
+   ],
+   "BIN_GROUP": [
+    "Bin 그룹 (옛 조회 쿼리 주석상 Hard Bin, 현재 저장 안 함)",
+    "소스"
+   ],
+   "BIN_NAME": [
+    "Bin 이름 (E-Test 는 'HW2 SW2001' 형식)",
+    "소스"
+   ],
+   "CHAR_BIN": [
+    "Map 표시 문자 (AVI 는 원본 Bin 문자)",
+    "소스"
+   ],
+   "HIGH_GEC": [
+    "양품 Bin 여부 (Y = Good, 수율 GEC 계산)",
+    "소스"
+   ],
+   "DISPLAY": [
+    "표시 여부 (Y / N)",
+    "소스"
+   ],
+   "UPPER_LIMIT_CNT": [
+    "Bin Die 수 상한 (Bin 분포 조회에 표시)",
+    "소스"
+   ],
+   "LOWER_LIMIT_CNT": [
+    "Bin Die 수 하한 (Bin 분포 조회에 표시)",
+    "소스"
+   ],
+   "COLOR": [
+    "Map 표시 색 (HTML '#RRGGBB')",
+    "소스"
+   ],
+   "DESCRIPTION": [
+    "Bin 설명 (E-Test 는 HW / SW Bin 설명)",
+    "소스"
+   ]
+  },
+  "TQP_MAPDEF": {
+   "FACTORY": [
+    "Factory (기본값 'SCK')",
+    "소스"
+   ],
+   "MAPID": [
+    "Map ID (= TQP_LOT.DEVICE_ALIAS / TQP_PRODUCT.MAPID)",
+    "소스"
+   ],
+   "WAFER_SIZE": [
+    "Wafer 지름 µm (200000 / 300000)",
+    "설계 문서"
+   ],
+   "CHIP_SIZE_X": [
+    "Die 크기(Pitch) X, µm",
+    "설계 문서"
+   ],
+   "CHIP_SIZE_Y": [
+    "Die 크기(Pitch) Y, µm",
+    "설계 문서"
+   ],
+   "ORIGIN_MICRO_X": [
+    "원점 위치 X, µm (KLARF SampleCenterLocation X)",
+    "소스"
+   ],
+   "ORIGIN_MICRO_Y": [
+    "원점 Y 저장값 µm (= CHIP_SIZE_Y - 원점 Y, 조회 때 되돌림)",
+    "소스"
+   ],
+   "ORIGIN_INDEX_X": [
+    "원점 Die X Index (TQD_SETUP.DIE_ORIGIN_X 와 같음)",
+    "설계 문서"
+   ],
+   "ORIGIN_INDEX_Y": [
+    "원점 Die Y Index (TQD_SETUP.DIE_ORIGIN_Y 와 같음)",
+    "설계 문서"
+   ],
+   "FIRST_MICRO_X": [
+    "첫 Die 위치 X, µm (첫 Die Index x Die 크기)",
+    "소스"
+   ],
+   "FIRST_MICRO_Y": [
+    "첫 Die 위치 Y, µm (첫 Die Index x Die 크기)",
+    "소스"
+   ],
+   "FIRST_INDEX_X": [
+    "첫 Die X Index",
+    "소스"
+   ],
+   "FIRST_INDEX_Y": [
+    "첫 Die Y Index",
+    "소스"
+   ],
+   "EDGE_SIZE": [
+    "Edge 제외 폭, mm (기존 2.5 ~ 5)",
+    "소스"
+   ],
+   "ANGLE": [
+    "Notch 방향 각도 (0 아래 / 90 왼쪽 / 180 위 / 270 오른쪽)",
+    "소스"
+   ],
+   "NETDIE": [
+    "Map 사용 Die 수 (Wafer 요약 수율 분모)",
+    "소스"
+   ],
+   "NETSHOT": [
+    "Shot 수 (현재 저장 안 함, 기존 Map 값만 있음)",
+    "이름 추정"
+   ],
+   "NOTCH_TYPE": [
+    "Notch 종류 (0 Notch / 1 Flat)",
+    "소스"
+   ],
+   "ST_START": [
+    "Shot 시작 위치 코드 (현재 저장 때 0)",
+    "이름 추정"
+   ],
+   "ST_INTYPE": [
+    "Shot 입력 방식 (현재 저장 때 0)",
+    "이름 추정"
+   ],
+   "ST_XCNT": [
+    "Shot 당 X Die 수 (현재 저장 때 0)",
+    "이름 추정"
+   ],
+   "ST_YCNT": [
+    "Shot 당 Y Die 수 (현재 저장 때 0)",
+    "이름 추정"
+   ],
+   "ST_START_X": [
+    "Shot 시작 X Index (현재 저장 때 0)",
+    "이름 추정"
+   ],
+   "ST_START_Y": [
+    "Shot 시작 Y Index (현재 저장 때 0)",
+    "이름 추정"
+   ],
+   "DIE_INDEX_MIN_X": [
+    "Die X Index 최소값 (Wafer 전체 격자)",
+    "설계 문서"
+   ],
+   "DIE_INDEX_MAX_X": [
+    "Die X Index 최대값 (Wafer 전체 격자)",
+    "설계 문서"
+   ],
+   "DIE_INDEX_MIN_Y": [
+    "Die Y Index 최소값 (Wafer 전체 격자)",
+    "설계 문서"
+   ],
+   "DIE_INDEX_MAX_Y": [
+    "Die Y Index 최대값 (Wafer 전체 격자)",
+    "설계 문서"
+   ],
+   "XY_DIRECTION": [
+    "Index 방향 (0 LeftTop / 1 LeftBottom / 2 RightBottom / 3 RightTop)",
+    "소스"
+   ],
+   "REFERENCEDIE_SETTING": [
+    "기준 Die 설정 (TSK Map 헤더 값, 원점 계산 방식, 기본 2)",
+    "소스"
+   ],
+   "DELETE_FLAG": [
+    "삭제 여부 (Y 삭제 또는 사용자 Map, 기본 N)",
+    "소스"
+   ],
+   "INSERT_TIME": [
+    "생성 일시",
+    "소스"
+   ],
+   "INSERT_USER": [
+    "생성 사용자 ID",
+    "소스"
+   ],
+   "UPDATE_TIME": [
+    "수정 일시",
+    "소스"
+   ],
+   "UPDATE_USER": [
+    "수정 사용자 ID",
+    "소스"
+   ],
+   "USER_REF_X": [
+    "사용자 지정 X Ref Vector, mm (RPNet TSK Map 생성, 없으면 계산)",
+    "소스"
+   ],
+   "USER_REF_Y": [
+    "사용자 지정 Y Ref Vector, mm (RPNet TSK Map 생성, 없으면 계산)",
+    "소스"
+   ]
+  },
+  "TQP_MAPDEF_DIE": {
+   "FACTORY": [
+    "Factory (예 SCK)",
+    "소스"
+   ],
+   "MAPID": [
+    "Map ID (TQP_MAPDEF.MAPID)",
+    "소스"
+   ],
+   "DIE_TYPE": [
+    "구분 (DIE = Map Die / SHOT = Shot)",
+    "소스"
+   ],
+   "DIE_NO": [
+    "Die / Shot 번호",
+    "소스"
+   ],
+   "INDEX_X": [
+    "Die X Index",
+    "소스"
+   ],
+   "INDEX_Y": [
+    "Die Y Index",
+    "소스"
+   ]
+  },
+  "TQP_USEMAP": {
+   "FACTORY": [
+    "Factory (로그인 Factory)",
+    "소스"
+   ],
+   "MAPID": [
+    "Map ID (TQP_MAPDEF.MAPID)",
+    "소스"
+   ],
+   "PROGRAM_REV": [
+    "Program Revision (저장 때 0 고정)",
+    "소스"
+   ],
+   "X": [
+    "Die X Index (TQP_MAPDEF.XY_DIRECTION 기준 번호)",
+    "소스"
+   ],
+   "Y": [
+    "Die Y Index (TQP_MAPDEF.XY_DIRECTION 기준 번호)",
+    "소스"
+   ],
+   "USECODE": [
+    "Die 사용 구분 (1 사용 / -1 제거 / 0 Skip / 2 Mark)",
+    "소스"
+   ],
+   "DIE_NUM": [
+    "Die 순번 (저장 행 순서 1 ~ N, 방향 순서 아님)",
+    "소스"
+   ]
+  },
+  "TQP_MAPCFG": {
+   "MAP_CFG_SEQ": [
+    "보정 설정 번호 (MAP_CFG_SEQ 시퀀스)",
+    "소스"
+   ],
+   "REV_NO": [
+    "보정 설정 Revision (같은 TestArea / Device / Program 안)",
+    "소스"
+   ],
+   "TESTAREA": [
+    "적용 TestArea",
+    "소스"
+   ],
+   "DEVICE_ALIAS": [
+    "적용 Device Alias (Map ID)",
+    "소스"
+   ],
+   "PROGRAM": [
+    "적용 Program ('%' 패턴 가능, 'ALL' = 전체)",
+    "소스"
+   ],
+   "ALTER_DIRECTION": [
+    "좌표 뒤집기 (LL 그대로 / TL Y 반전 / LR X 반전 / TR X / Y 반전)",
+    "소스"
+   ],
+   "ALTER_ANGLE": [
+    "회전 각도 (0 / 90 / 270)",
+    "소스"
+   ],
+   "ALTER_INDEX_X": [
+    "X Index 이동량",
+    "소스"
+   ],
+   "ALTER_INDEX_Y": [
+    "Y Index 이동량",
+    "소스"
+   ],
+   "CREATE_USER": [
+    "생성 사용자 ID",
+    "소스"
+   ],
+   "CREATE_TIME": [
+    "생성 일시",
+    "소스"
+   ],
+   "UPDATE_USER": [
+    "수정 사용자 ID",
+    "소스"
+   ],
+   "UPDATE_TIME": [
+    "수정 일시",
+    "소스"
+   ],
+   "USER_COMMENT": [
+    "사용자 설명 (삭제 때 사유 기록)",
+    "소스"
+   ],
+   "DELETE_FLAG": [
+    "삭제 여부 (Y 삭제, 기본 N)",
+    "소스"
+   ]
+  },
+  "TQP_CHANGE_HIS": {
+   "TRAN_KEY": [
+    "이력 키 = 변경 시각 (SYSTIMESTAMP 'YYYYMMDDHH24MISSFF')",
+    "소스"
+   ],
+   "FACTORY": [
+    "Factory (로그인 Factory)",
+    "소스"
+   ],
+   "TESTAREA": [
+    "TestArea (화면 선택값)",
+    "소스"
+   ],
+   "PRODUCT": [
+    "Device (화면 선택값)",
+    "소스"
+   ],
+   "PROGRAM": [
+    "Test Program (화면 선택값)",
+    "소스"
+   ],
+   "LOT_ID": [
+    "Lot ID (화면 선택값)",
+    "소스"
+   ],
+   "WAFER_ID": [
+    "Wafer ID (화면 표시 'ID (재측정 순번)' 형식)",
+    "소스"
+   ],
+   "TRAN_USER": [
+    "변경한 사용자 ID",
+    "소스"
+   ],
+   "TRAN_USER_IP": [
+    "변경한 PC IP",
+    "소스"
+   ],
+   "TRAN_CATEGORY": [
+    "변경 대상 (RAWDATA / WAFER / LOT / FILE_UPLOAD)",
+    "소스"
+   ],
+   "TRAN_TYPE": [
+    "변경 유형 (INSERT / UPDATE / DELETE / CHANGE_PROGRAM)",
+    "소스"
+   ],
+   "TRAN_COUNT": [
+    "변경 건수 (RAWDATA 는 수정 행 수, 그 외 1)",
+    "소스"
+   ],
+   "PREV_VALUE": [
+    "변경 전 값 (Lot / Wafer ID, Program 등)",
+    "소스"
+   ],
+   "CURR_VALUE": [
+    "변경 후 값",
+    "소스"
+   ],
+   "USER_COMMENT": [
+    "사용자 입력 변경 사유",
+    "소스"
+   ]
+  },
+  "TQP_PCM_INPUT_HIS": {
+   "FACTORY": [
+    "Factory (로그인 Factory)",
+    "소스"
+   ],
+   "EQUIP_ID": [
+    "PCM 설비 ID (TQC_EQUIP.EQUIP_ID)",
+    "소스"
+   ],
+   "INPUT_TIME": [
+    "입력 일시 (SYSDATE)",
+    "소스"
+   ],
+   "PROBE_CARD": [
+    "입력한 Probe Card ID",
+    "소스"
+   ],
+   "OPERATOR": [
+    "입력한 작업자",
+    "소스"
+   ],
+   "INPUT_USER_ID": [
+    "입력한 로그인 사용자 ID",
+    "소스"
+   ],
+   "CMF_*": [
+    "사용자 정의 필드 01 ~ 05 (현재 미사용)",
+    "이름 추정"
+   ]
+  },
+  "TQP_FOI_DIE": {
+   "WAFER_SEQ": [
+    "Wafer 번호 (TQP_WAFER.WAFER_SEQ)",
+    "소스"
+   ],
+   "DIE_NUM": [
+    "Die 순번 (적재 행 순서 1 ~ N)",
+    "소스"
+   ],
+   "TEST_AREA": [
+    "TestArea ('AVI' 고정)",
+    "소스"
+   ],
+   "DIEPROBE_CNT": [
+    "Die 재측정 순번 (0 고정)",
+    "소스"
+   ],
+   "X": [
+    "Die X Index",
+    "소스"
+   ],
+   "Y": [
+    "Die Y Index",
+    "소스"
+   ],
+   "BIN": [
+    "외관검사 Bin (숫자 아닌 원본 Bin 은 99, Scope Bin 우선)",
+    "소스"
+   ],
+   "BIN_CHAR": [
+    "원본 Bin 문자",
+    "소스"
+   ],
+   "IMAGE_PATH": [
+    "Scope 이미지 경로",
+    "소스"
+   ],
+   "THUMB_PATH": [
+    "썸네일 경로 (현재 비움)",
+    "소스"
+   ],
+   "IMAGE_FILE_NAME": [
+    "Scope 이미지 파일 이름",
+    "소스"
+   ],
+   "THUMB_FILENAME": [
+    "썸네일 파일 이름 (현재 비움)",
+    "소스"
+   ]
+  },
+  "TQP_FOI_IMAGES": {
+   "WAFER_SEQ": [
+    "Wafer 번호 (TQP_WAFER.WAFER_SEQ)",
+    "소스"
+   ],
+   "X": [
+    "Die X Index",
+    "소스"
+   ],
+   "Y": [
+    "Die Y Index",
+    "소스"
+   ],
+   "BIN": [
+    "이미지 Die 의 Bin",
+    "소스"
+   ],
+   "IMAGE_PATH": [
+    "서버 이미지 경로",
+    "소스"
+   ],
+   "THUMB_PATH": [
+    "썸네일 경로 (현재 비움)",
+    "소스"
+   ],
+   "IMAGE_FILE_NAME": [
+    "로컬 이미지 파일 이름",
+    "소스"
+   ],
+   "THUMB_FILENAME": [
+    "썸네일 파일 이름 (현재 비움)",
+    "소스"
+   ]
+  },
+  "TQP_VISUALINSPSPEC": {
+   "INSPTYPE": [
+    "검사 유형 (기본 VI, IQC / OQC / AVI)",
+    "소스"
+   ],
+   "BIN": [
+    "불량 코드 Bin 번호",
+    "소스"
+   ],
+   "BIN_NAME": [
+    "Bin 이름 ('NOTUSE' 는 목록 제외)",
+    "소스"
+   ],
+   "COLOR": [
+    "Map 표시 색",
+    "소스"
+   ],
+   "CREATE_DATE": [
+    "생성 일시",
+    "이름 추정"
+   ],
+   "EDIT_DATE": [
+    "수정 일시",
+    "이름 추정"
+   ],
+   "DESCRIPTION": [
+    "Bin 설명 (Map 편집 콤보 표시)",
+    "소스"
+   ],
+   "KEYMAP": [
+    "Map 편집 단축키 (1 ~ 0 / F1 ~ F9)",
+    "소스"
+   ]
+  },
+  "TQP_CUSTOMER": {
+   "CUSTOMER_ID": [
+    "고객 ID (MAP Parser 가 TQP_PRODUCT.CUSTOMER_ID 로 복사)",
+    "소스"
+   ],
+   "CUSTOMER_NAME": [
+    "고객 이름",
+    "이름 추정"
+   ],
+   "CUSTOMER_DESC": [
+    "고객 설명",
+    "이름 추정"
+   ],
+   "DATA_SERVICE": [
+    "Data 서비스 사용 여부 (숫자 1자리)",
+    "이름 추정"
+   ],
+   "USER_COUNT": [
+    "사용자 수",
+    "이름 추정"
+   ],
+   "EXPIRE_DATE": [
+    "만료 일자",
+    "이름 추정"
+   ],
+   "FTPSITE": [
+    "FTP 서버 주소",
+    "이름 추정"
+   ],
+   "FTPUSER": [
+    "FTP 사용자",
+    "이름 추정"
+   ],
+   "FTPPASSWORD": [
+    "FTP 비밀번호 (평문 컬럼)",
+    "이름 추정"
+   ],
+   "FTPPATH": [
+    "FTP 경로",
+    "이름 추정"
+   ],
+   "SENDTIME": [
+    "전송 시각 설정",
+    "이름 추정"
+   ],
+   "AVIFORMAT": [
+    "AVI 결과 파일 형식",
+    "이름 추정"
+   ],
+   "EDSFORMAT": [
+    "EDS 결과 파일 형식",
+    "이름 추정"
+   ],
+   "INKLESSFORMAT": [
+    "Inkless Map 파일 형식",
+    "이름 추정"
+   ],
+   "RAWDATA": [
+    "Raw Data 형식 / 경로",
+    "이름 추정"
+   ]
+  },
+  "TD_08EYP1": {
+   "WAFER_SEQ": [
+    "Wafer 번호 (TQP_WAFER.WAFER_SEQ)",
+    "소스"
+   ],
+   "DIE_NUM": [
+    "Die 순번 (파일 Die 행 순서 1 ~ N)",
+    "소스"
+   ],
+   "DIEPROBE_CNT": [
+    "Die 재측정 순번 (적재 때 0)",
+    "소스"
+   ],
+   "X": [
+    "Die X Index (CP 파일 좌표, Map 보정 설정이 있으면 적용)",
+    "소스"
+   ],
+   "Y": [
+    "Die Y Index (CP 파일 좌표, Map 보정 설정이 있으면 적용)",
+    "소스"
+   ],
+   "BIN": [
+    "Die Bin 번호 (TQP_BINDESC.BIN, 요약은 0 ~ 99 만 집계)",
+    "소스"
+   ]
+  },
+  "TD_52PX": {
+   "WAFER_SEQ": [
+    "Wafer 번호 (TQP_WAFER.WAFER_SEQ)",
+    "소스"
+   ],
+   "DIE_NUM": [
+    "Die 순번 (파일 Die 행 순서 1 ~ N)",
+    "소스"
+   ],
+   "DIEPROBE_CNT": [
+    "Die 재측정 순번 (적재 때 0)",
+    "소스"
+   ],
+   "X": [
+    "Die X Index (CP 파일 좌표, Map 보정 설정이 있으면 적용)",
+    "소스"
+   ],
+   "Y": [
+    "Die Y Index (CP 파일 좌표, Map 보정 설정이 있으면 적용)",
+    "소스"
+   ],
+   "BIN": [
+    "Die Bin 번호 (TQP_BINDESC.BIN, 요약은 0 ~ 99 만 집계)",
+    "소스"
+   ]
+  },
+  "TD_89CP": {
+   "WAFER_SEQ": [
+    "Wafer 번호 (TQP_WAFER.WAFER_SEQ)",
+    "소스"
+   ],
+   "DIE_NUM": [
+    "Die 순번 (파일 Die 행 순서 1 ~ N)",
+    "소스"
+   ],
+   "DIEPROBE_CNT": [
+    "Die 재측정 순번 (적재 때 0)",
+    "소스"
+   ],
+   "X": [
+    "Die X Index (CP 파일 좌표, Map 보정 설정이 있으면 적용)",
+    "소스"
+   ],
+   "Y": [
+    "Die Y Index (CP 파일 좌표, Map 보정 설정이 있으면 적용)",
+    "소스"
+   ],
+   "BIN": [
+    "Die Bin 번호 (TQP_BINDESC.BIN, 요약은 0 ~ 99 만 집계)",
+    "소스"
+   ]
+  },
+  "TD_KA36_CP2": {
+   "WAFER_SEQ": [
+    "Wafer 번호 (TQP_WAFER.WAFER_SEQ)",
+    "소스"
+   ],
+   "DIE_NUM": [
+    "Die 순번 (파일 Die 행 순서 1 ~ N)",
+    "소스"
+   ],
+   "DIEPROBE_CNT": [
+    "Die 재측정 순번 (적재 때 0)",
+    "소스"
+   ],
+   "X": [
+    "Die X Index (CP 파일 좌표, Map 보정 설정이 있으면 적용)",
+    "소스"
+   ],
+   "Y": [
+    "Die Y Index (CP 파일 좌표, Map 보정 설정이 있으면 적용)",
+    "소스"
+   ],
+   "BIN": [
+    "Die Bin 번호 (TQP_BINDESC.BIN, 요약은 0 ~ 99 만 집계)",
+    "소스"
+   ]
+  },
+  "TD_OMM_TSVET": {
+   "WAFER_SEQ": [
+    "Wafer 번호 (TQP_WAFER.WAFER_SEQ)",
+    "소스"
+   ],
+   "DIE_NUM": [
+    "Die 순번 (고객 Die# 순서로 1 ~ N, Die# 값 아님)",
+    "소스"
+   ],
+   "DIEPROBE_CNT": [
+    "Die 재측정 순번 (적재 때 0)",
+    "소스"
+   ],
+   "X": [
+    "Die X Index (MAP_X, 왼쪽 아래 (1,1) 시스템 좌표)",
+    "소스"
+   ],
+   "Y": [
+    "Die Y Index (MAP_Y, 왼쪽 아래 (1,1) 시스템 좌표)",
+    "소스"
+   ],
+   "BIN": [
+    "Die Bin = 결과 파일 Hardware Bin (TQP_BINDESC.BIN)",
+    "소스"
+   ],
+   "PARAM*": [
+    "Parameter 측정값 (컬럼 이름 = Parameter 이름, TQP_PARASPEC.PARAM_NAME)",
+    "소스"
+   ]
+  }
+ },
+ "relations": [
+  {
+   "child": "TQP_WAFER",
+   "child_cols": "FACTORY, LOT_SEQ",
+   "parent": "TQP_LOT",
+   "parent_cols": "FACTORY, LOT_SEQ",
+   "note": "Lot 의 Wafer (TQP_WAFER.xml SELECT_WAFER_INFO_02 / TD_TABLE.xml GET_PCM_DATA)"
+  },
+  {
+   "child": "TQP_WAFER_SUM",
+   "child_cols": "LOT_SEQ, WAFER_SEQ",
+   "parent": "TQP_WAFER",
+   "parent_cols": "LOT_SEQ, WAFER_SEQ",
+   "note": "Wafer 요약 1:1 (TQP_WAFER_SUM.xml GET_WAFER_LOT_INFO)"
+  },
+  {
+   "child": "TQP_WAFER_SUM",
+   "child_cols": "FACILITY, LOT_SEQ",
+   "parent": "TQP_LOT",
+   "parent_cols": "FACTORY, LOT_SEQ",
+   "note": "Wafer 요약의 Lot (TD_TABLE.xml GET_TEST_DATA)"
+  },
+  {
+   "child": "TQP_LOT_SUM",
+   "child_cols": "LOT_SEQ",
+   "parent": "TQP_LOT",
+   "parent_cols": "LOT_SEQ",
+   "note": "Lot 요약 1:1, TQP_WAFER_SUM 을 같은 LOT_SEQ 로 집계 (TQP_LOT_SUM.xml INSERT_LOT_SUMMARY / TestCommon.SummaryData)"
+  },
+  {
+   "child": "TQP_LOT",
+   "child_cols": "FACTORY, DEVICE_ALIAS",
+   "parent": "TQP_MAPDEF",
+   "parent_cols": "FACTORY, MAPID",
+   "note": "Lot 의 Wafer Map, NETDIE 조회 (TQP_WAFER.xml GET_WAFER_SUMMARY_INFO [WSEQ], 외부 조인)"
+  },
+  {
+   "child": "TQP_LOT",
+   "child_cols": "FACTORY, DEVICE_ALIAS",
+   "parent": "TQP_PRODUCT",
+   "parent_cols": "FACTORY, PRODUCT",
+   "note": "Lot 의 Product (TQP_WAFER.xml SELECT_WAFER_INFO_05 / 06)"
+  },
+  {
+   "child": "TQP_LOT",
+   "child_cols": "LOT_ID",
+   "parent": "TQC_LOT_STS",
+   "parent_cols": "LOT_NO",
+   "note": "MES Lot 상태 (TQD_DEFECT_DIE.xml INSERT_DATA, CP 적재 때 MASK_ID / MAT_ID / CUSTOMER 조회)"
+  },
+  {
+   "child": "TQP_WAFER",
+   "child_cols": "FACTORY, PROGRAM, PROGRAM_REV",
+   "parent": "TQP_PARASPEC",
+   "parent_cols": "FACTORY, PROGRAM, PROGRAM_REV",
+   "note": "Wafer 가 쓴 Parameter 정의 (TQP_PARASPEC.xml GET_BIN_TTABLE / SELECT_PARA_ITEM)"
+  },
+  {
+   "child": "TQP_WAFER",
+   "child_cols": "PROGRAM",
+   "parent": "TQP_DATA_TABLES",
+   "parent_cols": "PROGRAM",
+   "note": "Wafer 의 TD 테이블 찾기 (TQP_DATA_TABLES.xml SELECT_TABLE_BY_WAFER)"
+  },
+  {
+   "child": "TQP_WAFER",
+   "child_cols": "MAP_CFG_SEQ",
+   "parent": "TQP_MAPCFG",
+   "parent_cols": "MAP_CFG_SEQ",
+   "note": "적용한 Map 보정 설정 (TestCommon.WaferConfigSeqUpdate / TQP_MAPCFG.xml SELECT_MAPCFG_SEQ)"
+  },
+  {
+   "child": "TQP_WAFER_SUM",
+   "child_cols": "MAP_CFG_SEQ",
+   "parent": "TQP_MAPCFG",
+   "parent_cols": "MAP_CFG_SEQ",
+   "note": "적용한 Map 보정 설정 (TestCommon.WaferConfigSeqUpdate)"
+  },
+  {
+   "child": "TQP_WAFER_SUM",
+   "child_cols": "DEVICE_ALIAS",
+   "parent": "TQP_MAPDEF",
+   "parent_cols": "MAPID",
+   "note": "Wafer 요약의 Map (TQD_DEFECT_DIE.xml SELECT_DEFECT_DIE / TQC_LOSS_YIELD_SUM.xml)"
+  },
+  {
+   "child": "TQP_WAFER_SUM",
+   "child_cols": "PROGRAM",
+   "parent": "TQP_BINDESC",
+   "parent_cols": "PROGRAM",
+   "note": "Program 의 Bin 정의 (TQD_STEP.xml SELECT_TST_BIN_INFO / TQC_LOSS_YIELD_SUM.xml INSERT_TQC_MATCH_SUM)"
+  },
+  {
+   "child": "TQP_PARASPEC",
+   "child_cols": "PROGRAM, TABLE_NAME",
+   "parent": "TQP_DATA_TABLES",
+   "parent_cols": "PROGRAM, TABLE_NAME",
+   "note": "Parameter 가 있는 TD 테이블 (TQP_PARASPEC.xml SELECT_PARA_SPEC_02)"
+  },
+  {
+   "child": "TQP_PROGRAM",
+   "child_cols": "DEVICE",
+   "parent": "TQP_PRODUCT",
+   "parent_cols": "PRODUCT",
+   "note": "Program 의 Device (TQP_PROGRAM.xml SELECT_CONDITION_DEVICE / SELECT_CONDITION_PROGRAM)"
+  },
+  {
+   "child": "TQP_BINDESC",
+   "child_cols": "PROGRAM",
+   "parent": "TQP_PROGRAM",
+   "parent_cols": "PROGRAM",
+   "note": "Program 의 Bin 정의 (TQP_PROGRAM.xml SELECT_PROGRAM_NOT_EXIST_BIN)"
+  },
+  {
+   "child": "TQP_PRODUCT",
+   "child_cols": "MAPID",
+   "parent": "TQP_MAPDEF",
+   "parent_cols": "MAPID",
+   "note": "Product 의 Wafer Map (TQP_MAPDEF.xml GET_MAPDEF_BY_LOTID)"
+  },
+  {
+   "child": "TQP_USEMAP",
+   "child_cols": "MAPID",
+   "parent": "TQP_MAPDEF",
+   "parent_cols": "MAPID",
+   "note": "Map 의 Die 목록, 같은 Map ID 로 저장 / 조회 (MapCreationService SetMapDef -> CreateUseMap, TQP_MAPDEF.xml SELECT_MAP_DIE_SOURCE)"
+  },
+  {
+   "child": "TQP_MAPDEF_DIE",
+   "child_cols": "MAPID",
+   "parent": "TQP_MAPDEF",
+   "parent_cols": "MAPID",
+   "note": "Map 의 Mark Die / Shot, 같은 Map ID 로 조회 (ProbeMapAnalysis GET_MAPDEF_MAP + GET_MAPDEF_DIE)"
+  },
+  {
+   "child": "TQP_FOI_DIE",
+   "child_cols": "WAFER_SEQ",
+   "parent": "TQP_WAFER",
+   "parent_cols": "WAFER_SEQ",
+   "note": "외관검사 Die 의 Wafer (TQP_WAFER_SUM.xml INSERT_TQP_WAFER_SUM_01)"
+  },
+  {
+   "child": "TQP_FOI_DIE",
+   "child_cols": "WAFER_SEQ",
+   "parent": "TQP_WAFER_SUM",
+   "parent_cols": "WAFER_SEQ",
+   "note": "외관검사 Die 조회 (TQP_FOI_DIE.xml SELECT_FOI_MAP_MULTI_RAW / SELECT_FOI_MAP_MULTI_IMAGE)"
+  },
+  {
+   "child": "TQP_FOI_DIE",
+   "child_cols": "BIN",
+   "parent": "TQP_BINDESC",
+   "parent_cols": "BIN",
+   "note": "PROGRAM = 'AVI' 조건 (TQP_FOI_DIE.xml SELECT_AVI_BIN_SUMMARY, 외부 조인)"
+  },
+  {
+   "child": "TQP_FOI_IMAGES",
+   "child_cols": "WAFER_SEQ",
+   "parent": "TQP_WAFER_SUM",
+   "parent_cols": "WAFER_SEQ",
+   "note": "이미지의 Wafer (TQP_FOI_IMAGES.xml SELECT_TQP_FOI_IMAGES_MULTI)"
+  },
+  {
+   "child": "TQP_PCM_INPUT_HIS",
+   "child_cols": "EQUIP_ID",
+   "parent": "TQC_EQUIP",
+   "parent_cols": "EQUIP_ID",
+   "note": "PCM 설비 Probe Card 사용 시간 계산 (TQC_EQUIP.xml SELECT_PCM_EQUIP_STATUS)"
+  },
+  {
+   "child": "TD_08EYP1",
+   "child_cols": "WAFER_SEQ",
+   "parent": "TQP_WAFER",
+   "parent_cols": "WAFER_SEQ",
+   "note": "Die 데이터의 Wafer (TD_TABLE.xml GET_PCM_DATA / SELECT_ALL_DATA), 테이블은 TQP_DATA_TABLES 에 등록"
+  },
+  {
+   "child": "TD_08EYP1",
+   "child_cols": "BIN",
+   "parent": "TQP_BINDESC",
+   "parent_cols": "BIN",
+   "note": "PROGRAM = '08EYP1' 조건 (TD_TABLE.xml GET_BIN_XY_DATA_SINGLE, 외부 조인)"
+  },
+  {
+   "child": "TD_52PX",
+   "child_cols": "WAFER_SEQ",
+   "parent": "TQP_WAFER",
+   "parent_cols": "WAFER_SEQ",
+   "note": "Die 데이터의 Wafer (TD_TABLE.xml GET_PCM_DATA / SELECT_ALL_DATA), 테이블은 TQP_DATA_TABLES 에 등록"
+  },
+  {
+   "child": "TD_52PX",
+   "child_cols": "BIN",
+   "parent": "TQP_BINDESC",
+   "parent_cols": "BIN",
+   "note": "PROGRAM = '52PX' 조건 (TD_TABLE.xml GET_BIN_XY_DATA_SINGLE, 외부 조인)"
+  },
+  {
+   "child": "TD_89CP",
+   "child_cols": "WAFER_SEQ",
+   "parent": "TQP_WAFER",
+   "parent_cols": "WAFER_SEQ",
+   "note": "Die 데이터의 Wafer (TD_TABLE.xml GET_PCM_DATA / SELECT_ALL_DATA), 테이블은 TQP_DATA_TABLES 에 등록"
+  },
+  {
+   "child": "TD_89CP",
+   "child_cols": "BIN",
+   "parent": "TQP_BINDESC",
+   "parent_cols": "BIN",
+   "note": "PROGRAM = '89CP' 조건 (TD_TABLE.xml GET_BIN_XY_DATA_SINGLE, 외부 조인)"
+  },
+  {
+   "child": "TD_KA36_CP2",
+   "child_cols": "WAFER_SEQ",
+   "parent": "TQP_WAFER",
+   "parent_cols": "WAFER_SEQ",
+   "note": "Die 데이터의 Wafer (TD_TABLE.xml GET_PCM_DATA / SELECT_ALL_DATA), 테이블은 TQP_DATA_TABLES 에 등록"
+  },
+  {
+   "child": "TD_KA36_CP2",
+   "child_cols": "BIN",
+   "parent": "TQP_BINDESC",
+   "parent_cols": "BIN",
+   "note": "PROGRAM = 'KA36_CP2' 조건 (TD_TABLE.xml GET_BIN_XY_DATA_SINGLE, 외부 조인)"
+  },
+  {
+   "child": "TD_OMM_TSVET",
+   "child_cols": "WAFER_SEQ",
+   "parent": "TQP_WAFER",
+   "parent_cols": "WAFER_SEQ",
+   "note": "Die 데이터의 Wafer (TD_TABLE.xml GET_PCM_DATA / SELECT_ALL_DATA), 테이블은 TQP_DATA_TABLES 에 등록"
+  },
+  {
+   "child": "TD_OMM_TSVET",
+   "child_cols": "BIN",
+   "parent": "TQP_BINDESC",
+   "parent_cols": "BIN",
+   "note": "PROGRAM = 'OMM_TSVET' 조건 (TD_TABLE.xml GET_BIN_XY_DATA_SINGLE, 외부 조인)"
+  }
+ ],
+ "report_notes": [
+  "TQP_WAFER 의 많은 컬럼(HANDLER_ID / T7SCRIBE / TWFLAGS 등)은 이관(TestDataMigration) 데이터에만 값이 있고 현재 적재(CP / PCM / AVI / E-Test)는 채우지 않는다. 이 컬럼들은 컬럼 이름과 STDF 항목 기준으로 추정했다 (설명에 STDF 항목 표기).",
+  "TD_* 는 Program 별로 자동 생성되는 Die 측정 데이터 테이블이다 (TQP_DATA_TABLES 에 등록, Parameter 컬럼 이름 = TQP_PARASPEC.PARAM_NAME). E-Test 업로드가 만드는 TD_<Device>_<공정>(예: TD_OMM_TSVET)의 Parameter 컬럼은 E-Test 등록 Parameter 헤더 원문으로 설명을 적는다. 기존 TD 4개는 고정 컬럼만 있다.",
+  "Lot 수율 계산이 경로마다 다르다: Summary 적재 = BIN1 합 / 측정 Die 합 (Lot 의 BIN0 ~ 99 만 채움), Wafer 삭제 뒤 재생성 = Wafer 수율 평균.",
+  "TQP_PRODUCT.MAPID 는 적재 경로마다 넣는 값이 다르다 (CP = MES MAT_ID, Scope 업로드 = DEVICE_ALIAS).",
+  "TQP_MAPDEF_DIE 는 적재(INSERT)하는 코드가 없다. TQP_CUSTOMER / TQP_FOI_DIE / TQP_FOI_IMAGES / TQP_PCM_INPUT_HIS / TQP_VISUALINSPSPEC 는 로컬 DB 에 데이터가 없어 소스로만 확인했다."
+ ]
+}

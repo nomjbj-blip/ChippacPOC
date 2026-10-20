@@ -10,7 +10,7 @@ namespace DACrux.SEMDMS.BSL
 {
     /// <summary>
     /// GDS Chain 저장 / 조회 / 삭제의 업무 검증과 DSL 호출을 담당한다.
-    /// 설계: 문서/2026-10-06_GDS_Chain_DB저장_설계.md 10.1절
+    /// 설계: 문서/설계/02_GDS/2026-10-06_GDS_Chain_DB저장_설계.md 10.1절
     /// 2026-10-06 결정: 버전 이력 없음(VERSION_NO = 1, 다시 저장하면 이전 내용을 지우고 새로 저장) / 삭제는 실제 삭제.
     /// 기존 GdsMapImport와 같이 문장마다 자동 Commit이다. 저장 도중 끊기면 VERSION_STATUS = DRAFT로 남고,
     /// 화면은 이를 "저장 미완료"로 보여 주며 다시 저장하면 처음부터 저장한다.
@@ -75,10 +75,12 @@ namespace DACrux.SEMDMS.BSL
                 throw new ArgumentException("격자 크기는 0보다 큰 숫자여야 합니다.", "ChainInfo");
             string strUser = Required(ChainInfo[8], "User", 30);
 
-            if (aLayers == null || aLayers.GetLength(0) == 0 || aLayers.GetLength(1) != 1)
-                throw new ArgumentException("탐색 Layer는 1개 이상, 열은 LAYER_ID 1개여야 합니다.", "aLayers");
-            if (aRules != null && aRules.GetLength(0) > 0 && aRules.GetLength(1) != 3)
-                throw new ArgumentException("Layer 규칙 열은 FIRST_LAYER_ID / SECOND_LAYER_ID / TOLERANCE 3개여야 합니다.", "aRules");
+            // Layer 는 번호 + DataType 단위다 (2026-10-20). 예전 열 수(DataType 없음)로 부르면 DataType 0 으로 저장한다.
+            if (aLayers == null || aLayers.GetLength(0) == 0 || (aLayers.GetLength(1) != 1 && aLayers.GetLength(1) != 2))
+                throw new ArgumentException("탐색 Layer는 1개 이상, 열은 LAYER_ID / DATA_TYPE 2개(또는 LAYER_ID 1개)여야 합니다.", "aLayers");
+            if (aRules != null && aRules.GetLength(0) > 0 && aRules.GetLength(1) != 3 && aRules.GetLength(1) != 5)
+                throw new ArgumentException("Layer 규칙 열은 FIRST_LAYER_ID / FIRST_DATA_TYPE / SECOND_LAYER_ID / SECOND_DATA_TYPE / TOLERANCE 5개"
+                    + "(또는 FIRST_LAYER_ID / SECOND_LAYER_ID / TOLERANCE 3개)여야 합니다.", "aRules");
 
             CheckMapReady(strFactory, strDevice);
 
@@ -123,36 +125,48 @@ namespace DACrux.SEMDMS.BSL
                 throw new DataException("Chain 저장 내용이 한 건 생성되지 않았습니다.");
 
             int iLayers = aLayers.GetLength(0);
-            string[,] aLayer = new string[iLayers, 4];
+            bool bLayerDataType = aLayers.GetLength(1) == 2;
+            string[,] aLayer = new string[iLayers, 5];
             for (int i = 0; i < iLayers; i++)
             {
                 aLayer[i, 0] = strFactory;
                 aLayer[i, 1] = strDevice;
                 aLayer[i, 2] = strChainSeq;
                 aLayer[i, 3] = ParseInt(aLayers[i, 0], "LAYER_ID").ToString(CultureInfo.InvariantCulture);
+                aLayer[i, 4] = (bLayerDataType ? ParseDataType(aLayers[i, 1], "DATA_TYPE") : 0).ToString(CultureInfo.InvariantCulture);
             }
-            new DACrux.SEMDMS.DSL.TQP_GDS_CHAIN_LAYER().InsertExecuteMultiple("CREATE_CHAIN_LAYER", aLayer);
+            new DACrux.SEMDMS.DSL.TQP_GDS_CHAIN_LAYER().InsertExecuteMultiple("CREATE_CHAIN_LAYER_DT", aLayer);
 
             if (aRules != null && aRules.GetLength(0) > 0)
             {
                 int iRules = aRules.GetLength(0);
-                string[,] aRule = new string[iRules, 6];
+                bool bRuleDataType = aRules.GetLength(1) == 5;
+                string[,] aRule = new string[iRules, 8];
                 for (int i = 0; i < iRules; i++)
                 {
                     int iFirst = ParseInt(aRules[i, 0], "FIRST_LAYER_ID");
-                    int iSecond = ParseInt(aRules[i, 1], "SECOND_LAYER_ID");
-                    double dTolerance = ParseDouble(aRules[i, 2], "TOLERANCE");
+                    int iFirstType = bRuleDataType ? ParseDataType(aRules[i, 1], "FIRST_DATA_TYPE") : 0;
+                    int iSecond = ParseInt(aRules[i, bRuleDataType ? 2 : 1], "SECOND_LAYER_ID");
+                    int iSecondType = bRuleDataType ? ParseDataType(aRules[i, 3], "SECOND_DATA_TYPE") : 0;
+                    double dTolerance = ParseDouble(aRules[i, bRuleDataType ? 4 : 2], "TOLERANCE");
                     if (dTolerance < 0)
                         throw new ArgumentException("허용 오차는 0 이상이어야 합니다.", "aRules");
+                    // DB CHECK(FIRST_LAYER_ID <= SECOND_LAYER_ID)에 맞춰 (번호, DataType)이 작은 쪽을 앞에 둔다.
+                    if (iFirst > iSecond || (iFirst == iSecond && iFirstType > iSecondType))
+                    {
+                        int iSwap = iFirst; iFirst = iSecond; iSecond = iSwap;
+                        iSwap = iFirstType; iFirstType = iSecondType; iSecondType = iSwap;
+                    }
                     aRule[i, 0] = strFactory;
                     aRule[i, 1] = strDevice;
                     aRule[i, 2] = strChainSeq;
-                    // DB CHECK(FIRST <= SECOND)에 맞춰 작은 번호를 앞에 둔다.
-                    aRule[i, 3] = Math.Min(iFirst, iSecond).ToString(CultureInfo.InvariantCulture);
-                    aRule[i, 4] = Math.Max(iFirst, iSecond).ToString(CultureInfo.InvariantCulture);
-                    aRule[i, 5] = dTolerance.ToString("G17", CultureInfo.InvariantCulture);
+                    aRule[i, 3] = iFirst.ToString(CultureInfo.InvariantCulture);
+                    aRule[i, 4] = iFirstType.ToString(CultureInfo.InvariantCulture);
+                    aRule[i, 5] = iSecond.ToString(CultureInfo.InvariantCulture);
+                    aRule[i, 6] = iSecondType.ToString(CultureInfo.InvariantCulture);
+                    aRule[i, 7] = dTolerance.ToString("G17", CultureInfo.InvariantCulture);
                 }
-                new DACrux.SEMDMS.DSL.TQP_GDS_CHAIN_RULE().InsertExecuteMultiple("CREATE_CHAIN_RULE", aRule);
+                new DACrux.SEMDMS.DSL.TQP_GDS_CHAIN_RULE().InsertExecuteMultiple("CREATE_CHAIN_RULE_DT", aRule);
             }
 
             DataTable dtResult = new DataTable("CHAIN_SAVE");
@@ -327,14 +341,16 @@ namespace DACrux.SEMDMS.BSL
 
         #region [Chain 상세 조회]
 
+        /// <summary>Chain 탐색 Layer 조회. 결과: LAYER_ID / DATA_TYPE (2026-10-20 DataType 추가).</summary>
         public DataTable GetChainLayers(string strFactory, string strDeviceID, string strChainSeq)
         {
-            return new DACrux.SEMDMS.DSL.TQP_GDS_CHAIN_LAYER().GetData("SELECT_CHAIN_LAYER", null, ChainKey(strFactory, strDeviceID, strChainSeq));
+            return new DACrux.SEMDMS.DSL.TQP_GDS_CHAIN_LAYER().GetData("SELECT_CHAIN_LAYER_DT", null, ChainKey(strFactory, strDeviceID, strChainSeq));
         }
 
+        /// <summary>Chain Layer 연결 규칙 조회. 결과에 FIRST_DATA_TYPE / SECOND_DATA_TYPE 이 있다 (2026-10-20).</summary>
         public DataTable GetChainRules(string strFactory, string strDeviceID, string strChainSeq)
         {
-            return new DACrux.SEMDMS.DSL.TQP_GDS_CHAIN_RULE().GetData("SELECT_CHAIN_RULE", null, ChainKey(strFactory, strDeviceID, strChainSeq));
+            return new DACrux.SEMDMS.DSL.TQP_GDS_CHAIN_RULE().GetData("SELECT_CHAIN_RULE_DT", null, ChainKey(strFactory, strDeviceID, strChainSeq));
         }
 
         public DataTable GetChainMembers(string strFactory, string strDeviceID, string strChainSeq)
@@ -401,6 +417,15 @@ namespace DACrux.SEMDMS.BSL
             int iValue;
             if (!int.TryParse(strValue, NumberStyles.Integer, CultureInfo.InvariantCulture, out iValue))
                 throw new ArgumentException(strName + " 값이 정수가 아닙니다: " + strValue, strName);
+            return iValue;
+        }
+
+        /// <summary>GDS DataType / TextType(0 ~ 65535)을 확인한다 (2026-10-20).</summary>
+        private static int ParseDataType(string strValue, string strName)
+        {
+            int iValue = ParseInt(strValue, strName);
+            if (iValue < 0 || iValue > 65535)
+                throw new ArgumentException(strName + " 값은 0 ~ 65535 사이여야 합니다: " + strValue, strName);
             return iValue;
         }
 

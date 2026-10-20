@@ -1,4 +1,4 @@
-# 여러 Input/Output 중 실제 연결된 단자 쌍을 찾고 단일 지정 호출도 유지하는지 검사한다.
+﻿# 여러 Input/Output 중 실제 연결된 단자 쌍을 찾고 단일 지정 호출도 유지하는지 검사한다.
 $ErrorActionPreference = 'Stop'
 $exePath = if ($env:CHAIN_PROBE_EXE) { $env:CHAIN_PROBE_EXE }
     else { Join-Path $PSScriptRoot '..\bin\Debug\NexplantQMS.GdsMap.exe' }
@@ -49,7 +49,7 @@ if ($disconnectedResult.IsConnected -or $disconnectedCandidates -ne 'A,E') {
 }
 
 $request.SelectedLayerIds = [System.Collections.Generic.HashSet[int]]::new()
-[void]$request.SelectedLayerIds.Add(1)
+[void]$request.SelectedLayerIds.Add([NexplantQMS.GdsMap.GdsLayerKey]::Make(1, 0))
 $missing = $tracer.Trace($request)
 if ($missing.IsConnected -or $missing.Message -notlike '*Input Element 일부*') {
     throw '필터에서 빠진 Input을 무시하고 경로를 계산했습니다.'

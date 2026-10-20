@@ -36,5 +36,44 @@ namespace DACrux.SEMDMS.RO
                 throw ex;
             }
         }
+
+        /// <summary>통합 연관 분석 Wafer 집계 (2026-10-16)</summary>
+        public DataSet Analyze(DACrux.SEMDMS.Interface.GdsKlarfAnalysisRequest request)
+        {
+            try
+            {
+                return m_OBJ.Analyze(request);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        /// <summary>통합 연관 분석 Ready 조회 (2026-10-16)</summary>
+        public DataSet GetWaferReady(string strFactory, long lStepSeq, string strDeviceID)
+        {
+            try
+            {
+                return m_OBJ.GetWaferReady(strFactory, lStepSeq, strDeviceID);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        /// <summary>통합 연관 분석 Die 1개 상세 (2026-10-16)</summary>
+        public DataSet AnalyzeDie(DACrux.SEMDMS.Interface.GdsKlarfAnalysisRequest request, int xIndex, int yIndex, string focusChainSeq)
+        {
+            try
+            {
+                return m_OBJ.AnalyzeDie(request, xIndex, yIndex, focusChainSeq);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
     }
 }

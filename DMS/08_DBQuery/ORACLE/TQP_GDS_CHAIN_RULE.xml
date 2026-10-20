@@ -44,4 +44,84 @@ VALUES
             <param direction="Input" dbtype="Number" size="0">:chain_seq</param>
         </parameters>
     </query>
+    <!-- Map 복사(GdsMapImport.CopyMap, 2026-10-15): 원본 Device 의 행을 새 Device 이름으로 INSERT ... SELECT (Chain 1개씩) -->
+    <query statement="Insert" queryid="COPY_CHAIN_RULE" commandtype="Text" description="Map 복사: Chain Layer 연결 규칙" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_GDS_CHAIN_RULE
+    (FACTORY, DEVICE_ID, CHAIN_SEQ, VERSION_NO, FIRST_LAYER_ID, SECOND_LAYER_ID, TOLERANCE)
+SELECT FACTORY, :target_device_id, :new_chain_seq, VERSION_NO, FIRST_LAYER_ID, SECOND_LAYER_ID, TOLERANCE
+  FROM TQP_GDS_CHAIN_RULE
+ WHERE FACTORY = :factory
+   AND DEVICE_ID = :source_device_id
+   AND CHAIN_SEQ = :source_chain_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="50">:target_device_id</param>
+            <param direction="Input" dbtype="Number" size="0">:new_chain_seq</param>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:source_device_id</param>
+            <param direction="Input" dbtype="Number" size="0">:source_chain_seq</param>
+        </parameters>
+    </query>
+    <!-- 연결 규칙 두 Layer = Layer 번호 + DataType (2026-10-20). 위 쿼리는 이전 서버용. -->
+    <query statement="Insert" queryid="CREATE_CHAIN_RULE_DT" commandtype="Text" description="Chain Layer(번호 + DataType) 연결 규칙 저장 (InsertExecuteMultiple, 허용 오차는 G17 문자열)" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_GDS_CHAIN_RULE
+    (FACTORY,
+    DEVICE_ID,
+    CHAIN_SEQ,
+    VERSION_NO,
+    FIRST_LAYER_ID,
+    FIRST_DATA_TYPE,
+    SECOND_LAYER_ID,
+    SECOND_DATA_TYPE,
+    TOLERANCE)
+VALUES
+    (:factory,
+    :device_id,
+    :chain_seq,
+    1,
+    :first_layer_id,
+    :first_data_type,
+    :second_layer_id,
+    :second_data_type,
+    TO_BINARY_DOUBLE(:tolerance))]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
+            <param direction="Input" dbtype="Number" size="0">:chain_seq</param>
+            <param direction="Input" dbtype="Number" size="0">:first_layer_id</param>
+            <param direction="Input" dbtype="Number" size="0">:first_data_type</param>
+            <param direction="Input" dbtype="Number" size="0">:second_layer_id</param>
+            <param direction="Input" dbtype="Number" size="0">:second_data_type</param>
+            <param direction="Input" dbtype="VarChar" size="40">:tolerance</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_CHAIN_RULE_DT" commandtype="Text" description="Chain Layer(번호 + DataType) 연결 규칙 조회" commandtimeout="60">
+        <commandtext><![CDATA[SELECT FIRST_LAYER_ID, FIRST_DATA_TYPE, SECOND_LAYER_ID, SECOND_DATA_TYPE, TOLERANCE
+  FROM TQP_GDS_CHAIN_RULE
+ WHERE FACTORY = :factory
+   AND DEVICE_ID = :device_id
+   AND CHAIN_SEQ = :chain_seq
+   AND VERSION_NO = 1
+ ORDER BY FIRST_LAYER_ID, FIRST_DATA_TYPE, SECOND_LAYER_ID, SECOND_DATA_TYPE]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
+            <param direction="Input" dbtype="Number" size="0">:chain_seq</param>
+        </parameters>
+    </query>
+    <query statement="Insert" queryid="COPY_CHAIN_RULE_DT" commandtype="Text" description="Map 복사: Chain Layer(번호 + DataType) 연결 규칙" commandtimeout="60">
+        <commandtext><![CDATA[INSERT INTO TQP_GDS_CHAIN_RULE
+    (FACTORY, DEVICE_ID, CHAIN_SEQ, VERSION_NO, FIRST_LAYER_ID, FIRST_DATA_TYPE, SECOND_LAYER_ID, SECOND_DATA_TYPE, TOLERANCE)
+SELECT FACTORY, :target_device_id, :new_chain_seq, VERSION_NO, FIRST_LAYER_ID, FIRST_DATA_TYPE, SECOND_LAYER_ID, SECOND_DATA_TYPE, TOLERANCE
+  FROM TQP_GDS_CHAIN_RULE
+ WHERE FACTORY = :factory
+   AND DEVICE_ID = :source_device_id
+   AND CHAIN_SEQ = :source_chain_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="50">:target_device_id</param>
+            <param direction="Input" dbtype="Number" size="0">:new_chain_seq</param>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:source_device_id</param>
+            <param direction="Input" dbtype="Number" size="0">:source_chain_seq</param>
+        </parameters>
+    </query>
 </queryxml>

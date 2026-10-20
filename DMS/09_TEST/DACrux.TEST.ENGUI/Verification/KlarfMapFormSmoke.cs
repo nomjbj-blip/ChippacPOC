@@ -587,7 +587,7 @@ internal static class KlarfMapFormSmoke
         const double newX = 23830d, newY = 30064d;
         px.Value = (decimal)newX;
         py.Value = (decimal)newY;
-        Check("Pitch 변경 -> [원형 생성] 안내", status.Text.Contains("[원형 생성]"));
+        Check("Pitch 변경 -> 원형 생성 전 표시", status.Text.Contains("원형 생성 전"));
         Check("Pitch 변경만으로는 Map 그대로", (double)Prop(map, "DieSizeX") == PitchX);
         Invoke(type, form, "btnGenerate_Click");
         Check("변경 Pitch -> Die 크기 (저장 CHIP_SIZE)", (double)Prop(map, "DieSizeX") == newX && (double)Prop(map, "DieSizeY") == newY);

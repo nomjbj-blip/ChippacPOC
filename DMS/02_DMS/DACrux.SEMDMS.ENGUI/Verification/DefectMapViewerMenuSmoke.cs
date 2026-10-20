@@ -7,10 +7,11 @@ using System.Windows.Forms;
 /// 컨트롤만 만들고 화면에 띄우지 않는다 (Load 이벤트의 기준정보 / DB 조회를 하지 않기 위해서다).
 /// 확인 항목:
 /// 1. 기존 메뉴 항목은 그대로이고 맨 뒤에 "-" / "Center Cross Show / Hide" 2개만 늘었다
-/// 2. 처음 CenterMark = 끔 (InitializeComponent 값 그대로, Debug 빌드의 켬은 Draw 에서 정한다)
-/// 3. 메뉴를 누를 때마다 CenterMark 가 바뀌고, 작업자가 바꿨다는 표시(m_bCenterCrossChanged)가 남는다
-///    (Draw 의 Debug 기본값 처리는 Wafer / DB 가 있어야 실행되므로 이 검사에서는 표시 값만 본다)
+/// 2. 처음 CenterMark = 끔 (InitializeComponent 값 그대로. 2026-10-16 부터 Debug 빌드도 Draw 에서 켜지 않는다)
+/// 3. 메뉴를 누를 때마다 CenterMark 가 바뀐다
+///    (Draw 는 Wafer / DB 가 있어야 실행되므로 이 검사에서는 Draw 뒤 값을 보지 않는다. 대신 Debug 켬 처리용 필드가 없어졌는지 본다)
 /// 4. 메뉴가 뜰 때(Popup) Free Zoom / Fit Size / Move View Center / Defect Select / Die Select / Center Cross 만 보인다 (2026-10-13 메뉴 정리)
+/// 5. Reclassify / RD 탭은 닫혀 있고 Shot 선 / 원점(중심) Die 테두리는 기본 꺼짐 (2026-10-16)
 /// 사용: DefectMapViewerMenuSmoke.exe <TEMP 빌드 DACrux.SEMDMS.Control.dll>
 /// 출력 마지막 줄: DEFECT_MAP_VIEWER_MENU_SMOKE=PASS / FAIL
 /// </summary>
@@ -52,10 +53,11 @@ internal static class DefectMapViewerMenuSmoke
             }
 
             PropertyInfo centerMark = defectMapType.GetProperty("CenterMark");
-            FieldInfo changed = type.GetField("m_bCenterCrossChanged", BindingFlags.Instance | BindingFlags.NonPublic);
-            Check("처음 십자선 끔 / 바꾼 표시 없음", !(bool)centerMark.GetValue(map, null) && !(bool)changed.GetValue(viewer));
+            // Debug 빌드에서 Draw 가 십자선을 켜던 처리(작업자 변경 표시 필드 포함)는 2026-10-16 에 없앴다. 이 검사는 Debug 빌드 DLL 로 돈다.
+            Check("Debug 기본 켬 처리 없음 (m_bCenterCrossChanged 필드 없음)", type.GetField("m_bCenterCrossChanged", BindingFlags.Instance | BindingFlags.NonPublic) == null);
+            Check("처음 십자선 끔", !(bool)centerMark.GetValue(map, null));
             menu.MenuItems[count - 1].PerformClick();
-            Check("메뉴 1번 -> 십자선 켬 / 바꾼 표시", (bool)centerMark.GetValue(map, null) && (bool)changed.GetValue(viewer));
+            Check("메뉴 1번 -> 십자선 켬", (bool)centerMark.GetValue(map, null));
             menu.MenuItems[count - 1].PerformClick();
             Check("메뉴 2번 -> 십자선 끔", !(bool)centerMark.GetValue(map, null));
 
@@ -72,6 +74,22 @@ internal static class DefectMapViewerMenuSmoke
             int hidden = 0;
             foreach (MenuItem item in menu.MenuItems) if (!item.Visible) hidden++;
             Check("숨긴 항목 " + hidden + "개 (메뉴 자체는 그대로, 항목 수 " + menu.MenuItems.Count + ")", hidden > 0 && menu.MenuItems.Count == count);
+
+            // 탭 정리 (2026-10-16): Reclassify(RC) / RD 탭은 닫혀 있고 나머지 4개는 열려 있다. Shot 선은 기본 꺼짐.
+            object dockManager = type.GetField("ultraDockManager", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(viewer);
+            object panes = dockManager.GetType().GetProperty("ControlPanes").GetValue(dockManager, null);
+            PropertyInfo byKey = panes.GetType().GetProperty("Item", new Type[] { typeof(string) });
+            string closedKeys = "";
+            foreach (string key in new string[] { "DD", "IL", "RA", "IM", "RC", "RD" })
+            {
+                object pane = byKey.GetValue(panes, new object[] { key });
+                if ((bool)pane.GetType().GetProperty("Closed").GetValue(pane, null)) closedKeys += (closedKeys.Length > 0 ? "," : "") + key;
+            }
+            Console.WriteLine("닫힌 탭: " + closedKeys);
+            Check("닫힌 탭 = RC(Reclassify) / RD", closedKeys == "RC,RD");
+            Check("Shot 선 기본 꺼짐 (VisibleShot = false)", !(bool)defectMapType.GetProperty("VisibleShot").GetValue(map, null));
+            // 원점(중심) Die 빨간 테두리 기본 끔 (2026-10-16)
+            Check("원점 Die 테두리 기본 끔 (DrawOriginDie = false)", !(bool)defectMapType.GetProperty("DrawOriginDie").GetValue(map, null));
         }
     }
 

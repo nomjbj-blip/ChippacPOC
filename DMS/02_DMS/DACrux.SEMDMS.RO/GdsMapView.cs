@@ -89,33 +89,5 @@ namespace DACrux.SEMDMS.RO
         }
 
         #endregion
-
-        #region [TQP_GDS_MAP_SUB_DEVICE]
-
-        public DataTable GetSubDeviceList(string strFactory, string strDeviceID)
-        {
-            try
-            {
-                return m_OBJ.GetSubDeviceList(strFactory, strDeviceID);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public DataTable GetMapDeviceBySub(string strFactory, string strSubDeviceID)
-        {
-            try
-            {
-                return m_OBJ.GetMapDeviceBySub(strFactory, strSubDeviceID);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        #endregion
     }
 }

@@ -190,8 +190,22 @@
     <Compile Include="DefectMapAnalysis\frmGdsKlarfAnalysis.Designer.cs">
       <DependentUpon>frmGdsKlarfAnalysis.cs</DependentUpon>
     </Compile>
+    <Compile Include="DefectMapAnalysis\frmGdsKlarfSourceFind.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DefectMapAnalysis\frmGdsKlarfSourceFind.Designer.cs">
+      <DependentUpon>frmGdsKlarfSourceFind.cs</DependentUpon>
+    </Compile>
     <Compile Include="ETest\EtResultFileParser.cs" />
+    <Compile Include="ETest\EtJudgeRule.cs" />
     <Compile Include="ETest\EtSpecTable.cs" />
+    <Compile Include="ETest\EtResultData.cs" />
+    <Compile Include="ETest\EtResultDataControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ETest\EtResultDataControl.Designer.cs">
+      <DependentUpon>EtResultDataControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="ETest\frmEtResultUpload.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -204,11 +218,17 @@
     <Compile Include="ETest\frmEtResultView.Designer.cs">
       <DependentUpon>frmEtResultView.cs</DependentUpon>
     </Compile>
-    <Compile Include="ETest\frmEtLimitSetup.cs">
+    <Compile Include="ETest\frmEtParaRegister.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ETest\frmEtLimitSetup.Designer.cs">
-      <DependentUpon>frmEtLimitSetup.cs</DependentUpon>
+    <Compile Include="ETest\frmEtParaRegister.Designer.cs">
+      <DependentUpon>frmEtParaRegister.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ETest\frmEtParaSetup.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ETest\frmEtParaSetup.Designer.cs">
+      <DependentUpon>frmEtParaSetup.cs</DependentUpon>
     </Compile>
     <Compile Include="GdsMap\frmGdsMapSetup.cs">
       <SubType>Form</SubType>
@@ -412,6 +432,27 @@
     </EmbeddedResource>
     <EmbeddedResource Include="DefectMapAnalysis\frmDefectBareMapViewer.resx">
       <DependentUpon>frmDefectBareMapViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ETest\EtResultDataControl.resx">
+      <DependentUpon>EtResultDataControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ETest\frmEtParaRegister.resx">
+      <DependentUpon>frmEtParaRegister.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ETest\frmEtParaSetup.resx">
+      <DependentUpon>frmEtParaSetup.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ETest\frmEtResultUpload.resx">
+      <DependentUpon>frmEtResultUpload.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ETest\frmEtResultView.resx">
+      <DependentUpon>frmEtResultView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DefectMapAnalysis\frmKlarfFileViewer.resx">
+      <DependentUpon>frmKlarfFileViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DefectMapAnalysis\frmGdsKlarfSourceFind.resx">
+      <DependentUpon>frmGdsKlarfSourceFind.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\licenses.licx" />
     <EmbeddedResource Include="Properties\Resources.resx">

@@ -6,7 +6,7 @@
 
 AOI KLARF의 Defect 위치가 GDS Chain을 구성하는 Bump / RDL 영역과 관련되는지 확인하고 E-Test Fail Chain과 연결한다.
 
-근거는 [9/30 문서 검토 종합](../../../문서/2026-09-30_문서검토_종합.md)과 [Chain Setup 컨셉안](../../../문서/2026-09-23_Chain_Setup_기능_컨셉안.md)이다. 이번 정리에서는 고객 원본 PDF / XLSX를 새로 분석하지 않았다. 확정 고객 요구로 인용할 때 원본과 최신 협의 내용을 다시 확인한다.
+근거는 [9/30 문서 검토 종합](../../../문서/설계/01_계획_관리/2026-09-30_문서검토_종합.md)과 [Chain Setup 컨셉안](../../../문서/설계/02_GDS/2026-09-23_Chain_Setup_기능_컨셉안.md)이다. 이번 정리에서는 고객 원본 PDF / XLSX를 새로 분석하지 않았다. 확정 고객 요구로 인용할 때 원본과 최신 협의 내용을 다시 확인한다.
 
 ## 현재 구분
 
@@ -34,32 +34,47 @@ AOI KLARF의 Defect 위치가 GDS Chain을 구성하는 Bump / RDL 영역과 관
 
 ## 2026-10-02 사용자 결정
 
-KLARF Defect와의 연관분석은 Chain 영역(현재 Chain Version의 Member 도형)만 대상으로 한다. 배경 도면 도형은 비교하지 않는다. 1차 후보는 Defect 좌표 +/- Tolerance와 Member 도형 Bounds 겹침. 상세는 [GDS Map DB 저장 설계 13.3절](../../../문서/2026-10-02_GDS_Map_DB저장_설계.md).
+KLARF Defect와의 연관분석은 Chain 영역(현재 Chain Version의 Member 도형)만 대상으로 한다. 배경 도면 도형은 비교하지 않는다. 1차 후보는 Defect 좌표 +/- Tolerance와 Member 도형 Bounds 겹침. 상세는 [GDS Map DB 저장 설계 13.3절](../../../문서/설계/02_GDS/2026-10-02_GDS_Map_DB저장_설계.md).
 
 
 ## 2026-10-07 E-Test 결과 파일 설계 (CLAUDE-029)
 
-샘플 `SampleFile/26_10_06 Sample File/CAI_OMM_ATV_A0_TSVET_..._RH-HS2615-02.xlsx` 분석 결과 헤더 형식은 `{Para}[_{조건}={값}]@{Chain}[:{Chain2}]` (Leakage_Serial 은 Chain 2개). 파일 Limit 은 쓰지 않고 별도 Limit 테이블 / 화면으로 판정한다 (Connectivity / Resistance 는 파일 Limit 이 N/A 라 Open 판정에 Limit 화면 필수). E-Test Chain 이름(최대 19자)과 GDS `CHAIN_CODE` 는 FK 없이 이름으로 대응. 상세와 결정 대기 항목 D1~D8은 [E-Test Parsing / DB 설계](../../../문서/2026-10-07_ETest_결과파일_Parsing_DB설계.md). 설계만 됨 / 구현 없음.
+샘플 `SampleFile/26_10_06 Sample File/CAI_OMM_ATV_A0_TSVET_..._RH-HS2615-02.xlsx` 분석 결과 헤더 형식은 `{Para}[_{조건}={값}]@{Chain}[:{Chain2}]` (Leakage_Serial 은 Chain 2개). 파일 Limit 은 쓰지 않고 별도 Limit 테이블 / 화면으로 판정한다 (Connectivity / Resistance 는 파일 Limit 이 N/A 라 Open 판정에 Limit 화면 필수). E-Test Chain 이름(최대 19자)과 GDS `CHAIN_CODE` 는 FK 없이 이름으로 대응. 상세와 결정 대기 항목 D1~D8은 [E-Test Parsing / DB 설계](../../../문서/설계/04_ETest/2026-10-07_ETest_결과파일_Parsing_DB설계.md). 설계만 됨 / 구현 없음.
 
 KLARF `XD106.02` 연결 분석 (같은 날): Wafer 는 (Lot 핵심 문자열, Slot) 으로 대응, Die 는 시계 90도 + 이동 (4, 5) 잠정 (Defect Die 4 중 3 이 E-Test Fail Die). 설계 문서 8절, 연구소 좌표 대응표로 확정 필요.
 
-범위 조정 (같은 날 사용자 지시): 먼저 파일 간 기준 정보 관계만 설계 -> [파일 간 기준 정보 관계 설계](../../../문서/2026-10-07_파일간_기준정보_관계_설계.md). 연결 규칙 / Die 좌표 / 결과 Data 는 나중.
+범위 조정 (같은 날 사용자 지시): 먼저 파일 간 기준 정보 관계만 설계 -> [파일 간 기준 정보 관계 설계](../../../문서/설계/03_KLARF_Map/2026-10-07_파일간_기준정보_관계_설계.md). 연결 규칙 / Die 좌표 / 결과 Data 는 나중.
 
 E-Test 결과 저장 구현 (CLAUDE-029, 2026-10-07): 테이블 `TQP_GDS_SRC_FILE` / `TQP_GDS_ET_ITEM` / `TQP_GDS_ET_DIE` / `TQP_GDS_ET_VALUE` (로컬 DB 적용), 서비스 `GdsEtResult`, 화면 DMS > E-Test 결과 업로드 (`ENGUI/ETest/frmEtResultUpload`). 13:11 배포, Probe 16/16 / Smoke 17 PASS, DMS 화면 확인 대기. Limit 판정 / KLARF 연결은 나중.
 
 E-Test 중복 기준 변경 (같은 날 사용자 지시): Device 중복 허용, UNIQUE = FACTORY + WAFER_ID, Slot No 는 업로드 화면에서 입력 (설계 12절). 로컬 DB 적용, 배포 승인 대기.
 
-E-Test Spec (CLAUDE-029, 2026-10-12): 키 = Device + 공정 + Parameter(헤더 전체, '#번호' 제거, 대문자), 고객 Spec 표 붙여넣기로 등록, 정의된 항목만 판정('-' 도 정의 항목만 Fail). E-Test Chain 묶음 `TQP_GDS_ET_CHAIN_GROUP` (대표 이름 없음, 보통 _FH + _FL, Device 단위) + Setup Chain(GDS) 으로 찾기: 같은 이름 -> 없으면 이름_FH / _FL -> 묶인 Chain 전부의 Spec / 측정 항목 (`GetEtChainSpecInfo`). [Limit 설계](../../../문서/2026-10-07_ETest_Limit_설정_설계.md) 12 · 14 · 15절.
+E-Test Spec (CLAUDE-029 2026-10-12, CLAUDE-090 2026-10-14 변경): 키 = Device + 공정 + **등록 Parameter 저장 이름**(E-Test Para 설정에서 등록, 헤더 원문을 넣어도 서버가 저장 이름으로 바꿈, DB FK 로 등록 Parameter 에만). 고객 Spec 표 붙여넣기는 등록되지 않은 Parameter 를 Spec 표 출처로 먼저 등록한 뒤 저장. 정의된 항목만 판정('-' 도 정의 항목만 Fail). Spec 편집은 2026-10-14 CLAUDE-095 부터 **E-Test Para 설정 화면**에서 한다(E-Test Limit 설정 화면 / 메뉴 삭제, CLAUDE-096 부터 결과 파일 등록은 E-Test Para 등록 화면으로 분리): 등록 Parameter 전체(Spec 없는 것 포함) + GDS Chain(값 통계 열은 2026-10-14 사용자 요청으로 삭제), Lower / Upper / Enable 더블클릭 · 클릭 수정, 수정 행만 저장(`SaveEtParameterSetup`), [Spec 표 붙여넣기], 다시 판정 질문. 예전 Chain 묶음 `TQP_GDS_ET_CHAIN_GROUP` / 대표 Chain(`TQP_GDS_ET_REP_CHAIN` / `TQP_GDS_ET_CHAIN_LINK`)은 2026-10-14 삭제 -> Parameter 별 `GDS_CHAIN_NAME` + 인계 API `GetEtChainSpecInfo`(GDS Setup Chain 이름 -> 그 이름을 넣은 모든 공정 Parameter / Spec). [Limit 설계](../../../문서/설계/04_ETest/2026-10-07_ETest_Limit_설정_설계.md) 12절 / [Para Setup 설계](../../../문서/설계/04_ETest/2026-10-14_ETest_Para_Setup_설계.md) 4.5 · 10절.
 
-통합 Die# / 좌표 대응 (CLAUDE-081, 2026-10-13): 고객 Die# 1~76 (BS top view 왼쪽 위부터) 와 E-Test (X,Y) / BS·FS KLARF (X,Y) 대응은 규칙식. Setup 없이 Logic 으로 처리 (사용자 결정): `DACrux.SEMDMS.Interface` 의 `DieCoordinateMapper` (Map 사용 Die + KLARF 원점으로 E-Test / KLARF Back·Front / Die# <-> 시스템 좌표). [Die 좌표 설계](../../../문서/2026-10-13_Die좌표_대응_Setup_설계.md) 9절. 쓰는 곳 연결은 다음 단계.
+통합 Die# / 좌표 대응 (CLAUDE-081, 2026-10-13): 고객 Die# 1~76 (BS top view 왼쪽 위부터) 와 E-Test (X,Y) / BS·FS KLARF (X,Y) 대응은 규칙식. Setup 없이 Logic 으로 처리 (사용자 결정): `DACrux.SEMDMS.Interface` 의 `DieCoordinateMapper` (Map 사용 Die + KLARF 원점으로 E-Test / KLARF Back·Front / Die# <-> 시스템 좌표). [Die 좌표 설계](../../../문서/설계/03_KLARF_Map/2026-10-13_Die좌표_대응_Setup_설계.md) 9절. 쓰는 곳 연결은 다음 단계.
 
-E-Test Upload 재설계 (CLAUDE-029 12단계, 2026-10-13): 회의록 기준으로 Pass / Fail 을 Spec 판정으로, 여러 파일 업로드, 업로드 때 Fail Chain 빨간색, $Silterra$ / VIEW_SIDE 저장 중지, 내부 Map 확인 -> [Upload 재설계](../../../문서/2026-10-13_ETest_Upload_재설계.md) (결정 U1~U9 대기).
+E-Test Upload 재설계 (CLAUDE-029 12단계, 2026-10-13): 회의록 기준으로 Pass / Fail 을 Spec 판정으로, 여러 파일 업로드, 업로드 때 Fail Chain 빨간색, $Silterra$ / VIEW_SIDE 저장 중지, 내부 Map 확인 -> [Upload 재설계](../../../문서/설계/04_ETest/2026-10-13_ETest_Upload_재설계.md) (권장안 전부 확정, **2026-10-14 CLAUDE-090 5단계로 구현** — 10.3절).
+
+E-Test 결과 Upload / View 분리 (CLAUDE-113, 2026-10-15): 공통 결과 Control 하나로 두 화면이 같은 모양 -> [설계](../../../문서/설계/04_ETest/2026-10-15_ETest_Upload_View_분리_설계.md) (결정 V1~V6 대기).
 
 ## 2026-10-12 GDS × KLARF 연관 분석 화면 설계 (CLAUDE-053)
 
-화면 A(ENGUI `frmGdsKlarfAnalysis`, 기존 DMSearch + Defect Count Color 방식 구간 색) / 화면 B(GdsMap `GdsDieAnalysisForm`, Die 상세) / 읽기 서비스 `GdsKlarfAnalysis.AnalyzeWafer` 설계. 1차 좌표 가정 `gx = XREL - PitchX/2`, `gy = YREL - PitchY/2` (GDS 원점 = Chip 중심), 보기 기준 기본 Back, 결과 저장 안 함, 결과 키 `(Die, Chain)`으로 E-Test 확장 자리. 설계만 됨 / 결정 A1 ~ A10 대기. 상세는 [연관 분석 화면 설계](../../../문서/2026-10-12_GDS_KLARF_연관분석_화면_설계.md).
+화면 A(ENGUI `frmGdsKlarfAnalysis`, 기존 DMSearch + Defect Count Color 방식 구간 색) / 화면 B(GdsMap `GdsDieAnalysisForm`, Die 상세) / 읽기 서비스 `GdsKlarfAnalysis.AnalyzeWafer` 설계. 1차 좌표 가정 `gx = XREL - PitchX/2`, `gy = YREL - PitchY/2` (GDS 원점 = Chip 중심), 보기 기준 기본 Back, 결과 저장 안 함, 결과 키 `(Die, Chain)`으로 E-Test 확장 자리. 설계만 됨 / 결정 A1 ~ A10 대기. 상세는 [연관 분석 화면 설계](../../../문서/설계/05_연관분석/2026-10-12_GDS_KLARF_연관분석_화면_설계.md).
 
 연관 분석 구현 (CLAUDE-053, 같은 날, 사용자 "우선 권장한대로 진행"): 서비스 `GdsKlarfAnalysis.AnalyzeWafer`(+ `GdsKlarfMatchEngine`) / 화면 A POC > GDS-KLARF 연관 분석(`frmGdsKlarfAnalysis`, RESV_04 = DM) / 화면 B Die 상세(`GdsDieAnalysisForm` + 호스트 `frmGdsDieAnalysis`, 숨김 메뉴). Probe `GdsKlarfAnalysisProbe` 19/19, Smoke `Verify-GdsKlarfAnalysis` 29/29 (반전 일치 10/10). 실제 데이터 SCK / U9 x XD106.02: Back / 5 µm -> Chain 영역 Defect 7 / Die 2. 배포 / DMS 화면 확인은 사용자. 운영 Service config wellknown 미등록(배포 때 추가). 상세: 설계 문서 13절.
+
+## 2026-10-15 GDS × KLARF × E-Test 통합 분석 데이터 설계 (CLAUDE-119)
+
+세 데이터를 불러오는 방식 / GDS Element 폭 / KLARF 허용오차 / E-Test Chain 연동 / Die 수가 많을 때의 리소스 설계. 소스 수정 없음, 결정 B1 ~ B14 대기. 상세: [통합 분석 데이터 설계](../../../문서/설계/05_연관분석/2026-10-15_GDS_KLARF_ETest_통합분석_데이터_설계.md).
+
+- GDS: Chain Member 모양을 Device마다 한 번 읽어 서버 Cache(Die 수와 무관), Bounds 1차 후보 + 실제 모양(BOUNDARY 다각형 / PATH 폭 · PATH_TYPE 끝 · 꺾임) 2차 거리.
+- KLARF: 판정을 거리(Gap)로 바꾸고 허용오차는 거르기 값. 기본 5 µm 유지(무작위 오차 합 약 4.4 µm), Scribe / Seal ring 같은 한 방향 오차는 보정 X / Y. 허용오차 0 ~ 50 µm 표.
+- E-Test: `GDS_CHAIN_NAME`이 있는 Parameter만 (Die, Chain) 판정으로 SQL 집계. Wafer는 엔지니어가 파일 선택, Die는 시스템 Die 좌표, Chain은 이름으로 연결. (Die, Chain) 4분류(일치 / Fail만 / Defect만 / 정상).
+- 리소스: 결과 축소(Member 단위 행 없앰), Die 상세는 `AnalyzeDie`로 따로, DataSet Binary 전송.
+- E-Test Fail 역추적(15절): 1차 = 화면 A "E-Test Fail" 탭(가장 가까운 Defect 거리 포함) + 화면 B 역추적 열기. 2차 = 2 Chain Short 후보. 결정 B15 ~ B17.
+- 2026-10-16 (CLAUDE-123): 결정 B1 ~ B20 권장안 확정, 1차 화면 레이아웃 시안 완료(화면만, 서버는 화면 확인 뒤). 화면 A [준비] / 허용오차 / E-Test 연결 / E-Test Fail 탭, 색 기준 4개, Fail Die 모서리 표식, [직접 찾기] 창 / 화면 B 역추적 / E-Test 값 탭. 시안 이미지 `문서/설계/05_연관분석/2026-10-16_1차화면_시안/`, 재생성 `ENGUI/Verification/Preview-GdsKlarfLayout.ps1 -StepSeq 528 -Device OMM_Hybrid`. Smoke 36/36(지금 서버). 설계 문서 17절.
+- Wafer 중심 Ready 컨셉(16절, 같은 날 변경): DMSearch 에서 Wafer 를 고르면 Wafer Key + Device 로 KLARF Step 전체 / E-Test 공정별 파일 / GDS 상태를 목록만 모아 [준비] 탭에 보임 -> 체크 / 선택 후 [분석]. Wafer Key 규칙은 고객 협의 대상이라 `WaferKeyRule` 한 파일(잠정 Lot 핵심 + Slot), 못 찾으면 [직접 찾기]. 여러 Step 1차 포함(Step별 보기 기준). 결정 B18 ~ B20.
+- 확인 필요(0단계): `GdsMapControl.FlattenStructure`의 중첩 SREF 행렬 순서(부모 변환 먼저 적용), SREF 배율이 PATH 폭에 미반영.
 
 ## 2026-10-12 E-Test 헤더 파싱 / 항목 Spec Rule 초안 (CLAUDE-054)
 
@@ -67,7 +82,7 @@ E-Test Upload 재설계 (CLAUDE-029 12단계, 2026-10-13): 회의록 기준으�
 
 ## 2026-10-13 Scribe 오프셋 (CLAUDE-074 에서 정리, 고객 확인 대상)
 
-File Map Setup 은 Die / Scribe 크기를 받지 않고 Die Pitch 만 조정한다 (사용자 결정). KLARF / DMS / Map 은 모두 Pitch 칸 기준이고, Scribe 는 KLARF Pitch 칸 -> GDS Chip 좌표로 바꿀 때만 필요하다. 연관 분석은 `TQD_SETUP.DIE_PITCH_X / Y` (KLARF 값)를 쓰므로 Map Setup 에서 바꾼 CHIP_SIZE 와 무관하다 (`GdsKlarfAnalysis.cs` 확인).
+File Map Setup 은 Die / Scribe 크기를 받지 않고 Die Pitch 만 조정한다 (사용자 결정). KLARF / DMS / Map 은 모두 Pitch 칸 기준이고, Scribe 는 KLARF Pitch 칸 -> GDS Chip 좌표로 바꿀 때만 필요하다. 연관 분석은 `TQD_SETUP.DIE_PITCH_X / Y` (KLARF 값)를 쓰므로 Map Setup 에서 바꾼 CHIP_SIZE 와 무관하다 (`GdsKlarfAnalysis.cs` 확인). (2026-10-15 정정: Map Setup 필수(CLAUDE-078 / 083) 이후 `TQD_SETUP` Pitch 는 Map Setup 값이다. KLARF Pitch 와 다르면 Chip 중심이 ΔPitch / 2 밀린다. 대책은 통합 분석 데이터 설계 B6.)
 
 - 현재 변환 `gx = XREL - PitchX / 2 + OffsetX` 는 Chip 이 Pitch 칸 가운데 있다 (Scribe 양쪽 균등, 샘플 X 72 / Y 75 µm 차이 -> 약 36 µm 씩) 는 가정이다.
 - Scribe 가 한쪽으로 몰려 있으면 그 차이가 `OffsetX / OffsetY` (화면 보정값, 기본 0) 가 되며, 이것이 Scribe 오프셋 설정이다. 별도 Die / Scribe 입력은 만들지 않는다.
@@ -82,8 +97,8 @@ YMS Function List 11개 화면(Bin Map View·Gallery / Wafer Cumulative / Bin St
 - E-Test 를 기존 YMS 적재 함수로 옮기는 브리지 1개와 메뉴 / TESTAREA 설정만 있으면 된다.
 - 권장 TESTAREA 는 공정명(TSVET / COWET / FT)이다. PARAMETRIC 이면 Map 모양이 나오지 않고 Cum / Bin Stack / Test Report 에서 빠진다.
 - 실제 E-Test 파일이 1개라 여러 Wafer 화면은 데이터가 부족하다.
-- 상세: [E-Test YMS 화면 연계 검토](../../../문서/2026-10-14_ETest_YMS_화면연계_검토.md).
-- 확정 설계 (2026-10-14 사용자 "권장안으로 설계"): 업로드 저장 때 YMS 테이블에도 적재한다 -> [E-Test Upload YMS 적재 설계](../../../문서/2026-10-14_ETest_Upload_YMS적재_설계.md) 14절. 구현 대기.
+- 상세: [E-Test YMS 화면 연계 검토](../../../문서/설계/04_ETest/2026-10-14_ETest_YMS_화면연계_검토.md).
+- 확정 설계 (2026-10-14 사용자 "권장안으로 설계"): 업로드 저장 때 YMS 테이블에도 적재한다 -> [E-Test Upload YMS 적재 설계](../../../문서/설계/04_ETest/2026-10-14_ETest_Upload_YMS적재_설계.md) 14절. 구현 대기.
   - 저장 흐름: `CompleteEtFile` 뒤 별도 호출 `PublishEtFileToYms` 가 기존 YMS 적재 함수를 순서대로 부른다(SaveWaferData -> TestDataManager.SaveData -> SummaryData).
   - 이름: PROGRAM = Device_공정, TESTAREA = 공정, BIN 1 / 2 / 3.
   - 상태 / 키: `TQP_GDS_SRC_FILE.YMS_*`, `TQP_GDS_ET_ITEM.YMS_PARAM_NAME`.
@@ -100,13 +115,95 @@ YMS Function List 11개 화면(Bin Map View·Gallery / Wafer Cumulative / Bin St
   - 기존 `TestDataMaint.DeleteWaferData` 빈 Lot 버그를 고쳤고, `DeleteWafer` 는 그 함수를 그대로 부른다.
   - 검증: `ET_YMS_PUBLISH_PROBE=PASS 22/22` (같은 Lot 2장 중 1장 삭제 / 마지막 Wafer 삭제 포함).
   - 배포 안 함.
+- 3차: 업로드 서비스 연결 (같은 날, 사용자 "Setup 은 내가, 지금은 프로그램이 돌아갈 수 있게만", 설계 16절).
+  - 반영 시점: `CompleteEtFile` / `RejudgeEtFiles` / `RemapEtFiles` 가 YMS 에 자동 반영한다.
+  - 삭제: `DeleteEtFile` 은 YMS 도 지운다.
+  - Map 없음: WAIT. Map 을 만든 뒤 [Map 좌표 다시 계산] 을 하면 반영된다.
+  - 메뉴: YMS 분석 메뉴를 열었다(VISIBLE / RESV_03 / `SELECT_TESTAREA`). 화면 수정은 없다.
+  - YMS 컬럼 이름은 Parameter 저장 이름 그대로다(`YMS_PARAM_NAME` 컬럼 안 만듦).
+  - 검증: `ET_YMS_SERVICE_PROBE=PASS 9/9`.
+  - 운영 반영: 14:33 사용자 VS 빌드로 운영 폴더에 들어갔다. DMS 화면 확인 대기.
+- TEST Analysis 메뉴 정리 (CLAUDE-097, 같은 날, 설계 16.6): CP 하위 메뉴를 없애고 Map / Bin·수율 / Parameter 3묶음(구분선)으로 나열, 9개 메뉴 아이콘 새로 그림(`99_Resource/ByModule/POC/make_test_menu_icons.ps1`). Yield Report 를 사용 가능(ENABLE True)으로 바꾸고 캡션 오타(Yeild) 수정. DACrux 다시 시작 후 화면 확인 대기.
 
 ## 2026-10-14 E-Test Para Setup / E-Test Chain ↔ GDS Chain 연결 기준 (CLAUDE-086)
 
-E-Test 쪽 "ET Chain 매핑 기준"을 회의록 근거로 정했다 (설계 v2만, 결정 P1 · P2 · P4 ~ P8 대기. 대표 Chain 은 사용자가 단자를 고르고 이름을 입력해 묶고, 자동 묶기는 본 프로젝트 — 2026-10-14 사용자 결정).
+E-Test 쪽 "ET Chain 매핑 기준"을 회의록 근거로 정했다 (설계 v2만, 결정 P1 · P2 · P4 ~ P8 대기. 대표 Chain 은 사용자가 E-Test Chain 을 고르고 이름을 입력해 묶고, 자동 묶기는 본 프로젝트 — 2026-10-14 사용자 결정).
 
 - Parameter = 결과 파일 헤더 전체(공백 정리 / 끝 `#번호` 제거 / 대문자), Device + 공정 단위로 Para Setup 화면에서 등록.
-- 단자 이름 = 헤더 `@` 뒤 Chain 이름(Force leg 포함) = GDS Label. 한 Chain 의 양 끝 단자 이름은 다를 수 있고(`TOP1_P_FH` / `TOP1_N_FL`, 2026-10-14 사용자 지시) GDS 는 Input 단자 이름 하나로 등록하므로, **대표 Chain 을 등록**한다 (`TQP_GDS_ET_REP_CHAIN`, U9 + 단자 -> 대표 이름).
-- 연결 테이블 `TQP_GDS_ET_CHAIN_LINK` (U9 + 대표 Chain -> GDS CHAIN_SEQ, 양쪽 1:1). GDS 이름이 대표 이름 또는 구성 단자 중 하나와 똑같으면 연결(이름 비교), 아니면 사용자가 고름. Fail 값 -> Parameter -> 단자 -> 대표 Chain -> GDS Chain 영역으로 연관 분석에 쓴다.
-- 로컬: Spec 표 단자 52개 중 10개가 U9 GDS Chain 이름과 똑같다. 자동 묶기 방법(① GDS Chain 영역 단자 Label / ② `X_FH` + `X_FL`)과 시험 결과는 본 프로젝트 참고로 설계 12절에 남김.
-- 상세: [E-Test Para Setup 설계](../../../문서/2026-10-14_ETest_Para_Setup_설계.md).
+- E-Test Chain 이름 = 헤더 `@` 뒤 Chain 이름(Force leg 포함) = GDS Label. 한 Chain 의 양 끝 이름은 다를 수 있고(`TOP1_P_FH` / `TOP1_N_FL`, 2026-10-14 사용자 지시) GDS 는 Input 쪽 이름 하나로 등록하므로, **대표 Chain 을 등록**한다 (`TQP_GDS_ET_REP_CHAIN`, U9 + Chain 이름 -> 대표 이름). 2026-10-14 부터 "단자" 대신 **Chain** 으로 부른다(사용자: "단자1은 결국 chain 이름이다").
+- 연결 테이블 `TQP_GDS_ET_CHAIN_LINK` (U9 + 대표 Chain -> GDS CHAIN_SEQ, 양쪽 1:1). GDS 이름이 대표 이름 또는 구성 Chain 중 하나와 똑같으면 연결(이름 비교), 아니면 사용자가 고름. Fail 값 -> Parameter -> Chain -> 대표 Chain -> GDS Chain 영역으로 연관 분석에 쓴다.
+- 로컬: Spec 표 Chain 52개 중 10개가 U9 GDS Chain 이름과 똑같다. 자동 묶기 방법(① GDS Chain 영역 안 Chain Label / ② `X_FH` + `X_FL`)과 시험 결과는 본 프로젝트 참고로 설계 12절에 남김.
+- 상세: [E-Test Para Setup 설계](../../../문서/설계/04_ETest/2026-10-14_ETest_Para_Setup_설계.md).
+- 구현 (CLAUDE-090, 2026-10-14): 이름 변환(Parameter = `EtYmsRule.ToParamName`, Chain·대표 = `EtParameterNameRule.ToSafeName`, 원문 HEADER_TEXT) / 로컬 DB 1단계 DDL(추가만) / 서비스 16개 / 화면 POC > E-Test Para 설정(`frmEtParaSetup`, 탭 파일 헤더 · 등록 Parameter · 대표 Chain). 화면 동작: Device / 공정은 파일명에서 가져오는 읽기 전용 칸, 파일 헤더 표는 "열" 을 왼쪽 행 머리글로 보이고 드래그로 고른 행을 우클릭 / Del 로 목록에서 뺀다(화면에서만, 되살리기 가능). Probe `ET_PARA_SETUP_PROBE=PASS` 32/32, Smoke `ET_PARA_FORM_SMOKE=PASS` 24/24. **배포 / DMS 화면 확인 대기**. 남음: Limit 화면 정리 + 2단계 DDL, Upload 재설계 연결, 연관 분석에서 연결 테이블 사용.
+- 4단계 (CLAUDE-090, 2026-10-14): Limit(Spec) 화면 정리 — 위 E-Test Spec 문단 기준으로 바뀜. 로컬 DB 2단계 일부 적용(`2026-10-14_tqp_gds_et_limit_fk.sql`: Spec -> 등록 Parameter FK, Chain 묶음 테이블 DROP). Smoke `ET_LIMIT_FORM_SMOKE=PASS` 41/41 (`Verify-EtLimitSetup.ps1`), Probe 34/34. **배포 / DMS 화면 확인 대기**. 남음: Upload 재설계 연결(저장 대상 = 등록 Parameter) + 2단계 나머지(TEST_PROGRAM NOT NULL).
+- 5단계 (CLAUDE-090, 2026-10-14): Upload 재설계 구현 — 저장 대상 = 등록 Parameter(사용 Y), 판정 = Spec(Enable) 을 서버 SQL 과 화면 미리보기(`EtJudgeRule`)가 같은 규칙으로 저장(값 -> Die -> 파일), Map ID = 파일 Device 의 사용 Die 로 시스템 좌표 저장, Spec 을 바꾸면 다시 판정 질문(`RejudgeEtFiles`), Map 을 나중에 만들면 [Map 좌표 다시 계산](`RemapEtFiles`). 업로드 화면 / 조회 창 다시 작성. 로컬 DB 2b 적용(데이터 정리 -> `TEST_PROGRAM` NOT NULL + 판정 / Map 컬럼). 자동 검사: Upload Probe 18/18 / Upload Smoke 19 / Limit 43 / Para 27 / Para Probe 34. **배포 / DMS 화면 확인 대기** — 직접 시험은 [테스트 시나리오](../../../문서/설계/04_ETest/2026-10-14_ETest_Para_Spec_Upload_테스트_시나리오.md). 남음: YMS 적재 연결(`PublishEtFileToYms`).
+- 진행 표시줄 / 대량 처리 (CLAUDE-094, 2026-10-14): Para 설정에서 2,755개 삭제가 한 건씩 DB 왕복(약 8,300번)이라 오래 걸려 멈춘 것처럼 보였다. 서버 삭제 / 사용 저장을 묶음 처리로 바꾸고(2,755개 삭제 서버 0.1초), POC 화면 아래에 공통 진행 표시줄(`DACrux.SEMDMS.Control.ProgressStatusBar`)을 넣었다. 서버 호출은 작업 스레드에서 돌고 작업 이름 / 경과 시간 / 막대가 움직이며, 작업 중 그 화면 입력과 닫기는 막는다. 상세: [POC 화면 진행 표시줄](../../../문서/설계/06_환경_운영/2026-10-14_POC_화면_진행표시줄.md).
+- 화면 재구성 (CLAUDE-095, 2026-10-14, **구현 완료 / 배포 · DMS 화면 확인 대기**): 대표 Chain 대신 Parameter 별 **GDS Chain** 한 칸(`TQP_GDS_ET_ITEM.GDS_CHAIN_NAME`, Chain 1 의 GDS Setup Chain 이름, 사용자가 직접 입력 / 오른쪽 GDS Setup Chain 목록에서 복사, 목록에 없는 이름은 주황 경고). Para 설정 화면 하나에서 등록([파일 헤더] 탭 [등록]) + GDS Chain + Spec 편집([등록 Parameter] 탭, 수정 행만 저장, Spec 값이 바뀐 행만 다시 씀). Device / 공정은 파일을 연 동안만 잠그고 그 밖에는 콤보로 골라 바로 조회. 삭제: [대표 Chain] 탭 / 대표 Chain 테이블 2개(로컬 DB DROP) / 서비스 11개 / E-Test Limit 설정 화면 · 메뉴 / 업로드 Fail Chain 의 대표 Chain 열 / [Spec 표로 고르기]. 연관 분석이 쓸 연결은 Fail 값 -> Parameter -> GDS_CHAIN_NAME -> GDS Setup Chain(이름, 대소문자 무시). `ET_PARA_SETUP_PROBE=PASS` 26 / `ET_PARA_FORM_SMOKE=PASS` 37 / `ET_RESULT_PROBE=PASS` 18 / `ET_UPLOAD_FORM_SMOKE=PASS` 30. [Para 화면 재구성 설계](../../../문서/설계/04_ETest/2026-10-14_ETest_Para_화면_재구성_설계.md) / [직접 시험 시나리오](../../../문서/설계/04_ETest/2026-10-14_ETest_Para_Spec_Upload_테스트_시나리오.md).
+- 결과 Upload / View 화면 분리 (CLAUDE-113, 2026-10-15, **구현 완료 / 배포 · DMS 화면 확인 대기**): POC > **E-Test 결과 업로드**(`frmEtResultUpload`) = 파일 올리기만(**파일 하나씩**, 2026-10-15 CLAUDE-114: [파일 열기] / [다시 읽기] / Slot / [저장] + 결과 확인 + 저장 수 확인 "Parameter p x Die d = 값 v" -> 저장), [등록 파일] 탭 / 팝업 조회 창 제거. 다중 파일은 본 프로젝트(참고 사본 `문서/설계/04_ETest/참고소스_다중파일_업로드_20261015`). POC > **E-Test 결과 조회**(`frmEtResultView`, 신규 메뉴 F03127 순서 8) = Device / 공정 / Lot 으로 저장 파일 목록(추가 Para / Spec 바뀜 / Map / YMS 열) + 삭제 ([Map 좌표 다시 계산] 은 2026-10-15 CLAUDE-116 삭제: 업로드 때 Map(Map ID = Device) 이 없으면 오류, Map 을 고치면 다시 업로드). 두 화면의 결과는 **같은 Control**(`EtResultDataControl` + 모델 `EtResultData`): 정보 표(파일명 ~ 등록 11행, 업로드 저장 전에는 Device / 공정 / Lot / Lot-Wafer No 더블클릭 수정 -> 다시 분석) / 1단계 Die(DUT · 좌표 · Map · 판정 · Fail 수) / 2단계 정의 Para 값(한 행 = Die x Parameter, 고른 Die · Fail 만 · '-' 만 · 찾기로 거름), Parameter 순서 = 표시 순서 -> 저장 이름. 나중에 등록한 Parameter 는 다시 업로드해야 보인다(조회 목록 "추가 Para" = 업로드 뒤 등록·변경되고 파일에 없는 수). 서버 = 조회 쿼리 / 메서드 1개, DDL 없음. `ET_UPLOAD_FORM_SMOKE=PASS` 39(업로드 미리보기와 조회 888행 같음 포함). 1단계 '-' 수는 정의 Para 기준(Spec 무관) / `ET_RESULT_PROBE=PASS` 18. [Upload / View 분리 설계](../../../문서/설계/04_ETest/2026-10-15_ETest_Upload_View_분리_설계.md).
+- 등록 / 설정 화면 분리 (CLAUDE-096, 2026-10-14, **구현 완료 / 배포 · DMS 화면 확인 대기**): POC > **E-Test Para 등록**(`frmEtParaRegister`, 순서 5, 새 아이콘) = 결과 파일을 열어 Factory 만 입력하고 Device / 공정 / 파일은 파일명에서(읽기 전용), 헤더 체크 후 [등록]만. POC > **E-Test Para 설정**(`frmEtParaSetup`, 순서 6) = 등록된 Device / 공정을 콤보로 골라(직접 입력 없음) 조회 / GDS Chain · Spec · 사용 수정 / Spec 표 붙여넣기 / 삭제. 서버 / DB 변경 없음. `ET_PARA_FORM_SMOKE=PASS` 41 / `ET_UPLOAD_FORM_SMOKE=PASS` 30. [화면 분리 설계](../../../문서/설계/04_ETest/2026-10-14_ETest_Para_등록_설정_화면_분리_설계.md).
+- 설정 화면 필터 콤보 (CLAUDE-121, 2026-10-15, **구현 완료 / 배포 · DMS 화면 확인 대기**): 표 위 측정 / 조건 / Chain 1 / GDS Chain / 사용 / Enable 콤보. 펼치면 `(전체)` + 값(건수, 다른 콤보 통과 행 기준), 고르면 그 값 행만(AND, 수정 행은 보임). 같은 Device / 공정 다시 조회는 유지, 바뀌면 (전체). [필터 해제]. 서버 변경 없음. `ET_PARA_FORM_SMOKE=PASS` 47. [화면 분리 설계 5절](../../../문서/설계/04_ETest/2026-10-14_ETest_Para_등록_설정_화면_분리_설계.md). 같은 날 오른쪽 GDS Device 는 고르지 않고 위 E-Test Device 이름으로 조회(읽기 전용, 없으면 빈 목록).
+
+- YMS Bin 기준 (2026-10-14, CLAUDE-102): YMS BIN = E-Test 결과 파일 Hardware Bin (Software Bin 은 Bin 정의 이름에), 양품 = 파일 DUT 결과. POC Limit 판정과 별개이며 Measure 는 Setup Parameter + Setup LSL/USL. 설계 `문서/설계/04_ETest/2026-10-14_ETest_Upload_YMS적재_설계.md` 18절.
+- YMS Map Die 표시 (2026-10-14, CLAUDE-103): Map 사용 Die 와 결과 파일 Die 가 **둘 다 있는 Die 만** 보인다. CLAUDE-098 의 "측정 안 한 Map Die = 하늘색 Mark Die" 표시는 취소(서버 Mark Die 조회 원래대로 + `TPUCMapView` 원래대로, 원점 LeftBottom 환산은 유지). 결과 파일에만 있는 Die 는 Map 좌표가 없어 원래 YMS 에 안 들어간다. 수율 분모(NETDIE = Map 사용 Die 수)는 결정 대기. 검토 문서 `문서/설계/04_ETest/2026-10-14_ETest_YMS_화면연계_검토.md` 10.2절.
+
+## 2026-10-16 단위 확인 / E-Test 업로드 단위 비교 (CLAUDE-125 / 126)
+
+- 길이 단위: GDS / KLARF / Map Setup 모두 시스템 안은 µm(GDS 파일은 nm 정수, KLARF SampleSize / Map EDGE_SIZE 만 mm). 연관 분석 허용오차 / 보정 / Gap 도 µm. E-Test 는 길이 값이 없다(DUT = Die 번호).
+- E-Test 측정값 단위는 파일 Unit 행(V / Ohm / uA)을 `TQP_GDS_ET_ITEM.UNIT` 에 그대로 두고 값은 환산하지 않는다.
+- 2026-10-16 수정: 업로드 계획 `EtUploadPlan.Build`(`ENGUI/ETest/EtJudgeRule.cs`)가 파일 Unit 과 등록 단위를 비교한다(둘 다 있을 때, 대소문자 구분 = Para 등록과 같은 규칙). 다르면 그 Parameter 는 저장 / 판정하지 않고 상태 경고 "단위 다름 n 건너뜀 (예: 저장 이름: 파일 nA / 등록 uA)"(`frmEtResultUpload`). 누락으로는 세지 않는다. 서버 변경 없음.
+- 검증: `Verify-EtResultUpload.ps1` -> `ET_UPLOAD_FORM_SMOKE=PASS`(새 검사: 첫 Parameter 단위를 nOhm 으로 바꾸면 저장 36 / 누락 0 / 경고) + `DIE_COORD_PROBE=PASS (11/11)`, TEMP 빌드 오류 0, PROBE 시험 데이터 정리됨.
+
+## 2026-10-16 Scribe 위치 / GDS Chip 크기 / Pitch 비교 (CLAUDE-128, 결정 대기)
+
+- 지금: KLARF `XREL / YREL` 을 Die 칸(Die + Scribe) 왼쪽 아래 기준으로 보고 `X = XREL − Pitch / 2 + 보정 X` 로 Chip 중심 좌표로 옮긴다. Chip 이 칸 가운데(Scribe 양쪽 균등)라는 가정이다. Scribe 정의 / GDS Chip 크기 / Pitch 비교는 시스템에 없다(DMS `TQD_SETUP.STREET_X / Y` 는 Glass 용, 모두 0).
+- KLARF 규격은 칸 안 Scribe 위치를 정하지 않는다. 검사 Recipe 의 Die 기준점(Scribe 교차점 중앙 = 가운데 / Chip 왼쪽 아래 모서리 = 오른쪽 위)에 따른다. 샘플(STEP 541)로는 정하지 못했다.
+- 실측(OMM): KLARF Pitch 23,832 × 30,060, GDS Chip(전체 Layer) 23,760 × 29,985(원점 = 중심), 고객 Die(Scribe 제외) 23,680 × 29,905. 한쪽 차이 Pitch − GDS 36 / 37.5, GDS − Die 40 / 40. Layer 일부만 저장한 Map 은 저장 도형 범위가 Chip 크기와 다르다(U9 X −11,810 ~ +11,793.6).
+- 설계 추가: 통합 분석 설계 20절, 결정 B23(Device 별 Scribe 위치 가운데 / 오른쪽 위 / 직접 입력 + Step 별 변경) / B24(GDS Chip 크기 저장, `TQP_GDS_MAP` 컬럼) / B25([준비] 점검 Pitch 비교 + Chip 밖 Defect). 고객 확인 질문 4개는 20.6.
+
+## 통합 연관 분석 서버 개발 (2026-10-16, CLAUDE-127)
+
+- 상태: **완료(코드) / TEMP 빌드 + Probe · Smoke 확인 / 배포 안 함 / 사용자 DMS 화면 확인 대기**. 상세: 통합 분석 설계 21절, 변경이력 2026-10-16 CLAUDE-127.
+- 서비스(`iGdsKlarfAnalysis`): `GetWaferReady`(Wafer Key 로 같은 Wafer KLARF Step / E-Test 파일 + GDS 상태 + 점검) / `Analyze(GdsKlarfAnalysisRequest)`(실제 모양 Gap 판정, 여러 Step, Chain 면 / 검사 면, 허용오차 표, E-Test 4분류 · Fail률) / `AnalyzeDie`(Die 1개 + Member 단위 + E-Test 값). `AnalyzeWafer` 는 호환용으로 남김.
+- 모양 판정: BOUNDARY 다각형 / PATH 폭 · 끝 처리 · 꺾임, 서버 Cache(Device 별, LRU 3). OMM_Hybrid 첫 읽기 1.3초, 이후 0초.
+- Wafer Key 규칙: `Interface/Coordinate/WaferKeyRule.cs` 잠정(LOT 가운데 조각 + Slot 2자리), 고객 규칙이 오면 이 파일만 바꾼다.
+- KLARF 업로드: Step COMMENT 에 원본 Die Pitch(`RAW_DIE_PITCH`), 분석이 먼저 쓴다(이전에 올린 Step 은 Map Setup Pitch).
+- 검증 스크립트: `02_DMS/DACrux.SEMDMS.BSL/Probes/GdsKlarfShapeProbe.ps1`(33) / `GdsKlarfAnalyzeProbe.ps1`(14) / `GdsKlarfEtProbe.ps1`(13, 시험 데이터 PROBE 만들고 삭제) / `ENGUI/Verification/Verify-GdsKlarfAnalysis.ps1`(42).
+- 남은 것: 배포(서버 · 화면 함께), 통합 설계 20절 B23 ~ B25(Scribe / Chip 크기 / Pitch 비교) 결정 뒤 반영, 면(FS / BS) 확인(STEP 528 은 반전 없이 Gap 0 Defect 6개).
+- 2026-10-16 CLAUDE-132: Ready 조회 KLARF Step 은 Step 당 한 줄이다(`SELECT_KLARF_STEP_BY_WAFER` GROUP BY, Defect = 검사 Test 합). Test 가 2개인 KLARF(1107236219)가 두 줄로 나와 [분석]이 "같은 KLARF Step 이 두 번" 으로 멈추던 문제. 화면 `ReadySteps` / [직접 찾기]도 같은 Step 을 한 번만 보낸다.
+
+## 2026-10-16 [준비] 탭 KLARF Step 목록 (CLAUDE-134, 결정 B26 / B27)
+
+- 같은 파일 다시 올림은 업로드가 지우고 다시 쓰므로 목록에서 중복 처리하지 않는다(사용자 결정). Product 만 다르게 올린 같은 파일은 남아 있을 수 있어 Ready 는 고른 Step 과 같은 Product 만 모은다(B26, 쿼리 `SELECT_KLARF_STEP_BY_WAFER_PRODUCT`).
+- 같은 Wafer + 같은 Step ID 재검사는 `TQD_STEP.TEST_ORDER`(새 업로드마다 +1, 작을수록 최신) 순으로 놓고 Step ID 마다 한 행만 기본 체크한다(고른 Step 우선, 없으면 최신). 다른 행은 "이전 검사" / "이후 검사"(B27, `GdsKlarfReadyStepRule`).
+- 한 파일 안의 검사 Test(InspectionTest 3 / 80)는 CLAUDE-132 에서 Step 당 한 줄로 묶음. 상세: 통합 분석 설계 22절.
+
+- 2026-10-16 CLAUDE-135: 연관 분석 화면 A / B 는 Chain 을 이름으로만 보인다(코드 A / B / AA .. 화면에 없음). [Die] 탭 X / Y 열, Defect 전체 / Chain In / Chain Out, 주요 Chain 열 삭제. 설계 23절.
+- 2026-10-16 CLAUDE-139 (설계, 결정 대기): Die 상세 여러 화면 + 도면 재사용. 측정 = 창마다 도면 데이터 약 6초 + 도면 만들기 약 4초 / 도면 컨트롤 하나 약 1.85 GB. 권장 = 도면 하나를 보이는 상세보기 탭으로 옮겨 씀 + [분석] 때 미리 읽기. [설계](../../../문서/설계/05_연관분석/2026-10-16_Die상세_여러화면_GDS재사용_설계.md)
+- 2026-10-16 CLAUDE-140: 화면 A 색 구간 표 끝에 "E-Test Fail Die" 행(Map 왼쪽 위 빨간 삼각형 범례 + Die 수). E-Test 판정이 있을 때만 보이고 색 기준과 상관없다. 표식 Die 는 위 구간 행에도 함께 세어진다(합계에서 뺀다). `GDS_KLARF_FORM_SMOKE=PASS (47/47)`, 배포 안 함.
+- 2026-10-19 CLAUDE-145: 화면 A 빨간 삼각형 기준 라디오 "Spec Out"(기본, DMS Spec 판정) / "Fail Die"(결과 파일 DUT Flag). 서버 Analyze DIE 표에 `ET_FILE_FLAG` 열 추가(끝 열, 예전 화면은 무시). `GDS_KLARF_ET_PROBE=PASS (16/16)`, `GDS_KLARF_FORM_SMOKE=PASS (61/61)`, 배포 안 함(BSL + ENGUI).
+- 2026-10-20 CLAUDE-151 / 152: 상세보기(화면 B) [GDS] + [KLARF] 탭 -> [GDS / KLARF] 탭 하나. 한 행 = (Chain, Defect), Chain 칸은 묶음처럼 그림, 걸린 Defect 없는 Chain 은 빈 1행, 두 Chain Defect 는 두 묶음 모두, 맨 아래 "Chain 밖 Defect"(가까운 거리 순). Defect 범위 콤보 대신 [Chain 밖 Defect] 체크. 서버 변경 없음. `GDS_KLARF_FORM_SMOKE=PASS (70/70)`, 실제 Die (4, 6) 52행 확인. 배포 안 함(GdsMap EXE).
+- 2026-10-20 CLAUDE-155: 상세보기 [GDS / KLARF] 표 행 선택 = Defect 로 이동 / 강조만(노란 Chain 칠하기 없음, Chain 칸 클릭도 칠하지 않음). 두 Chain 에 걸린 Defect 는 두 묶음 모두 + "함께 걸림"(SCKLOTIDA-01 STEP 603 에 6개, 대부분 P / N 쌍). Smoke 70/70.
+- 2026-10-20 CLAUDE-156: 상세보기 [GDS / KLARF] 표에서 두 Chain 에 걸린 Defect 는 Defect ID 굵게, "가까운 Chain" 열을 Gap 바로 뒤로(가로 스크롤 없이 "함께 걸림" 보임). Smoke 71/71.
+- 2026-10-16 CLAUDE-139 (구현, 결정 D1 ~ D6 권장안 / D7 도면 메모리 줄이기는 CLAUDE-142 추후): Die 상세 = Die 마다 상세보기 창(같은 Die 는 그 창, 역추적 / 재분석이면 그 창에 새 결과), GDS 상세 화면(도면) 하나를 활성 창으로 옮겨 씀(창마다 결과 / 보기 상태 저장 / 복원, 없는 창은 안내 문구), [분석] 뒤 도면 데이터 미리 읽기(`GdsDieMapCache`), 화면 A 와 상세보기 창을 모두 닫으면 해제. Smoke 54/54: 첫 상세보기 11.6 -> 5.2초(미리 읽기 7.4초 백그라운드), 두 번째 Die 창 0.94초, DB 다시 읽기 0 / 도면 핸들 같음. 배포 안 함 / DMS 화면 확인 대기. 상세: 설계 9절
+- 2026-10-16 CLAUDE-139 (창끼리 간섭 4건 수정): 읽는 중 같은 키 창으로 넘어가면 늦게 끝난 읽기가 덮던 버그 수정 / 새 창은 앞 창 상태줄 · Chain 고른 행을 이어받지 않음(상태줄도 창마다 저장) / 미리 읽기 캐시 2칸(조건 다른 창 전환 8.7 ~ 10 -> 2.4 ~ 4.2초) / 재분석 뒤 이전 결과 창 탭 제목 "(이전 분석)". Smoke 61/61(메시지 루프 안 검사 포함). 상세: 설계 10절
+- 2026-10-19 CLAUDE-146 (설계, 결정 L1 ~ L4 대기): 화면 A 레이아웃 후보 3개 - 안 1 기능 탭 = 기준 + 결과(권장, 색 구간 = Map 아래 범례 + 팝업) / 안 2 기준 탭 · 결과 탭 2단 / 안 3 단계 탭 + 색 구간 팝업. [설계](../../../문서/설계/05_연관분석/2026-10-19_화면A_레이아웃_후보.md)
+- 2026-10-19 CLAUDE-146 (구현, 결정 "권장안으로 하되 색구간설정은 팝업으로"): 화면 A = 위쪽 "지금 기준" 요약 줄 / 왼쪽 Map + [색 구간 설정] 팝업 + Map 왼쪽 아래 범례 / 오른쪽 기능 탭 [GDS] [KLARF] [E-Test] [종합 (Die)](탭마다 기준 묶음 + 접기 + 결과 하위 탭), [준비] 탭 없앰. Wafer 받으면 KLARF, 첫 분석 결과면 종합 (Die). Smoke 64/64, 배포 안 함 / DMS 화면 확인 대기. [설계](../../../문서/설계/05_연관분석/2026-10-19_화면A_레이아웃_후보.md) 8절
+- 2026-10-19 데이터 검증 (SCKLOTIDA-01 / OMM_TCB / TSVET, 판정 DONE_WITH_CONCERNS, 검사 47 중 PASS 44): 원본 -> DB 는 **DB 확인**(KLARF 10/12 · E-Test 8/9 · GDS 5/5), 분석 결과는 설계 규칙으로 따로 다시 계산한 값과 모두 같음 **Probe 확인**(9/9: 걸림 472 / (Defect, Chain) 478 / (Die, Chain) 298 4분류 / 허용오차 표 / E-Test 연결 17 / Chain Fail률), 화면 A 표시는 화면 밖 실행으로 분석 결과 · 사용자 사진과 같음 **Probe 확인**(12/12: 범례 19 / 12 / 7 / 3 / 2 / 8 / 25 / Spec Out 25, Defect (472), E-Test Fail (149)). 운영 DMS 화면은 사진 숫자 대조만. 다른 값 3건은 연관 분석 영향 없음: KLARF 원본 Summary 1098 vs 목록 1122(원본 문제) / TQD_INSP_INFO Test 80 DEFECTIVE_DIE 51(원본 1, 기존 업로드 동작, 원인 조사 중) / E-Test 파일 내용 Wafer ID U9-HS2635-01(이름만 바꾼 시험 파일로 보임). GDS 저장은 완전히 같은 도형을 한 번만 저장한다(파서 규칙, 설계 문서에 없음). 반전 · 보정 · Scribe 가 실제 Wafer 에 맞는지는 고객 확인 대상으로 남음. 리포트 `.testagent/reports/run-20261019-103914-F07DATA/report.md`, 변경이력 2026-10-19
+- 2026-10-19 CLAUDE-148 (상세보기 기능 탭, 결정 "1안으로 하되 해당 화면에 컨셉에 맞게 문구나 용어를 잘 확인"): 상세보기(화면 B) = 위 분석 기준 요약 3칸(화면 A 문구) + Die 줄 / 왼쪽 GDS 도면 / 오른쪽 기능 탭 [GDS] Chain 표 · [KLARF] Defect · [E-Test] E-Test 값 · [종합 (Die)] Die 요약 + 4분류 수 + 일치 · Fail만 · Defect만 Chain 표. 처음 열면 종합, 역추적이면 KLARF(탭 제목 "(역추적)"). 용어 화면 A 와 맞춤(비교 불가 / Defect 수 / Defect ID / RoughBin / Spec Out · Fail Die). Smoke 68/68 + 실제 데이터 Probe 9/9, 배포 안 함(GdsMap EXE) / DMS 화면 확인 대기. [설계](../../../문서/설계/05_연관분석/2026-10-19_화면A_레이아웃_후보.md) 9 · 10절
+
+## 화면 A 정리 (2026-10-20, CLAUDE-149)
+
+- 위쪽 "지금 기준" 요약 3칸과 Map 왼쪽 아래 범례를 없앴다. 색 구간 / Die 수는 [색 구간 설정] 팝업 표에서만 본다.
+- GDS Chain 면 기본값을 BS 로 바꿨다(화면 콤보 / 서버 Ready / Analyze 요청이 비었을 때). 기본 조건(Chain BS · 검사 BS)은 반전 없이 판정한다.
+- 상태: 완료(코드) / TEMP 빌드 + Smoke 67 · EtProbe 17 / 배포 안 함 / DMS 화면 확인 대기.
+
+## 화면 A KLARF 탭 Step 정보 / Wafer 1개만 분석 (2026-10-20, CLAUDE-150)
+
+- KLARF 탭의 Step 표와 KLARF [직접 찾기]를 없앴다. 고른 Step 정보 두 줄(Step / Lot, 검사 시각 / Defect / 검사 Die) + 검사 면 [BS / FS](기본 = Ready 값 BS) + "Pitch 출처" 문구만 보인다. [분석]은 고른 Step 1개 + 이 검사 면으로 요청한다.
+- 여러 KLARF Step 합치기(결정 B16)는 2차로 되돌렸다. 서버 Analyze 의 `StepSeqs[]` / `ViewSides[]` 기능은 그대로다. 상세: 통합 분석 설계 11절 B16 / 15.4 / 16.6 / 16.7, 화면 A 레이아웃 설계 12절.
+- GDS / KLARF / E-Test 탭 위쪽 제목에 "(Wafer 1개만 분석)", Wafer 여러 개 선택 오류 = "1개 Wafer 만 분석할 수 있습니다. Wafer 를 하나만 선택하세요. (선택 n개)".
+- 상태: 완료(코드, ENGUI 만) / TEMP 빌드 + Smoke 69/69 / 배포 안 함 / DMS 화면 확인 대기.
+- 2026-10-20 CLAUDE-153 (Map E-Test 표식 2종, 결정 "안 1, E1 ~ E4 권장안"): 화면 A Wafer Map 에 Spec Out(DMS Spec 판정 F) = Die 왼쪽 위 빨간 삼각형, Fail Die(결과 파일 DUT Flag F) = 오른쪽 아래 작은 남색 삼각형을 함께 그린다. [E-Test] 탭 라디오 -> 체크 2개(기본 켬), 색 구간 팝업 끝 2행, 상태줄 "E-Test Spec Out (…) · 결과 파일 Fail Die". Smoke 70/70 + 실제 데이터(SCKLOTIDA-01 25 / 73) Probe 5/5, 배포 안 함(ENGUI) / DMS 화면 확인 대기. [설계](../../../문서/설계/05_연관분석/2026-10-20_Map_ETest_표식_설계.md)
+- 2026-10-20 CLAUDE-154 (결정 B28): KLARF 검사 면 = FS 고정, 화면에 보이지 않음(KLARF 탭 검사 면 콤보 삭제). 고르는 것은 GDS Chain 면만(기본 BS). 반전 규칙(Chain 면 ≠ 검사 면)은 그대로라 기본 조건 Chain BS · 검사 FS = 반전, STEP 528 Chain In 1 / 15(Chain FS 로 바꾸면 8 / 15). KLARF / E-Test Die 는 그대로: 서버가 검사 면 FS 일 때 KLARF Die 번호를 좌우로 바꾸던 것을 없앴다(ToSystem / FromSystem = Index 그대로). 서버 Ready VIEW_SIDE = FRONT, 요청 검사 면이 비면 FRONT. BSL + ENGUI, TEMP 빌드 + Smoke 70/70 + EtProbe 17/17 + AnalyzeProbe 14/14, 배포 안 함 / DMS 화면 확인 대기. 설계: 통합 분석 B28 / 6.4 / 18절, 화면 A 레이아웃 13절.
+- 2026-10-20 CLAUDE-157: 화면 A 상태줄과 상세보기 "분석 기준" GDS 칸 · GDS / KLARF 기준 줄에서도 검사 면을 뺐다(KLARF 검사 면 FS 고정, B28). 상태줄 "BACK 보기 (Chain BS -> 반전)", 상세보기 "GDS · Chain BS -> 반전". ENGUI + GdsMap EXE, TEMP 빌드 + Smoke 71/71, 배포 안 함 / DMS 화면 확인 대기.
+- 2026-10-20 CLAUDE-160 (E-Test 목록 조건, 결정 B29 = 권장안 3개): 화면 A [E-Test] 탭 목록은 Wafer Key 같음 + E-Test Device = 분석 GDS Device 인 파일만(서버 Ready), 표 위 Step 콤보(E-Test Step = 파일 Step ID = 공정)로 고른 Step 파일만 보이고 1개 선택. Device 가 다른 같은 Wafer 파일은 상태줄 "E-Test n개는 Device 가 GDS Device X 와 달라 목록에서 뺌(…)", [직접 찾기]로는 더할 수 있다(찾기 Device 기본 = GDS Device). 실제 데이터: STEP 601(OMMTCB) -> 331 / 603(OMM_TCB)·528(OMM_Hybrid) -> 0개. BSL + ENGUI, Probe 18/18 + Smoke 75/75, 배포 안 함 / DMS 화면 확인 대기. [설계](../../../문서/설계/05_연관분석/2026-10-20_ETest_목록_조건_설계.md)

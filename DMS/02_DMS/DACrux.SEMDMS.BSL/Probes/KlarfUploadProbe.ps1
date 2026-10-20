@@ -5,7 +5,7 @@
 #  2) BeginUpload 미리보기 (DMS WaferID 규칙 / 원본 WaferID / SetupID 46자 / Defect 15 / 검사 Die 26 / 이미지 이름 15)
 #  3) 이미지 15장 + CommitUpload -> 저장소 파일(원본 / thumb_ / KLARF) + 기존 화면 BSL 로 재조회
 #     GetDMSStepWaferList (왼쪽 Wafer 조회, "Include Image" = IMAGES > 0 포함) / GetDefectMapInfo / GetDefectData / GetDefectMapViewer_Info / GetDefectImagePath01
-#     값: Defect 1 X = -23229.419 / CLASSNUMBER = ROUGHBIN 54 (D3) / SETUP_ID 46자 (D2) / IMAGE_PATH = FTP 상대 경로 (D4)
+#     값: Defect 1 X = -23229.419 / CLASSNUMBER 0 · ROUGHBIN 54 = 파일 값 그대로 (KLARF 표준, 2026-10-15) / SETUP_ID 46자 (D2) / IMAGE_PATH = FTP 상대 경로 (D4)
 #  4) 같은 파일 다시: 미리보기 EXISTS / 건너뜀(N) SKIPPED / 재등록(Y, 이미지 14장만) -> 이전 STEP 삭제, 없는 이미지 행 미생성
 #  5) 이미지 저장소 설정(KLARF_IMAGE_ROOT)이 없는데 이미지가 있으면 DB 저장 전에 오류 (기존 데이터 그대로)
 #  6) 기존 쿼리 회귀: 쿼리를 추가한 XML 의 기존 쿼리(SELECT_SETUP_SEQ / SELECT_STEP_INFO)가 기존 데이터를 찾는다
@@ -162,7 +162,7 @@ $results = New-Object Collections.Generic.List[string]
 function Check($name, [bool]$ok, $detail) {
     $line = ($(if ($ok) { 'PASS' } else { 'FAIL' })) + " / $name / $detail"; $results.Add($line); Write-Host $line
 }
-function Info([string]$cls = 'ROUGHBIN') { return [string[]]@('SCK', 'PROBE', 'XD106.02', '', '', '', $cls) }
+function Info { return [string[]]@('SCK', 'PROBE', 'XD106.02', '', '', '', '') }
 function Stop-Probe($msg) { Write-Host "KLARF_UPLOAD_PROBE=FAIL ($msg)"; exit 1 }
 function Send-Images($key, [int]$count) {
     $files = @(Get-ChildItem $imageDir -Filter '*.jpg' | Sort-Object Name | Select-Object -First $count)
@@ -185,7 +185,7 @@ $expectedRel = ($storeFolder.Substring([IO.Path]::GetPathRoot($storeFolder).Leng
 # ---- 1) 입력 검증 ----
 $e = [KlarfUploadProbeHelper]::BeginError([string[]]@('SCK', 'PROBE', 'XD106.02'), $bytes)
 Check '입력 항목 수 부족 -> 거부' ($e.Length -gt 0) $e
-$e = [KlarfUploadProbeHelper]::BeginError([string[]]@('SCK', 'PROBE', '..\XD106.02', '', '', '', 'ROUGHBIN'), $bytes)
+$e = [KlarfUploadProbeHelper]::BeginError([string[]]@('SCK', 'PROBE', '..\XD106.02', '', '', '', ''), $bytes)
 Check '경로가 섞인 파일 이름 -> 거부' ($e.Length -gt 0) $e
 $e = [KlarfUploadProbeHelper]::AddImageError('..\..\Windows', 'a.jpg', [byte[]](1, 2, 3))
 Check '잘못된 업로드 키 -> 거부' ($e.Length -gt 0) $e
@@ -195,7 +195,7 @@ $pv = [KlarfUploadProbeHelper]::Begin((Info), $bytes)
 $r = $pv.Rows[0]
 $key = $r['UPLOAD_KEY']
 # Map Setup 에 없는 Device 로 올리면 미리보기 INVALID, 저장하면 ERROR (DB 변경 없음) (2026-10-13)
-$noMap = [KlarfUploadProbeHelper]::Begin([string[]]@('SCK', 'PROBE', 'XD106.02', 'NO_MAP_PROBE_DEVICE', '', '', 'ROUGHBIN'), $bytes)
+$noMap = [KlarfUploadProbeHelper]::Begin([string[]]@('SCK', 'PROBE', 'XD106.02', 'NO_MAP_PROBE_DEVICE', '', '', ''), $bytes)
 Check 'Map 없는 Device -> 미리보기 INVALID' (($noMap.Rows[0]['RESULT'] -eq 'INVALID') -and $noMap.Rows[0]['MESSAGE'].ToString().Contains('Map')) "$($noMap.Rows[0]['RESULT']) $($noMap.Rows[0]['MESSAGE'])"
 $noMapSave = [KlarfUploadProbeHelper]::Commit($noMap.Rows[0]['UPLOAD_KEY'], 'Y')
 Check 'Map 없는 Device -> 저장 ERROR / STEP 없음' (($noMapSave.Rows[0]['RESULT'] -eq 'ERROR') -and ($noMapSave.Rows[0]['STEP_SEQ'] -eq [DBNull]::Value)) "$($noMapSave.Rows[0]['RESULT']) $($noMapSave.Rows[0]['MESSAGE'])"
@@ -241,7 +241,7 @@ $df = [KlarfUploadProbeHelper]::Defects($step)
 $d1 = @($df.Rows | Where-Object { [int]$_['DEFECTID'] -eq 1 })[0]
 Check 'Defect 15건(GetDefectData)' ($df.Rows.Count -eq 15) "$($df.Rows.Count)"
 Check 'Defect 1 X = -23229.419 / Y = 86770.97' (([math]::Abs([double]$d1['X'] + 23229.419) -lt 0.001) -and ([math]::Abs([double]$d1['Y'] - 86770.97) -lt 0.001)) "X=$($d1['X']) Y=$($d1['Y']) XINDEX=$($d1['XINDEX']) YINDEX=$($d1['YINDEX'])"
-Check 'CLASSNUMBER = ROUGHBIN 54 (D3)' (([int]$d1['CLASSNUMBER'] -eq 54) -and ([int]$d1['ROUGHBINNUMBER'] -eq 54)) "CLASS=$($d1['CLASSNUMBER']) ROUGH=$($d1['ROUGHBINNUMBER'])"
+Check 'CLASSNUMBER 0 / ROUGHBIN 54 그대로 (KLARF 표준)' (([int]$d1['CLASSNUMBER'] -eq 0) -and ([int]$d1['ROUGHBINNUMBER'] -eq 54)) "CLASS=$($d1['CLASSNUMBER']) ROUGH=$($d1['ROUGHBINNUMBER'])"
 Check 'Defect 1 IMAGECOUNT = 1' ([int]$d1['IMAGECOUNT'] -eq 1) "$($d1['IMAGECOUNT'])"
 $ip = [KlarfUploadProbeHelper]::ImagePaths($step)
 $ip1 = @($ip.Rows | Where-Object { [int]$_['DEFECTID'] -eq 1 })[0]

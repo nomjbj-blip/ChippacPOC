@@ -20,6 +20,7 @@ using System.Deployment.Application;
 using System.Drawing;
 using System.IO;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
 using DACrux.Base;
@@ -138,16 +139,15 @@ namespace DACrux.Framework
 
         /// <summary>
         /// Main form 상의 화면에 따라 Search Control 을 활성화 한다.
+        /// 메뉴 RESV_04 = DM -> DM Search, TEST -> TEST Search, 그 밖 -> 둘 다 닫음.
+        /// 패널을 닫고 열면 MDI 영역 폭이 바뀌어 열린 화면 전체가 다시 배치 / 다시 그려지므로
+        /// 상태가 바뀔 때만 처리하고, 여는 패널을 먼저 열어 패널 영역이 접혔다 펴지지 않게 한다 (2026-10-16)
         /// </summary>
         private void DACruxMain_MdiChildActivate(
             object sender,
             EventArgs e
             )
         {
-            Assembly assemblyMap = null;
-            Type type = null;
-            System.Windows.Forms.UserControl oUserControl = null;
-
             //Active 된 Form 기반 Assembly정보를 가져 온다.
             if (((Form)sender).ActiveMdiChild == null)
                 return;
@@ -158,45 +158,113 @@ namespace DACrux.Framework
                 DataRow[] dr = m_dtMenu.Select(string.Format("ASSEMBLY = '{0}'", strAssembly));
                 if (dr.Length > 0)
                 {
-                    if (String.Equals(dr[0]["RESV_04"].ToString(), DM))
-                    {
-                        udmMain.ControlPanes[TEST].Closed = true;
-                        udmMain.ControlPanes[DM].Closed = false;
-
-                        assemblyMap = DACrux.Base.AssemblyUtil.LoadAssembly(string.Format(@"{0}\{1}", Application.StartupPath, "DACrux.SEMDMS.Control.dll"));
-                        type = assemblyMap.GetType("DACrux.SEMDMS.Control.DPUCStepSelect");
-
-                        if (plDMSearch.Controls == null || plDMSearch.Controls.Count == 0)
-                        {
-                            oUserControl = (System.Windows.Forms.UserControl)Activator.CreateInstance(type);
-                            plDMSearch.Controls.Add(oUserControl);
-                            oUserControl.Dock = DockStyle.Fill;
-                            udmMain.ControlPanes[DM].Pinned = true;
-                        }
-                    }
-                    else if (String.Equals(dr[0]["RESV_04"].ToString(), TEST))
-                    {
-                        udmMain.ControlPanes[TEST].Closed = false;
-                        udmMain.ControlPanes[DM].Closed = true;
-
-                        assemblyMap = DACrux.Base.AssemblyUtil.LoadAssembly(string.Format(@"{0}\{1}", Application.StartupPath, "DACrux.TEST.ENGUI.dll"));
-                        type = assemblyMap.GetType("DACrux.TEST.ENGUI.TPUCSelectWafer");
-
-                        if (plTESTSearch.Controls == null || plTESTSearch.Controls.Count == 0)
-                        {
-                            oUserControl = (System.Windows.Forms.UserControl)Activator.CreateInstance(type);
-                            plTESTSearch.Controls.Add(oUserControl);
-                            oUserControl.Dock = DockStyle.Fill;
-
-                            udmMain.ControlPanes[TEST].Pinned = true;
-                        }
-                    }
+                    string kind = dr[0]["RESV_04"].ToString();
+                    if (String.Equals(kind, DM))
+                        ShowSearchPane(DM);
+                    else if (String.Equals(kind, TEST))
+                        ShowSearchPane(TEST);
                     else
-                    {
-                        udmMain.ControlPanes[TEST].Closed = true;
-                        udmMain.ControlPanes[DM].Closed = true;
-                    }
+                        ShowSearchPane(null);
+                }
+            }
+        }
 
+        // 조회 패널 형식은 처음 한 번만 읽는다. 전환마다 DLL 을 다시 읽으면 같은 어셈블리가 계속 쌓인다 (2026-10-16)
+        private Type m_dmSearchType = null;
+        private Type m_testSearchType = null;
+
+        private const int WM_SETREDRAW = 0x000B;
+        private const uint RDW_INVALIDATE = 0x0001, RDW_ERASE = 0x0004, RDW_ALLCHILDREN = 0x0080, RDW_FRAME = 0x0400;
+
+        [DllImport("user32.dll")]
+        private static extern IntPtr SendMessage(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
+
+        [DllImport("user32.dll")]
+        private static extern bool RedrawWindow(IntPtr hWnd, IntPtr rcUpdate, IntPtr hrgnUpdate, uint flags);
+
+        /// <summary>
+        /// 조회 패널 표시를 바꾼다. kind = DM / TEST / null(둘 다 닫음).
+        /// 1) 지금 상태와 같으면 아무것도 하지 않는다.
+        /// 2) 바꾸는 동안 메인 화면 그리기를 멈췄다가 끝난 뒤 한 번에 다시 그린다(중간 모양이 깜빡이지 않게).
+        /// 3) 여는 패널을 먼저 열고 나머지를 닫는다. 같은 패널 영역이라 영역 폭이 그대로다.
+        /// 4) 조회 컨트롤은 처음 열 때 한 번 만든다(기존과 같이 만든 뒤 고정 Pinned).
+        /// </summary>
+        private void ShowSearchPane(string kind)
+        {
+            bool showDM = kind == DM;
+            bool showTEST = kind == TEST;
+            if (udmMain.ControlPanes[DM].Closed == !showDM && udmMain.ControlPanes[TEST].Closed == !showTEST)
+                return;
+
+            // 조회 컨트롤을 처음 만들 때는 그 컨트롤 Load(서버 조회 / 메시지 창)가 돌 수 있어 그리기를 멈추지 않는다 (2026-10-16)
+            bool firstCreate = (showDM && plDMSearch.Controls.Count == 0) || (showTEST && plTESTSearch.Controls.Count == 0);
+            bool redrawStopped = IsHandleCreated && Visible && WindowState != FormWindowState.Minimized && !firstCreate;
+            if (redrawStopped)
+                SendMessage(Handle, WM_SETREDRAW, IntPtr.Zero, IntPtr.Zero);
+            try
+            {
+                if (showDM)
+                {
+                    udmMain.ControlPanes[DM].Closed = false;
+                    if (plDMSearch.Controls == null || plDMSearch.Controls.Count == 0)
+                    {
+                        if (m_dmSearchType == null)
+                            m_dmSearchType = DACrux.Base.AssemblyUtil.LoadAssembly(string.Format(@"{0}\{1}", Application.StartupPath, "DACrux.SEMDMS.Control.dll")).GetType("DACrux.SEMDMS.Control.DPUCStepSelect");
+                        System.Windows.Forms.UserControl oUserControl = (System.Windows.Forms.UserControl)Activator.CreateInstance(m_dmSearchType);
+                        plDMSearch.Controls.Add(oUserControl);
+                        oUserControl.Dock = DockStyle.Fill;
+                        udmMain.ControlPanes[DM].Pinned = true;
+                    }
+                }
+                else if (showTEST)
+                {
+                    udmMain.ControlPanes[TEST].Closed = false;
+                    if (plTESTSearch.Controls == null || plTESTSearch.Controls.Count == 0)
+                    {
+                        if (m_testSearchType == null)
+                            m_testSearchType = DACrux.Base.AssemblyUtil.LoadAssembly(string.Format(@"{0}\{1}", Application.StartupPath, "DACrux.TEST.ENGUI.dll")).GetType("DACrux.TEST.ENGUI.TPUCSelectWafer");
+                        System.Windows.Forms.UserControl oUserControl = (System.Windows.Forms.UserControl)Activator.CreateInstance(m_testSearchType);
+                        plTESTSearch.Controls.Add(oUserControl);
+                        oUserControl.Dock = DockStyle.Fill;
+                        udmMain.ControlPanes[TEST].Pinned = true;
+                    }
+                }
+
+                if (!showDM)
+                    udmMain.ControlPanes[DM].Closed = true;
+                if (!showTEST)
+                    udmMain.ControlPanes[TEST].Closed = true;
+            }
+            finally
+            {
+                if (redrawStopped)
+                {
+                    SendMessage(Handle, WM_SETREDRAW, new IntPtr(1), IntPtr.Zero);
+                    RedrawChangedArea();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 그리기를 다시 켠 뒤 바뀐 곳만 다시 그린다: 메인 틀 / 패널 영역 / MDI 영역 바탕 / 지금 보이는 화면.
+        /// 뒤에 가려진 MDI 화면까지 다시 그리면 열린 화면 수만큼 느려지므로 제외한다 (2026-10-16)
+        /// </summary>
+        private void RedrawChangedArea()
+        {
+            RedrawWindow(Handle, IntPtr.Zero, IntPtr.Zero, RDW_ERASE | RDW_FRAME | RDW_INVALIDATE);
+            foreach (Control child in Controls)
+            {
+                if (!child.Visible || !child.IsHandleCreated)
+                    continue;
+                if (child is MdiClient)
+                {
+                    RedrawWindow(child.Handle, IntPtr.Zero, IntPtr.Zero, RDW_ERASE | RDW_INVALIDATE);
+                    if (ActiveMdiChild != null && ActiveMdiChild.IsHandleCreated)
+                        RedrawWindow(ActiveMdiChild.Handle, IntPtr.Zero, IntPtr.Zero, RDW_ERASE | RDW_FRAME | RDW_INVALIDATE | RDW_ALLCHILDREN);
+                }
+                else
+                {
+                    RedrawWindow(child.Handle, IntPtr.Zero, IntPtr.Zero, RDW_ERASE | RDW_FRAME | RDW_INVALIDATE | RDW_ALLCHILDREN);
                 }
             }
         }

@@ -389,7 +389,8 @@ namespace DACrux.Data.Parser.Klarf
                 defect.XSIZE = defect.XSIZE / 1000;
                 defect.YSIZE = defect.YSIZE / 1000;
                 defect.DEFECTAREA = defect.DEFECTAREA / 1000 / 1000;
-                defect.DSIZE = defect.DSIZE / 100000;
+                // DSIZE 도 XSIZE / YSIZE 와 같은 nm 값이라 1000 으로 나눈다. 이전 100000 은 1/100 크기로 저장됐다 (2026-10-16)
+                defect.DSIZE = defect.DSIZE / 1000;
 
                 int idx = defectList.BinarySearch(defect);
 

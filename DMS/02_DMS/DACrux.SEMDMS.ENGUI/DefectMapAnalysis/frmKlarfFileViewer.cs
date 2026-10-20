@@ -57,6 +57,7 @@ namespace DACrux.SEMDMS.ENGUI
         public frmKlarfFileViewer()
         {
             InitializeComponent();
+            DACrux.SEMDMS.Control.GridBuffer.Enable(this); // 표 스크롤 잔상 방지 (2026-10-15)
             cmbColorBy.SelectedIndex = 1;
             ClearView();
         }
@@ -87,6 +88,7 @@ namespace DACrux.SEMDMS.ENGUI
         /// 기존 HandlerInsp.CreateParser 와 같이 FileAnalyzer 로 KLARF 1.8 여부를 판별해 Parser 를 고른다.
         /// Parser 는 예외를 밖으로 던지지 않고 ErrorFlag / ErrorMessage 로 실패를 알려주므로 둘 다 확인한다.
         /// WaferID 가 없거나 Slot 이 0 인 Wafer 는 기존 Parser 가 건너뛰므로 Wafer 0건도 실패로 본다.
+        /// 진행 표시(2026-10-14): 파일 읽기 / 원본 WaferID 읽기는 화면 아래 busyBar 가 작업 스레드에서 돌리고 작업 이름을 보인다.
         /// </summary>
         private void LoadFile()
         {
@@ -98,11 +100,14 @@ namespace DACrux.SEMDMS.ENGUI
                 return;
             }
 
+            IDisposable scope = busyBar.Begin("KLARF 읽기");
             try
             {
-                Cursor = Cursors.WaitCursor;
-                FileAnalyzer analyzer = new FileAnalyzer(path);
-                ParserKlarf loaded = analyzer.FileType == FileType.KlarfFile_1_8 ? new ParserKlarf_18(path) : new ParserKlarf(path);
+                ParserKlarf loaded = busyBar.Run("파일 읽기", () =>
+                {
+                    FileAnalyzer analyzer = new FileAnalyzer(path);
+                    return analyzer.FileType == FileType.KlarfFile_1_8 ? new ParserKlarf_18(path) : new ParserKlarf(path);
+                });
                 if (loaded.ErrorFlag) throw new FormatException(loaded.ErrorMessage);
                 if (loaded.Wafers == null || loaded.Wafers.Count == 0)
                     throw new FormatException("Wafer 정보가 없습니다. WaferID / Slot / DieOrigin 항목을 확인하세요.");
@@ -112,7 +117,7 @@ namespace DACrux.SEMDMS.ENGUI
                     throw new FormatException("SampleSize (Wafer 크기) 값이 없습니다.");
 
                 parser = loaded;
-                Dictionary<int, string> rawIds = ReadRawWaferIds(path);
+                Dictionary<int, string> rawIds = busyBar.Run("원본 WaferID 읽기", () => ReadRawWaferIds(path));
                 updatingWafer = true;
                 foreach (Wafer wafer in parser.Wafers)
                 {
@@ -125,6 +130,7 @@ namespace DACrux.SEMDMS.ENGUI
             }
             catch (Exception ex)
             {
+                scope.Dispose();
                 ClearView();
                 lblStatus.Text = "파일 읽기 실패 / 파일 내용을 확인하세요.";
                 MessageBox.Show(this, ex.Message, "KLARF 파일 확인", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -132,7 +138,7 @@ namespace DACrux.SEMDMS.ENGUI
             finally
             {
                 updatingWafer = false;
-                Cursor = Cursors.Default;
+                scope.Dispose();
             }
         }
 
@@ -152,12 +158,14 @@ namespace DACrux.SEMDMS.ENGUI
             return result;
         }
 
-        /// <summary>한 파일에 Wafer 가 여러 장이면 선택한 Wafer 를 다시 그린다.</summary>
+        /// <summary>한 파일에 Wafer 가 여러 장이면 선택한 Wafer 를 다시 그린다(Map + Defect 목록 + 정보). 그동안 모래시계 커서 (2026-10-15).</summary>
         private void cmbWafer_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (updatingWafer) return;
             WaferItem item = cmbWafer.SelectedItem as WaferItem;
-            if (item != null) ShowWafer(item);
+            if (item == null) return;
+            using (DACrux.SEMDMS.Control.BusyCursor.Show(this))
+                ShowWafer(item);
         }
 
         /// <summary>다른 파일을 읽기 전/실패 시 이전 Wafer 가 남지 않도록 화면을 비운다.</summary>
@@ -337,32 +345,17 @@ namespace DACrux.SEMDMS.ENGUI
             m_dMap.Redraw();
         }
 
-        /// <summary>오른쪽 정보창에 파일 Header 와 Defect 가 많은 Die 순위를 표시한다. Die Index 는 KLARF 원본 기준이다.</summary>
+        /// <summary>오른쪽 정보창에 파일 / Lot / Wafer / Device / Step / 검사 시각 / 검사 Die·Defect 수만 짧게 보인다 (2026-10-15 핵심 항목만).</summary>
         private void FillInfo()
         {
             var sb = new StringBuilder();
             sb.AppendLine("파일: " + Path.GetFileName(txtFile.Text.Trim()));
             sb.AppendLine("Lot ID: " + parser.LotID);
             sb.AppendLine(string.Format("Wafer ID: {0} (Slot {1})", currentRawWaferId, currentWafer.Slot));
-            sb.AppendLine("DMS Wafer ID: " + currentWafer.WaferID);
             sb.AppendLine("Device ID: " + parser.DeviceID);
             sb.AppendLine("Step ID: " + parser.StepID);
-            sb.AppendLine("Setup ID: " + parser.SetupID);
-            sb.AppendLine(string.Format("설비: {0} / {1} / {2}", parser.Maker, parser.Model, parser.Equip));
             sb.AppendLine("Result Time: " + parser.ResultTimestamp.ToString("yyyy-MM-dd HH:mm:ss"));
-            sb.AppendLine(string.Format("Wafer 크기: {0} mm / Notch: {1}", parser.SampleSize, parser.OrientationMarkLocation));
-            sb.AppendLine(string.Format(CultureInfo.InvariantCulture, "Die Pitch: {0:#,0.###} x {1:#,0.###} um", parser.DiePitchX, parser.DiePitchY));
-            sb.AppendLine(string.Format(CultureInfo.InvariantCulture, "Sample Center: {0:#,0.###}, {1:#,0.###} um", currentWafer.SampleCenterLocationX, currentWafer.SampleCenterLocationY));
-            sb.AppendLine(string.Format("화면 Index 보정: X+{0}, Y+{1}", m_dMap.IndexOffset.X, m_dMap.IndexOffset.Y));
-            sb.AppendLine(string.Format("검사 Die: {0}개 / Defect: {1}개", sampleDies.Count, currentWafer.DefectList.Count));
-            sb.AppendLine();
-            sb.AppendLine("Defect 많은 Die (KLARF Index)");
-            var top = currentWafer.DefectList
-                .GroupBy(d => new Point(d.XINDEX, d.YINDEX))
-                .OrderByDescending(g => g.Count()).ThenBy(g => g.Key.X).ThenBy(g => g.Key.Y)
-                .Take(6);
-            foreach (var group in top)
-                sb.AppendLine(string.Format("  ({0}, {1}): {2}", group.Key.X - m_dMap.IndexOffset.X, group.Key.Y - m_dMap.IndexOffset.Y, group.Count()));
+            sb.Append(string.Format("검사 Die: {0}개 / Defect: {1}개", sampleDies.Count, currentWafer.DefectList.Count));
             txtInfo.Text = sb.ToString();
         }
 
@@ -410,20 +403,17 @@ namespace DACrux.SEMDMS.ENGUI
             double klarfY = e.Y + m_dMap.OriginY;
             int dieX = (int)Math.Floor(klarfX / parser.DiePitchX);
             int dieY = (int)Math.Floor(klarfY / parser.DiePitchY);
-            double relX = klarfX - dieX * parser.DiePitchX;
-            double relY = klarfY - dieY * parser.DiePitchY;
             int mapX = dieX + m_dMap.IndexOffset.X;
             int mapY = dieY + m_dMap.IndexOffset.Y;
             bool onWafer = e.X * e.X + e.Y * e.Y <= Math.Pow(m_dMap.WaferSize / 2d, 2);
             int dieDefects = currentWafer.DefectList.Count(d => d.XINDEX == mapX && d.YINDEX == mapY);
 
+            // 핵심 항목만 2줄(2026-10-15): Wafer 좌표 / Die Index / 검사 여부 / Die Defect 수, 가까운 Defect
             lblMouse.Text = string.Format(CultureInfo.InvariantCulture,
-                "Wafer 좌표 (중심 기준): X={0:#,0.0}, Y={1:#,0.0} um   |   KLARF 좌표: X={2:#,0.0}, Y={3:#,0.0} um   |   중심 거리 {4:#,0.0} um{5}\r\n" +
-                "Die (KLARF Index): ({6}, {7})  {8}   |   Die 안 위치 XREL={9:#,0.0}, YREL={10:#,0.0} um   |   Die Defect {11}개\r\n" +
-                "가까운 Defect: {12}",
-                e.X, e.Y, klarfX, klarfY, Math.Sqrt(e.X * e.X + e.Y * e.Y), onWafer ? "" : " (Wafer 밖)",
+                "Wafer X={0:#,0.0}, Y={1:#,0.0} um{2}   |   Die (KLARF Index): ({3}, {4})  {5}   |   Die Defect {6}개\r\n가까운 Defect: {7}",
+                e.X, e.Y, onWafer ? "" : " (Wafer 밖)",
                 dieX, dieY, sampleDies.Contains(new Point(mapX, mapY)) ? "[검사 Die]" : "[미검사]",
-                relX, relY, dieDefects, DescribeNearDefect(e.Screen));
+                dieDefects, DescribeNearDefect(e.Screen));
         }
 
         /// <summary>마우스가 Map 밖으로 나가면 좌표를 지운다.</summary>
@@ -434,7 +424,7 @@ namespace DACrux.SEMDMS.ENGUI
 
         private void ClearMouseInfo()
         {
-            lblMouse.Text = "Wafer 좌표: -\r\nDie (KLARF Index): -\r\n가까운 Defect: -";
+            lblMouse.Text = string.Empty;
         }
 
         /// <summary>화면에서 NearDefectPixel 안에 있는 가장 가까운 보이는 Defect 를 설명 문자열로 만든다.</summary>
@@ -459,9 +449,8 @@ namespace DACrux.SEMDMS.ENGUI
             if (currentWafer.ClassLookup == null || !currentWafer.ClassLookup.TryGetValue(nearest.CLASSNUMBER, out className))
                 className = "-";
             return string.Format(CultureInfo.InvariantCulture,
-                "ID {0} / Class {1} ({2}) / FineBin {3} / RoughBin {4} / XREL={5:0.0}, YREL={6:0.0} / Size {7:0.###} / Image {8}",
-                nearest.DEFECTID, nearest.CLASSNUMBER, className, nearest.FINEBINNUMBER, nearest.ROUGHBINNUMBER,
-                nearest.XREL, nearest.YREL, nearest.DSIZE, nearest.IMAGECOUNT);
+                "ID {0} / Class {1} ({2}) / Size {3:0.###}",
+                nearest.DEFECTID, nearest.CLASSNUMBER, className, nearest.DSIZE);
         }
 
         #endregion

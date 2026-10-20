@@ -7,7 +7,7 @@ namespace NexplantQMS.GdsMap.Persistence
 {
     /// <summary>
     /// 화면 배치 도형(MapPlacedElementData)을 DB 저장 서비스(iGdsMapImport.CreatePlacedBatch)에 보낼 행으로 바꾼다.
-    /// 설계: 문서/2026-10-02_GDS_Map_DB저장_설계.md 6.3절.
+    /// 설계: 문서/설계/02_GDS/2026-10-02_GDS_Map_DB저장_설계.md 6.3절.
     /// 서비스는 기존 DMS 방식대로 string[,]만 받으므로
     ///  - 좌표(POINTS_BIN v1 = 월드 X/Y double little-endian 반복, 점당 16바이트)는 16진수 문자열로,
     ///  - double(Bounds / PATH 폭)은 G17 문자열로(서버 / DB에서 TO_BINARY_DOUBLE로 정확히 복원) 보낸다.

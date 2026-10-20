@@ -32,10 +32,13 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\..\100_ClientBin\GdsMap\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
+    <PreferNativeArm64>false</PreferNativeArm64>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="OpenTK, Version=3.3.3.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
@@ -161,24 +164,26 @@
       <DependentUpon>GdsMapViewForm.cs</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GdsMapViewForm_SubDevice.cs">
-      <DependentUpon>GdsMapViewForm.cs</DependentUpon>
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="GdsMapViewForm_Layout.cs">
       <DependentUpon>GdsMapViewForm.cs</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="SubDeviceSetupForm.cs">
+    <Compile Include="GdsMapViewForm_MapCopy.cs">
+      <DependentUpon>GdsMapViewForm.cs</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="SubDeviceSetupForm.Designer.cs">
-      <DependentUpon>SubDeviceSetupForm.cs</DependentUpon>
+    <Compile Include="MapCopyForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MapCopyForm.Designer.cs">
+      <DependentUpon>MapCopyForm.cs</DependentUpon>
     </Compile>
     <Compile Include="GdsMapForm.Designer.cs">
       <DependentUpon>GdsMapForm.cs</DependentUpon>
     </Compile>
     <Compile Include="DmsHostContext.cs" />
+    <Compile Include="BusyStatus.cs" />
+    <Compile Include="GridBuffer.cs" />
     <Compile Include="GdsMapViewForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -191,9 +196,11 @@
     <Compile Include="GdsDieAnalysisForm.Designer.cs">
       <DependentUpon>GdsDieAnalysisForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="GdsDieMapCache.cs" />
     <Compile Include="Gds\GBox.cs" />
     <Compile Include="Gds\GdsGeometry.cs" />
     <Compile Include="Gds\GdsLayer.cs" />
+    <Compile Include="Gds\GdsLayerKey.cs" />
     <Compile Include="Gds\GdsLibrary.cs" />
     <Compile Include="Gds\GdsElementGridRow.cs" />
     <Compile Include="Gds\GdsReader.cs" />
@@ -219,6 +226,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="GdsMapViewForm.resx">
       <DependentUpon>GdsMapViewForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GdsDieAnalysisForm.resx">
+      <DependentUpon>GdsDieAnalysisForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MapCopyForm.resx">
+      <DependentUpon>MapCopyForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

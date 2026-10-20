@@ -1026,12 +1026,44 @@ namespace DACrux.Data.Parser.Klarf
                 {
                     double d;
 
-                    if (!Double.TryParse(val, out d))
+                    if (!Double.TryParse(val, out d) && !TryParseCrtSpecialValue(val, out d))
                         throw new Exception(String.Format("Parsing Error: '{0}'", val));
 
                     valueList.Add(d);
                 }
             }
+        }
+
+        /// <summary>
+        /// Windows C 런타임이 NaN / 무한대를 문자로 쓴 값을 읽는다. 예: -1.#IND000000e+000, 1.#QNAN0, 1.#INF000000e+000 (2026-10-14)
+        /// 일부 장비 KLARF 는 Defect 가 0 인 Test 의 SummaryList DEFDENSITY 를 이렇게 기록하며, Double.TryParse 가 읽지 못해 파일 전체가 실패했다.
+        /// #IND / #QNAN / #SNAN = NaN, #INF = 부호에 맞는 무한대. 앞자리가 1 / -1 / +1 이 아니거나 다른 표기면 기존처럼 실패로 둔다.
+        /// </summary>
+        private static bool TryParseCrtSpecialValue(string text, out double value)
+        {
+            value = 0;
+            int mark = text.IndexOf(".#", StringComparison.Ordinal);
+            if (mark < 1)
+                return false;
+
+            string head = text.Substring(0, mark);
+            if (head != "1" && head != "-1" && head != "+1")
+                return false;
+
+            string kind = text.Substring(mark + 2).ToUpperInvariant();
+            if (kind.StartsWith("IND", StringComparison.Ordinal) || kind.StartsWith("QNAN", StringComparison.Ordinal) || kind.StartsWith("SNAN", StringComparison.Ordinal))
+            {
+                value = Double.NaN;
+                return true;
+            }
+
+            if (kind.StartsWith("INF", StringComparison.Ordinal))
+            {
+                value = head == "-1" ? Double.NegativeInfinity : Double.PositiveInfinity;
+                return true;
+            }
+
+            return false;
         }
 
         private string GetIndexData(System.Collections.Specialized.NameValueCollection col, string name, int index)

@@ -222,4 +222,67 @@ SELECT :factory, :device_id, :placed_element_id, :source_element_id, :layer_id, 
             <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
         </parameters>
     </query>
+    <!-- Map 복사(GdsMapImport.CopyMap, 2026-10-15): 원본 Device 의 행을 새 Device 이름으로 INSERT ... SELECT -->
+    <query statement="Insert" queryid="COPY_PLACED_EL" commandtype="Text" description="Map 복사: 배치 도형 전체(좌표 BLOB / TEXT 포함)" commandtimeout="1800">
+        <commandtext><![CDATA[INSERT INTO TQP_GDS_PLACED_EL
+    (FACTORY, DEVICE_ID, PLACED_ELEMENT_ID, SOURCE_ELEMENT_ID, LAYER_ID, DATA_TYPE, ELEMENT_TYPE, CLOSED_FLAG,
+    PATH_WIDTH, PATH_TYPE, MIN_X, MIN_Y, MAX_X, MAX_Y, POINT_COUNT, POINTS_FORMAT_VERSION, POINTS_BIN,
+    TEXT_VALUE, TEXT_TYPE, TEXT_FONT, TEXT_HORIZONTAL, TEXT_VERTICAL)
+SELECT FACTORY, :target_device_id, PLACED_ELEMENT_ID, SOURCE_ELEMENT_ID, LAYER_ID, DATA_TYPE, ELEMENT_TYPE, CLOSED_FLAG,
+       PATH_WIDTH, PATH_TYPE, MIN_X, MIN_Y, MAX_X, MAX_Y, POINT_COUNT, POINTS_FORMAT_VERSION, POINTS_BIN,
+       TEXT_VALUE, TEXT_TYPE, TEXT_FONT, TEXT_HORIZONTAL, TEXT_VERTICAL
+  FROM TQP_GDS_PLACED_EL
+ WHERE FACTORY = :factory
+   AND DEVICE_ID = :source_device_id]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="50">:target_device_id</param>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:source_device_id</param>
+        </parameters>
+    </query>
+    <!-- Layer 번호 + DataType(TEXT 는 TEXTTYPE) 단위 페이지 조회 (2026-10-20). 위 쿼리는 Layer 번호 단위(이전 서버용). -->
+    <query statement="Select" queryid="SELECT_PLACED_EL_PAGE_FIRST_DT" commandtype="Text" description="조회 화면: Layer(번호 + DataType)의 첫 페이지" commandtimeout="600">
+        <commandtext><![CDATA[SELECT * FROM (
+        SELECT PLACED_ELEMENT_ID, SOURCE_ELEMENT_ID, LAYER_ID, DATA_TYPE, ELEMENT_TYPE,
+               CLOSED_FLAG, PATH_WIDTH, PATH_TYPE, MIN_X, MIN_Y, MAX_X, MAX_Y,
+               POINT_COUNT, POINTS_FORMAT_VERSION, POINTS_BIN,
+               TEXT_VALUE, TEXT_TYPE, TEXT_FONT, TEXT_HORIZONTAL, TEXT_VERTICAL
+          FROM TQP_GDS_PLACED_EL
+         WHERE FACTORY = :factory
+           AND DEVICE_ID = :device_id
+           AND LAYER_ID = :layer_id
+           AND DATA_TYPE = :data_type
+         ORDER BY PLACED_ELEMENT_ID)
+ WHERE ROWNUM <= :max_rows]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
+            <param direction="Input" dbtype="Number" size="0">:layer_id</param>
+            <param direction="Input" dbtype="Number" size="0">:data_type</param>
+            <param direction="Input" dbtype="Number" size="0">:max_rows</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_PLACED_EL_PAGE_DT" commandtype="Text" description="조회 화면: Layer(번호 + DataType)의 다음 페이지 (이전 페이지 마지막 PLACED_ELEMENT_ID 다음부터)" commandtimeout="600">
+        <commandtext><![CDATA[SELECT * FROM (
+        SELECT PLACED_ELEMENT_ID, SOURCE_ELEMENT_ID, LAYER_ID, DATA_TYPE, ELEMENT_TYPE,
+               CLOSED_FLAG, PATH_WIDTH, PATH_TYPE, MIN_X, MIN_Y, MAX_X, MAX_Y,
+               POINT_COUNT, POINTS_FORMAT_VERSION, POINTS_BIN,
+               TEXT_VALUE, TEXT_TYPE, TEXT_FONT, TEXT_HORIZONTAL, TEXT_VERTICAL
+          FROM TQP_GDS_PLACED_EL
+         WHERE FACTORY = :factory
+           AND DEVICE_ID = :device_id
+           AND LAYER_ID = :layer_id
+           AND DATA_TYPE = :data_type
+           AND PLACED_ELEMENT_ID > :after_id
+         ORDER BY PLACED_ELEMENT_ID)
+ WHERE ROWNUM <= :max_rows]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
+            <param direction="Input" dbtype="Number" size="0">:layer_id</param>
+            <param direction="Input" dbtype="Number" size="0">:data_type</param>
+            <param direction="Input" dbtype="VarChar" size="1024">:after_id</param>
+            <param direction="Input" dbtype="Number" size="0">:max_rows</param>
+        </parameters>
+    </query>
 </queryxml>

@@ -46,7 +46,7 @@ namespace NexplantQMS.GdsMap
             HashSet<int> checkedLayers = GetCheckedChainLayers();
             List<ChainElementCandidate> candidates = map.GetChainElementCandidates(screenPoint)
                 .Where(candidate => chainKeys.Contains(candidate.ElementKey)
-                    && checkedLayers.Contains(candidate.LayerId)
+                    && checkedLayers.Contains(candidate.LayerKey)
                     && !_chainInputSelections.ContainsKey(candidate.ElementKey)
                     && !_chainOutputSelections.ContainsKey(candidate.ElementKey))
                 .ToList();
@@ -103,9 +103,9 @@ namespace NexplantQMS.GdsMap
         private void ShowChainExampleStatus()
         {
             SetChainStatus(_chainExampleSelecting
-                ? "예시로 쓸 도형을 지도에서 클릭하세요. 다시 클릭하면 빠집니다. 다 고르면 [예시 묶음 지정]을 다시 누르세요."
+                ? "예시 도형 선택 중"
                 : _chainExampleKeys.Count == 0 ? "예시 묶음 지정을 마쳤습니다. 고른 도형이 없습니다."
-                : "예시 묶음 지정을 마쳤습니다. [유사 묶음 찾기]를 누르세요.");
+                : "예시 묶음 지정을 마쳤습니다.");
         }
 
         /// <summary>Chain/Layer/경로가 바뀌면 이전 예시 Key가 새 화면에 섞이지 않도록 초기화한다.</summary>
@@ -133,7 +133,7 @@ namespace NexplantQMS.GdsMap
             ClearChainSimilarPreview();
             HashSet<int> checkedLayers = GetCheckedChainLayers();
             ChainTraceElement[] chainElements = map.GetChainTraceElements(GetEditedChainKeys())
-                .Where(element => checkedLayers.Contains(element.LayerId)).ToArray();
+                .Where(element => checkedLayers.Contains(element.LayerKey)).ToArray();
             string[] exampleKeys = _chainExampleKeys.ToArray();
             string[] protectedKeys = _chainInputSelections.Keys.Concat(_chainOutputSelections.Keys).ToArray();
             ChainDefinition selectedChain = _activeChain;
@@ -145,9 +145,11 @@ namespace NexplantQMS.GdsMap
             SetChainStatus("유사 묶음을 찾는 중입니다.");
             try
             {
-                IList<ChainSimilarGroup> found = await Task.Run(() =>
-                    new ChainSimilarGroupFinder().Find(chainElements, exampleKeys,
-                        protectedKeys, 0.0001, cancellation.Token));
+                IList<ChainSimilarGroup> found;
+                using (ViewBusy.Busy()) // 서버 조회 / 계산 동안 모래시계 커서 (2026-10-15)
+                    found = await Task.Run(() =>
+                        new ChainSimilarGroupFinder().Find(chainElements, exampleKeys,
+                            protectedKeys, 0.0001, cancellation.Token));
                 if (generation != _chainSimilarGeneration
                     || !ReferenceEquals(selectedChain, _activeChain)) return;
                 _chainSimilarGroups = found;
@@ -157,7 +159,7 @@ namespace NexplantQMS.GdsMap
                 int ambiguousCount = found.Count(group => group.IsAmbiguous);
                 // 보호 / 검토 필요 수와 색 범례는 상태 줄에 쓰지 않는다. 묶음별 상태는 오른쪽 유사 묶음 목록에 있다 (2026-10-13).
                 SetChainStatus(found.Count == 0 ? "비슷한 묶음을 찾지 못했습니다."
-                    : "유사 묶음 " + found.Count + "개를 찾았습니다. 오른쪽 목록에서 뺄 묶음을 체크하고 [체크 묶음 제외]를 누르세요.");
+                    : "유사 묶음 " + found.Count + "개");
             }
             catch (OperationCanceledException)
             {

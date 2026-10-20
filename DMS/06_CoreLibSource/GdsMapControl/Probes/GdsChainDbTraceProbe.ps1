@@ -1,4 +1,4 @@
-﻿# GDS Map View 화면의 Chain 탐색 전제 검증 스크립트 (1단계, 설계: 문서/2026-10-06_GDS_Map_화면역할_재정의_설계.md 3절)
+﻿# GDS Map View 화면의 Chain 탐색 전제 검증 스크립트 (1단계, 설계: 문서/설계/02_GDS/2026-10-06_GDS_Map_화면역할_재정의_설계.md 3절)
 # 목적: Chain 설정을 View(DB 도형) 화면으로 옮겨도 탐색 결과가 같은지 확인한다.
 #       같은 GDS를 (1) 파일 Flatten(ShowStructure)과 (2) DB 페이지 조회 + ShowPlacedElements로 각각 그린 뒤
 #       같은 Input / Layer / 격자로 TraceChainCandidate를 실행해 방문 / 후보 도형 ID 집합을 비교한다.
@@ -10,11 +10,14 @@ param(
     [string]$GdsPath = '',
     [string]$Factory = 'PROBE',
     [string]$Device = 'LAYER_FILTER_PROBE',
-    [int[]]$Layers = @(1, 2, 6)
+    [int[]]$Layers = @(1, 2, 6),
+    [string]$BinDir = ''
 )
+# -Layers 는 GDS Layer 번호(DataType 0), -BinDir 생략 시 101_ServerBin. 화면 / 탐색은 Layer 키(번호 + DataType)로 다룬다 (2026-10-20)
 $ErrorActionPreference = 'Stop'
 $dms = (Resolve-Path (Join-Path $PSScriptRoot '..\..\..')).Path
 $serverBin = Join-Path $dms '101_ServerBin'
+if ($BinDir -eq '') { $BinDir = $serverBin }
 if ($GdsPath -eq '') { $GdsPath = Join-Path (Split-Path $dms -Parent) 'SampleFile\OMM all layer2.gds\OMM all layer2.gds' }
 
 [AppDomain]::CurrentDomain.SetData('APP_CONFIG_FILE', (Join-Path $serverBin 'DACrux.SEMDMS.Service.exe.config'))
@@ -23,9 +26,11 @@ $flags = [Reflection.BindingFlags]'NonPublic,Static'
 $cm = [Configuration.ConfigurationManager]
 $cm.GetField('s_initState', $flags).SetValue($null, 0)
 $cm.GetField('s_configSystem', $flags).SetValue($null, $null)
-foreach ($d in 'Oracle.ManagedDataAccess', 'Miracom.Middleware', 'DACrux.Base', 'DACrux.SEMDMS.Interface', 'DACrux.SEMDMS.DSL', 'DACrux.SEMDMS.BSL') {
+foreach ($d in 'Oracle.ManagedDataAccess', 'Miracom.Middleware', 'DACrux.Base') {
     $p = Join-Path $serverBin "$d.dll"; if (Test-Path $p) { [void][Reflection.Assembly]::LoadFrom($p) }
 }
+foreach ($d in 'DACrux.SEMDMS.Interface', 'DACrux.SEMDMS.DSL', 'DACrux.SEMDMS.BSL') { [void][Reflection.Assembly]::LoadFrom((Join-Path $BinDir "$d.dll")) }
+Write-Host "BSL: $(Join-Path $BinDir 'DACrux.SEMDMS.BSL.dll')"
 # RO(화면 참조)는 ClientBin에서 로드한다. 이 Probe는 RO를 호출하지 않지만 Form 형식 로드에 필요하다.
 foreach ($d in 'DACrux.SEMDMS.RO') { [void][Reflection.Assembly]::LoadFrom((Join-Path $dms "100_ClientBin\$d.dll")) }
 $probeDir = Join-Path $env:TEMP 'chippac\gdschaindbtraceprobe'
@@ -68,7 +73,7 @@ public static class ChainDbTraceProbe
             string after = string.Empty;
             while (true)
             {
-                DataTable page = bsl.GetPlacedElementPage(factory, device, layer.ToString(), after, 10000);
+                DataTable page = bsl.GetPlacedElementPage(factory, device, GdsLayerKey.Format(layer), after, 10000);
                 foreach (DataRow row in page.Rows) items.Add(GdsMapPlacedRowReader.Read(row));
                 if (page.Rows.Count > 0) after = page.Rows[page.Rows.Count - 1]["PLACED_ELEMENT_ID"].ToString();
                 if (page.Rows.Count < 10000) break;
@@ -103,8 +108,9 @@ public static class ChainDbTraceProbe
         var layerOf = new Dictionary<string, int>();
         map.VisitPlacedElements(new HashSet<int>(first), d =>
         {
-            if ((d.ElementType == "BOUNDARY" || d.ElementType == "PATH") && keys.Count(k => layerOf[k] == d.LayerId) < 5)
-            { keys.Add(d.PlacedElementId); layerOf[d.PlacedElementId] = d.LayerId; }
+            int layerKey = GdsLayerKey.Make(d.LayerId, d.DataType);
+            if ((d.ElementType == "BOUNDARY" || d.ElementType == "PATH") && keys.Count(k => layerOf[k] == layerKey) < 5)
+            { keys.Add(d.PlacedElementId); layerOf[d.PlacedElementId] = layerKey; }
         });
         map.RebuildChainTraceItems();
         int before = map.GetChainTraceElements(keys).Count;
@@ -128,7 +134,7 @@ public static class ChainDbTraceProbe
     }
 }
 "@
-Add-Type -TypeDefinition $helper -ReferencedAssemblies @($gdsDll, (Join-Path $serverBin 'DACrux.SEMDMS.BSL.dll'), (Join-Path $serverBin 'DACrux.SEMDMS.Interface.dll'),
+Add-Type -TypeDefinition $helper -ReferencedAssemblies @($gdsDll, (Join-Path $BinDir 'DACrux.SEMDMS.BSL.dll'), (Join-Path $BinDir 'DACrux.SEMDMS.Interface.dll'),
     (Join-Path $serverBin 'Miracom.Middleware.dll'), (Join-Path $probeDir 'OpenTK.GLControl.dll'), (Join-Path $probeDir 'OpenTK.dll'),
     'System.Core', 'System.Data', 'System.Windows.Forms', 'System.Drawing', 'System.Xml')
 
@@ -148,6 +154,7 @@ Check '화면 생성: Setup에 Chain 없음 / View에 Chain 있음' ($setupChain
 $setup.Dispose(); $view.Dispose()
 
 # 2. 파일 도형 vs DB 도형 탐색 결과 비교
+$Layers = [int[]]@($Layers | ForEach-Object { [NexplantQMS.GdsMap.GdsLayerKey]::Make($_, 0) })
 $sw = [Diagnostics.Stopwatch]::StartNew()
 $fileMap = [ChainDbTraceProbe]::FileMap($GdsPath)
 $fileMs = $sw.ElapsedMilliseconds; $sw.Restart()
@@ -166,7 +173,7 @@ foreach ($input in $inputs) {
 if ($Layers.Count -ge 2) {
     $first = [int[]]@($Layers[0], $Layers[1]); $second = [int[]]@($Layers[0]) + @($Layers | Select-Object -Skip 2)
     $r = ([ChainDbTraceProbe]::Reattach($Factory, $Device, $first, $second)).Split('|')
-    Check '다시 조회 후 Chain 도형 재연결' ([int]$r[0] -eq [int]$r[4] -and [int]$r[2] -eq [int]$r[3] -and [int]$r[3] -gt 0) ("첫 조회 Layer {0} 연결 {1}/{5} -> Layer {2} 다시 조회 직후(새 지도) {3} -> 재연결 {4} (기대 {6})" -f ($first -join ','), $r[0], ($second -join ','), $r[1], $r[2], $r[4], $r[3])
+    Check '다시 조회 후 Chain 도형 재연결' ([int]$r[0] -eq [int]$r[4] -and [int]$r[2] -eq [int]$r[3] -and [int]$r[3] -gt 0) ("첫 조회 Layer {0} 연결 {1}/{5} -> Layer {2} 다시 조회 직후(새 지도) {3} -> 재연결 {4} (기대 {6})" -f (($first | ForEach-Object { [NexplantQMS.GdsMap.GdsLayerKey]::Format($_) }) -join ','), $r[0], (($second | ForEach-Object { [NexplantQMS.GdsMap.GdsLayerKey]::Format($_) }) -join ','), $r[1], $r[2], $r[4], $r[3])
 }
 
 $fail = @($results | Where-Object { $_.StartsWith('FAIL') }).Count

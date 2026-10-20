@@ -226,7 +226,8 @@ namespace NexplantQMS.GdsMap
         private void AppendChainOverlayElements(IEnumerable<ChainTraceElement> elements, Color color,
             bool dashed, bool respectLayerVisibility)
         {
-            foreach (var layerGroup in elements.GroupBy(element => element.LayerId))
+            // 표시 여부는 Layer 키(번호 + DataType)로 판단한다 (2026-10-20)
+            foreach (var layerGroup in elements.GroupBy(element => element.LayerKey))
             {
                 int lineStart = _chainOverlayVertices.Count;
                 foreach (ChainTraceElement element in layerGroup)
@@ -332,7 +333,7 @@ namespace NexplantQMS.GdsMap
             }
             if (_chainOverlayDrawRanges.Count == 0) return;
 
-            var visibleLayers = new HashSet<int>(_layerList.Where(layer => layer.Visible).Select(layer => layer.LayerID));
+            var visibleLayers = new HashSet<int>(_layerList.Where(layer => layer.Visible).Select(layer => layer.LayerKey));
             GL.UseProgram(_chainOverlayShaderProgram);
             GL.UniformMatrix4(_chainOverlayMatrixLoc, false, ref projection);
             GL.Uniform1(_chainOverlayScaleLoc, (float)_scale);

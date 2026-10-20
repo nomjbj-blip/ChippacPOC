@@ -117,7 +117,7 @@ $results = New-Object Collections.Generic.List[string]
 function Check($name, [bool]$ok, $detail) {
     $line = ($(if ($ok) { 'PASS' } else { 'FAIL' })) + " / $name / $detail"; $results.Add($line); Write-Host $line
 }
-function Info([string]$file, [string]$product = '') { return [string[]]@('SCK', 'PROBE', $file, $product, '', '', 'ROUGHBIN') }
+function Info([string]$file, [string]$product = '') { return [string[]]@('SCK', 'PROBE', $file, $product, '', '', '') }
 function Key-Set($table, $xCol, $yCol) {
     $s = New-Object 'Collections.Generic.HashSet[string]'
     foreach ($r in $table.Rows) { [void]$s.Add("$([int]$r[$xCol]),$([int]$r[$yCol])") }
@@ -190,6 +190,12 @@ $xc = @('XINDEX', 'INDEX_X') | Where-Object { $df.Columns.Contains($_) } | Selec
 $yc = @('YINDEX', 'INDEX_Y') | Where-Object { $df.Columns.Contains($_) } | Select-Object -First 1
 $out = @($df.Rows | Where-Object { -not $expected.Contains("$([int]$_[$xc]),$([int]$_[$yc])") }).Count
 Check 'Defect 15 / 모두 Map Setup Die 안' (($df.Rows.Count -eq 15) -and ($out -eq 0)) "Defect $($df.Rows.Count) / Map 밖 $out ($xc / $yc)"
+# 분류는 KLARF 표준대로 파일 값 그대로 (2026-10-15): 샘플은 CLASSNUMBER 전부 0, ROUGHBINNUMBER 53 / 54
+$cc = @('CLASSNUMBER', 'CLASS_NUMBER') | Where-Object { $df.Columns.Contains($_) } | Select-Object -First 1
+$rc = @('ROUGHBINNUMBER', 'ROUGHBIN_NUMBER', 'ROUGHBIN') | Where-Object { $df.Columns.Contains($_) } | Select-Object -First 1
+$classes = @($df.Rows | ForEach-Object { [int]$_[$cc] } | Sort-Object -Unique) -join ','
+$roughs = @($df.Rows | ForEach-Object { [int]$_[$rc] } | Sort-Object -Unique) -join ','
+Check 'Defect 분류 = 파일 값 그대로 (CLASSNUMBER 0 / ROUGHBIN 53,54)' (($classes -eq '0') -and ($roughs -eq '53,54')) "$cc=$classes / $rc=$roughs"
 
 # ---- 3) Defect 번호 독립 확인: 사용자가 예전 규칙으로 올린 같은 Wafer (읽기만) ----
 $orig = [SetupMapProbeHelper]::Begin((Info 'XD106.02'), [IO.File]::ReadAllBytes($sample)).Rows[0]

@@ -5,7 +5,7 @@
 --      찾은 Chain 이 묶여 있으면 같은 묶음의 Chain 전부 -> 그 Chain 들의 Spec(Limit) / 측정 항목 / 값 통계.
 -- 같은 날 만든 TQP_GDS_ET_CHAIN_MAP(대표 Chain, 2026-10-12_tqp_gds_et_chain_map.sql)은 배포 전이고 0행이라 지운다.
 -- Device 단위(E-Test 파일명 Device), 공정 무관. Chain 1개는 묶음 1개에만 들어간다(PK).
--- 설계: 문서/2026-10-07_ETest_Limit_설정_설계.md 15절
+-- 설계: 문서/설계/04_ETest/2026-10-07_ETest_Limit_설정_설계.md 15절
 -- 적용: 2026-10-12 로컬 docker oracle19c DMSMGR. 고객 DB 적용 여부는 별도 확인 (고객 DB 에 CHAIN_MAP 이 없으면 1단계는 건너뛴다).
 
 WHENEVER SQLERROR EXIT SQL.SQLCODE ROLLBACK

@@ -119,16 +119,18 @@
   </resheader>
   <data name="btnSearch.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
-        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFn
-        ZVJlYWR5ccllPAAAAehJREFUeNqkks1rGmEQxp/sLvhtRYn+A0a0ECINlBziqQ3knEMOpYf2UtgS6D9Q
-        qDl4CjkLRa8hubR4aQWhIAqGlg1tTnrpasEgkYXqav1AJTNvMYRk20Ay8IPdeed5Znb2Xchms/hPPCNe
-        EKvElNCI98THeYEyHo+thA+JnXA4rBLw+/0iaRjGZq1W26zX62l63SP0fxnsJBIJNRKJoNvtotVqiaTX
-        6wXlEQgE1EqlwqnXymg0ujF2NBoVnakThsMhZrOZOOj1enA6nYjFYmg0Gqqu62UrA5ULOp0OJpMJZFkW
-        zIPrTdNEPB5HtVpVFe5wLR4Hg0G0223YbDbLzQ4GA7EX0i5bGfzdrqJAkiTLM56Iz0grWxl8bTab66FQ
-        CBafJ8Jut4Nq2ECT2OAqTl/4vFgswuVyiUL+jKs4HA6xyEKhwPVpibvMWXr0PNkPrG2dmUA+n4fb7RZG
-        LGQzfmZyuRw0TUuT5kimX4bpdIqV9VfJXyP7uyeJJRyeevDjWxn6aRE+nw8ejwd8X2jryGQyKJVKadK8
-        JQbiIq1tvLkU73/qYtj/g/OfDkQXFw5SqdSDa1eZb2H+ctk3xL/P0D85xsvt1d3y5/0kbgnpPmIxwXHJ
-        wHczdCexmGD7qWvX+PLhTmKOCwEGAJjwCW15fGXWAAAAAElFTkSuQmCC
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACMklEQVR4nIVTTWgTQRT+3uzMxibVCCLi
+        T6xi/Um1lSKiokixiCJGPBR61B68ePDgQVos1qKQ3osgXkR78KBeYgvFi6b4V1RSFZqmpZiKNYL4l0aE
+        ptmRN8luUq36Lbs7O/u9733vzQwFOgdi1bYVcbQGX4R/QwMgEAQRcrOFezJgW5HosV3IFwqGwAJkVPih
+        ofWfAgxlWWiPDUfkbMHBysU2uh9+MIFEBEmAFAJzjoO8o8tRJQG+u5pWgWMR6BzQC8H/l/nfOdIpKa84
+        /QA3jv5AfOgxoj1RcGJGcnQUzGFnxoHmPmnU1W01HOnaG+lYD7Is1Ddsn1ez7fPBIeE1l+lCu2kByZ03
+        TVEK4UsT6Dsyg9VrQoY6k8shOTaO9NR7w1lXE8LGTbWoWuTz5KSrRJbC5OVtsEpWGYnEazwL7kRba7P5
+        vp7MQkwmsKOxweMItwR2IJXC2vYRz2tyLIW28BJsWGbjiSMw8TaLdHoKtlIeR7rFBfw+gAQ+X9k3b70Z
+        fZ/mkEp9KzolgrJVuR9UUlh+5imev3iJcx0XvMDwls3Gdv/gO5OdkfmYKTuobOKXq8U6d+/Z6/1s5FoT
+        rxD6OW6+pzPTaDrQjFjPcbR0DRZJVef7vY2x9NR9PfwobsaV85W4ffGQ1ndrzJs5UlnCy/j12kFvXDlf
+        Cc58p/swWurHgDe9IP/ZW3FZHdyfL2hzfrgjliAoQeA5Pg/urvSWjoCbqhcnsieHmF8LILhguv/j+y+q
+        CR4gACy+/wAAAABJRU5ErkJggg==
     </value>
   </data>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
 </root>

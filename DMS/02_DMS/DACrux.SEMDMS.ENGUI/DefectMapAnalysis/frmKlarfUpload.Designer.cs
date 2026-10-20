@@ -2,7 +2,7 @@
 {
     // KLARF 업로드 화면의 컨트롤과 배치를 정의한다. 파일 읽기 / 저장 동작은 본문 파일(frmKlarfUpload.cs)에서 처리한다.
     // 2026-10-08 재배치(요청): 처리 기록 제거 / KLARF Defect Grid 추가 / [분석] 버튼 제거 / 아이콘 버튼.
-    // 버튼 아이콘은 frmKlarfUpload.resx 가 DMS/11_Resource/ByModule/POC/BTN_*.png 를 파일 참조(ResXFileRef)로 읽는다.
+    // 버튼 아이콘은 DMS/99_Resource/ByModule/POC/BTN_*.png 를 frmKlarfUpload.resx 에 이미지로 넣어 쓴다.
     partial class frmKlarfUpload
     {
         private System.ComponentModel.IContainer components = null;
@@ -40,8 +40,6 @@
             this.txtStepId = new System.Windows.Forms.TextBox();
             this.lblEquip = new System.Windows.Forms.Label();
             this.txtEquip = new System.Windows.Forms.TextBox();
-            this.lblClassSource = new System.Windows.Forms.Label();
-            this.cmbClassSource = new System.Windows.Forms.ComboBox();
             this.btnSave = new System.Windows.Forms.Button();
             this.lblSummary = new System.Windows.Forms.Label();
             this.splitMain = new System.Windows.Forms.SplitContainer();
@@ -64,7 +62,6 @@
             this.colDefectId = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colIndexX = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colIndexY = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colSaveClass = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colClassName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colImageFound = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colX = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -77,7 +74,9 @@
             this.colRoughBin = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colFineBin = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colImageFile = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.pnlStatus = new System.Windows.Forms.Panel();
             this.lblStatus = new System.Windows.Forms.Label();
+            this.busyBar = new DACrux.SEMDMS.Control.ProgressStatusBar();
             this.topBar.SuspendLayout();
             this.grpFile.SuspendLayout();
             this.grpSaveValue.SuspendLayout();
@@ -94,6 +93,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.dgvWafer)).BeginInit();
             this.grpDefect.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvDefect)).BeginInit();
+            this.pnlStatus.SuspendLayout();
             this.SuspendLayout();
             // 
             // topBar
@@ -119,7 +119,7 @@
             this.grpFile.Controls.Add(this.btnImageDir);
             this.grpFile.Location = new System.Drawing.Point(8, 4);
             this.grpFile.Name = "grpFile";
-            this.grpFile.Size = new System.Drawing.Size(1236, 88);
+            this.grpFile.Size = new System.Drawing.Size(1384, 88);
             this.grpFile.TabIndex = 0;
             this.grpFile.TabStop = false;
             this.grpFile.Text = "파일";
@@ -138,23 +138,19 @@
             this.txtFile.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtFile.BackColor = System.Drawing.SystemColors.Window;
-            this.txtFile.Location = new System.Drawing.Point(98, 24);
+            this.txtFile.Location = new System.Drawing.Point(98, 22);
             this.txtFile.Name = "txtFile";
             this.txtFile.ReadOnly = true;
-            this.txtFile.Size = new System.Drawing.Size(1000, 31);
+            this.txtFile.Size = new System.Drawing.Size(1024, 23);
             this.txtFile.TabIndex = 1;
             // 
             // btnBrowse
             // 
             this.btnBrowse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnBrowse.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(150)))), ((int)(((byte)(165)))), ((int)(((byte)(185)))));
-            this.btnBrowse.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnBrowse.Image = ((System.Drawing.Image)(resources.GetObject("btnBrowse.Image")));
-            this.btnBrowse.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnBrowse.Location = new System.Drawing.Point(1106, 18);
+            this.btnBrowse.Location = new System.Drawing.Point(1278, 19);
             this.btnBrowse.Name = "btnBrowse";
-            this.btnBrowse.Padding = new System.Windows.Forms.Padding(6, 0, 4, 0);
-            this.btnBrowse.Size = new System.Drawing.Size(120, 32);
+            this.btnBrowse.Size = new System.Drawing.Size(96, 28);
             this.btnBrowse.TabIndex = 2;
             this.btnBrowse.Text = "파일 선택";
             this.btnBrowse.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
@@ -175,23 +171,19 @@
             this.txtImageDir.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtImageDir.BackColor = System.Drawing.SystemColors.Window;
-            this.txtImageDir.Location = new System.Drawing.Point(98, 56);
+            this.txtImageDir.Location = new System.Drawing.Point(98, 54);
             this.txtImageDir.Name = "txtImageDir";
             this.txtImageDir.ReadOnly = true;
-            this.txtImageDir.Size = new System.Drawing.Size(1000, 31);
+            this.txtImageDir.Size = new System.Drawing.Size(1024, 23);
             this.txtImageDir.TabIndex = 4;
             // 
             // btnImageDir
             // 
             this.btnImageDir.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnImageDir.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(150)))), ((int)(((byte)(165)))), ((int)(((byte)(185)))));
-            this.btnImageDir.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnImageDir.Image = ((System.Drawing.Image)(resources.GetObject("btnImageDir.Image")));
-            this.btnImageDir.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnImageDir.Location = new System.Drawing.Point(1106, 50);
+            this.btnImageDir.Location = new System.Drawing.Point(1278, 51);
             this.btnImageDir.Name = "btnImageDir";
-            this.btnImageDir.Padding = new System.Windows.Forms.Padding(6, 0, 4, 0);
-            this.btnImageDir.Size = new System.Drawing.Size(120, 32);
+            this.btnImageDir.Size = new System.Drawing.Size(96, 28);
             this.btnImageDir.TabIndex = 5;
             this.btnImageDir.Text = "폴더 선택";
             this.btnImageDir.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
@@ -208,11 +200,9 @@
             this.grpSaveValue.Controls.Add(this.txtStepId);
             this.grpSaveValue.Controls.Add(this.lblEquip);
             this.grpSaveValue.Controls.Add(this.txtEquip);
-            this.grpSaveValue.Controls.Add(this.lblClassSource);
-            this.grpSaveValue.Controls.Add(this.cmbClassSource);
             this.grpSaveValue.Location = new System.Drawing.Point(8, 94);
             this.grpSaveValue.Name = "grpSaveValue";
-            this.grpSaveValue.Size = new System.Drawing.Size(1236, 54);
+            this.grpSaveValue.Size = new System.Drawing.Size(1238, 54);
             this.grpSaveValue.TabIndex = 1;
             this.grpSaveValue.TabStop = false;
             this.grpSaveValue.Text = "저장 값 ";
@@ -268,43 +258,18 @@
             this.txtEquip.Size = new System.Drawing.Size(150, 31);
             this.txtEquip.TabIndex = 5;
             // 
-            // lblClassSource
-            // 
-            this.lblClassSource.Location = new System.Drawing.Point(878, 20);
-            this.lblClassSource.Name = "lblClassSource";
-            this.lblClassSource.Size = new System.Drawing.Size(72, 26);
-            this.lblClassSource.TabIndex = 6;
-            this.lblClassSource.Text = "분류 기준";
-            this.lblClassSource.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // cmbClassSource
-            // 
-            this.cmbClassSource.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cmbClassSource.Items.AddRange(new object[] {
-            "RoughBin",
-            "FineBin",
-            "Class"});
-            this.cmbClassSource.Location = new System.Drawing.Point(952, 22);
-            this.cmbClassSource.Name = "cmbClassSource";
-            this.cmbClassSource.Size = new System.Drawing.Size(130, 33);
-            this.cmbClassSource.TabIndex = 7;
-            this.cmbClassSource.SelectedIndexChanged += new System.EventHandler(this.cmbClassSource_SelectedIndexChanged);
-            // 
             // btnSave
             // 
             this.btnSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSave.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(226)))), ((int)(((byte)(238)))), ((int)(((byte)(252)))));
-            this.btnSave.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(70)))), ((int)(((byte)(110)))), ((int)(((byte)(170)))));
-            this.btnSave.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnSave.Font = new System.Drawing.Font("맑은 고딕", 11F, System.Drawing.FontStyle.Bold);
+            this.btnSave.Font = new System.Drawing.Font("맑은 고딕", 9F, System.Drawing.FontStyle.Bold);
             this.btnSave.Image = ((System.Drawing.Image)(resources.GetObject("btnSave.Image")));
-            this.btnSave.Location = new System.Drawing.Point(1252, 10);
+            this.btnSave.Location = new System.Drawing.Point(1252, 113);
             this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(140, 138);
+            this.btnSave.Size = new System.Drawing.Size(140, 28);
             this.btnSave.TabIndex = 2;
             this.btnSave.Text = "DB 저장";
-            this.btnSave.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-            this.btnSave.UseVisualStyleBackColor = false;
+            this.btnSave.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.btnSave.UseVisualStyleBackColor = true;
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
             // lblSummary
@@ -319,7 +284,7 @@
             this.lblSummary.Padding = new System.Windows.Forms.Padding(8, 0, 0, 0);
             this.lblSummary.Size = new System.Drawing.Size(1400, 30);
             this.lblSummary.TabIndex = 1;
-            this.lblSummary.Text = "KLARF 파일을 선택하세요.";
+            this.lblSummary.Text = "";
             this.lblSummary.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // splitMain
@@ -349,7 +314,7 @@
             this.grpMap.Size = new System.Drawing.Size(560, 680);
             this.grpMap.TabIndex = 0;
             this.grpMap.TabStop = false;
-            this.grpMap.Text = "Wafer Map 미리보기 (색 = 분류 기준)";
+            this.grpMap.Text = "Wafer Map";
             // 
             // m_dMap
             // 
@@ -390,7 +355,7 @@
             this.m_dMap.GradationMinValue = double.NaN;
             this.m_dMap.IndexOffset = new System.Drawing.Point(0, 0);
             this.m_dMap.Location = new System.Drawing.Point(3, 27);
-            this.m_dMap.MapType = DACrux.Base.MAP_TYPE.ROUGHBIN;
+            this.m_dMap.MapType = DACrux.Base.MAP_TYPE.CLASS;
             this.m_dMap.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.m_dMap.MarkDieColor = System.Drawing.Color.LightSkyBlue;
             this.m_dMap.Name = "m_dMap";
@@ -477,7 +442,6 @@
             this.dgvWafer.AllowUserToDeleteRows = false;
             dataGridViewCellStyle3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(248)))), ((int)(((byte)(252)))));
             this.dgvWafer.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle3;
-            this.dgvWafer.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
             this.dgvWafer.BackgroundColor = System.Drawing.SystemColors.Window;
             this.dgvWafer.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvWafer.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
@@ -591,14 +555,13 @@
             this.dgvDefect.AllowUserToDeleteRows = false;
             dataGridViewCellStyle4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(248)))), ((int)(((byte)(252)))));
             this.dgvDefect.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle4;
-            this.dgvDefect.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
             this.dgvDefect.BackgroundColor = System.Drawing.SystemColors.Window;
             this.dgvDefect.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvDefect.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.colDefectId,
             this.colIndexX,
             this.colIndexY,
-            this.colSaveClass,
+            this.colClass,
             this.colClassName,
             this.colImageFound,
             this.colX,
@@ -607,7 +570,6 @@
             this.colYRel,
             this.colSize,
             this.colTest,
-            this.colClass,
             this.colRoughBin,
             this.colFineBin,
             this.colImageFile});
@@ -620,8 +582,6 @@
             this.dgvDefect.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dgvDefect.Size = new System.Drawing.Size(828, 474);
             this.dgvDefect.TabIndex = 0;
-            this.dgvDefect.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvDefect_CellDoubleClick);
-            this.dgvDefect.SelectionChanged += new System.EventHandler(this.dgvDefect_SelectionChanged);
             // 
             // colDefectId
             // 
@@ -637,7 +597,6 @@
             this.colIndexX.MinimumWidth = 8;
             this.colIndexX.Name = "colIndexX";
             this.colIndexX.ReadOnly = true;
-            this.colIndexX.ToolTipText = "KLARF 원본 Die Index";
             this.colIndexX.Width = 109;
             // 
             // colIndexY
@@ -646,17 +605,7 @@
             this.colIndexY.MinimumWidth = 8;
             this.colIndexY.Name = "colIndexY";
             this.colIndexY.ReadOnly = true;
-            this.colIndexY.ToolTipText = "KLARF 원본 Die Index";
             this.colIndexY.Width = 108;
-            // 
-            // colSaveClass
-            // 
-            this.colSaveClass.HeaderText = "저장 Class";
-            this.colSaveClass.MinimumWidth = 8;
-            this.colSaveClass.Name = "colSaveClass";
-            this.colSaveClass.ReadOnly = true;
-            this.colSaveClass.ToolTipText = "DB 의 CLASSNUMBER 로 저장될 값 (분류 기준 적용)";
-            this.colSaveClass.Width = 130;
             // 
             // colClassName
             // 
@@ -664,7 +613,6 @@
             this.colClassName.MinimumWidth = 8;
             this.colClassName.Name = "colClassName";
             this.colClassName.ReadOnly = true;
-            this.colClassName.ToolTipText = "KLARF ClassLookup 이름";
             this.colClassName.Width = 102;
             // 
             // colImageFound
@@ -673,7 +621,6 @@
             this.colImageFound.MinimumWidth = 8;
             this.colImageFound.Name = "colImageFound";
             this.colImageFound.ReadOnly = true;
-            this.colImageFound.ToolTipText = "이미지 폴더에서 찾았는지";
             this.colImageFound.Width = 102;
             // 
             // colX
@@ -682,7 +629,6 @@
             this.colX.MinimumWidth = 8;
             this.colX.Name = "colX";
             this.colX.ReadOnly = true;
-            this.colX.ToolTipText = "Wafer 중심 기준";
             this.colX.Width = 101;
             // 
             // colY
@@ -691,7 +637,6 @@
             this.colY.MinimumWidth = 8;
             this.colY.Name = "colY";
             this.colY.ReadOnly = true;
-            this.colY.ToolTipText = "Wafer 중심 기준";
             // 
             // colXRel
             // 
@@ -699,7 +644,6 @@
             this.colXRel.MinimumWidth = 8;
             this.colXRel.Name = "colXRel";
             this.colXRel.ReadOnly = true;
-            this.colXRel.ToolTipText = "Die 안 상대 위치 (um)";
             this.colXRel.Width = 88;
             // 
             // colYRel
@@ -708,7 +652,6 @@
             this.colYRel.MinimumWidth = 8;
             this.colYRel.Name = "colYRel";
             this.colYRel.ReadOnly = true;
-            this.colYRel.ToolTipText = "Die 안 상대 위치 (um)";
             this.colYRel.Width = 87;
             // 
             // colSize
@@ -759,16 +702,32 @@
             this.colImageFile.ReadOnly = true;
             this.colImageFile.Width = 144;
             // 
+            // pnlStatus
+            // 
+            this.pnlStatus.Controls.Add(this.lblStatus);
+            this.pnlStatus.Controls.Add(this.busyBar);
+            this.pnlStatus.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.pnlStatus.Name = "pnlStatus";
+            this.pnlStatus.Size = new System.Drawing.Size(1300, 26);
+            this.pnlStatus.TabIndex = 90;
+            // 
+            // busyBar
+            // 
+            this.busyBar.Dock = System.Windows.Forms.DockStyle.Right;
+            this.busyBar.Name = "busyBar";
+            this.busyBar.Size = new System.Drawing.Size(420, 26);
+            this.busyBar.TabIndex = 1;
+            // 
             // lblStatus
             // 
             this.lblStatus.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.lblStatus.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.lblStatus.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lblStatus.Location = new System.Drawing.Point(0, 862);
             this.lblStatus.Name = "lblStatus";
             this.lblStatus.Padding = new System.Windows.Forms.Padding(6, 0, 0, 0);
             this.lblStatus.Size = new System.Drawing.Size(1400, 26);
             this.lblStatus.TabIndex = 3;
-            this.lblStatus.Text = "KLARF 파일을 선택하세요.";
+            this.lblStatus.Text = "";
             this.lblStatus.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // frmKlarfUpload
@@ -779,7 +738,7 @@
             this.Controls.Add(this.splitMain);
             this.Controls.Add(this.lblSummary);
             this.Controls.Add(this.topBar);
-            this.Controls.Add(this.lblStatus);
+            this.Controls.Add(this.pnlStatus);
             this.Font = new System.Drawing.Font("맑은 고딕", 9F);
             this.MinimumSize = new System.Drawing.Size(1100, 700);
             this.Name = "frmKlarfUpload";
@@ -802,6 +761,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.dgvWafer)).EndInit();
             this.grpDefect.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dgvDefect)).EndInit();
+            this.pnlStatus.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -821,8 +781,6 @@
         private System.Windows.Forms.TextBox txtStepId;
         private System.Windows.Forms.Label lblEquip;
         private System.Windows.Forms.TextBox txtEquip;
-        private System.Windows.Forms.Label lblClassSource;
-        private System.Windows.Forms.ComboBox cmbClassSource;
         private System.Windows.Forms.Button btnSave;
         private System.Windows.Forms.Label lblSummary;
         private System.Windows.Forms.SplitContainer splitMain;
@@ -854,10 +812,11 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn colClass;
         private System.Windows.Forms.DataGridViewTextBoxColumn colRoughBin;
         private System.Windows.Forms.DataGridViewTextBoxColumn colFineBin;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colSaveClass;
         private System.Windows.Forms.DataGridViewTextBoxColumn colClassName;
         private System.Windows.Forms.DataGridViewTextBoxColumn colImageFile;
         private System.Windows.Forms.DataGridViewTextBoxColumn colImageFound;
+        private System.Windows.Forms.Panel pnlStatus;
         private System.Windows.Forms.Label lblStatus;
+        private DACrux.SEMDMS.Control.ProgressStatusBar busyBar;
     }
 }

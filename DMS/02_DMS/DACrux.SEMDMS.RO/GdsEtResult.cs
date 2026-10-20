@@ -62,6 +62,18 @@ namespace DACrux.SEMDMS.RO
             }
         }
 
+        public DataTable GetEtFileBrowseList(string strFactory, string strDeviceID, string strTestProgram, string strLot)
+        {
+            try
+            {
+                return m_OBJ.GetEtFileBrowseList(strFactory, strDeviceID, strTestProgram, strLot);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         public int DeleteEtFile(string strSrcFileSeq, string strUpdateUser)
         {
             try
@@ -98,21 +110,45 @@ namespace DACrux.SEMDMS.RO
             }
         }
 
-        #endregion
-
-        #region [TQP_GDS_ET_ITEM]
-
-        public DataTable MergeEtItem(string[] aKey, string[,] aItems, string strUpdateUser)
+        public int RejudgeEtFiles(string[] aKey, string strUpdateUser)
         {
             try
             {
-                return m_OBJ.MergeEtItem(aKey, aItems, strUpdateUser);
+                return m_OBJ.RejudgeEtFiles(aKey, strUpdateUser);
             }
             catch (Exception ex)
             {
                 throw ex;
             }
         }
+
+        public DataTable PublishEtFileToYms(string strSrcFileSeq, string strUpdateUser)
+        {
+            try
+            {
+                return m_OBJ.PublishEtFileToYms(strSrcFileSeq, strUpdateUser);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public DataTable GetEtMapDieList(string strFactory, string strMapId)
+        {
+            try
+            {
+                return m_OBJ.GetEtMapDieList(strFactory, strMapId);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        #endregion
+
+        #region [TQP_GDS_ET_ITEM]
 
         public DataTable GetEtItemList(string strFactory, string strDeviceID)
         {
@@ -210,18 +246,6 @@ namespace DACrux.SEMDMS.RO
             }
         }
 
-        public DataTable GetEtLimitList(string strFactory, string strDeviceID, string strTestProgram)
-        {
-            try
-            {
-                return m_OBJ.GetEtLimitList(strFactory, strDeviceID, strTestProgram);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
         public DataTable GetEtLimit(string strFactory, string strDeviceID, string strTestProgram)
         {
             try
@@ -260,67 +284,7 @@ namespace DACrux.SEMDMS.RO
 
         #endregion
 
-        #region [TQP_GDS_ET_CHAIN_GROUP]
-
-        public DataTable GetEtChainGroupList(string strFactory, string strDeviceID)
-        {
-            try
-            {
-                return m_OBJ.GetEtChainGroupList(strFactory, strDeviceID);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public DataTable GetEtGdsChainList(string strFactory)
-        {
-            try
-            {
-                return m_OBJ.GetEtGdsChainList(strFactory);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public int CreateEtChainGroups(string[] aKey, string[,] aRows, string strUpdateUser)
-        {
-            try
-            {
-                return m_OBJ.CreateEtChainGroups(aKey, aRows, strUpdateUser);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public int DeleteEtChainGroup(string[] aKey, string strUpdateUser)
-        {
-            try
-            {
-                return m_OBJ.DeleteEtChainGroup(aKey, strUpdateUser);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public DataTable GetEtChainMatch(string strFactory, string strDeviceID, string strSetupChain)
-        {
-            try
-            {
-                return m_OBJ.GetEtChainMatch(strFactory, strDeviceID, strSetupChain);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
+        #region [Setup Chain -> E-Test 정보 (인계 API)]
 
         public DataTable GetEtChainSpecInfo(string strFactory, string strDeviceID, string strSetupChain)
         {

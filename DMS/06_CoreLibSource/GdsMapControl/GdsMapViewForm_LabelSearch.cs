@@ -9,7 +9,7 @@ using System.Windows.Forms;
 namespace NexplantQMS.GdsMap
 {
     /// <summary>
-    /// GDS Map View Label 검색 (2026-10-07, 설계: 문서/2026-10-07_GDS_Label_검색_설계.md).
+    /// GDS Map View Label 검색 (2026-10-07, 설계: 문서/설계/02_GDS/2026-10-07_GDS_Label_검색_설계.md).
     /// Label 색인을 [조회] 때 한 번 받아 메모리 검색 / 결과 목록 + 첫 건 이동 + [전체 보기] / 결과 중심 300µm.
     /// 일치 방식은 "포함" 하나(대소문자 무시)로 고정하고 일치 방식 콤보를 없앴다. 검색 시간 표시도 뺐다 (2026-10-12).
     /// 검색 결과 수 / 안내는 상태 줄 한 곳에만 보인다. 검색 칸 옆 결과 글자는 없앴다 (2026-10-13).
@@ -112,7 +112,7 @@ namespace NexplantQMS.GdsMap
         {
             if (_labelIndex == null)
             {
-                SetStatus(_labelIndexError == null ? "[조회]로 도면을 먼저 불러오세요." : "Label 색인이 없어 검색할 수 없습니다: " + _labelIndexError);
+                SetStatus(_labelIndexError == null ? "조회된 도면 없음" : "Label 색인 없음: " + _labelIndexError);
                 return;
             }
             string text = txtLabel.Text.Trim();
@@ -130,7 +130,7 @@ namespace NexplantQMS.GdsMap
             {
                 SetLabelSearchEnabled(true);
                 SetStatus(_labelIndex.Count == 0
-                    ? "이 Map에는 TEXT(Label)가 없습니다. Setup에서 Label Layer를 포함해 저장했는지 확인하세요."
+                    ? "이 Map에는 TEXT(Label)가 없습니다."
                     : "'" + text + "'이(가) 들어 있는 Label이 없습니다.");
                 return;
             }
@@ -146,22 +146,23 @@ namespace NexplantQMS.GdsMap
             SelectLabelResult(0);
             SetStatus("'" + text + "' " + results.Count.ToString("N0") + "건"
                 + (results.Count > LabelResultLimit ? "(목록에는 앞 " + LabelResultLimit.ToString("N0") + "건)" : "")
-                + ". 첫 번째 위치로 이동했습니다." + UnloadedLabelLayerNote(results));
+                + UnloadedLabelLayerNote(results));
         }
 
         /// <summary>결과 Layer 중 도면에 올리지 않은 Layer가 있으면 안내 문구(위치로는 이동하지만 지도에 글자가 없다).</summary>
         private string UnloadedLabelLayerNote(IEnumerable<GdsLabelEntry> results)
         {
-            var missing = results.Select(r => r.LayerId).Distinct().Where(l => !_loadedLayers.Contains(l)).OrderBy(l => l).ToList();
+            // 조회 여부는 Layer 키(번호 + TEXTTYPE)로 판단한다 (2026-10-20)
+            var missing = results.Select(r => GdsLayerKey.Make(r.LayerId, r.TextType ?? 0)).Distinct().Where(l => !_loadedLayers.Contains(l)).OrderBy(l => l).ToList();
             return missing.Count == 0 ? ""
-                : " Label 글자를 보려면 Layer " + string.Join(", ", missing) + " 을(를) 체크하고 [조회]를 누르세요.";
+                : " (Layer " + string.Join(", ", missing.Select(GdsLayerKey.Format)) + " 미조회)";
         }
 
         /// <summary>목록 문구: 값 / Layer / 화면 좌표(지금 보기 기준).</summary>
         private string DescribeLabelResult(int index)
         {
             GdsLabelEntry entry = _labelResults[index];
-            return (index + 1).ToString(CultureInfo.InvariantCulture) + ". " + entry.Text + "  |  Layer " + entry.LayerId
+            return (index + 1).ToString(CultureInfo.InvariantCulture) + ". " + entry.Text + "  |  Layer " + GdsLayerKey.Format(GdsLayerKey.Make(entry.LayerId, entry.TextType ?? 0))
                 + "  |  (" + ToDisplayX(entry.StoredX).ToString("0.###", CultureInfo.InvariantCulture)
                 + ", " + entry.Y.ToString("0.###", CultureInfo.InvariantCulture) + ")";
         }

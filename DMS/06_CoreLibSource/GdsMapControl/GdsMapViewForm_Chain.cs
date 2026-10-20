@@ -175,9 +175,9 @@ namespace NexplantQMS.GdsMap
             switch (mode)
             {
                 case ChainPointCaptureMode.Input:
-                    return "지도에서 Input 도형을 클릭한 뒤 [선택 적용]을 누르세요.";
+                    return "Input 지정 중";
                 case ChainPointCaptureMode.Output:
-                    return "지도에서 Output 도형을 클릭한 뒤 [선택 적용]을 누르세요.";
+                    return "Output 지정 중";
                 default:
                     return string.Empty;
             }
@@ -291,7 +291,7 @@ namespace NexplantQMS.GdsMap
             ShowChainEndpointSelection();
             SetChainStatus(_chainDraftSelections.Count == 0
                 ? GetCaptureGuide(_chainPointCaptureMode)
-                : "도형을 골랐습니다. [선택 적용]을 누르세요.");
+                : "도형 " + _chainDraftSelections.Count + "개 선택");
         }
 
         /// <summary>역할별 임시/확정 선택을 합쳐 지도에 표시하고 후보 메뉴의 Hover를 추가한다.</summary>
@@ -333,8 +333,8 @@ namespace NexplantQMS.GdsMap
             var checkedLayers = new HashSet<int>();
             for (int i = 0; i < chkLayerItems.Items.Count; i++)
                 if (chkLayerItems.GetItemChecked(i))
-                    checkedLayers.Add(((LayerDisplayItem)chkLayerItems.Items[i]).LayerId);
-            if (_chainDraftSelections.Values.Any(pick => !checkedLayers.Contains(pick.Candidate.LayerId)))
+                    checkedLayers.Add(((LayerDisplayItem)chkLayerItems.Items[i]).LayerKey);
+            if (_chainDraftSelections.Values.Any(pick => !checkedLayers.Contains(pick.Candidate.LayerKey)))
             {
                 SetChainStatus("고른 도형의 Layer 가 꺼져 있습니다. Layer 를 켜거나 다시 고르세요.");
                 return;
@@ -356,7 +356,7 @@ namespace NexplantQMS.GdsMap
             UpdateChainSelectionButtons();
             RefreshChainDisplay();
             string nameNote = role == "Input" ? ApplyInputLabelName() : string.Empty;
-            SetChainStatus(role + " 지정 완료." + nameNote + " [후보 경로 찾기]를 누르세요.");
+            SetChainStatus(role + " 지정 완료." + nameNote);
         }
 
         /// <summary>
@@ -505,13 +505,15 @@ namespace NexplantQMS.GdsMap
                 string[] outputElementKeys = _chainOutputSelections.Keys.ToArray();
                 bool applyLayerRules = _applyChainLayerRules;
                 double cellSize = (double)_numChainCellSize.Value;
-                ChainTraceResult result = await Task.Run(() => map.TraceChainCandidate(
-                    inputElementKeys,
-                    outputElementKeys,
-                    selectedLayerIds,
-                    rules,
-                    applyLayerRules,
-                    cellSize));
+                ChainTraceResult result;
+                using (ViewBusy.Busy()) // 서버 조회 / 계산 동안 모래시계 커서 (2026-10-15)
+                    result = await Task.Run(() => map.TraceChainCandidate(
+                        inputElementKeys,
+                        outputElementKeys,
+                        selectedLayerIds,
+                        rules,
+                        applyLayerRules,
+                        cellSize));
 
                 if (traceGeneration != _chainTraceGeneration)
                     return;
@@ -544,18 +546,16 @@ namespace NexplantQMS.GdsMap
         private static string FormatChainTraceResult(ChainTraceResult result)
         {
             if (result.IsOpenEnded)
-                return "Input 에서 이어진 도형 " + result.VisitedElements.Count.ToString("N0")
-                    + "개를 찾았습니다. 지도에서 확인하고 필요하면 [경로 추가] / [경로 제외]로 고치세요.";
+                return "Input 에서 이어진 도형 " + result.VisitedElements.Count.ToString("N0") + "개";
             if (result.IsConnected)
-                return "후보 경로 도형 " + result.Path.Count.ToString("N0")
-                    + "개를 찾았습니다. 지도에서 확인하고 필요하면 [경로 추가] / [경로 제외]로 고치세요.";
+                return "후보 경로 도형 " + result.Path.Count.ToString("N0") + "개";
 
             string visitedLayers = string.Join(", ", result.VisitedElements
-                .Select(element => element.LayerId)
+                .Select(element => element.LayerKey)
                 .Distinct()
-                .OrderBy(layerId => layerId)
-                .Select(layerId => "Layer " + layerId));
-            return "Output 까지 이어진 경로를 찾지 못했습니다. Layer 체크를 확인하세요."
+                .OrderBy(layerKey => layerKey)
+                .Select(layerKey => "Layer " + GdsLayerKey.Format(layerKey)));
+            return "Output 까지 이어진 경로 없음"
                 + (string.IsNullOrEmpty(visitedLayers) ? "" : " (지나간 Layer: " + visitedLayers + ")");
         }
 
@@ -587,7 +587,7 @@ namespace NexplantQMS.GdsMap
             for (int i = 0; i < chkLayerItems.Items.Count; i++)
             {
                 if (chkLayerItems.GetItemChecked(i))
-                    selectedLayerIds.Add(((LayerDisplayItem)chkLayerItems.Items[i]).LayerId);
+                    selectedLayerIds.Add(((LayerDisplayItem)chkLayerItems.Items[i]).LayerKey);
             }
             if (selectedLayerIds.Count == 0)
             {
@@ -596,7 +596,7 @@ namespace NexplantQMS.GdsMap
             }
             foreach (ChainEndpointPick pick in _chainInputSelections.Values.Concat(_chainOutputSelections.Values))
             {
-                if (!selectedLayerIds.Contains(pick.Candidate.LayerId))
+                if (!selectedLayerIds.Contains(pick.Candidate.LayerKey))
                 {
                     message = "Input과 Output의 Layer를 왼쪽에서 모두 체크하세요.";
                     return false;
@@ -629,7 +629,7 @@ namespace NexplantQMS.GdsMap
             map.Cursor = Cursors.SizeAll;
             RestoreChainEndpointHighlight();
             UpdateChainSelectionButtons();
-            SetChainStatus("Layer 체크가 바뀌었습니다. [후보 경로 찾기]를 다시 누르세요.");
+            SetChainStatus("Layer 체크가 바뀌었습니다.");
         }
 
         /// <summary>GDS 조회 상태에 따라 Chain 설정 버튼의 사용 가능 상태를 일괄 변경한다.</summary>

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace NexplantQMS.GdsMap.Persistence
 {
     /// <summary>
-    /// GDS Front / Back side 좌표 변환을 한 곳에 모은다. (설계: 문서/2026-10-07_GDS_FrontBack_전환_설계.md 4절 /)
+    /// GDS Front / Back side 좌표 변환을 한 곳에 모은다. (설계: 문서/설계/02_GDS/2026-10-07_GDS_FrontBack_전환_설계.md 4절 /)
     /// GDS 원본은 Front side. Back side = GDS 원점 기준 좌우 반전: X' = -X, Y' = Y.
     /// DB(PLACED / Chain Marker)는 저장 기준(TQP_GDS_MAP.VIEW_SIDE) 좌표 그대로 두고, 보기 / 분석 기준이 다를 때만 이 변환을 쓴다.
     /// X 부호만 바꾸므로(GPoint 생성자의 소수 5자리 반올림을 다시 거치지 않음) 두 번 바꾸면 비트 단위로 원본과 같다.

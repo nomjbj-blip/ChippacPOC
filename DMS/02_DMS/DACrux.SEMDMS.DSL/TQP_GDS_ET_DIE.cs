@@ -95,6 +95,19 @@ namespace DACrux.SEMDMS.DSL
                 throw ex;
             }
         }
+
+        /// <summary>여러 행 UPDATE 를 한 번에 보낸다(Die Map 좌표, 2026-10-14).</summary>
+        public void UpdateExecuteMultiple(string sqlName, string[,] paras)
+        {
+            try
+            {
+                this.ExecuteMultiple(sqlName, null, paras);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
         #endregion
     }
 }

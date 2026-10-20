@@ -11,7 +11,7 @@ namespace DACrux.SEMDMS.Interface
     //  목적
     //   E-Test 결과를 YMS 테이블(TQP_LOT / TQP_WAFER / TD_<PROGRAM> / TQP_PARASPEC / TQP_BINDESC / 요약)에 넣을 때 쓰는
     //   이름 / Bin / 값 / 수율 규칙을 한 곳에 둔다. 업로드 화면 미리보기와 서버 적재가 같은 결과를 내야 하므로
-    //   양쪽 모두 이 클래스만 호출한다. 설계: 문서/2026-10-14_ETest_Upload_YMS적재_설계.md 14절.
+    //   양쪽 모두 이 클래스만 호출한다. 설계: 문서/설계/04_ETest/2026-10-14_ETest_Upload_YMS적재_설계.md 14절.
     //
     //  YMS 쪽 길이 제약 (로컬 DB 컬럼 길이로 확인)
     //   TQP_PARASPEC.PARAM_NAME / TABLE_NAME 50자 -> Parameter 컬럼 이름 50자, Program 45자 (TD_ + Program + 분할 접미어 1자)
@@ -30,9 +30,12 @@ namespace DACrux.SEMDMS.Interface
     //       Leakage_Serial@TSVDC_ASIC_HBM_N_FH:TSVDC_ASIC_HBM_P_FL (54자) -> LKG_SERIAL_TSVDC_ASIC_HBM_N_FH_TSVDC_ASIC_HBM_P_FL (50자)
     //   같은 Program 안의 서로 다른 Parameter 가 같은 이름이 되면 FindNameProblems 가 알려 준다 (적재 전에 막는다).
     //
-    //  BIN (ToBin)
-    //   1 PASS = Die 판정 P / 2 SPEC_FAIL = 범위 밖 값이 1개 이상 / 3 NOT_TESTED = '-' 때문에만 Fail
-    //   Die 판정 자체는 E-Test 판정 규칙(Upload 재설계 9.2절)을 그대로 쓰고, 여기서는 Fail 을 원인별로 나눠 적기만 한다.
+    //  BIN (ToBin, 2026-10-14 변경)
+    //   YMS BIN = 결과 파일의 Hardware Bin. E-Test Spec 판정(POC Para / Limit)과는 따로 본다.
+    //   Software Bin(예: 2001)은 BIN 으로 쓸 수 없다: YMS 요약(TD_TABLE.xml GET_RAW_DATA)이 BIN < 100 인 Die 만 세고
+    //   TQP_WAFER_SUM / TQP_LOT_SUM 의 Bin 열은 BIN0 ~ BIN150 뿐이다. 그래서 Software Bin 은 Bin 정의 이름 / 설명에 적는다.
+    //   양품(HIGH_GEC = Y) = 그 Hardware Bin 의 Die 가 모두 파일 DUT 결과 Pass. YMS 수율은 양품 Bin 의 Die 로 계산된다.
+    //   예전 규칙(1 PASS / 2 SPEC_FAIL / 3 NOT_TESTED)으로 만든 Bin 정의는 LegacyJudgeBins 로 알아보고 다시 반영할 때 지운다.
     //
     //  걷어내기 / 재활용
     //   이 파일 하나에 모든 규칙이 있다 (System 만 사용, DB 조회 없음). 걷어낼 때는 이 파일과 csproj Compile 1행을 지운다.
@@ -52,9 +55,34 @@ namespace DACrux.SEMDMS.Interface
         /// <summary>TQP_LOT.TEST_AREA 길이</summary>
         public const int MaxTestAreaLength = 30;
 
-        public const int BinPass = 1;
-        public const int BinSpecFail = 2;
-        public const int BinNotTested = 3;
+        /// <summary>YMS BIN 최대값 (요약 쿼리 GET_RAW_DATA 가 BIN &lt; 100 만 센다)</summary>
+        public const int MaxBin = 99;
+        /// <summary>TQP_BINDESC.BIN_NAME 길이</summary>
+        public const int MaxBinNameLength = 30;
+        /// <summary>TQP_BINDESC.DESCRIPTION 길이</summary>
+        public const int MaxBinDescriptionLength = 100;
+        /// <summary>양품 Bin 색</summary>
+        public const string GoodBinColor = "#00C000";
+
+        /// <summary>
+        /// 불량 Bin 색. 인덱스 = Hardware Bin 번호의 끝자리 (2 빨강 / 3 파랑 / 4 자주 / 5 금색 ...).
+        /// 초록(양품) / 하늘색(측정 안 한 Die) / 회색(Wafer 바탕)은 쓰지 않는다.
+        /// </summary>
+        private static readonly string[] FailBinColors = new string[]
+        {
+            "#800000", "#FF8C00", "#FF0000", "#0000FF", "#C000C0", "#FFD700", "#8B4513", "#FF69B4", "#808000", "#4B0082"
+        };
+
+        /// <summary>
+        /// 예전 규칙(E-Test Spec 판정 1 / 2 / 3)으로 만든 Bin 정의 {BIN, BIN_NAME, DESCRIPTION}.
+        /// 세 값이 모두 같을 때만 지운다 (YMS Program Setup 에서 고친 정의는 남긴다).
+        /// </summary>
+        public static readonly string[][] LegacyJudgeBins = new string[][]
+        {
+            new string[] { "1", "PASS", "E-Test Spec Pass" },
+            new string[] { "2", "SPEC_FAIL", "E-Test Spec Fail (out of limit)" },
+            new string[] { "3", "NOT_TESTED", "E-Test Fail by not tested value only" }
+        };
 
         /// <summary>TD 테이블에서 Parameter 이름으로 쓸 수 없는 이름 (기존 고정 컬럼과 Die 컬럼)</summary>
         public static readonly string[] ReservedNames = new string[] { "X", "Y", "BIN", "WAFER_SEQ", "DIE_NUM", "DIEPROBE_CNT" };
@@ -180,54 +208,59 @@ namespace DACrux.SEMDMS.Interface
         }
 
         /// <summary>
-        /// Die 의 YMS BIN. dieJudge = Die 판정(P / F),
-        /// rangeFailCount = 범위 밖으로 Fail 인 값 수 (VALUE_STATUS V + 판정 F),
-        /// notTestedFailCount = '-' 로 Fail 인 값 수 (VALUE_STATUS N + 판정 F).
+        /// Die 의 YMS BIN = 결과 파일 Hardware Bin. 값이 없거나 0 ~ MaxBin 밖이면 YMS 요약에 들어가지 않으므로 오류로 알린다.
         /// </summary>
-        public static int ToBin(string dieJudge, int rangeFailCount, int notTestedFailCount)
+        public static int ToBin(int? hardwareBin)
         {
-            string judge = (dieJudge ?? string.Empty).Trim().ToUpperInvariant();
-            if (judge == "P")
-                return BinPass;
-            if (judge != "F")
-                throw new ArgumentException("Die 판정은 P 또는 F 여야 합니다: " + dieJudge, "dieJudge");
-            return rangeFailCount > 0 ? BinSpecFail : BinNotTested;
+            if (!hardwareBin.HasValue)
+                throw new ArgumentException("Hardware Bin 이 없습니다.");
+            if (hardwareBin.Value < 0 || hardwareBin.Value > MaxBin)
+                throw new ArgumentException("YMS 에 넣을 수 있는 Hardware Bin 은 0 ~ " + MaxBin + " 입니다: " + hardwareBin.Value.ToString(CultureInfo.InvariantCulture));
+            return hardwareBin.Value;
         }
 
-        /// <summary>BIN 이름 (TQP_BINDESC.BIN_NAME, 30자 이하)</summary>
-        public static string BinName(int bin)
+        /// <summary>
+        /// Bin 이름 (TQP_BINDESC.BIN_NAME, 30자 이하). 예: HW2 SW2001 / Software Bin 이 여러 개면 HW2 SW2001,2002 / 없으면 HW2
+        /// </summary>
+        public static string BinName(int hardwareBin, IEnumerable<int> softwareBins)
         {
-            switch (bin)
-            {
-                case BinPass: return "PASS";
-                case BinSpecFail: return "SPEC_FAIL";
-                case BinNotTested: return "NOT_TESTED";
-                default: throw new ArgumentOutOfRangeException("bin");
-            }
+            string soft = JoinBins(softwareBins);
+            string name = "HW" + hardwareBin.ToString(CultureInfo.InvariantCulture) + (soft.Length > 0 ? " SW" + soft : string.Empty);
+            return name.Length <= MaxBinNameLength ? name : name.Substring(0, MaxBinNameLength);
         }
 
-        /// <summary>BIN 색 (TQP_BINDESC.COLOR, HTML 형식. Map 화면이 ColorTranslator.FromHtml 로 읽는다)</summary>
-        public static string BinColor(int bin)
+        /// <summary>
+        /// Bin 설명 (TQP_BINDESC.DESCRIPTION, 100자 이하). 예: E-Test file Hardware Bin 2 / Software Bin 2001 / Fail
+        /// mixed = 같은 Hardware Bin 에 파일 결과 Pass 와 Fail 이 섞여 있음 (양품으로 보지 않는다).
+        /// </summary>
+        public static string BinDescription(int hardwareBin, IEnumerable<int> softwareBins, bool good, bool mixed)
         {
-            switch (bin)
-            {
-                case BinPass: return "#00C000";
-                case BinSpecFail: return "#FF0000";
-                case BinNotTested: return "#FFA500";
-                default: throw new ArgumentOutOfRangeException("bin");
-            }
+            string soft = JoinBins(softwareBins);
+            string text = "E-Test file Hardware Bin " + hardwareBin.ToString(CultureInfo.InvariantCulture)
+                + (soft.Length > 0 ? " / Software Bin " + soft : string.Empty)
+                + (good ? " / Pass" : mixed ? " / Pass and Fail mixed" : " / Fail");
+            return text.Length <= MaxBinDescriptionLength ? text : text.Substring(0, MaxBinDescriptionLength);
         }
 
-        /// <summary>BIN 설명 (TQP_BINDESC.DESCRIPTION, 100자 이하)</summary>
-        public static string BinDescription(int bin)
+        /// <summary>Bin 색 (TQP_BINDESC.COLOR, HTML 형식. Map 화면이 ColorTranslator.FromHtml 로 읽는다). 양품 = 초록, 불량 = Hardware Bin 번호로 고른 색</summary>
+        public static string BinColor(int hardwareBin, bool good)
         {
-            switch (bin)
+            if (good)
+                return GoodBinColor;
+            return FailBinColors[Math.Abs(hardwareBin) % FailBinColors.Length];
+        }
+
+        /// <summary>예전 규칙으로 만든 Bin 정의인지 (BIN / 이름 / 설명이 모두 LegacyJudgeBins 와 같음)</summary>
+        public static bool IsLegacyJudgeBin(string bin, string binName, string description)
+        {
+            foreach (string[] legacy in LegacyJudgeBins)
             {
-                case BinPass: return "E-Test Spec Pass";
-                case BinSpecFail: return "E-Test Spec Fail (out of limit)";
-                case BinNotTested: return "E-Test Fail by not tested value only";
-                default: throw new ArgumentOutOfRangeException("bin");
+                if (string.Equals(legacy[0], (bin ?? string.Empty).Trim(), StringComparison.Ordinal)
+                    && string.Equals(legacy[1], (binName ?? string.Empty).Trim(), StringComparison.Ordinal)
+                    && string.Equals(legacy[2], (description ?? string.Empty).Trim(), StringComparison.Ordinal))
+                    return true;
             }
+            return false;
         }
 
         /// <summary>
@@ -258,6 +291,15 @@ namespace DACrux.SEMDMS.Interface
                 divisor = (net / total > 1.5 || total / net > 1.5) ? total : net;
             }
             return Math.Round(100d * goodDieCount / divisor, 2);
+        }
+
+        /// <summary>Software Bin 목록을 작은 번호부터 중복 없이 ',' 로 잇는다</summary>
+        private static string JoinBins(IEnumerable<int> bins)
+        {
+            if (bins == null)
+                return string.Empty;
+            List<int> list = new List<int>(new SortedSet<int>(bins));
+            return string.Join(",", list.ConvertAll(b => b.ToString(CultureInfo.InvariantCulture)).ToArray());
         }
 
         private static bool IsReserved(string name)

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!--
   TQP_GDS_ET_YMS: E-Test 결과를 YMS 테이블에 넣을 때 기존 YMS 쿼리로는 할 수 없는 것만 둔다 (2026-10-14).
-  설계: 문서/2026-10-14_ETest_Upload_YMS적재_설계.md 14절 / 15절.
+  설계: 문서/설계/04_ETest/2026-10-14_ETest_Upload_YMS적재_설계.md 14절 / 15절.
   YMS 적재 / 조회 / 삭제는 기존 YMS 함수와 쿼리를 그대로 쓴다
   (TestCommon.SaveWaferData / TestDataManager.SaveData / TestCommon.SummaryData / TestDataMaint.DeleteWaferData,
    TQP_WAFER.xml GET_WAFER_INFO [WSQ] / TQP_WAFER_SUM.xml GET_WAFER_LOT_INFO / TQP_BINDESC.xml EXISTS_BIN_INFO·CREATE_BIN).
@@ -9,8 +9,81 @@
   Program 행 전체를 지우고 다시 넣는데 LSL / USL 컬럼을 넣지 않는다. 자동 등록된 행(형식 FLOAT, 설명·단위·Spec 없음)을 보정할 쿼리가 없다.
   숫자는 InvariantCulture 문자열로 받아 CAST(TO_BINARY_DOUBLE(..) AS NUMBER) 로 바꾼다 (0.1 / 1E-05 그대로 들어감 확인). 빈 문자열은 NULL.
   같은 :이름 을 두 번 쓰지 않는다 (Middleware 는 순서대로 바인딩).
+  2026-10-14 추가: E-Test 파일 -> YMS 반영(GdsEtResult_Yms.cs)이 E-Test 테이블을 읽는 쿼리(SELECT_ET_YMS_*)와
+  반영 상태 기록(UPDATE_SRC_FILE_YMS*). Parameter 저장 이름(TQP_GDS_ET_ITEM.ITEM_NAME)이 곧 YMS 컬럼 이름이다.
 -->
 <queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
+    <query statement="Select" queryid="SELECT_ET_YMS_FILE" commandtype="Text" description="YMS 반영용 E-Test 파일 1건 + 반영 상태 + Map Wafer 크기(µm). 없으면 0행" commandtimeout="60">
+        <commandtext><![CDATA[SELECT F.SRC_FILE_SEQ, F.FACTORY, F.DEVICE_ID, F.TEST_PROGRAM, F.MAP_ID, F.LOT_ID, F.WAFER_ID, F.LOT_WAFER_NO, F.FILE_NAME,
+       F.TEST_TIME, F.LOAD_STATUS, F.YMS_STATUS, F.YMS_PROGRAM, F.YMS_LOT_SEQ, F.YMS_WAFER_SEQ, F.YMS_TIME, F.YMS_MESSAGE,
+       (SELECT MAX(M.WAFER_SIZE) FROM TQP_MAPDEF M WHERE M.FACTORY = F.FACTORY AND M.MAPID = F.MAP_ID) AS WAFER_SIZE
+  FROM TQP_GDS_SRC_FILE F
+ WHERE F.SRC_FILE_SEQ = TO_NUMBER(:f_seq)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:f_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ET_YMS_PARAM" commandtype="Text" description="파일에 값이 저장된 등록 Parameter (저장 이름 = YMS 컬럼 이름) + 헤더 원문 / 단위 + Spec(사용 Y 인 것만)" commandtimeout="60">
+        <commandtext><![CDATA[SELECT I.ET_ITEM_SEQ, I.ITEM_NAME, I.HEADER_TEXT, NVL(I.UNIT, L.UNIT) AS UNIT,
+       CASE WHEN L.ENABLE_FLAG = 'Y' THEN L.LOWER_LIMIT END AS LOWER_LIMIT,
+       CASE WHEN L.ENABLE_FLAG = 'Y' THEN L.UPPER_LIMIT END AS UPPER_LIMIT
+  FROM TQP_GDS_ET_ITEM I
+  JOIN (SELECT DISTINCT V.ET_ITEM_SEQ FROM TQP_GDS_ET_VALUE V WHERE V.SRC_FILE_SEQ = TO_NUMBER(:p_seq)) S ON S.ET_ITEM_SEQ = I.ET_ITEM_SEQ
+  LEFT JOIN TQP_GDS_ET_LIMIT L
+         ON L.FACTORY = I.FACTORY AND L.DEVICE_ID = I.DEVICE_ID AND L.TEST_PROGRAM = I.TEST_PROGRAM AND L.ITEM_NAME = I.ITEM_NAME
+ ORDER BY I.DISPLAY_ORDER, I.ITEM_NAME]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:p_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ET_YMS_DIE" commandtype="Text" description="파일 Die: 시스템 Map 좌표 / 파일 Hardware · Software Bin / 파일 DUT 결과 (YMS BIN = Hardware Bin, 2026-10-14)" commandtimeout="60">
+        <commandtext><![CDATA[SELECT D.DUT_NO, D.MAP_X, D.MAP_Y, D.HW_BIN, D.SW_BIN, D.PASS_FLAG
+  FROM TQP_GDS_ET_DIE D
+ WHERE D.SRC_FILE_SEQ = TO_NUMBER(:d_seq)
+ ORDER BY D.DUT_NO]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:d_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ET_YMS_VALUE" commandtype="Text" description="파일 측정값 (Die x 등록 Parameter)" commandtimeout="300">
+        <commandtext><![CDATA[SELECT V.DUT_NO, V.ET_ITEM_SEQ, V.MEAS_VALUE, V.VALUE_STATUS
+  FROM TQP_GDS_ET_VALUE V
+ WHERE V.SRC_FILE_SEQ = TO_NUMBER(:v_seq)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="40">:v_seq</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_SRC_FILE_YMS_KEY" commandtype="Text" description="YMS 반영 키 기록 (Lot / Wafer 를 만든 직후, 또는 빈 값으로 지움)" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_GDS_SRC_FILE
+   SET YMS_PROGRAM = :k_program,
+       YMS_LOT_SEQ = TO_NUMBER(:k_lot),
+       YMS_WAFER_SEQ = TO_NUMBER(:k_wafer)
+ WHERE SRC_FILE_SEQ = TO_NUMBER(:k_seq)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="200">:k_program</param>
+            <param direction="Input" dbtype="VarChar" size="40">:k_lot</param>
+            <param direction="Input" dbtype="VarChar" size="40">:k_wafer</param>
+            <param direction="Input" dbtype="VarChar" size="40">:k_seq</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_SRC_FILE_YMS" commandtype="Text" description="YMS 반영 결과 기록 (상태 / 시각 / 메시지). 키는 새 값이 있을 때만 바꾼다" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_GDS_SRC_FILE
+   SET YMS_STATUS = :s_status,
+       YMS_PROGRAM = NVL(:s_program, YMS_PROGRAM),
+       YMS_LOT_SEQ = NVL(TO_NUMBER(:s_lot), YMS_LOT_SEQ),
+       YMS_WAFER_SEQ = NVL(TO_NUMBER(:s_wafer), YMS_WAFER_SEQ),
+       YMS_TIME = SYSDATE,
+       YMS_MESSAGE = :s_message
+ WHERE SRC_FILE_SEQ = TO_NUMBER(:s_seq)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="10">:s_status</param>
+            <param direction="Input" dbtype="VarChar" size="200">:s_program</param>
+            <param direction="Input" dbtype="VarChar" size="40">:s_lot</param>
+            <param direction="Input" dbtype="VarChar" size="40">:s_wafer</param>
+            <param direction="Input" dbtype="VarChar" size="2000">:s_message</param>
+            <param direction="Input" dbtype="VarChar" size="40">:s_seq</param>
+        </parameters>
+    </query>
     <query statement="Update" queryid="UPDATE_YMS_PARASPEC" commandtype="Text" description="YMS Parameter 정의 보정: 설명(헤더 원문) / 단위 / LSL / USL / 형식 (ExecuteMultiple)" commandtimeout="60">
         <commandtext><![CDATA[UPDATE TQP_PARASPEC
    SET PARAM_DESC = :param_desc,

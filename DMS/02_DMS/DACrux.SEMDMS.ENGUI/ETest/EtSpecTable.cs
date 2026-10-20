@@ -14,8 +14,10 @@ namespace DACrux.SEMDMS.ENGUI
         public string Device;
         /// <summary>공정 = Test Type (대문자)</summary>
         public string TestProgram;
-        /// <summary>Parameter = 헤더 전체 (공백 정리 / 끝 '#번호' 제거 / 대문자)</summary>
+        /// <summary>Parameter = 헤더 전체 (공백 정리 / 끝 '#번호' 제거 / 대문자). 저장 이름은 EtParameterNameRule.ToParameterName(ItemName).</summary>
         public string ItemName;
+        /// <summary>헤더 전체 원문 대소문자 그대로(공백 정리 / 끝 '#번호' 제거). Spec 표 붙여넣기가 Parameter 를 등록할 때 HEADER_TEXT 로 쓴다(2026-10-14).</summary>
+        public string HeaderText;
         /// <summary>표의 Parameter 열 (Resistance / Leakage, 참고용)</summary>
         public string Kind;
         /// <summary>하한 / 상한 (R 형식 문자열, 없으면 빈 값)</summary>
@@ -43,7 +45,7 @@ namespace DACrux.SEMDMS.ENGUI
             @"^(?:(?<abs>abs\(val\))|val)(?<op>>|<)(?<num>[-+]?(?:\d+\.?\d*|\.\d+)(?:e[-+]?\d+)?)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         private static readonly Regex DashRegex = new Regex(@"^val=(?:""-""|'-'|-)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-        /// <summary>Parameter 이름 정리: EtResultFileParser.NormalizeHeader + 대문자. 서버 BSL NormalizeItemName 과 같은 규칙이다.</summary>
+        /// <summary>Parameter 이름 정리: EtResultFileParser.NormalizeHeader + 대문자. 같은 공정 안 중복 행을 찾는 키로 쓴다.</summary>
         public static string NormalizeItemName(string header)
         {
             return EtResultFileParser.NormalizeHeader(header).ToUpperInvariant();
@@ -73,7 +75,8 @@ namespace DACrux.SEMDMS.ENGUI
                 EtSpecRow row = new EtSpecRow { LineNo = i + 1 };
                 row.Device = Cell(cells, map[0]);
                 row.TestProgram = Cell(cells, map[1]).ToUpperInvariant();
-                row.ItemName = NormalizeItemName(Cell(cells, map[2]));
+                row.HeaderText = EtResultFileParser.NormalizeHeader(Cell(cells, map[2]));
+                row.ItemName = row.HeaderText.ToUpperInvariant();
                 row.Kind = Cell(cells, map[3]);
                 row.SpecText = Regex.Replace(Cell(cells, map[4]), @"\s+", " ");
                 row.Unit = Cell(cells, map[5]);

@@ -10,7 +10,7 @@ using System.Windows.Forms;
 namespace NexplantQMS.GdsMap
 {
     /// <summary>
-    /// GDS Map View 화면의 DB Chain 불러오기다. (설계: 문서/2026-10-06_GDS_Map_화면역할_재정의_설계.md 4.3절)
+    /// GDS Map View 화면의 DB Chain 불러오기다. (설계: 문서/설계/02_GDS/2026-10-06_GDS_Map_화면역할_재정의_설계.md 4.3절)
     ///
     /// 처리 흐름 ([조회] 안에서 호출)
     ///  1) 도면을 그리기 전: DB Chain 목록 + Chain별 Layer / 규칙 / Member(+도형 Layer) / 편집 기록 읽기(ReadDbChains, 백그라운드)
@@ -32,13 +32,13 @@ namespace NexplantQMS.GdsMap
             public DataTable Members;
             public DataTable Edits;
 
-            /// <summary>이 Chain을 온전히 그리는 데 필요한 Layer: 탐색 Layer + Member 도형 Layer.</summary>
+            /// <summary>이 Chain을 온전히 그리는 데 필요한 Layer 키(번호 + DataType): 탐색 Layer + Member 도형 Layer.</summary>
             public IEnumerable<int> NeededLayers
             {
                 get
                 {
-                    return Layers.Rows.Cast<DataRow>().Select(row => ToInt(row["LAYER_ID"]))
-                        .Concat(Members.Rows.Cast<DataRow>().Select(row => ToInt(row["LAYER_ID"])));
+                    return Layers.Rows.Cast<DataRow>().Select(row => GdsLayerKey.FromRow(row))
+                        .Concat(Members.Rows.Cast<DataRow>().Select(row => GdsLayerKey.FromRow(row)));
                 }
             }
         }
@@ -75,11 +75,11 @@ namespace NexplantQMS.GdsMap
         /// </summary>
         private bool ConfirmChainLayers(IEnumerable<int> neededLayers, string chainText)
         {
-            var checkedIds = new HashSet<int>(chkLayerItems.CheckedItems.Cast<LayerDisplayItem>().Select(item => item.LayerId));
+            var checkedIds = new HashSet<int>(chkLayerItems.CheckedItems.Cast<LayerDisplayItem>().Select(item => item.LayerKey));
             List<int> missing = neededLayers.Distinct().Where(id => !checkedIds.Contains(id) && _layerCounts.ContainsKey(id))
                 .OrderBy(id => id).ToList();
             if (missing.Count == 0) return false;
-            if (MessageBox.Show(this, chainText + "이(가) 사용하는 Layer " + String.Join(", ", missing) + "가 조회 대상에 없습니다.\r\n\r\n"
+            if (MessageBox.Show(this, chainText + "이(가) 사용하는 Layer " + String.Join(", ", missing.Select(GdsLayerKey.Format)) + "가 조회 대상에 없습니다.\r\n\r\n"
                     + "함께 조회하시겠습니까?\r\n[아니오]를 누르면 그 Layer의 Chain 도형이 지도에 나오지 않고, "
                     + "DB에서 불러오는 Chain은 도형 일부를 복원하지 못해 저장에서 제외됩니다.",
                     "Chain Layer 조회", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
@@ -88,7 +88,7 @@ namespace NexplantQMS.GdsMap
             try
             {
                 for (int i = 0; i < chkLayerItems.Items.Count; i++)
-                    if (missing.Contains(((LayerDisplayItem)chkLayerItems.Items[i]).LayerId))
+                    if (missing.Contains(((LayerDisplayItem)chkLayerItems.Items[i]).LayerKey))
                         chkLayerItems.SetItemChecked(i, true);
             }
             finally
@@ -149,9 +149,11 @@ namespace NexplantQMS.GdsMap
                 Color = h["COLOR_ARGB"] is DBNull ? Color.Gold : Color.FromArgb(ToInt(h["COLOR_ARGB"])),
                 ApplyLayerRules = !(h["APPLY_LAYER_RULES"] is DBNull) && ToInt(h["APPLY_LAYER_RULES"]) == 1,
                 CellSize = cellSize,
-                LayerIds = new HashSet<int>(item.Layers.Rows.Cast<DataRow>().Select(row => ToInt(row["LAYER_ID"]))),
+                // 탐색 Layer / 규칙은 Layer 키(번호 + DataType). DataType 열이 없는 이전 서버 응답은 0 (2026-10-20)
+                LayerIds = new HashSet<int>(item.Layers.Rows.Cast<DataRow>().Select(row => GdsLayerKey.FromRow(row))),
                 LayerRules = item.Rules.Rows.Cast<DataRow>().Select(row => new ChainLayerConnectionRule(
-                    ToInt(row["FIRST_LAYER_ID"]), ToInt(row["SECOND_LAYER_ID"]), Convert.ToDouble(row["TOLERANCE"], CultureInfo.InvariantCulture))).ToList()
+                    GdsLayerKey.FromRow(row, "FIRST_LAYER_ID", "FIRST_DATA_TYPE"), GdsLayerKey.FromRow(row, "SECOND_LAYER_ID", "SECOND_DATA_TYPE"),
+                    Convert.ToDouble(row["TOLERANCE"], CultureInfo.InvariantCulture))).ToList()
             };
 
             var traceIds = new List<string>();
@@ -162,7 +164,7 @@ namespace NexplantQMS.GdsMap
             {
                 string id = row["PLACED_ELEMENT_ID"].ToString();
                 string role = row["ROLE_CODE"].ToString();
-                int layer = ToInt(row["LAYER_ID"]);
+                int layer = GdsLayerKey.FromRow(row);
                 chain.MemberLayerIds.Add(layer);
                 if (role == "INPUT" || role == "OUTPUT")
                 {
@@ -200,7 +202,7 @@ namespace NexplantQMS.GdsMap
                     if (row["INCLUSION_SOURCE"].ToString() == "TRACE" && !found.Contains(row["PLACED_ELEMENT_ID"].ToString()))
                     {
                         missing++;
-                        missingLayers.Add(ToInt(row["LAYER_ID"]));
+                        missingLayers.Add(GdsLayerKey.FromRow(row));
                     }
             }
             if (traceElements.Count > 0 || endpointElements.Count > 0)
@@ -211,8 +213,8 @@ namespace NexplantQMS.GdsMap
                 chain.TraceShown = true;
             }
             if (missing > 0)
-                chain.DbIncomplete = "Layer " + String.Join(", ", missingLayers) + " 미조회로 도형 " + missing
-                    + "개를 복원하지 못함(그 Layer를 체크하고 Device를 다시 선택해 조회하세요)";
+                chain.DbIncomplete = "Layer " + String.Join(", ", missingLayers.Select(GdsLayerKey.Format)) + " 미조회로 도형 " + missing
+                    + "개를 복원하지 못함";
             // 바꾸지 않으면 "변경 없음"이 되도록 지금 내용의 저장 지문을 기록한다. DRAFT는 다시 저장 대상이 되도록 비워 둔다.
             chain.SavedFingerprint = ready ? BuildChainSaveData(chain).Fingerprint : null;
             return chain;

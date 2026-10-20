@@ -15,13 +15,14 @@ using System.Windows.Forms;
 ///    조회 화면 Die 위치 / 번호(LeftBottom) / USECODE 가 File Map Setup 화면 Map 과 같은가, 화면 Map 은 LeftBottom 인가
 /// 2. 조회 화면 마우스 위치 Die 판정이 4방향 모두 그려진 Die 와 같은가 (LeftTop 최상단 행 포함)
 /// 3. 같은 저장값을 기존 Map Define(frmSetupMap.DrawLoadingMap)으로 그린 위치와 같은가
-/// 4. File Map Setup 으로 저장한 값은 데이터 확인 항목이 모두 일치인가 / 좌표 표시에 저장 방향 번호와 LeftBottom 번호가 나오는가
+/// 4. Map 정보 탭 16행 / 상태줄 "조회 완료" / 좌표 표시에 저장 방향 번호와 LeftBottom 번호가 나오는가
 /// 5. 기존 Map Define 방식 Map (격자 일부 / USECODE 0, 3 / 임의 원점 인덱스) 도 4방향 모두 기존 화면과 같은 위치인가
-/// 6. 일부러 틀린 값(NETDIE / Die 0행 / 중복 / Edge µm / Wafer mm / XY 방향 7)은 해당 항목만 다름인가
-/// 7. Map 목록: 표시 컬럼 / 건수 / 검색(대소문자 무시, 특수 문자) / 자동 선택 없음
-/// 8. (인수 4 = DB 데이터 폴더, StandardMapViewDbProbe.ps1) 실제 DB 조회 결과로 목록 / Map 표시 / 마우스 판정 확인, 데이터 확인 결과 출력
+/// 6. XY 방향 값이 틀리면(7) Map 을 그리지 않고 상태줄 / Map 정보에 이유를 보이는가
+/// 7. Map 목록: 표시 컬럼 / 건수 / 자동 선택 없음
+/// 8. (인수 4 = DB 데이터 폴더, StandardMapViewDbProbe.ps1) 실제 DB 조회 결과로 목록 / Map 표시 / 마우스 판정 확인, StoredMapLayout 확인 결과 출력
 /// 9. Die 번호 (2026-10-13): 방향 4종 모두 조회 화면 / File Map Setup 화면 번호 = 시험 코드가 따로 계산한 번호 (시작 모서리부터 행 우선, 사용 Die 만),
-///    번호를 켜면 Map 그림이 바뀌는가, 좌표 / Die 목록에 번호가 나오는가, 저장 DIE_NUM 비교 항목 (행 순서 = 참고 / Direction 번호 = 일치)
+///    번호를 켜면 Map 그림이 바뀌는가, 좌표에 번호가 나오는가
+/// 10. 화면 정리 (2026-10-15): 오른쪽 탭 = Map 정보 하나 (데이터 확인 / Die 목록 탭 없음), Device 검색칸 없음
 /// 출력 마지막 줄: STANDARD_MAP_VIEW_SMOKE=PASS / FAIL
 /// </summary>
 internal static class StandardMapViewSmoke
@@ -68,7 +69,10 @@ internal static class StandardMapViewSmoke
             CheckCenterCrossMenu("File Map Setup", setupMap);
             Button search = (Button)Field(viewType, view, "btnSearch");
             Check("조회 버튼 아이콘 16x16", search.Image != null && search.Image.Width == 16 && search.Image.Height == 16);
-            Check("오른쪽 탭 3개", ((TabControl)Field(viewType, view, "tabRight")).TabPages.Count == 3);
+            TabControl right = (TabControl)Field(viewType, view, "tabRight");
+            Check("오른쪽 탭 = Map 정보 하나", right.TabPages.Count == 1 && right.TabPages[0].Text == "Map 정보");
+            Check("Device 검색칸 / 데이터 확인 / Die 목록 컨트롤 없음",
+                FieldMissing(viewType, "txtSearch") && FieldMissing(viewType, "lblSearch") && FieldMissing(viewType, "grdCheck") && FieldMissing(viewType, "grdDies"));
             Check("처음에는 Map 없음", Dies(viewMap).Count == 0 && Field(viewType, view, "currentLayout") == null);
 
             DataTable leftBottomDef = null, leftBottomDies = null;
@@ -83,17 +87,15 @@ internal static class StandardMapViewSmoke
                 Check(dir + " 화면 Map = LeftBottom", Prop(viewMap, "XYDirect").ToString() == "LeftBottom");
                 CompareDies(dir + " 조회 화면 = File Map Setup 화면", setupMap, viewMap, null, null);
                 CheckHoverHitTest(view, viewMap, dir);
-                CheckAllMatch(viewType, view, dir);
                 CheckCoordinateLabel(viewType, view, viewMap, def, dir);
                 CheckDieNumbers(viewType, view, viewMap, setupMap, dir);
-                CheckTabs(viewType, view, dies.Rows.Count, dir);
+                CheckTabs(viewType, view, dir);
                 CheckLegacyDraw(assembly, def, dies, viewMap, dir + " 조회 화면 = 기존 Map Define");
                 if (dir == "LeftTop") SaveImages(view, viewMap, args[2]);
                 if (dir == "LeftBottom") { leftBottomDef = def; leftBottomDies = dies; }
             }
 
             CheckDieNumberPaint(viewType, view, viewMap);
-            CheckStoredDieNum(viewType, view, leftBottomDef, leftBottomDies, setupMap);
             CheckLegacyStyleMaps(assembly, viewType, view, viewMap);
             CheckErrorCases(viewType, view, viewMap, leftBottomDef, leftBottomDies);
             CheckMapList(viewType, view, viewMap);
@@ -232,20 +234,6 @@ internal static class StandardMapViewSmoke
         Check(dir + " 마우스 위치 Die = 그려진 Die", ok > 0 && wrong == 0 && miss == 0);
     }
 
-    /// <summary>File Map Setup 저장값은 데이터 확인 항목이 모두 일치여야 한다 (Wafer 밖 사용 Die 포함 11항목).</summary>
-    private static void CheckAllMatch(Type viewType, Form view, string dir)
-    {
-        object layout = Field(viewType, view, "currentLayout");
-        IList checks = (IList)Prop(layout, "Checks");
-        List<string> notMatch = new List<string>();
-        foreach (object check in checks)
-            if (Prop(check, "ResultText").ToString() != "일치") notMatch.Add(Prop(check, "Name") + "=" + Prop(check, "ResultText") + "(" + Prop(check, "StoredValue") + " / " + Prop(check, "DieValue") + ")");
-        if (notMatch.Count > 0) Console.WriteLine("   " + string.Join(" | ", notMatch.ToArray()));
-        Check(dir + " 데이터 확인 11항목 모두 일치", checks.Count == 11 && notMatch.Count == 0);
-        Label status = (Label)Field(viewType, view, "lblStatus");
-        Check(dir + " 상태줄 다름 0", status.Text.Contains("다름 0"));
-    }
-
     /// <summary>좌표 표시: 사용 Die 하나를 좌표 이벤트에 넣어 저장 방향 번호(시험 코드에서 따로 계산) / LeftBottom 번호가 나오는지 본다.</summary>
     private static void CheckCoordinateLabel(Type viewType, Form view, Control map, DataTable def, string dir)
     {
@@ -317,11 +305,6 @@ internal static class StandardMapViewSmoke
             if (p.Y == rowY) rowEdgeX = dir.StartsWith("Right") ? Math.Max(rowEdgeX, p.X) : Math.Min(rowEdgeX, p.X);
         Console.WriteLine(string.Format("{0} Die 번호 1 = LeftBottom ({1}, {2}) / 마지막 {3}", dir, first.X, first.Y, expected.Count));
         Check(dir + " Die 번호 1 = 시작 모서리 행의 끝 Die", first.Y == rowY && first.X == rowEdgeX);
-
-        DataGridView dies = (DataGridView)Field(viewType, view, "grdDies");
-        int numbered = 0;
-        foreach (DataGridViewRow row in dies.Rows) if (row.Cells["colDieNumber"].Value != null && row.Cells["colDieNumber"].Value != DBNull.Value) numbered++;
-        Check(dir + " Die 목록 Die 번호 칸 = 사용 Die 수", numbered == expected.Count);
     }
 
     /// <summary>번호를 켜고 끈 Map 그림을 비교한다 (번호를 덧그리면 픽셀이 바뀌어야 한다). 체크를 끄면 Map 컨트롤 표시도 꺼진다.</summary>
@@ -345,51 +328,17 @@ internal static class StandardMapViewSmoke
         off.Dispose();
     }
 
-    /// <summary>
-    /// 저장 DIE_NUM 비교 항목. 실제 저장 서비스(DSL CreateUseMap)처럼 행 순서(i + 1)로 넣으면 참고,
-    /// Direction 번호(사용 Die) 로 넣으면 일치여야 한다. DIE_NUM 컬럼이 없으면(앞 검사들) 항목이 없다.
-    /// </summary>
-    private static void CheckStoredDieNum(Type viewType, Form view, DataTable def, DataTable dies, Control setupMap)
-    {
-        DataTable saved = dies.Copy();
-        saved.Columns.Add("DIE_NUM", typeof(decimal));
-        for (int i = 0; i < saved.Rows.Count; i++) saved.Rows[i]["DIE_NUM"] = (decimal)(i + 1);
-        ShowStoredMap(viewType, view, def, saved);
-        Dictionary<string, string> results = Results(Field(viewType, view, "currentLayout"));
-        Console.WriteLine("저장 순서 DIE_NUM: " + (results.ContainsKey("DIE_NUM 순서") ? results["DIE_NUM 순서"] : "항목 없음"));
-        Check("저장 순서(i + 1) DIE_NUM -> DIE_NUM 순서 참고 (12항목)", results.Count == 12 && results["DIE_NUM 순서"] == "참고");
 
-        // LeftBottom 저장값: 방향 번호 = LB 번호이므로 시험 계산 번호를 그대로 넣는다.
-        Control viewMap = (Control)Field(viewType, view, "m_wMap");
-        Dictionary<Point, int> expected = ExpectedNumbers(viewMap, "LeftBottom");
-        DataTable direction = dies.Copy();
-        direction.Columns.Add("DIE_NUM", typeof(decimal));
-        int next = expected.Count;
-        foreach (DataRow row in direction.Rows)
-        {
-            int value;
-            Point key = new Point(Convert.ToInt32(row["X"]), Convert.ToInt32(row["Y"]));
-            row["DIE_NUM"] = (decimal)(expected.TryGetValue(key, out value) && Convert.ToInt32(row["USECODE"]) == 1 ? value : ++next);
-        }
-        ShowStoredMap(viewType, view, def, direction);
-        results = Results(Field(viewType, view, "currentLayout"));
-        Check("Direction 번호로 저장한 DIE_NUM -> DIE_NUM 순서 일치", results["DIE_NUM 순서"] == "일치");
-        ShowStoredMap(viewType, view, def, dies);
-    }
-
-    /// <summary>탭 내용: Map 정보 행 / 데이터 확인 행 / Die 목록 행 수와 탭 제목.</summary>
-    private static void CheckTabs(Type viewType, Form view, int dieRows, string dir)
+    /// <summary>Map 정보 탭 16행 / XY 방향 표시, 상태줄 = "조회 완료: Map ID" (그리기 오류 없음).</summary>
+    private static void CheckTabs(Type viewType, Form view, string dir)
     {
         DataGridView info = (DataGridView)Field(viewType, view, "grdInfo");
-        DataGridView check = (DataGridView)Field(viewType, view, "grdCheck");
-        DataGridView dies = (DataGridView)Field(viewType, view, "grdDies");
-        TabPage dieTab = (TabPage)Field(viewType, view, "tabDies");
         bool hasDirection = false;
         foreach (DataGridViewRow row in info.Rows)
             if (Convert.ToString(row.Cells[0].Value) == "XY 방향" && Convert.ToString(row.Cells[1].Value).StartsWith(dir)) hasDirection = true;
         Check(dir + " Map 정보 16행 / XY 방향 표시", info.Rows.Count == 16 && hasDirection);
-        Check(dir + " 데이터 확인 11행", check.Rows.Count == 11);
-        Check(dir + " Die 목록 행 = 저장 행 (" + dieRows + ")", dies.Rows.Count == dieRows && dieTab.Text.Contains(dieRows.ToString()));
+        string status = ((Label)Field(viewType, view, "lblStatus")).Text;
+        Check(dir + " 상태줄 = 조회 완료: SMOKE_" + dir, status == "조회 완료: SMOKE_" + dir);
     }
 
     /// <summary>
@@ -420,7 +369,7 @@ internal static class StandardMapViewSmoke
 
     /// <summary>
     /// 기존 Map Define 방식처럼 격자 일부만 / USECODE 1, 0, 3 / 원점 인덱스가 격자 가운데인 Map 을 4방향으로 만들어
-    /// 기존 화면과 같은 위치인지 / 마우스 판정 / 확인 결과(다름 0, 격자 채움과 USECODE 는 참고)를 본다.
+    /// 기존 화면과 같은 위치인지 / 마우스 판정 / 상태줄(그리기 오류 없음)을 본다.
     /// </summary>
     private static void CheckLegacyStyleMaps(Assembly assembly, Type viewType, Form view, Control viewMap)
     {
@@ -469,63 +418,27 @@ internal static class StandardMapViewSmoke
             ShowStoredMap(viewType, view, def, dies);
             CheckHoverHitTest(view, viewMap, "기존 방식 " + dir);
             CheckLegacyDraw(assembly, def, dies, viewMap, "기존 방식 " + dir + " 조회 화면 = 기존 Map Define");
-            object layout = Field(viewType, view, "currentLayout");
-            Dictionary<string, string> results = Results(layout);
-            Check("기존 방식 " + dir + " 다름 0 / 격자 채움 참고 / USECODE 참고",
-                (int)Prop(layout, "DifferCount") == 0 && results["격자 채움"] == "참고" && results["USECODE 구성"] == "참고");
+            Check("기존 방식 " + dir + " 상태줄 = 조회 완료: LEGACY_" + dir,
+                ((Label)Field(viewType, view, "lblStatus")).Text == "조회 완료: LEGACY_" + dir);
         }
     }
 
-    /// <summary>LeftBottom 저장값을 일부러 바꿔 해당 항목만 다름이 되는지 본다. XY 방향 값이 틀리면 Map 을 그리지 않는다.</summary>
+
+    /// <summary>XY 방향 값이 틀리면(7) Map 을 그리지 않고 상태줄 / Map 정보에 이유를 보인다. 정상 값으로 다시 보이면 상태줄이 돌아온다.</summary>
     private static void CheckErrorCases(Type viewType, Form view, Control viewMap, DataTable def, DataTable dies)
     {
-        ExpectDiffer(viewType, view, "NETDIE + 1", Modify(def, "NETDIE", (decimal)def.Rows[0]["NETDIE"] + 1), dies, new[] { "Net Die" });
-        TabControl tabs = (TabControl)Field(viewType, view, "tabRight");
-        tabs.SelectedTab = (TabPage)Field(viewType, view, "tabCheck");
-        SaveFormImage(view, Path.ChangeExtension(imagePath, ".check.png"));
-        tabs.SelectedTab = (TabPage)Field(viewType, view, "tabDies");
-        SaveFormImage(view, Path.ChangeExtension(imagePath, ".dies.png"));
-        tabs.SelectedTab = (TabPage)Field(viewType, view, "tabInfo");
-
-        DataTable empty = dies.Clone();
-        ExpectDiffer(viewType, view, "Die 0행", def, empty, new[] { "Die 행 (TQP_USEMAP)", "Net Die", "Die 번호 범위" });
-
-        DataTable duplicated = dies.Copy();
-        DataRow removed = null;
-        foreach (DataRow row in duplicated.Rows) if (Convert.ToInt32(row["USECODE"]) == -1) { removed = row; break; }
-        duplicated.Rows.Add(removed.ItemArray);
-        ExpectDiffer(viewType, view, "중복 행", def, duplicated, new[] { "중복 Die" });
-
-        ExpectDiffer(viewType, view, "Edge µm 저장", Modify(def, "EDGE_SIZE", 3000m), dies, new[] { "Edge 단위 (mm)" });
-        ExpectDiffer(viewType, view, "Wafer mm 저장", Modify(def, "WAFER_SIZE", 300m), dies, new[] { "Wafer 크기 단위 (µm)" });
-        ExpectDiffer(viewType, view, "Die 크기 mm 저장", Modify(Modify(def, "CHIP_SIZE_X", 3.34m), "CHIP_SIZE_Y", 3.12m), dies, new[] { "Die 크기 단위 (µm)" });
-
-        ExpectDiffer(viewType, view, "XY 방향 7", Modify(def, "XY_DIRECTION", 7m), dies, new[] { "XY 방향" });
+        ShowStoredMap(viewType, view, Modify(def, "XY_DIRECTION", 7m), dies);
+        string status = ((Label)Field(viewType, view, "lblStatus")).Text;
+        bool infoUnknown = false;
+        foreach (DataGridViewRow row in ((DataGridView)Field(viewType, view, "grdInfo")).Rows)
+            if (Convert.ToString(row.Cells[0].Value) == "XY 방향" && Convert.ToString(row.Cells[1].Value) == "알 수 없음 (7)") infoUnknown = true;
+        Console.WriteLine("XY 방향 7 상태줄: " + status);
         Check("XY 방향 7 이면 Map 을 그리지 않음", Dies(viewMap).Count == 0);
-        DataGridView grid = (DataGridView)Field(viewType, view, "grdCheck");
-        bool red = false;
-        foreach (DataGridViewRow row in grid.Rows)
-            if (Convert.ToString(row.Cells[3].Value) == "다름" && row.Cells[3].Style.ForeColor == Color.Red) red = true;
-        Check("다름 결과는 빨간 글자", red);
+        Check("XY 방향 7 상태줄 / Map 정보에 이유", status == "조회 완료: SMOKE_LeftBottom / XY 방향 값 오류 (7) - Map 을 그리지 않음" && infoUnknown);
 
         ShowStoredMap(viewType, view, def, dies);
-        Check("정상 값으로 되돌리면 다름 0", (int)Prop(Field(viewType, view, "currentLayout"), "DifferCount") == 0
-            && ((TabPage)Field(viewType, view, "tabCheck")).Text == "데이터 확인");
-    }
-
-    private static void ExpectDiffer(Type viewType, Form view, string name, DataTable def, DataTable dies, string[] expected)
-    {
-        ShowStoredMap(viewType, view, def, dies);
-        object layout = Field(viewType, view, "currentLayout");
-        List<string> differ = new List<string>();
-        foreach (KeyValuePair<string, string> pair in Results(layout)) if (pair.Value == "다름") differ.Add(pair.Key);
-        differ.Sort();
-        List<string> want = new List<string>(expected);
-        want.Sort();
-        string tab = ((TabPage)Field(viewType, view, "tabCheck")).Text;
-        Console.WriteLine(string.Format("{0}: 다름 = {1} / 탭 = {2}", name, string.Join(", ", differ.ToArray()), tab));
-        Check(name + " -> 다름 항목 " + string.Join(", ", expected), string.Join("|", differ.ToArray()) == string.Join("|", want.ToArray())
-            && tab == "데이터 확인 (다름 " + expected.Length + ")");
+        Check("정상 값으로 되돌리면 Map / 상태줄 정상", Dies(viewMap).Count > 0
+            && ((Label)Field(viewType, view, "lblStatus")).Text == "조회 완료: SMOKE_LeftBottom");
     }
 
     private static DataTable Modify(DataTable def, string column, decimal value)
@@ -543,7 +456,7 @@ internal static class StandardMapViewSmoke
     }
 
     /// <summary>
-    /// Map 목록: GET_MAPDEF_ALL 모양 표를 넣어 표시 컬럼 / 건수 / 검색을 본다. 목록을 묶으면 보던 Map 은 지우고 자동 선택하지 않는다
+    /// Map 목록: GET_MAPDEF_ALL 모양 표를 넣어 표시 컬럼 / 건수를 본다. 목록을 묶으면 보던 Map 은 지우고 자동 선택하지 않는다
     /// (자동 선택되면 원격 조회가 일어나므로 이 검사에서 예외가 난다).
     /// </summary>
     private static void CheckMapList(Type viewType, Form view, Control viewMap)
@@ -564,22 +477,13 @@ internal static class StandardMapViewSmoke
         Application.DoEvents();
         DataGridView grid = (DataGridView)Field(viewType, view, "grdMapList");
         Label count = (Label)Field(viewType, view, "lblListCount");
-        TextBox search = (TextBox)Field(viewType, view, "txtSearch");
-        Check("목록 4행 / 건수 4 / 4", grid.Rows.Count == 4 && count.Text == "4 / 4 건");
+        Check("목록 4행 / 건수 4 건", grid.Rows.Count == 4 && count.Text == "4 건");
         Check("목록 컬럼 Device / Wafer mm / Net Die / XY 이름",
             Convert.ToString(grid.Rows[0].Cells[0].Value) == "U9_HYBRID" && Convert.ToString(grid.Rows[0].Cells[1].Value) == "300"
             && Convert.ToString(grid.Rows[0].Cells[2].Value) == "76" && Convert.ToString(grid.Rows[0].Cells[3].Value) == "LeftTop"
             && Convert.ToString(grid.Rows[2].Cells[3].Value) == "RightBottom" && Convert.ToString(grid.Rows[3].Cells[3].Value) == "9");
         Check("목록을 묶으면 Map 비움 / 자동 선택 없음", Field(viewType, view, "currentLayout") == null && Dies(viewMap).Count == 0
             && grid.SelectedRows.Count == 0);
-
-        string[,] cases = { { "u9", "2" }, { "U9_H", "1" }, { "omm[1", "1" }, { "%", "1" }, { "'", "0" }, { "*", "0" }, { "", "4" } };
-        for (int i = 0; i < cases.GetLength(0); i++)
-        {
-            search.Text = cases[i, 0];
-            Check("검색 '" + cases[i, 0] + "' -> " + cases[i, 1] + "건", grid.Rows.Count == int.Parse(cases[i, 1]) && count.Text == cases[i, 1] + " / 4 건");
-        }
-        Check("검색 후에도 자동 선택 없음", grid.SelectedRows.Count == 0 && Field(viewType, view, "currentLayout") == null);
         SaveFormImage(view, Path.ChangeExtension(imagePath, ".list.png"));
     }
 
@@ -596,7 +500,7 @@ internal static class StandardMapViewSmoke
         Label count = (Label)Field(viewType, view, "lblListCount");
         Console.WriteLine(string.Format("DB 목록 컬럼 형식: WAFER_SIZE={0} / NETDIE={1} / XY_DIRECTION={2}",
             TypeName(list, "WAFER_SIZE"), TypeName(list, "NETDIE"), TypeName(list, "XY_DIRECTION")));
-        Check("DB 목록 건수 " + list.Rows.Count, count.Text == list.Rows.Count + " / " + list.Rows.Count + " 건");
+        Check("DB 목록 건수 " + list.Rows.Count, count.Text == list.Rows.Count + " 건");
 
         string[] files = Directory.GetFiles(dir, "map*_def.xml");
         Array.Sort(files, StringComparer.Ordinal);
@@ -731,6 +635,11 @@ internal static class StandardMapViewSmoke
     private static IList Dies(Control map) { return (IList)map.GetType().GetProperty("Dies").GetValue(map, null); }
     private static object Prop(object target, string name) { return target.GetType().GetProperty(name).GetValue(target, null); }
     private static object GetField(object target, string name) { return target.GetType().GetField(name).GetValue(target); }
+
+    private static bool FieldMissing(Type type, string name)
+    {
+        return type.GetField(name, BindingFlags.Instance | BindingFlags.NonPublic) == null;
+    }
 
     private static object Field(Type type, object instance, string name)
     {

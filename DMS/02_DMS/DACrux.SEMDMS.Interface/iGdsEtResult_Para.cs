@@ -1,15 +1,14 @@
-﻿using System;
+using System;
 using System.Data;
 
 namespace DACrux.SEMDMS.Interface
 {
     /// <summary>
-    /// E-Test Para Setup 원격 호출 계약 (2026-10-14).
+    /// E-Test Para 설정 원격 호출 계약 (2026-10-14).
     /// 결과 파일 헤더를 Parameter 로 등록하고(TQP_GDS_ET_ITEM, Device + 공정 + Parameter),
-    /// 단자(Chain) 이름을 사용자가 입력한 대표 Chain 으로 묶고(TQP_GDS_ET_REP_CHAIN),
-    /// 대표 Chain 을 GDS Setup Chain 과 1:1 로 잇는다(TQP_GDS_ET_CHAIN_LINK).
-    /// 설계: 문서/2026-10-14_ETest_Para_Setup_설계.md. 이름 분해 / 변환 규칙은 EtParameterNameRule.
-    /// 대표 Chain / 연결은 GDS 대표 Device(예 U9) 단위다. E-Test Device(예 OMM)는 Sub Device 연결로 찾는다.
+    /// Parameter 마다 GDS Chain(Chain 1 의 GDS Setup Chain 이름, 사용자 입력)과 Spec(TQP_GDS_ET_LIMIT)을 같은 화면에서 편집한다.
+    /// 설계: 문서/설계/04_ETest/2026-10-14_ETest_Para_Setup_설계.md (등록 / 이름 변환), 문서/설계/04_ETest/2026-10-14_ETest_Para_화면_재구성_설계.md (화면 / GDS Chain / Spec 편집).
+    /// 이름 분해 / 변환 규칙은 EtParameterNameRule. GDS Device 는 E-Test Device 와 이름이 같은(대소문자 무시) READY Map 이다(2026-10-15 Sub Device 연결 제거).
     /// </summary>
     public partial interface iGdsEtResult
     {
@@ -19,13 +18,20 @@ namespace DACrux.SEMDMS.Interface
         DataTable GetEtParaProgramList(string strFactory);
 
         /// <summary>
-        /// Device + 공정의 등록 Parameter 목록.
+        /// Device + 공정의 등록 Parameter 목록 (업로드 계획 / 조회 창).
         /// 열: ET_ITEM_SEQ / ITEM_NAME(변환 이름) / HEADER_TEXT(원문) / MEAS_TYPE / PARA_NAME / COND_VALUE / CHAIN_NAME / CHAIN_NAME2 / FORCE_LEG / FORCE_LEG2 /
-        ///     CHAIN_TYPE / UNIT / TEST_NO / DISPLAY_ORDER / USE_FLAG / REG_SOURCE / REG_FILE_NAME / REMARK /
-        ///     REP_CHAIN_NAME / REP_CHAIN_NAME2 / GDS_CHAIN_NAME / GDS_CHAIN_NAME2 / HAS_SPEC / LOWER_LIMIT / UPPER_LIMIT / ENABLE_FLAG / FILE_COUNT / UPDATE_USER / UPDATE_TIME
-        /// 대표 Chain / GDS 열은 E-Test Device 의 GDS 대표 Device(Sub Device 연결, 없으면 같은 이름) 기준이다.
+        ///     CHAIN_TYPE / UNIT / TEST_NO / DISPLAY_ORDER / USE_FLAG / REG_SOURCE / REG_FILE_NAME / REMARK / GDS_CHAIN_NAME /
+        ///     HAS_SPEC / LOWER_LIMIT / UPPER_LIMIT / ENABLE_FLAG / FILE_COUNT / UPDATE_USER / UPDATE_TIME
         /// </summary>
         DataTable GetEtParameterList(string strFactory, string strDeviceID, string strTestProgram);
+
+        /// <summary>
+        /// E-Test Para 설정 화면 목록: 등록 Parameter + GDS Chain + Spec.
+        /// 열: ET_ITEM_SEQ / ITEM_NAME / HEADER_TEXT / MEAS_TYPE / PARA_NAME / COND_VALUE / CHAIN_NAME / CHAIN_NAME2 / ITEM_UNIT / TEST_NO / DISPLAY_ORDER /
+        ///     USE_FLAG / REG_SOURCE / REG_FILE_NAME / REMARK / GDS_CHAIN_NAME / HAS_SPEC / LOWER_LIMIT / UPPER_LIMIT / ENABLE_FLAG / UNIT(Spec 단위, 없으면 등록 단위) /
+        ///     SPEC_TEXT / UPDATE_USER / UPDATE_TIME (등록 / Spec 중 나중 수정)
+        /// </summary>
+        DataTable GetEtParameterSetupList(string strFactory, string strDeviceID, string strTestProgram);
 
         /// <summary>
         /// 헤더를 Parameter 로 등록한다. 서버가 EtParameterNameRule 로 다시 분해 / 변환해 저장한다.
@@ -36,8 +42,13 @@ namespace DACrux.SEMDMS.Interface
         /// </summary>
         DataTable RegisterEtParameters(string[] aKey, string[,] aRows, string strUpdateUser);
 
-        /// <summary>사용 여부 / 비고 저장. aKey: 0 Factory / 1 Device / 2 공정. aRows 열: 0 Parameter(ITEM_NAME) / 1 USE_FLAG(Y/N) / 2 비고. 반환: 저장한 행 수</summary>
-        int SaveEtParameters(string[] aKey, string[,] aRows, string strUpdateUser);
+        /// <summary>
+        /// [등록 Parameter] 탭 저장: 화면에서 수정된 행만 받는다. aKey: 0 Factory / 1 Device / 2 공정.
+        /// aRows 열: 0 Parameter(저장 이름) / 1 사용(Y/N) / 2 비고 / 3 GDS Chain(빈 값 = 없음) / 4 Lower / 5 Upper(빈 값 = 없음) / 6 Enable(Y/N)
+        /// Lower / Upper 가 모두 빈 행은 Spec 을 지운다. 등록되지 않은 Parameter / 같은 행 두 번 / 숫자 아님 / Lower &gt; Upper / Enable 인데 Limit 없음이
+        /// 하나라도 있으면 아무것도 저장하지 않는다. Spec 은 값이 바뀐 행만 다시 쓴다. 반환 1행: UPDATED / SPEC_SAVED(새로 만들거나 바뀐 Spec) / SPEC_DELETED
+        /// </summary>
+        DataTable SaveEtParameterSetup(string[] aKey, string[,] aRows, string strUpdateUser);
 
         /// <summary>
         /// Parameter 삭제. aKey: 0 Factory / 1 Device / 2 공정. 측정값이 저장된 Parameter 는 거부한다(사용 안 함으로 바꾼다).
@@ -47,61 +58,13 @@ namespace DACrux.SEMDMS.Interface
 
         #endregion
 
-        #region [대표 Chain (TQP_GDS_ET_REP_CHAIN) / GDS 연결 (TQP_GDS_ET_CHAIN_LINK)]
+        #region [GDS Chain 참고 목록]
 
-        /// <summary>
-        /// 단자 목록: GDS 대표 Device 의 Sub Device(와 같은 이름 Device)에 등록된 Parameter(사용 Y)의 단자 1 / 2 + 대표 Chain.
-        /// 등록 Parameter 에 없는데 대표 Chain 에 남아 있는 단자도 나온다(PARA_COUNT 0).
-        /// 열: TERMINAL_NAME / FORCE_LEG / CHAIN_TYPE / TEST_PROGRAMS / PARA_COUNT / SPEC_COUNT / REP_CHAIN_NAME / REMARK / UPDATE_USER / UPDATE_TIME
-        /// </summary>
-        DataTable GetEtTerminalList(string strFactory, string strGdsDeviceID);
+        /// <summary>E-Test Device 의 GDS Device: 이름이 같은(대소문자 무시) READY Map, 없으면 E-Test Device 이름 그대로.</summary>
+        string GetEtGdsDevice(string strFactory, string strDeviceID);
 
-        /// <summary>
-        /// 대표 Chain 목록 + GDS 연결 상태.
-        /// 열: REP_CHAIN_NAME / TERMINALS(", ") / TERMINAL_COUNT / CHAIN_SEQ / GDS_CHAIN_NAME(지금 이름) / LINK_TYPE(NAME / MANUAL) /
-        ///     LINK_STATUS(NAME / MANUAL / NAME_CHANGED / READY / TAKEN / MULTIPLE / NONE) / CANDIDATES(이름이 같은 GDS Chain, ", ")
-        /// READY = 이름이 같은 GDS Chain 1개, 아직 연결 전 / TAKEN = 그 GDS Chain 이 다른 대표에 연결됨
-        /// </summary>
-        DataTable GetEtRepChainList(string strFactory, string strGdsDeviceID);
-
-        /// <summary>GDS Setup Chain 목록(ACTIVE + 현재 READY 버전) + 연결된 대표. 열: CHAIN_SEQ / CHAIN_CODE / CHAIN_NAME / NAME_KEY(비교 이름) / REP_CHAIN_NAME / LINK_TYPE</summary>
-        DataTable GetEtGdsChainLinkList(string strFactory, string strGdsDeviceID);
-
-        /// <summary>
-        /// 단자를 대표 Chain 으로 묶는다. aKey: 0 Factory / 1 GDS Device / 2 대표 이름(입력값, 이름 규칙으로 바꿔 저장).
-        /// 이미 다른 대표에 있던 단자는 옮긴다. 같은 대표 이름이 이미 있으면 그 대표에 더한다. 저장 뒤 이름 연결(LinkEtRepChainsByName)을 한다.
-        /// 반환: 저장한 단자 수
-        /// </summary>
-        int SaveEtRepChain(string[] aKey, string[] aTerminals, string strUpdateUser);
-
-        /// <summary>대표 이름 바꾸기. aKey: 0 Factory / 1 GDS Device / 2 이전 이름 / 3 새 이름(이름 규칙으로 바꿈). 새 이름이 다른 대표와 같으면 거부. 반환: 바꾼 단자 수</summary>
-        int RenameEtRepChain(string[] aKey, string strUpdateUser);
-
-        /// <summary>단자를 대표에서 뺀다. aKey: 0 Factory / 1 GDS Device. 단자가 0 이 된 대표의 연결도 지운다. 반환: 뺀 단자 수</summary>
-        int RemoveEtRepChainMembers(string[] aKey, string[] aTerminals, string strUpdateUser);
-
-        /// <summary>대표 Chain 삭제(단자 + 연결). aKey: 0 Factory / 1 GDS Device / 2 대표 이름. 반환: 지운 단자 수</summary>
-        int DeleteEtRepChain(string[] aKey, string strUpdateUser);
-
-        /// <summary>
-        /// 이름 일치 연결: GDS Chain 이름(비교 이름)이 대표 이름 또는 구성 단자 이름과 똑같은 GDS Chain 이 1개이면 연결(NAME).
-        /// MANUAL 연결은 건드리지 않는다. 지금 이름이 맞지 않는 NAME 연결은 지운다.
-        /// 반환 1행: LINKED / UPDATED / REMOVED / NONE / MULTIPLE / TAKEN
-        /// </summary>
-        DataTable LinkEtRepChainsByName(string strFactory, string strGdsDeviceID, string strUpdateUser);
-
-        /// <summary>사용자 연결(MANUAL). aKey: 0 Factory / 1 GDS Device / 2 대표 이름 / 3 GDS CHAIN_SEQ. 그 GDS Chain 의 다른 대표 연결은 지운다(1:1). 반환 1</summary>
-        int SaveEtChainLink(string[] aKey, string strUpdateUser);
-
-        /// <summary>연결 해제. aKey: 0 Factory / 1 GDS Device / 2 대표 이름. 반환: 지운 행 수</summary>
-        int DeleteEtChainLink(string[] aKey, string strUpdateUser);
-
-        /// <summary>
-        /// 대표 Chain 의 단자가 단자 1 / 2 로 들어간 모든 공정의 등록 Parameter + Spec.
-        /// 열: DEVICE_ID / TEST_PROGRAM / ITEM_NAME / HEADER_TEXT / CHAIN_NAME / CHAIN_NAME2 / MATCH_POSITION(1 / 2 / 1,2) / UNIT / USE_FLAG /
-        ///     HAS_SPEC / LOWER_LIMIT / UPPER_LIMIT / ENABLE_FLAG / SPEC_TEXT
-        /// </summary>
-        DataTable GetEtRepChainSpecInfo(string strFactory, string strGdsDeviceID, string strRepChainName);
+        /// <summary>GDS Device 의 Setup Chain 목록(ACTIVE + 현재 READY 버전). Para 설정 [등록 Parameter] 탭 오른쪽 목록(이름 복사용). 열: CHAIN_SEQ / CHAIN_CODE / CHAIN_NAME</summary>
+        DataTable GetEtGdsChainList(string strFactory, string strGdsDeviceID);
 
         #endregion
     }

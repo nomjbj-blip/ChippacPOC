@@ -65,7 +65,7 @@
   <ItemGroup Condition="'$(Configuration)' == 'Release'">
     <Reference Include="Miracom.Middleware">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\07_CoreLib\Miracom.Middleware\x64\Miracom.Middleware.dll</HintPath>
+      <HintPath>..\..\07_CoreLib\Miracom.Middleware.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -86,10 +86,16 @@
     <Compile Include="GdsChain.cs" />
     <Compile Include="GdsEtResult.cs" />
     <Compile Include="GdsEtResult_Para.cs" />
+    <Compile Include="GdsEtResult_Yms.cs" />
     <Compile Include="EtYmsPublisher.cs" />
     <Compile Include="KlarfUpload.cs" />
     <Compile Include="GdsKlarfAnalysis.cs" />
+    <Compile Include="GdsKlarfAnalysis_Analyze.cs" />
+    <Compile Include="GdsKlarfReady.cs" />
+    <Compile Include="GdsKlarfEtLink.cs" />
     <Compile Include="GdsKlarfMatchEngine.cs" />
+    <Compile Include="GdsKlarfShapeGeometry.cs" />
+    <Compile Include="GdsKlarfGeometryCache.cs" />
     <Compile Include="DefectMapAnalysis.cs" />
     <Compile Include="DMReport.cs" />
     <Compile Include="DMReview.cs" />

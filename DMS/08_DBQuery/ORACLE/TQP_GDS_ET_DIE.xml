@@ -2,6 +2,7 @@
 <!--
   TQP_GDS_ET_DIE: E-Test Die 정보 (파일 행 단위). 2026-10-07 추가.
   좌표는 파일 원본 (X, Y) 그대로. 숫자 빈 값은 VarChar + TO_NUMBER 로 받아 NULL 로 저장한다.
+  2026-10-14 Upload 재설계: Spec 판정(JUDGE_FLAG / FAIL_COUNT / NOT_TESTED_COUNT) + 시스템 Map 좌표(MAP_X / MAP_Y). PASS_FLAG 는 파일 DUT Flag(참고).
 -->
 <queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
     <query statement="Insert" queryid="CREATE_ET_DIE" commandtype="Text" description="Die 정보 저장 (InsertExecuteMultiple)" commandtimeout="600">
@@ -44,7 +45,8 @@ VALUES
         </parameters>
     </query>
     <query statement="Select" queryid="SELECT_ET_DIE" commandtype="Text" description="파일의 Die 목록 (DUT 번호 순)" commandtimeout="60">
-        <commandtext><![CDATA[SELECT DUT_NO, DIE_X, DIE_Y, HW_BIN, SW_BIN, PASS_FLAG, FLAG_CODE, TEST_TIME_MS, TESTS_EXECUTED, HEAD_SITE
+        <commandtext><![CDATA[SELECT DUT_NO, DIE_X, DIE_Y, HW_BIN, SW_BIN, PASS_FLAG, FLAG_CODE, TEST_TIME_MS, TESTS_EXECUTED, HEAD_SITE,
+       MAP_X, MAP_Y, JUDGE_FLAG, FAIL_COUNT, NOT_TESTED_COUNT
   FROM TQP_GDS_ET_DIE
  WHERE SRC_FILE_SEQ = :src_file_seq
  ORDER BY DUT_NO]]></commandtext>
@@ -54,7 +56,9 @@ VALUES
     </query>
     <query statement="Select" queryid="SELECT_ET_DIE_COUNT" commandtype="Text" description="저장 확정 검사: Die 수 / Fail Die 수" commandtimeout="60">
         <commandtext><![CDATA[SELECT COUNT(*) AS DIE_COUNT,
-       NVL(SUM(CASE WHEN PASS_FLAG = 'F' THEN 1 ELSE 0 END), 0) AS FAIL_DIE_COUNT
+       NVL(SUM(CASE WHEN PASS_FLAG = 'F' THEN 1 ELSE 0 END), 0) AS FAIL_DIE_COUNT,
+       NVL(SUM(CASE WHEN JUDGE_FLAG = 'F' THEN 1 ELSE 0 END), 0) AS SPEC_FAIL_DIE_COUNT,
+       COUNT(MAP_X) AS MAP_DIE_COUNT
   FROM TQP_GDS_ET_DIE
  WHERE SRC_FILE_SEQ = :src_file_seq]]></commandtext>
         <parameters>
@@ -65,6 +69,53 @@ VALUES
         <commandtext><![CDATA[DELETE FROM TQP_GDS_ET_DIE WHERE SRC_FILE_SEQ = :src_file_seq]]></commandtext>
         <parameters>
             <param direction="Input" dbtype="Number" size="0">:src_file_seq</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_ET_DIE_JUDGE" commandtype="Text" description="Die 판정: Fail 값 수 / '-' 값 수 / P·F (값 판정 뒤, 2026-10-14)" commandtimeout="600">
+        <commandtext><![CDATA[UPDATE TQP_GDS_ET_DIE D
+   SET (FAIL_COUNT, NOT_TESTED_COUNT, JUDGE_FLAG) =
+       (SELECT NVL(SUM(CASE WHEN V.JUDGE_FLAG = 'F' THEN 1 ELSE 0 END), 0),
+               NVL(SUM(CASE WHEN V.VALUE_STATUS = 'N' THEN 1 ELSE 0 END), 0),
+               CASE WHEN NVL(SUM(CASE WHEN V.JUDGE_FLAG = 'F' THEN 1 ELSE 0 END), 0) > 0 THEN 'F' ELSE 'P' END
+          FROM TQP_GDS_ET_VALUE V
+         WHERE V.SRC_FILE_SEQ = D.SRC_FILE_SEQ
+           AND V.DUT_NO = D.DUT_NO)
+ WHERE D.SRC_FILE_SEQ = :src_file_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:src_file_seq</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_ET_DIE_MAP" commandtype="Text" description="Die 시스템 Map 좌표 (ExecuteMultiple, Map 사용 Die 가 아니면 빈 값 = NULL)" commandtimeout="600">
+        <commandtext><![CDATA[UPDATE TQP_GDS_ET_DIE
+   SET MAP_X = TO_NUMBER(:map_x),
+       MAP_Y = TO_NUMBER(:map_y)
+ WHERE SRC_FILE_SEQ = :src_file_seq
+   AND DUT_NO = :dut_no]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="20">:map_x</param>
+            <param direction="Input" dbtype="VarChar" size="20">:map_y</param>
+            <param direction="Input" dbtype="Number" size="0">:src_file_seq</param>
+            <param direction="Input" dbtype="Number" size="0">:dut_no</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_ET_DIE_MAP_CLEAR" commandtype="Text" description="파일 Die 의 Map 좌표 비우기 (Map 이 없을 때)" commandtimeout="600">
+        <commandtext><![CDATA[UPDATE TQP_GDS_ET_DIE SET MAP_X = NULL, MAP_Y = NULL WHERE SRC_FILE_SEQ = :src_file_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:src_file_seq</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ET_MAP_DIE" commandtype="Text" description="Map 사용 Die (File Map Setup 의 TQP_USEMAP, 가장 큰 PROGRAM_REV). Map ID = E-Test 파일 Device" commandtimeout="60">
+        <commandtext><![CDATA[SELECT U.X, U.Y, U.USECODE
+  FROM TQP_USEMAP U
+ WHERE U.FACTORY = :factory
+   AND U.MAPID = :mapid
+   AND U.PROGRAM_REV = (SELECT MAX(M.PROGRAM_REV) FROM TQP_USEMAP M WHERE M.FACTORY = :factory2 AND M.MAPID = :mapid2)
+ ORDER BY U.Y DESC, U.X]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="120">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="200">:mapid</param>
+            <param direction="Input" dbtype="VarChar" size="120">:factory2</param>
+            <param direction="Input" dbtype="VarChar" size="200">:mapid2</param>
         </parameters>
     </query>
 </queryxml>

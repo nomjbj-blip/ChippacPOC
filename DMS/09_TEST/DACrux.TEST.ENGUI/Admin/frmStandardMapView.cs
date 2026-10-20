@@ -13,17 +13,17 @@ namespace DACrux.TEST.ENGUI
     /// Data 가 저장 규칙대로 들어갔는지 확인한다. 편집 / 삭제 / 저장 기능은 없다.
     /// 역할 / 흐름:
     /// 1. 화면을 열거나 [조회] 를 누르면 기존 ProbeAdmin.GetMapIDAllList (삭제 안 된 Map 전체) 를 읽어 왼쪽 목록에 보인다.
-    ///    Device 검색칸은 다시 조회하지 않고 목록만 거른다 (Map ID 포함 검색 / 대소문자 무시).
     /// 2. 목록에서 Map 을 고르면 GetMapDef + GetDies 로 정의 1행과 Die 행을 읽고 StoredMapLayout 으로 화면 기준 값과 확인 항목을 만든다.
     /// 3. Map 컨트롤은 LeftBottom 번호로 그린다 (StoredMapLayout 주석 참고). 좌표 표시는 저장 방향 번호와 LeftBottom 번호를 함께 보인다.
-    /// 4. 오른쪽 탭: Map 정보 (TQP_MAPDEF 값) / 데이터 확인 (저장값 vs Die 행) / Die 목록 (TQP_USEMAP 행).
-    /// 5. Die 번호: 저장 XY 방향 기준으로 화면에서 계산해 Die 위에 그린다 (DieNumberRule, 2026-10-13). 저장 DIE_NUM 은 Die 목록에서 비교한다.
+    /// 4. 오른쪽 탭: Map 정보 (TQP_MAPDEF 값) 하나만 둔다. Device 검색칸 / 데이터 확인 탭 / Die 목록 탭은 지웠다 (2026-10-15).
+    ///    Map 을 그리지 못하면(XY 방향 값 오류 / 그리기 예외) 이유를 상태줄에 보인다.
+    /// 5. Die 번호: 저장 XY 방향 기준으로 화면에서 계산해 Die 위에 그린다 (DieNumberRule, 2026-10-13).
     /// Factory 선택은 두지 않는다. 저장 쿼리(CREATE_MAP)가 FACTORY 를 넣지 않아 Factory 로 거르면 새로 만든 Map 이 빠질 수 있다.
-    /// 설계: 문서/2026-10-13_Wafer_Map_조회화면_설계.md
+    /// 설계: 문서/설계/03_KLARF_Map/2026-10-13_Wafer_Map_조회화면_설계.md
     /// </summary>
     public partial class frmStandardMapView : DACrux.Framework.Base.DACruxUXBasic01
     {
-        /// <summary>마지막으로 조회한 Map 목록 (검색은 이 표의 DataView 로 거른다).</summary>
+        /// <summary>마지막으로 조회한 Map 목록.</summary>
         private DataTable mapList;
         /// <summary>지금 화면에 그린 Map. 없으면 null.</summary>
         private StoredMapLayout currentLayout;
@@ -36,9 +36,9 @@ namespace DACrux.TEST.ENGUI
         public frmStandardMapView()
         {
             InitializeComponent();
+            DACrux.SEMDMS.Control.GridBuffer.Enable(this); // 표 스크롤 잔상 방지 (2026-10-15)
             grdMapList.AutoGenerateColumns = false;
-            grdDies.AutoGenerateColumns = false;
-            ClearMap("Device 를 선택하세요.");
+            ClearMap(string.Empty);
         }
 
         #region Map 목록
@@ -46,51 +46,33 @@ namespace DACrux.TEST.ENGUI
         /// <summary>화면을 열면 Map 목록을 한 번 읽는다.</summary>
         private void frmStandardMapView_Load(object sender, EventArgs e)
         {
-            LoadMapList();
+            LoadMapList(false);
         }
 
         /// <summary>[조회]: 목록을 다시 읽는다. 보던 Map 이 목록에 남아 있으면 다시 골라 정의 / Die 를 새로 읽는다.</summary>
         private void btnSearch_Click(object sender, EventArgs e)
         {
-            LoadMapList();
-        }
-
-        /// <summary>검색칸에서 Enter 를 누르면 목록을 거른다 (다시 조회하지 않음).</summary>
-        private void txtSearch_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode != Keys.Enter) return;
-            e.SuppressKeyPress = true;
-            ApplyFilter();
-        }
-
-        /// <summary>검색어가 바뀌면 바로 목록을 거른다.</summary>
-        private void txtSearch_TextChanged(object sender, EventArgs e)
-        {
-            ApplyFilter();
+            LoadMapList(true);
         }
 
         /// <summary>
         /// 기존 서비스 ProbeAdmin.GetMapIDAllList (GET_MAPDEF_ALL: DELETE_FLAG 가 Y 가 아닌 Map 전체, MAPID 순) 를 부른다.
         /// 원격 호출이 실패하면 이전 목록 / Map 을 지워 다른 Map 정보가 남지 않게 한다.
+        /// 진행 표시(2026-10-14): [조회] 는 작업 스레드에서(background = true), 화면 Load 중에는 화면 스레드에서 읽고 표시만 한다.
         /// </summary>
-        private void LoadMapList()
+        private void LoadMapList(bool background)
         {
             string keepMapId = currentLayout == null ? null : currentLayout.MapId;
             try
             {
-                Cursor = Cursors.WaitCursor;
-                DACrux.TEST.RO.ProbeAdmin admin = new DACrux.TEST.RO.ProbeAdmin();
-                ShowMapList(admin.GetMapIDAllList(), keepMapId);
+                Func<DataTable> query = () => new DACrux.TEST.RO.ProbeAdmin().GetMapIDAllList();
+                ShowMapList(background ? busyBar.Run("Map 목록 조회", query) : busyBar.RunHere("Map 목록 조회", query), keepMapId);
             }
             catch (Exception ex)
             {
                 ShowMapList(null, null);
                 lblStatus.Text = "Map 목록 조회 실패";
                 MessageBox.Show(this, ex.Message, "Map 목록 조회", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            finally
-            {
-                Cursor = Cursors.Default;
             }
         }
 
@@ -123,7 +105,7 @@ namespace DACrux.TEST.ENGUI
                 }
                 // 표가 새 목록을 묶은 뒤에 이전 목록을 해제한다.
                 if (old != null && !object.ReferenceEquals(old, mapList)) old.Dispose();
-                ApplyFilterCore();
+                UpdateListCount();
                 grdMapList.ClearSelection();
             }
             finally
@@ -132,29 +114,14 @@ namespace DACrux.TEST.ENGUI
             }
 
             if (!string.IsNullOrEmpty(keepMapId) && SelectMapRow(keepMapId)) return;
-            ClearMap(mapList == null ? "Map 목록이 없습니다." : "Device 를 선택하세요.");
+            ClearMap(mapList == null ? "Map 목록 없음" : string.Empty);
         }
 
-        /// <summary>검색어로 목록을 거르고 건수를 갱신한다. 보던 Map 이 걸러져도 Map 은 그대로 둔다.</summary>
-        private void ApplyFilter()
-        {
-            bindingList = true;
-            try { ApplyFilterCore(); }
-            finally { bindingList = false; }
-        }
 
-        private void ApplyFilterCore()
+        /// <summary>목록 건수를 보인다.</summary>
+        private void UpdateListCount()
         {
-            DataView view = grdMapList.DataSource as DataView;
-            if (view == null)
-            {
-                lblListCount.Text = "0 / 0 건";
-                return;
-            }
-            string keyword = txtSearch.Text.Trim();
-            // DataTable 의 문자열 비교는 기본이 대소문자 무시(CaseSensitive = false)다. LIKE 특수 문자는 [] 로 감싼다.
-            view.RowFilter = keyword.Length == 0 ? string.Empty : "MAPID LIKE '%" + EscapeLike(keyword) + "%'";
-            lblListCount.Text = string.Format(CultureInfo.InvariantCulture, "{0} / {1} 건", view.Count, view.Table.Rows.Count);
+            lblListCount.Text = string.Format(CultureInfo.InvariantCulture, "{0} 건", mapList == null ? 0 : mapList.Rows.Count);
         }
 
         /// <summary>목록에서 Map ID 행을 골라 보이게 한다. 고르면 선택 변경 이벤트가 Map 을 읽는다.</summary>
@@ -173,7 +140,7 @@ namespace DACrux.TEST.ENGUI
         }
 
         /// <summary>
-        /// 표가 DataSource 를 묶거나 다시 거른 뒤 첫 행을 자동 선택하므로 선택을 지운다.
+        /// 표가 DataSource 를 묶은 뒤 첫 행을 자동 선택하므로 선택을 지운다.
         /// 작업자가 고른 Map 만 읽게 하기 위해서다 (자동 선택으로 원격 조회가 일어나지 않게).
         /// </summary>
         private void grdMapList_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
@@ -201,6 +168,7 @@ namespace DACrux.TEST.ENGUI
         /// <summary>
         /// 고른 Map 의 정의 1행(GetMapDef / GET_MAPDEF)과 Die 행(GetDies / SELECT_USEMAP_ALLDIE)을 읽어 보인다.
         /// 다른 화면이 그 사이 덮어썼을 수 있으므로 목록 값 대신 GET_MAPDEF 로 다시 읽는다.
+        /// 목록 선택 변경 이벤트에서 불리므로 진행 표시줄은 화면 스레드 실행(RunHere)으로 표시만 한다.
         /// </summary>
         private void LoadSelectedMap()
         {
@@ -208,22 +176,25 @@ namespace DACrux.TEST.ENGUI
             if (mapId == null) return;
             try
             {
-                Cursor = Cursors.WaitCursor;
-                DACrux.TEST.RO.ProbeAdmin admin = new DACrux.TEST.RO.ProbeAdmin();
-                using (DataTable mapDef = admin.GetMapDef(mapId))
-                using (DataTable dies = admin.GetDies(mapId))
+                // 서버 조회부터 Map 그리기(수만 Die)까지 한 작업으로 묶어 모래시계를 유지한다 (2026-10-15)
+                using (busyBar.Begin("Map 조회 (" + mapId + ")"))
                 {
-                    ShowStoredMap(mapDef, dies);
+                    DataTable[] data = busyBar.RunHere("서버 조회", () =>
+                    {
+                        DACrux.TEST.RO.ProbeAdmin admin = new DACrux.TEST.RO.ProbeAdmin();
+                        return new DataTable[] { admin.GetMapDef(mapId), admin.GetDies(mapId) };
+                    });
+                    using (DataTable mapDef = data[0])
+                    using (DataTable dies = data[1])
+                    {
+                        ShowStoredMap(mapDef, dies);
+                    }
                 }
             }
             catch (Exception ex)
             {
                 ClearMap("Map 조회 실패: " + mapId);
                 MessageBox.Show(this, ex.Message, "Map 조회", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            finally
-            {
-                Cursor = Cursors.Default;
             }
         }
 
@@ -233,74 +204,45 @@ namespace DACrux.TEST.ENGUI
 
         /// <summary>
         /// 저장된 Map 정의 / Die 행을 화면에 보인다. 서비스 호출과 나눈 이유: 화면 밖 검사가 DataTable 을 직접 넣어 확인하기 위해서다.
-        /// 흐름: StoredMapLayout 계산 -> Map 그리기(XY 방향 값이 올바를 때만) -> Wafer 밖 사용 Die 확인 추가 -> 탭 3개 / 개수 줄 갱신.
+        /// 흐름: StoredMapLayout 계산 -> Map 그리기(XY 방향 값이 올바를 때만) -> Map 정보 탭 / 개수 줄 / 상태줄 갱신.
         /// </summary>
         internal void ShowStoredMap(DataTable mapDef, DataTable dies)
         {
             if (mapDef == null || mapDef.Rows.Count == 0)
             {
-                ClearMap("Map 정의(TQP_MAPDEF)가 없습니다. 목록을 다시 조회하세요.");
+                ClearMap("Map 정의(TQP_MAPDEF) 없음");
                 return;
             }
 
             StoredMapLayout layout = StoredMapLayout.Create(mapDef.Rows[0], dies);
             ClearCoordinates();
+            string drawError = null;
             if (layout.IsDirectionValid)
             {
-                bool drawn = false;
                 try
                 {
                     DrawStoredMap(layout);
-                    drawn = true;
                 }
                 catch (Exception ex)
                 {
-                    // 저장값이 Map 컨트롤이 그릴 수 없는 값이어도 확인 표 / Die 목록은 보여야 한다 (이 화면의 목적이 저장값 확인이다).
+                    // 저장값이 Map 컨트롤이 그릴 수 없는 값이어도 Map 정보는 보인다.
                     ResetMapControl();
-                    layout.AddDrawFailureCheck(ex.Message);
+                    drawError = "Map 그리기 실패 (" + ex.Message + ")";
                 }
-                if (drawn) CheckInsideWafer(layout);
             }
             else
             {
                 ResetMapControl();
+                drawError = "XY 방향 값 오류 (" + layout.StoredXYDirection.ToString(CultureInfo.InvariantCulture) + ") - Map 을 그리지 않음";
             }
 
             currentLayout = layout;
             ShowInfo(layout);
-            ShowChecks(layout);
-            ShowDies(layout);
             // XY 방향 / 원점 등 나머지 값은 [Map 정보] 탭에 있으므로 개수 줄은 한 줄에 들어가는 값만 보인다.
             lblDieCount.Text = string.Format(CultureInfo.InvariantCulture,
                 "{0}  /  사용(1) {1:#,0}  /  제거(-1) {2:#,0}  /  기타 {3:#,0}  /  Die 행 {4:#,0}",
                 layout.MapId, layout.UsedCount, layout.RemovedCount, layout.OtherCount, layout.Dies.Count);
-            int differ = layout.DifferCount;
-            lblStatus.Text = differ == 0
-                ? "조회 완료: " + layout.MapId + " / 데이터 확인 다름 0"
-                : "조회 완료: " + layout.MapId + " / 데이터 확인 다름 " + differ + " - [데이터 확인] 탭을 보세요.";
-        }
-
-        /// <summary>
-        /// 그린 Map 의 Die 마다 Wafer 안(반지름 - Edge, Notch / Flat 영역 밖)인지 Map 컨트롤 판정(IsInsideWafer)으로 정하고,
-        /// 사용(1) 인데 Wafer 밖인 Die 수를 확인 항목에 넣는다. Map 컨트롤 Die 목록 순서에 기대지 않고 LeftBottom 번호로 찾는다.
-        /// </summary>
-        private void CheckInsideWafer(StoredMapLayout layout)
-        {
-            Dictionary<Point, bool> inside = new Dictionary<Point, bool>();
-            for (int i = 0; i < m_wMap.Dies.Count; i++)
-            {
-                Die die = m_wMap.Dies[i];
-                inside[new Point(die.IndexX, die.IndexY)] = m_wMap.IsInsideWafer(die);
-            }
-            int outsideUsed = 0;
-            foreach (StoredMapDie die in layout.Dies)
-            {
-                bool value;
-                if (!inside.TryGetValue(die.LeftBottom, out value)) continue;
-                die.InsideWafer = value;
-                if (die.UseCode == 1 && !value) outsideUsed++;
-            }
-            layout.AddOutsideWaferCheck(outsideUsed);
+            lblStatus.Text = "조회 완료: " + layout.MapId + (drawError == null ? string.Empty : " / " + drawError);
         }
 
         /// <summary>
@@ -412,84 +354,12 @@ namespace DACrux.TEST.ENGUI
         }
 
         /// <summary>
-        /// 숨은 탭의 표는 보이게 될 때 첫 행을 자동 선택한다. 정보 / 확인 표는 선택이 의미가 없으므로 보일 때 선택을 지운다.
+        /// 표는 보이게 될 때 첫 행을 자동 선택한다. Map 정보 표는 선택이 의미가 없으므로 보일 때 선택을 지운다.
         /// </summary>
         private void InfoGrid_VisibleChanged(object sender, EventArgs e)
         {
             DataGridView grid = (DataGridView)sender;
             if (grid.Visible) grid.ClearSelection();
-        }
-
-        /// <summary>[데이터 확인] 탭: 항목 / 저장값 / Die 행(기준) / 결과 / 설명. 다름은 빨간 글자, 참고는 회색.</summary>
-        private void ShowChecks(StoredMapLayout layout)
-        {
-            grdCheck.Rows.Clear();
-            foreach (StoredMapCheck check in layout.Checks)
-            {
-                int index = grdCheck.Rows.Add(check.Name, check.StoredValue, check.DieValue, check.ResultText, check.Description);
-                DataGridViewCell cell = grdCheck.Rows[index].Cells[colCheckResult.Index];
-                if (check.Result == StoredMapCheckResult.Differ)
-                {
-                    cell.Style.ForeColor = Color.Red;
-                    cell.Style.Font = new Font(grdCheck.Font, FontStyle.Bold);
-                }
-                else if (check.Result == StoredMapCheckResult.Note)
-                {
-                    cell.Style.ForeColor = Color.DimGray;
-                }
-                else
-                {
-                    cell.Style.ForeColor = Color.Green;
-                }
-            }
-            grdCheck.ClearSelection();
-            int differ = layout.DifferCount;
-            tabCheck.Text = differ == 0 ? "데이터 확인" : "데이터 확인 (다름 " + differ + ")";
-        }
-
-        /// <summary>
-        /// [Die 목록] 탭: 저장 번호 / LeftBottom 번호 / USECODE / Wafer 안 / Die 번호 (Direction) / DIE_NUM (저장).
-        /// 저장 번호 Y, X 순으로 정렬한다 (= Direction 행 우선 순서라 Die 번호가 1 부터 차례로 보인다).
-        /// 기존 Map 중에는 Die 가 수만 개인 것도 있어 행을 하나씩 추가하지 않고 DataTable 로 묶는다.
-        /// </summary>
-        private void ShowDies(StoredMapLayout layout)
-        {
-            DataTable table = new DataTable();
-            table.Columns.Add("X", typeof(int));
-            table.Columns.Add("Y", typeof(int));
-            table.Columns.Add("LB_X", typeof(int));
-            table.Columns.Add("LB_Y", typeof(int));
-            table.Columns.Add("USECODE", typeof(int));
-            table.Columns.Add("INSIDE", typeof(string));
-            table.Columns.Add("DIE_NO_DIR", typeof(int));
-            table.Columns.Add("DIE_NUM", typeof(int));
-            StoredMapDie[] sorted = layout.Dies.ToArray();
-            Array.Sort(sorted, CompareStoredDie);
-            table.BeginLoadData();
-            foreach (StoredMapDie die in sorted)
-            {
-                string inside = die.InsideWafer.HasValue ? (die.InsideWafer.Value ? "예" : "아니오") : "-";
-                table.Rows.Add(die.Stored.X, die.Stored.Y, die.LeftBottom.X, die.LeftBottom.Y, die.UseCode, inside,
-                    die.DirectionNumber.HasValue ? (object)die.DirectionNumber.Value : DBNull.Value,
-                    die.StoredDieNum.HasValue ? (object)die.StoredDieNum.Value : DBNull.Value);
-            }
-            table.EndLoadData();
-            SetDieTable(table);
-            tabDies.Text = "Die 목록 (" + layout.Dies.Count.ToString("#,0", CultureInfo.InvariantCulture) + ")";
-        }
-
-        /// <summary>Die 목록 표의 DataSource 를 바꾸고 이전 DataTable 은 해제한다.</summary>
-        private void SetDieTable(DataTable table)
-        {
-            DataTable old = grdDies.DataSource as DataTable;
-            grdDies.DataSource = table;
-            if (old != null) old.Dispose();
-        }
-
-        private static int CompareStoredDie(StoredMapDie a, StoredMapDie b)
-        {
-            int y = a.Stored.Y.CompareTo(b.Stored.Y);
-            return y != 0 ? y : a.Stored.X.CompareTo(b.Stored.X);
         }
 
         /// <summary>Map / 탭 / 개수 줄을 비우고 상태줄에 이유를 적는다. 조회 실패 후 다른 Map 정보가 남지 않게 한다.</summary>
@@ -499,10 +369,6 @@ namespace DACrux.TEST.ENGUI
             hoverDie = null;
             ResetMapControl();
             grdInfo.Rows.Clear();
-            grdCheck.Rows.Clear();
-            SetDieTable(null);
-            tabCheck.Text = "데이터 확인";
-            tabDies.Text = "Die 목록";
             lblDieCount.Text = "Map: -";
             ClearCoordinates();
             lblStatus.Text = status;
@@ -531,7 +397,7 @@ namespace DACrux.TEST.ENGUI
             int number;
             string numberText = m_wMap.DieNumbers.TryGetValue(lb, out number) ? number.ToString(CultureInfo.InvariantCulture) : "-";
             lblCoordinates.Text = string.Format(CultureInfo.InvariantCulture,
-                "Die ({0}) X/Y: {1}, {2} / LeftBottom: {3}, {4} / USECODE: {5} ({6}) / Die 번호: {7}\r\n마우스 Wafer 중심 기준: X={8:#,0.###}, Y={9:#,0.###} µm",
+                "Die ({0}) X/Y: {1}, {2} / LeftBottom: {3}, {4} / USECODE: {5} ({6}) / Die 번호: {7}   |   마우스 X={8:#,0.###}, Y={9:#,0.###} µm",
                 currentLayout.Direction, stored.X, stored.Y, lb.X, lb.Y, hoverDie.DieProp, UseCodeName(hoverDie.DieProp), numberText,
                 point.X, point.Y);
         }
@@ -544,7 +410,7 @@ namespace DACrux.TEST.ENGUI
 
         private void ClearCoordinates()
         {
-            lblCoordinates.Text = "Die X/Y: - / LeftBottom: - / USECODE: - / Die 번호: -\r\n마우스 Wafer 중심 기준: -";
+            lblCoordinates.Text = string.Empty;
         }
 
         #endregion
@@ -583,19 +449,6 @@ namespace DACrux.TEST.ENGUI
         private static string Dash(string value)
         {
             return string.IsNullOrEmpty(value) ? "-" : value;
-        }
-
-        /// <summary>DataView.RowFilter 의 LIKE 값에서 특수 문자(* % [ ])는 [] 로 감싸고 작은따옴표는 두 번 쓴다.</summary>
-        private static string EscapeLike(string value)
-        {
-            System.Text.StringBuilder sb = new System.Text.StringBuilder();
-            foreach (char c in value)
-            {
-                if (c == '*' || c == '%' || c == '[' || c == ']') sb.Append('[').Append(c).Append(']');
-                else if (c == '\'') sb.Append("''");
-                else sb.Append(c);
-            }
-            return sb.ToString();
         }
 
         #endregion

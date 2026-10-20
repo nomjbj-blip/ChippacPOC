@@ -12,7 +12,7 @@ namespace DACrux.SEMDMS.BSL
     //  목적
     //   E-Test Wafer 1장(파일 1개)을 YMS 가 읽는 테이블에 넣어, 기존 YMS 화면(TEST Map View / Gallery / Cum / Bin Stack /
     //   Yield / Param Analysis / Standard Report / Test Report)에서 바로 조회되게 한다.
-    //   설계: 문서/2026-10-14_ETest_Upload_YMS적재_설계.md 14절.
+    //   설계: 문서/설계/04_ETest/2026-10-14_ETest_Upload_YMS적재_설계.md 14절.
     //
     //  처리 순서 (YMS 설비 파일 적재 PCMDataService 와 같은 기존 함수를 같은 순서로 부른다)
     //   1. 입력 확인 (YMS 컬럼 길이 / 이름 규칙 / Die 좌표)
@@ -21,7 +21,7 @@ namespace DACrux.SEMDMS.BSL
     //   4. Lot / Wafer             TestCommon.SaveWaferData         -> LOT_SEQ / WAFER_SEQ (콜백으로 바로 알림)
     //   5. Die 데이터              TestDataManager.SaveData         -> TD_<PROGRAM> (없으면 테이블 / 컬럼 / PARASPEC 자동 생성)
     //   6. Parameter 정의 보정     UPDATE_YMS_PARASPEC              -> 설명(헤더 원문) / 단위 / LSL / USL / 형식
-    //   7. Bin 정의                TQP_BINDESC                      -> 1 PASS / 2 SPEC_FAIL / 3 NOT_TESTED (없을 때만)
+    //   7. Bin 정의                TQP_BINDESC                      -> 파일 Hardware Bin 별 (없을 때만), 예전 판정 Bin 정의(1 / 2 / 3)는 삭제
     //   8. 요약                    TestCommon.SummaryData           -> TQP_WAFER_SUM / TQP_LOT_SUM (수율)
     //
     //  저장 경계
@@ -32,7 +32,8 @@ namespace DACrux.SEMDMS.BSL
     //  입력 (EtYmsWafer)
     //   Die 의 MapX / MapY = 시스템 Map 좌표 (File Map Setup Map 기준, LeftBottom (1,1)). YMS Map 은 이 값을 변환 없이 Map Index 로 쓴다.
     //   Map 좌표가 없는 Die(Map 밖)는 넣지 않고 SkipDieCount 로 센다. Map 이 아예 없는 파일은 호출하는 쪽이 보류한다.
-    //   Die 판정 / Fail 수는 E-Test 판정 결과를 그대로 받는다. 값이 없는('-' / 빈 칸) Parameter 는 null -> TD 에 NULL.
+    //   Die BIN = 결과 파일 Hardware Bin, 양품 = 파일 DUT 결과 Pass (2026-10-14). E-Test Spec 판정(POC Limit)은 YMS BIN / 수율에 쓰지 않는다.
+    //   Parameter 는 등록(Setup)된 것만, LSL / USL 은 등록 Spec 값이다. 값이 없는('-' / 빈 칸) Parameter 는 null -> TD 에 NULL.
     // =====================================================================================================
 
     /// <summary>YMS 에 넣을 Parameter 1개 (TD 컬럼 1개)</summary>
@@ -63,12 +64,12 @@ namespace DACrux.SEMDMS.BSL
         public int? MapX { get; set; }
         /// <summary>시스템 Map Y (없으면 Map 밖 Die)</summary>
         public int? MapY { get; set; }
-        /// <summary>Die 판정 P / F</summary>
-        public string Judge { get; set; }
-        /// <summary>범위 밖으로 Fail 인 값 수</summary>
-        public int RangeFailCount { get; set; }
-        /// <summary>'-' 로 Fail 인 값 수</summary>
-        public int NotTestedFailCount { get; set; }
+        /// <summary>결과 파일 Hardware Bin (YMS BIN)</summary>
+        public int? HardwareBin { get; set; }
+        /// <summary>결과 파일 Software Bin (Bin 정의 이름 / 설명에 적는다)</summary>
+        public int? SoftwareBin { get; set; }
+        /// <summary>결과 파일 DUT 결과 P / F (양품 Bin 판단)</summary>
+        public string FilePass { get; set; }
         /// <summary>Parameter 순서와 같은 측정값. 값이 없으면 null</summary>
         public double?[] Values { get; set; }
     }
@@ -120,9 +121,12 @@ namespace DACrux.SEMDMS.BSL
         public int DieCount { get; set; }
         public int SkipDieCount { get; set; }
         public int ParamCount { get; set; }
-        public int Bin1Count { get; set; }
-        public int Bin2Count { get; set; }
-        public int Bin3Count { get; set; }
+        /// <summary>파일 DUT 결과 Pass 인 Die 수 (Map 안)</summary>
+        public int GoodDieCount { get; set; }
+        /// <summary>파일 DUT 결과 Fail 인 Die 수 (Map 안)</summary>
+        public int FailDieCount { get; set; }
+        /// <summary>Hardware Bin 별 Die 수. 예: 1:20, 5:4</summary>
+        public string BinCounts { get; set; }
         public decimal? NetDie { get; set; }
         public decimal? TestedDie { get; set; }
         public decimal? Yield { get; set; }
@@ -131,9 +135,9 @@ namespace DACrux.SEMDMS.BSL
         public DataTable ToDataTable()
         {
             DataTable dt = new DataTable("YMS_RESULT");
-            foreach (string column in new string[] { "YMS_STATUS", "YMS_STEP", "YMS_MESSAGE", "YMS_PROGRAM", "YMS_TESTAREA", "YMS_LOT_SEQ", "YMS_WAFER_SEQ" })
+            foreach (string column in new string[] { "YMS_STATUS", "YMS_STEP", "YMS_MESSAGE", "YMS_PROGRAM", "YMS_TESTAREA", "YMS_LOT_SEQ", "YMS_WAFER_SEQ", "BIN_COUNTS" })
                 dt.Columns.Add(column, typeof(string));
-            foreach (string column in new string[] { "DIE_COUNT", "SKIP_DIE_COUNT", "PARAM_COUNT", "BIN1_COUNT", "BIN2_COUNT", "BIN3_COUNT" })
+            foreach (string column in new string[] { "DIE_COUNT", "SKIP_DIE_COUNT", "PARAM_COUNT", "GOOD_DIE_COUNT", "FAIL_DIE_COUNT" })
                 dt.Columns.Add(column, typeof(int));
             foreach (string column in new string[] { "NETDIE", "TESTED_DIE", "YIELD" })
                 dt.Columns.Add(column, typeof(decimal));
@@ -149,9 +153,9 @@ namespace DACrux.SEMDMS.BSL
             row["DIE_COUNT"] = DieCount;
             row["SKIP_DIE_COUNT"] = SkipDieCount;
             row["PARAM_COUNT"] = ParamCount;
-            row["BIN1_COUNT"] = Bin1Count;
-            row["BIN2_COUNT"] = Bin2Count;
-            row["BIN3_COUNT"] = Bin3Count;
+            row["GOOD_DIE_COUNT"] = GoodDieCount;
+            row["FAIL_DIE_COUNT"] = FailDieCount;
+            row["BIN_COUNTS"] = BinCounts;
             row["NETDIE"] = NetDie.HasValue ? (object)NetDie.Value : DBNull.Value;
             row["TESTED_DIE"] = TestedDie.HasValue ? (object)TestedDie.Value : DBNull.Value;
             row["YIELD"] = Yield.HasValue ? (object)Yield.Value : DBNull.Value;
@@ -236,7 +240,7 @@ namespace DACrux.SEMDMS.BSL
                 UpdateParameterSpec(factory, result.Program, programRev, wafer.Parameters, updateUser);
 
                 step = "Bin 정의";
-                RegisterBins(result.Program);
+                RegisterBins(result.Program, dies);
 
                 step = "요약";
                 common.SummaryData(factory, lotSeq, waferSeq, waferId);
@@ -328,6 +332,7 @@ namespace DACrux.SEMDMS.BSL
 
             List<EtYmsDie> dies = new List<EtYmsDie>();
             HashSet<long> positions = new HashSet<long>();
+            SortedDictionary<int, int> binCounts = new SortedDictionary<int, int>();
             foreach (EtYmsDie die in wafer.Dies ?? new List<EtYmsDie>())
             {
                 if (die == null)
@@ -335,7 +340,16 @@ namespace DACrux.SEMDMS.BSL
                 int valueCount = die.Values == null ? 0 : die.Values.Length;
                 if (valueCount != parameters.Count)
                     throw new ArgumentException("DUT #" + die.DutNo + " 의 값 수(" + valueCount + ")가 Parameter 수(" + parameters.Count + ")와 다릅니다.");
-                int bin = EtYmsRule.ToBin(die.Judge, die.RangeFailCount, die.NotTestedFailCount);
+                int bin;
+                try
+                {
+                    bin = EtYmsRule.ToBin(die.HardwareBin);
+                }
+                catch (ArgumentException ex)
+                {
+                    // 결과 메시지는 가장 안쪽 예외 문구를 쓰므로 원래 예외를 안에 넣지 않고 DUT 번호를 붙여 다시 던진다.
+                    throw new ArgumentException("DUT #" + die.DutNo + " : " + ex.Message);
+                }
                 if (!die.MapX.HasValue || !die.MapY.HasValue)
                 {
                     result.SkipDieCount++;
@@ -343,13 +357,19 @@ namespace DACrux.SEMDMS.BSL
                 }
                 if (!positions.Add(((long)die.MapX.Value << 32) | (uint)die.MapY.Value))
                     throw new ArgumentException("같은 Map 좌표 Die 가 두 번 있습니다: (" + die.MapX.Value + ", " + die.MapY.Value + ")");
-                if (bin == EtYmsRule.BinPass) result.Bin1Count++;
-                else if (bin == EtYmsRule.BinSpecFail) result.Bin2Count++;
-                else result.Bin3Count++;
+                if (IsFilePass(die)) result.GoodDieCount++;
+                else result.FailDieCount++;
+                int count;
+                binCounts.TryGetValue(bin, out count);
+                binCounts[bin] = count + 1;
                 dies.Add(die);
             }
             if (dies.Count == 0)
                 throw new ArgumentException("Map 좌표가 있는 Die 가 없습니다 (Map 밖 " + result.SkipDieCount + "개).");
+            List<string> binTexts = new List<string>();
+            foreach (KeyValuePair<int, int> pair in binCounts)
+                binTexts.Add(pair.Key.ToString(CultureInfo.InvariantCulture) + ":" + pair.Value.ToString(CultureInfo.InvariantCulture));
+            result.BinCounts = string.Join(", ", binTexts.ToArray());
 
             dies.Sort(delegate (EtYmsDie a, EtYmsDie b)
             {
@@ -375,7 +395,7 @@ namespace DACrux.SEMDMS.BSL
                 DataRow row = raw.NewRow();
                 row["X"] = die.MapX.Value.ToString(CultureInfo.InvariantCulture);
                 row["Y"] = die.MapY.Value.ToString(CultureInfo.InvariantCulture);
-                row["BIN"] = EtYmsRule.ToBin(die.Judge, die.RangeFailCount, die.NotTestedFailCount).ToString(CultureInfo.InvariantCulture);
+                row["BIN"] = EtYmsRule.ToBin(die.HardwareBin).ToString(CultureInfo.InvariantCulture);
                 for (int i = 0; i < parameters.Count; i++)
                     row[3 + i] = EtYmsRule.ToYmsValue(die.Values[i]);
                 raw.Rows.Add(row);
@@ -396,7 +416,7 @@ namespace DACrux.SEMDMS.BSL
             {
                 new string[] { "X", "Die X (system map index)" },
                 new string[] { "Y", "Die Y (system map index)" },
-                new string[] { "BIN", "E-Test Spec judge (1 PASS / 2 SPEC_FAIL / 3 NOT_TESTED)" }
+                new string[] { "BIN", "E-Test file Hardware Bin" }
             };
             for (int i = 0; i < fixedColumns.Length; i++)
                 SetSpecRow(rows, i, fixedColumns[i][1], string.Empty, null, null, "INT", user, factory, program, rev, fixedColumns[i][0]);
@@ -429,19 +449,62 @@ namespace DACrux.SEMDMS.BSL
             rows[index, 9] = paramName;
         }
 
-        /// <summary>Program 의 Bin 1 / 2 / 3 을 없을 때만 등록한다. Bin Define 화면에서 고친 값(색 / 이름 등)은 덮어쓰지 않는다.</summary>
-        private static void RegisterBins(string program)
+        /// <summary>
+        /// Program 의 Bin 정의를 이 Wafer 의 Hardware Bin 으로 맞춘다 (기존 DSL 함수만 사용).
+        /// 1. 예전 규칙(E-Test Spec 판정 1 PASS / 2 SPEC_FAIL / 3 NOT_TESTED)으로 만든 정의는 지운다. 이름 / 설명을 고친 정의는 남긴다.
+        /// 2. 이 Wafer 의 Hardware Bin 중 정의가 없는 것만 등록한다. YMS Program Setup 에서 고친 값(색 / 이름 / 양품)은 덮어쓰지 않는다.
+        ///    양품(HIGH_GEC = Y) = 그 Bin 의 Die 가 모두 파일 결과 Pass. 이름 / 설명에 Software Bin 을 적는다.
+        /// </summary>
+        private static void RegisterBins(string program, List<EtYmsDie> dies)
         {
             DACrux.TEST.DSL.TQP_BINDESC oBin = new DACrux.TEST.DSL.TQP_BINDESC();
-            foreach (int bin in new int[] { EtYmsRule.BinPass, EtYmsRule.BinSpecFail, EtYmsRule.BinNotTested })
+            foreach (string[] legacy in EtYmsRule.LegacyJudgeBins)
             {
-                string code = bin.ToString(CultureInfo.InvariantCulture);
+                using (DataTable dt = oBin.SelectProgramBin(program, legacy[0]))
+                {
+                    if (dt != null && dt.Rows.Count > 0
+                        && EtYmsRule.IsLegacyJudgeBin(Convert.ToString(dt.Rows[0]["BIN"], CultureInfo.InvariantCulture),
+                            Convert.ToString(dt.Rows[0]["BIN_NAME"], CultureInfo.InvariantCulture),
+                            Convert.ToString(dt.Rows[0]["DESCRIPTION"], CultureInfo.InvariantCulture)))
+                        oBin.DeleteBinInfo(program, legacy[0], string.Empty);
+                }
+            }
+
+            SortedDictionary<int, List<EtYmsDie>> byBin = new SortedDictionary<int, List<EtYmsDie>>();
+            foreach (EtYmsDie die in dies)
+            {
+                int bin = EtYmsRule.ToBin(die.HardwareBin);
+                List<EtYmsDie> list;
+                if (!byBin.TryGetValue(bin, out list))
+                    byBin[bin] = list = new List<EtYmsDie>();
+                list.Add(die);
+            }
+
+            foreach (KeyValuePair<int, List<EtYmsDie>> pair in byBin)
+            {
+                string code = pair.Key.ToString(CultureInfo.InvariantCulture);
                 if (Convert.ToInt32(oBin.ExistsBinInfo(program, code), CultureInfo.InvariantCulture) > 0)
                     continue;
-                oBin.InsertBinInfo(program, code, EtYmsRule.BinName(bin), string.Empty,
-                    bin == EtYmsRule.BinPass ? "Y" : "N",   // HIGH_GEC: Good Bin -> 수율 분자
-                    "Y", string.Empty, string.Empty, EtYmsRule.BinColor(bin), EtYmsRule.BinDescription(bin), string.Empty);
+                int passCount = 0;
+                List<int> softBins = new List<int>();
+                foreach (EtYmsDie die in pair.Value)
+                {
+                    if (IsFilePass(die)) passCount++;
+                    if (die.SoftwareBin.HasValue) softBins.Add(die.SoftwareBin.Value);
+                }
+                bool good = passCount == pair.Value.Count;
+                bool mixed = passCount > 0 && !good;
+                oBin.InsertBinInfo(program, code, EtYmsRule.BinName(pair.Key, softBins), string.Empty,
+                    good ? "Y" : "N",   // HIGH_GEC: 양품 Bin -> 수율 분자
+                    "Y", string.Empty, string.Empty, EtYmsRule.BinColor(pair.Key, good),
+                    EtYmsRule.BinDescription(pair.Key, softBins, good, mixed), string.Empty);
             }
+        }
+
+        /// <summary>파일 DUT 결과가 Pass 인지 (P)</summary>
+        private static bool IsFilePass(EtYmsDie die)
+        {
+            return string.Equals((die.FilePass ?? string.Empty).Trim(), "P", StringComparison.OrdinalIgnoreCase);
         }
 
         private static string RequiredText(string value, string name, int maxChars)

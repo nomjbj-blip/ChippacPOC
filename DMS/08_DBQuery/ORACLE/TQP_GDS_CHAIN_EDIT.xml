@@ -64,4 +64,21 @@ VALUES
             <param direction="Input" dbtype="Number" size="0">:chain_seq</param>
         </parameters>
     </query>
+    <!-- Map 복사(GdsMapImport.CopyMap, 2026-10-15): 원본 Device 의 행을 새 Device 이름으로 INSERT ... SELECT (Chain 1개씩, 편집 기록은 원래 작성자 / 일시 그대로) -->
+    <query statement="Insert" queryid="COPY_CHAIN_EDIT" commandtype="Text" description="Map 복사: Chain 수동 편집 기록" commandtimeout="600">
+        <commandtext><![CDATA[INSERT INTO TQP_GDS_CHAIN_EDIT
+    (FACTORY, DEVICE_ID, CHAIN_SEQ, VERSION_NO, EDIT_SEQ, PLACED_ELEMENT_ID, ACTION_CODE, BATCH_EDIT_SEQ, CREATE_USER, CREATE_TIME)
+SELECT FACTORY, :target_device_id, :new_chain_seq, VERSION_NO, EDIT_SEQ, PLACED_ELEMENT_ID, ACTION_CODE, BATCH_EDIT_SEQ, CREATE_USER, CREATE_TIME
+  FROM TQP_GDS_CHAIN_EDIT
+ WHERE FACTORY = :factory
+   AND DEVICE_ID = :source_device_id
+   AND CHAIN_SEQ = :source_chain_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="50">:target_device_id</param>
+            <param direction="Input" dbtype="Number" size="0">:new_chain_seq</param>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:source_device_id</param>
+            <param direction="Input" dbtype="Number" size="0">:source_chain_seq</param>
+        </parameters>
+    </query>
 </queryxml>

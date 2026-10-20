@@ -3,7 +3,9 @@
 #       - Chain 목록: 글자 클릭 / 이미 선택된 행 다시 클릭 / 체크 칸 클릭 / Space -> 체크 그대로, 더블클릭 -> 토글 + Chain 표시(Visible) 반영
 #       - 유사 묶음 목록: 클릭 -> 체크 그대로, 더블클릭 -> 토글, 단자 보호 묶음은 더블클릭해도 체크 안 됨
 #       - Setup 화면 Layer 목록: 클릭 / 다시 클릭 / 체크 칸 / Space -> 그대로, 더블클릭 -> 토글 + 도면 Layer 표시 반영,
-#         [전체 미체크] / [전체 체크] 버튼은 그대로 동작, 우클릭은 행 선택만(색 변경 대상)
+#         [전체 미체크] / [전체 체크] 버튼은 실제 버튼 클릭(PerformClick)으로 동작 확인(Click 연결 빠짐도 잡음, 2026-10-15),
+#         [Layer 적용](예전 [Redraw]) 버튼은 화면에서 빠져 검사에서 뺀다. 체크는 바뀔 때마다 바로 도면에 반영된다 (2026-10-20),
+#         우클릭은 행 선택만(색 변경 대상)
 #       화면은 화면 밖에 띄우고 DB / Service 를 쓰지 않는다(빈 도면 + 시험 Chain 2개 + 시험 유사 묶음 3개 / Setup 은 샘플 GDS 읽기).
 # 실행: powershell -NoProfile -STA -ExecutionPolicy Bypass -File GdsChainListDoubleClickSmoke.ps1 -GdsExe <빌드한 NexplantQMS.GdsMap.exe>
 param(
@@ -47,7 +49,19 @@ public static class ChainDblClickSmoke
         WM_RBUTTONDOWN = 0x204, WM_RBUTTONUP = 0x205;
 
     static object F(object o, string name) { FieldInfo f = o.GetType().GetField(name, NP); return f == null ? null : f.GetValue(o); }
-    static object Call(object o, string name, params object[] args) { return o.GetType().GetMethod(name, NP).Invoke(o, args); }
+    // 화면 구조가 바뀌어 필드 / 함수가 없으면 NullReference 대신 이름을 알려 준다 (2026-10-20).
+    static object Need(object o, string name)
+    {
+        object v = F(o, name);
+        if (v == null) throw new InvalidOperationException("화면에 필드가 없습니다: " + o.GetType().Name + "." + name);
+        return v;
+    }
+    static object Call(object o, string name, params object[] args)
+    {
+        MethodInfo m = o.GetType().GetMethod(name, NP);
+        if (m == null) throw new MissingMethodException(o.GetType().Name, name);
+        return m.Invoke(o, args);
+    }
     static void Pump() { for (int i = 0; i < 15; i++) { Application.DoEvents(); System.Threading.Thread.Sleep(10); } }
     static IntPtr Pt(Point p) { return (IntPtr)((p.Y << 16) | (p.X & 0xFFFF)); }
 
@@ -92,14 +106,14 @@ public static class ChainDblClickSmoke
             form.Size = new Size(1500, 1100);
             form.Show();
             Pump();
-            var map = (GdsMapControl)F(form, "map");
+            var map = (GdsMapControl)Need(form, "map");
             map.ShowStructure(lib);
             Call(form, "RefreshLayerList");
             Pump();
-            var layers = (CheckedListBox)F(form, "chkLayerItems");
+            var layers = (CheckedListBox)Need(form, "chkLayerItems");
             Func<int, bool> mapVisible = i => {
-                int id = ((LayerDisplayItem)layers.Items[i]).LayerId;
-                foreach (var item in map.GetLayerDisplayItems()) if (item.LayerId == id) return item.Visible;
+                int id = ((LayerDisplayItem)layers.Items[i]).LayerKey;
+                foreach (var item in map.GetLayerDisplayItems()) if (item.LayerKey == id) return item.Visible;
                 return false; };
             r.Add("layerCheckOnClick=" + layers.CheckOnClick);
             r.Add("layer.count=" + layers.Items.Count);
@@ -116,9 +130,14 @@ public static class ChainDblClickSmoke
             r.Add("layer.dbl0=" + State(layers) + " map0=" + mapVisible(0));
             DoubleClick(layers, TextPoint(layers, 0));
             r.Add("layer.dbl0Again=" + State(layers) + " map0=" + mapVisible(0));
-            Call(form, "btnLayerCheckNone_Click", form, EventArgs.Empty); Pump();
+            // 버튼은 처리 함수를 직접 부르지 않고 실제 버튼을 누른다(PerformClick). Click 연결이 빠지면 상태가 그대로라 FAIL 이 된다 (2026-10-15).
+            // [Layer 적용](btnLayer) 버튼은 화면에서 빠졌다. 남은 버튼 2개만 확인한다 (2026-10-20).
+            var btnNone = (Button)Need(form, "btnLayerCheckNone");
+            var btnAll = (Button)Need(form, "btnLayerCheckAll");
+            r.Add("layer.buttonsEnabled=" + btnNone.Enabled + "/" + btnAll.Enabled);
+            btnNone.PerformClick(); Pump();
             r.Add("layer.none=" + State(layers) + " map0=" + mapVisible(0));
-            Call(form, "btnLayerCheckAll_Click", form, EventArgs.Empty); Pump();
+            btnAll.PerformClick(); Pump();
             r.Add("layer.all=" + State(layers) + " map0=" + mapVisible(0));
             Point p2 = TextPoint(layers, 2);
             SendMessage(layers.Handle, WM_RBUTTONDOWN, (IntPtr)2, Pt(p2)); SendMessage(layers.Handle, WM_RBUTTONUP, IntPtr.Zero, Pt(p2)); Pump();
@@ -243,8 +262,9 @@ Check 'Setup 체크 칸 클릭 = 선택만' ($v['layer.glyph1'] -eq 'sel=1 chk=1
 Check 'Setup Space 키 = 체크 그대로' ($v['layer.space1'] -eq 'sel=1 chk=111111111') $v['layer.space1']
 Check 'Setup 더블클릭 = 토글 + 도면 Layer 숨김' ($v['layer.dbl0'] -eq 'sel=0 chk=011111111 map0=False') $v['layer.dbl0']
 Check 'Setup 다시 더블클릭 = 토글 + 도면 Layer 표시' ($v['layer.dbl0Again'] -eq 'sel=0 chk=111111111 map0=True') $v['layer.dbl0Again']
-Check 'Setup [전체 미체크] 버튼 동작' ($v['layer.none'] -eq 'sel=0 chk=000000000 map0=False') $v['layer.none']
-Check 'Setup [전체 체크] 버튼 동작' ($v['layer.all'] -eq 'sel=0 chk=111111111 map0=True') $v['layer.all']
+Check 'Setup Layer 버튼 2개 사용 가능(도면 읽은 뒤)' ($v['layer.buttonsEnabled'] -eq 'True/True') $v['layer.buttonsEnabled']
+Check 'Setup [전체 미체크] 버튼 클릭 동작' ($v['layer.none'] -eq 'sel=0 chk=000000000 map0=False') $v['layer.none']
+Check 'Setup [전체 체크] 버튼 클릭 동작' ($v['layer.all'] -eq 'sel=0 chk=111111111 map0=True') $v['layer.all']
 Check 'Setup 우클릭 = 행 선택만(색 변경 대상)' ($v['layer.right2'] -eq 'sel=2 chk=111111111') $v['layer.right2']
 
 $fail = @($results | Where-Object { $_.StartsWith('FAIL') }).Count

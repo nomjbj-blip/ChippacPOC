@@ -18,14 +18,17 @@ namespace NexplantQMS.GdsMap
     {
         Color IColorListItem.ListColor { get { return Color; } }
 
-        public int LayerId { get; private set; }
+        /// <summary>Layer 번호 + DataType 키(GdsLayerKey). 18/0 / 18/3 / 18/4 는 다른 항목이다 (2026-10-20)</summary>
+        public int LayerKey { get; private set; }
+        public int Layer { get { return GdsLayerKey.Layer(LayerKey); } }
+        public int DataType { get { return GdsLayerKey.DataType(LayerKey); } }
         public Color Color { get; set; }
         public bool Visible { get; private set; }
 
         /// <summary>도면의 레이어 상태를 목록에서 사용할 항목으로 만든다.</summary>
-        public LayerDisplayItem(int layerId, Color color, bool visible)
+        public LayerDisplayItem(int layerKey, Color color, bool visible)
         {
-            LayerId = layerId;
+            LayerKey = layerKey;
             Color = color;
             Visible = visible;
         }
@@ -33,7 +36,7 @@ namespace NexplantQMS.GdsMap
         /// <summary>기본 체크박스 그리기와 접근성 읽기에 사용할 레이어 이름을 제공한다.</summary>
         public override string ToString()
         {
-            return "Layer " + LayerId;
+            return "Layer " + GdsLayerKey.Format(LayerKey);
         }
     }
 

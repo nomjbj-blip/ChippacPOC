@@ -18,7 +18,7 @@ namespace DACrux.SEMDMS.ENGUI
     }
 
     /// <summary>
-    /// 연관 분석 Wafer Map 의 Die 색 규칙이다. 설계: 문서/2026-10-12_GDS_KLARF_연관분석_화면_설계.md 4.4절 (결정 A1 / A2)
+    /// 연관 분석 Wafer Map 의 Die 색 규칙이다. 설계: 문서/설계/05_연관분석/2026-10-12_GDS_KLARF_연관분석_화면_설계.md 4.4절 (결정 A1 / A2)
     ///   검사 계획 밖 Die      : 칠하지 않는다(기존 Map 표시 그대로)
     ///   Defect 없음           : 흰색 (기존 Defect Count Color 0 구간과 같음)
     ///   N &lt; 표시 기준       : 연회색 (Chain 밖 Defect 만 있는 Die 포함)
@@ -81,5 +81,56 @@ namespace DACrux.SEMDMS.ENGUI
                 if (band.Contains(chainCount)) return band.Color;
             return BelowThresholdColor;
         }
+
+        /// <summary>E-Test 가 없거나 Chain 이 E-Test 와 연결되지 않아 비교할 수 없는 Die (2026-10-16).</summary>
+        public static readonly Color NotComparableColor = Color.FromArgb(0xC8, 0xC6, 0xBE);
+
+        /// <summary>
+        /// (Die, Chain) 4분류 색 (2026-10-16). 설계: 문서/설계/05_연관분석/2026-10-15_GDS_KLARF_ETest_통합분석_데이터_설계.md 7.1절
+        /// 서버 결과 DIE_CHAIN.CLASS4 값: BOTH(일치) / FAIL(Fail만) / DEFECT(Defect만) / OK(정상) / NA(비교 불가).
+        /// 색은 구간 색과 같은 Defect Count Color 순서에서 고른다.
+        /// </summary>
+        public static Color ClassColor(string class4)
+        {
+            switch (class4)
+            {
+                case "BOTH": return Palette[3];
+                case "FAIL": return Palette[2];
+                case "DEFECT": return Palette[1];
+                case "OK": return NoDefectColor;
+                default: return NotComparableColor;
+            }
+        }
+
+        /// <summary>4분류 화면 문구.</summary>
+        public static string ClassText(string class4)
+        {
+            switch (class4)
+            {
+                case "BOTH": return "일치";
+                case "FAIL": return "Fail만";
+                case "DEFECT": return "Defect만";
+                case "OK": return "정상";
+                default: return "비교 불가";
+            }
+        }
+
+        /// <summary>4분류 표시 순서 (구간 표 / 범례).</summary>
+        public static readonly string[] ClassCodes = { "BOTH", "FAIL", "DEFECT", "OK", "NA" };
+    }
+
+    /// <summary>
+    /// Wafer Map 색 기준 (2026-10-16). 설계: 문서/설계/05_연관분석/2026-10-15_GDS_KLARF_ETest_통합분석_데이터_설계.md 8.1절 (결정 B13)
+    ///   ChainDefect : Die 안 Chain 영역 Defect 수 (기존)
+    ///   EtFailChain : Die 의 E-Test Fail Chain 수
+    ///   MatchChain  : Defect 와 E-Test Fail 이 같은 Chain 에서 겹친 수
+    ///   ChainClass  : Chain 탭에서 고른 Chain 하나의 4분류
+    /// </summary>
+    public enum GdsKlarfColorBasis
+    {
+        ChainDefect = 0,
+        EtFailChain = 1,
+        MatchChain = 2,
+        ChainClass = 3
     }
 }

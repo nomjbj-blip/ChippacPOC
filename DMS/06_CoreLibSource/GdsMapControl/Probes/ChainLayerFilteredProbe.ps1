@@ -62,35 +62,35 @@ $noRules = [NexplantQMS.GdsMap.Chain.ChainLayerConnectionRule[]]@()
 $request = [NexplantQMS.GdsMap.Chain.ChainTraceRequest]::new($elements, 'A', 'C', $noRules, 5.0)
 $request.ApplyLayerRules = $false
 $request.SelectedLayerIds = [System.Collections.Generic.HashSet[int]]::new()
-[void]$request.SelectedLayerIds.Add(1)
-[void]$request.SelectedLayerIds.Add(3)
+[void]$request.SelectedLayerIds.Add([NexplantQMS.GdsMap.GdsLayerKey]::Make(1, 0))
+[void]$request.SelectedLayerIds.Add([NexplantQMS.GdsMap.GdsLayerKey]::Make(3, 0))
 $tracer = [NexplantQMS.GdsMap.Chain.ChainCandidateTracer]::new()
 Assert-Condition (-not $tracer.Trace($request).IsConnected) `
     '체크하지 않은 중간 Layer를 통과했습니다.'
 
-[void]$request.SelectedLayerIds.Add(2)
+[void]$request.SelectedLayerIds.Add([NexplantQMS.GdsMap.GdsLayerKey]::Make(2, 0))
 Assert-Condition $tracer.Trace($request).IsConnected '체크한 Layer의 연결 경로를 찾지 못했습니다.'
 $request.ApplyLayerRules = $true
 $request = [NexplantQMS.GdsMap.Chain.ChainTraceRequest]::new(
     $elements, 'A', 'C',
     [NexplantQMS.GdsMap.Chain.ChainLayerConnectionRule[]]@(
-        [NexplantQMS.GdsMap.Chain.ChainLayerConnectionRule]::new(1, 2, 0.0)), 5.0)
+        [NexplantQMS.GdsMap.Chain.ChainLayerConnectionRule]::new([NexplantQMS.GdsMap.GdsLayerKey]::Make(1, 0), [NexplantQMS.GdsMap.GdsLayerKey]::Make(2, 0), 0.0)), 5.0)
 $request.SelectedLayerIds = [System.Collections.Generic.HashSet[int]]::new()
-[void]$request.SelectedLayerIds.Add(1)
-[void]$request.SelectedLayerIds.Add(2)
-[void]$request.SelectedLayerIds.Add(3)
+[void]$request.SelectedLayerIds.Add([NexplantQMS.GdsMap.GdsLayerKey]::Make(1, 0))
+[void]$request.SelectedLayerIds.Add([NexplantQMS.GdsMap.GdsLayerKey]::Make(2, 0))
+[void]$request.SelectedLayerIds.Add([NexplantQMS.GdsMap.GdsLayerKey]::Make(3, 0))
 Assert-Condition (-not $tracer.Trace($request).IsConnected) `
     'Layer 규칙에 없는 2-3 연결을 통과했습니다.'
 
 $request = [NexplantQMS.GdsMap.Chain.ChainTraceRequest]::new(
     $elements, 'A', 'C',
     [NexplantQMS.GdsMap.Chain.ChainLayerConnectionRule[]]@(
-        [NexplantQMS.GdsMap.Chain.ChainLayerConnectionRule]::new(1, 2, 0.0),
-        [NexplantQMS.GdsMap.Chain.ChainLayerConnectionRule]::new(2, 3, 0.0)), 5.0)
+        [NexplantQMS.GdsMap.Chain.ChainLayerConnectionRule]::new([NexplantQMS.GdsMap.GdsLayerKey]::Make(1, 0), [NexplantQMS.GdsMap.GdsLayerKey]::Make(2, 0), 0.0),
+        [NexplantQMS.GdsMap.Chain.ChainLayerConnectionRule]::new([NexplantQMS.GdsMap.GdsLayerKey]::Make(2, 0), [NexplantQMS.GdsMap.GdsLayerKey]::Make(3, 0), 0.0)), 5.0)
 $request.SelectedLayerIds = [System.Collections.Generic.HashSet[int]]::new()
-[void]$request.SelectedLayerIds.Add(1)
-[void]$request.SelectedLayerIds.Add(2)
-[void]$request.SelectedLayerIds.Add(3)
+[void]$request.SelectedLayerIds.Add([NexplantQMS.GdsMap.GdsLayerKey]::Make(1, 0))
+[void]$request.SelectedLayerIds.Add([NexplantQMS.GdsMap.GdsLayerKey]::Make(2, 0))
+[void]$request.SelectedLayerIds.Add([NexplantQMS.GdsMap.GdsLayerKey]::Make(3, 0))
 Assert-Condition $tracer.Trace($request).IsConnected '등록된 Layer 규칙 경로를 찾지 못했습니다.'
 
 $large = New-RectangleElement 'LARGE' 1 0 0 1000 1000

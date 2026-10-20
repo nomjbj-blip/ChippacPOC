@@ -7,7 +7,7 @@ namespace DACrux.SEMDMS.Interface
 {
     /// <summary>
     /// GDS Map 전체 도형을 DB에 저장(Import)하는 원격 호출 계약이다.
-    /// 설계: 문서/2026-10-02_GDS_Map_DB저장_설계.md
+    /// 설계: 문서/설계/02_GDS/2026-10-02_GDS_Map_DB저장_설계.md
     /// 큰 도면을 한 번에 보내지 않고 저장 작업(Job)을 만든 뒤 LAYER -> PLACED 배치로 나눠 보낸다(원본 행 테이블은 2026-10-12 제거).
     /// 2026-10-02: 리비전 관리 없음. Map은 Factory + Device당 1개(TQP_GDS_MAP)이고 다시 등록하려면 DeleteMap 후 등록한다.
     /// 이번 단계는 Job 시작 / 조회 / 취소와 완료 배치 조회만 제공한다. 배치 업로드와 완료 확정은 다음 단계에서 추가한다.
@@ -27,16 +27,13 @@ namespace DACrux.SEMDMS.Interface
         /// <summary>Device의 GDS 데이터(헤더 / Layer / 배치 도형 / 저장 작업 / Chain)를 모두 삭제한다. 반환: 지운 배치 도형 수</summary>
         int DeleteMap(string strFactory, string strDeviceID, string strUpdateUser);
 
-        #endregion
-
-        #region [TQP_GDS_MAP_SUB_DEVICE]
-
         /// <summary>
-        /// 대표 Device(Map)의 Sub Device 목록을 통째로 바꾼다(2026-10-12, 기존 삭제 후 일괄 등록).
-        /// aSubDeviceIDs / aRemarks 는 같은 길이(aRemarks 는 null 가능). 대표 자신과 빈 값은 빼고 저장한다.
-        /// 오류: 대표 Map 없음 / 대소문자만 다른 중복 / 다른 대표에 등록된 Sub / 다른 Map의 대표 Device 이름. 반환: 저장한 Sub 수
+        /// 저장이 끝난(READY) Map 을 새 Device 이름으로 복사한다(2026-10-15). Map 헤더 / Layer / 배치 도형 / 저장 작업 건수 / Chain 전체를 복사하고
+        /// Chain 은 새 Chain 번호를 받는다(Code / 이름 / 색은 그대로). E-Test / KLARF 데이터는 복사하지 않는다.
+        /// 오류: 원본 없음 / 원본 READY 아님 / 새 이름이 원본과 같음 / 이미 있는 Device(대소문자 무시). 중간에 실패하면 새 Device 데이터를 지운다.
+        /// 반환 1행: TARGET_DEVICE_ID / LAYER_COUNT / PLACED_COUNT / CHAIN_COUNT
         /// </summary>
-        int SaveSubDeviceList(string strFactory, string strDeviceID, string[] aSubDeviceIDs, string[] aRemarks, string strUpdateUser);
+        DataTable CopyMap(string strFactory, string strSourceDeviceID, string strTargetDeviceID, string strUser);
 
         #endregion
 
@@ -78,7 +75,8 @@ namespace DACrux.SEMDMS.Interface
         #region [TQP_GDS_LAYER]
 
         /// <summary>
-        /// Layer 배치 하나를 저장한다. aParas 열: 0 LAYER_ID / 1 COLOR_ARGB / 2 DISPLAY_NAME (Factory / Device는 서버가 작업에서 채운다)
+        /// Layer 배치 하나를 저장한다. aParas 열: 0 LAYER_ID / 1 DATA_TYPE / 2 COLOR_ARGB / 3 DISPLAY_NAME (Factory / Device는 서버가 작업에서 채운다)
+        /// Layer 는 번호 + DataType(TEXT 는 TEXTTYPE) 단위다. 예전 3열(LAYER_ID / COLOR_ARGB / DISPLAY_NAME)은 DATA_TYPE 0 으로 저장한다 (2026-10-20).
         /// 같은 (Job, LAYER, 번호) 배치가 이미 저장되어 있으면 내용(서버 계산 해시)이 같을 때 0을 반환하고, 다르면 오류다.
         /// 반환: 이번 호출에서 저장 처리한 행 수
         /// </summary>

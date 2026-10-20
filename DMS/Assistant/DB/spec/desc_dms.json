@@ -1,0 +1,1309 @@
+{
+ "tables": {
+  "TQD_COLORBYSIZE": {
+   "desc": "사용자별 Defect Size(DSIZE) 구간 표시 색 설정",
+   "basis": "소스",
+   "used_by": "Defect Coloring 화면 / Defect Map Viewer / Chart Analysis Size 구간"
+  },
+  "TQD_DATA_MAINT_HIS": {
+   "desc": "Defect Data Maint 변경 / 삭제 이력 (처리 1건 = 1행)",
+   "basis": "소스",
+   "used_by": "Defect Data Maint 화면 (이력 저장 / 조회)"
+  },
+  "TQD_DEFECT": {
+   "desc": "Defect 1건 (KLARF DefectList 1행) 의 좌표 / 크기 / 분류",
+   "basis": "소스",
+   "used_by": "KLARF 자동 적재 / Review 적재 / KLARF 업로드 / Defect Map Viewer / Gallery / Chart / GDS Correlation"
+  },
+  "TQD_DEFECT_DIE": {
+   "desc": "YMS Test Die 와 같은 위치 Defect 의 매칭 결과 (Die x Defect)",
+   "basis": "소스",
+   "used_by": "YMS CP / PCM DataService 매칭 적재 / Killing Rate 리포트"
+  },
+  "TQD_DEFECT_GROUP": {
+   "desc": "Defect Class 그룹 기준정보",
+   "basis": "소스",
+   "used_by": "Defect Group Define 화면 / Defect Type Define 조회"
+  },
+  "TQD_DEFECT_TYPE": {
+   "desc": "Defect Class 기준정보 (CLASSNUMBER 별 이름 / 색 / 그룹)",
+   "basis": "소스",
+   "used_by": "Defect Type Define 화면 / Map Viewer Class 이름과 색 / Killing Rate / 설비 Defect Trend"
+  },
+  "TQD_IMAGES": {
+   "desc": "Defect 이미지 파일 1건 (원본 / 썸네일 경로)",
+   "basis": "소스",
+   "used_by": "KLARF / Review 적재 / KLARF 업로드 / Map Viewer 이미지 / Image Gallery / Data Maint 이미지 삭제"
+  },
+  "TQD_INSP_INFO": {
+   "desc": "검사 결과 요약 1건 (Step x Test), Lot / Wafer / Step 값을 펼친 형태",
+   "basis": "소스",
+   "used_by": "왼쪽 Wafer 조회 / Map Viewer / Gallery / Chart / DMS 리포트 / Review 매칭 / KLARF 업로드 / GDS Correlation"
+  },
+  "TQD_INSP_SUM": {
+   "desc": "Step 별 Defect 집계 (Random / Cluster / Size 구간 / New Defect)",
+   "basis": "소스",
+   "used_by": "KLARF 적재 (Step 12) / KLARF 업로드 / Data Maint / Data Sheet / 설비 Defect Trend"
+  },
+  "TQD_LOT": {
+   "desc": "Lot 기준정보 (Product + Lot ID)",
+   "basis": "소스",
+   "used_by": "KLARF 적재 / KLARF 업로드 / Data Maint Lot 변경 / 기존 등록 확인"
+  },
+  "TQD_PRODUCT": {
+   "desc": "Product(Device) 기준정보, 처음 적재된 KLARF 의 Wafer / Die 값",
+   "basis": "소스",
+   "used_by": "KLARF 적재 / KLARF 업로드 (Device 최초 등록) / Data Maint Product 복사"
+  },
+  "TQD_REVIEW_SUM": {
+   "desc": "Step 별 Defect Class(CLASSNUMBER) 개수 집계",
+   "basis": "소스",
+   "used_by": "Review DataService / Data Maint (생성만, 조회 쿼리 없음)"
+  },
+  "TQD_SETUP": {
+   "desc": "검사 Setup(Recipe) 별 Wafer / Die 좌표 기준 (KLARF SetupID 단위)",
+   "basis": "소스",
+   "used_by": "KLARF 적재 / KLARF 업로드 / Map 표시 (Map Viewer, GDS Correlation) / Origin Die Index 조회"
+  },
+  "TQD_SETUP_MAP": {
+   "desc": "Setup + Test 별 검사 Die 목록 (Die Index)",
+   "basis": "소스",
+   "used_by": "KLARF 적재 / KLARF 업로드 / Map 검사 Die 표시 / Defect Density / GDS Correlation"
+  },
+  "TQD_STEP": {
+   "desc": "검사 Step 1건 (KLARF 파일 1개 x Wafer 1장 의 헤더)",
+   "basis": "소스",
+   "used_by": "KLARF 적재 / Review 적재 / KLARF 업로드 / Data Maint / Inspection Detail 리포트"
+  },
+  "TQD_WAFER": {
+   "desc": "Wafer 기준정보 (Lot + Wafer ID / Slot)",
+   "basis": "소스",
+   "used_by": "KLARF 적재 / KLARF 업로드 / Data Maint (Lot 변경 시 WAFER_ID 갱신)"
+  }
+ },
+ "columns": {
+  "TQD_COLORBYSIZE": {
+   "USER_ID": [
+    "사용자 ID ('ADMIN' 행 = 공통 기본, 조회 시 본인 + ADMIN)",
+    "소스"
+   ],
+   "SIZE_SEQ": [
+    "Size 구간 순번 (사용자별)",
+    "소스"
+   ],
+   "SIZE_FROM": [
+    "구간 시작 Defect Size (DSIZE, um, 이상)",
+    "소스"
+   ],
+   "SIZE_TO": [
+    "구간 끝 Defect Size (DSIZE, um, 이하)",
+    "소스"
+   ],
+   "COLOR": [
+    "구간 표시 색 (HTML 색, 예 #FF0080)",
+    "소스"
+   ]
+  },
+  "TQD_DATA_MAINT_HIS": {
+   "TRAN_KEY": [
+    "처리 키 = 처리 시각 (SYSTIMESTAMP 'YYYYMMDDHH24MISSFF')",
+    "소스"
+   ],
+   "LOT_ID": [
+    "대상 Lot ID",
+    "소스"
+   ],
+   "PRODUCT": [
+    "대상 Product",
+    "소스"
+   ],
+   "STEP_ID": [
+    "대상 Step ID",
+    "소스"
+   ],
+   "SLOT_ID": [
+    "대상 Slot 번호 (Lot 변경 이력은 빈 값)",
+    "소스"
+   ],
+   "WAFER_ID": [
+    "대상 Wafer ID (Lot 변경 이력은 빈 값)",
+    "소스"
+   ],
+   "TRAN_USER": [
+    "처리 사용자 ID",
+    "소스"
+   ],
+   "TRAN_USER_IP": [
+    "처리 PC IP 주소",
+    "소스"
+   ],
+   "PREV_VALUE": [
+    "변경 전 값 (예 'Lot, Slot, WaferID, StepID, Product')",
+    "소스"
+   ],
+   "CURR_VALUE": [
+    "변경 후 값 또는 작업 이름 (Delete Wafer Base / Delete Lot Base 등)",
+    "소스"
+   ],
+   "PREV_STEP_SEQ": [
+    "변경 전 STEP_SEQ (여러 개면 쉼표 구분)",
+    "소스"
+   ],
+   "CURR_STEP_SEQ": [
+    "변경 후 STEP_SEQ (Wafer / Step 변경 시 새 번호)",
+    "소스"
+   ],
+   "USER_COMMENT": [
+    "사용자 입력 사유 (삭제는 'Data Delete :' + 사유)",
+    "소스"
+   ]
+  },
+  "TQD_DEFECT": {
+   "STEP_SEQ": [
+    "검사 Step 번호 (TQD_STEP.STEP_SEQ)",
+    "소스"
+   ],
+   "DEFECTID": [
+    "Defect ID (KLARF DEFECTID, Step 안에서 고유)",
+    "소스"
+   ],
+   "WAFER_SEQ": [
+    "Wafer 번호 (TQD_WAFER.WAFER_SEQ)",
+    "소스"
+   ],
+   "X": [
+    "Wafer 중심 기준 X 좌표 (um, XINDEX*DiePitch+XREL-SampleCenter)",
+    "소스"
+   ],
+   "Y": [
+    "Wafer 중심 기준 Y 좌표 (um, YINDEX*DiePitch+YREL-SampleCenter)",
+    "소스"
+   ],
+   "XREL": [
+    "Die 안 X 좌표 (um, KLARF XREL, Die 좌하단 기준)",
+    "소스"
+   ],
+   "YREL": [
+    "Die 안 Y 좌표 (um, KLARF YREL, Die 좌하단 기준)",
+    "소스"
+   ],
+   "XINDEX": [
+    "Defect Die X Index (좌하단 기준 = KLARF Index + Origin Die Index)",
+    "소스"
+   ],
+   "YINDEX": [
+    "Defect Die Y Index (좌하단 기준 = KLARF Index + Origin Die Index)",
+    "소스"
+   ],
+   "XSIZE": [
+    "Defect X 크기 (um, KLARF XSIZE)",
+    "소스"
+   ],
+   "YSIZE": [
+    "Defect Y 크기 (um, KLARF YSIZE)",
+    "소스"
+   ],
+   "DEFECTAREA": [
+    "Defect 면적 (um², KLARF DEFECTAREA)",
+    "소스"
+   ],
+   "DSIZE": [
+    "Defect 크기 (um, KLARF DSIZE)",
+    "소스"
+   ],
+   "CLASSNUMBER": [
+    "Defect Class 번호 (KLARF CLASSNUMBER, 0 = 미분류)",
+    "소스"
+   ],
+   "TEST": [
+    "검사 Test 번호 (KLARF TEST)",
+    "소스"
+   ],
+   "CLUSTERNUMBER": [
+    "Cluster 번호 (0 = Random, 설비 CMF03='Y' 면 적재 시 재계산)",
+    "소스"
+   ],
+   "ROUGHBINNUMBER": [
+    "Rough Bin 분류 코드 (KLARF ROUGHBINNUMBER)",
+    "소스"
+   ],
+   "FINEBINNUMBER": [
+    "Fine Bin 분류 코드 (KLARF FINEBINNUMBER)",
+    "소스"
+   ],
+   "REVIEWSAMPLE": [
+    "Review 대상 표시 (KLARF REVIEWSAMPLE, Review 적재 시 갱신)",
+    "소스"
+   ],
+   "IMAGECOUNT": [
+    "Defect 이미지 수 (적재 후 TQD_IMAGES 건수로 갱신)",
+    "소스"
+   ],
+   "ADDER": [
+    "New Defect 여부 (1 = 같은 Wafer 이전 Step 에 없던 위치, 허용오차 비교)",
+    "소스"
+   ],
+   "FIRST_STEP": [
+    "처음 발견된 Step (KLARF 같은 이름 항목만 저장, 로컬 값 없음)",
+    "이름 추정"
+   ],
+   "RETICLE_REPEAT_ID": [
+    "Reticle 반복 Defect ID (적재 값 0)",
+    "이름 추정"
+   ],
+   "DIE_REPEAT_ID": [
+    "Die 반복 Defect ID (적재 값 0)",
+    "이름 추정"
+   ],
+   "MAN_OPT_CLASS": [
+    "Optical 수동 분류 Class (적재 값 0)",
+    "이름 추정"
+   ],
+   "AUTO_OPT_CLASS": [
+    "Optical 자동 분류 Class (적재 값 0)",
+    "이름 추정"
+   ],
+   "MAN_SEM_CLASS": [
+    "SEM 수동 분류 Class (적재 값 0)",
+    "이름 추정"
+   ],
+   "AUTO_SEM_CLASS": [
+    "SEM 자동 분류 Class (적재 값 0)",
+    "이름 추정"
+   ],
+   "OLD_XINDEX": [
+    "변경 전 XINDEX (사용 소스 없음, 로컬 값 없음)",
+    "이름 추정"
+   ],
+   "OLD_YINDEX": [
+    "변경 전 YINDEX (사용 소스 없음, 로컬 값 없음)",
+    "이름 추정"
+   ],
+   "TEST_WAFER_SEQ": [
+    "연결 YMS Test Wafer 번호 (사용 소스 없음, 로컬 값 없음)",
+    "이름 추정"
+   ],
+   "DIE_NUM": [
+    "연결 YMS Die 번호 (사용 소스 없음, 로컬 값 없음)",
+    "이름 추정"
+   ]
+  },
+  "TQD_DEFECT_DIE": {
+   "TEST_WAFER_SEQ": [
+    "YMS Test Wafer 번호 (TQP_WAFER.WAFER_SEQ)",
+    "소스"
+   ],
+   "TEST_DIE_NUM": [
+    "YMS Die 번호 (Program Bin 테이블 DIE_NUM)",
+    "소스"
+   ],
+   "DM_STEP_SEQ": [
+    "DMS 검사 Step 번호 (TQD_INSP_INFO.STEP_SEQ, TEST 1)",
+    "소스"
+   ],
+   "DM_DEFECTID": [
+    "Defect ID (TQD_DEFECT.DEFECTID)",
+    "소스"
+   ],
+   "X": [
+    "YMS Die X 좌표 (Program Bin 테이블 X)",
+    "소스"
+   ],
+   "Y": [
+    "YMS Die Y 좌표 (Program Bin 테이블 Y)",
+    "소스"
+   ],
+   "BIN": [
+    "해당 Die 의 Test Bin",
+    "소스"
+   ],
+   "CLASSNUMBER": [
+    "Defect Class 번호 (TQD_DEFECT.CLASSNUMBER)",
+    "소스"
+   ]
+  },
+  "TQD_DEFECT_GROUP": {
+   "GROUP_ID": [
+    "Defect Group 번호",
+    "소스"
+   ],
+   "GROUP_NAME": [
+    "Defect Group 이름",
+    "소스"
+   ],
+   "DELETE_FLAG": [
+    "삭제 표시 (Y / N, 기본 N, Type 조회는 N 만 조인)",
+    "소스"
+   ],
+   "CREATE_USER": [
+    "생성 사용자 ID",
+    "소스"
+   ],
+   "CREATE_TIME": [
+    "생성 일시",
+    "소스"
+   ],
+   "UPDATE_USER": [
+    "수정 사용자 ID",
+    "소스"
+   ],
+   "UPDATE_TIME": [
+    "수정 일시",
+    "소스"
+   ]
+  },
+  "TQD_DEFECT_TYPE": {
+   "CLASSNUMBER": [
+    "Defect Class 번호 (KLARF CLASSNUMBER, 0 = Uncategorized)",
+    "소스"
+   ],
+   "NAME": [
+    "Class 이름 (화면 표시 '이름(번호)')",
+    "소스"
+   ],
+   "DESCRIPTION": [
+    "Class 설명",
+    "소스"
+   ],
+   "GROUP_ID": [
+    "Defect Group 번호 (TQD_DEFECT_GROUP.GROUP_ID, 기본 0)",
+    "소스"
+   ],
+   "DELETE_FLAG": [
+    "사용 안 함 표시 (Y / N, 기본 N, Class 목록은 N 만)",
+    "소스"
+   ],
+   "DEFECT_COLOR": [
+    "Map 표시 색 (#RRGGBB, 없으면 화면은 #FF0000)",
+    "소스"
+   ],
+   "CREATE_USER": [
+    "생성 사용자 ID",
+    "소스"
+   ],
+   "CREATE_TIME": [
+    "생성 일시",
+    "소스"
+   ],
+   "UPDATE_USER": [
+    "수정 사용자 ID",
+    "소스"
+   ],
+   "UPDATE_TIME": [
+    "수정 일시",
+    "소스"
+   ]
+  },
+  "TQD_IMAGES": {
+   "STEP_SEQ": [
+    "검사 Step 번호 (TQD_DEFECT.STEP_SEQ)",
+    "소스"
+   ],
+   "DEFECTID": [
+    "Defect ID (TQD_DEFECT.DEFECTID)",
+    "소스"
+   ],
+   "IMAGE_ID": [
+    "Defect 안 이미지 순번 (0부터, 기존 최대값 + 1)",
+    "소스"
+   ],
+   "WAFER_SEQ": [
+    "Wafer 번호 (TQD_WAFER.WAFER_SEQ)",
+    "소스"
+   ],
+   "TEST": [
+    "검사 Test 번호 (Defect 의 TEST)",
+    "소스"
+   ],
+   "IMAGE_TYPE": [
+    "이미지 파일 확장자 (예 .jpg)",
+    "소스"
+   ],
+   "IMAGE_PATH": [
+    "이미지 폴더 경로 (FTP 상대 경로, 예 FTP/SCK/20261013/{Lot})",
+    "소스"
+   ],
+   "IMAGE_FILENAME": [
+    "이미지 파일명 (KLARF TiffFileName)",
+    "소스"
+   ],
+   "IMAGE_SERVER": [
+    "이미지 서버 (적재 시 ' ' 고정)",
+    "소스"
+   ],
+   "THUMB_PATH": [
+    "썸네일 폴더 경로 (IMAGE_PATH 와 같음)",
+    "소스"
+   ],
+   "THUMB_FILENAME": [
+    "썸네일 파일명 ('thumb_' + 이미지 파일명)",
+    "소스"
+   ],
+   "UPLOAD": [
+    "적재 경로 (INSP 검사 / REVIEW 리뷰 / UPLOAD KLARF 업로드)",
+    "소스"
+   ]
+  },
+  "TQD_INSP_INFO": {
+   "STEP_SEQ": [
+    "검사 Step 번호 (TQD_STEP.STEP_SEQ)",
+    "소스"
+   ],
+   "WAFER_SEQ": [
+    "Wafer 번호 (TQD_WAFER.WAFER_SEQ)",
+    "소스"
+   ],
+   "RESULTTIMESTAMP": [
+    "검사 시각 (KLARF ResultTimestamp), Wafer 조회 기간 기준",
+    "소스"
+   ],
+   "FILETIMESTAMP": [
+    "KLARF 파일 생성 시각 (KLARF FileTimestamp)",
+    "소스"
+   ],
+   "FACTORY": [
+    "Factory (적재 서비스 설정 FACTORY / 업로드는 로그인 Factory)",
+    "소스"
+   ],
+   "TECHNOLOGY": [
+    "Technology (적재 시 'NONE' 고정)",
+    "소스"
+   ],
+   "PRODUCT": [
+    "Product = KLARF DeviceID (TQD_PRODUCT.PRODUCT 와 같은 값)",
+    "소스"
+   ],
+   "LOT_ID": [
+    "Lot ID (TQD_LOT.LOT_ID 와 같은 값)",
+    "소스"
+   ],
+   "WAFER_ID": [
+    "Wafer ID ({LOT_ID}-{Slot 2자리}, TQD_WAFER.WAFER_ID 와 같은 값)",
+    "소스"
+   ],
+   "STEP_ID": [
+    "검사 Step ID (TQD_STEP.STEP_ID 와 같은 값)",
+    "소스"
+   ],
+   "TEST": [
+    "검사 Test 번호 (KLARF InspectionTest, Test 마다 1행)",
+    "소스"
+   ],
+   "SLOT_ID": [
+    "Slot 번호 (KLARF Slot)",
+    "소스"
+   ],
+   "SETUP_SEQ": [
+    "Setup 번호 (TQD_SETUP.SETUP_SEQ)",
+    "소스"
+   ],
+   "STATUS": [
+    "적재 / 마지막 변경 처리 시각 (yyyyMMddHHmmss 문자열)",
+    "소스"
+   ],
+   "MAIN_EQ": [
+    "공정 설비 ID (옛 KtoD 는 MES 이력, DataService 는 검사 설비)",
+    "소스"
+   ],
+   "ROUTE": [
+    "MES Route (옛 KtoD 만 MES 이력에서 채움, DataService 빈 값)",
+    "소스"
+   ],
+   "OPER": [
+    "MES Operation (옛 KtoD 만 MES MAIN_OPER, DataService 빈 값)",
+    "소스"
+   ],
+   "INSPECTION_EQ": [
+    "검사 설비 ID (적재 Handler 의 TQC_EQUIP 설비, 업로드는 화면 값)",
+    "소스"
+   ],
+   "INSPECTION_PARAM": [
+    "KLARF DefectRecordSpec 항목 이름 목록 (쉼표 구분)",
+    "소스"
+   ],
+   "DEFECTS": [
+    "해당 Test 의 Defect 수",
+    "소스"
+   ],
+   "CLASSIFIED_DEFECTS": [
+    "분류된 Defect 수 (CLASSNUMBER > 0, Review 적재 시 재계산)",
+    "소스"
+   ],
+   "KILLER_DEFECTS": [
+    "Killer Defect 수 (적재 시 0 고정)",
+    "이름 추정"
+   ],
+   "RANDOM_DEFECTS": [
+    "Random Defect 수 (CLUSTERNUMBER = 0)",
+    "소스"
+   ],
+   "ADDER_KILLER_DEFECT": [
+    "New Killer Defect 수 (적재 시 0 고정)",
+    "이름 추정"
+   ],
+   "ADDER_RANDOM_DEFECT": [
+    "New(ADDER > 0) Random Defect 수",
+    "소스"
+   ],
+   "CLUSTERS": [
+    "Cluster 에 속한 Defect 수 (CLUSTERNUMBER > 0, 그룹 수 아님)",
+    "소스"
+   ],
+   "ADDER_CLUSTERS": [
+    "New Cluster Defect 수",
+    "소스"
+   ],
+   "CLUSTER_AREA": [
+    "Cluster Defect 면적 합 (um², DEFECTAREA 합)",
+    "소스"
+   ],
+   "DEFECT_DD": [
+    "Defect Density (Defect 수 / 검사 면적 cm²)",
+    "소스"
+   ],
+   "KILLER_DEFECT_DD": [
+    "Killer Defect Density (적재 시 0 고정)",
+    "이름 추정"
+   ],
+   "RANDOM_DEFECT_DD": [
+    "Random Defect 면적 합(um²) / 검사 면적(cm²)",
+    "소스"
+   ],
+   "INSPECTED_DIE": [
+    "검사 Die 수 (KLARF SampleTestPlan Die 개수)",
+    "소스"
+   ],
+   "DEFECTIVE_DIE": [
+    "Defect 가 있는 Die 수 (XINDEX, YINDEX 고유 개수)",
+    "소스"
+   ],
+   "ADDER_DEF_DIE": [
+    "New Defect Die 수 (적재 시 0 고정)",
+    "이름 추정"
+   ],
+   "KILL_DEF_DIE": [
+    "Killer Defect Die 수 (적재 시 0 고정)",
+    "이름 추정"
+   ],
+   "KILL_ADDER_DEF_DIE": [
+    "New Killer Defect Die 수 (적재 시 0 고정)",
+    "이름 추정"
+   ],
+   "IMAGES": [
+    "Defect 이미지 수 (자동 적재 0, Review 적재 / 업로드 시 TQD_IMAGES 건수)",
+    "소스"
+   ],
+   "SCAN_AREA": [
+    "검사 면적 (cm², KLARF AreaPerTest um² / 1e8)",
+    "소스"
+   ],
+   "ADDER_DEFECTS": [
+    "New Defect 수 (ADDER > 0)",
+    "소스"
+   ],
+   "KILL_RND_DEFECTS": [
+    "Killer Random Defect 수 (적재 시 0 고정)",
+    "이름 추정"
+   ],
+   "COMMENT": [
+    "적재 구분 (Parser 자동 적재 / Upload KLARF 업로드 / Maint Update)",
+    "소스"
+   ],
+   "RETICLE_ID": [
+    "Reticle ID (옛 KtoD 만 MES 이력에서 채움)",
+    "소스"
+   ],
+   "INTERLOCK_FLAG": [
+    "설비 Interlock 표시 (옛 KtoD Interlock 검사용, 현재 빈 값)",
+    "소스"
+   ],
+   "STEPPER_EQ": [
+    "노광(Stepper) 설비 ID (옛 KtoD 만 MES 이력에서 채움)",
+    "소스"
+   ],
+   "SUMMARY_FLAG": [
+    "요약 처리 표시 (용도 미확인, 업로드는 ' ')",
+    "이름 추정"
+   ]
+  },
+  "TQD_INSP_SUM": {
+   "STEP_SEQ": [
+    "검사 Step 번호 (TQD_STEP.STEP_SEQ)",
+    "소스"
+   ],
+   "TOTALDEFECT": [
+    "Step 전체 Defect 수",
+    "소스"
+   ],
+   "TOTALCLUSTER": [
+    "Cluster 그룹 수 (CLUSTERNUMBER > 0 고유 개수)",
+    "소스"
+   ],
+   "TOTALRANDOM": [
+    "Random Defect 수 + Cluster 그룹 수 (Cluster 는 1개로 셈)",
+    "소스"
+   ],
+   "TOTAL0_5UM": [
+    "전체 Defect 중 DSIZE/10 0.5 이하 인 수",
+    "소스"
+   ],
+   "TOTAL0_7UM": [
+    "전체 Defect 중 DSIZE/10 0.5 초과 0.7 이하 인 수",
+    "소스"
+   ],
+   "TOTAL1UM": [
+    "전체 Defect 중 DSIZE/10 0.7 초과 1 이하 인 수",
+    "소스"
+   ],
+   "TOTAL2UM": [
+    "전체 Defect 중 DSIZE/10 1 초과 2 이하 인 수",
+    "소스"
+   ],
+   "TOTAL3UM": [
+    "전체 Defect 중 DSIZE/10 2 초과 3 이하 인 수",
+    "소스"
+   ],
+   "TOTAL4UM": [
+    "전체 Defect 중 DSIZE/10 3 초과 4 이하 인 수",
+    "소스"
+   ],
+   "TOTAL5UM": [
+    "전체 Defect 중 DSIZE/10 4 초과 5 이하 인 수",
+    "소스"
+   ],
+   "TOTAL6UM": [
+    "전체 Defect 중 DSIZE/10 5 초과 6 이하 인 수",
+    "소스"
+   ],
+   "TOTAL7UM": [
+    "전체 Defect 중 DSIZE/10 6 초과 7 이하 인 수",
+    "소스"
+   ],
+   "TOTALOS": [
+    "전체 Defect 중 DSIZE/10 7 초과 (Over Size) 인 수",
+    "소스"
+   ],
+   "TOTALRANDOM0_5UM": [
+    "전체 Random Defect 중 DSIZE/10 0.5 이하 인 수",
+    "소스"
+   ],
+   "TOTALRANDOM0_7UM": [
+    "전체 Random Defect 중 DSIZE/10 0.5 초과 0.7 이하 인 수",
+    "소스"
+   ],
+   "TOTALRANDOM1UM": [
+    "전체 Random Defect 중 DSIZE/10 0.7 초과 1 이하 인 수",
+    "소스"
+   ],
+   "TOTALRANDOM2UM": [
+    "전체 Random Defect 중 DSIZE/10 1 초과 2 이하 인 수",
+    "소스"
+   ],
+   "TOTALRANDOM3UM": [
+    "전체 Random Defect 중 DSIZE/10 2 초과 3 이하 인 수",
+    "소스"
+   ],
+   "TOTALRANDOM4UM": [
+    "전체 Random Defect 중 DSIZE/10 3 초과 4 이하 인 수",
+    "소스"
+   ],
+   "TOTALRANDOM5UM": [
+    "전체 Random Defect 중 DSIZE/10 4 초과 5 이하 인 수",
+    "소스"
+   ],
+   "TOTALRANDOM6UM": [
+    "전체 Random Defect 중 DSIZE/10 5 초과 6 이하 인 수",
+    "소스"
+   ],
+   "TOTALRANDOM7UM": [
+    "전체 Random Defect 중 DSIZE/10 6 초과 7 이하 인 수",
+    "소스"
+   ],
+   "TOTALRANDOMOS": [
+    "전체 Random Defect 중 DSIZE/10 7 초과 (Over Size) 인 수",
+    "소스"
+   ],
+   "TOTALRETICLE": [
+    "전체 Reticle Defect 수 (적재 시 NULL)",
+    "이름 추정"
+   ],
+   "TOTALNONRETICLE": [
+    "전체 Non-Reticle Defect 수 (적재 시 NULL)",
+    "이름 추정"
+   ],
+   "TOTALRANDOMRETICLE": [
+    "전체 Random Reticle Defect 수 (적재 시 NULL)",
+    "이름 추정"
+   ],
+   "TOTALDEFECTDIE": [
+    "전체 Defect 가 있는 Die 수",
+    "소스"
+   ],
+   "TOTALRANDOMDIE": [
+    "전체 Random Defect 가 있는 Die 수",
+    "소스"
+   ],
+   "TOTALCLUSTERDIE": [
+    "전체 Cluster Defect 가 있는 Die 수",
+    "소스"
+   ],
+   "NEWDEFECT": [
+    "New(ADDER=1) Defect 수",
+    "소스"
+   ],
+   "NEWCLUSTER": [
+    "New Defect 의 Cluster 그룹 수",
+    "소스"
+   ],
+   "NEWRANDOM": [
+    "New Random Defect 수 + New Cluster 그룹 수",
+    "소스"
+   ],
+   "NEW0_5UM": [
+    "New(ADDER=1) Defect 중 DSIZE/10 0.5 이하 인 수",
+    "소스"
+   ],
+   "NEW0_7UM": [
+    "New(ADDER=1) Defect 중 DSIZE/10 0.5 초과 0.7 이하 인 수",
+    "소스"
+   ],
+   "NEW1UM": [
+    "New(ADDER=1) Defect 중 DSIZE/10 0.7 초과 1 이하 인 수",
+    "소스"
+   ],
+   "NEW2UM": [
+    "New(ADDER=1) Defect 중 DSIZE/10 1 초과 2 이하 인 수",
+    "소스"
+   ],
+   "NEW3UM": [
+    "New(ADDER=1) Defect 중 DSIZE/10 2 초과 3 이하 인 수",
+    "소스"
+   ],
+   "NEW4UM": [
+    "New(ADDER=1) Defect 중 DSIZE/10 3 초과 4 이하 인 수",
+    "소스"
+   ],
+   "NEW5UM": [
+    "New(ADDER=1) Defect 중 DSIZE/10 4 초과 5 이하 인 수",
+    "소스"
+   ],
+   "NEW6UM": [
+    "New(ADDER=1) Defect 중 DSIZE/10 5 초과 6 이하 인 수",
+    "소스"
+   ],
+   "NEW7UM": [
+    "New(ADDER=1) Defect 중 DSIZE/10 6 초과 7 이하 인 수",
+    "소스"
+   ],
+   "NEWOS": [
+    "New(ADDER=1) Defect 중 DSIZE/10 7 초과 (Over Size) 인 수",
+    "소스"
+   ],
+   "NEWRANDOM0_5UM": [
+    "New(ADDER=1) Random Defect 중 DSIZE/10 0.5 이하 인 수",
+    "소스"
+   ],
+   "NEWRANDOM0_7UM": [
+    "New(ADDER=1) Random Defect 중 DSIZE/10 0.5 초과 0.7 이하 인 수",
+    "소스"
+   ],
+   "NEWRANDOM1UM": [
+    "New(ADDER=1) Random Defect 중 DSIZE/10 0.7 초과 1 이하 인 수",
+    "소스"
+   ],
+   "NEWRANDOM2UM": [
+    "New(ADDER=1) Random Defect 중 DSIZE/10 1 초과 2 이하 인 수",
+    "소스"
+   ],
+   "NEWRANDOM3UM": [
+    "New(ADDER=1) Random Defect 중 DSIZE/10 2 초과 3 이하 인 수",
+    "소스"
+   ],
+   "NEWRANDOM4UM": [
+    "New(ADDER=1) Random Defect 중 DSIZE/10 3 초과 4 이하 인 수",
+    "소스"
+   ],
+   "NEWRANDOM5UM": [
+    "New(ADDER=1) Random Defect 중 DSIZE/10 4 초과 5 이하 인 수",
+    "소스"
+   ],
+   "NEWRANDOM6UM": [
+    "New(ADDER=1) Random Defect 중 DSIZE/10 5 초과 6 이하 인 수",
+    "소스"
+   ],
+   "NEWRANDOM7UM": [
+    "New(ADDER=1) Random Defect 중 DSIZE/10 6 초과 7 이하 인 수",
+    "소스"
+   ],
+   "NEWRANDOMOS": [
+    "New(ADDER=1) Random Defect 중 DSIZE/10 7 초과 (Over Size) 인 수",
+    "소스"
+   ],
+   "NEWRETICLE": [
+    "New(ADDER=1) Reticle Defect 수 (적재 시 NULL)",
+    "이름 추정"
+   ],
+   "NEWNONRETICLE": [
+    "New(ADDER=1) Non-Reticle Defect 수 (적재 시 NULL)",
+    "이름 추정"
+   ],
+   "NEWRANDOMRETICLE": [
+    "New(ADDER=1) Random Reticle Defect 수 (적재 시 NULL)",
+    "이름 추정"
+   ],
+   "NEWDEFECTDIE": [
+    "New(ADDER=1) Defect 가 있는 Die 수",
+    "소스"
+   ],
+   "NEWRANDOMDIE": [
+    "New(ADDER=1) Random Defect 가 있는 Die 수",
+    "소스"
+   ],
+   "NEWCLUSTERDIE": [
+    "New(ADDER=1) Cluster Defect 가 있는 Die 수",
+    "소스"
+   ]
+  },
+  "TQD_LOT": {
+   "LOT_SEQ": [
+    "Lot 번호 (LOT_SEQ 시퀀스)",
+    "소스"
+   ],
+   "LOT_ID": [
+    "Lot ID (KLARF LotID 대문자, 자동 적재는 앞 'A' 제거)",
+    "소스"
+   ],
+   "PRODUCT": [
+    "Product (TQD_PRODUCT.PRODUCT)",
+    "소스"
+   ],
+   "COMMENT": [
+    "생성 경로 (Parser / Upload / Maint Update)",
+    "소스"
+   ]
+  },
+  "TQD_PRODUCT": {
+   "PRODUCT": [
+    "Product = KLARF DeviceID (업로드는 화면 Product)",
+    "소스"
+   ],
+   "FACTORY": [
+    "Factory (적재 서비스 설정 FACTORY / 업로드는 로그인 Factory)",
+    "소스"
+   ],
+   "TECHNOLOGY": [
+    "Technology (적재 시 'NONE' 고정)",
+    "소스"
+   ],
+   "NETDIE": [
+    "Net Die 수 (첫 KLARF 검사 Die 수, 업로드는 Map 사용 Die 수)",
+    "소스"
+   ],
+   "WAFER_SIZE": [
+    "Wafer 크기 (um, KLARF SampleSize mm x 1000)",
+    "소스"
+   ],
+   "ANGLE": [
+    "Orientation Mark 각도 (DOWN 0 / LEFT 90 / TOP 180 / RIGHT 270)",
+    "소스"
+   ],
+   "NOTCH_TYPE": [
+    "Orientation Mark 형태 (적재 시 'N' 고정, 'F' = Flat)",
+    "소스"
+   ],
+   "DIE_PITCH_X": [
+    "Die Pitch X (um, KLARF DiePitch)",
+    "소스"
+   ],
+   "DIE_PITCH_Y": [
+    "Die Pitch Y (um, KLARF DiePitch)",
+    "소스"
+   ],
+   "DIE_ORIGIN_X": [
+    "Origin Die Index X (KLARF 원점 Die 의 좌하단 기준 번호)",
+    "소스"
+   ],
+   "DIE_ORIGIN_Y": [
+    "Origin Die Index Y (KLARF 원점 Die 의 좌하단 기준 번호)",
+    "소스"
+   ],
+   "ORIGIN_X": [
+    "Wafer 중심 위치 X (um, KLARF SampleCenterLocation)",
+    "소스"
+   ],
+   "ORIGIN_Y": [
+    "Wafer 중심 위치 Y (um, KLARF SampleCenterLocation)",
+    "소스"
+   ],
+   "COMMENT": [
+    "생성 경로 (Parser / Upload / Maint Update)",
+    "소스"
+   ]
+  },
+  "TQD_REVIEW_SUM": {
+   "STEP_SEQ": [
+    "검사 Step 번호 (TQD_STEP.STEP_SEQ)",
+    "소스"
+   ],
+   "CAT*": [
+    "CLASSNUMBER n 인 Defect 수 (CATn, Cluster 는 1개, CAT0 은 0 고정)",
+    "소스"
+   ]
+  },
+  "TQD_SETUP": {
+   "SETUP_SEQ": [
+    "Setup 번호 (SETUP_SEQ 시퀀스)",
+    "소스"
+   ],
+   "SETUP_ID": [
+    "KLARF SetupID (검사 Recipe 이름, 로컬 DB 128자로 확대)",
+    "소스"
+   ],
+   "STEP_ID": [
+    "KLARF StepID 원문 (8자리 변환 없음)",
+    "소스"
+   ],
+   "SETUP_TIME": [
+    "KLARF SetupID 의 일시 (MM-DD-YY HH:MI:SS)",
+    "소스"
+   ],
+   "ANGLE": [
+    "Orientation Mark 각도 (DOWN 0 / LEFT 90 / TOP 180 / RIGHT 270)",
+    "소스"
+   ],
+   "WAFER_SIZE": [
+    "Wafer 크기 (um, KLARF SampleSize mm x 1000, 업로드는 Map Setup)",
+    "소스"
+   ],
+   "NOTCH_TYPE": [
+    "Orientation Mark 형태 (적재 시 'N' 고정, 'F' = Flat)",
+    "소스"
+   ],
+   "DIE_PITCH_X": [
+    "Die Pitch X (um, KLARF DiePitch, 업로드는 Map Setup)",
+    "소스"
+   ],
+   "DIE_PITCH_Y": [
+    "Die Pitch Y (um, KLARF DiePitch, 업로드는 Map Setup)",
+    "소스"
+   ],
+   "DIE_ORIGIN_X": [
+    "Origin Die Index X (좌하단 기준, Index 변환에 사용)",
+    "소스"
+   ],
+   "DIE_ORIGIN_Y": [
+    "Origin Die Index Y (좌하단 기준, Index 변환에 사용)",
+    "소스"
+   ],
+   "ORIGIN_X": [
+    "Wafer 중심 위치 X (um, KLARF SampleCenterLocation)",
+    "소스"
+   ],
+   "ORIGIN_Y": [
+    "Wafer 중심 위치 Y (um, KLARF SampleCenterLocation)",
+    "소스"
+   ],
+   "STREET_X": [
+    "Street(Scribe Line) 폭 X (적재 값 0, 갱신 호출 소스 없음)",
+    "이름 추정"
+   ],
+   "STREET_Y": [
+    "Street(Scribe Line) 폭 Y (적재 값 0, 갱신 호출 소스 없음)",
+    "이름 추정"
+   ]
+  },
+  "TQD_SETUP_MAP": {
+   "SETUP_SEQ": [
+    "Setup 번호 (TQD_SETUP.SETUP_SEQ)",
+    "소스"
+   ],
+   "TEST": [
+    "검사 Test 번호 (KLARF InspectionTest)",
+    "소스"
+   ],
+   "INDEX_X": [
+    "검사 Die X Index (좌하단 기준, KLARF SampleTestPlan)",
+    "소스"
+   ],
+   "INDEX_Y": [
+    "검사 Die Y Index (좌하단 기준, KLARF SampleTestPlan)",
+    "소스"
+   ]
+  },
+  "TQD_STEP": {
+   "STEP_SEQ": [
+    "검사 Step 번호 (STEP_SEQ 시퀀스), Defect 조회의 기준 키",
+    "소스"
+   ],
+   "TEST": [
+    "Test 번호 (자동 적재 1 고정, 옛 KtoD 는 KLARF InspectionTest)",
+    "소스"
+   ],
+   "WAFER_SEQ": [
+    "Wafer 번호 (TQD_WAFER.WAFER_SEQ)",
+    "소스"
+   ],
+   "STEP_ID": [
+    "검사 Step ID (KLARF StepID, 자동 적재는 8자리 아니면 SetupID '_' 뒤 값)",
+    "소스"
+   ],
+   "SLOT_ID": [
+    "Slot 번호 (KLARF Slot)",
+    "소스"
+   ],
+   "RESULT_ID": [
+    "결과 ID (자동 적재 / 업로드 = LotID, 옛 KtoD = KLARF ResultsID)",
+    "소스"
+   ],
+   "INSPECTION_EQ": [
+    "검사 설비 ID (적재 Handler 의 TQC_EQUIP 설비, 업로드는 화면 값)",
+    "소스"
+   ],
+   "REVIEW_EQ": [
+    "Review 설비 ID (Review KLARF 적재 시 기록, 기본 ' ')",
+    "소스"
+   ],
+   "SETUP_SEQ": [
+    "Setup 번호 (TQD_SETUP.SETUP_SEQ)",
+    "소스"
+   ],
+   "RESULTTIMESTAMP": [
+    "검사 시각 (KLARF ResultTimestamp), 기존 등록 판정 키 일부",
+    "소스"
+   ],
+   "FILETIMESTAMP": [
+    "KLARF 파일 생성 시각 (KLARF FileTimestamp)",
+    "소스"
+   ],
+   "MAIN_EQ": [
+    "공정 설비 ID (자동 적재는 검사 설비, 없으면 'UNKNOWN')",
+    "소스"
+   ],
+   "ROUTE": [
+    "MES Route (자동 적재 ' ')",
+    "소스"
+   ],
+   "OPER": [
+    "MES Operation (자동 적재 ' ')",
+    "소스"
+   ],
+   "SCAN_AREA": [
+    "검사 면적 (옛 KtoD 만 값, 자동 적재 -1, 실제 값은 INSP_INFO)",
+    "소스"
+   ],
+   "DEFECTIVE_DIE": [
+    "Defect Die 수 (옛 KtoD 만 값, 자동 적재 -1)",
+    "소스"
+   ],
+   "DEFECTS": [
+    "Defect 수 (옛 KtoD 만 값, 자동 적재 -1)",
+    "소스"
+   ],
+   "IMAGES": [
+    "이미지 수 (Review 적재 / 업로드 시 갱신, 기본 0)",
+    "소스"
+   ],
+   "DEFECT_DD": [
+    "Defect Density (옛 KtoD 만 값, 자동 적재 -1)",
+    "소스"
+   ],
+   "INSP_FILENAME": [
+    "검사 KLARF 파일명",
+    "소스"
+   ],
+   "INSP_FILEPATH": [
+    "KLARF 백업 폴더 FTP 상대 경로 (예 FTP/SCK/20261013/{Lot})",
+    "소스"
+   ],
+   "COMMENT": [
+    "적재 구분 (Parser / UPLOAD;USER=..;FILE=..;RAW_WAFER_ID=.. 등)",
+    "소스"
+   ],
+   "TEST_ORDER": [
+    "같은 Wafer + Step ID 재검사 순번 (최신 1, 이전일수록 증가)",
+    "소스"
+   ],
+   "REVIEW_FILENAME": [
+    "Review KLARF 파일명",
+    "소스"
+   ],
+   "REVIEW_FILEPATH": [
+    "Review KLARF 백업 폴더 FTP 상대 경로",
+    "소스"
+   ]
+  },
+  "TQD_WAFER": {
+   "WAFER_SEQ": [
+    "Wafer 번호 (WAFER_SEQ 시퀀스)",
+    "소스"
+   ],
+   "LOT_SEQ": [
+    "Lot 번호 (TQD_LOT.LOT_SEQ)",
+    "소스"
+   ],
+   "WAFER_ID": [
+    "DMS Wafer ID = {LOT_ID}-{Slot 2자리} (KLARF WaferID 원문 아님)",
+    "소스"
+   ],
+   "SLOT_ID": [
+    "Slot 번호 (KLARF Slot)",
+    "소스"
+   ],
+   "COMMENT": [
+    "비고 (CREATE_WAFER 가 빈 값 고정)",
+    "소스"
+   ]
+  }
+ },
+ "relations": [
+  {
+   "child": "TQD_LOT",
+   "child_cols": "PRODUCT",
+   "parent": "TQD_PRODUCT",
+   "parent_cols": "PRODUCT",
+   "note": "Lot 의 Product (TQD_STEP.xml CHECK_EXIST_WAFERID)"
+  },
+  {
+   "child": "TQD_WAFER",
+   "child_cols": "LOT_SEQ",
+   "parent": "TQD_LOT",
+   "parent_cols": "LOT_SEQ",
+   "note": "Lot 의 Wafer (CHECK_EXIST_WAFERID / TQD_WAFER.xml SELECT_WAFER_INFO_02)"
+  },
+  {
+   "child": "TQD_STEP",
+   "child_cols": "WAFER_SEQ",
+   "parent": "TQD_WAFER",
+   "parent_cols": "WAFER_SEQ",
+   "note": "Wafer 의 검사 Step (CHECK_EXIST_WAFERID / TQD_STEP_SUM.xml SELECT_STEP_INFO)"
+  },
+  {
+   "child": "TQD_STEP",
+   "child_cols": "SETUP_SEQ",
+   "parent": "TQD_SETUP",
+   "parent_cols": "SETUP_SEQ",
+   "note": "Step 의 Setup (InspectionDataService Step 1 / 6 이 같은 SETUP_SEQ 저장)"
+  },
+  {
+   "child": "TQD_STEP",
+   "child_cols": "INSPECTION_EQ",
+   "parent": "TQC_EQUIP",
+   "parent_cols": "EQUIP_ID",
+   "note": "검사 설비 (TQD_INSP_INFO.xml SELECT_INSP_DETAIL, UPPER(INSPECTION_EQ) 조인)"
+  },
+  {
+   "child": "TQD_INSP_INFO",
+   "child_cols": "STEP_SEQ, WAFER_SEQ",
+   "parent": "TQD_STEP",
+   "parent_cols": "STEP_SEQ, WAFER_SEQ",
+   "note": "Step 의 Test 별 요약 (TQD_INSP_INFO.xml SELECT_INSP_DETAIL / SELECT_LOT_INSP_INFO)"
+  },
+  {
+   "child": "TQD_INSP_INFO",
+   "child_cols": "SETUP_SEQ",
+   "parent": "TQD_SETUP",
+   "parent_cols": "SETUP_SEQ",
+   "note": "Map 좌표 기준 (SELECT_DMS_WAFER_INFO / TQD_SETUP.xml SELECT_SETUP_DUPLE)"
+  },
+  {
+   "child": "TQD_INSP_INFO",
+   "child_cols": "FACTORY, PRODUCT",
+   "parent": "TQP_MAPDEF",
+   "parent_cols": "FACTORY, MAPID",
+   "note": "Map Setup 정보, 외부 조인 (GET_INSP_INFO_MULTI_SEQ, SELECT_DMS_WAFER_INFO 는 PRODUCT 만)"
+  },
+  {
+   "child": "TQD_INSP_INFO",
+   "child_cols": "LOT_ID, WAFER_ID",
+   "parent": "TQP_WAFER_SUM",
+   "parent_cols": "LOT_ID, WAFER_ID",
+   "note": "YMS Wafer 수율 연결 (TQD_DEFECT_DIE.xml SELECT_DEFECT_DIE, Data Sheet 는 LOT_ID + SLOT_ID 외부 조인)"
+  },
+  {
+   "child": "TQD_SETUP_MAP",
+   "child_cols": "SETUP_SEQ",
+   "parent": "TQD_SETUP",
+   "parent_cols": "SETUP_SEQ",
+   "note": "Setup 의 검사 Die. Map 은 INSP_INFO 의 SETUP_SEQ + TEST 로 조회 (SELECT_X_Y / GET_DENSITY)"
+  },
+  {
+   "child": "TQD_DEFECT",
+   "child_cols": "STEP_SEQ",
+   "parent": "TQD_STEP",
+   "parent_cols": "STEP_SEQ",
+   "note": "Step 의 Defect 목록 (TQD_DEFECT.xml SELECT_LAST_WAFER_DEFECT)"
+  },
+  {
+   "child": "TQD_DEFECT",
+   "child_cols": "STEP_SEQ, WAFER_SEQ, TEST",
+   "parent": "TQD_INSP_INFO",
+   "parent_cols": "STEP_SEQ, WAFER_SEQ, TEST",
+   "note": "Test 별 Defect (UPDATE_INSP_INFO[REVIEW_PARSER] / TQD_IMAGES.xml GET_DEFECT_IMAGE_ALL)"
+  },
+  {
+   "child": "TQD_DEFECT",
+   "child_cols": "CLASSNUMBER",
+   "parent": "TQD_DEFECT_TYPE",
+   "parent_cols": "CLASSNUMBER",
+   "note": "Class 이름 / 색, 외부 조인 (TQD_DEFECT.xml SELECT_DEFECT_MULTI)"
+  },
+  {
+   "child": "TQD_DEFECT_TYPE",
+   "child_cols": "GROUP_ID",
+   "parent": "TQD_DEFECT_GROUP",
+   "parent_cols": "GROUP_ID",
+   "note": "Class 의 그룹, 외부 조인 (TQD_DEFECT_TYPE.xml SELECT_DEFECT_BY_TYPE)"
+  },
+  {
+   "child": "TQD_IMAGES",
+   "child_cols": "STEP_SEQ, DEFECTID",
+   "parent": "TQD_DEFECT",
+   "parent_cols": "STEP_SEQ, DEFECTID",
+   "note": "Defect 의 이미지 (TQD_IMAGES.xml SELECT_DEFECT_INFO / TQD_DEFECT.xml UPDATE_IMAGECOUNT)"
+  },
+  {
+   "child": "TQD_INSP_SUM",
+   "child_cols": "STEP_SEQ",
+   "parent": "TQD_STEP",
+   "parent_cols": "STEP_SEQ",
+   "note": "TQD_DEFECT 를 STEP_SEQ 로 집계 (INSERT_DATA), 조회는 TQD_INSP_INFO 와 STEP_SEQ 조인 (GET_DATASHEET_01)"
+  },
+  {
+   "child": "TQD_REVIEW_SUM",
+   "child_cols": "STEP_SEQ",
+   "parent": "TQD_STEP",
+   "parent_cols": "STEP_SEQ",
+   "note": "TQD_DEFECT 를 STEP_SEQ 로 Class 별 집계 (TQD_REVIEW_SUM.XML INSERT_DATA)"
+  },
+  {
+   "child": "TQD_DEFECT_DIE",
+   "child_cols": "DM_STEP_SEQ, DM_DEFECTID",
+   "parent": "TQD_DEFECT",
+   "parent_cols": "STEP_SEQ, DEFECTID",
+   "note": "매칭된 Defect (TQD_DEFECT_DIE.xml INSERT_DATA)"
+  },
+  {
+   "child": "TQD_DEFECT_DIE",
+   "child_cols": "DM_STEP_SEQ",
+   "parent": "TQD_STEP",
+   "parent_cols": "STEP_SEQ",
+   "note": "검사 Step (TQD_STEP.xml SELECT_TST_BIN_INFO, SELECT_DEFECT_DIE 는 TQD_INSP_INFO 와 조인)"
+  },
+  {
+   "child": "TQD_DEFECT_DIE",
+   "child_cols": "TEST_WAFER_SEQ",
+   "parent": "TQP_WAFER",
+   "parent_cols": "WAFER_SEQ",
+   "note": "YMS Test Wafer (INSERT_DATA, SELECT_TST_BIN_INFO 는 TQP_WAFER_SUM.WAFER_SEQ 와 조인)"
+  }
+ ],
+ "report_notes": [
+  "적재 경로가 셋이다: 자동 적재(Inspection DataService) / 옛 경로 KtoD / KLARF 업로드 화면. TQD_STEP.RESULT_ID 는 자동 적재 / 업로드 = LotID, KtoD = KLARF ResultsID 이고, MAIN_EQ / ROUTE / OPER / RETICLE_ID / STEPPER_EQ 는 KtoD 만 MES Lot 이력에서 채운다.",
+  "TQD_STEP 의 SCAN_AREA / DEFECTIVE_DIE / DEFECTS / DEFECT_DD 는 자동 적재가 -1 로 넣는다. 실제 값은 TQD_INSP_INFO 에 있다.",
+  "TQD_INSP_INFO 의 KILLER / KILL 계열 컬럼은 모든 적재 경로에서 0 고정이다. CLUSTERS 는 Cluster 그룹 수가 아니라 Cluster 에 속한 Defect 수, RANDOM_DEFECT_DD 는 Random Defect 면적 합 / 검사 면적이다.",
+  "TQD_INSP_SUM 의 Size 구간은 DSIZE/10 기준이다 (예: TOTAL0_5UM = DSIZE/10 <= 0.5). DSIZE 단위가 um 이라 실제 경계는 컬럼 이름의 10배다.",
+  "TQD_REVIEW_SUM 은 Review DataService 가 만들기만 하고 읽는 쿼리가 없다 (로컬 0건).",
+  "TQD_WAFER.WAFER_ID 는 KLARF WaferID 원문이 아니라 {LOT_ID}-{Slot 2자리} 다.",
+  "TQD_SETUP.SETUP_ID 는 로컬 DB 에서 VARCHAR2(128) 로 늘렸다 (2026-10-07, 고객 KLARF SetupID 46자). 고객 DB 에도 같은 변경이 필요하다."
+ ]
+}

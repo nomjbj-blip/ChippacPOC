@@ -7,7 +7,7 @@ namespace DACrux.SEMDMS.Interface
 {
     /// <summary>
     /// GDS Map Setup 화면에서 만든 Chain을 DB에 저장 / 조회 / 삭제하는 원격 호출 계약이다.
-    /// 설계: 문서/2026-10-06_GDS_Chain_DB저장_설계.md 10.1절
+    /// 설계: 문서/설계/02_GDS/2026-10-06_GDS_Chain_DB저장_설계.md 10.1절
     /// 2026-10-06 결정: 버전 이력 없음(VERSION_NO는 항상 1, 저장 = 덮어쓰기) / 삭제는 실제 삭제.
     /// 저장 순서: BeginChainSave(헤더 / Layer / 규칙, 기존 내용 삭제) -> CreateChainMemberBatch / CreateChainEditBatch -> CompleteChainSave
     /// 문장마다 자동 Commit이며, 확정 전에는 VERSION_STATUS = DRAFT로 남아 "저장 미완료"로 구분한다.
@@ -34,8 +34,9 @@ namespace DACrux.SEMDMS.Interface
         /// Chain 저장을 시작한다. Device Map이 READY여야 한다.
         /// ChainInfo 순서: 0 Factory / 1 Device ID / 2 Chain Seq(신규면 빈 값) / 3 Chain Code / 4 Chain 이름 / 5 색상 ARGB /
         ///                 6 Layer 규칙 적용(0/1) / 7 격자 크기 / 8 User
-        /// aLayers 열: 0 LAYER_ID (탐색 Layer, 1행 이상)
-        /// aRules 열: 0 FIRST_LAYER_ID / 1 SECOND_LAYER_ID / 2 TOLERANCE(G17) (없으면 null 또는 0행)
+        /// aLayers 열: 0 LAYER_ID / 1 DATA_TYPE (탐색 Layer, 1행 이상)
+        /// aRules 열: 0 FIRST_LAYER_ID / 1 FIRST_DATA_TYPE / 2 SECOND_LAYER_ID / 3 SECOND_DATA_TYPE / 4 TOLERANCE(G17) (없으면 null 또는 0행)
+        ///   Layer 는 번호 + DataType 단위다. 예전 열 수(aLayers 1열 / aRules 3열)는 DataType 0 으로 저장한다 (2026-10-20).
         /// 처리: 신규면 Chain 생성(시퀀스), 기존이면 이전 저장 내용을 지우고 VERSION 1을 DRAFT로 다시 만든 뒤 Layer / 규칙을 저장한다.
         /// 반환 1행: CHAIN_SEQ / CHAIN_CODE
         /// </summary>
@@ -68,10 +69,10 @@ namespace DACrux.SEMDMS.Interface
 
         #region [Chain 상세 조회]
 
-        /// <summary>Chain 탐색 Layer. 반환 열: LAYER_ID</summary>
+        /// <summary>Chain 탐색 Layer. 반환 열: LAYER_ID / DATA_TYPE (2026-10-20 DATA_TYPE 추가)</summary>
         DataTable GetChainLayers(string strFactory, string strDeviceID, string strChainSeq);
 
-        /// <summary>Chain Layer 연결 규칙. 반환 열: FIRST_LAYER_ID / SECOND_LAYER_ID / TOLERANCE</summary>
+        /// <summary>Chain Layer 연결 규칙. 반환 열: FIRST_LAYER_ID / FIRST_DATA_TYPE / SECOND_LAYER_ID / SECOND_DATA_TYPE / TOLERANCE (2026-10-20 DataType 추가)</summary>
         DataTable GetChainRules(string strFactory, string strDeviceID, string strChainSeq);
 
         /// <summary>Chain 포함 도형. 반환 열: PLACED_ELEMENT_ID / ROLE_CODE / INCLUSION_SOURCE / MARKER_X / MARKER_Y</summary>

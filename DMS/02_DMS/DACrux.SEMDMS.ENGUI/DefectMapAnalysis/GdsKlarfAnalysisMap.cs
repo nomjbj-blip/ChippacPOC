@@ -8,7 +8,7 @@ namespace DACrux.SEMDMS.ENGUI
 {
     /// <summary>
     /// GDS × KLARF 연관 분석 화면(frmGdsKlarfAnalysis) 전용 Wafer Map 이다.
-    /// 설계: 문서/2026-10-12_GDS_KLARF_연관분석_화면_설계.md 4.4 / 4.5절
+    /// 설계: 문서/설계/05_연관분석/2026-10-12_GDS_KLARF_연관분석_화면_설계.md 4.4 / 4.5절
     ///
     /// Wafer / Die / Defect 그리기, 확대 / 이동 / 기본 메뉴는 기존 DefectMap(KlarfDefectMap)을 그대로 쓰고 아래만 더한다.
     /// 1. Die 채움색: 서버 분석 결과(Die 안 Chain 영역 Defect 수)를 구간 색으로 칠한다.
@@ -17,8 +17,9 @@ namespace DACrux.SEMDMS.ENGUI
     /// 2. Die 안 숫자(Chain 영역 Defect 수): Map 을 다 그린 뒤(e == null) 덧그린다(KlarfDefectMap 의 Index 라벨과 같은 방식).
     /// 3. Die 클릭 / 더블클릭 이벤트: 기존 DefectMap 은 Die 더블클릭 이벤트가 없고 Defect 배열만 보내므로 현재 Die Index 로 따로 알린다.
     /// 4. 우클릭 메뉴(설계 14.2 / 14.3절, 2026-10-12 요청): 우클릭하면 커서 아래 Chip 을 먼저 선택하고, 메뉴는
-    ///    Free Zoom / Fit Size / Defect Select / Die Select / Center Cross(2026-10-13) / Detail Analysis(신규) 만 보인다. 기존 메뉴(WaferMap 의 protected ctxmWaferMap)는
+    ///    Free Zoom / Fit Size / Center Cross(2026-10-13) / Detail Analysis(신규) 만 보인다(Defect / Die Select 는 2026-10-16 제거, 기본 Die 선택). 기존 메뉴(WaferMap 의 protected ctxmWaferMap)는
     ///    수정하지 않고 Popup 때 표시 여부만 바꾼다(06_CoreLibSource 수정 금지). DefectMap 항목 필드가 private 이라 Text 로 구분한다.
+    /// 5. E-Test Fail Die 표식(2026-10-16): Die 왼쪽 위 모서리 빨간 삼각형. 선택 Die 빨간 테두리와 겹치지 않게 테두리 대신 모서리에 그린다.
     /// </summary>
     public class GdsKlarfAnalysisMap : KlarfDefectMap
     {
@@ -31,10 +32,13 @@ namespace DACrux.SEMDMS.ENGUI
         /// <summary>우클릭 메뉴 [Detail Analysis] 를 눌렀다. 인자: 선택한 Chip(Die Index).</summary>
         public event EventHandler<GdsKlarfDieEventArgs> DetailAnalysisRequested;
 
-        /// <summary>우클릭 메뉴에서 보이게 둘 기존 항목(Text).</summary>
+        /// <summary>
+        /// 우클릭 메뉴에서 보이게 둘 기존 항목(Text).
+        /// Defect Select / Die Select 는 2026-10-16 요청으로 뺐다. 화면이 처음부터 Die 선택 모드로 둔다(frmGdsKlarfAnalysis.ShowWafer).
+        /// </summary>
         private static readonly HashSet<string> VisibleMenuTexts = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
-            "Free Zoom", "Fit Size", "Defect Select", "Die Select"
+            "Free Zoom", "Fit Size"
         };
 
         private readonly MenuItem _detailSeparator;
@@ -49,6 +53,26 @@ namespace DACrux.SEMDMS.ENGUI
 
         /// <summary>Die 안에 쓸 숫자(Chain 영역 Defect 수). Defect 가 있는 Die 만 넣는다.</summary>
         private readonly Dictionary<Point, int> _dieLabel = new Dictionary<Point, int>();
+
+        /// <summary>
+        /// E-Test 표식 (2026-10-16 통합 분석 설계 8.1절, 2026-10-20 두 가지로 나눔: 문서/설계/05_연관분석/2026-10-20_Map_ETest_표식_설계.md).
+        /// 색 기준과 상관없이 모서리에 그린다. 선택 Die 의 빨간 테두리 / 가운데 숫자와 겹치지 않게 모서리 표식만 쓴다.
+        ///  Spec Out(DMS Spec 판정 F) = 왼쪽 위 빨간 삼각형(두 변의 35%)
+        ///  Fail Die(결과 파일 DUT Flag F) = 오른쪽 아래 작은 남색 삼각형(22%). 결과 파일 Fail 이 대부분인 Wafer 도 Map 을 덮지 않게 작게 둔다.
+        /// 둘 다 흰 1px 테두리를 그려 진한 구간 색 위에서도 보이게 한다.
+        /// </summary>
+        private readonly HashSet<Point> _specDies = new HashSet<Point>();
+        private readonly HashSet<Point> _fileDies = new HashSet<Point>();
+
+        /// <summary>Spec Out 표식 색. 색 구간 팝업 표의 Spec Out Die 행도 같은 색으로 그린다.</summary>
+        internal static readonly Color FailMarkColor = Color.FromArgb(0xE2, 0x1B, 0x1B);
+
+        /// <summary>Fail Die(결과 파일) 표식 색. 빨강 / 구간 색과 겹치지 않는 남색.</summary>
+        internal static readonly Color FileFailMarkColor = Color.FromArgb(0x24, 0x40, 0x8E);
+
+        /// <summary>표식 크기: Die 두 변을 따라 이 비율까지 삼각형.</summary>
+        private const float FailMarkRatio = 0.35f;
+        private const float FileFailMarkRatio = 0.22f;
 
         private Point _mouseDown;
 
@@ -124,8 +148,23 @@ namespace DACrux.SEMDMS.ENGUI
         /// <summary>분석 결과 표시를 지운다(Wafer 변경 / 분석 전).</summary>
         public void ClearDieDisplay()
         {
+            _specDies.Clear();
+            _fileDies.Clear();
             SetDieDisplay(null, null);
         }
+
+        /// <summary>E-Test 모서리 표식을 바꾼다(Spec Out Die / Fail Die). 다시 그리기는 SetDieDisplay 가 한다(2026-10-20).</summary>
+        public void SetEtMarks(IEnumerable<Point> specOutDies, IEnumerable<Point> fileFailDies)
+        {
+            _specDies.Clear();
+            _fileDies.Clear();
+            if (specOutDies != null) foreach (Point p in specOutDies) _specDies.Add(p);
+            if (fileFailDies != null) foreach (Point p in fileFailDies) _fileDies.Add(p);
+        }
+
+        /// <summary>표식이 있는 Spec Out Die / Fail Die 수(Smoke 확인용).</summary>
+        public int SpecOutMarkCount { get { return _specDies.Count; } }
+        public int FileFailMarkCount { get { return _fileDies.Count; } }
 
         /// <summary>
         /// 기존 Die 그리기 뒤에 분석 결과 채움색을 덮고 테두리를 다시 그린다.
@@ -134,18 +173,25 @@ namespace DACrux.SEMDMS.ENGUI
         protected override void DrawDies(Graphics g)
         {
             base.DrawDies(g);
-            if (_dieFill.Count == 0 || m_arrDies == null || m_arrDies.Count == 0) return;
+            if ((_dieFill.Count == 0 && _specDies.Count == 0 && _fileDies.Count == 0) || m_arrDies == null || m_arrDies.Count == 0) return;
 
             var points = new PointF[4];
             var cood = new PointD[4];
             using (var brush = new SolidBrush(Color.White))
+            using (var failBrush = new SolidBrush(FailMarkColor))
+            using (var fileBrush = new SolidBrush(FileFailMarkColor))
+            using (var markEdge = new Pen(Color.White, 1f))
             using (var border = new Pen(m_colDieBorder))
             using (var selected = new Pen(Color.Red, 3))
             {
                 foreach (Die die in m_arrDies)
                 {
                     Color fill;
-                    if (!_dieFill.TryGetValue(new Point(die.IndexX, die.IndexY), out fill)) continue;
+                    var key = new Point(die.IndexX, die.IndexY);
+                    bool hasFill = _dieFill.TryGetValue(key, out fill);
+                    bool specOut = _specDies.Contains(key);
+                    bool fileFail = _fileDies.Contains(key);
+                    if (!hasFill && !specOut && !fileFail) continue;
                     if (!UseDie(die.DieCood.X - m_WaferRecipe.ORIGIN_X, die.DieCood.Y - m_WaferRecipe.ORIGIN_Y,
                             m_WaferRecipe.DIE_SIZE_X, m_WaferRecipe.DIE_SIZE_Y)) continue;
 
@@ -164,14 +210,36 @@ namespace DACrux.SEMDMS.ENGUI
                         points[i].Y = (float)((-m_rectdWaferArea.Y + m_WaferRecipe.WAFER_RADIUS - cood[i].Y) * m_dZoomRatio_X_m_dScale);
                     }
 
-                    brush.Color = fill;
-                    m_gdiTempMap.FillPolygon(brush, points);
-                    if (m_SelectedDies.IndexOf(new Point(die.IndexX, die.IndexY)) > -1)
+                    if (hasFill)
+                    {
+                        brush.Color = fill;
+                        m_gdiTempMap.FillPolygon(brush, points);
+                    }
+                    // Spec Out: 왼쪽 위 꼭짓점(points[3])에서 두 변을 따라 35% 지점까지 빨간 삼각형
+                    if (specOut)
+                        FillMark(failBrush, markEdge, points[3], points[2], points[0], FailMarkRatio);
+                    // Fail Die(결과 파일): 오른쪽 아래 꼭짓점(points[1])에서 22% 지점까지 남색 삼각형
+                    if (fileFail)
+                        FillMark(fileBrush, markEdge, points[1], points[0], points[2], FileFailMarkRatio);
+                    if (m_SelectedDies.IndexOf(key) > -1)
                         g.DrawPolygon(selected, points);
                     else if (m_bVisibleDieBorder)
                         g.DrawPolygon(border, points);
                 }
             }
+        }
+
+        /// <summary>꼭짓점 corner 에서 두 이웃 꼭짓점 쪽으로 ratio 만큼 간 삼각형을 칠하고 흰 테두리를 그린다.</summary>
+        private void FillMark(Brush brush, Pen edge, PointF corner, PointF a, PointF b, float ratio)
+        {
+            var mark = new[] { corner, Lerp(corner, a, ratio), Lerp(corner, b, ratio) };
+            m_gdiTempMap.FillPolygon(brush, mark);
+            m_gdiTempMap.DrawPolygon(edge, mark);
+        }
+
+        private static PointF Lerp(PointF a, PointF b, float t)
+        {
+            return new PointF(a.X + (b.X - a.X) * t, a.Y + (b.Y - a.Y) * t);
         }
 
         /// <summary>Map 을 다 그린 뒤(e == null) Die 안 숫자를 덧그린다. Index 라벨(기반 클래스)과 겹치지 않게 아래쪽에 둔다.</summary>

@@ -15,7 +15,7 @@ namespace DACrux.TEST.ENGUI
     /// 1. 기존 DMS 와 같은 방식으로 Parser 를 고른다 (FileAnalyzer -> ParserKlarf / ParserKlarf_18).
     /// 2. Parser 가 옮긴 인덱스(좌하단 1,1 기준)를 그대로 쓴다. 옮긴 양 = Wafer.DieOrigin.
     /// 3. 원점 조회 함수(originLookup)를 주면 DMS 업로드 서비스처럼 TQD_SETUP 저장값을 먼저 쓴다.
-    /// 설계: 문서/2026-10-06_KLARF_Map_Setup_설계.md 3~4절
+    /// 설계: 문서/설계/03_KLARF_Map/2026-10-06_KLARF_Map_Setup_설계.md 3~4절
     /// </summary>
     internal sealed class KlarfMapSource
     {

@@ -1,10 +1,11 @@
-﻿# E-Test -> YMS 테이블 적재(EtYmsPublisher) 검증 스크립트 (2026-10-14, 설계: 문서/2026-10-14_ETest_Upload_YMS적재_설계.md 14절)
+﻿# E-Test -> YMS 테이블 적재(EtYmsPublisher) 검증 스크립트 (2026-10-14, 설계: 문서/설계/04_ETest/2026-10-14_ETest_Upload_YMS적재_설계.md 14절)
 # 목적: 샘플 E-Test xlsx + 고객 Spec 표(TSVET) + 로컬 Map 으로 Wafer 1장을 만들어 EtYmsPublisher 로 YMS 테이블에 넣는다.
 #       TQP_LOT / TQP_WAFER / TD_<PROGRAM> / TQP_PARASPEC / TQP_BINDESC / TQP_WAFER_SUM 결과,
 #       다시 반영 / Map 밖 Die / 입력 오류 / 삭제를 확인한다.
 #       DB 접속은 BSL -> DSL -> Miracom.Middleware 경로다 (Service Remoting 경유 아님). 결과 조회 / 정리는 기존 YMS DSL 쿼리만 쓴다.
 #       같은 Lot 에 Wafer 2장을 넣고 1장 / 마지막 1장을 지워 기존 TestDataMaint.DeleteWaferData 의 두 경로(Lot 요약 다시 만들기 / 빈 Lot 지우기)도 본다.
-#       Die 판정은 Upload 재설계 9.2절 규칙(Spec 범위 밖 = F / 정의 항목 '-' = F / 빈 칸 = 판정 없음)을 이 스크립트가 계산한다.
+#       YMS BIN = 결과 파일 Hardware Bin, 양품 = 파일 DUT 결과 Pass (2026-10-14, E-Test Spec 판정과 별개). 샘플 RH-HS2615-02 = Bin 1 Pass 20 / Bin 5 Fail 4.
+#       예전 판정 Bin 정의(1 PASS / 2 SPEC_FAIL / 3 NOT_TESTED)가 남아 있으면 지우고, 사용자가 고친 정의는 남기는지도 본다.
 # 보호: 실제 데이터와 섞이지 않게 Factory PROBE / Device PRB* 만 허용한다. 시작할 때와 끝날 때 그 Program 의 YMS 데이터만 지운다.
 # 실행: powershell -NoProfile -ExecutionPolicy Bypass -File EtYmsPublishProbe.ps1 [-BinDir <TEMP 빌드 폴더>] [-Keep]
 #       -BinDir 생략 시 101_ServerBin. -Keep 이면 마지막 삭제를 하지 않는다 (DMS YMS 화면에서 PRBOMM_TSVET 를 직접 볼 때).
@@ -115,10 +116,11 @@ try {
     $wb = New-Object ClosedXML.Excel.XLWorkbook($fs)
     $ws = $wb.Worksheet('DUT Summary')
     $lastCol = $ws.LastColumnUsed().ColumnNumber(); $lastRow = $ws.LastRowUsed().RowNumber()
-    $colOf = @{}; $xyCol = 0
+    $colOf = @{}; $xyCol = 0; $hwCol = 0; $swCol = 0; $flagCol = 0
     for ($c = 1; $c -le $lastCol; $c++) {
         $h = [string]$ws.Cell(1, $c).Value
         if ($h.Contains('@')) { $colOf[$Rule::NormalizeParameterName($h)] = $c } elseif ($h.Trim() -eq '(X, Y)') { $xyCol = $c }
+        elseif ($h.Trim() -eq 'Hardware Bin') { $hwCol = $c } elseif ($h.Trim() -eq 'Software Bin') { $swCol = $c } elseif ($h.Trim() -eq 'DUT Flag') { $flagCol = $c }
     }
     $rawDies = New-Object Collections.Generic.List[object]
     for ($r = 2; $r -le $lastRow; $r++) {
@@ -132,7 +134,10 @@ try {
             $v = $cell.Value
             $texts[$k] = $(if ($cell.IsEmpty()) { '' } elseif ($v -is [double]) { $v.ToString('R', $inv) } else { ([string]$v).Trim() })
         }
-        $rawDies.Add([pscustomobject]@{ Dut = $dut; X = [int]$xy.Split(',')[0]; Y = [int]$xy.Split(',')[1]; Texts = $texts })
+        $hw = [int](([string]$ws.Cell($r, $hwCol).Value) -replace '[^0-9]', '')
+        $sw = [int](([string]$ws.Cell($r, $swCol).Value) -replace '[^0-9]', '')
+        $pf = $(if (([string]$ws.Cell($r, $flagCol).Value).Trim().StartsWith('Pass')) { 'P' } else { 'F' })
+        $rawDies.Add([pscustomobject]@{ Dut = $dut; X = [int]$xy.Split(',')[0]; Y = [int]$xy.Split(',')[1]; Texts = $texts; Hw = $hw; Sw = $sw; Pass = $pf })
     }
 } finally { $fs.Dispose() }
 $missing = @($spec | Where-Object { -not $colOf.ContainsKey($_.Name) }).Count
@@ -142,7 +147,7 @@ Check '샘플 / Spec 읽기' ($spec.Count -eq 37 -and $missing -eq 0 -and $rawDi
 $probeAdmin = New-Object DACrux.TEST.BSL.ProbeAdmin
 $mapper = [DACrux.SEMDMS.Interface.DieCoordinateMapper]::FromDieTable($probeAdmin.GetDies($MapId), (New-Object DACrux.SEMDMS.Interface.DiePoint(0, 0)))
 
-# 4. 판정 + 적재 모델
+# 4. 적재 모델 (Die BIN = 파일 Hardware Bin, 양품 = 파일 DUT 결과)
 function Build-Wafer() {
     $w = New-Object DACrux.SEMDMS.BSL.EtYmsWafer
     $w.Factory = $Factory; $w.DeviceId = $Device; $w.TestProgram = 'TSVET'; $w.MapId = $MapId
@@ -162,42 +167,44 @@ function Build-Wafer() {
         $sys = New-Object DACrux.SEMDMS.Interface.DiePoint
         if ($mapper.TryToSystem([DACrux.SEMDMS.Interface.DieCoordType]::ETest, (New-Object DACrux.SEMDMS.Interface.DiePoint($rd.X, $rd.Y)), [ref]$sys)) { $d.MapX = $sys.X; $d.MapY = $sys.Y }
         $values = New-Object 'System.Nullable[double][]' $spec.Count
-        $rangeFail = 0; $ntFail = 0
         for ($k = 0; $k -lt $spec.Count; $k++) {
             $t = $rd.Texts[$k]
-            if ($t -eq '-') { $ntFail++; continue }
-            if ($t -eq '') { continue }
-            $v = [double]::Parse($t, [Globalization.NumberStyles]::Float, $inv); $values[$k] = $v
-            if (($null -ne $spec[$k].Lower -and $v -lt $spec[$k].Lower) -or ($null -ne $spec[$k].Upper -and $v -gt $spec[$k].Upper)) { $rangeFail++ }
+            if ($t -eq '-' -or $t -eq '') { continue }
+            $values[$k] = [double]::Parse($t, [Globalization.NumberStyles]::Float, $inv)
         }
-        $d.Values = $values; $d.RangeFailCount = $rangeFail; $d.NotTestedFailCount = $ntFail
-        $d.Judge = $(if ($rangeFail + $ntFail -gt 0) { 'F' } else { 'P' })
+        $d.Values = $values
+        $d.HardwareBin = $rd.Hw; $d.SoftwareBin = $rd.Sw; $d.FilePass = $rd.Pass
         $w.Dies.Add($d)
     }
     return $w
 }
 $wafer = Build-Wafer
-$failDies = @($wafer.Dies | Where-Object { $_.Judge -eq 'F' })
+$failDies = @($wafer.Dies | Where-Object { $_.FilePass -eq 'F' })
+$hw5 = @($wafer.Dies | Where-Object { $_.HardwareBin -eq 5 -and $_.SoftwareBin -eq 5001 }).Count
 $inMap = @($wafer.Dies | Where-Object { $_.MapX -ne $null }).Count
 $dut20 = $wafer.Dies | Where-Object { $_.DutNo -eq 20 }
-Check '판정 / 좌표' ($failDies.Count -eq 1 -and $failDies[0].DutNo -eq 44 -and $failDies[0].RangeFailCount -eq 6 -and $inMap -eq 24 -and $dut20.MapX -eq 9 -and $dut20.MapY -eq 2) "Fail Die $($failDies.Count) (DUT #$($failDies[0].DutNo), 범위 밖 $($failDies[0].RangeFailCount)) / Map 안 $inMap / DUT #20 -> ($($dut20.MapX), $($dut20.MapY))"
+$dut44 = $wafer.Dies | Where-Object { $_.DutNo -eq 44 }
+Check '파일 Bin / 좌표' ($failDies.Count -eq 4 -and $hw5 -eq 4 -and $inMap -eq 24 -and $dut20.MapX -eq 9 -and $dut20.MapY -eq 2 -and $dut20.HardwareBin -eq 5 -and $dut44.HardwareBin -eq 1 -and $dut44.FilePass -eq 'P') "파일 Fail Die $($failDies.Count) (HW5/SW5001 $hw5) / Map 안 $inMap / DUT #20 -> ($($dut20.MapX), $($dut20.MapY)) HW$($dut20.HardwareBin) / DUT #44 HW$($dut44.HardwareBin) $($dut44.FilePass) (Spec 판정은 Fail 이던 Die)"
 
 # 첫 Die (DIE_NUM 1) 기대값 = 위 행부터 / 왼쪽부터 첫 Die = 고객 Die# 가 가장 작은 Die
 $sorted = @($wafer.Dies | Sort-Object @{ Expression = { $_.MapY }; Descending = $true }, @{ Expression = { $_.MapX }; Descending = $false })
 $firstDieNo = $mapper.DieNumberOf((New-Object DACrux.SEMDMS.Interface.DiePoint($sorted[0].MapX, $sorted[0].MapY)))
 $minDieNo = ($wafer.Dies | ForEach-Object { $mapper.DieNumberOf((New-Object DACrux.SEMDMS.Interface.DiePoint($_.MapX, $_.MapY))) } | Measure-Object -Minimum).Minimum
 
-# 5. 첫 반영
+# 5. 첫 반영. 예전 판정 Bin 정의 1 / 2 (그대로) + 3 (사용자가 설명을 고친 것)을 미리 넣어 둔다.
+[void]$binDsl.InsertBinInfo($program, '1', 'PASS', '', 'Y', 'Y', '', '', '#00C000', 'E-Test Spec Pass', '')
+[void]$binDsl.InsertBinInfo($program, '2', 'SPEC_FAIL', '', 'N', 'Y', '', '', '#FF0000', 'E-Test Spec Fail (out of limit)', '')
+[void]$binDsl.InsertBinInfo($program, '3', 'NOT_TESTED', '', 'N', 'Y', '', '', '#FFA500', 'user edited', '')
 $script:createdSeq = ''
 $onCreated = [Action[DACrux.SEMDMS.BSL.EtYmsPublishResult]] { param($r) $script:createdSeq = $r.WaferSeq }
 $sw = [Diagnostics.Stopwatch]::StartNew()
 $res = $pub.Publish($wafer, $null, 'probe', $onCreated)
 $ms1 = $sw.ElapsedMilliseconds
-Check '반영 결과' ($res.Status -eq 'DONE' -and $res.Program -eq $program -and $res.TestArea -eq 'TSVET' -and $res.DieCount -eq 24 -and $res.SkipDieCount -eq 0 -and $res.ParamCount -eq 37 -and $res.Bin1Count -eq 23 -and $res.Bin2Count -eq 1 -and $res.Bin3Count -eq 0) "$($res.Status) $($res.Step) $($res.Message) / $($res.Program) / Die $($res.DieCount) Skip $($res.SkipDieCount) / Param $($res.ParamCount) / Bin $($res.Bin1Count)-$($res.Bin2Count)-$($res.Bin3Count) / ${ms1}ms"
+Check '반영 결과' ($res.Status -eq 'DONE' -and $res.Program -eq $program -and $res.TestArea -eq 'TSVET' -and $res.DieCount -eq 24 -and $res.SkipDieCount -eq 0 -and $res.ParamCount -eq 37 -and $res.GoodDieCount -eq 20 -and $res.FailDieCount -eq 4 -and $res.BinCounts -eq '1:20, 5:4') "$($res.Status) $($res.Step) $($res.Message) / $($res.Program) / Die $($res.DieCount) Skip $($res.SkipDieCount) / Param $($res.ParamCount) / 양품 $($res.GoodDieCount) 불량 $($res.FailDieCount) / Bin $($res.BinCounts) / ${ms1}ms"
 Check '콜백 WAFER_SEQ' ($script:createdSeq -ne '' -and $script:createdSeq -eq $res.WaferSeq) "콜백 $($script:createdSeq) / 결과 $($res.WaferSeq)"
-Check '수율' ($res.Yield -eq 95.83 -and $res.TestedDie -eq 24) "YIELD $($res.Yield) / TESTED $($res.TestedDie) / NETDIE $($res.NetDie) (Factory PROBE 라 Map(SCK) NETDIE 조인 안 됨 -> 측정 Die 로 나눔)"
+Check '수율 (파일 Bin 기준 20 / 24)' ($res.Yield -eq 83.33 -and $res.TestedDie -eq 24) "YIELD $($res.Yield) / TESTED $($res.TestedDie) / NETDIE $($res.NetDie) (Factory PROBE 라 Map(SCK) NETDIE 조인 안 됨 -> 측정 Die 로 나눔)"
 $tbl = $res.ToDataTable()
-Check '결과 표' ($tbl.Rows.Count -eq 1 -and [string]$tbl.Rows[0]['YMS_STATUS'] -eq 'DONE' -and [int]$tbl.Rows[0]['BIN2_COUNT'] -eq 1) "열 $($tbl.Columns.Count)"
+Check '결과 표' ($tbl.Rows.Count -eq 1 -and [string]$tbl.Rows[0]['YMS_STATUS'] -eq 'DONE' -and [int]$tbl.Rows[0]['FAIL_DIE_COUNT'] -eq 4 -and [string]$tbl.Rows[0]['BIN_COUNTS'] -eq '1:20, 5:4') "열 $($tbl.Columns.Count) / BIN_COUNTS $($tbl.Rows[0]['BIN_COUNTS'])"
 
 # Lot 은 기존 쿼리 GET_WAFER_INFO(TQP_LOT + TQP_WAFER, Lot 컬럼이 앞), Wafer 는 Publisher.GetWafer(GET_WAFER_INFO [WSQ])
 $lr = $waferDsl.GetData('GET_WAFER_INFO', $null, [string[]]@($res.WaferSeq)).Rows
@@ -213,8 +220,8 @@ $first = @($td.Rows | Where-Object { [int]$_['DIE_NUM'] -eq 1 })[0]
 $row20 = @($td.Rows | Where-Object { [int]$_['X'] -eq 9 -and [int]$_['Y'] -eq 2 })
 $die44 = $wafer.Dies | Where-Object { $_.DutNo -eq 44 }
 $row44 = @($td.Rows | Where-Object { [int]$_['X'] -eq $die44.MapX -and [int]$_['Y'] -eq $die44.MapY })
-Check "TD $($td.TableName)" ($td.Rows.Count -eq 24 -and $td.Columns.Count -eq 43 -and $binCounts['1'] -eq 23 -and $binCounts['2'] -eq 1 -and $minValue -gt -1E20) "행 $($td.Rows.Count) / 열 $($td.Columns.Count) / BIN1 $($binCounts['1']) BIN2 $($binCounts['2']) / 최소값 $minValue"
-Check 'TD Die 순서 / 좌표 / 값' ([int]$first['X'] -eq $sorted[0].MapX -and [int]$first['Y'] -eq $sorted[0].MapY -and $firstDieNo -eq $minDieNo -and $row20.Count -eq 1 -and [int]$row20[0]['BIN'] -eq 1 -and $row44.Count -eq 1 -and [int]$row44[0]['BIN'] -eq 2) "DIE_NUM 1 = ($($first['X']), $($first['Y'])) Die#$firstDieNo (최소 Die# $minDieNo) / DUT #20 (9,2) BIN $($row20[0]['BIN']) / DUT #44 ($($die44.MapX),$($die44.MapY)) BIN $($row44[0]['BIN'])"
+Check "TD $($td.TableName)" ($td.Rows.Count -eq 24 -and $td.Columns.Count -eq 43 -and $binCounts['1'] -eq 20 -and $binCounts['5'] -eq 4 -and $minValue -gt -1E20) "행 $($td.Rows.Count) / 열 $($td.Columns.Count) / BIN1 $($binCounts['1']) BIN5 $($binCounts['5']) / 최소값 $minValue"
+Check 'TD Die 순서 / 좌표 / 값' ([int]$first['X'] -eq $sorted[0].MapX -and [int]$first['Y'] -eq $sorted[0].MapY -and $firstDieNo -eq $minDieNo -and $row20.Count -eq 1 -and [int]$row20[0]['BIN'] -eq 5 -and $row44.Count -eq 1 -and [int]$row44[0]['BIN'] -eq 1) "DIE_NUM 1 = ($($first['X']), $($first['Y'])) Die#$firstDieNo (최소 Die# $minDieNo) / DUT #20 (9,2) BIN $($row20[0]['BIN']) / DUT #44 ($($die44.MapX),$($die44.MapY)) BIN $($row44[0]['BIN'])"
 $k44 = 0; for ($k = 0; $k -lt $spec.Count; $k++) { if ($null -ne $die44.Values[$k] -and $die44.Values[$k] -gt 715) { $k44 = $k; break } }
 $v44 = [double]$row44[0][$paramCols[$k44]]
 Check 'TD 값 일치' ([Math]::Abs($v44 - [double]$die44.Values[$k44]) -lt 1E-9) "$($paramCols[$k44]) = $v44 (파일 $($die44.Values[$k44]))"
@@ -228,22 +235,23 @@ $lkgRow = @($psRows | Where-Object { $_['PARAM_NAME'] -eq 'LKG_SERIAL_TSVDC_ASIC
 Check 'TQP_PARASPEC' ($psRows.Count -eq 40 -and $intCount -eq 3 -and $floatCount -eq 37 -and [double]$resRow['USL'] -eq 715 -and $resRow['LSL'] -eq [DBNull]::Value -and $resRow['UOM'] -eq 'Ohm' -and $resRow['PARAM_DESC'] -eq 'Resistance_iforce=8.0mA@TSVDC_TR_FH' -and [double]$lkgRow['LSL'] -eq -50 -and [double]$lkgRow['USL'] -eq 50 -and $lkgRow['PARAM_DESC'] -eq 'Leakage_Serial@TSVDC_ASIC_HBM_N_FH:TSVDC_ASIC_HBM_P_FL') "행 $($psRows.Count) (INT $intCount / FLOAT $floatCount) / RES USL $($resRow['USL']) LSL '$($resRow['LSL'])' $($resRow['UOM']) / LKG(줄인 이름) $($lkgRow['LSL']) ~ $($lkgRow['USL'])"
 
 $bd = BinRows
-Check 'TQP_BINDESC' ($bd.Count -eq 3 -and $bd[0]['BIN_NAME'] -eq 'PASS' -and $bd[0]['HIGH_GEC'] -eq 'Y' -and $bd[0]['BIN_COLOR'] -eq '#00C000' -and $bd[1]['HIGH_GEC'] -eq 'N' -and $bd[2]['BIN_NAME'] -eq 'NOT_TESTED') (($bd | ForEach-Object { "$($_['BIN']) $($_['BIN_NAME']) $($_['HIGH_GEC']) $($_['BIN_COLOR'])" }) -join ' / ')
+$fail5Color = $Rule::BinColor(5, $false)
+Check 'TQP_BINDESC (파일 Bin 1 / 5, 예전 판정 2 삭제, 사용자가 고친 3 유지)' ($bd.Count -eq 3 -and [int]$bd[0]['BIN'] -eq 1 -and $bd[0]['BIN_NAME'] -eq 'HW1 SW1' -and $bd[0]['HIGH_GEC'] -eq 'Y' -and $bd[0]['BIN_COLOR'] -eq '#00C000' -and [int]$bd[1]['BIN'] -eq 3 -and $bd[1]['BIN_NAME'] -eq 'NOT_TESTED' -and [int]$bd[2]['BIN'] -eq 5 -and $bd[2]['BIN_NAME'] -eq 'HW5 SW5001' -and $bd[2]['HIGH_GEC'] -eq 'N' -and $bd[2]['BIN_COLOR'] -eq $fail5Color) (($bd | ForEach-Object { "$($_['BIN']) $($_['BIN_NAME']) $($_['HIGH_GEC']) $($_['BIN_COLOR'])" }) -join ' / ')
 
 $sum = $pub.GetWaferSummary($res.WaferSeq).Rows
-Check 'TQP_WAFER_SUM' ($sum.Count -eq 1 -and [int]$sum[0]['TESTED_DIE'] -eq 24 -and [int]$sum[0]['GEC'] -eq 23 -and [double]$sum[0]['YIELD'] -eq 95.83 -and [int]$sum[0]['BIN1'] -eq 23 -and [int]$sum[0]['BIN2'] -eq 1) "TESTED $($sum[0]['TESTED_DIE']) / GEC $($sum[0]['GEC']) / YIELD $($sum[0]['YIELD']) / BIN1 $($sum[0]['BIN1']) BIN2 $($sum[0]['BIN2']) BIN3 '$($sum[0]['BIN3'])'"
+Check 'TQP_WAFER_SUM' ($sum.Count -eq 1 -and [int]$sum[0]['TESTED_DIE'] -eq 24 -and [int]$sum[0]['GEC'] -eq 20 -and [double]$sum[0]['YIELD'] -eq 83.33 -and [int]$sum[0]['BIN1'] -eq 20 -and [int]$sum[0]['BIN5'] -eq 4) "TESTED $($sum[0]['TESTED_DIE']) / GEC $($sum[0]['GEC']) / YIELD $($sum[0]['YIELD']) / BIN1 $($sum[0]['BIN1']) BIN5 $($sum[0]['BIN5']) BIN2 '$($sum[0]['BIN2'])'"
 
 # 6. 다시 반영: 이전 Wafer 를 지우고 새로 넣는다. Bin Define 에서 고친 색은 유지한다.
-[void]$binDsl.MergeBinInfo($program, '2', 'SPEC_FAIL', '', 'N', 'Y', '', '', '#123456', 'changed by probe', '')
+[void]$binDsl.MergeBinInfo($program, '5', 'HW5 SW5001', '', 'N', 'Y', '', '', '#123456', 'changed by probe', '')
 $seq1 = $res.WaferSeq
 $res2 = $pub.Publish($wafer, $seq1, 'probe', $null)
 $wafers2 = ProgramWafers
 $td2 = TdRows $res2.WaferSeq
 $old = TdRows $seq1
-$bin2Color = @((BinRows) | Where-Object { [int]$_['BIN'] -eq 2 })[0]['BIN_COLOR']
+$bin5Color = @((BinRows) | Where-Object { [int]$_['BIN'] -eq 5 })[0]['BIN_COLOR']
 $probeCnt2 = $pub.GetWafer($res2.WaferSeq).Rows[0]['PROBE_CNT']
-Check '다시 반영' ($res2.Status -eq 'DONE' -and $res2.WaferSeq -ne $seq1 -and $pub.GetWafer($seq1).Rows.Count -eq 0 -and $wafers2.Count -eq 1 -and [int]$probeCnt2 -eq 0 -and $td2.Rows.Count -eq 24 -and ($null -eq $old -or $old.Rows.Count -eq 0) -and $res2.Yield -eq 95.83) "$($res2.Status) / WAFER_SEQ $seq1 -> $($res2.WaferSeq) / Program Wafer $($wafers2.Count) (PROBE_CNT $probeCnt2) / TD $($td2.Rows.Count) / 이전 TD $(if ($null -eq $old) { '테이블 다시 만듦' } else { $old.Rows.Count })"
-Check 'Bin 정의 유지' ($bin2Color -eq '#123456') "BIN2 COLOR $bin2Color"
+Check '다시 반영' ($res2.Status -eq 'DONE' -and $res2.WaferSeq -ne $seq1 -and $pub.GetWafer($seq1).Rows.Count -eq 0 -and $wafers2.Count -eq 1 -and [int]$probeCnt2 -eq 0 -and $td2.Rows.Count -eq 24 -and ($null -eq $old -or $old.Rows.Count -eq 0) -and $res2.Yield -eq 83.33) "$($res2.Status) / WAFER_SEQ $seq1 -> $($res2.WaferSeq) / Program Wafer $($wafers2.Count) (PROBE_CNT $probeCnt2) / TD $($td2.Rows.Count) / 이전 TD $(if ($null -eq $old) { '테이블 다시 만듦' } else { $old.Rows.Count })"
+Check 'Bin 정의 유지' ($bin5Color -eq '#123456') "BIN5 COLOR $bin5Color"
 
 # 6-1. 같은 Lot 에 Wafer 2장 -> 1장 삭제: 기존 TestDataMaint.DeleteWaferData 의 "Wafer 가 남은 Lot 요약 다시 만들기" 경로
 $wafer.WaferId = 'RH-HS2615-03'; $wafer.LotWaferNo = 'RH-HS2615-03'
@@ -275,6 +283,13 @@ $wafer.MapId = ''
 $res5 = $pub.Publish($wafer, $res3.WaferSeq, 'probe', $null)
 $wafer.MapId = $MapId
 Check 'Map ID 없음' ($res5.Status -eq 'FAIL' -and $res5.Step -eq '입력 확인' -and (ProgramWafers).Count -eq 1) $res5.Message
+$keepHw = $wafer.Dies[1].HardwareBin
+$wafer.Dies[1].HardwareBin = $null
+$res6 = $pub.Publish($wafer, $res3.WaferSeq, 'probe', $null)
+$wafer.Dies[1].HardwareBin = 100
+$res7 = $pub.Publish($wafer, $res3.WaferSeq, 'probe', $null)
+$wafer.Dies[1].HardwareBin = $keepHw
+Check 'Hardware Bin 없음 / 100 이상' ($res6.Status -eq 'FAIL' -and $res6.Step -eq '입력 확인' -and $res6.Message.Contains("DUT #$($wafer.Dies[1].DutNo)") -and $res7.Status -eq 'FAIL' -and $res7.Step -eq '입력 확인' -and (ProgramWafers).Count -eq 1) "$($res6.Message) / $($res7.Message)"
 
 if ($Keep) {
     $resKeep = $pub.Publish($wafer, $res3.WaferSeq, 'probe', $null)

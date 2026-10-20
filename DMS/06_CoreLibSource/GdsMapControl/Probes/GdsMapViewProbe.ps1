@@ -79,11 +79,14 @@ $ids = New-Object 'Collections.Generic.HashSet[string]'
 $totalRows = 0L; $totalPoint = 0L; $pages = 0; $orderOk = $true; $binOk = $true; $layerOk = $true
 $firstPage = $null; $maxPageMs = 0L
 $swAll = [Diagnostics.Stopwatch]::StartNew()
+# Layer 는 번호 + DataType 단위(KLayout 18/0, 18/3), 화면과 같이 "번호/DataType" 으로 조회한다 (2026-10-20)
+$hasDataType = $layers.Columns.Contains('DATA_TYPE')
+Check 'Layer 목록에 DATA_TYPE 열' $hasDataType (($layers.Rows | ForEach-Object { "$($_['LAYER_ID'])/$($_['DATA_TYPE'])" }) -join ',')
 foreach ($l in $layers.Rows) {
-    $layerId = [string]$l['LAYER_ID']; $after = ''; $layerRows = 0L
+    $layerId = [string]$l['LAYER_ID']; $dataType = [string]$l['DATA_TYPE']; $after = ''; $layerRows = 0L
     while ($true) {
         $swPage = [Diagnostics.Stopwatch]::StartNew()
-        $page = $view.GetPlacedElementPage($factory, $device, $layerId, $after, $PageRows)
+        $page = $view.GetPlacedElementPage($factory, $device, "$layerId/$dataType", $after, $PageRows)
         if ($swPage.ElapsedMilliseconds -gt $maxPageMs) { $maxPageMs = $swPage.ElapsedMilliseconds }
         $pages++
         $prev = $after
@@ -91,7 +94,7 @@ foreach ($l in $layers.Rows) {
             $id = [string]$row['PLACED_ELEMENT_ID']
             if ($prev -ne '' -and [string]::CompareOrdinal($prev, $id) -ge 0) { $orderOk = $false }
             if (-not $ids.Add($id)) { $orderOk = $false }
-            if ([string]$row['LAYER_ID'] -ne $layerId) { $layerOk = $false }
+            if ([string]$row['LAYER_ID'] -ne $layerId -or [string]$row['DATA_TYPE'] -ne $dataType) { $layerOk = $false }
             $pc = [long]$row['POINT_COUNT']; $totalPoint += $pc
             if (([byte[]]$row['POINTS_BIN']).Length -ne $pc * 16) { $binOk = $false }
             $prev = $id
@@ -101,12 +104,24 @@ foreach ($l in $layers.Rows) {
         if ($page.Rows.Count -lt $PageRows) { break }
         $after = $prev
     }
-    if ($layerRows -ne [long]$l['PLACED_COUNT']) { $layerOk = $false; Write-Host "  Layer $layerId 행 수 불일치: $layerRows / $($l['PLACED_COUNT'])" }
+    if ($layerRows -ne [long]$l['PLACED_COUNT']) { $layerOk = $false; Write-Host "  Layer $layerId/$dataType 행 수 불일치: $layerRows / $($l['PLACED_COUNT'])" }
 }
 $allMs = $swAll.ElapsedMilliseconds
 Check '전체 페이지 행 수 = PLACED 수 (중복 없음)' ($totalRows -eq $sumPlaced -and $ids.Count -eq $totalRows) "rows=$totalRows unique=$($ids.Count) pages=$pages"
 Check '페이지 순서 증가 / 중복 없음' $orderOk ''
-Check 'Layer별 행 수 / LAYER_ID 일치' $layerOk ''
+Check 'Layer별 행 수 / LAYER_ID / DATA_TYPE 일치' $layerOk ''
+
+# 예전 호출(번호만) = 그 번호의 모든 DataType. 첫 Layer 번호로 확인한다.
+$firstLayer = [string]$layers.Rows[0]['LAYER_ID']
+$sameNumber = 0L; foreach ($l in $layers.Rows) { if ([string]$l['LAYER_ID'] -eq $firstLayer) { $sameNumber += [long]$l['PLACED_COUNT'] } }
+$legacyRows = 0L; $after = ''
+while ($true) {
+    $page = $view.GetPlacedElementPage($factory, $device, $firstLayer, $after, $PageRows)
+    $legacyRows += $page.Rows.Count
+    if ($page.Rows.Count -lt $PageRows) { $page.Dispose(); break }
+    $after = [string]$page.Rows[$page.Rows.Count - 1]['PLACED_ELEMENT_ID']; $page.Dispose()
+}
+Check '번호만 조회(예전 호출) = 그 번호의 모든 DataType' ($legacyRows -eq $sameNumber) "Layer $firstLayer rows=$legacyRows / 목록 합계 $sameNumber"
 Check '좌표 합계 일치 / POINTS_BIN 길이 = 점 수 x 16' ($binOk -and $totalPoint -eq $sumPoint) "point=$totalPoint"
 Write-Host ("측정: 전체 {0:N1}초 / 페이지 {1}개 / 최대 페이지 {2}ms / 행당 {3:N4}ms" -f ($allMs / 1000.0), $pages, $maxPageMs, ($allMs / [Math]::Max(1, $totalRows)))
 
@@ -124,6 +139,9 @@ $m2 = Fails { $view.GetPlacedElementPage($factory, $device, '0', '', 50001) }
 Check '페이지 행 수 상한 초과 거부' ($m2 -ne $null) "$m2"
 $m3 = Fails { $view.GetPlacedElementPage($factory, $device, '-1', '', 10) }
 Check '음수 Layer 거부' ($m3 -ne $null) "$m3"
+$m3b = Fails { $view.GetPlacedElementPage($factory, $device, '1/65536', '', 10) }
+$m3c = Fails { $view.GetPlacedElementPage($factory, $device, '1/x', '', 10) }
+Check 'DataType 범위(0 ~ 65535) / 형식 거부' ($m3b -ne $null -and $m3c -ne $null) "$m3b / $m3c"
 $m4 = Fails { $view.GetMapLayerList('PROBE', 'NO_SUCH_DEVICE') }
 Check '없는 Map 거부' ($m4 -ne $null -and $m4.Contains('없습니다')) "$m4"
 $m5 = Fails { $view.GetMapInfo('', 'X') }

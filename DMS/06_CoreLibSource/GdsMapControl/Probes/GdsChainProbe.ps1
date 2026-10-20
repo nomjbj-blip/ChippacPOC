@@ -1,4 +1,4 @@
-﻿# GDS Chain DB 저장 서비스 검증 스크립트 (설계: 문서/2026-10-06_GDS_Chain_DB저장_설계.md 10.1절)
+﻿# GDS Chain DB 저장 서비스 검증 스크립트 (설계: 문서/설계/02_GDS/2026-10-06_GDS_Chain_DB저장_설계.md 10.1절)
 # 목적: BSL GdsChain을 같은 프로세스에서 직접 호출해 Chain 저장 / 조회 / 덮어쓰기 / 확정 검사 / 실제 삭제를 확인한다.
 #       DB 접속은 BSL -> DSL -> Miracom.Middleware 경로다(Service Remoting 경유 아님).
 # 전제: FACTORY=PROBE / DEVICE_ID=LAYER_FILTER_PROBE 에 READY Map이 있어야 한다(GdsImportLayerFilterProbe.ps1 -Keep 으로 생성, Layer 1,2,6).

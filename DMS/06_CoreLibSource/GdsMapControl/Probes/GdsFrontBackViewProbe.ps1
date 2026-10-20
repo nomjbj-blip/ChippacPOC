@@ -1,4 +1,4 @@
-﻿# GDS Map View Front / Back 보기 전환 검증 스크립트 (설계: 문서/2026-10-07_GDS_FrontBack_전환_설계.md 4 / 5.2절)
+﻿# GDS Map View Front / Back 보기 전환 검증 스크립트 (설계: 문서/설계/02_GDS/2026-10-07_GDS_FrontBack_전환_설계.md 4 / 5.2절)
 # 목적: DB는 저장 기준(FRONT) 1벌이고 View에서 로직으로 Back을 보여 주는 방식이 맞게 동작하는지 확인한다.
 #       1) GdsSideTransform: 두 번 반전 = 원본(비트), 반전 X = -X, NeedsMirror 규칙
 #       2) Back 보기(DB 도형 반전)에서 Chain 탐색 도형 ID 집합 = Front 보기 탐색 집합
@@ -12,20 +12,25 @@
 param(
     [Parameter(Mandatory = $true)][string]$GdsExe,
     [string]$Factory = 'PROBE',
-    [string]$Device = 'LAYER_FILTER_PROBE'
+    [string]$Device = 'LAYER_FILTER_PROBE',
+    [string]$BinDir = ''
 )
+# -BinDir 생략 시 101_ServerBin. 화면 / 탐색 / 페이지 조회는 Layer 키(번호 + DataType)로 다룬다 (2026-10-20)
 $ErrorActionPreference = 'Stop'
 $dms = (Resolve-Path (Join-Path $PSScriptRoot '..\..\..')).Path
 $serverBin = Join-Path $dms '101_ServerBin'
+if ($BinDir -eq '') { $BinDir = $serverBin }
 [AppDomain]::CurrentDomain.SetData('APP_CONFIG_FILE', (Join-Path $serverBin 'DACrux.SEMDMS.Service.exe.config'))
 Add-Type -AssemblyName System.Configuration
 $flags = [Reflection.BindingFlags]'NonPublic,Static'
 $cm = [Configuration.ConfigurationManager]
 $cm.GetField('s_initState', $flags).SetValue($null, 0)
 $cm.GetField('s_configSystem', $flags).SetValue($null, $null)
-foreach ($d in 'Oracle.ManagedDataAccess', 'Miracom.Middleware', 'DACrux.Base', 'DACrux.SEMDMS.Interface', 'DACrux.SEMDMS.DSL', 'DACrux.SEMDMS.BSL') {
+foreach ($d in 'Oracle.ManagedDataAccess', 'Miracom.Middleware', 'DACrux.Base') {
     $p = Join-Path $serverBin "$d.dll"; if (Test-Path $p) { [void][Reflection.Assembly]::LoadFrom($p) }
 }
+foreach ($d in 'DACrux.SEMDMS.Interface', 'DACrux.SEMDMS.DSL', 'DACrux.SEMDMS.BSL') { [void][Reflection.Assembly]::LoadFrom((Join-Path $BinDir "$d.dll")) }
+Write-Host "BSL: $(Join-Path $BinDir 'DACrux.SEMDMS.BSL.dll')"
 [void][Reflection.Assembly]::LoadFrom((Join-Path $dms '100_ClientBin\DACrux.SEMDMS.RO.dll'))
 $probeDir = Join-Path $env:TEMP 'chippac\gdsfrontbackprobe'
 New-Item -ItemType Directory -Force $probeDir | Out-Null
@@ -63,7 +68,7 @@ public static class FrontBackProbe
             string after = string.Empty;
             while (true)
             {
-                DataTable page = view.GetPlacedElementPage(factory, device, layer.ToString(), after, 10000);
+                DataTable page = view.GetPlacedElementPage(factory, device, GdsLayerKey.Format(layer), after, 10000);
                 foreach (DataRow row in page.Rows) items.Add(GdsMapPlacedRowReader.Read(row));
                 if (page.Rows.Count > 0) after = page.Rows[page.Rows.Count - 1]["PLACED_ELEMENT_ID"].ToString();
                 if (page.Rows.Count < 10000) break;
@@ -102,8 +107,9 @@ public static class FrontBackProbe
     public static string SaveFrontChain(GdsMapControl front, string factory, string device)
     {
         string input = null;
-        front.VisitPlacedElements(new HashSet<int> { 2 }, false, d => { if (input == null && (d.ElementType == "BOUNDARY" || d.ElementType == "PATH")) input = d.PlacedElementId; });
-        var trace = front.TraceChainCandidate(new[] { input }, new string[0], new[] { 2 }, new ChainLayerConnectionRule[0], false, 10.0);
+        int layer2 = GdsLayerKey.Make(2, 0);
+        front.VisitPlacedElements(new HashSet<int> { layer2 }, false, d => { if (input == null && (d.ElementType == "BOUNDARY" || d.ElementType == "PATH")) input = d.PlacedElementId; });
+        var trace = front.TraceChainCandidate(new[] { input }, new string[0], new[] { layer2 }, new ChainLayerConnectionRule[0], false, 10.0);
         GPoint marker = new GPoint(1234.56789, -98.76543);
         var members = new List<string[]> { new[] { input, "INPUT", "ENDPOINT", G(marker.X), G(marker.Y) } };
         members.AddRange(trace.VisitedElements.Select(e => e.ElementKey).Where(k => k != input).Distinct().Select(k => new[] { k, "MEMBER", "TRACE", "", "" }));
@@ -178,7 +184,7 @@ public static class FrontBackProbe
     }
 }
 "@
-Add-Type -TypeDefinition $helper -ReferencedAssemblies @($gdsDll, (Join-Path $serverBin 'DACrux.SEMDMS.BSL.dll'), (Join-Path $serverBin 'DACrux.SEMDMS.Interface.dll'),
+Add-Type -TypeDefinition $helper -ReferencedAssemblies @($gdsDll, (Join-Path $BinDir 'DACrux.SEMDMS.BSL.dll'), (Join-Path $BinDir 'DACrux.SEMDMS.Interface.dll'),
     (Join-Path $serverBin 'Miracom.Middleware.dll'), (Join-Path $probeDir 'OpenTK.GLControl.dll'), (Join-Path $probeDir 'OpenTK.dll'),
     'System.Core', 'System.Data', 'System.Windows.Forms', 'System.Drawing', 'System.Xml')
 
@@ -186,7 +192,8 @@ $results = New-Object Collections.Generic.List[string]
 function Check($name, [bool]$ok, $detail) {
     $line = ($(if ($ok) { 'PASS' } else { 'FAIL' })) + " / $name / $detail"; $results.Add($line); Write-Host $line
 }
-$layers = [int[]]@(1, 2, 6)
+$key = [NexplantQMS.GdsMap.GdsLayerKey]
+$layers = [int[]]@($key::Make(1, 0), $key::Make(2, 0), $key::Make(6, 0))
 $info = (New-Object DACrux.SEMDMS.BSL.GdsMapView).GetMapInfo($Factory, $Device)
 if ($info.Rows.Count -eq 0 -or $info.Rows[0]['MAP_STATUS'] -ne 'READY' -or $info.Rows[0]['VIEW_SIDE'] -ne 'FRONT') { Write-Host "전제 실패: $Factory / $Device FRONT READY Map 없음"; exit 2 }
 
@@ -209,7 +216,7 @@ $sw = [Diagnostics.Stopwatch]::StartNew()
 $mirrored = [NexplantQMS.GdsMap.Persistence.GdsSideTransform]::MirrorAll($items)
 $back.ShowPlacedElements('TOP', $colors, $mirrored)
 $switchMs = $sw.ElapsedMilliseconds
-$a = [FrontBackProbe]::Trace($front, $input, 2); $b = [FrontBackProbe]::Trace($back, $input, 2)
+$a = [FrontBackProbe]::Trace($front, $input, $key::Make(2, 0)); $b = [FrontBackProbe]::Trace($back, $input, $key::Make(2, 0))
 Check 'Back 보기 Chain 탐색 = Front 탐색' ($a -eq $b -and $a.Length -gt 0) ("방문 {0}개 / 반전 + 다시 그리기 {1:N0} ms (도형 {2:N0})" -f $a.Split(',').Count, $switchMs, $items.Count)
 
 $r = ([FrontBackProbe]::LoadInBack($formBack, $back, $Factory, $Device, $seq, $input)).Split('|')

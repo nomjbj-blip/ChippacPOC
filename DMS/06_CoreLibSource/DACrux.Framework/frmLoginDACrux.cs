@@ -42,8 +42,6 @@ namespace DACrux.Framework
             lbl_UserID.Text = DACrux.Base.MultiLanguage.Translation("User ID");
             lbl_Password.Text = DACrux.Base.MultiLanguage.Translation("Password");
 
-            if (File.Exists("CustomCI.png"))
-                picCustomCI.Image = Image.FromFile("CustomCI.png");
         }
 
         private void butOk_Click(object sender, EventArgs e)
@@ -71,7 +69,7 @@ namespace DACrux.Framework
             try
             {
                 // 1. System Version 처리
-                lbl_DACruxVersion.Text = DACrux.Base.GlobalVariable.ApplicationLongVersion;
+                //lbl_DACruxVersion.Text = DACrux.Base.GlobalVariable.ApplicationLongVersion;
 
                 // 2. 화면 Faidin 효과
                 t = new System.Threading.Thread(new System.Threading.ThreadStart(ThreadFaidIn));

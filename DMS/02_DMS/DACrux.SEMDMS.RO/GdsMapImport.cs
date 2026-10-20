@@ -44,15 +44,11 @@ namespace DACrux.SEMDMS.RO
             }
         }
 
-        #endregion
-
-        #region [TQP_GDS_MAP_SUB_DEVICE]
-
-        public int SaveSubDeviceList(string strFactory, string strDeviceID, string[] aSubDeviceIDs, string[] aRemarks, string strUpdateUser)
+        public DataTable CopyMap(string strFactory, string strSourceDeviceID, string strTargetDeviceID, string strUser)
         {
             try
             {
-                return m_OBJ.SaveSubDeviceList(strFactory, strDeviceID, aSubDeviceIDs, aRemarks, strUpdateUser);
+                return m_OBJ.CopyMap(strFactory, strSourceDeviceID, strTargetDeviceID, strUser);
             }
             catch (Exception ex)
             {

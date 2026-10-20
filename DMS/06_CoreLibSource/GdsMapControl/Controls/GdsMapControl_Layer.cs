@@ -14,7 +14,7 @@ namespace NexplantQMS.GdsMap
 		private readonly GlSceneLayerList _layerList = new GlSceneLayerList();
 		private readonly GlDefectItemList _defectList = new GlDefectItemList();
 
-		// 사용자 지정 색상은 실행 중 유지한다. 미지정 레이어는 번호별 기본 팔레트를 사용한다.
+		// 사용자 지정 색상은 실행 중 유지한다(키 = Layer 번호 + DataType). 미지정 레이어는 기본 팔레트를 사용한다.
 		private Dictionary<int, Color> _layerColor = new Dictionary<int, Color>();
 		private static readonly Color[] DefaultLayerColors =
 		{
@@ -33,8 +33,10 @@ namespace NexplantQMS.GdsMap
 			if (Structure == null)
 				return;
 
+			// 원본 Layer(번호 단위) 표시 상태를 같은 번호의 화면 Layer(번호 + DataType) 모두에 맞춘다 (2026-10-20)
 			foreach (var layer in Structure.Layers)
-				_layerList.GetLayer(layer.LayerID).Visible = layer.Visible;
+				foreach (var sceneLayer in _layerList.Where(p => GdsLayerKey.Layer(p.LayerKey) == layer.LayerID))
+					sceneLayer.Visible = layer.Visible;
 
 			InvalidateWithDrawProgress();
 		}
@@ -54,7 +56,7 @@ namespace NexplantQMS.GdsMap
 				: dic.ToDictionary(p => p.Key, p => Color.FromArgb(255, p.Value));
 			foreach (var layer in _layerList)
 			{
-				Color color = GetLayerColor(layer.LayerID);
+				Color color = GetLayerColor(layer.LayerKey);
 				if (layer.Color.ToArgb() == color.ToArgb()) continue;
 				layer.Color = color;
 				UpdateLayerColorVertices(layer);
@@ -62,32 +64,35 @@ namespace NexplantQMS.GdsMap
 			InvalidateWithDrawProgress();
 		}
 
-		/// <summary>1~8번의 기존 색상을 유지하고, 다른 번호에도 일정한 기본 색상을 배정한다.</summary>
-		public Color GetDefaultLayerColor(int layerId)
+		/// <summary>
+		/// 1~8번의 기존 색상을 유지하고, 다른 번호에도 일정한 기본 색상을 배정한다.
+		/// 키(Layer 번호 + DataType) 기준: DataType 0 은 지금까지와 같은 색, 같은 번호의 다른 DataType 은 팔레트 다음 색 (2026-10-20)
+		/// </summary>
+		public Color GetDefaultLayerColor(int layerKey)
 		{
-			int index = (int)((((long)layerId - 1) % DefaultLayerColors.Length
-				+ DefaultLayerColors.Length) % DefaultLayerColors.Length);
+			long index = (long)GdsLayerKey.Layer(layerKey) - 1 + GdsLayerKey.DataType(layerKey);
+			index = ((index % DefaultLayerColors.Length) + DefaultLayerColors.Length) % DefaultLayerColors.Length;
 			return DefaultLayerColors[index];
 		}
 
 		/// <summary>사용자 지정 색상이 없으면 기본 팔레트 색상을 반환한다.</summary>
-		public Color GetLayerColor(int layerId)
+		public Color GetLayerColor(int layerKey)
 		{
-			return _layerColor.TryGetValue(layerId, out var color) ? color : GetDefaultLayerColor(layerId);
+			return _layerColor.TryGetValue(layerKey, out var color) ? color : GetDefaultLayerColor(layerKey);
 		}
 
 		/// <summary>
 		/// 한 레이어의 RGB 색상을 변경하고 GPU 데이터를 갱신한다.
 		/// 표시 상태, 선택 상태, 확대/이동 위치는 유지하며 채우기 투명도는 ColorAlpha를 따른다.
 		/// </summary>
-		public bool SetLayerColor(int layerId, Color color)
+		public bool SetLayerColor(int layerKey, Color color)
 		{
-			var layer = _layerList.FirstOrDefault(p => p.LayerID == layerId);
+			var layer = _layerList.FirstOrDefault(p => p.LayerKey == layerKey);
 			if (layer == null) return false;
-			_layerColor[layerId] = Color.FromArgb(255, color);
-			if (layer.Color.ToArgb() != _layerColor[layerId].ToArgb())
+			_layerColor[layerKey] = Color.FromArgb(255, color);
+			if (layer.Color.ToArgb() != _layerColor[layerKey].ToArgb())
 			{
-				layer.Color = _layerColor[layerId];
+				layer.Color = _layerColor[layerKey];
 				UpdateLayerColorVertices(layer);
 			}
 			InvalidateWithDrawProgress();
@@ -97,29 +102,32 @@ namespace NexplantQMS.GdsMap
 		/// <summary>현재 그려진 레이어를 목록으로 전달한다. 참조 구조에만 있는 레이어도 포함한다.</summary>
 		public List<LayerDisplayItem> GetLayerDisplayItems()
 		{
-			return _layerList.Select(p => new LayerDisplayItem(p.LayerID, p.Color, p.Visible)).ToList();
+			return _layerList.Select(p => new LayerDisplayItem(p.LayerKey, p.Color, p.Visible)).ToList();
 		}
 
 		/// <summary>
-		/// Layer별 화면 배치 도형 수(참조 구조를 펼친 인스턴스 포함). DB 저장 시 PLACED 행 수와 같다.
+		/// Layer 키(번호 + DataType)별 화면 배치 도형 수(참조 구조를 펼친 인스턴스 포함). DB 저장 시 PLACED 행 수와 같다.
 		/// Layer 목록의 도형 수 / 선택 합계 표시에 사용한다.
 		/// </summary>
 		public Dictionary<int, int> GetLayerElementCounts()
 		{
-			return _layerList.ToDictionary(p => p.LayerID, p => p.Items.Count);
+			return _layerList.ToDictionary(p => p.LayerKey, p => p.Items.Count);
 		}
 
 		/// <summary>
 		/// 목록의 체크 상태를 실제 렌더링 레이어에 일괄 반영한 뒤 한 번만 다시 그린다.
-		/// 최상위 Structure에도 같은 번호가 있으면 표시 상태를 함께 맞춘다.
+		/// 키는 Layer 번호 + DataType(GdsLayerKey). 최상위 Structure 의 원본 Layer(번호 단위)는 같은 번호의 키가 하나라도 보이면 보인다.
 		/// </summary>
 		public void SetLayerVisibility(IDictionary<int, bool> visibility)
 		{
 			foreach (var layer in _layerList)
-				if (visibility.TryGetValue(layer.LayerID, out var visible)) layer.Visible = visible;
+				if (visibility.TryGetValue(layer.LayerKey, out var visible)) layer.Visible = visible;
 			if (Structure != null)
 				foreach (var layer in Structure.Layers)
-					if (visibility.TryGetValue(layer.LayerID, out var visible)) layer.Visible = visible;
+				{
+					var keys = visibility.Where(p => GdsLayerKey.Layer(p.Key) == layer.LayerID).ToList();
+					if (keys.Count > 0) layer.Visible = keys.Any(p => p.Value);
+				}
 			InvalidateWithDrawProgress();
 		}
 

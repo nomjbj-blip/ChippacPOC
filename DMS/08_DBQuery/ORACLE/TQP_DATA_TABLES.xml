@@ -32,7 +32,9 @@ ORDER BY TABLE_NAME]]></commandtext>
         </parameters>
     </query>
     <query statement="Select" queryid="SELECT_TABLE_BY_WAFER" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT TABLE_NAME
+        <commandtext><![CDATA[-- 2026-10-15: TD 테이블 이름은 Program 으로만 정해져 여러 Factory 행이 같은 테이블을 가리킬 수 있다.
+--             이름이 두 번 나오면 첫 번째에서 빈 테이블을 DROP 한 뒤 두 번째 삭제가 ORA-00942 로 멈추므로 한 번만 돌려준다.
+SELECT DISTINCT TABLE_NAME
 FROM TQP_DATA_TABLES
 WHERE PROGRAM IN (
     SELECT PROGRAM
@@ -46,7 +48,8 @@ ORDER BY 1
         </parameters>
     </query>
     <query statement="Select" queryid="SELECT_TABLE_BY_LOT" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[SELECT TABLE_NAME
+        <commandtext><![CDATA[-- 2026-10-15: SELECT_TABLE_BY_WAFER 와 같은 이유로 테이블 이름을 한 번만 돌려준다.
+SELECT DISTINCT TABLE_NAME
 FROM TQP_DATA_TABLES
 WHERE PROGRAM IN (
     SELECT DISTINCT PROGRAM

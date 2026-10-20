@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(GdsMapForm));
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
@@ -38,22 +39,24 @@
             this.txtDbDevice = new System.Windows.Forms.TextBox();
             this.btnDbSave = new System.Windows.Forms.Button();
             this.btnDbStop = new System.Windows.Forms.Button();
+            this.lblTopCell = new System.Windows.Forms.Label();
+            this.cboTopCell = new System.Windows.Forms.ComboBox();
             this.dataGrid = new System.Windows.Forms.DataGridView();
             this.GDSContainer = new System.Windows.Forms.SplitContainer();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.map = new NexplantQMS.GdsMap.GdsMapControl();
+            this.statusStripMap = new System.Windows.Forms.StatusStrip();
+            this.progressMapLoad = new System.Windows.Forms.ToolStripProgressBar();
+            this.lblMapElapsed = new System.Windows.Forms.ToolStripStatusLabel();
+            this.lblMapStatus = new System.Windows.Forms.ToolStripStatusLabel();
+            this.lblMapCoordinate = new System.Windows.Forms.ToolStripStatusLabel();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.chkLayerItems = new NexplantQMS.GdsMap.LayerColorCheckedListBox();
             this.lblLayerSummary = new System.Windows.Forms.Label();
             this.panel2 = new System.Windows.Forms.Panel();
             this.btnLayerCheckAll = new System.Windows.Forms.Button();
-            this.btnLayer = new System.Windows.Forms.Button();
             this.btnLayerCheckNone = new System.Windows.Forms.Button();
-            this.statusStripMap = new System.Windows.Forms.StatusStrip();
-            this.progressMapLoad = new System.Windows.Forms.ToolStripProgressBar();
-            this.lblMapStatus = new System.Windows.Forms.ToolStripStatusLabel();
-            this.lblMapCoordinate = new System.Windows.Forms.ToolStripStatusLabel();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGrid)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.GDSContainer)).BeginInit();
@@ -62,9 +65,9 @@
             this.GDSContainer.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
+            this.statusStripMap.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.panel2.SuspendLayout();
-            this.statusStripMap.SuspendLayout();
             this.SuspendLayout();
             // 
             // panel1
@@ -75,21 +78,25 @@
             this.panel1.Controls.Add(this.txtDbDevice);
             this.panel1.Controls.Add(this.btnDbSave);
             this.panel1.Controls.Add(this.btnDbStop);
+            this.panel1.Controls.Add(this.lblTopCell);
+            this.panel1.Controls.Add(this.cboTopCell);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Margin = new System.Windows.Forms.Padding(4);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(1488, 59);
+            this.panel1.Size = new System.Drawing.Size(1488, 60);
             this.panel1.TabIndex = 2;
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(18, 13);
+            this.button1.Image = ((System.Drawing.Image)(resources.GetObject("button1.Image")));
+            this.button1.Location = new System.Drawing.Point(18, 9);
             this.button1.Margin = new System.Windows.Forms.Padding(4);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(178, 39);
+            this.button1.Size = new System.Drawing.Size(137, 42);
             this.button1.TabIndex = 2;
-            this.button1.Text = "Load from File";
+            this.button1.Text = "파일 열기";
+            this.button1.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
@@ -98,7 +105,7 @@
             this.chkOriginCross.AutoSize = true;
             this.chkOriginCross.Checked = true;
             this.chkOriginCross.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkOriginCross.Location = new System.Drawing.Point(502, 21);
+            this.chkOriginCross.Location = new System.Drawing.Point(469, 19);
             this.chkOriginCross.Margin = new System.Windows.Forms.Padding(4);
             this.chkOriginCross.Name = "chkOriginCross";
             this.chkOriginCross.Size = new System.Drawing.Size(112, 22);
@@ -110,7 +117,7 @@
             // lblDbDevice
             // 
             this.lblDbDevice.AutoSize = true;
-            this.lblDbDevice.Location = new System.Drawing.Point(203, 23);
+            this.lblDbDevice.Location = new System.Drawing.Point(170, 21);
             this.lblDbDevice.Name = "lblDbDevice";
             this.lblDbDevice.Size = new System.Drawing.Size(62, 18);
             this.lblDbDevice.TabIndex = 12;
@@ -118,7 +125,7 @@
             // 
             // txtDbDevice
             // 
-            this.txtDbDevice.Location = new System.Drawing.Point(271, 18);
+            this.txtDbDevice.Location = new System.Drawing.Point(238, 16);
             this.txtDbDevice.MaxLength = 50;
             this.txtDbDevice.Name = "txtDbDevice";
             this.txtDbDevice.Size = new System.Drawing.Size(211, 28);
@@ -126,25 +133,50 @@
             // 
             // btnDbSave
             // 
-            this.btnDbSave.Location = new System.Drawing.Point(625, 13);
+            this.btnDbSave.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Bold);
+            this.btnDbSave.Image = ((System.Drawing.Image)(resources.GetObject("btnDbSave.Image")));
+            this.btnDbSave.Location = new System.Drawing.Point(600, 9);
             this.btnDbSave.Margin = new System.Windows.Forms.Padding(4);
             this.btnDbSave.Name = "btnDbSave";
-            this.btnDbSave.Size = new System.Drawing.Size(209, 39);
+            this.btnDbSave.Size = new System.Drawing.Size(126, 42);
             this.btnDbSave.TabIndex = 16;
             this.btnDbSave.Text = "DB 저장";
+            this.btnDbSave.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.btnDbSave.UseVisualStyleBackColor = true;
             this.btnDbSave.Click += new System.EventHandler(this.btnDbSave_Click);
             // 
             // btnDbStop
             // 
-            this.btnDbStop.Location = new System.Drawing.Point(842, 13);
+            this.btnDbStop.Image = ((System.Drawing.Image)(resources.GetObject("btnDbStop.Image")));
+            this.btnDbStop.Location = new System.Drawing.Point(735, 9);
             this.btnDbStop.Margin = new System.Windows.Forms.Padding(4);
             this.btnDbStop.Name = "btnDbStop";
-            this.btnDbStop.Size = new System.Drawing.Size(209, 39);
+            this.btnDbStop.Size = new System.Drawing.Size(137, 42);
             this.btnDbStop.TabIndex = 17;
             this.btnDbStop.Text = "저장 중지";
+            this.btnDbStop.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.btnDbStop.UseVisualStyleBackColor = true;
             this.btnDbStop.Click += new System.EventHandler(this.btnDbStop_Click);
+            // 
+            // lblTopCell
+            // 
+            this.lblTopCell.AutoSize = true;
+            this.lblTopCell.Location = new System.Drawing.Point(892, 21);
+            this.lblTopCell.Name = "lblTopCell";
+            this.lblTopCell.Size = new System.Drawing.Size(39, 18);
+            this.lblTopCell.TabIndex = 18;
+            this.lblTopCell.Text = "Cell";
+            // 
+            // cboTopCell
+            // 
+            this.cboTopCell.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cboTopCell.Enabled = false;
+            this.cboTopCell.FormattingEnabled = true;
+            this.cboTopCell.Location = new System.Drawing.Point(937, 16);
+            this.cboTopCell.Name = "cboTopCell";
+            this.cboTopCell.Size = new System.Drawing.Size(360, 26);
+            this.cboTopCell.TabIndex = 19;
+            this.cboTopCell.SelectionChangeCommitted += new System.EventHandler(this.cboTopCell_SelectionChangeCommitted);
             // 
             // dataGrid
             // 
@@ -182,7 +214,7 @@
             this.dataGrid.RowHeadersDefaultCellStyle = dataGridViewCellStyle6;
             this.dataGrid.RowHeadersWidth = 62;
             this.dataGrid.RowTemplate.Height = 23;
-            this.dataGrid.Size = new System.Drawing.Size(1057, 1671);
+            this.dataGrid.Size = new System.Drawing.Size(1067, 861);
             this.dataGrid.TabIndex = 3;
             // 
             // GDSContainer
@@ -190,7 +222,7 @@
             this.GDSContainer.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.GDSContainer.Dock = System.Windows.Forms.DockStyle.Fill;
             this.GDSContainer.FixedPanel = System.Windows.Forms.FixedPanel.Panel2;
-            this.GDSContainer.Location = new System.Drawing.Point(0, 59);
+            this.GDSContainer.Location = new System.Drawing.Point(0, 60);
             this.GDSContainer.Name = "GDSContainer";
             // 
             // GDSContainer.Panel1
@@ -204,7 +236,7 @@
             this.GDSContainer.Panel2.Controls.Add(this.lblLayerSummary);
             this.GDSContainer.Panel2.Controls.Add(this.panel2);
             this.GDSContainer.Panel2MinSize = 400;
-            this.GDSContainer.Size = new System.Drawing.Size(1488, 901);
+            this.GDSContainer.Size = new System.Drawing.Size(1488, 900);
             this.GDSContainer.SplitterDistance = 1083;
             this.GDSContainer.TabIndex = 5;
             // 
@@ -216,7 +248,7 @@
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(1081, 899);
+            this.tabControl1.Size = new System.Drawing.Size(1081, 898);
             this.tabControl1.TabIndex = 1;
             // 
             // tabPage1
@@ -226,7 +258,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 28);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(1073, 867);
+            this.tabPage1.Size = new System.Drawing.Size(1073, 866);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Map";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -241,99 +273,21 @@
             this.map.Margin = new System.Windows.Forms.Padding(6, 4, 6, 4);
             this.map.Mode = NexplantQMS.GdsMap.GdsMapControl.ViewMode.View;
             this.map.Name = "map";
-            this.map.Size = new System.Drawing.Size(1067, 825);
+            this.map.Size = new System.Drawing.Size(1067, 824);
             this.map.TabIndex = 4;
             this.map.VSync = false;
             this.map.MouseWorldPositionChanged += new System.EventHandler<System.Drawing.PointF>(this.Map_MouseWorldPositionChanged);
             this.map.RenderProgressChanged += new System.EventHandler<NexplantQMS.GdsMap.GdsMapRenderProgressChangedEventArgs>(this.Map_RenderProgressChanged);
-            this.map.FirstFrameMeasured += new System.EventHandler<NexplantQMS.GdsMap.GdsMapLoadMetrics>(this.Map_FirstFrameMeasured);
-            // 
-            // tabPage2
-            // 
-            this.tabPage2.Controls.Add(this.dataGrid);
-            this.tabPage2.Location = new System.Drawing.Point(4, 28);
-            this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(1063, 1677);
-            this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "Grid";
-            this.tabPage2.UseVisualStyleBackColor = true;
-            // 
-            // chkLayerItems
-            // 
-            this.chkLayerItems.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.chkLayerItems.FormattingEnabled = true;
-            this.chkLayerItems.Location = new System.Drawing.Point(0, 175);
-            this.chkLayerItems.Name = "chkLayerItems";
-            this.chkLayerItems.Size = new System.Drawing.Size(399, 724);
-            this.chkLayerItems.TabIndex = 4;
-            this.chkLayerItems.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.ChkLayerItems_ItemCheck);
-            this.chkLayerItems.Format += new System.Windows.Forms.ListControlConvertEventHandler(this.ChkLayerItems_Format);
-            this.chkLayerItems.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.ChkLayerItems_MouseDoubleClick);
-            // 
-            // lblLayerSummary
-            // 
-            this.lblLayerSummary.Dock = System.Windows.Forms.DockStyle.Top;
-            this.lblLayerSummary.Location = new System.Drawing.Point(0, 139);
-            this.lblLayerSummary.Name = "lblLayerSummary";
-            this.lblLayerSummary.Padding = new System.Windows.Forms.Padding(4, 0, 0, 0);
-            this.lblLayerSummary.Size = new System.Drawing.Size(399, 36);
-            this.lblLayerSummary.TabIndex = 9;
-            this.lblLayerSummary.Text = "Layer (도형 수)";
-            this.lblLayerSummary.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // panel2
-            // 
-            this.panel2.Controls.Add(this.btnLayerCheckAll);
-            this.panel2.Controls.Add(this.btnLayer);
-            this.panel2.Controls.Add(this.btnLayerCheckNone);
-            this.panel2.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel2.Location = new System.Drawing.Point(0, 0);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(399, 139);
-            this.panel2.TabIndex = 2;
-            // 
-            // btnLayerCheckAll
-            // 
-            this.btnLayerCheckAll.Enabled = false;
-            this.btnLayerCheckAll.Location = new System.Drawing.Point(7, 7);
-            this.btnLayerCheckAll.Margin = new System.Windows.Forms.Padding(4);
-            this.btnLayerCheckAll.Name = "btnLayerCheckAll";
-            this.btnLayerCheckAll.Size = new System.Drawing.Size(204, 41);
-            this.btnLayerCheckAll.TabIndex = 2;
-            this.btnLayerCheckAll.Text = "전체 체크";
-            this.btnLayerCheckAll.UseVisualStyleBackColor = true;
-            // 
-            // btnLayer
-            // 
-            this.btnLayer.Enabled = false;
-            this.btnLayer.Location = new System.Drawing.Point(7, 90);
-            this.btnLayer.Margin = new System.Windows.Forms.Padding(4);
-            this.btnLayer.Name = "btnLayer";
-            this.btnLayer.Size = new System.Drawing.Size(204, 38);
-            this.btnLayer.TabIndex = 1;
-            this.btnLayer.Text = "Redraw";
-            this.btnLayer.UseVisualStyleBackColor = true;
-            // 
-            // btnLayerCheckNone
-            // 
-            this.btnLayerCheckNone.Enabled = false;
-            this.btnLayerCheckNone.Location = new System.Drawing.Point(7, 49);
-            this.btnLayerCheckNone.Margin = new System.Windows.Forms.Padding(4);
-            this.btnLayerCheckNone.Name = "btnLayerCheckNone";
-            this.btnLayerCheckNone.Size = new System.Drawing.Size(204, 40);
-            this.btnLayerCheckNone.TabIndex = 3;
-            this.btnLayerCheckNone.Text = "전체 미체크";
-            this.btnLayerCheckNone.UseVisualStyleBackColor = true;
             // 
             // statusStripMap
             // 
             this.statusStripMap.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.statusStripMap.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.progressMapLoad,
+            this.lblMapElapsed,
             this.lblMapStatus,
             this.lblMapCoordinate});
-            this.statusStripMap.Location = new System.Drawing.Point(3, 828);
+            this.statusStripMap.Location = new System.Drawing.Point(3, 827);
             this.statusStripMap.Name = "statusStripMap";
             this.statusStripMap.Size = new System.Drawing.Size(1067, 36);
             this.statusStripMap.SizingGrip = false;
@@ -346,10 +300,17 @@
             this.progressMapLoad.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
             this.progressMapLoad.Visible = false;
             // 
+            // lblMapElapsed
+            // 
+            this.lblMapElapsed.ForeColor = System.Drawing.Color.DimGray;
+            this.lblMapElapsed.Name = "lblMapElapsed";
+            this.lblMapElapsed.Size = new System.Drawing.Size(0, 29);
+            this.lblMapElapsed.Visible = false;
+            // 
             // lblMapStatus
             // 
             this.lblMapStatus.Name = "lblMapStatus";
-            this.lblMapStatus.Size = new System.Drawing.Size(930, 29);
+            this.lblMapStatus.Size = new System.Drawing.Size(940, 29);
             this.lblMapStatus.Spring = true;
             this.lblMapStatus.Text = "대기";
             this.lblMapStatus.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -360,6 +321,84 @@
             this.lblMapCoordinate.Name = "lblMapCoordinate";
             this.lblMapCoordinate.Size = new System.Drawing.Size(112, 29);
             this.lblMapCoordinate.Text = "X: — / Y: —";
+            // 
+            // tabPage2
+            // 
+            this.tabPage2.Controls.Add(this.dataGrid);
+            this.tabPage2.Location = new System.Drawing.Point(4, 28);
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage2.Size = new System.Drawing.Size(1073, 867);
+            this.tabPage2.TabIndex = 1;
+            this.tabPage2.Text = "Grid";
+            this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // chkLayerItems
+            // 
+            this.chkLayerItems.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.chkLayerItems.FormattingEnabled = true;
+            this.chkLayerItems.Location = new System.Drawing.Point(0, 146);
+            this.chkLayerItems.Name = "chkLayerItems";
+            this.chkLayerItems.Size = new System.Drawing.Size(399, 752);
+            this.chkLayerItems.TabIndex = 4;
+            this.chkLayerItems.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.ChkLayerItems_ItemCheck);
+            this.chkLayerItems.Format += new System.Windows.Forms.ListControlConvertEventHandler(this.ChkLayerItems_Format);
+            this.chkLayerItems.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.ChkLayerItems_MouseDoubleClick);
+            // 
+            // lblLayerSummary
+            // 
+            this.lblLayerSummary.Dock = System.Windows.Forms.DockStyle.Top;
+            this.lblLayerSummary.Location = new System.Drawing.Point(0, 110);
+            this.lblLayerSummary.Name = "lblLayerSummary";
+            this.lblLayerSummary.Padding = new System.Windows.Forms.Padding(4, 0, 0, 0);
+            this.lblLayerSummary.Size = new System.Drawing.Size(399, 36);
+            this.lblLayerSummary.TabIndex = 9;
+            this.lblLayerSummary.Text = "Layer (도형 수)";
+            this.lblLayerSummary.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // panel2
+            // 
+            this.panel2.Controls.Add(this.btnLayerCheckAll);
+            this.panel2.Controls.Add(this.btnLayerCheckNone);
+            this.panel2.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panel2.Location = new System.Drawing.Point(0, 0);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(399, 110);
+            this.panel2.TabIndex = 2;
+            // 
+            // btnLayerCheckAll
+            // 
+            this.btnLayerCheckAll.Enabled = false;
+            this.btnLayerCheckAll.Image = ((System.Drawing.Image)(resources.GetObject("btnLayerCheckAll.Image")));
+            this.btnLayerCheckAll.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnLayerCheckAll.Location = new System.Drawing.Point(7, 7);
+            this.btnLayerCheckAll.Margin = new System.Windows.Forms.Padding(4);
+            this.btnLayerCheckAll.Name = "btnLayerCheckAll";
+            this.btnLayerCheckAll.Padding = new System.Windows.Forms.Padding(9, 0, 0, 0);
+            this.btnLayerCheckAll.Size = new System.Drawing.Size(204, 42);
+            this.btnLayerCheckAll.TabIndex = 2;
+            this.btnLayerCheckAll.Text = "전체 체크";
+            this.btnLayerCheckAll.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnLayerCheckAll.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.btnLayerCheckAll.UseVisualStyleBackColor = true;
+            this.btnLayerCheckAll.Click += new System.EventHandler(this.btnLayerCheckAll_Click);
+            // 
+            // btnLayerCheckNone
+            // 
+            this.btnLayerCheckNone.Enabled = false;
+            this.btnLayerCheckNone.Image = ((System.Drawing.Image)(resources.GetObject("btnLayerCheckNone.Image")));
+            this.btnLayerCheckNone.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnLayerCheckNone.Location = new System.Drawing.Point(7, 52);
+            this.btnLayerCheckNone.Margin = new System.Windows.Forms.Padding(4);
+            this.btnLayerCheckNone.Name = "btnLayerCheckNone";
+            this.btnLayerCheckNone.Padding = new System.Windows.Forms.Padding(9, 0, 0, 0);
+            this.btnLayerCheckNone.Size = new System.Drawing.Size(204, 42);
+            this.btnLayerCheckNone.TabIndex = 3;
+            this.btnLayerCheckNone.Text = "전체 미체크";
+            this.btnLayerCheckNone.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnLayerCheckNone.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.btnLayerCheckNone.UseVisualStyleBackColor = true;
+            this.btnLayerCheckNone.Click += new System.EventHandler(this.btnLayerCheckNone_Click);
             // 
             // GdsMapForm
             // 
@@ -385,10 +424,10 @@
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.tabPage1.PerformLayout();
-            this.tabPage2.ResumeLayout(false);
-            this.panel2.ResumeLayout(false);
             this.statusStripMap.ResumeLayout(false);
             this.statusStripMap.PerformLayout();
+            this.tabPage2.ResumeLayout(false);
+            this.panel2.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -402,6 +441,8 @@
         private System.Windows.Forms.TextBox txtDbDevice;
         private System.Windows.Forms.Button btnDbSave;
         private System.Windows.Forms.Button btnDbStop;
+        private System.Windows.Forms.Label lblTopCell;
+        private System.Windows.Forms.ComboBox cboTopCell;
 		private NexplantQMS.GdsMap.GdsMapControl map;
         private System.Windows.Forms.SplitContainer GDSContainer;
         private NexplantQMS.GdsMap.LayerColorCheckedListBox chkLayerItems;
@@ -411,10 +452,10 @@
         private System.Windows.Forms.Label lblLayerSummary;
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.Button btnLayerCheckAll;
-        private System.Windows.Forms.Button btnLayer;
         private System.Windows.Forms.Button btnLayerCheckNone;
         private System.Windows.Forms.StatusStrip statusStripMap;
         private System.Windows.Forms.ToolStripProgressBar progressMapLoad;
+        private System.Windows.Forms.ToolStripStatusLabel lblMapElapsed;
         private System.Windows.Forms.ToolStripStatusLabel lblMapStatus;
         private System.Windows.Forms.ToolStripStatusLabel lblMapCoordinate;
     }

@@ -14,14 +14,14 @@ namespace NexplantQMS.GdsMap
     /// </summary>
     public partial class GdsMapViewForm
     {
-        /// <summary>Map 정보 문구(파일 / 건수 / 저장 기준 / Sub Device / 보기 기준)를 Device 콤보 툴팁에 넣는다.</summary>
+        /// <summary>Map 정보 문구(파일 / 건수 / 저장 기준 / 보기 기준)를 Device 콤보 툴팁에 넣는다.</summary>
         private void SetMapInfo(string text)
         {
             toolTipView.SetToolTip(cboDevice, text ?? string.Empty);
         }
 
         /// <summary>
-        /// Chain 작업 안내를 상태 줄에 보인다. 한 문장으로 지금 상태와 다음에 할 일만 쓴다(계산 / 확인용 세부 값은 쓰지 않는다).
+        /// Chain 작업 상태를 상태 줄에 보인다. 지금 상태만 짧게 쓴다(사용법 안내 / 계산 / 확인용 세부 값은 쓰지 않는다, 2026-10-15).
         /// 저장 진행처럼 긴 작업 중에도 바로 보이도록 상태 줄을 다시 그린다.
         /// </summary>
         private void SetChainStatus(string text)
@@ -31,17 +31,15 @@ namespace NexplantQMS.GdsMap
         }
 
         /// <summary>
-        /// Chain 을 고르거나 다시 연결했을 때 그 Chain 의 상태로 다음 할 일을 안내한다.
-        /// 순서: Layer 미조회 -> 저장 미완료 -> Input 없음 -> 후보 경로 없음 -> 편집 가능.
+        /// Chain 을 고르거나 다시 연결했을 때 그 Chain 의 상태를 짧게 보인다(사용법 안내 문구 없음, 2026-10-15).
+        /// 순서: Layer 미조회 -> 저장 미완료 -> 선택.
         /// </summary>
         private string ChainGuide(ChainDefinition chain)
         {
-            if (chain == null) return "목록에서 Chain 을 선택하거나 [새 Chain]을 누르세요.";
+            if (chain == null) return string.Empty;
             if (chain.DbIncomplete != null) return chain.Name + ": " + chain.DbIncomplete;
             if (chain.ChainSeq != null && chain.SavedFingerprint == null)
-                return chain.Name + ": 저장이 끝나지 않은 Chain 입니다. [Chain 저장(DB)]으로 다시 저장하세요.";
-            if (chain.Inputs.Count == 0) return chain.Name + ": [Input 지정]을 누르고 지도에서 Input 도형을 클릭하세요.";
-            if (!chain.TraceShown) return chain.Name + ": [후보 경로 찾기]를 누르세요.";
+                return chain.Name + ": 저장 미완료";
             return chain.Name + " 선택";
         }
 
@@ -72,7 +70,7 @@ namespace NexplantQMS.GdsMap
             return name.Length <= 28 ? name : name.Substring(0, 27) + "…";
         }
 
-        /// <summary>[Map ▾] Map 관리 메뉴(Sub Device 설정 / 원점 표시 / Map 삭제)를 버튼 아래에 연다.</summary>
+        /// <summary>[Map ▾] Map 관리 메뉴(원점 표시 / Map 삭제)를 버튼 아래에 연다.</summary>
         private void btnMapMenu_Click(object sender, EventArgs e)
         {
             mnuMap.Show(btnMapMenu, new Point(0, btnMapMenu.Height));

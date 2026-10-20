@@ -1,5 +1,5 @@
 -- 2026-10-07: E-Test 결과 파일 기준 정보 테이블 TQP_GDS_SRC_FILE
--- 설계: 문서/2026-10-07_ETest_결과파일_Parsing_DB설계.md 9절
+-- 설계: 문서/설계/04_ETest/2026-10-07_ETest_결과파일_Parsing_DB설계.md 9절
 -- 범위: E-Test 결과 파일만 (KLARF 는 별도 작업). 측정값 / Die / Limit 은 나중 설계.
 -- 한 행 = E-Test 파일 1개. 기준 정보는 파일명에서 읽은 값을 그대로 넣는다.
 -- WAFER_ID 는 LOT_ID + '-' + 2자리 SLOT_NO 가상 컬럼이다 (R1). INSERT / UPDATE 문에 넣지 않는다 (ORA-54013).

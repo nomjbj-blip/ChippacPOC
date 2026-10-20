@@ -42,7 +42,7 @@ VALUES
     </query>
     <query statement="Select" queryid="SELECT_CHAIN_MEMBER" commandtype="Text" description="Chain 포함 도형 조회 + 도형 Layer (2026-10-06 3단계: View 화면이 Chain에 필요한 Layer를 함께 조회하기 위해 LAYER_ID 추가)" commandtimeout="600">
         <commandtext><![CDATA[SELECT /*+ LEADING(M) USE_NL(P) INDEX(P PK_GDS_PLACED_EL) */
-       M.PLACED_ELEMENT_ID, M.ROLE_CODE, M.INCLUSION_SOURCE, M.MARKER_X, M.MARKER_Y, P.LAYER_ID
+       M.PLACED_ELEMENT_ID, M.ROLE_CODE, M.INCLUSION_SOURCE, M.MARKER_X, M.MARKER_Y, P.LAYER_ID, P.DATA_TYPE
   FROM TQP_GDS_CHAIN_MEMBER M
   JOIN TQP_GDS_PLACED_EL P
     ON P.FACTORY = M.FACTORY AND P.DEVICE_ID = M.DEVICE_ID AND P.PLACED_ELEMENT_ID = M.PLACED_ELEMENT_ID
@@ -62,8 +62,29 @@ VALUES
          Chain 저장 상태(READY / DRAFT)와 화면 Chain 선택은 BSL이 SELECT_CHAIN_LIST 결과로 거른다. -->
     <query statement="Select" queryid="SELECT_CHAIN_MEMBER_BOUNDS_ALL" commandtype="Text" description="연관 분석: Device 전체 Chain Member + 도형 Layer / Bounds" commandtimeout="600">
         <commandtext><![CDATA[SELECT /*+ LEADING(M) USE_NL(P) INDEX(P PK_GDS_PLACED_EL) */
-       M.CHAIN_SEQ, M.PLACED_ELEMENT_ID, M.ROLE_CODE, P.LAYER_ID,
+       M.CHAIN_SEQ, M.PLACED_ELEMENT_ID, M.ROLE_CODE, P.LAYER_ID, P.DATA_TYPE,
        P.MIN_X, P.MIN_Y, P.MAX_X, P.MAX_Y
+  FROM TQP_GDS_CHAIN_MEMBER M
+  JOIN TQP_GDS_PLACED_EL P
+    ON P.FACTORY = M.FACTORY AND P.DEVICE_ID = M.DEVICE_ID AND P.PLACED_ELEMENT_ID = M.PLACED_ELEMENT_ID
+ WHERE M.FACTORY = :factory
+   AND M.DEVICE_ID = :device_id
+   AND M.VERSION_NO = 1
+ ORDER BY M.CHAIN_SEQ, M.PLACED_ELEMENT_ID]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
+        </parameters>
+    </query>
+    <!-- 2026-10-16 추가: 연관 분석 서버 Cache(설계 05_연관분석/2026-10-15_GDS_KLARF_ETest_통합분석_데이터_설계.md 4.5절)가
+         Device 의 모든 Chain Member 실제 모양(BOUNDARY 다각형 / PATH 중심선 + 폭 + 끝 처리)을 한 번에 읽는다.
+         SELECT_CHAIN_MEMBER_BOUNDS_ALL 과 같은 조인 / 힌트에 도형 종류 / 폭 / 좌표(POINTS_BIN v1)를 더했다. 좌표는 저장 기준 µm. -->
+    <query statement="Select" queryid="SELECT_CHAIN_MEMBER_SHAPE_ALL" commandtype="Text" description="연관 분석: Device 전체 Chain Member + 도형 모양(종류 / 폭 / 끝 처리 / 좌표)" commandtimeout="600">
+        <commandtext><![CDATA[SELECT /*+ LEADING(M) USE_NL(P) INDEX(P PK_GDS_PLACED_EL) */
+       M.CHAIN_SEQ, M.PLACED_ELEMENT_ID, M.ROLE_CODE, P.LAYER_ID, P.DATA_TYPE,
+       P.ELEMENT_TYPE, P.CLOSED_FLAG, P.PATH_WIDTH, P.PATH_TYPE,
+       P.MIN_X, P.MIN_Y, P.MAX_X, P.MAX_Y,
+       P.POINTS_FORMAT_VERSION, P.POINT_COUNT, P.POINTS_BIN
   FROM TQP_GDS_CHAIN_MEMBER M
   JOIN TQP_GDS_PLACED_EL P
     ON P.FACTORY = M.FACTORY AND P.DEVICE_ID = M.DEVICE_ID AND P.PLACED_ELEMENT_ID = M.PLACED_ELEMENT_ID
@@ -89,6 +110,23 @@ VALUES
             <param direction="Input" dbtype="VarChar" size="30">:factory</param>
             <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
             <param direction="Input" dbtype="Number" size="0">:chain_seq</param>
+        </parameters>
+    </query>
+    <!-- Map 복사(GdsMapImport.CopyMap, 2026-10-15): 원본 Device 의 행을 새 Device 이름으로 INSERT ... SELECT (Chain 1개씩) -->
+    <query statement="Insert" queryid="COPY_CHAIN_MEMBER" commandtype="Text" description="Map 복사: Chain 포함 도형 / 단자 Marker" commandtimeout="600">
+        <commandtext><![CDATA[INSERT INTO TQP_GDS_CHAIN_MEMBER
+    (FACTORY, DEVICE_ID, CHAIN_SEQ, VERSION_NO, PLACED_ELEMENT_ID, ROLE_CODE, INCLUSION_SOURCE, MARKER_X, MARKER_Y)
+SELECT FACTORY, :target_device_id, :new_chain_seq, VERSION_NO, PLACED_ELEMENT_ID, ROLE_CODE, INCLUSION_SOURCE, MARKER_X, MARKER_Y
+  FROM TQP_GDS_CHAIN_MEMBER
+ WHERE FACTORY = :factory
+   AND DEVICE_ID = :source_device_id
+   AND CHAIN_SEQ = :source_chain_seq]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="50">:target_device_id</param>
+            <param direction="Input" dbtype="Number" size="0">:new_chain_seq</param>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:source_device_id</param>
+            <param direction="Input" dbtype="Number" size="0">:source_chain_seq</param>
         </parameters>
     </query>
 </queryxml>

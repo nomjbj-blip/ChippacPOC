@@ -25,7 +25,7 @@ namespace DACrux.TEST.ENGUI
     /// 6. Die Pitch: 기본 = KLARF DiePitch (Die + Scribe). 작업자가 바꾸면 [원형 생성] 때 격자 / Die 크기에 쓰고 CHIP_SIZE_X / Y 로 저장한다 (2026-10-13).
     ///    KLARF Defect 위치(XREL / YREL)는 KLARF Pitch 칸 기준이라, 값이 다르면 정보창에 차이와 어긋나는 양을 표시한다.
     ///    Die 크기 / Scribe 폭은 입력받지 않는다. GDS 좌표 변환용 Scribe 오프셋은 연관 분석(F07) 설정에서 다룬다.
-    /// 설계: 문서/2026-10-06_KLARF_Map_Setup_설계.md
+    /// 설계: 문서/설계/03_KLARF_Map/2026-10-06_KLARF_Map_Setup_설계.md
     /// </summary>
     public partial class frmStandardMapSetup : DACrux.Framework.Base.DACruxUXBasic01
     {
@@ -95,10 +95,11 @@ namespace DACrux.TEST.ENGUI
         private void btnParse_Click(object sender, EventArgs e)
         {
             ClearMap();
+            string path = txtFile.Text.Trim();
+            IDisposable scope = busyBar.Begin("KLARF 읽기 / 원형 Map 만들기");
             try
             {
-                Cursor = Cursors.WaitCursor;
-                KlarfMapSource loaded = KlarfMapSource.Load(txtFile.Text.Trim(), null);
+                KlarfMapSource loaded = busyBar.Run("파일 읽기", () => KlarfMapSource.Load(path, null));
 
                 updatingSettings = true;
                 source = loaded;
@@ -121,18 +122,19 @@ namespace DACrux.TEST.ENGUI
                 updatingSettings = false;
 
                 GenerateCircleMap();
-                lblStatus.Text = "읽기 완료 / 원형 Map 을 만들었습니다. Edit Map 메뉴로 필요 없는 Die 를 지우세요.";
+                lblStatus.Text = "읽기 완료 / 원형 Map 생성";
             }
             catch (Exception ex)
             {
                 updatingSettings = false;
+                scope.Dispose();
                 ClearMap();
-                lblStatus.Text = "파일 읽기 실패 / 파일 내용을 확인하세요.";
+                lblStatus.Text = "파일 읽기 실패";
                 MessageBox.Show(this, ex.Message, "KLARF 파일 확인", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             finally
             {
-                Cursor = Cursors.Default;
+                scope.Dispose();
             }
         }
 
@@ -206,7 +208,7 @@ namespace DACrux.TEST.ENGUI
             btnPitchKlarf.Enabled = false;
             txtInfo.Clear();
             ClearDieCount();
-            lblStatus.Text = "KLARF 파일을 선택하세요.";
+            lblStatus.Text = string.Empty;
             m_wMap.DieNumbers = null;
             m_wMap.DieClear();
             m_wMap.Redraw();
@@ -227,17 +229,21 @@ namespace DACrux.TEST.ENGUI
                 updatingSettings = false;
                 return;
             }
-            updatingSettings = true;
-            ApplyWaferOrigin(source.Wafers[cmbKlarfWafer.SelectedIndex]);
-            updatingSettings = false;
-            GenerateCircleMap();
+            // 확인 뒤 원형 Map 다시 만들기(Die 반복 + 다시 그리기) 동안 모래시계 커서 (2026-10-15)
+            using (DACrux.SEMDMS.Control.BusyCursor.Show(this))
+            {
+                updatingSettings = true;
+                ApplyWaferOrigin(source.Wafers[cmbKlarfWafer.SelectedIndex]);
+                updatingSettings = false;
+                GenerateCircleMap();
+            }
         }
 
         /// <summary>Wafer 크기 / Edge / XY 방향 / Flat Zone / 원점 / Die Pitch 가 바뀌면 [원형 생성] 을 눌러 반영하도록 안내만 한다.</summary>
         private void MapSettingsChanged(object sender, EventArgs e)
         {
             if (updatingSettings || source == null) return;
-            lblStatus.Text = "설정이 바뀌었습니다. [원형 생성] 을 눌러 반영하세요.";
+            lblStatus.Text = "설정 변경됨 / 원형 생성 전";
         }
 
         /// <summary>
@@ -252,7 +258,7 @@ namespace DACrux.TEST.ENGUI
             updatingSettings = false;
             bool applied = !PitchDiffers(m_wMap.DieSizeX, source.PitchX) && !PitchDiffers(m_wMap.DieSizeY, source.PitchY);
             lblStatus.Text = applied ? "Die Pitch 가 이미 KLARF 값입니다."
-                : "Die Pitch 를 KLARF 값으로 되돌렸습니다. [원형 생성] 을 눌러 반영하세요.";
+                : "Die Pitch 를 KLARF 값으로 되돌렸습니다.";
         }
 
         /// <summary>현재 설정으로 원형 Map 을 다시 만든다. 편집 내용이 있으면 먼저 확인한다.</summary>
@@ -261,7 +267,8 @@ namespace DACrux.TEST.ENGUI
             if (source == null || !ConfirmRegenerate()) return;
             try
             {
-                GenerateCircleMap();
+                using (DACrux.SEMDMS.Control.BusyCursor.Show(this)) // 원형 Map 다시 만드는 동안 모래시계 커서 (2026-10-15)
+                    GenerateCircleMap();
                 lblStatus.Text = "원형 Map 을 다시 만들었습니다.";
             }
             catch (Exception ex)
@@ -401,9 +408,7 @@ namespace DACrux.TEST.ENGUI
             if (radio != null && !radio.Checked) return;
             ApplyEditMode();
             if (source != null)
-                lblStatus.Text = rdoRemove.Checked ? "제거 모드: Map 에서 Die 를 클릭하거나 드래그하면 제거(-1)됩니다."
-                    : rdoRestore.Checked ? "복원 모드: Map 에서 Die 를 클릭하거나 드래그하면 사용(1)으로 되살아납니다."
-                    : "보기 모드: 클릭해도 Die 가 바뀌지 않습니다. 드래그하면 확대합니다.";
+                lblStatus.Text = rdoRemove.Checked ? "제거 모드" : rdoRestore.Checked ? "복원 모드" : "보기 모드";
         }
 
         /// <summary>
@@ -437,9 +442,12 @@ namespace DACrux.TEST.ENGUI
         {
             if (source == null || currentGrid == null) return;
             // 입력칸의 Edge / Flat Zone 위치 / 형태를 바로 쓰고, Notch / Flat 영역은 그리기 중에 계산되므로 먼저 다시 그린다.
-            m_wMap.EdgeSize = (double)numEdge.Value;
-            ApplyFlatZone();
-            m_wMap.Redraw();
+            using (DACrux.SEMDMS.Control.BusyCursor.Show(this)) // 다시 그리는 동안 모래시계 커서 (2026-10-15)
+            {
+                m_wMap.EdgeSize = (double)numEdge.Value;
+                ApplyFlatZone();
+                m_wMap.Redraw();
+            }
             RemoveDies(die => !m_wMap.IsInsideWafer(die), "Wafer 밖 제거",
                 "Wafer(Edge {2:#,0} µm 포함) 밖에 걸친 사용 Die {1}개를 제거합니다.");
         }
@@ -464,10 +472,14 @@ namespace DACrux.TEST.ENGUI
             string message = string.Format(CultureInfo.InvariantCulture, messageFormat, inspectedDies.Count, dies.Count, (double)numEdge.Value);
             if (!AskYesNo(message + "\r\n\r\n계속하시겠습니까?", title))
                 return;
-            foreach (Die die in dies) die.DieProp = -1;
-            dieEdited = true;
-            m_wMap.Redraw();
-            UpdateInfo();
+            // 확인 뒤 Die 변경 / 다시 그리기 / 정보 갱신 동안 모래시계 커서 (2026-10-15)
+            using (DACrux.SEMDMS.Control.BusyCursor.Show(this))
+            {
+                foreach (Die die in dies) die.DieProp = -1;
+                dieEdited = true;
+                m_wMap.Redraw();
+                UpdateInfo();
+            }
             lblStatus.Text = title + ": " + dies.Count + "개 제거했습니다.";
         }
 
@@ -529,25 +541,13 @@ namespace DACrux.TEST.ENGUI
             sb.AppendLine("DEVICE: " + source.DeviceID);
             sb.AppendLine("LOT: " + source.LotID);
             sb.AppendLine(string.Format("WAFER: {0} (Slot {1})", currentWafer.WaferID, currentWafer.Slot));
-            sb.AppendLine("SETUP / STEP: " + source.SetupID + " / " + source.StepID);
-            sb.AppendLine();
-            sb.AppendLine(string.Format(CultureInfo.InvariantCulture, "Wafer: {0:#,0} µm (파일 {1} mm)", m_wMap.WaferSize, source.SampleSize));
+            sb.AppendLine(string.Format(CultureInfo.InvariantCulture, "Wafer: {0:#,0} µm", m_wMap.WaferSize));
             AppendPitchInfo(sb);
-            sb.AppendLine(string.Format("Notch(파일): {0} / {1} ({2}°)", source.MarkType, source.MarkLocation, source.NotchAngle));
-            sb.AppendLine(string.Format("Flat Zone(적용): {0} / {1} ({2}°)", m_wMap.NotchType, KlarfMapRule.AngleToFlatZone(m_wMap.NotchAngle), m_wMap.NotchAngle));
             sb.AppendLine(string.Format(CultureInfo.InvariantCulture, "원점(Center): {0:#,0.###}, {1:#,0.###} µm", m_wMap.OriginX, m_wMap.OriginY));
             MapDefStoredValues stored = MapCreationService.ToStoredValues(m_wMap, currentDirection, currentGrid);
-            sb.AppendLine(string.Format(CultureInfo.InvariantCulture, "저장값: EDGE {0:0.###} mm / ORIGIN_MICRO {1:#,0.###}, {2:#,0.###}",
-                stored.EdgeSizeMm, stored.OriginMicroX, stored.OriginMicroY));
-            sb.AppendLine(string.Format("KLARF (0,0) -> LeftBottom ({0}, {1}) / 출처: {2}", currentWafer.ShiftX, currentWafer.ShiftY,
-                source.OriginFromDB ? "TQD_SETUP" : "계산기"));
-            sb.AppendLine(string.Format("격자 (LeftBottom): X {0}~{1} / Y {2}~{3}", currentGrid.MinX, currentGrid.MaxX, currentGrid.MinY, currentGrid.MaxY));
-            if (currentGrid.MinX < 1 || currentGrid.MinY < 1)
-                sb.AppendLine("※ 0 이하 인덱스가 있습니다. KLARF (0,0) Die 인덱스를 유지하면서 격자가 왼쪽 / 아래로 늘어났습니다 (Pitch / 원점 확인).");
             sb.AppendLine(string.Format("XY 방향(저장): {0} / 원점 인덱스 {1}, {2}", currentDirection, stored.OriginIndexX, stored.OriginIndexY));
-            if (currentDirection != XYDirection.LeftBottom)
-                sb.AppendLine("※ DMS Defect 인덱스는 LeftBottom 기준이라 이 Map 번호와 다릅니다 (형상은 같음).");
-            sb.AppendLine();
+            if (currentGrid.MinX < 1 || currentGrid.MinY < 1)
+                sb.AppendLine("※ 0 이하 인덱스 있음");
             sb.AppendLine(string.Format("사용 Die: {0} / 제거(-1): {1} / 기타: {2}", used, removed, other));
             sb.AppendLine(string.Format("검사 Die: {0} / 그중 제거됨: {1}", inspectedDies.Count, inspectedRemoved));
             sb.AppendLine("Defect: " + currentWafer.DefectCount);
@@ -577,7 +577,7 @@ namespace DACrux.TEST.ENGUI
             int farX = Math.Max(Math.Abs(currentGrid.MinX - currentWafer.ShiftX), Math.Abs(currentGrid.MaxX - currentWafer.ShiftX + 1));
             int farY = Math.Max(Math.Abs(currentGrid.MinY - currentWafer.ShiftY), Math.Abs(currentGrid.MaxY - currentWafer.ShiftY + 1));
             sb.AppendLine(string.Format(CultureInfo.InvariantCulture,
-                "※ KLARF Pitch 와 다름 (차이 X {0:+#,0.###;-#,0.###;0} / Y {1:+#,0.###;-#,0.###;0} µm). Defect 위치와 어긋날 수 있습니다 (격자 끝 최대 X {2:#,0.###} / Y {3:#,0.###} µm).",
+                "※ KLARF Pitch 와 다름: 차이 X {0:+#,0.###;-#,0.###;0} / Y {1:+#,0.###;-#,0.###;0} µm / 격자 끝 최대 X {2:#,0.###} / Y {3:#,0.###} µm",
                 diffX, diffY, Math.Abs(diffX) * farX, Math.Abs(diffY) * farY));
         }
 
@@ -652,7 +652,7 @@ namespace DACrux.TEST.ENGUI
             int dieNumber;
             string dieNumberText = m_wMap.DieNumbers.TryGetValue(lb, out dieNumber) ? dieNumber.ToString(CultureInfo.InvariantCulture) : "-";
             lblCoordinates.Text = string.Format(CultureInfo.InvariantCulture,
-                "Die ({0}) X/Y: {1}, {2} / LeftBottom: {3}, {4} / KLARF 원본: {5}, {6} / 검사 Die: {7} / 상태: {8} / Die 번호: {9}\r\n마우스 Wafer 중심 기준: X={10:#,0.###}, Y={11:#,0.###} µm",
+                "Die ({0}) X/Y: {1}, {2} / LeftBottom: {3}, {4} / KLARF 원본: {5}, {6} / 검사 Die: {7} / 상태: {8} / Die 번호: {9}   |   마우스 X={10:#,0.###}, Y={11:#,0.###} µm",
                 currentDirection, number.X, number.Y, lb.X, lb.Y,
                 lb.X - currentWafer.ShiftX, lb.Y - currentWafer.ShiftY,
                 inspectedDies.Contains(lb) ? "예" : "아니오", hoverDie.DieProp, dieNumberText,
@@ -667,7 +667,7 @@ namespace DACrux.TEST.ENGUI
 
         private void ClearCoordinates()
         {
-            lblCoordinates.Text = "Die X/Y: - / LeftBottom: - / KLARF 원본: -\r\n마우스 Wafer 중심 기준: -";
+            lblCoordinates.Text = string.Empty;
         }
 
         #endregion
@@ -696,11 +696,9 @@ namespace DACrux.TEST.ENGUI
             bool writeStarted = false;
             bool overwrite = false;
             btnSave.Enabled = false;
-            UseWaitCursor = true;
             try
             {
-                DACrux.TEST.RO.ProbeAdmin admin = new DACrux.TEST.RO.ProbeAdmin();
-                using (DataTable existing = admin.GetMapDef(mapId))
+                using (DataTable existing = busyBar.Run("Map ID 확인", () => new DACrux.TEST.RO.ProbeAdmin().GetMapDef(mapId)))
                 {
                     if (existing != null && existing.Rows.Count > 0)
                     {
@@ -727,11 +725,12 @@ namespace DACrux.TEST.ENGUI
                         "신규 Map 저장", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
 
                 writeStarted = true;
-                if (overwrite) MapCreationService.Update(mapId, m_wMap, currentDirection, currentGrid);
-                else MapCreationService.Create(mapId, m_wMap, currentDirection, currentGrid);
+                // 화면 값은 여기서 읽고, 원격 저장(정의 + Die 목록)은 진행 표시줄의 작업 스레드에서 한다
+                Action write = MapCreationService.PrepareSave(mapId, m_wMap, currentDirection, currentGrid, overwrite);
+                busyBar.Run(overwrite ? "Map 덮어쓰기" : "Map 저장", write);
                 savedMapId = mapId;
                 btnOpenMap.Enabled = true;
-                lblStatus.Text = (overwrite ? "덮어쓰기 완료: " : "저장 완료: ") + mapId + " / 기존 Map Define 화면에서 조회할 수 있습니다.";
+                lblStatus.Text = (overwrite ? "덮어쓰기 완료: " : "저장 완료: ") + mapId;
                 MessageBox.Show(this, overwrite ? "Map을 덮어썼습니다." : "Map을 저장했습니다.", "Map 저장", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
@@ -744,7 +743,6 @@ namespace DACrux.TEST.ENGUI
             }
             finally
             {
-                UseWaitCursor = false;
                 btnSave.Enabled = source != null;
             }
         }
@@ -753,11 +751,15 @@ namespace DACrux.TEST.ENGUI
         private void btnOpenMap_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(savedMapId)) return;
-            frmSetupMap form = new frmSetupMap();
-            form.StartPosition = FormStartPosition.CenterParent;
-            // Show 에서 기존 화면의 Load 초기화를 마친 다음 저장 Map 을 불러온다.
-            form.Show(this);
-            form.LoadMap(savedMapId);
+            // 기존 화면 열기 + 서버에서 Map 읽기 동안 모래시계 커서. 기존 화면 코드는 바꾸지 않고 부르는 쪽만 감싼다 (2026-10-15).
+            using (DACrux.SEMDMS.Control.BusyCursor.Show(this))
+            {
+                frmSetupMap form = new frmSetupMap();
+                form.StartPosition = FormStartPosition.CenterParent;
+                // Show 에서 기존 화면의 Load 초기화를 마친 다음 저장 Map 을 불러온다.
+                form.Show(this);
+                form.LoadMap(savedMapId);
+            }
         }
 
         /// <summary>m_wMap 의 Die 목록에서 DB 저장용 X / Y / USECODE 를 만든다. (검사 프로그램에서도 사용)</summary>
