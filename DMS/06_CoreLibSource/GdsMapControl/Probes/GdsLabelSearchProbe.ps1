@@ -4,7 +4,7 @@
 #       2026-10-07 지도 검색 표시(과녁 / 글자) 제거 -> 이동 확인은 지도 화면 중심(GdsMapControl._offset)으로 한다.
 #       화면은 띄우지 않고 GdsMapViewForm을 만들어 private 검색 메서드를 리플렉션으로 호출한다(RO 원격 호출 / 실제 그리기는 DMS 화면에서 확인).
 # 전제: FACTORY=PROBE / DEVICE_ID=FULL_PROBE READY Map(GdsImportFullProbe.ps1로 샘플 전체 Layer 등록). DB를 바꾸지 않는다(조회만).
-# 실행: powershell -NoProfile -ExecutionPolicy Bypass -File GdsLabelSearchProbe.ps1 -GdsExe <빌드한 NexplantQMS.GdsMap.exe> [-BinDir <BSL/DSL/Interface 폴더>]
+# 실행: powershell -NoProfile -ExecutionPolicy Bypass -File GdsLabelSearchProbe.ps1 -GdsExe <빌드한 NexplantQMS.GdsMap.dll> [-BinDir <BSL/DSL/Interface 폴더>]
 #       -BinDir 생략 시 101_ServerBin. 배포 전에는 TEMP 서버 빌드 폴더를 넘긴다.
 param(
     [Parameter(Mandatory = $true)][string]$GdsExe,

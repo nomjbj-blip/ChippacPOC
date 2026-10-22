@@ -95,6 +95,19 @@ namespace DACrux.SEMDMS.DSL
                 throw ex;
             }
         }
+
+        /// <summary>여러 Chain 저장 내용을 한 번에 바꾼다(ExecuteMultiple 1회, 2026-10-20 일괄 저장 READY 확정).</summary>
+        public void UpdateExecuteMultiple(string sqlName, string[,] paras)
+        {
+            try
+            {
+                this.ExecuteMultiple(sqlName, null, paras);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
         #endregion
     }
 }

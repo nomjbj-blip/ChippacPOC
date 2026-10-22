@@ -156,7 +156,8 @@ function Build-Wafer() {
     $w.TestTime = [datetime]::ParseExact('20260609161940', 'yyyyMMddHHmmss', $inv)
     foreach ($s in $spec) {
         $p = New-Object DACrux.SEMDMS.BSL.EtYmsParameter
-        $p.ParameterName = $s.Name; $p.YmsName = $Rule::ToParamName($s.Name); $p.Description = $s.Header; $p.Unit = $s.Unit
+        # YMS 이름 = 등록 때 저장하는 값(EtParameterNameRule.Parse -> EtYmsRule.ToYmsName, 30자 이하, 2026-10-21)
+        $p.ParameterName = $s.Name; $p.YmsName = $Rule::ToYmsName([DACrux.SEMDMS.Interface.EtParameterNameRule]::Parse($s.Header)); $p.Description = $s.Header; $p.Unit = $s.Unit
         if ($null -ne $s.Lower) { $p.Lower = [double]$s.Lower }
         if ($null -ne $s.Upper) { $p.Upper = [double]$s.Upper }
         $w.Parameters.Add($p)
@@ -221,6 +222,8 @@ $row20 = @($td.Rows | Where-Object { [int]$_['X'] -eq 9 -and [int]$_['Y'] -eq 2 
 $die44 = $wafer.Dies | Where-Object { $_.DutNo -eq 44 }
 $row44 = @($td.Rows | Where-Object { [int]$_['X'] -eq $die44.MapX -and [int]$_['Y'] -eq $die44.MapY })
 Check "TD $($td.TableName)" ($td.Rows.Count -eq 24 -and $td.Columns.Count -eq 43 -and $binCounts['1'] -eq 20 -and $binCounts['5'] -eq 4 -and $minValue -gt -1E20) "행 $($td.Rows.Count) / 열 $($td.Columns.Count) / BIN1 $($binCounts['1']) BIN5 $($binCounts['5']) / 최소값 $minValue"
+$longCols = @($td.Columns | Where-Object { $_.ColumnName.Length -gt $Rule::MaxYmsNameLength } | ForEach-Object { $_.ColumnName })
+Check 'TD 컬럼 이름 30자 이하 (2026-10-21)' ($longCols.Count -eq 0 -and @($paramCols | Where-Object { -not $Rule::IsValidYmsName($_) }).Count -eq 0) "최대 $(($td.Columns | ForEach-Object { $_.ColumnName.Length } | Measure-Object -Maximum).Maximum)자 / 30자 넘는 컬럼 $($longCols.Count) $($longCols -join ',')"
 Check 'TD Die 순서 / 좌표 / 값' ([int]$first['X'] -eq $sorted[0].MapX -and [int]$first['Y'] -eq $sorted[0].MapY -and $firstDieNo -eq $minDieNo -and $row20.Count -eq 1 -and [int]$row20[0]['BIN'] -eq 5 -and $row44.Count -eq 1 -and [int]$row44[0]['BIN'] -eq 1) "DIE_NUM 1 = ($($first['X']), $($first['Y'])) Die#$firstDieNo (최소 Die# $minDieNo) / DUT #20 (9,2) BIN $($row20[0]['BIN']) / DUT #44 ($($die44.MapX),$($die44.MapY)) BIN $($row44[0]['BIN'])"
 $k44 = 0; for ($k = 0; $k -lt $spec.Count; $k++) { if ($null -ne $die44.Values[$k] -and $die44.Values[$k] -gt 715) { $k44 = $k; break } }
 $v44 = [double]$row44[0][$paramCols[$k44]]
@@ -230,9 +233,12 @@ $ps = $paraDsl.GetParamSepc($Factory, $program, '0')
 $psRows = @($ps.Rows)
 $intCount = @($psRows | Where-Object { $_['PARAM_TYPE'] -eq 'INT' }).Count
 $floatCount = @($psRows | Where-Object { $_['PARAM_TYPE'] -eq 'FLOAT' }).Count
-$resRow = @($psRows | Where-Object { $_['PARAM_NAME'] -eq 'RESISTANCE_IFORCE_8P0MA_TSVDC_TR_FH' })[0]
-$lkgRow = @($psRows | Where-Object { $_['PARAM_NAME'] -eq 'LKG_SERIAL_TSVDC_ASIC_HBM_N_FH_TSVDC_ASIC_HBM_P_FL' })[0]
-Check 'TQP_PARASPEC' ($psRows.Count -eq 40 -and $intCount -eq 3 -and $floatCount -eq 37 -and [double]$resRow['USL'] -eq 715 -and $resRow['LSL'] -eq [DBNull]::Value -and $resRow['UOM'] -eq 'Ohm' -and $resRow['PARAM_DESC'] -eq 'Resistance_iforce=8.0mA@TSVDC_TR_FH' -and [double]$lkgRow['LSL'] -eq -50 -and [double]$lkgRow['USL'] -eq 50 -and $lkgRow['PARAM_DESC'] -eq 'Leakage_Serial@TSVDC_ASIC_HBM_N_FH:TSVDC_ASIC_HBM_P_FL') "행 $($psRows.Count) (INT $intCount / FLOAT $floatCount) / RES USL $($resRow['USL']) LSL '$($resRow['LSL'])' $($resRow['UOM']) / LKG(줄인 이름) $($lkgRow['LSL']) ~ $($lkgRow['USL'])"
+# PARAM_NAME = YMS 이름(30자 이하, 2026-10-21). RES = 줄인 이름, LKG = 해시 이름
+$resYms = $Rule::ToYmsName([DACrux.SEMDMS.Interface.EtParameterNameRule]::Parse('Resistance_iforce=8.0mA@TSVDC_TR_FH'))
+$lkgYms = $Rule::ToYmsName([DACrux.SEMDMS.Interface.EtParameterNameRule]::Parse('Leakage_Serial@TSVDC_ASIC_HBM_N_FH:TSVDC_ASIC_HBM_P_FL'))
+$resRow = @($psRows | Where-Object { $_['PARAM_NAME'] -eq $resYms })[0]
+$lkgRow = @($psRows | Where-Object { $_['PARAM_NAME'] -eq $lkgYms })[0]
+Check 'TQP_PARASPEC' ($psRows.Count -eq 40 -and $intCount -eq 3 -and $floatCount -eq 37 -and $null -ne $resRow -and $null -ne $lkgRow -and [double]$resRow['USL'] -eq 715 -and $resRow['LSL'] -eq [DBNull]::Value -and $resRow['UOM'] -eq 'Ohm' -and $resRow['PARAM_DESC'] -eq 'Resistance_iforce=8.0mA@TSVDC_TR_FH' -and [double]$lkgRow['LSL'] -eq -50 -and [double]$lkgRow['USL'] -eq 50 -and $lkgRow['PARAM_DESC'] -eq 'Leakage_Serial@TSVDC_ASIC_HBM_N_FH:TSVDC_ASIC_HBM_P_FL') "행 $($psRows.Count) (INT $intCount / FLOAT $floatCount) / RES($resYms) USL $($resRow['USL']) LSL '$($resRow['LSL'])' $($resRow['UOM']) / LKG($lkgYms) $($lkgRow['LSL']) ~ $($lkgRow['USL'])"
 
 $bd = BinRows
 $fail5Color = $Rule::BinColor(5, $false)

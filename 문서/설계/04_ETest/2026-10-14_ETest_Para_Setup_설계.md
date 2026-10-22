@@ -1,6 +1,8 @@
 # E-Test Para Setup 화면 설계 (Header -> Parameter 등록 / 대표 Chain 등록 / GDS Chain 연결)
 
-작성: 2026-10-14 Claude (CLAUDE-086 설계 / CLAUDE-090 구현) / 상태: **설계 v2 확정 + 이름 변환 규칙(5.1절) — 구현 1~4단계 완료(서버 / Para 화면 / 메뉴 / Limit 화면 정리 + 2단계 DDL 일부, Probe 34/34 · Para Smoke 24/24 · Limit Smoke 41/41, 배포 / DMS 화면 확인 대기), 5단계(Upload 재설계 연결) 남음 (CLAUDE-090)**. 결정 P1 ~ P10 모두 확정 (P3 · P9 · P10 사용자 지시, 나머지는 "설계 넣고 개발 시작" 지시로 권장안)
+작성: 2026-10-14 Claude (CLAUDE-086 설계 / CLAUDE-090 구현) / 상태: **설계 v2 확정 + 이름 변환 규칙(5.1절) — 구현 1~5단계 완료(서버 / Para 화면 / 메뉴 / Limit 화면 정리 + 2단계 DDL / Upload 재설계 연결, Probe 34/34 · Para Smoke 27/27 · Limit Smoke 43/43 · Upload Smoke 19 · Upload Probe 18/18, 배포 / DMS 화면 확인 대기, 직접 시험 = [테스트 시나리오](2026-10-14_ETest_Para_Spec_Upload_테스트_시나리오.md)) (CLAUDE-090)**. 결정 P1 ~ P10 모두 확정 (P3 · P9 · P10 사용자 지시, 나머지는 "설계 넣고 개발 시작" 지시로 권장안)
+
+> 2026-10-14 (CLAUDE-095): 화면 재구성 설계 [E-Test Para 화면 재구성](2026-10-14_ETest_Para_화면_재구성_설계.md) 가 확정되면 이 문서의 6절(대표 Chain) / 7절(GDS Chain 연결) / 8.4절([대표 Chain] 탭)과 대표 Chain 테이블 2개는 **Parameter 별 GDS Chain 이름 한 칸**으로 대체되고, Spec 편집은 [등록 Parameter] 탭으로 옮겨진다(E-Test Limit 설정 화면 삭제).
 
 사용자 지시 (2026-10-14):
 - "e Test 결과 File 기반으로 Header 를 Parameter 로 등록하는 화면에 대해 설계 진행한다. e test Limit Setup 화면에 이어서 작업하면 된다."
@@ -189,7 +191,7 @@ TQP_GDS_ET_VALUE  측정값 (ET_ITEM_SEQ)
 | --- | --- | --- | --- |
 | 1 (이번) | `Persistence/2026-10-14_tqp_gds_et_para_rep_chain.sql` | `ET_ITEM` 컬럼 추가(NULL 허용, USE_FLAG 기본 Y) / UQ 교체 / 등록 행 CHECK / CHAIN_NAME2 색인 + `ET_REP_CHAIN` / `ET_CHAIN_LINK` 생성 | 없음 (추가만. 예전 업로드 MergeEtItem 은 TEST_PROGRAM NULL 행을 계속 만든다) |
 | 2a (Limit 화면 정리, **10-14 로컬 적용**) | `Persistence/2026-10-14_tqp_gds_et_limit_fk.sql` | 사전 확인(등록 Parameter 없는 Spec / Chain 묶음 행이 있으면 아무것도 바꾸지 않고 멈춤) -> `ET_LIMIT` FK -> `ET_CHAIN_GROUP` / 시퀀스 DROP | 이전 버전 Limit 화면(Chain 묶기 탭 / 헤더 원문 키 저장)은 동작하지 않는다 -> 서버 / 클라이언트를 같이 배포 |
-| 2b (Upload 재설계 구현 때) | 별도 DDL | 로컬 E-Test 데이터 정리(S5) -> `ET_ITEM.TEST_PROGRAM` NOT NULL | 업로드 화면을 같이 바꾼다 |
+| 2b (Upload 재설계 구현 때, **10-14 로컬 적용**) | `Persistence/2026-10-14_tqp_gds_et_local_reset.sql` -> `2026-10-14_tqp_gds_et_upload_registered.sql` | 로컬 E-Test 데이터 정리(S5: 파일 / Die / 값 + 예전 측정 항목 13,775) -> `ET_ITEM.TEST_PROGRAM` NOT NULL + Upload 재설계 컬럼 | 업로드 화면을 같이 바꾼다(완료) |
 
 - Upload 재설계 DDL(`2026-10-13_tqp_gds_et_defined_only.sql`)과 YMS 적재 DDL(`2026-10-14_tqp_gds_et_yms.sql`)은 2b 와 같은 날 **Para 2b -> Upload 재설계 -> YMS** 순서로 적용한다(데이터 정리 한 번, YMS UQ 는 TEST_PROGRAM 이 NOT NULL 이 된 뒤).
 
@@ -448,7 +450,7 @@ v2 초안에서 검토한 자동 묶기 방법과 로컬 시험 결과를 본 �
 | 3 | **완료**: 화면 `frmEtParaSetup` + 메뉴(소스 `MenuFile.mnu`, `MNU_DMS_ET_PARA` F03125, POC 순서 5) + Smoke `Verification/Verify-EtParaSetup.ps1` / `EtParaSetupFormSmoke.cs` (`ET_PARA_FORM_SMOKE=PASS` 18/18). 배포 / DMS 화면 확인은 대기 |
 | 3-1 | **완료 (10-14)**: 화면 레이아웃 변경(Device / 공정 읽기 전용, 헤더 표 우클릭 / Del 로 목록에서 빼기 + 되살리기, "열" -> 행 머리글) + 용어 "단자" -> "Chain"(컬럼 / 서비스 / 쿼리 이름 포함, 로컬 DB 컬럼 RENAME). Probe 32/32 / Smoke 24/24 |
 | 4 | **완료 (10-14)**: Limit 화면 정리(10절) + 2단계 DDL 일부(4.7 2a: Spec FK / Chain 묶음 DROP, 로컬 적용) + 인계 API `GetEtChainSpecInfo` 새 구현 + Para 쿼리의 예전 키 Spec 조인 제거. Smoke `Verification/Verify-EtLimitSetup.ps1`(신규, `Verify-EtResultUpload.ps1` 3절에서 옮김) `ET_LIMIT_FORM_SMOKE=PASS` 41/41, Probe 34/34 |
-| 5 | Upload 재설계 구현 때 저장 대상 = 등록 Parameter (P7) |
+| 5 | **완료 (10-14)**: Upload 재설계 구현(저장 대상 = 등록 Parameter, P7) + 2b DDL. 결과는 [Upload 재설계](2026-10-13_ETest_Upload_재설계.md) 10.3절. 같은 날 CLAUDE-094: Parameter 삭제 / 사용 저장 서버 묶음 처리(2,755개 삭제 서버 0.1초) + 화면 아래 진행 표시줄 |
 | 6 | 연관 분석 / Wafer Map 에서 연결 테이블 사용 (별도 설계) |
 
 ## 14. 검증 기준 (기대값)
@@ -484,5 +486,5 @@ v2 초안에서 검토한 자동 묶기 방법과 로컬 시험 결과를 본 �
 - **소스 확인**: `EtResultFileParser.NormalizeHeader` / `HeaderRegex`, `iGdsEtResult` 메서드 목록, `iGdsMapView.GetMapDeviceBySub`, `frmEtLimitSetup` Factory 칸, Interface 공용 규칙 클래스 선례(`Coordinate/DieCoordinateMapper.cs`), 메뉴 `MNU_DMS_ET_LIMIT`(F03121, 최대 기능 코드 F03124), Limit / Upload / Parsing / YMS 적재 설계 문서
 - **DB 확인 (로컬 docker `oracle19c-DMS`, 조회만)**: `TQP_GDS_CHAIN` PK `(FACTORY, DEVICE_ID, CHAIN_SEQ)`, `TQP_GDS_CHAIN_VER` / `TQP_GDS_CHAIN_MEMBER` / `TQP_GDS_PLACED_EL` 컬럼, SCK GDS Chain 17개(U9 15 / U7 2, 모두 Input 만), Chain 영역 안 Chain Label 조회(12절), `TQP_GDS_MAP_SUB_DEVICE`(OMM / OMM_Hybrid -> U9), `TQP_GDS_ET_ITEM` 컬럼 / 제약, `TQP_GDS_ET_LIMIT` 0행, `TQP_GDS_ET_CHAIN_GROUP` 0행, Chain 시험 계산(3절)
 - **회의록 / 메일 확인**: 10-02 / 10-06 / 10-13 회의록 json · 녹취, 10-12 메일 회신 docx, Limit 설계 13.1 (10-12 사용자 요청)
-- **Probe / Smoke 확인 (구현 후)**: `ET_PARA_SETUP_PROBE=PASS` 34/34 (BSL 직접 호출, 로컬 DB), `ET_PARA_FORM_SMOKE=PASS` 24/24 · `ET_LIMIT_FORM_SMOKE=PASS` 41/41 (화면 -> RO -> BSL -> 로컬 DB, TEMP 빌드), 회귀 `ET_RESULT_PROBE=PASS` 19/19
+- **Probe / Smoke 확인 (구현 후)**: `ET_PARA_SETUP_PROBE=PASS` 34/34 (BSL 직접 호출, 로컬 DB), `ET_PARA_FORM_SMOKE=PASS` 27/27 (진행 표시줄 3건 포함) · `ET_LIMIT_FORM_SMOKE=PASS` 43/43 (화면 -> RO -> BSL -> 로컬 DB, TEMP 빌드), `ET_RESULT_PROBE=PASS` 18/18 (5단계 Upload 재설계로 다시 작성)
 - **미확인**: 배포 / Service Remoting 경유 / DMS 화면 직접 조작, C2 / C3, COWET / FT 실제 파일

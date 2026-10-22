@@ -94,6 +94,7 @@ $b = "$env:TEMP\ChippacBuild\CLAUDE-0nn"
 | `DMS/Assistant/작업_현황.md` | 내 행의 상태 칸(완료 범위 / 배포 시각 / 확인 수준 / 남은 일), 상단 `최종 갱신` 시각 |
 | `DMS/Assistant/기능/F0n_*.md` | 현재 동작 / 중요한 로직의 이유 / 미완료 항목. 바뀐 이유는 이력에 남긴다 |
 | `DMS/Assistant/변경이력/YYYY-MM-DD.md` | 오늘 날짜 파일 끝에 추가한다. 없으면 `# YYYY-MM-DD 작업 이력` 헤더로 새로 만든다. 과거 항목은 고치지 않는다 |
+| `문서/설계/<주제>/YYYY-MM-DD_*.md` | 설계 / 검토 문서. 새로 만들 때 주제 폴더(02_GDS / 03_KLARF_Map / 04_ETest / 05_연관분석 / 06_환경_운영 / 01_계획_관리)에 둔다. `문서/` 바로 아래에 만들지 않는다. 발표자료 / 엑셀은 `문서/자료/<용도>` |
 
 이력 형식과 실제 예시는 [references/doc-templates.md](references/doc-templates.md)에 있다. 꼭 남길 것:
 - 실제 실행한 명령, 대상 DLL / EXE, 결과(PASS 개수 / 건수 / 시간)

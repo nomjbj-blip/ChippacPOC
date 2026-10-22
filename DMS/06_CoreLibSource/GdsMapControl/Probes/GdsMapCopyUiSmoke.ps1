@@ -22,7 +22,7 @@ $cm.GetField('s_configSystem', $flags).SetValue($null, $null)
 # 시험용 임시 폴더: GdsMap EXE 는 .dll 이름으로 복사해 참조한다(Add-Type 은 .exe 참조 불가).
 $probeDir = Join-Path $env:TEMP 'chippac\gdsmapcopyui'
 New-Item -ItemType Directory -Force $probeDir | Out-Null
-Copy-Item (Join-Path $GdsDir 'NexplantQMS.GdsMap.exe') (Join-Path $probeDir 'NexplantQMS.GdsMap.dll') -Force
+Copy-Item (Join-Path $GdsDir 'NexplantQMS.GdsMap.dll') (Join-Path $probeDir 'NexplantQMS.GdsMap.dll') -Force
 $searchDirs = @($SrvDir, $GdsDir, $probeDir, $serverBin)
 [AppDomain]::CurrentDomain.add_AssemblyResolve([ResolveEventHandler] {
     param($s, $e)

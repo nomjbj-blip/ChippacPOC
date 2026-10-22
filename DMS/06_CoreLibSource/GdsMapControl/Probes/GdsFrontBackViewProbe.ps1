@@ -8,7 +8,7 @@
 #       화면 private 메서드를 리플렉션으로 호출한다. BSL 직접 호출(Service Remoting 아님).
 # 전제: FACTORY=PROBE / DEVICE_ID=LAYER_FILTER_PROBE READY Map(Layer 1, 2, 6, VIEW_SIDE FRONT). 없으면 GdsImportLayerFilterProbe.ps1 -Keep.
 #       Chain Code ZZSIDE1을 만들었다가 마지막에 삭제한다.
-# 실행: powershell -NoProfile -ExecutionPolicy Bypass -File GdsFrontBackViewProbe.ps1 -GdsExe <빌드한 NexplantQMS.GdsMap.exe>
+# 실행: powershell -NoProfile -ExecutionPolicy Bypass -File GdsFrontBackViewProbe.ps1 -GdsExe <빌드한 NexplantQMS.GdsMap.dll>
 param(
     [Parameter(Mandatory = $true)][string]$GdsExe,
     [string]$Factory = 'PROBE',
@@ -143,10 +143,11 @@ public static class FrontBackProbe
         Type dataType = ft.GetNestedType("ChainDbData", BindingFlags.NonPublic);
         object data = Activator.CreateInstance(dataType, true);
         dataType.GetField("Header").SetValue(data, header);
-        dataType.GetField("Layers").SetValue(data, bsl.GetChainLayers(factory, device, seq));
-        dataType.GetField("Rules").SetValue(data, bsl.GetChainRules(factory, device, seq));
-        dataType.GetField("Members").SetValue(data, bsl.GetChainMembers(factory, device, seq));
-        dataType.GetField("Edits").SetValue(data, bsl.GetChainEdits(factory, device, seq));
+        // ChainDbData 상세는 행 목록이다(2026-10-21, 화면은 범위 조회 행을 나눠 담음).
+        ((List<DataRow>)dataType.GetField("Layers").GetValue(data)).AddRange(bsl.GetChainLayers(factory, device, seq).Rows.Cast<DataRow>());
+        ((List<DataRow>)dataType.GetField("Rules").GetValue(data)).AddRange(bsl.GetChainRules(factory, device, seq).Rows.Cast<DataRow>());
+        ((List<DataRow>)dataType.GetField("Members").GetValue(data)).AddRange(bsl.GetChainMembers(factory, device, seq).Rows.Cast<DataRow>());
+        ((List<DataRow>)dataType.GetField("Edits").GetValue(data)).AddRange(bsl.GetChainEdits(factory, device, seq).Rows.Cast<DataRow>());
         object chain = ft.GetMethod("CreateChainFromDb", NP).Invoke(form, new[] { data });
         Type ct = chain.GetType();
 

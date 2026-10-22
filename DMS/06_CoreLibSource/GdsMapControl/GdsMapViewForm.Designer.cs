@@ -81,8 +81,10 @@ namespace NexplantQMS.GdsMap
             this._btnChainRename = new System.Windows.Forms.Button();
             this._btnChainDelete = new System.Windows.Forms.Button();
             this._btnChainDbSave = new System.Windows.Forms.Button();
+            this._btnChainCheckAll = new System.Windows.Forms.Button();
+            this._btnChainCheckNone = new System.Windows.Forms.Button();
             this.chainSimilarListPanel = new System.Windows.Forms.Panel();
-            this._chainSimilarList = new System.Windows.Forms.CheckedListBox();
+            this._chainSimilarList = new NexplantQMS.GdsMap.LayerColorCheckedListBox();
             this.chainSimilarButtons = new System.Windows.Forms.FlowLayoutPanel();
             this._btnChainApplySimilar = new System.Windows.Forms.Button();
             this._btnChainClearSimilar = new System.Windows.Forms.Button();
@@ -715,12 +717,12 @@ namespace NexplantQMS.GdsMap
             this._chainList.Location = new System.Drawing.Point(0, 93);
             this._chainList.Margin = new System.Windows.Forms.Padding(4);
             this._chainList.Name = "_chainList";
+            this._chainList.CheckOnCheckBoxOnly = true;
             this._chainList.SelectOnRightClick = false;
             this._chainList.Size = new System.Drawing.Size(330, 640);
             this._chainList.TabIndex = 2;
             this._chainList.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.ChainList_ItemCheck);
             this._chainList.SelectedIndexChanged += new System.EventHandler(this.ChainList_SelectedIndexChanged);
-            this._chainList.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.ChainList_MouseDoubleClick);
             // 
             // _chainListMenu
             // 
@@ -744,11 +746,14 @@ namespace NexplantQMS.GdsMap
             this.chainListButtons.Controls.Add(this._btnChainRename);
             this.chainListButtons.Controls.Add(this._btnChainDelete);
             this.chainListButtons.Controls.Add(this._btnChainDbSave);
+            this.chainListButtons.Controls.Add(this._btnChainCheckAll);
+            this.chainListButtons.Controls.Add(this._btnChainCheckNone);
             this.chainListButtons.SetFlowBreak(this._btnChainRename, true);
+            this.chainListButtons.SetFlowBreak(this._btnChainDbSave, true);
             this.chainListButtons.Dock = System.Windows.Forms.DockStyle.Top;
             this.chainListButtons.Location = new System.Drawing.Point(0, 0);
             this.chainListButtons.Name = "chainListButtons";
-            this.chainListButtons.Size = new System.Drawing.Size(330, 96);
+            this.chainListButtons.Size = new System.Drawing.Size(330, 138);
             this.chainListButtons.TabIndex = 1;
             // 
             // _btnChainNew
@@ -795,9 +800,33 @@ namespace NexplantQMS.GdsMap
             this._btnChainDbSave.Image = ((System.Drawing.Image)(resources.GetObject("_btnChainDbSave.Image")));
             this._btnChainDbSave.Size = new System.Drawing.Size(198, 42);
             this._btnChainDbSave.TabIndex = 3;
-            this._btnChainDbSave.Text = "Chain 저장(DB)";
+            this._btnChainDbSave.Text = "Chain 저장";
             this._btnChainDbSave.UseVisualStyleBackColor = true;
             this._btnChainDbSave.Click += new System.EventHandler(this.BtnChainDbSave_Click);
+            // 
+            // _btnChainCheckAll
+            // 
+            this._btnChainCheckAll.Location = new System.Drawing.Point(3, 87);
+            this._btnChainCheckAll.Name = "_btnChainCheckAll";
+            this._btnChainCheckAll.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this._btnChainCheckAll.Image = ((System.Drawing.Image)(resources.GetObject("_btnChainCheckAll.Image")));
+            this._btnChainCheckAll.Size = new System.Drawing.Size(159, 42);
+            this._btnChainCheckAll.TabIndex = 4;
+            this._btnChainCheckAll.Text = "전체 체크";
+            this._btnChainCheckAll.UseVisualStyleBackColor = true;
+            this._btnChainCheckAll.Click += new System.EventHandler(this.BtnChainCheckAll_Click);
+            // 
+            // _btnChainCheckNone
+            // 
+            this._btnChainCheckNone.Location = new System.Drawing.Point(165, 87);
+            this._btnChainCheckNone.Name = "_btnChainCheckNone";
+            this._btnChainCheckNone.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this._btnChainCheckNone.Image = ((System.Drawing.Image)(resources.GetObject("_btnChainCheckNone.Image")));
+            this._btnChainCheckNone.Size = new System.Drawing.Size(159, 42);
+            this._btnChainCheckNone.TabIndex = 5;
+            this._btnChainCheckNone.Text = "전체 미체크";
+            this._btnChainCheckNone.UseVisualStyleBackColor = true;
+            this._btnChainCheckNone.Click += new System.EventHandler(this.BtnChainCheckNone_Click);
             // 
             // chainSimilarListPanel
             // 
@@ -814,6 +843,7 @@ namespace NexplantQMS.GdsMap
             // 
             // _chainSimilarList
             // 
+            this._chainSimilarList.CheckOnCheckBoxOnly = true;
             this._chainSimilarList.Dock = System.Windows.Forms.DockStyle.Fill;
             this._chainSimilarList.FormattingEnabled = true;
             this._chainSimilarList.HorizontalScrollbar = true;
@@ -821,11 +851,11 @@ namespace NexplantQMS.GdsMap
             this._chainSimilarList.Location = new System.Drawing.Point(0, 33);
             this._chainSimilarList.Margin = new System.Windows.Forms.Padding(4);
             this._chainSimilarList.Name = "_chainSimilarList";
+            this._chainSimilarList.SelectOnRightClick = false;
             this._chainSimilarList.Size = new System.Drawing.Size(330, 183);
             this._chainSimilarList.TabIndex = 1;
             this._chainSimilarList.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.ChainSimilarList_ItemCheck);
             this._chainSimilarList.SelectedIndexChanged += new System.EventHandler(this.ChainSimilarList_SelectedIndexChanged);
-            this._chainSimilarList.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.ChainSimilarList_MouseDoubleClick);
             // 
             // chainSimilarButtons
             // 
@@ -900,7 +930,7 @@ namespace NexplantQMS.GdsMap
             // 
             // chkLayerItems
             // 
-            this.chkLayerItems.CheckOnClick = true;
+            this.chkLayerItems.CheckOnCheckBoxOnly = true;
             this.chkLayerItems.Dock = System.Windows.Forms.DockStyle.Fill;
             this.chkLayerItems.FormattingEnabled = true;
             this.chkLayerItems.IntegralHeight = false;
@@ -956,7 +986,7 @@ namespace NexplantQMS.GdsMap
             this.lblLayerTitle.Name = "lblLayerTitle";
             this.lblLayerTitle.Size = new System.Drawing.Size(131, 18);
             this.lblLayerTitle.TabIndex = 0;
-            this.lblLayerTitle.Text = "Layer (도형 수)";
+            this.lblLayerTitle.Text = "Layer";
             // 
             // statusStripView
             // 
@@ -1103,7 +1133,7 @@ namespace NexplantQMS.GdsMap
         private System.Windows.Forms.ToolStripMenuItem _chainColorMenuItem;
         private System.Windows.Forms.Panel chainSimilarListPanel;
         private System.Windows.Forms.Label chainSimilarListTitle;
-        private System.Windows.Forms.CheckedListBox _chainSimilarList;
+        private NexplantQMS.GdsMap.LayerColorCheckedListBox _chainSimilarList;
         private System.Windows.Forms.FlowLayoutPanel chainSimilarButtons;
         private System.Windows.Forms.TableLayoutPanel tblChainBar;
         private System.Windows.Forms.FlowLayoutPanel chainFirstRow;
@@ -1129,5 +1159,7 @@ namespace NexplantQMS.GdsMap
         private System.Windows.Forms.Button _btnChainRename;
         private System.Windows.Forms.Button _btnChainDelete;
         private System.Windows.Forms.Button _btnChainDbSave;
+        private System.Windows.Forms.Button _btnChainCheckAll;
+        private System.Windows.Forms.Button _btnChainCheckNone;
     }
 }

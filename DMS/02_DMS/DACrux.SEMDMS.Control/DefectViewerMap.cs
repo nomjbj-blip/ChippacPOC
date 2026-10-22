@@ -24,6 +24,12 @@ namespace DACrux.SEMDMS.Control
             ctxmWaferMap.Popup += ctxmWaferMap_ShowWorkItemsOnly;
         }
 
+        /// <summary>마우스가 올라가 있는 Die 번호(Map Index). Die 밖이면 null (2026-10-21). 기존 Map 이 마우스 이동 때 기록하는 값이다.</summary>
+        public System.Drawing.Point? MouseDieIndex
+        {
+            get { return m_iCurrentX < 0 || m_iCurrentY < 0 ? (System.Drawing.Point?)null : new System.Drawing.Point(m_iCurrentX, m_iCurrentY); }
+        }
+
         /// <summary>메뉴가 뜨기 직전: 남길 항목만 보이고, 구분선은 보이는 항목 사이에만 보인다.</summary>
         private void ctxmWaferMap_ShowWorkItemsOnly(object sender, EventArgs e)
         {

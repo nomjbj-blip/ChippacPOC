@@ -1,0 +1,1 @@
+﻿INSP_INFO_DUMP=OK (k_step_info 1행 / k_insp_info_tests 2행)

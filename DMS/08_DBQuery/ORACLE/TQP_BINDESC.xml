@@ -1,4 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+  2026-10-22 MERGE_BIN / SELECT_BIN_EDITABLE 바인딩 크기 40 / 25 -> 0 (CREATE_BIN 과 같게 값 길이 그대로).
+  크기를 정한 바인딩은 긴 값을 오류 없이 잘라 넣어, 40자가 넘는 설명(E-Test 업로드가 만드는 설명 50 ~ 53자)이 저장 때 40자로 잘리고
+  26자 Program 은 조회되지 않았다. 컬럼 길이(BIN_NAME 30 / DESCRIPTION 100 바이트 등)를 넘는 값은 이제 DB 오류로 알린다.
+-->
 <queryxml conid="TPSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
     <query statement="Insert" queryid="CREATE_BIN" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[INSERT INTO TQP_BINDESC(PROGRAM, BIN, BIN_NAME, CHAR_BIN, HIGH_GEC, DISPLAY, UPPER_LIMIT_CNT, LOWER_LIMIT_CNT, COLOR, DESCRIPTION)
@@ -42,7 +47,7 @@ SELECT '' AS "EDITMODE",
    AND PROGRAM = :program
  ORDER BY PROGRAM, BIN]]></commandtext>
         <parameters>
-            <param direction="Input" dbtype="VarChar" size="25" value="TESTPROG">:program</param>
+            <param direction="Input" dbtype="VarChar" size="0" value="TESTPROG">:program</param>
         </parameters>
     </query>
     <query statement="Delete" queryid="DELETE_PROGRAM_BIN" commandtype="Text" description="선택한 Program의 Bin DELETE" commandtimeout="60">
@@ -357,16 +362,16 @@ THEN
                :color,
                :description)]]></commandtext>
         <parameters>
-            <param direction="Input" dbtype="VarChar2" size="40" value="program">:program</param>
-            <param direction="Input" dbtype="VarChar2" size="40" value="bin">:bin</param>
-            <param direction="Input" dbtype="VarChar2" size="40" value="bname">:bname</param>
-            <param direction="Input" dbtype="VarChar2" size="40" value="cbin">:cbin</param>
-            <param direction="Input" dbtype="VarChar2" size="40" value="hgec">:hgec</param>
-            <param direction="Input" dbtype="VarChar2" size="40" value="display">:display</param>
-            <param direction="Input" dbtype="VarChar2" size="40" value="upper_limit_cnt">:upper_limit_cnt</param>
-            <param direction="Input" dbtype="VarChar2" size="40" value="lower_limit_cnt">:lower_limit_cnt</param>
-            <param direction="Input" dbtype="VarChar2" size="40" value="color">:color</param>
-            <param direction="Input" dbtype="VarChar2" size="40" value="description">:description</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="program">:program</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="bin">:bin</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="bname">:bname</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="cbin">:cbin</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="hgec">:hgec</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="display">:display</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="upper_limit_cnt">:upper_limit_cnt</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="lower_limit_cnt">:lower_limit_cnt</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="color">:color</param>
+            <param direction="Input" dbtype="VarChar2" size="0" value="description">:description</param>
         </parameters>
     </query>
 </queryxml>

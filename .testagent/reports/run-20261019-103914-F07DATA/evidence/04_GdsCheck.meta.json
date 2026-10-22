@@ -1,0 +1,26 @@
+﻿{
+    "id":  "04",
+    "name":  "GdsCheck",
+    "scenarios":  [
+                      "1-G"
+                  ],
+    "status":  "PASS",
+    "exitCode":  0,
+    "timedOut":  false,
+    "durationMs":  7009,
+    "started":  "2026-10-19 10:54:36",
+    "command":  "python -I -X utf8 \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\probes\\f07data_gds_check.py\" \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\SampleFile\\OMM all layer2.gds\\OMM all layer2.gds\" \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\reports\\run-20261019-103914-F07DATA\\evidence\\db\"",
+    "workingDir":  "D:\\1_프로젝트 문서\\18.스테츠칩팩_POC",
+    "keys":  {
+                 "GDS_CHECK_PROBE":  "PASS (5/5)"
+             },
+    "passLines":  5,
+    "failLines":  [
+
+                  ],
+    "skipLines":  [
+
+                  ],
+    "stdout":  "04_GdsCheck.stdout.txt",
+    "stderr":  "04_GdsCheck.stderr.txt"
+}

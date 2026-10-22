@@ -1,0 +1,27 @@
+﻿{
+    "id":  "02",
+    "name":  "KlarfCheck",
+    "scenarios":  [
+                      "SCN-K"
+                  ],
+    "status":  "FAIL",
+    "exitCode":  1,
+    "timedOut":  false,
+    "durationMs":  645,
+    "started":  "2026-10-19 10:45:03",
+    "command":  "python -I -X utf8 \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\probes\\f07data_klarf_check.py\" \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\SampleFile\\26_10_14 Sample File\\TEST.SINF\" \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\reports\\run-20261019-103914-F07DATA\\evidence\\db\"",
+    "workingDir":  "D:\\1_프로젝트 문서\\18.스테츠칩팩_POC",
+    "keys":  {
+                 "KLARF_CHECK_PROBE":  "FAIL (10/12)"
+             },
+    "passLines":  10,
+    "failLines":  [
+                      "FAIL / K5b 원본 파일 Summary NDEFECT 와 DefectList 줄 수(파일 자체 일관성) / Summary {3: 1098, 80: 0} / DefectList TEST 분포 {\u00273\u0027: 1122}",
+                      "FAIL / K11 TQD_INSP_INFO Test 80 행: DEFECTS / INSPECTED_DIE / DEFECTIVE_DIE 가 원본 Test 80 과 같음 / DB DEFECTS 0 / INSPECTED_DIE 761 / DEFECTIVE_DIE 51(6.70%) vs 원본 Summary NDEFECT 0 / NDIE 1 / NDEFDIE 1, SampleTestPlan 761"
+                  ],
+    "skipLines":  [
+
+                  ],
+    "stdout":  "02_KlarfCheck.stdout.txt",
+    "stderr":  "02_KlarfCheck.stderr.txt"
+}

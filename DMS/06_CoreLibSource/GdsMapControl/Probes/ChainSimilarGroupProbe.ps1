@@ -1,7 +1,7 @@
 # 현재 Chain의 평행 이동 묶음만 찾고, 단일 유사 도형과 보호 단자를 구분한다.
 $ErrorActionPreference = 'Stop'
 $exePath = if ($env:CHAIN_PROBE_EXE) { $env:CHAIN_PROBE_EXE }
-    else { Join-Path $PSScriptRoot '..\bin\EndpointQA\NexplantQMS.GdsMap.exe' }
+    else { Join-Path $PSScriptRoot '..\bin\EndpointQA\NexplantQMS.GdsMap.dll' }
 [void][System.Reflection.Assembly]::LoadFrom((Resolve-Path $exePath).Path)
 
 function New-Element([string]$key, [double]$x, [double]$y,

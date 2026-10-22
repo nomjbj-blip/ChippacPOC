@@ -1,7 +1,7 @@
 # 일괄 제외와 직전 되돌리기가 기존 수동 제외 기록을 건드리지 않는지 검사한다.
 $ErrorActionPreference = 'Stop'
 $exePath = if ($env:CHAIN_PROBE_EXE) { $env:CHAIN_PROBE_EXE }
-    else { Join-Path $PSScriptRoot '..\bin\EndpointQA\NexplantQMS.GdsMap.exe' }
+    else { Join-Path $PSScriptRoot '..\bin\EndpointQA\NexplantQMS.GdsMap.dll' }
 [void][System.Reflection.Assembly]::LoadFrom((Resolve-Path $exePath).Path)
 $automatic = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
 $added = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)

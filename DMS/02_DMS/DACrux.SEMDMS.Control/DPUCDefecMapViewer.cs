@@ -17,7 +17,7 @@ namespace DACrux.SEMDMS.Control
     /// <summary>
     /// frmDefecMapAnalysis에 대한 요약 설명입니다.
     /// </summary>
-    public class DPUCDefecMapViewer : DACruxCTLBasic01, ISendDefect, IExportExcel
+    public partial class DPUCDefecMapViewer : DACruxCTLBasic01, ISendDefect, IExportExcel
     {
         #region 멤버 변수
 

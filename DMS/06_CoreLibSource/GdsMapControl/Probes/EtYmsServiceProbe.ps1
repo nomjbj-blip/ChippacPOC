@@ -173,6 +173,22 @@ $u2 = Upload $plan
 $seq2 = $u2.Seq; $c2 = $u2.Complete; $st6 = YmsState $seq2
 Check '업로드 (Map 있음) -> 확정 때 바로 YMS DONE' ($c2['RESULT'] -eq 'OK' -and [string]$c2['MAP_ID'] -eq $Device -and [string]$c2['YMS_STATUS'] -eq 'DONE' -and [string]$c2['YMS_PROGRAM'] -eq $program -and [double]$c2['YMS_YIELD'] -eq 83.33 -and [string]$st6['YMS_STATUS'] -eq 'DONE' -and (YmsWafers).Count -eq 1) "YMS $($c2['YMS_STATUS']) / Wafer $($c2['YMS_WAFER_SEQ']) / 수율 $($c2['YMS_YIELD'])"
 
+# 7-1. YMS 컬럼 이름 = 등록 때 저장한 YMS_PARAM_NAME(30자 이하). YMS 에 반영된 Parameter 의 YMS 이름은 고칠 수 없다 (2026-10-21)
+$setup = $bsl.GetEtParameterSetupList($Factory, $Device, 'TSVET')
+$psNames = New-Object 'Collections.Generic.HashSet[string]'
+foreach ($r in @((New-Object DACrux.TEST.DSL.TQP_PARASPEC).GetParamSepc($Factory, $program, '0').Rows)) { [void]$psNames.Add([string]$r['PARAM_NAME']) }
+$pubRows = @($setup.Rows | Where-Object { [string]$_['YMS_PUBLISHED'] -eq 'Y' })
+$notInYms = @($setup.Rows | Where-Object { -not $psNames.Contains([string]$_['YMS_PARAM_NAME']) }).Count
+$longPs = @($psNames | Where-Object { $_.Length -gt 30 }).Count
+$pr = $pubRows[0]
+$prLower = $(if ($pr['LOWER_LIMIT'] -eq [DBNull]::Value) { '' } else { ([double]$pr['LOWER_LIMIT']).ToString('R', [Globalization.CultureInfo]::InvariantCulture) })
+$prUpper = $(if ($pr['UPPER_LIMIT'] -eq [DBNull]::Value) { '' } else { ([double]$pr['UPPER_LIMIT']).ToString('R', [Globalization.CultureInfo]::InvariantCulture) })
+$prEnable = $(if ([string]$pr['ENABLE_FLAG'] -eq 'Y') { 'Y' } else { 'N' })
+$eRename = ''
+try { [void]$bsl.SaveEtParameterSetup([string[]]@($Factory, $Device, 'TSVET'), (Rows @(,@([string]$pr['ITEM_NAME'], 'Y', '', '', $prLower, $prUpper, $prEnable, 'ZZ_RENAME_TRY')) 8), 'probe') } catch { $eRename = $_.Exception.Message }
+$prAfter = @($bsl.GetEtParameterSetupList($Factory, $Device, 'TSVET').Rows | Where-Object { [string]$_['ITEM_NAME'] -eq [string]$pr['ITEM_NAME'] })[0]
+Check 'YMS 반영 후: Parameter 정의 이름 = YMS_PARAM_NAME(30자 이하) / YMS_PUBLISHED Y / YMS 이름 수정 거부' ($pubRows.Count -eq 37 -and $notInYms -eq 0 -and $longPs -eq 0 -and $eRename -match 'YMS 에 반영된 Parameter' -and [string]$prAfter['YMS_PARAM_NAME'] -eq [string]$pr['YMS_PARAM_NAME']) "반영됨 $($pubRows.Count) / PARASPEC 에 없는 이름 $notInYms / 30자 넘는 PARAM_NAME $longPs / $($pr['YMS_PARAM_NAME']) -> $eRename"
+
 if ($Keep) {
     Write-Host "Keep: SRC_FILE_SEQ=$seq2 / YMS Program $program / Wafer $($st6['YMS_WAFER_SEQ']) (Factory $Factory, 시험 Map TQP_USEMAP 남김)"
 } else {

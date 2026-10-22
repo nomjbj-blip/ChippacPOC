@@ -2,7 +2,7 @@
 # 화면을 띄우지 않고 Debug 실행 파일의 Chain 모델을 직접 호출한다.
 $ErrorActionPreference = 'Stop'
 $exePath = if ($env:CHAIN_PROBE_EXE) { $env:CHAIN_PROBE_EXE }
-    else { Join-Path $PSScriptRoot '..\bin\Debug\NexplantQMS.GdsMap.exe' }
+    else { Join-Path $PSScriptRoot '..\bin\Debug\NexplantQMS.GdsMap.dll' }
 [void][System.Reflection.Assembly]::LoadFrom((Resolve-Path $exePath).Path)
 
 function New-Point([double]$x, [double]$y) {

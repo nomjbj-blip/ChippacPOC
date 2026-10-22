@@ -1,13 +1,13 @@
 ﻿# 펼친 배치 결과 해시 회귀 검증 (2026-10-20). 설계: 문서/설계/02_GDS/2026-10-20_U8_GDS_로딩_원인분석_설계.md D3
 # 해시 대상: 배치 ID / Layer / 종류 / 좌표 double 비트 / PATH 폭 / TEXT. 그리기 버퍼 / 펼치기 속도를 바꿔도 펼친 결과는 같아야 한다.
 # 기준값은 2026-10-20 이전 운영 EXE(평행 이동을 GDI+ Matrix 로 계산)로 만든 값이다. 값이 바뀌면 좌표나 순서가 바뀐 것이다.
-# 실행: powershell -NoProfile -ExecutionPolicy Bypass -File GdsPlacedHashProbe.ps1 [-ExePath <NexplantQMS.GdsMap.exe>] [-WithU8Product]
+# 실행: powershell -NoProfile -ExecutionPolicy Bypass -File GdsPlacedHashProbe.ps1 [-ExePath <NexplantQMS.GdsMap.dll>] [-WithU8Product]
 param(
     [string]$ExePath = '',
     [switch]$WithU8Product,
     [string]$WorkName = 'placedhash'
 )
-if ($ExePath -eq '') { $ExePath = Join-Path (Resolve-Path (Join-Path $PSScriptRoot '..\..\..')).Path '100_ClientBin\GdsMap\NexplantQMS.GdsMap.exe' }
+if ($ExePath -eq '') { $ExePath = Join-Path (Resolve-Path (Join-Path $PSScriptRoot '..\..\..')).Path '100_ClientBin\GdsMap\NexplantQMS.GdsMap.dll' }
 $sample = (Resolve-Path (Join-Path $PSScriptRoot '..\..\..\..\SampleFile')).Path
 $cases = @(
     @{ Gds = 'OMM all layer2.gds\OMM all layer2.gds'; Cell = 'TOP'; Count = 605080; Hash = '73FB0E30F9C58191' },

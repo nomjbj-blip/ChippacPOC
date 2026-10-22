@@ -124,4 +124,19 @@ SELECT FACTORY, :target_device_id, :new_chain_seq, VERSION_NO, FIRST_LAYER_ID, F
             <param direction="Input" dbtype="Number" size="0">:source_chain_seq</param>
         </parameters>
     </query>
+    <query statement="Select" queryid="SELECT_CHAIN_RULE_RANGE" commandtype="Text" description="Chain 번호 범위의 Layer(번호 + DataType) 연결 규칙 일괄 조회. GDS Map View 가 Chain 이 많을 때 Chain 마다 조회하지 않도록 (2026-10-21)" commandtimeout="600">
+        <commandtext><![CDATA[SELECT CHAIN_SEQ, FIRST_LAYER_ID, FIRST_DATA_TYPE, SECOND_LAYER_ID, SECOND_DATA_TYPE, TOLERANCE
+  FROM TQP_GDS_CHAIN_RULE
+ WHERE FACTORY = :factory
+   AND DEVICE_ID = :device_id
+   AND CHAIN_SEQ BETWEEN :from_seq AND :to_seq
+   AND VERSION_NO = 1
+ ORDER BY CHAIN_SEQ, FIRST_LAYER_ID, FIRST_DATA_TYPE, SECOND_LAYER_ID, SECOND_DATA_TYPE]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
+            <param direction="Input" dbtype="Number" size="0">:from_seq</param>
+            <param direction="Input" dbtype="Number" size="0">:to_seq</param>
+        </parameters>
+    </query>
 </queryxml>

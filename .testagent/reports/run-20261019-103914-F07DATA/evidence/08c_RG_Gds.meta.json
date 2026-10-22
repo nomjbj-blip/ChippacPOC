@@ -1,0 +1,26 @@
+﻿{
+    "id":  "08c",
+    "name":  "RG_Gds",
+    "scenarios":  [
+                      "RG"
+                  ],
+    "status":  "FAIL",
+    "exitCode":  1,
+    "timedOut":  false,
+    "durationMs":  7529,
+    "started":  "2026-10-19 11:08:27",
+    "command":  "python -I -X utf8 \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\probes\\f07data_gds_check.py\" \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\SampleFile\\OMM all layer2.gds\\OMM all layer2.gds\" C:\\Users\\USER\\AppData\\Local\\Temp\\claude\\D--1---------18-------POC\\957adbdd-9676-41cc-8e41-8662274edcca\\scratchpad\\verify\\db_mut",
+    "workingDir":  "D:\\1_프로젝트 문서\\18.스테츠칩팩_POC",
+    "keys":  {
+                 "GDS_CHECK_PROBE":  "FAIL (4/5)"
+             },
+    "passLines":  4,
+    "failLines":  [
+                      "FAIL / G3 Chain Member 도형 62609개 = 원본 요소(같은 Layer / 종류 / nm 좌표 전체 / DataType / PATH 폭 · 타입, BOUNDARY Bounds) / 다른 값 {\u0027nm 정수 아님\u0027: 1, \u0027원본에 없음\u0027: 1} 예 {\u0027nm 정수 아님\u0027: (\u0027TOP/E15884\u0027, -2.08203125, -13639.994), \u0027원본에 없음\u0027: (\u0027TOP/E15884\u0027, \u00273\u0027, \u0027BOUNDARY\u0027, [(-2.08203125, -13639.994), (-11604.657, -13639.765)])} / 종류 {\u0027BOUNDARY\u0027: 34728, \u0027PATH\u0027: 27881} / 같은 모양 원본이 2개 이상인 Member 431"
+                  ],
+    "skipLines":  [
+
+                  ],
+    "stdout":  "08c_RG_Gds.stdout.txt",
+    "stderr":  "08c_RG_Gds.stderr.txt"
+}

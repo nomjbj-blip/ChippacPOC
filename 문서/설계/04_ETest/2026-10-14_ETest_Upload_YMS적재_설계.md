@@ -7,7 +7,11 @@
 - 검증: Probe 2개 PASS.
 - 정정: 컬럼 이름 한도 50자.
 - 2차 정리(15.5): 조회 / 삭제를 기존 YMS 쿼리·함수로 바꾸고 기존 `TestDataMaint.DeleteWaferData` 빈 Lot 버그를 고쳤다. 새 쿼리는 `UPDATE_YMS_PARASPEC` 1개만 남았다.
-- `GdsEtResult` 연결과 화면은 Para Setup 결정 / Upload 재설계 1단계 뒤에 한다.
+- ~~`GdsEtResult` 연결과 화면은 Para Setup 결정 / Upload 재설계 1단계 뒤에 한다.~~ -> **3차(16절): 업로드 서비스에 연결 완료.**
+  - 저장 확정 / 다시 판정 / Map 좌표 다시 계산 때 자동 반영되고, 파일을 지우면 YMS 도 같이 지운다.
+  - YMS 메뉴를 열었다. 화면(ENGUI) 수정은 없다.
+  - 로컬 DB DDL 을 적용했다.
+  - 서비스 Probe PASS.
 
 사용자 지시 (2026-10-14):
 
@@ -111,7 +115,7 @@ YMS 는 설비 파일(CP / PCM)을 아래 순서로 적재한다(`09_TEST/DACrux
 |  | TESTER / PROBER / PROBE_CARD / OPERATOR / TEMP | 비움 (파일에 없음) |
 | `TD_OMM_TSVET` (자동 생성) | WAFER_SEQ / DIE_NUM / DIEPROBE_CNT | 기존 함수가 채움. 행 순서는 고객 Die# 순으로 넘긴다 -> DIE_NUM 순서 = Die# 순서 (Die# 값 자체는 넣지 않음, R9) |
 |  | X / Y | `TQP_GDS_ET_DIE.MAP_X / MAP_Y` (시스템 좌표, LeftBottom (1,1)). YMS Map 은 이 값을 변환 없이 Map Index 로 쓴다 |
-|  | BIN | Die 판정: **1 = Pass / 2 = Spec Fail (범위 밖 값이 있음) / 3 = 미측정('-') 때문에만 Fail** (결정 D6) |
+|  | BIN | Die 판정: **1 = Pass / 2 = Spec Fail (범위 밖 값이 있음) / 3 = 미측정('-') 때문에만 Fail** (결정 D6) | → **2026-10-14 변경 (18절): YMS BIN = 결과 파일 Hardware Bin, E-Test Spec 판정과 별개**
 |  | Parameter 컬럼 | Spec 정의 Parameter 만 (재설계 S4). 컬럼 이름 = 4.3 규칙. 값 = `MEAS_VALUE` (InvariantCulture 문자열), **'-' / 빈 칸은 빈 문자열 -> NULL** (decimal.MinValue 방지) |
 | `TQP_PARASPEC` (자동 생성 후 보정) | PARAM_NAME / TABLE_NAME / PARAM_INDEX | 기존 함수가 등록 |
 |  | PARAM_DESC | 헤더 원문 (Spec ITEM_NAME) |
@@ -120,7 +124,7 @@ YMS 는 설비 파일(CP / PCM)을 아래 순서로 적재한다(`09_TEST/DACrux
 |  | PARAM_TYPE | X / Y / BIN = `INT`, 나머지 `FLOAT` |
 |  | 보정 방법 | **신규 쿼리**로 갱신. 기존 YMS XML 은 고치지 않고 E-Test XML 에 추가 |
 | `TQP_DATA_TABLES` | FACTORY / PROGRAM / TABLE_NAME | 기존 함수 자동 |
-| `TQP_BINDESC` | PROGRAM / BIN / BIN_NAME / HIGH_GEC / COLOR | Program 마다 1 `PASS`(Y, 녹색) / 2 `SPEC_FAIL`(N, 빨강) / 3 `NOT_TESTED`(N, 주황). **없을 때만 등록** — Bin Define 화면에서 고친 값은 덮어쓰지 않는다(기존 `EXISTS_BIN_INFO` / `CREATE_BIN`) |
+| `TQP_BINDESC` | PROGRAM / BIN / BIN_NAME / HIGH_GEC / COLOR | Program 마다 1 `PASS`(Y, 녹색) / 2 `SPEC_FAIL`(N, 빨강) / 3 `NOT_TESTED`(N, 주황). **없을 때만 등록** — Bin Define 화면에서 고친 값은 덮어쓰지 않는다(기존 `EXISTS_BIN_INFO` / `CREATE_BIN`) | → **2026-10-14 변경 (18절): YMS BIN = 결과 파일 Hardware Bin, E-Test Spec 판정과 별개**
 | `TQP_WAFER_SUM` / `TQP_LOT_SUM` | BINn / TESTED_DIE / GEC / YIELD / NETDIE | 기존 `SummaryData`. 샘플: BIN1 23 / BIN2 1 / TESTED 24 / NETDIE 76 -> 1.5배 넘게 차이라 측정 Die 수로 나눔 -> **YIELD 95.83** |
 
 YMS 에 넣지 않는 Parsing 결과(E-Test 테이블에만 저장):
@@ -228,7 +232,7 @@ YMS 에 넣지 않는 Parsing 결과(E-Test 테이블에만 저장):
 | D3 | Map 없는 파일 | **YMS 반영 보류(WAIT)**, Map 등록 후 [Map 좌표 다시 계산] 때 자동 반영 | E-Test 원본 좌표로 반영 (YMS 가 가상 격자로 그림, 방향이 Map 과 다름) |
 | D4 | TESTAREA | **공정명 TSVET / COWET / FT** (+ 9절 설정) | MULTIPROBE 빌림 / PARAMETRIC (Map 모양 안 나옴) |
 | D5 | PROGRAM | **Device_공정** (`OMM_TSVET`) | 파일 Test Type 그대로 (`TSVET`, Device 간 섞임) |
-| D6 | BIN | **1 Pass / 2 Spec Fail / 3 미측정만 Fail**, 기존 Bin 정의는 덮어쓰지 않음 | 1 Pass / 2 Fail |
+| D6 | BIN | **1 Pass / 2 Spec Fail / 3 미측정만 Fail**, 기존 Bin 정의는 덮어쓰지 않음 | 1 Pass / 2 Fail | → **2026-10-14 변경 (18절): YMS BIN = 결과 파일 Hardware Bin, E-Test Spec 판정과 별개**
 | D7 | YMS 컬럼 이름 | **4.3 규칙 + ET_ITEM 에 저장** | 매번 규칙으로 계산 / 일련번호(ET0001) |
 | D8 | 같은 Wafer + 공정 재업로드 | **YMS 도 교체** (E-Test 와 같게, 재측정 이력 없음) | YMS 에는 재측정 이력(PROBE_CNT)으로 남김 |
 | D9 | YMS 실패 처리 | **E-Test 저장은 유지 + YMS_STATUS FAIL + [YMS 다시 반영]** | 파일 전체 실패 (E-Test 도 지움) |
@@ -288,7 +292,7 @@ YMS 에 넣지 않는 Parsing 결과(E-Test 테이블에만 저장):
 | D3 | Map 없는 파일: **YMS 반영 보류(`WAIT`)**. Map 등록 후 [Map 좌표 다시 계산] 때 자동 반영 |
 | D4 | TESTAREA: **공정명 TSVET / COWET / FT** |
 | D5 | PROGRAM: **Device_공정** (`OMM_TSVET`) |
-| D6 | BIN: **1 Pass / 2 Spec Fail / 3 미측정만 Fail**. Program 에 Bin 정의가 이미 있으면 덮어쓰지 않음 |
+| D6 | BIN: **1 Pass / 2 Spec Fail / 3 미측정만 Fail**. Program 에 Bin 정의가 이미 있으면 덮어쓰지 않음 | → **2026-10-14 변경 (18절): YMS BIN = 결과 파일 Hardware Bin, E-Test Spec 판정과 별개**
 | D7 | YMS 컬럼 이름: **4.3 규칙으로 만들어 `TQP_GDS_ET_ITEM.YMS_PARAM_NAME` 에 저장** |
 | D8 | 같은 Wafer + 공정 재업로드: **YMS 도 교체** (재측정 이력 없음) |
 | D9 | YMS 실패: **E-Test 저장 유지 + `YMS_STATUS = FAIL` + [YMS 다시 반영]** |
@@ -588,3 +592,131 @@ Probe 는 실제 데이터와 섞이지 않게 Factory `PROBE` + Device `PRBOMM`
   - 마지막 Wafer 삭제 -> Lot / Lot 요약 없음 (수정 전에는 ORA-01400)
 - 끝난 뒤 PROBE 행 0. 기존 TQP_DATA_TABLES 4 / TQP_LOT 103 그대로. Product `PROBE / PRBOMM` 은 DELETE_FLAG Y 로 남는다.
 - 미확인: 배포 (TEST.BSL / SEMDMS.BSL / DSL 운영 폴더 변경 없음), Service Remoting, YMS TEST Data Maint 화면에서 마지막 Wafer 삭제.
+
+## 16. 구현 3차: 업로드 서비스 연결 (2026-10-14, CLAUDE-087)
+
+사용자: "setup 은 내가 작업 하더라도 지금은 프로그램이 돌아 갈수 있게만 진행."
+- 선행 조건이 다른 작업으로 풀렸다.
+  - Para Setup 결정: 저장 대상 = 등록 Parameter.
+  - Upload 재설계 구현: Die 판정 / Map 좌표 / DDL (CLAUDE-090).
+  - Para 화면 재구성 (CLAUDE-095).
+- Setup 데이터(OMM Map / Parameter / Spec)는 사용자가 만든다. 이번에는 업로드한 파일이 YMS 에 들어가 YMS 화면에서 보이는 데까지만 했다.
+
+### 16.1 14절과 달라진 점
+
+| 항목 | 14절 | 구현 | 이유 |
+| --- | --- | --- | --- |
+| YMS 컬럼 이름 저장 | `TQP_GDS_ET_ITEM.YMS_PARAM_NAME` 추가 | **추가 안 함** | CLAUDE-090 이 Parameter 저장 이름(`ITEM_NAME`)을 `EtYmsRule.ToParamName` 으로 만들어 이미 YMS 컬럼 이름과 같다. UQ(FACTORY, DEVICE_ID, TEST_PROGRAM, ITEM_NAME)도 이미 있다 |
+| 반영 호출 | 화면이 `CompleteEtFile` 뒤 `PublishEtFileToYms` 를 따로 호출 (D9) | **서버 `CompleteEtFile` 끝에서 자동 호출** | 화면 수정 없이 동작. 업로드 화면은 CLAUDE-095 가 같은 날 고치고 있어 겹치지 않게 했다. YMS 실패는 예외 없이 결과 열(YMS_STATUS 등)로만 알려 확정은 그대로다 (D9 의 "E-Test 유지" 는 같음) |
+| 화면 YMS 열 / [YMS 다시 반영] | 업로드 화면에 추가 | **이번에는 안 함** | "프로그램이 돌아갈 수 있게만". 다시 반영은 [등록 파일] 탭 [Map 좌표 다시 계산] 이 대신한다 (그 서비스가 YMS 도 다시 반영) |
+| E-Test 읽기 쿼리 | E-Test XML 에 추가 | **`TQP_GDS_ET_YMS.xml` 에 둠** | 다른 작업이 고치는 E-Test XML 을 건드리지 않게 |
+
+### 16.2 파일
+
+| 구분 | 파일 | 내용 |
+| --- | --- | --- |
+| DDL | `06_CoreLibSource/GdsMapControl/Persistence/2026-10-14_tqp_gds_et_yms.sql` | `TQP_GDS_SRC_FILE` YMS 6컬럼만 (ET_ITEM 부분 삭제). **로컬 DB 적용** |
+| 서버 | 신규 `02_DMS/DACrux.SEMDMS.BSL/GdsEtResult_Yms.cs` (partial) + BSL csproj Compile 1행 | `PublishEtFileToYms`(원격) / `PublishToYms`(본체, 예외 없음) / `BuildYmsWafer`(E-Test -> EtYmsWafer) / `DeleteYmsOfFile` / `AppendYmsResult` |
+| 서버 | `GdsEtResult.cs` 호출 4곳 | `DeleteEtFile` 앞 YMS 삭제(실패하면 파일도 안 지움) / `CompleteEtFile` 끝 반영 + 결과 열 5개(YMS_STATUS / YMS_MESSAGE / YMS_PROGRAM / YMS_WAFER_SEQ / YMS_YIELD) / `RejudgeEtFiles` 파일마다 반영 / `RemapEtFiles` 파일마다 반영 + 결과 열 YMS_FAIL |
+| 원격 | `Interface/iGdsEtResult.cs` / `RO/GdsEtResult.cs` | `PublishEtFileToYms` 1개 |
+| 쿼리 | `TQP_GDS_ET_YMS.xml` + DSL `TQP_GDS_ET_YMS.cs`(GetData / UpdateDataNonQuery 추가) | `SELECT_ET_YMS_FILE` / `SELECT_ET_YMS_PARAM`(파일에 값 있는 등록 Parameter + 헤더 원문 / 단위 + 사용 Y Spec) / `SELECT_ET_YMS_DIE`(Map 좌표 / 판정 / 범위 밖·'-' Fail 수) / `SELECT_ET_YMS_VALUE` / `UPDATE_SRC_FILE_YMS_KEY` / `UPDATE_SRC_FILE_YMS` |
+| 메뉴 | `01_WinApp/DACruxV5/MenuFile.mnu` + `100_ClientBin/MenuFile.mnu` (두 파일 같음) | VISIBLE True 7곳 (`MNU_TEST` / `MNU_TEST_CP` / `MNU_PCM_ANALYSIS` / `MNU_STANDARD_REPORT` / `MNU_CUM_REPORT` / `MNU_BIN_WAFER_REPORT` / `MNU_YIELD_REPORT`), RESV_03 에 `,TSVET,COWET,FT` 4곳 (`MNU_CUM_REPORT` / `MNU_BIN_WAFER_REPORT` / `MNU_YIELD_REPORT` / `MNU_TEST_REPORT`). 다른 값 / 행 순서 변경 없음 |
+| 쿼리 | `TQP_PROGRAM.xml` `SELECT_TESTAREA` | TSVET / COWET / FT 3줄 추가 (Standard Report TestArea 목록) |
+| Probe | 신규 `06_CoreLibSource/GdsMapControl/Probes/EtYmsServiceProbe.ps1` | 16.3 |
+
+메뉴 권한: 화면을 열 때 `UXUtil.AccessCheck` 가 검사한다. ADMIN / 1111(개발 자동 로그인)은 통과한다. 다른 사용자는 기존 POC 메뉴처럼 기능 코드 권한 등록이 필요하다(이번에 안 함).
+
+### 16.3 검증 (TEMP `%TEMP%\chippac\CLAUDE-087`, 로컬 docker `oracle19c-DMS`)
+
+- 빌드: BSL Rebuild(Interface / DSL / TEST.* 포함) + RO 오류 0, 경고 6 / 5 (모두 기존 파일).
+- **`EtYmsServiceProbe.ps1 -BinDir <TEMP>` -> `ET_YMS_SERVICE_PROBE=PASS (9/9)`**
+  - 실행 조건: Factory PROBE / Device PRBOMM, 화면과 같은 파서(ClientBin ENGUI)로 업로드 서비스만 호출.
+  - Map 없이 업로드 -> 확정 OK + YMS WAIT (YMS 데이터 없음)
+  - 시험 Map(TQP_USEMAP 복사) + [Map 좌표 다시 계산] -> YMS DONE: TD 24 / Bin 23-1 / 수율 95.83 / TESTAREA TSVET / DEVICE_ALIAS PRBOMM (610 ms)
+  - `PublishEtFileToYms` 다시 반영 -> 새 Wafer 1장, 이전 Wafer 없음
+  - Spec 완화(715 -> 800) + 다시 판정 -> YMS 수율 100 / 되돌리면 95.83
+  - 파일 삭제 -> YMS Wafer / Lot 삭제 (Lot 의 마지막 Wafer, 2차에서 고친 기존 함수 사용)
+  - Map 있는 상태로 다시 업로드 -> 확정 결과에 바로 YMS DONE / 수율 95.83
+  - Map 삭제 + 다시 계산 -> YMS WAIT + YMS 데이터 삭제
+  - 끝 정리 0
+- 회귀:
+  - `EtYmsRuleProbe` 24/24 / `EtYmsPublishProbe` 22/22
+  - CLAUDE-090 의 `GdsEtResultProbe.ps1 -BinDir <TEMP>` -> `ET_RESULT_PROBE=PASS (18/18)`. 이 Probe 의 좌표 다시 계산 단계에서 YMS 반영 / 정리도 지나간다.
+  - 그 Probe 는 YMS 를 몰라서 `ET_PROBE_TSVET` Bin 3 / Program 1 / Product 1 행을 남긴다 -> 기존 DSL 쿼리로 정리함.
+- 로컬 DB: PROBE 행 0, 기존 TQP_DATA_TABLES 4 / TQP_LOT 103 그대로.
+- **운영 반영 (Claude 배포 아님)**: 14:33 사용자 Visual Studio 빌드가 이 소스로 운영 폴더에 나갔다.
+  - 101_ServerBin: `DACrux.SEMDMS.BSL.dll` 33eb9b4e / `DSL` 3ad40683 / `Interface` 7253012f / `DACrux.TEST.BSL.dll` 1a7e85eb (2차 삭제 함수 수정 포함)
+  - 100_ClientBin: `Interface` 7253012f / `RO` d60dd069
+  - 14:34 DACrux / SEMDMS / TEST / Framework Service 가 다시 시작되어 지금 실행 중인 DMS 에 반영되어 있다.
+  - DMS 화면 확인은 아직 하지 않았다.
+- 미확인: DMS 화면에서 업로드 -> YMS 화면 조회 (사용자 Setup 후), Service Remoting 경유 호출 시간, 여러 Wafer / Lot.
+
+### 16.4 사용자 확인 순서 (Setup 은 사용자)
+
+1. POC > File Map Setup: 샘플 KLARF 를 읽고 **Map ID 를 `OMM`** 으로 바꿔 저장한다 (업로드 Map ID = 파일 Device).
+2. E-Test Para 설정: OMM / TSVET Parameter 등록 + Spec.
+3. E-Test 결과 업로드: 샘플 파일 저장.
+   - 확정 결과에 YMS 가 붙는다(화면 표시 없음).
+   - Map 을 나중에 만들었으면 [등록 파일] 탭 [Map 좌표 다시 계산] 을 누른다.
+4. TEST Analysis > TEST Map View: Wafer 선택에서 기간을 2026-06-09 가 들어가게 하고 Program `OMM_TSVET` / TestArea `TSVET` 를 고른다.
+   - Bin Map: 녹색 23 / 빨강 1.
+   - Parameter 를 고르면 값 Map, Spec 체크면 범위 밖 빨강.
+5. 같은 데이터를 Bin / Test Map Gallery / Wafer Cum Report / Wafer Bin Report / Yield Report / Param Analysis / Standard Report / Test Report 에서 확인한다.
+   - Standard Report 의 TestArea 목록에 TSVET 이 보여야 한다.
+
+### 16.5 남은 것
+
+- 업로드 화면 YMS 열 / [YMS 다시 반영] 버튼 (필요하면).
+- 기능 코드 권한 등록 (ADMIN 외 사용자).
+- 고객 DB 적용 때 DDL 2개: Upload 재설계 DDL + 이 파일.
+- `GdsEtResultProbe` 정리에 YMS 마스터 행 지우기 추가 (CLAUDE-090 파일이라 이번에는 안 고침).
+
+### 16.6 TEST Analysis 메뉴 정리 (2026-10-14, CLAUDE-097)
+
+요청: CP 로 나누지 말고 성격에 맞게 나열, 아이콘도 성격에 맞게.
+
+| 순서 | 묶음 | 메뉴 (MENU_KEY) | 아이콘 |
+| --- | --- | --- | --- |
+| 0 | Wafer Map | TEST Map View (`MNU_TEST_MAP_VIEW`) | Wafer 1장 + Die 격자(Bin 색) |
+| 1 | | Bin Map Gallery (`MNU_BIN_MAP_GALLERY`) | 작은 Wafer 4장(Bin 색) |
+| 2 | | Test Map Gallery (`MNU_TEST_MAP_GALLERY`) | 작은 Wafer 4장(Parameter 값 색) |
+| 3 | | Wafer Cum Report (`MNU_CUM_REPORT`) | 겹친 Wafer 3장 + 누적 Fail 색 |
+| 4 | Bin / 수율 (구분선) | Wafer Bin Report (`MNU_BIN_WAFER_REPORT`, Bin Stack) | Bin 누적 막대 |
+| 5 | | Yield Report (`MNU_YIELD_REPORT`) | 수율 추이 선 + % |
+| 6 | Parameter (구분선) | Param Analysis (`MNU_PCM_ANALYSIS`) | 분포 막대 + 곡선 + LSL / USL |
+| 7 | | Standard Report (`MNU_STANDARD_REPORT`) | 통계 표 문서 |
+| 8 | | Test Report (`MNU_TEST_REPORT`, BoxPlot) | BoxPlot 3개 |
+
+- 메뉴 파일 2곳(`01_WinApp/DACruxV5/MenuFile.mnu`, `100_ClientBin/MenuFile.mnu`, 같은 내용)의 TEST 블록만 바꿨다. 행 순서는 그대로다.
+  - CP 하위 4개: `POPUP_MENU` -> `MNU_TEST`, `MNU_LEVEL` 3 -> 2.
+  - `MNU_TEST` 하위: `MNU_ORDER` 0 ~ 14 다시 매김(숨김 메뉴 5개와 `MNU_TEST_CP` 는 뒤로).
+  - 구분선: `IS_START` True = Wafer Bin Report / Param Analysis (`MenuHelper.InitMenu` 가 Button 에만 `IsFirstInGroup` 적용).
+  - `MNU_TEST_CP`: VISIBLE False. 하위가 없어져 Button 으로 만들어지지만 숨김이다.
+  - `MNU_YIELD_REPORT`: ENABLE False -> True (회색이라 열 수 없었음, 검토 문서 5 / 6번 화면), 캡션 / 툴팁 `Yeild` -> `Yield`.
+  - ICON32 / ICON16: 9개 모두 새 PNG(32 / 16px). 그림 스크립트 `99_Resource/ByModule/POC/make_test_menu_icons.ps1`, PNG 와 미리보기 `99_Resource/ByModule/POC/TEST_Menu/`.
+- 기능 코드(`FUNCTION_CODE`) / 화면 / `RESV_03` 은 바꾸지 않았다.
+- 확인: DataSet 으로 두 파일을 읽어 107행, `MNU_TEST` 하위 순서 / 구분선 / 아이콘 크기(32 / 16), `MNU_TEST_CP` 하위 0 확인. DACrux 를 다시 시작해야 보인다. 화면 확인 대기.
+
+## 18. Bin 기준 변경: 결과 파일 Hardware Bin (2026-10-14, CLAUDE-102)
+
+계기: U9-HS2635-01 (OMM / TSVET) 업로드 후 YMS Map 이 전부 PASS(초록). 이 Device 의 등록 Parameter 109 개에 Spec 이 없어 E-Test 값 판정이 모두 NULL -> Die 판정 P -> BIN 1. 파일은 73 Die 모두 Fail (HW 2 / SW 2001 = 5, HW 4 / SW 4001 = 68).
+
+사용자 결정:
+- YMS 는 E-Test Limit 판정과 별개로 결과 파일의 Hardware / Software Bin 으로 보여 준다. 파싱해 올릴 때 YMS 의 Map / Measure 와 POC E-Test 기능은 따로 보고, 공용 부분(파싱 / Map 좌표 / 적재 순서)만 같이 쓴다.
+- Measure 는 Setup(등록)된 Parameter 만, LSL / USL 도 등록 Spec (14절 그대로).
+- Die BIN = **Hardware Bin** ("우선 하드웨어 빈으로"). Software Bin 을 BIN 으로 쓰는 안은 YMS 제약으로 불가: 요약 쿼리 `TD_TABLE.xml GET_RAW_DATA` 가 `BIN < 100` 만 세고 `TQP_WAFER_SUM` / `TQP_LOT_SUM` 은 BIN0 ~ BIN150 열만 있다.
+- 양품 = 파일 DUT 결과 Pass. 예전 판정 Bin 정의(1 PASS / 2 SPEC_FAIL / 3 NOT_TESTED)는 지우고 파일 Bin 으로 다시 만든다 (사용자가 고친 정의는 유지).
+
+| 항목 | 규칙 |
+| --- | --- |
+| TD BIN | `TQP_GDS_ET_DIE.HW_BIN` (0 ~ 99, 없거나 범위 밖이면 입력 확인 단계 FAIL, 메시지에 DUT 번호) |
+| Bin 정의 (`TQP_BINDESC`) | 이 Wafer 의 Hardware Bin 중 정의가 없는 것만 등록 (기존 `EXISTS_BIN_INFO` / `CREATE_BIN`). BIN_NAME `HW2 SW2001` (Software Bin 여러 개면 `HW2 SW2001,2002`, 30자), DESCRIPTION `E-Test file Hardware Bin 2 / Software Bin 2001 / Fail` |
+| 양품 (HIGH_GEC) | 그 Hardware Bin 의 Die 가 모두 파일 결과 Pass 면 Y. 섞여 있으면 N + 설명 "Pass and Fail mixed" |
+| 색 | 양품 `#00C000`, 불량은 Hardware Bin 끝자리로 고정 (2 빨강 / 3 파랑 / 4 자주 / 5 금색 ...) |
+| 예전 정의 정리 | BIN / BIN_NAME / DESCRIPTION 이 예전 규칙 값과 모두 같을 때만 삭제 (기존 `SELECT_PGM_BIN` / `DELETE_PROGRAM_BIN`) |
+| 결과 표 열 | `BIN1_COUNT / BIN2_COUNT / BIN3_COUNT` -> `GOOD_DIE_COUNT / FAIL_DIE_COUNT / BIN_COUNTS` (예 `1:20, 5:4`) |
+| E-Test 쪽 | 값 / Die 판정(JUDGE_FLAG)과 POC 화면은 그대로. 다시 판정(Rejudge)해도 YMS Bin / 수율은 바뀌지 않는다 (YMS 반영은 계속 다시 한다) |
+
+변경 파일: `Interface/ETest/EtYmsRule.cs` (Bin 규칙) / `BSL/EtYmsPublisher.cs` (Die 모델 / 입력 확인 / Bin 정의) / `BSL/GdsEtResult_Yms.cs` (Die 읽기) / `08_DBQuery/ORACLE/TQP_GDS_ET_YMS.xml` `SELECT_ET_YMS_DIE` (값 판정 집계 대신 HW_BIN / SW_BIN / PASS_FLAG) / `Interface/iGdsEtResult.cs` (주석) / Probe 3개. 새 쿼리 / DDL 없음.
+
+검증 (TEMP 빌드 `%TEMP%\chippac\CLAUDE-102\bin`, 오류 0): `ET_YMS_RULE_PROBE=PASS (27/27)` / `ET_YMS_PUBLISH_PROBE=PASS (23/23)` (샘플 RH-HS2615-02: Bin 1 Pass 20 / Bin 5 Fail 4 -> 수율 83.33, 예전 정의 2 삭제 / 고친 3 유지, HW Bin 없음 / 100 -> FAIL) / `ET_YMS_SERVICE_PROBE=PASS (9/9)` (업로드 -> YMS 83.33, Spec 완화 다시 판정 후에도 83.33) / 회귀 `ET_RESULT_PROBE=PASS (18/18)`.

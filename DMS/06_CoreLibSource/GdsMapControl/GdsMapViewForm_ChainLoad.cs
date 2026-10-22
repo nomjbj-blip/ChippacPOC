@@ -14,6 +14,7 @@ namespace NexplantQMS.GdsMap
     ///
     /// 처리 흐름 ([조회] 안에서 호출)
     ///  1) 도면을 그리기 전: DB Chain 목록 + Chain별 Layer / 규칙 / Member(+도형 Layer) / 편집 기록 읽기(ReadDbChains, 백그라운드)
+    ///     - 상세는 Chain 번호 범위마다 한 번에 읽어 CHAIN_SEQ 로 나눈다(Chain 이 수만 개인 U8 대응, 2026-10-21)
     ///  2) Chain이 쓰는 Layer(탐색 Layer + Member 도형 Layer)가 조회 체크에 없으면 함께 조회할지 묻기(ConfirmChainLayers, 설계 결정 3)
     ///  3) 도면을 그린 뒤: DB 행을 화면 Chain(ChainDefinition)으로 복원(LoadChainsFromDb)
     ///     - Input / Output = 단자 후보 + 저장된 클릭 좌표, 수동 추가 / 제외 = 편집 기록
@@ -23,50 +24,112 @@ namespace NexplantQMS.GdsMap
     /// </summary>
     public partial class GdsMapViewForm
     {
-        /// <summary>DB에서 읽은 Chain 1개의 원본 행.</summary>
+        /// <summary>
+        /// DB에서 읽은 Chain 1개의 원본 행.
+        /// 상세 행은 Chain 번호 범위로 한 번에 읽은 표에서 이 Chain 의 행만 모은 것이다(행은 원래 표를 가리킨다) (2026-10-21).
+        /// </summary>
         private sealed class ChainDbData
         {
             public DataRow Header;
-            public DataTable Layers;
-            public DataTable Rules;
-            public DataTable Members;
-            public DataTable Edits;
+            public List<DataRow> Layers = new List<DataRow>();
+            public List<DataRow> Rules = new List<DataRow>();
+            public List<DataRow> Members = new List<DataRow>();
+            public List<DataRow> Edits = new List<DataRow>();
 
             /// <summary>이 Chain을 온전히 그리는 데 필요한 Layer 키(번호 + DataType): 탐색 Layer + Member 도형 Layer.</summary>
             public IEnumerable<int> NeededLayers
             {
                 get
                 {
-                    return Layers.Rows.Cast<DataRow>().Select(row => GdsLayerKey.FromRow(row))
-                        .Concat(Members.Rows.Cast<DataRow>().Select(row => GdsLayerKey.FromRow(row)));
+                    return Layers.Select(row => GdsLayerKey.FromRow(row))
+                        .Concat(Members.Select(row => GdsLayerKey.FromRow(row)));
                 }
             }
         }
 
         /// <summary>
+        /// Chain 상세를 한 번에 읽는 Chain 수(Chain 번호 범위 1개).
+        /// U8 같은 형태 Chain(도형 10개)이면 포함 도형 약 5만 행, Binary 전송 약 4MB 다 (2026-10-21).
+        /// </summary>
+        private const int ChainDetailRangeSize = 5000;
+
+        /// <summary>
+        /// 불러온 Chain 이 이보다 많으면 지도 표시(체크)를 끈 채로 불러온다. 목록에는 모두 넣고, 체크 박스로 체크한 Chain 만 외곽선을 그린다.
+        /// U8 같은 형태 Chain 27,342개를 모두 그리면 외곽선 정점이 약 3,200만 개(불러오기 약 15초 + 메모리 1.6GB 이상)였다 (2026-10-21 결정).
+        /// 표시 여부는 저장 지문에 들어가지 않아 꺼도 "변경 없음" 그대로다.
+        /// </summary>
+        private const int ChainLoadVisibleLimit = 1000;
+
+        /// <summary>
         /// DB Chain 목록과 Chain별 상세를 읽는다. 서비스 호출만 하므로 백그라운드 스레드에서 실행한다.
-        /// progress: 화면 상태줄에 "n / 전체 Code"를 보여 주기 위한 진행 보고(Chain이 많을 때 멈춘 것처럼 보이지 않게).
+        /// progress: 화면 상태줄에 "n / 전체"를 보여 주기 위한 진행 보고(Chain이 많을 때 멈춘 것처럼 보이지 않게).
+        /// 처리 흐름:
+        ///  1) Chain 목록 1번 -> Chain 번호(CHAIN_SEQ) 순으로 정렬해 5,000개씩 범위를 나눈다
+        ///  2) 범위마다 Layer / 규칙 / 포함 도형 / 편집 기록을 한 번씩 읽어 CHAIN_SEQ 로 각 Chain 에 나눠 담는다
+        ///  3) 서버에 범위 조회가 없으면(이전 서버) Chain 마다 4번 읽는 예전 방식으로 바꾼다
+        /// Chain 마다 4번 부르면 U8(27,342개)은 상세 읽기만 약 5분이 걸렸다 (2026-10-21, 설계: 문서/설계/02_GDS/2026-10-21_U8_Chain_View_조회속도_분석.md S1).
         /// </summary>
         private static List<ChainDbData> ReadDbChains(string factory, string deviceId, IProgress<string> progress)
         {
             var service = new DACrux.SEMDMS.RO.GdsChain();
             var result = new List<ChainDbData>();
+            var bySeq = new Dictionary<long, ChainDbData>();
             DataTable list = service.GetChainList(factory, deviceId);
-            int index = 0;
             foreach (DataRow row in list.Rows)
             {
-                string seq = row["CHAIN_SEQ"].ToString();
-                progress.Report("저장된 Chain 조회 중 " + (++index) + " / " + list.Rows.Count + " (" + row["CHAIN_NAME"] + ")");
-                result.Add(new ChainDbData
+                var data = new ChainDbData { Header = row };
+                result.Add(data);
+                bySeq[Convert.ToInt64(row["CHAIN_SEQ"], CultureInfo.InvariantCulture)] = data;
+            }
+
+            List<long> seqs = bySeq.Keys.OrderBy(seq => seq).ToList();
+            bool rangeAvailable = false;
+            try
+            {
+                for (int start = 0; start < seqs.Count; start += ChainDetailRangeSize)
                 {
-                    Header = row,
-                    Layers = service.GetChainLayers(factory, deviceId, seq),
-                    Rules = service.GetChainRules(factory, deviceId, seq),
-                    Members = service.GetChainMembers(factory, deviceId, seq),
-                    Edits = service.GetChainEdits(factory, deviceId, seq)
-                });
+                    int end = Math.Min(start + ChainDetailRangeSize, seqs.Count) - 1;
+                    string from = seqs[start].ToString(CultureInfo.InvariantCulture);
+                    string to = seqs[end].ToString(CultureInfo.InvariantCulture);
+                    progress.Report("저장된 Chain 조회 중 " + (end + 1) + " / " + seqs.Count);
+                    SplitByChain(service.GetChainLayersRange(factory, deviceId, from, to), bySeq, data => data.Layers);
+                    rangeAvailable = true;
+                    SplitByChain(service.GetChainRulesRange(factory, deviceId, from, to), bySeq, data => data.Rules);
+                    SplitByChain(service.GetChainMembersRange(factory, deviceId, from, to), bySeq, data => data.Members);
+                    SplitByChain(service.GetChainEditsRange(factory, deviceId, from, to), bySeq, data => data.Edits);
+                }
+            }
+            catch (Exception ex) when (!rangeAvailable && (ex is System.Runtime.Remoting.RemotingException || ex is MissingMethodException))
+            {
+                ReadDbChainDetailsOneByOne(service, factory, deviceId, result, progress);
             }
             return result;
+        }
+
+        /// <summary>범위 조회 표의 행을 CHAIN_SEQ 로 해당 Chain 에 나눠 담는다. 목록에 없는 Chain(목록 조회 뒤 새로 저장된 것)의 행은 건너뛴다.</summary>
+        private static void SplitByChain(DataTable table, Dictionary<long, ChainDbData> bySeq, Func<ChainDbData, List<DataRow>> target)
+        {
+            foreach (DataRow row in table.Rows)
+            {
+                if (bySeq.TryGetValue(Convert.ToInt64(row["CHAIN_SEQ"], CultureInfo.InvariantCulture), out ChainDbData data))
+                    target(data).Add(row);
+            }
+        }
+
+        /// <summary>범위 조회가 없는 이전 서버: Chain 마다 Layer / 규칙 / 포함 도형 / 편집 기록을 따로 읽는다(예전 방식).</summary>
+        private static void ReadDbChainDetailsOneByOne(DACrux.SEMDMS.RO.GdsChain service, string factory, string deviceId,
+            List<ChainDbData> chains, IProgress<string> progress)
+        {
+            int index = 0;
+            foreach (ChainDbData data in chains)
+            {
+                string seq = data.Header["CHAIN_SEQ"].ToString();
+                progress.Report("저장된 Chain 조회 중 " + (++index) + " / " + chains.Count + " (" + data.Header["CHAIN_NAME"] + ")");
+                data.Layers.AddRange(service.GetChainLayers(factory, deviceId, seq).Rows.Cast<DataRow>());
+                data.Rules.AddRange(service.GetChainRules(factory, deviceId, seq).Rows.Cast<DataRow>());
+                data.Members.AddRange(service.GetChainMembers(factory, deviceId, seq).Rows.Cast<DataRow>());
+                data.Edits.AddRange(service.GetChainEdits(factory, deviceId, seq).Rows.Cast<DataRow>());
+            }
         }
 
         /// <summary>
@@ -110,12 +173,16 @@ namespace NexplantQMS.GdsMap
         {
             map.RebuildChainTraceItems();
             int maxOrdinal = 0;
+            bool hideAll = data.Count > ChainLoadVisibleLimit;
             _switchingChain = true;
+            // Chain 이 수만 개면 하나씩 넣을 때마다 목록을 다시 계산해 수십 초가 걸렸다. 넣는 동안 목록 그리기를 멈춘다 (2026-10-21)
+            _chainList.BeginUpdate();
             try
             {
                 foreach (ChainDbData item in data)
                 {
                     ChainDefinition chain = CreateChainFromDb(item);
+                    if (hideAll) chain.Visible = false;
                     _chains.Add(chain);
                     _chainList.Items.Add(chain, chain.Visible);
                     maxOrdinal = Math.Max(maxOrdinal, ParseChainCode(chain.Code));
@@ -123,6 +190,7 @@ namespace NexplantQMS.GdsMap
             }
             finally
             {
+                _chainList.EndUpdate();
                 _switchingChain = false;
             }
             // 새 Chain Code는 불러온 Chain의 최대 Code 다음부터 매긴다(같은 Code 덮어쓰기 방지).
@@ -150,8 +218,8 @@ namespace NexplantQMS.GdsMap
                 ApplyLayerRules = !(h["APPLY_LAYER_RULES"] is DBNull) && ToInt(h["APPLY_LAYER_RULES"]) == 1,
                 CellSize = cellSize,
                 // 탐색 Layer / 규칙은 Layer 키(번호 + DataType). DataType 열이 없는 이전 서버 응답은 0 (2026-10-20)
-                LayerIds = new HashSet<int>(item.Layers.Rows.Cast<DataRow>().Select(row => GdsLayerKey.FromRow(row))),
-                LayerRules = item.Rules.Rows.Cast<DataRow>().Select(row => new ChainLayerConnectionRule(
+                LayerIds = new HashSet<int>(item.Layers.Select(row => GdsLayerKey.FromRow(row))),
+                LayerRules = item.Rules.Select(row => new ChainLayerConnectionRule(
                     GdsLayerKey.FromRow(row, "FIRST_LAYER_ID", "FIRST_DATA_TYPE"), GdsLayerKey.FromRow(row, "SECOND_LAYER_ID", "SECOND_DATA_TYPE"),
                     Convert.ToDouble(row["TOLERANCE"], CultureInfo.InvariantCulture))).ToList()
             };
@@ -160,7 +228,7 @@ namespace NexplantQMS.GdsMap
             var endpointIds = new List<string>();
             var missingLayers = new SortedSet<int>();
             int missing = 0;
-            foreach (DataRow row in item.Members.Rows)
+            foreach (DataRow row in item.Members)
             {
                 string id = row["PLACED_ELEMENT_ID"].ToString();
                 string role = row["ROLE_CODE"].ToString();
@@ -185,7 +253,7 @@ namespace NexplantQMS.GdsMap
                 else
                     chain.ManualAdded.Add(id);
             }
-            foreach (DataRow row in item.Edits.Rows)
+            foreach (DataRow row in item.Edits)
             {
                 string id = row["PLACED_ELEMENT_ID"].ToString();
                 string action = row["ACTION_CODE"].ToString();
@@ -198,7 +266,7 @@ namespace NexplantQMS.GdsMap
             if (traceElements.Count < traceIds.Count)
             {
                 var found = new HashSet<string>(traceElements.Select(element => element.ElementKey), StringComparer.Ordinal);
-                foreach (DataRow row in item.Members.Rows)
+                foreach (DataRow row in item.Members)
                     if (row["INCLUSION_SOURCE"].ToString() == "TRACE" && !found.Contains(row["PLACED_ELEMENT_ID"].ToString()))
                     {
                         missing++;

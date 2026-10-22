@@ -14,7 +14,8 @@
         }
 
         /// <summary>
-        /// 위 1줄: Factory / [파일 열기] [다시 읽기] / 파일 경로(읽기 전용) / Slot(입력) / [저장]. 위 2줄: 상태 + 메시지.
+        /// 위 1줄: Factory / [파일 열기] [다시 읽기] / 파일 경로(읽기 전용) / Slot(입력) / [저장].
+        /// 위 2줄 상태 + 메시지(lblState / lblMessage)는 숨기고 위 막대를 1줄 높이로 줄였다 (2026-10-22).
         /// 가운데: 연 파일의 결과(공통 Control: 정보 / 1단계 Die / 2단계 정의 Para 값). 아래: 상태 표시줄 + 진행 막대.
         /// </summary>
         private void InitializeComponent()
@@ -57,7 +58,7 @@
             this.topBar.Location = new System.Drawing.Point(0, 0);
             this.topBar.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.topBar.Name = "topBar";
-            this.topBar.Size = new System.Drawing.Size(1857, 100);
+            this.topBar.Size = new System.Drawing.Size(1857, 60);
             this.topBar.TabIndex = 0;
             // 
             // lblFactory
@@ -171,6 +172,7 @@
             this.lblState.Size = new System.Drawing.Size(91, 27);
             this.lblState.TabIndex = 9;
             this.lblState.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.lblState.Visible = false;
             // 
             // lblMessage
             // 
@@ -183,14 +185,15 @@
             this.lblMessage.Size = new System.Drawing.Size(1731, 27);
             this.lblMessage.TabIndex = 10;
             this.lblMessage.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.lblMessage.Visible = false;
             // 
             // resultView
             // 
             this.resultView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.resultView.Location = new System.Drawing.Point(0, 100);
+            this.resultView.Location = new System.Drawing.Point(0, 60);
             this.resultView.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.resultView.Name = "resultView";
-            this.resultView.Size = new System.Drawing.Size(1857, 1035);
+            this.resultView.Size = new System.Drawing.Size(1857, 1071);
             this.resultView.TabIndex = 1;
             // 
             // pnlStatus
@@ -206,6 +209,7 @@
             // 
             // lblStatus
             // 
+            this.lblStatus.AutoEllipsis = true;
             this.lblStatus.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lblStatus.Location = new System.Drawing.Point(0, 0);
             this.lblStatus.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);

@@ -31,6 +31,8 @@
             this.btnOpenFile = new System.Windows.Forms.Button();
             this.lblFileName = new System.Windows.Forms.Label();
             this.txtFileName = new System.Windows.Forms.TextBox();
+            this.lblFileRuleTitle = new System.Windows.Forms.Label();
+            this.lblFileRule = new System.Windows.Forms.Label();
             this.fileBar = new System.Windows.Forms.Panel();
             this.lblMeasFilter = new System.Windows.Forms.Label();
             this.cboMeasFilter = new System.Windows.Forms.ComboBox();
@@ -64,6 +66,9 @@
             this.pnlStatus = new System.Windows.Forms.Panel();
             this.lblStatus = new System.Windows.Forms.Label();
             this.busyBar = new DACrux.SEMDMS.Control.ProgressStatusBar();
+            this.lblRegDevice = new System.Windows.Forms.Label();
+            this.cboRegDevice = new System.Windows.Forms.ComboBox();
+            this.btnDeleteDevice = new System.Windows.Forms.Button();
             this.topBar.SuspendLayout();
             this.fileBar.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvHeader)).BeginInit();
@@ -82,17 +87,22 @@
             this.topBar.Controls.Add(this.btnOpenFile);
             this.topBar.Controls.Add(this.lblFileName);
             this.topBar.Controls.Add(this.txtFileName);
+            this.topBar.Controls.Add(this.lblFileRuleTitle);
+            this.topBar.Controls.Add(this.lblFileRule);
+            this.topBar.Controls.Add(this.lblRegDevice);
+            this.topBar.Controls.Add(this.cboRegDevice);
+            this.topBar.Controls.Add(this.btnDeleteDevice);
             this.topBar.Dock = System.Windows.Forms.DockStyle.Top;
             this.topBar.Location = new System.Drawing.Point(0, 0);
             this.topBar.Margin = new System.Windows.Forms.Padding(4);
             this.topBar.Name = "topBar";
-            this.topBar.Size = new System.Drawing.Size(1857, 60);
+            this.topBar.Size = new System.Drawing.Size(1857, 90);
             this.topBar.TabIndex = 0;
             // 
             // lblFactory
             // 
             this.lblFactory.AutoSize = true;
-            this.lblFactory.Location = new System.Drawing.Point(14, 21);
+            this.lblFactory.Location = new System.Drawing.Point(14, 17);
             this.lblFactory.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblFactory.Name = "lblFactory";
             this.lblFactory.Size = new System.Drawing.Size(69, 18);
@@ -101,7 +111,7 @@
             // 
             // txtFactory
             // 
-            this.txtFactory.Location = new System.Drawing.Point(89, 16);
+            this.txtFactory.Location = new System.Drawing.Point(89, 12);
             this.txtFactory.Margin = new System.Windows.Forms.Padding(4);
             this.txtFactory.Name = "txtFactory";
             this.txtFactory.ReadOnly = true;
@@ -112,7 +122,7 @@
             // lblDevice
             // 
             this.lblDevice.AutoSize = true;
-            this.lblDevice.Location = new System.Drawing.Point(223, 21);
+            this.lblDevice.Location = new System.Drawing.Point(223, 17);
             this.lblDevice.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblDevice.Name = "lblDevice";
             this.lblDevice.Size = new System.Drawing.Size(62, 18);
@@ -121,7 +131,7 @@
             // 
             // txtDevice
             // 
-            this.txtDevice.Location = new System.Drawing.Point(291, 16);
+            this.txtDevice.Location = new System.Drawing.Point(291, 12);
             this.txtDevice.Margin = new System.Windows.Forms.Padding(4);
             this.txtDevice.Name = "txtDevice";
             this.txtDevice.ReadOnly = true;
@@ -132,7 +142,7 @@
             // lblTestProgram
             // 
             this.lblTestProgram.AutoSize = true;
-            this.lblTestProgram.Location = new System.Drawing.Point(526, 21);
+            this.lblTestProgram.Location = new System.Drawing.Point(526, 17);
             this.lblTestProgram.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblTestProgram.Name = "lblTestProgram";
             this.lblTestProgram.Size = new System.Drawing.Size(44, 18);
@@ -141,7 +151,7 @@
             // 
             // txtTestProgram
             // 
-            this.txtTestProgram.Location = new System.Drawing.Point(574, 16);
+            this.txtTestProgram.Location = new System.Drawing.Point(574, 12);
             this.txtTestProgram.Margin = new System.Windows.Forms.Padding(4);
             this.txtTestProgram.Name = "txtTestProgram";
             this.txtTestProgram.ReadOnly = true;
@@ -152,12 +162,12 @@
             // btnOpenFile
             // 
             this.btnOpenFile.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Bold);
-            this.btnOpenFile.Location = new System.Drawing.Point(709, 9);
+            this.btnOpenFile.Location = new System.Drawing.Point(709, 8);
             this.btnOpenFile.Margin = new System.Windows.Forms.Padding(4);
             this.btnOpenFile.Name = "btnOpenFile";
             this.btnOpenFile.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.btnOpenFile.Image = ((System.Drawing.Image)(resources.GetObject("btnOpenFile.Image")));
-            this.btnOpenFile.Size = new System.Drawing.Size(200, 42);
+            this.btnOpenFile.Size = new System.Drawing.Size(200, 36);
             this.btnOpenFile.TabIndex = 6;
             this.btnOpenFile.Text = "결과 파일 열기...";
             this.btnOpenFile.UseVisualStyleBackColor = true;
@@ -166,7 +176,7 @@
             // lblFileName
             // 
             this.lblFileName.AutoSize = true;
-            this.lblFileName.Location = new System.Drawing.Point(927, 21);
+            this.lblFileName.Location = new System.Drawing.Point(927, 17);
             this.lblFileName.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblFileName.Name = "lblFileName";
             this.lblFileName.Size = new System.Drawing.Size(44, 18);
@@ -175,14 +185,70 @@
             // 
             // txtFileName
             // 
-            this.txtFileName.Location = new System.Drawing.Point(972, 16);
+            this.txtFileName.Location = new System.Drawing.Point(972, 12);
             this.txtFileName.Margin = new System.Windows.Forms.Padding(4);
             this.txtFileName.Name = "txtFileName";
             this.txtFileName.ReadOnly = true;
             this.txtFileName.Size = new System.Drawing.Size(792, 28);
             this.txtFileName.TabIndex = 8;
             this.txtFileName.TabStop = false;
+            //
+            // lblFileRuleTitle
+            //
+            this.lblFileRuleTitle.AutoSize = true;
+            this.lblFileRuleTitle.ForeColor = System.Drawing.Color.DimGray;
+            this.lblFileRuleTitle.Location = new System.Drawing.Point(927, 57);
+            this.lblFileRuleTitle.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblFileRuleTitle.Name = "lblFileRuleTitle";
+            this.lblFileRuleTitle.Size = new System.Drawing.Size(44, 18);
+            this.lblFileRuleTitle.TabIndex = 9;
+            this.lblFileRuleTitle.Text = "규칙";
+            //
+            // lblFileRule
+            //
+            this.lblFileRule.AutoSize = true;
+            this.lblFileRule.Font = new System.Drawing.Font("굴림", 8F);
+            this.lblFileRule.ForeColor = System.Drawing.Color.DimGray;
+            this.lblFileRule.Location = new System.Drawing.Point(972, 58);
+            this.lblFileRule.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblFileRule.Name = "lblFileRule";
+            this.lblFileRule.Size = new System.Drawing.Size(790, 16);
+            this.lblFileRule.TabIndex = 10;
+            this.lblFileRule.Text = "[Customer]_[Device]_[Wafer Type]_[Wafer Rev]_[Test Type]_[Test Date]_[Lot]_[Lot-Wafer No]$Fab$";
             // 
+            // lblRegDevice
+            // 
+            this.lblRegDevice.AutoSize = true;
+            this.lblRegDevice.Location = new System.Drawing.Point(14, 57);
+            this.lblRegDevice.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblRegDevice.Name = "lblRegDevice";
+            this.lblRegDevice.Size = new System.Drawing.Size(96, 18);
+            this.lblRegDevice.TabIndex = 11;
+            this.lblRegDevice.Text = "등록 Device";
+            // 
+            // cboRegDevice
+            // 
+            this.cboRegDevice.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cboRegDevice.DropDownWidth = 420;
+            this.cboRegDevice.Location = new System.Drawing.Point(120, 53);
+            this.cboRegDevice.Margin = new System.Windows.Forms.Padding(4);
+            this.cboRegDevice.Name = "cboRegDevice";
+            this.cboRegDevice.Size = new System.Drawing.Size(384, 26);
+            this.cboRegDevice.TabIndex = 12;
+            this.cboRegDevice.DropDown += new System.EventHandler(this.cboRegDevice_DropDown);
+            // 
+            // btnDeleteDevice
+            // 
+            this.btnDeleteDevice.Enabled = false;
+            this.btnDeleteDevice.Location = new System.Drawing.Point(526, 51);
+            this.btnDeleteDevice.Margin = new System.Windows.Forms.Padding(4);
+            this.btnDeleteDevice.Name = "btnDeleteDevice";
+            this.btnDeleteDevice.Size = new System.Drawing.Size(161, 30);
+            this.btnDeleteDevice.TabIndex = 13;
+            this.btnDeleteDevice.Text = "Device 삭제";
+            this.btnDeleteDevice.UseVisualStyleBackColor = true;
+            this.btnDeleteDevice.Click += new System.EventHandler(this.btnDeleteDevice_Click);
+            //
             // fileBar
             // 
             this.fileBar.Controls.Add(this.lblMeasFilter);
@@ -196,7 +262,7 @@
             this.fileBar.Controls.Add(this.btnUncheckAll);
             this.fileBar.Controls.Add(this.btnRegister);
             this.fileBar.Dock = System.Windows.Forms.DockStyle.Top;
-            this.fileBar.Location = new System.Drawing.Point(0, 60);
+            this.fileBar.Location = new System.Drawing.Point(0, 90);
             this.fileBar.Margin = new System.Windows.Forms.Padding(4);
             this.fileBar.Name = "fileBar";
             this.fileBar.Size = new System.Drawing.Size(1857, 60);
@@ -371,7 +437,7 @@
             // 
             // colHHeader
             // 
-            this.colHHeader.HeaderText = "Parameter (헤더 원문)";
+            this.colHHeader.HeaderText = "Parameter";
             this.colHHeader.MinimumWidth = 8;
             this.colHHeader.Name = "colHHeader";
             this.colHHeader.ReadOnly = true;
@@ -414,6 +480,7 @@
             this.colHLeg1.HeaderText = "Leg";
             this.colHLeg1.MinimumWidth = 8;
             this.colHLeg1.Name = "colHLeg1";
+            this.colHLeg1.Visible = false;
             this.colHLeg1.ReadOnly = true;
             this.colHLeg1.Width = 36;
             // 
@@ -430,6 +497,7 @@
             this.colHLeg2.HeaderText = "Leg";
             this.colHLeg2.MinimumWidth = 8;
             this.colHLeg2.Name = "colHLeg2";
+            this.colHLeg2.Visible = false;
             this.colHLeg2.ReadOnly = true;
             this.colHLeg2.Width = 36;
             // 
@@ -455,6 +523,7 @@
             this.colHGds.MinimumWidth = 8;
             this.colHGds.Name = "colHGds";
             this.colHGds.ReadOnly = true;
+            this.colHGds.Visible = false;
             this.colHGds.Width = 140;
             // 
             // colHSpec
@@ -463,6 +532,7 @@
             this.colHSpec.MinimumWidth = 8;
             this.colHSpec.Name = "colHSpec";
             this.colHSpec.ReadOnly = true;
+            this.colHSpec.Visible = false;
             this.colHSpec.Width = 110;
             // 
             // colHMessage
@@ -471,6 +541,7 @@
             this.colHMessage.MinimumWidth = 8;
             this.colHMessage.Name = "colHMessage";
             this.colHMessage.ReadOnly = true;
+            this.colHMessage.Visible = false;
             this.colHMessage.Width = 300;
             // 
             // ctxHeader
@@ -564,6 +635,11 @@
         private System.Windows.Forms.Button btnOpenFile;
         private System.Windows.Forms.Label lblFileName;
         private System.Windows.Forms.TextBox txtFileName;
+        private System.Windows.Forms.Label lblFileRuleTitle;
+        private System.Windows.Forms.Label lblFileRule;
+        private System.Windows.Forms.Label lblRegDevice;
+        private System.Windows.Forms.ComboBox cboRegDevice;
+        private System.Windows.Forms.Button btnDeleteDevice;
         private System.Windows.Forms.Panel fileBar;
         private System.Windows.Forms.Label lblMeasFilter;
         private System.Windows.Forms.ComboBox cboMeasFilter;

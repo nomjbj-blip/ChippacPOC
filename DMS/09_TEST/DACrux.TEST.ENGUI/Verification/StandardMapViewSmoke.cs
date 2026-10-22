@@ -529,7 +529,7 @@ internal static class StandardMapViewSmoke
             foreach (string text in differ) Console.WriteLine("   다름: " + text);
             foreach (string text in note) Console.WriteLine("   참고: " + text);
             // Die 크기가 mm 로 저장된 Map 은 Die 가 1 픽셀보다 작아 마우스로 잡을 수 없으므로 판정하지 않는다 (데이터 확인에서 다름으로 표시됨).
-            if (Results(layout)["Die 크기 단위 (µm)"] == "다름") Console.WriteLine("DB " + mapId + " hit-test: 생략 (Die 크기 단위 다름)");
+            if (Results(layout)["Die 크기 단위"] == "다름") Console.WriteLine("DB " + mapId + " hit-test: 생략 (Die 크기 단위 다름)");
             else if (Dies(viewMap).Count > 0) CheckHoverHitTest(view, viewMap, "DB " + mapId, true);
         }
     }

@@ -467,6 +467,7 @@ namespace DACrux.SEMDMS.Control
             this.cmbValueTypes.Size = new System.Drawing.Size(186, 28);
             this.cmbValueTypes.TabIndex = 4;
             this.cmbValueTypes.Text = "DEFECTS";
+            this.cmbValueTypes.Visible = false;
             this.cmbValueTypes.SelectionChanged += new System.EventHandler(this.cmbValueTypes_SelectionChanged);
             // 
             // label9
@@ -479,33 +480,36 @@ namespace DACrux.SEMDMS.Control
             this.label9.Size = new System.Drawing.Size(98, 18);
             this.label9.TabIndex = 2;
             this.label9.Text = "Value Type";
+            this.label9.Visible = false;
             // 
             // rbtWaferList
             // 
             this.rbtWaferList.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.rbtWaferList.AutoSize = true;
+            this.rbtWaferList.Checked = true;
             this.rbtWaferList.Location = new System.Drawing.Point(465, 6);
             this.rbtWaferList.Margin = new System.Windows.Forms.Padding(4);
             this.rbtWaferList.Name = "rbtWaferList";
             this.rbtWaferList.Size = new System.Drawing.Size(106, 22);
             this.rbtWaferList.TabIndex = 0;
+            this.rbtWaferList.TabStop = true;
             this.rbtWaferList.Text = "WaferList";
             this.rbtWaferList.UseVisualStyleBackColor = true;
+            this.rbtWaferList.Visible = false;
             this.rbtWaferList.CheckedChanged += new System.EventHandler(this.rbtWaferList_CheckedChanged);
             // 
             // rbtStepList
             // 
             this.rbtStepList.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.rbtStepList.AutoSize = true;
-            this.rbtStepList.Checked = true;
             this.rbtStepList.Location = new System.Drawing.Point(300, 6);
             this.rbtStepList.Margin = new System.Windows.Forms.Padding(4);
             this.rbtStepList.Name = "rbtStepList";
             this.rbtStepList.Size = new System.Drawing.Size(146, 22);
             this.rbtStepList.TabIndex = 0;
-            this.rbtStepList.TabStop = true;
             this.rbtStepList.Text = "StepSummary";
             this.rbtStepList.UseVisualStyleBackColor = true;
+            this.rbtStepList.Visible = false;
             this.rbtStepList.CheckedChanged += new System.EventHandler(this.rbtStepList_CheckedChanged);
             // 
             // panel3

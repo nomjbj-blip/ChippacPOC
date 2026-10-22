@@ -33,9 +33,10 @@ namespace DACrux.SEMDMS.BSL
     ///    같은 Setup 이 이미 있고 값 / Die 가 Map Setup 과 다르면 저장할 때 Map Setup 값으로 바꾼다 (재업로드 시 교체).
     ///  - 기존 DataService 처럼 문장마다 자동 Commit 이다. Wafer 저장 중 오류가 나면 이번에 새로 만든 STEP 의 행을 지운다.
     ///    SETUP / PRODUCT / LOT / WAFER 는 다른 STEP 이 함께 쓰는 행이라 남겨 두고 다음 저장에서 재사용한다.
-    /// 이미지(구현 2단계, 결정 D4 = FTP 상대 경로): Service 설정 KLARF_IMAGE_ROOT(FTP 가 공개하는 폴더 아래) \ yyyyMMdd(저장일) \ {LotID} 에
-    ///   KLARF 원본 / 이미지 원본 / 썸네일(thumb_)을 저장하고(HandlerInsp.Backup 과 같은 함수), DB 에는 드라이브 루트를 뺀 '/' 상대 경로
+    /// 이미지(구현 2단계, 결정 D4 = FTP 상대 경로): Service 설정 KLARF_IMAGE_ROOT(FTP 가 공개하는 폴더 아래) \ yyyyMMdd(저장일) \ {Device} \ {LotID} 에
+    ///   KLARF 원본 / 이미지 원본 / 썸네일(thumb_, JPEG)을 저장하고(파일 이름 규칙은 HandlerInsp.Backup 과 같음), DB 에는 드라이브 루트를 뺀 '/' 상대 경로
     ///   (Handler.GetImageRelativePath 와 같은 규칙)를 넣는다. 화면은 TQC_CONFIG DEFECT_FTP 의 MAIN_PATH + 이 경로로 받는다.
+    ///   Service 설정 KLARF_IMAGE_FTP_BASE(MAIN_PATH 가 가리키는 실제 폴더)가 있으면 드라이브 루트 대신 그 폴더 기준 경로를 넣는다 (2026-10-21).
     /// </summary>
     public class KlarfUpload : Miracom.Middleware.BaseComponent, DACrux.SEMDMS.Interface.iKlarfUpload
     {
@@ -164,7 +165,7 @@ namespace DACrux.SEMDMS.BSL
                 Dictionary<int, string> rawIds = ReadRawWaferIds(klarfPath);
 
                 // 이미지 / KLARF 원본을 저장소로 먼저 복사한다(파일 1벌을 Wafer 들이 함께 쓴다). 실패하면 DB 저장 전에 멈춘다.
-                ImageStore store = SaveFilesToImageStore(parser, klarfPath);
+                ImageStore store = SaveFilesToImageStore(parser, klarfPath, ResolveProduct(setting, parser));
 
                 DataTable result = CreateResultTable(strUploadKey);
                 foreach (Wafer wafer in parser.Wafers)
@@ -654,11 +655,41 @@ namespace DACrux.SEMDMS.BSL
         }
 
         /// <summary>
-        /// KLARF 원본과 이미지 원본 / 썸네일을 KLARF_IMAGE_ROOT \ yyyyMMdd(저장일) \ {LotID} 에 저장한다(HandlerInsp.Backup 187~219행과 같은 함수 사용).
-        /// 폴더 형식은 2026-10-07 요청(예: D:\FTP\SCK\20261007\Lot). 같은 Wafer 를 다른 날 다시 올리면 새 날짜 폴더에 저장되고 DB 경로도 그 폴더를 가리킨다.
+        /// 이미지 저장 폴더를 DB(TQD_IMAGES.IMAGE_PATH / TQD_STEP.INSP_FILEPATH)에 넣는 FTP 상대 경로로 바꾼다.
+        /// 화면(DefectMapDraw.fnFTPImageDownload)은 DEFECT_FTP 의 MAIN_PATH + 이 경로 + 파일 이름으로 받는다.
+        ///  - ftpBase(Service 설정 KLARF_IMAGE_FTP_BASE)가 없으면: 지금까지와 같이 드라이브 루트를 뺀 경로(Handler.GetImageRelativePath 와 같은 규칙).
+        ///    예) D:\FTP\SCK\20261007\Lot -> FTP/SCK/20261007/Lot (FTP 루트 = 드라이브 루트, MAIN_PATH = /%2f/)
+        ///  - 있으면: 그 폴더 기준 경로. FTP 루트가 드라이브 루트가 아닌 서버에서 쓴다. (2026-10-21)
+        ///    예) FTP /DMS_IMAGE = C:\FTP\DMS_IMAGE 이면 KLARF_IMAGE_ROOT / KLARF_IMAGE_FTP_BASE = C:\FTP\DMS_IMAGE, MAIN_PATH = /DMS_IMAGE
+        ///        -> C:\FTP\DMS_IMAGE\20261021\Lot -> 20261021/Lot
+        /// 저장 폴더가 기준 폴더 아래가 아니면 화면에서 받을 수 없으므로 오류로 멈춘다.
+        /// </summary>
+        private static string ToFtpRelativePath(string folder, string ftpBase)
+        {
+            if (String.IsNullOrWhiteSpace(ftpBase))
+                return folder.Replace(Path.GetPathRoot(folder), String.Empty).Replace('\\', '/');
+
+            ftpBase = ftpBase.Trim();
+            if (!Path.IsPathRooted(ftpBase))
+                throw new Exception("이미지 FTP 기준 폴더 설정(KLARF_IMAGE_FTP_BASE)은 절대 경로여야 합니다: " + ftpBase);
+
+            // 끝에 '\' 를 붙여 비교해야 C:\FTP\DMS 가 C:\FTP\DMS_IMAGE 의 앞부분으로 맞지 않는다.
+            string basePath = Path.GetFullPath(ftpBase).TrimEnd('\\', '/') + "\\";
+            string folderPath = Path.GetFullPath(folder);
+            if (!folderPath.StartsWith(basePath, StringComparison.OrdinalIgnoreCase))
+                throw new Exception(String.Format("이미지 저장 폴더가 FTP 기준 폴더(KLARF_IMAGE_FTP_BASE) 아래가 아닙니다. KLARF_IMAGE_ROOT 를 확인하세요: {0} / 기준 {1}", folderPath, basePath));
+
+            return folderPath.Substring(basePath.Length).Replace('\\', '/');
+        }
+
+        /// <summary>
+        /// KLARF 원본과 이미지 원본 / 썸네일을 KLARF_IMAGE_ROOT \ yyyyMMdd(저장일) \ {Device} \ {LotID} 에 저장한다.
+        /// 폴더 형식: 2026-10-07 요청(날짜 \ Lot)에 Device(저장하는 Product 값)를 더했다 (2026-10-21). 예: D:\FTP\SCK\20261021\OMM_TCB\Lot.
+        /// 같은 Wafer 를 다른 날 다시 올리면 새 날짜 폴더에 저장되고 DB 경로도 그 폴더를 가리킨다. 이미 올린 파일 / DB 경로는 그대로다.
+        /// 파일 이름 규칙(원본 / 프레임 '이름_0001.확장자' / 'thumb_' + 이름)은 HandlerInsp.Backup 과 같고, 썸네일은 SaveJpegThumbnail 로 만든다.
         /// 설정이 없을 때: 이미지가 없으면 저장소 없이 진행(INSP_FILEPATH ' '), 이미지가 있으면 DB 저장 전에 오류로 멈춘다(이미지 없는 데이터가 생기지 않게).
         /// </summary>
-        private static ImageStore SaveFilesToImageStore(ParserKlarf parser, string klarfPath)
+        private static ImageStore SaveFilesToImageStore(ParserKlarf parser, string klarfPath, string product)
         {
             ImageStore store = new ImageStore();
             bool hasImages = parser.ImageManagerList != null && parser.ImageManagerList.HasData();
@@ -672,11 +703,12 @@ namespace DACrux.SEMDMS.BSL
             if (!Path.IsPathRooted(root))
                 throw new Exception("이미지 저장소 설정(KLARF_IMAGE_ROOT)은 절대 경로여야 합니다: " + root);
 
-            // 2026-10-07 요청: 저장 폴더 = KLARF_IMAGE_ROOT \ yyyyMMdd(저장한 날짜) \ LotID  (예: D:\FTP\SCK\20261007\PFIC_RH-HS2615_C4BUMP)
+            // 저장 폴더 = KLARF_IMAGE_ROOT \ yyyyMMdd(저장한 날짜) \ Device \ LotID (2026-10-21, 예: D:\FTP\SCK\20261021\OMM_TCB\PFIC_U9-FS2635_C4BUMP)
             // 기존 자동 적재의 yyyy\MM\dd(검사일자) 대신 업로드한 날짜를 쓴다. 폴더 이름에 쓸 수 없는 문자는 '_' 로 바꾼다.
-            store.Folder = Path.Combine(Path.Combine(root.Trim(), DateTime.Now.ToString("yyyyMMdd", CultureInfo.InvariantCulture)), SafeFolderName(parser.LotID));
-            // Handler.GetImageRelativePath 와 같은 규칙: 드라이브 루트를 떼고 '\' -> '/'
-            store.RelativePath = store.Folder.Replace(Path.GetPathRoot(store.Folder), String.Empty).Replace('\\', '/');
+            string dayFolder = Path.Combine(root.Trim(), DateTime.Now.ToString("yyyyMMdd", CultureInfo.InvariantCulture));
+            store.Folder = Path.Combine(Path.Combine(dayFolder, SafeFolderName(product)), SafeFolderName(parser.LotID));
+            // 폴더를 만들기 전에 DB 경로를 정한다. 기준 폴더 설정이 잘못되었으면 파일을 복사하기 전에 멈춘다.
+            store.RelativePath = ToFtpRelativePath(store.Folder, System.Configuration.ConfigurationManager.AppSettings["KLARF_IMAGE_FTP_BASE"]);
             if (store.RelativePath.Length > 200)
                 throw new Exception("이미지 저장 경로가 200자를 넘습니다(TQD_IMAGES.IMAGE_PATH): " + store.RelativePath);
             Directory.CreateDirectory(store.Folder);
@@ -686,21 +718,106 @@ namespace DACrux.SEMDMS.BSL
             {
                 foreach (ImageManager mgr in parser.ImageManagerList.SingleList)
                 {
-                    File.Copy(mgr.ImageFullName, Path.Combine(store.Folder, mgr.ImageName), true);
-                    mgr.SaveThumbnailImage(store.Folder);
+                    string target = Path.Combine(store.Folder, mgr.ImageName);
+                    File.Copy(mgr.ImageFullName, target, true);
+                    SaveThumbnailFromFile(target);
                     store.SavedNames.Add(mgr.ImageName);
                 }
                 foreach (ImageManager mgr in parser.ImageManagerList.MultiList)
                 {
-                    foreach (KeyValuePair<int, string> item in mgr.FrameDictionary)
-                    {
-                        string frame = mgr.SaveFrameImageAndThumbnail(item.Key, store.Folder);
-                        if (!String.IsNullOrEmpty(frame))
-                            store.SavedNames.Add(Path.GetFileName(frame));
-                    }
+                    foreach (string frame in SaveFrameImagesAndThumbnails(mgr.ImageFullName, mgr.FrameDictionary.Keys, store.Folder))
+                        store.SavedNames.Add(frame);
                 }
             }
             return store;
+        }
+
+        /// <summary>썸네일 파일 이름 규칙(Handler.THUMBNAIL_PREFIX / ImageLoader.GetThumbnailImageName 과 같음).</summary>
+        private const string ThumbnailPrefix = "thumb_";
+
+        /// <summary>썸네일 JPEG 품질. 화면 목록 표시용이라 원본보다 작게 둔다.</summary>
+        private const long ThumbnailJpegQuality = 85L;
+
+        /// <summary>
+        /// 저장한 이미지 파일 옆에 'thumb_' + 이름 썸네일을 만든다. 이미지를 읽을 수 없으면 원본을 그대로 복사한다
+        /// (기존 Core 와 같이 썸네일 파일이 없어서 화면 목록이 비지 않게).
+        /// </summary>
+        private static void SaveThumbnailFromFile(string imagePath)
+        {
+            string thumbPath = Path.Combine(Path.GetDirectoryName(imagePath), ThumbnailPrefix + Path.GetFileName(imagePath));
+            try
+            {
+                using (Image image = Image.FromFile(imagePath))
+                    SaveJpegThumbnail(image, thumbPath);
+            }
+            catch (Exception)
+            {
+                File.Copy(imagePath, thumbPath, true);
+            }
+        }
+
+        /// <summary>
+        /// 여러 장이 든 이미지(Multi Page TIFF 등)를 프레임마다 '이름_0001.확장자' 로 저장하고 썸네일을 만든다. 저장한 파일 이름 목록을 돌려준다.
+        /// 프레임 번호(frameSeqs)는 1부터(ImageManager.FrameDictionary 키), 프레임 파일 형식은 원본 형식 그대로(ImageLoader.SaveImageAndThumbnail 과 같음).
+        /// 이미지를 읽을 수 없으면 아무것도 저장하지 않는다(기존 Core 도 이 경우 프레임을 만들지 않음).
+        /// </summary>
+        private static List<string> SaveFrameImagesAndThumbnails(string imagePath, IEnumerable<int> frameSeqs, string folder)
+        {
+            List<string> saved = new List<string>();
+            Image image;
+            try { image = Image.FromFile(imagePath); }
+            catch (Exception) { return saved; }
+
+            using (image)
+            {
+                System.Drawing.Imaging.FrameDimension dimension = new System.Drawing.Imaging.FrameDimension(image.FrameDimensionsList[0]);
+                int frames = image.GetFrameCount(dimension);
+                System.Drawing.Imaging.ImageFormat format = ImageLoader.GetImageFormat(image);
+                foreach (int seq in frameSeqs)
+                {
+                    if (seq < 1 || seq > frames)
+                        continue;
+                    string name = String.Format(CultureInfo.InvariantCulture, "{0}_{1:0000}{2}",
+                        Path.GetFileNameWithoutExtension(imagePath), seq, Path.GetExtension(imagePath));
+                    image.SelectActiveFrame(dimension, seq - 1);
+                    image.Save(Path.Combine(folder, name), format);
+                    SaveJpegThumbnail(image, Path.Combine(folder, ThumbnailPrefix + name));
+                    saved.Add(name);
+                }
+            }
+            return saved;
+        }
+
+        /// <summary>
+        /// 썸네일 = 원본 가로 / 세로 절반 크기의 JPEG. 파일 이름(확장자)은 'thumb_' + 원본 이름 그대로 둔다(DB THUMB_FILENAME 규칙).
+        /// 왜 따로 만드는가 (2026-10-21): Core ImageLoader.SaveThumbnailImage 는 형식을 정하지 않고 저장해 실제 내용이 PNG 가 되고
+        /// (이름은 .jpg) 원본 JPEG 보다 약 5배 커진다. Core 는 기존 자동 적재도 쓰므로 고치지 않고 업로드만 여기서 만든다.
+        /// </summary>
+        private static void SaveJpegThumbnail(Image image, string thumbPath)
+        {
+            int width = Math.Max(1, image.Width / 2);
+            int height = Math.Max(1, image.Height / 2);
+            System.Drawing.Imaging.ImageCodecInfo jpeg = null;
+            foreach (System.Drawing.Imaging.ImageCodecInfo codec in System.Drawing.Imaging.ImageCodecInfo.GetImageEncoders())
+                if (codec.FormatID == System.Drawing.Imaging.ImageFormat.Jpeg.Guid) jpeg = codec;
+
+            using (Bitmap thumb = new Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format24bppRgb))
+            {
+                using (Graphics g = Graphics.FromImage(thumb))
+                {
+                    g.Clear(Color.White);
+                    g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                    g.DrawImage(image, 0, 0, width, height);
+                }
+                using (System.Drawing.Imaging.EncoderParameters parameters = new System.Drawing.Imaging.EncoderParameters(1))
+                {
+                    parameters.Param[0] = new System.Drawing.Imaging.EncoderParameter(System.Drawing.Imaging.Encoder.Quality, ThumbnailJpegQuality);
+                    if (jpeg != null)
+                        thumb.Save(thumbPath, jpeg, parameters);
+                    else
+                        thumb.Save(thumbPath, System.Drawing.Imaging.ImageFormat.Jpeg);
+                }
+            }
         }
 
         /// <summary>

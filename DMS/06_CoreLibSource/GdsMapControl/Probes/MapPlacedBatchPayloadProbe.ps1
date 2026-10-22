@@ -1,6 +1,6 @@
 # Service로 보낼 바이너리 본문 형식/재전송 해시/실제 크기 제한을 확인한다.
 $ErrorActionPreference = 'Stop'
-$assemblyPath = Join-Path $PSScriptRoot '..\bin\Debug\NexplantQMS.GdsMap.exe'
+$assemblyPath = Join-Path $PSScriptRoot '..\bin\Debug\NexplantQMS.GdsMap.dll'
 [void][System.Reflection.Assembly]::LoadFrom((Resolve-Path $assemblyPath).Path)
 
 function Assert-True([bool]$condition, [string]$message) {

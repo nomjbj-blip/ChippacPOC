@@ -2,7 +2,7 @@
 # 목적: GdsMap이 DACrux가 로드한 DACrux.Base의 GlobalVariable.Factory를 그대로 읽는지(DmsHostContext),
 #       View 화면 Device 목록이 그 Factory의 Map만 보여 주는지, Factory 입력 컨트롤이 없어졌는지 확인한다.
 #       Device 목록은 BSL GetMapDeviceList(직접 호출)로 채우고 화면은 띄우지 않는다. DB를 바꾸지 않는다(조회만).
-# 실행: powershell -NoProfile -ExecutionPolicy Bypass -File GdsFactoryContextProbe.ps1 -GdsExe <빌드한 NexplantQMS.GdsMap.exe> [-BinDir <BSL 폴더>]
+# 실행: powershell -NoProfile -ExecutionPolicy Bypass -File GdsFactoryContextProbe.ps1 -GdsExe <빌드한 NexplantQMS.GdsMap.dll> [-BinDir <BSL 폴더>]
 param(
     [Parameter(Mandatory = $true)][string]$GdsExe,
     [string]$BinDir = '',

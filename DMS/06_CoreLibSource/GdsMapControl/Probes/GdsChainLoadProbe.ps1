@@ -5,7 +5,7 @@
 #       Layer 일부만 조회한 지도에서는 DbIncomplete(저장 제외)로 표시되는지도 확인한다.
 #       Service를 띄우지 않고 BSL을 직접 호출한다(화면의 RO 원격 호출은 DMS 화면에서 확인).
 # 전제: FACTORY=PROBE / DEVICE_ID=LAYER_FILTER_PROBE READY Map(Layer 1, 2, 6). Chain Code ZZLOAD1을 만들었다가 마지막에 삭제한다.
-# 실행: powershell -NoProfile -ExecutionPolicy Bypass -File GdsChainLoadProbe.ps1 -GdsExe <빌드한 NexplantQMS.GdsMap.exe> [-BinDir <BSL/DSL/Interface 폴더>]
+# 실행: powershell -NoProfile -ExecutionPolicy Bypass -File GdsChainLoadProbe.ps1 -GdsExe <빌드한 NexplantQMS.GdsMap.dll> [-BinDir <BSL/DSL/Interface 폴더>]
 #       -BinDir 생략 시 101_ServerBin. 배포 전에는 TEMP 빌드 폴더를 넘긴다.
 # Layer 는 번호 + DataType 키다. 저장은 화면과 같은 탐색 Layer 2열(LAYER_ID / DATA_TYPE) / 규칙 5열로 한다 (2026-10-20).
 param(
@@ -141,10 +141,11 @@ public static class ChainLoadProbe
         Type dataType = ft.GetNestedType("ChainDbData", BindingFlags.NonPublic);
         object data = Activator.CreateInstance(dataType, true);
         dataType.GetField("Header").SetValue(data, header);
-        dataType.GetField("Layers").SetValue(data, bsl.GetChainLayers(factory, device, seq));
-        dataType.GetField("Rules").SetValue(data, bsl.GetChainRules(factory, device, seq));
-        dataType.GetField("Members").SetValue(data, bsl.GetChainMembers(factory, device, seq));
-        dataType.GetField("Edits").SetValue(data, bsl.GetChainEdits(factory, device, seq));
+        // 화면은 Chain 상세를 Chain 번호 범위로 한 번에 읽어 행 목록으로 나눈다(2026-10-21). 같은 범위 조회(시작 = 끝 = 이 Chain)로 채운다.
+        ((List<DataRow>)dataType.GetField("Layers").GetValue(data)).AddRange(bsl.GetChainLayersRange(factory, device, seq, seq).Rows.Cast<DataRow>());
+        ((List<DataRow>)dataType.GetField("Rules").GetValue(data)).AddRange(bsl.GetChainRulesRange(factory, device, seq, seq).Rows.Cast<DataRow>());
+        ((List<DataRow>)dataType.GetField("Members").GetValue(data)).AddRange(bsl.GetChainMembersRange(factory, device, seq, seq).Rows.Cast<DataRow>());
+        ((List<DataRow>)dataType.GetField("Edits").GetValue(data)).AddRange(bsl.GetChainEditsRange(factory, device, seq, seq).Rows.Cast<DataRow>());
         object chain = ft.GetMethod("CreateChainFromDb", NP).Invoke(form, new[] { data });
         object save = ft.GetMethod("BuildChainSaveData", NP).Invoke(form, new[] { chain });
         Type ct = chain.GetType(), st = save.GetType();

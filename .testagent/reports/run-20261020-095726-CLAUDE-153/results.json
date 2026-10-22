@@ -1,0 +1,106 @@
+﻿[
+    {
+        "id":  "04",
+        "name":  "RG_MarkCheck_wrongLiteral",
+        "scenarios":  [
+                          "RG"
+                      ],
+        "status":  "FAIL",
+        "exitCode":  1,
+        "timedOut":  false,
+        "durationMs":  624,
+        "started":  "2026-10-20 10:00:21",
+        "command":  "python -I -X utf8 \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\probes\\f07data_mark_check.py\" \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\reports\\run-20261020-095726-CLAUDE-153\\evidence\\ui\" 24 73",
+        "workingDir":  "D:\\1_프로젝트 문서\\18.스테츠칩팩_POC",
+        "keys":  {
+                     "MARK_CHECK_PROBE":  "FAIL (4/5)"
+                 },
+        "passLines":  4,
+        "failLines":  [
+                          "FAIL / M2 둘 다 켬: Spec Out 표식 Die = DIE.ET_STATE F 25 / Fail Die 표식 Die = DIE.ET_FILE_FLAG F 73 (리터럴 24 / 73) / 화면 25 / 73"
+                      ],
+        "skipLines":  [
+
+                      ],
+        "stdout":  "04_RG_MarkCheck_wrongLiteral.stdout.txt",
+        "stderr":  "04_RG_MarkCheck_wrongLiteral.stderr.txt"
+    },
+    {
+        "id":  "01",
+        "name":  "VerifyGdsKlarfAnalysis",
+        "scenarios":  [
+                          "SCN-S"
+                      ],
+        "status":  "PASS",
+        "exitCode":  0,
+        "timedOut":  false,
+        "durationMs":  86939,
+        "started":  "2026-10-20 10:01:14",
+        "command":  "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\DMS\\02_DMS\\DACrux.SEMDMS.ENGUI\\Verification\\Verify-GdsKlarfAnalysis.ps1\"",
+        "workingDir":  "D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\DMS\\02_DMS\\DACrux.SEMDMS.ENGUI\\Verification",
+        "keys":  {
+                     "GDS_KLARF_FORM_SMOKE":  "PASS (70/70)"
+                 },
+        "passLines":  70,
+        "failLines":  [
+
+                      ],
+        "skipLines":  [
+
+                      ],
+        "stdout":  "01_VerifyGdsKlarfAnalysis.stdout.txt",
+        "stderr":  "01_VerifyGdsKlarfAnalysis.stderr.txt"
+    },
+    {
+        "id":  "02",
+        "name":  "MarkDump",
+        "scenarios":  [
+                          "SCN-M"
+                      ],
+        "status":  "PASS",
+        "exitCode":  0,
+        "timedOut":  false,
+        "durationMs":  45015,
+        "started":  "2026-10-20 10:02:41",
+        "command":  "C:\\Users\\USER\\AppData\\Local\\Temp\\ChippacGdsKlarfAnalysisVerification\\bin\\F07MarkCheck.exe \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\reports\\run-20261020-095726-CLAUDE-153\\evidence\\ui\" 603 SCK OMM_TCB SCKLOTIDA-01 SCKLOTIDA OMM_TCB",
+        "workingDir":  "C:\\Users\\USER\\AppData\\Local\\Temp\\ChippacGdsKlarfAnalysisVerification\\bin",
+        "keys":  {
+                     "MARK_DUMP":  "PASS"
+                 },
+        "passLines":  0,
+        "failLines":  [
+
+                      ],
+        "skipLines":  [
+
+                      ],
+        "stdout":  "02_MarkDump.stdout.txt",
+        "stderr":  "02_MarkDump.stderr.txt"
+    },
+    {
+        "id":  "03",
+        "name":  "MarkCheck",
+        "scenarios":  [
+                          "SCN-M"
+                      ],
+        "status":  "PASS",
+        "exitCode":  0,
+        "timedOut":  false,
+        "durationMs":  651,
+        "started":  "2026-10-20 10:03:26",
+        "command":  "python -I -X utf8 \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\probes\\f07data_mark_check.py\" \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\reports\\run-20261020-095726-CLAUDE-153\\evidence\\ui\" 25 73",
+        "workingDir":  "D:\\1_프로젝트 문서\\18.스테츠칩팩_POC",
+        "keys":  {
+                     "MARK_CHECK_PROBE":  "PASS (5/5)"
+                 },
+        "passLines":  5,
+        "failLines":  [
+
+                      ],
+        "skipLines":  [
+
+                      ],
+        "stdout":  "03_MarkCheck.stdout.txt",
+        "stderr":  "03_MarkCheck.stderr.txt"
+    }
+]

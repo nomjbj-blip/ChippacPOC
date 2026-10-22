@@ -449,7 +449,7 @@ namespace DACrux.TEST.ENGUI
                 m_wMap.Redraw();
             }
             RemoveDies(die => !m_wMap.IsInsideWafer(die), "Wafer 밖 제거",
-                "Wafer(Edge {2:#,0} µm 포함) 밖에 걸친 사용 Die {1}개를 제거합니다.");
+                "Wafer(Edge {2:#,0} 포함) 밖에 걸친 사용 Die {1}개를 제거합니다.");
         }
 
         /// <summary>
@@ -541,9 +541,9 @@ namespace DACrux.TEST.ENGUI
             sb.AppendLine("DEVICE: " + source.DeviceID);
             sb.AppendLine("LOT: " + source.LotID);
             sb.AppendLine(string.Format("WAFER: {0} (Slot {1})", currentWafer.WaferID, currentWafer.Slot));
-            sb.AppendLine(string.Format(CultureInfo.InvariantCulture, "Wafer: {0:#,0} µm", m_wMap.WaferSize));
+            sb.AppendLine(string.Format(CultureInfo.InvariantCulture, "Wafer: {0:#,0}", m_wMap.WaferSize));
             AppendPitchInfo(sb);
-            sb.AppendLine(string.Format(CultureInfo.InvariantCulture, "원점(Center): {0:#,0.###}, {1:#,0.###} µm", m_wMap.OriginX, m_wMap.OriginY));
+            sb.AppendLine(string.Format(CultureInfo.InvariantCulture, "원점(Center): {0:#,0.###}, {1:#,0.###}", m_wMap.OriginX, m_wMap.OriginY));
             MapDefStoredValues stored = MapCreationService.ToStoredValues(m_wMap, currentDirection, currentGrid);
             sb.AppendLine(string.Format("XY 방향(저장): {0} / 원점 인덱스 {1}, {2}", currentDirection, stored.OriginIndexX, stored.OriginIndexY));
             if (currentGrid.MinX < 1 || currentGrid.MinY < 1)
@@ -568,8 +568,8 @@ namespace DACrux.TEST.ENGUI
         {
             double pitchX = m_wMap.DieSizeX;
             double pitchY = m_wMap.DieSizeY;
-            sb.AppendLine(string.Format(CultureInfo.InvariantCulture, "Die Pitch(KLARF): {0:#,0.###} x {1:#,0.###} µm", source.PitchX, source.PitchY));
-            sb.AppendLine(string.Format(CultureInfo.InvariantCulture, "Die Pitch(적용 / 저장): {0:#,0.###} x {1:#,0.###} µm", pitchX, pitchY));
+            sb.AppendLine(string.Format(CultureInfo.InvariantCulture, "Die Pitch(KLARF): {0:#,0.###} x {1:#,0.###}", source.PitchX, source.PitchY));
+            sb.AppendLine(string.Format(CultureInfo.InvariantCulture, "Die Pitch(적용 / 저장): {0:#,0.###} x {1:#,0.###}", pitchX, pitchY));
             if (!PitchDiffers(pitchX, source.PitchX) && !PitchDiffers(pitchY, source.PitchY)) return;
 
             double diffX = pitchX - source.PitchX;
@@ -577,7 +577,7 @@ namespace DACrux.TEST.ENGUI
             int farX = Math.Max(Math.Abs(currentGrid.MinX - currentWafer.ShiftX), Math.Abs(currentGrid.MaxX - currentWafer.ShiftX + 1));
             int farY = Math.Max(Math.Abs(currentGrid.MinY - currentWafer.ShiftY), Math.Abs(currentGrid.MaxY - currentWafer.ShiftY + 1));
             sb.AppendLine(string.Format(CultureInfo.InvariantCulture,
-                "※ KLARF Pitch 와 다름: 차이 X {0:+#,0.###;-#,0.###;0} / Y {1:+#,0.###;-#,0.###;0} µm / 격자 끝 최대 X {2:#,0.###} / Y {3:#,0.###} µm",
+                "※ KLARF Pitch 와 다름: 차이 X {0:+#,0.###;-#,0.###;0} / Y {1:+#,0.###;-#,0.###;0} / 격자 끝 최대 X {2:#,0.###} / Y {3:#,0.###}",
                 diffX, diffY, Math.Abs(diffX) * farX, Math.Abs(diffY) * farY));
         }
 
@@ -652,7 +652,7 @@ namespace DACrux.TEST.ENGUI
             int dieNumber;
             string dieNumberText = m_wMap.DieNumbers.TryGetValue(lb, out dieNumber) ? dieNumber.ToString(CultureInfo.InvariantCulture) : "-";
             lblCoordinates.Text = string.Format(CultureInfo.InvariantCulture,
-                "Die ({0}) X/Y: {1}, {2} / LeftBottom: {3}, {4} / KLARF 원본: {5}, {6} / 검사 Die: {7} / 상태: {8} / Die 번호: {9}   |   마우스 X={10:#,0.###}, Y={11:#,0.###} µm",
+                "Die ({0}) X/Y: {1}, {2} / LeftBottom: {3}, {4} / KLARF 원본: {5}, {6} / 검사 Die: {7} / 상태: {8} / Die 번호: {9}   |   마우스 X={10:#,0.###}, Y={11:#,0.###}",
                 currentDirection, number.X, number.Y, lb.X, lb.Y,
                 lb.X - currentWafer.ShiftX, lb.Y - currentWafer.ShiftY,
                 inspectedDies.Contains(lb) ? "예" : "아니오", hoverDie.DieProp, dieNumberText,
@@ -713,7 +713,7 @@ namespace DACrux.TEST.ENGUI
 
                 bool pitchChanged = PitchDiffers(m_wMap.DieSizeX, source.PitchX) || PitchDiffers(m_wMap.DieSizeY, source.PitchY);
                 string summary = string.Format(CultureInfo.InvariantCulture,
-                    "Map ID: {0}\r\n사용 Die: {1}개 / 전체 Die: {2}개\r\nWafer: {3:#,0} µm / XY: {4}\r\nDie Pitch: {5:#,0.###} x {6:#,0.###} µm{7}",
+                    "Map ID: {0}\r\n사용 Die: {1}개 / 전체 Die: {2}개\r\nWafer: {3:#,0} / XY: {4}\r\nDie Pitch: {5:#,0.###} x {6:#,0.###}{7}",
                     mapId, m_wMap.NetDie, m_wMap.Dies.Count, m_wMap.WaferSize, currentDirection,
                     m_wMap.DieSizeX, m_wMap.DieSizeY, pitchChanged ? " (KLARF 값과 다름)" : "");
                 if (overwrite)

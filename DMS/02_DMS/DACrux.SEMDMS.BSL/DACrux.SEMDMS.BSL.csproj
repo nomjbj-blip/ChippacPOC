@@ -86,6 +86,7 @@
     <Compile Include="GdsChain.cs" />
     <Compile Include="GdsEtResult.cs" />
     <Compile Include="GdsEtResult_Para.cs" />
+    <Compile Include="GdsEtResult_Bin.cs" />
     <Compile Include="GdsEtResult_Yms.cs" />
     <Compile Include="EtYmsPublisher.cs" />
     <Compile Include="KlarfUpload.cs" />

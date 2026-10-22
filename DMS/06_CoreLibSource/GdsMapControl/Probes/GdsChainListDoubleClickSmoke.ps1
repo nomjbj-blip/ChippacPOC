@@ -1,13 +1,15 @@
 ﻿# GDS Map 조회 화면 Chain 목록 / 유사 묶음 목록, Setup 화면 Layer 목록 체크 동작 Smoke (2026-10-13)
-# 목적: 한 번 클릭 = 행 선택만(체크 그대로), 더블클릭 = 체크 토글을 실제 창 메시지(WM_LBUTTONDOWN / UP / DBLCLK, Space)로 확인한다.
-#       - Chain 목록: 글자 클릭 / 이미 선택된 행 다시 클릭 / 체크 칸 클릭 / Space -> 체크 그대로, 더블클릭 -> 토글 + Chain 표시(Visible) 반영
-#       - 유사 묶음 목록: 클릭 -> 체크 그대로, 더블클릭 -> 토글, 단자 보호 묶음은 더블클릭해도 체크 안 됨
-#       - Setup 화면 Layer 목록: 클릭 / 다시 클릭 / 체크 칸 / Space -> 그대로, 더블클릭 -> 토글 + 도면 Layer 표시 반영,
+# 목적: 목록 체크 동작을 실제 창 메시지(WM_LBUTTONDOWN / UP / DBLCLK, Space)로 확인한다.
+#       - Chain 목록(2026-10-21 체크 박스로만): 글자 클릭 / 이미 선택된 행 다시 클릭 / 더블클릭 / Space -> 체크 그대로, 체크 칸 클릭 -> 토글 + Chain 표시(Visible) 반영
+#       - 유사 묶음 목록(2026-10-21 체크 박스로만): 글자 클릭 / 다시 클릭 / 더블클릭 -> 체크 그대로, 체크 칸 클릭 -> 토글, 단자 보호 묶음은 체크 칸을 눌러도 체크 안 됨
+#       - Setup / View 화면 Layer 목록(2026-10-20): 체크 칸 클릭 -> 토글(+ Setup 은 도면 Layer 표시 반영), 글자 클릭 / 다시 클릭 / 더블클릭 / Space -> 그대로,
+#         체크 칸 더블클릭 -> 두 번 바뀌어 그대로(일반 체크 박스와 같음),
 #         [전체 미체크] / [전체 체크] 버튼은 실제 버튼 클릭(PerformClick)으로 동작 확인(Click 연결 빠짐도 잡음, 2026-10-15),
 #         [Layer 적용](예전 [Redraw]) 버튼은 화면에서 빠져 검사에서 뺀다. 체크는 바뀔 때마다 바로 도면에 반영된다 (2026-10-20),
 #         우클릭은 행 선택만(색 변경 대상)
+#       - Chain 목록 [전체 미체크] / [전체 체크] 버튼(2026-10-21): 실제 버튼 클릭으로 모든 행 체크 + Chain 표시(Visible) 반영, 선택 행은 그대로
 #       화면은 화면 밖에 띄우고 DB / Service 를 쓰지 않는다(빈 도면 + 시험 Chain 2개 + 시험 유사 묶음 3개 / Setup 은 샘플 GDS 읽기).
-# 실행: powershell -NoProfile -STA -ExecutionPolicy Bypass -File GdsChainListDoubleClickSmoke.ps1 -GdsExe <빌드한 NexplantQMS.GdsMap.exe>
+# 실행: powershell -NoProfile -STA -ExecutionPolicy Bypass -File GdsChainListDoubleClickSmoke.ps1 -GdsExe <빌드한 NexplantQMS.GdsMap.dll>
 param(
     [Parameter(Mandatory = $true)][string]$GdsExe,
     [string]$GdsPath = ''
@@ -116,6 +118,7 @@ public static class ChainDblClickSmoke
                 foreach (var item in map.GetLayerDisplayItems()) if (item.LayerKey == id) return item.Visible;
                 return false; };
             r.Add("layerCheckOnClick=" + layers.CheckOnClick);
+            r.Add("layerCheckBoxOnly=" + ((LayerColorCheckedListBox)layers).CheckOnCheckBoxOnly);
             r.Add("layer.count=" + layers.Items.Count);
             r.Add("layer.start=" + State(layers));
             Click(layers, TextPoint(layers, 0));
@@ -123,13 +126,15 @@ public static class ChainDblClickSmoke
             Click(layers, TextPoint(layers, 0));
             r.Add("layer.clickAgain0=" + State(layers));
             Click(layers, GlyphPoint(layers, 1));
-            r.Add("layer.glyph1=" + State(layers));
+            r.Add("layer.glyph1=" + State(layers) + " map1=" + mapVisible(1));
             Space(layers);
             r.Add("layer.space1=" + State(layers));
             DoubleClick(layers, TextPoint(layers, 0));
             r.Add("layer.dbl0=" + State(layers) + " map0=" + mapVisible(0));
-            DoubleClick(layers, TextPoint(layers, 0));
-            r.Add("layer.dbl0Again=" + State(layers) + " map0=" + mapVisible(0));
+            Click(layers, GlyphPoint(layers, 1));
+            r.Add("layer.glyph1Again=" + State(layers) + " map1=" + mapVisible(1));
+            DoubleClick(layers, GlyphPoint(layers, 0));
+            r.Add("layer.glyphDbl0=" + State(layers) + " map0=" + mapVisible(0));
             // 버튼은 처리 함수를 직접 부르지 않고 실제 버튼을 누른다(PerformClick). Click 연결이 빠지면 상태가 그대로라 FAIL 이 된다 (2026-10-15).
             // [Layer 적용](btnLayer) 버튼은 화면에서 빠졌다. 남은 버튼 2개만 확인한다 (2026-10-20).
             var btnNone = (Button)Need(form, "btnLayerCheckNone");
@@ -175,17 +180,30 @@ public static class ChainDblClickSmoke
             r.Add("chain.click0=" + State(chains));
             Click(chains, TextPoint(chains, 0));
             r.Add("chain.clickAgain0=" + State(chains));
-            Click(chains, GlyphPoint(chains, 1));
-            r.Add("chain.glyph1=" + State(chains));
+            DoubleClick(chains, TextPoint(chains, 0));
+            r.Add("chain.dbl0=" + State(chains));
             Space(chains);
-            r.Add("chain.space1=" + State(chains));
-            DoubleClick(chains, TextPoint(chains, 0));
-            var chain0 = chains.Items[0];
-            bool visible0 = (bool)chain0.GetType().GetField("Visible").GetValue(chain0);
-            r.Add("chain.dbl0=" + State(chains) + " visible0=" + visible0);
-            DoubleClick(chains, TextPoint(chains, 0));
-            visible0 = (bool)chain0.GetType().GetField("Visible").GetValue(chain0);
-            r.Add("chain.dbl0Again=" + State(chains) + " visible0=" + visible0);
+            r.Add("chain.space0=" + State(chains));
+            var chain1 = chains.Items[1];
+            Click(chains, GlyphPoint(chains, 1));
+            bool visible1 = (bool)chain1.GetType().GetField("Visible").GetValue(chain1);
+            r.Add("chain.glyph1=" + State(chains) + " visible1=" + visible1);
+            Click(chains, GlyphPoint(chains, 1));
+            visible1 = (bool)chain1.GetType().GetField("Visible").GetValue(chain1);
+            r.Add("chain.glyph1Again=" + State(chains) + " visible1=" + visible1);
+            // Chain 목록 [전체 미체크] / [전체 체크]: 실제 버튼을 누른다(Click 연결 빠짐도 잡음). 선택 행(편집 대상)은 바뀌지 않아야 한다 (2026-10-21).
+            Func<string> visibles = () => {
+                var parts = new List<string>();
+                foreach (object c in chains.Items) parts.Add((bool)c.GetType().GetField("Visible").GetValue(c) ? "1" : "0");
+                return string.Join("", parts.ToArray()); };
+            var btnChainNone = (Button)Need(form, "_btnChainCheckNone");
+            var btnChainAll = (Button)Need(form, "_btnChainCheckAll");
+            r.Add("chain.buttonsEnabled=" + btnChainNone.Enabled + "/" + btnChainAll.Enabled);
+            r.Add("chain.buttonsText=" + btnChainAll.Text + "/" + btnChainNone.Text + " image=" + (btnChainAll.Image != null) + "/" + (btnChainNone.Image != null));
+            btnChainNone.PerformClick(); Pump();
+            r.Add("chain.none=" + State(chains) + " visible=" + visibles());
+            btnChainAll.PerformClick(); Pump();
+            r.Add("chain.all=" + State(chains) + " visible=" + visibles());
 
             // 유사 묶음 목록: 일치(체크) / 단자 보호(체크 안 됨) / 검토 필요(체크 안 됨)
             var groups = new List<ChainSimilarGroup> {
@@ -210,10 +228,35 @@ public static class ChainDblClickSmoke
             r.Add("similar.clickAgain0=" + State(similar));
             DoubleClick(similar, TextPoint(similar, 0));
             r.Add("similar.dbl0=" + State(similar));
-            DoubleClick(similar, TextPoint(similar, 1));
-            r.Add("similar.dbl1Protected=" + State(similar));
-            DoubleClick(similar, TextPoint(similar, 2));
-            r.Add("similar.dbl2=" + State(similar));
+            Click(similar, GlyphPoint(similar, 0));
+            r.Add("similar.glyph0=" + State(similar));
+            Click(similar, GlyphPoint(similar, 1));
+            r.Add("similar.glyph1Protected=" + State(similar));
+            Click(similar, GlyphPoint(similar, 2));
+            r.Add("similar.glyph2=" + State(similar));
+
+            // View 화면 Layer 목록(2026-10-20): 시험 Layer 3개(모두 체크). 체크 칸으로만 바뀐다.
+            var viewLayers = (CheckedListBox)Need(form, "chkLayerItems");
+            if (tabs != null) { tabs.SelectedTab = (TabPage)Need(form, "tabLayer"); Pump(); }
+            for (int i = 0; i < 3; i++) viewLayers.Items.Add(new LayerDisplayItem(GdsLayerKey.Make(i + 1, 0), Color.SteelBlue, true), true);
+            Pump();
+            r.Add("viewLayerCheckOnClick=" + viewLayers.CheckOnClick);
+            r.Add("viewLayerCheckBoxOnly=" + ((LayerColorCheckedListBox)viewLayers).CheckOnCheckBoxOnly);
+            r.Add("viewLayer.start=" + State(viewLayers));
+            Click(viewLayers, TextPoint(viewLayers, 0));
+            r.Add("viewLayer.click0=" + State(viewLayers));
+            Click(viewLayers, TextPoint(viewLayers, 0));
+            r.Add("viewLayer.clickAgain0=" + State(viewLayers));
+            DoubleClick(viewLayers, TextPoint(viewLayers, 1));
+            r.Add("viewLayer.dbl1=" + State(viewLayers));
+            Click(viewLayers, GlyphPoint(viewLayers, 2));
+            r.Add("viewLayer.glyph2=" + State(viewLayers));
+            Space(viewLayers);
+            r.Add("viewLayer.space2=" + State(viewLayers));
+            Click(viewLayers, GlyphPoint(viewLayers, 2));
+            r.Add("viewLayer.glyph2Again=" + State(viewLayers));
+            DoubleClick(viewLayers, GlyphPoint(viewLayers, 0));
+            r.Add("viewLayer.glyphDbl0=" + State(viewLayers));
 
             // 시험용 Chain 을 버려 닫을 때 "저장하지 않은 Chain" 확인 창이 뜨지 않게 한다.
             form.GetType().GetField("_activeChain", NP).SetValue(form, null);
@@ -240,28 +283,45 @@ Check 'Chain 목록 CheckOnClick 꺼짐' ($v['chainCheckOnClick'] -eq 'False') $
 Check 'Chain 시작 상태' ($v['chain.start'] -like '* chk=11') $v['chain.start']
 Check 'Chain 글자 클릭 = 선택만' ($v['chain.click0'] -eq 'sel=0 chk=11') $v['chain.click0']
 Check 'Chain 선택된 행 다시 클릭 = 체크 그대로' ($v['chain.clickAgain0'] -eq 'sel=0 chk=11') $v['chain.clickAgain0']
-Check 'Chain 체크 칸 클릭 = 선택만' ($v['chain.glyph1'] -eq 'sel=1 chk=11') $v['chain.glyph1']
-Check 'Chain Space 키 = 체크 그대로' ($v['chain.space1'] -eq 'sel=1 chk=11') $v['chain.space1']
-Check 'Chain 더블클릭 = 토글 + 표시 끔' ($v['chain.dbl0'] -eq 'sel=0 chk=01 visible0=False') $v['chain.dbl0']
-Check 'Chain 다시 더블클릭 = 토글 + 표시 켬' ($v['chain.dbl0Again'] -eq 'sel=0 chk=11 visible0=True') $v['chain.dbl0Again']
+Check 'Chain 더블클릭 = 체크 그대로' ($v['chain.dbl0'] -eq 'sel=0 chk=11') $v['chain.dbl0']
+Check 'Chain Space 키 = 체크 그대로' ($v['chain.space0'] -eq 'sel=0 chk=11') $v['chain.space0']
+Check 'Chain 체크 칸 클릭 = 토글 + 표시 끔' ($v['chain.glyph1'] -eq 'sel=1 chk=10 visible1=False') $v['chain.glyph1']
+Check 'Chain 체크 칸 다시 클릭 = 토글 + 표시 켬' ($v['chain.glyph1Again'] -eq 'sel=1 chk=11 visible1=True') $v['chain.glyph1Again']
+Check 'Chain [전체 체크] / [전체 미체크] 버튼 사용 가능' ($v['chain.buttonsEnabled'] -eq 'True/True') $v['chain.buttonsEnabled']
+Check 'Chain 버튼 글자 / 아이콘' ($v['chain.buttonsText'] -eq '전체 체크/전체 미체크 image=True/True') $v['chain.buttonsText']
+Check 'Chain [전체 미체크] 버튼 클릭 = 모두 체크 해제 + 표시 끔(선택 그대로)' ($v['chain.none'] -eq 'sel=1 chk=00 visible=00') $v['chain.none']
+Check 'Chain [전체 체크] 버튼 클릭 = 모두 체크 + 표시 켬(선택 그대로)' ($v['chain.all'] -eq 'sel=1 chk=11 visible=11') $v['chain.all']
 Check '유사 묶음 패널 보임(시험 준비)' ($v['similarPanelVisible'] -eq 'True') $v['similarPanelVisible']
 Check '유사 묶음 CheckOnClick 꺼짐' ($v['similarCheckOnClick'] -eq 'False') $v['similarCheckOnClick']
 Check '유사 묶음 시작 상태' ($v['similar.start'] -like '* chk=100') $v['similar.start']
 Check '유사 묶음 클릭 = 선택만' ($v['similar.click0'] -eq 'sel=0 chk=100') $v['similar.click0']
 Check '유사 묶음 선택된 행 다시 클릭 = 체크 그대로' ($v['similar.clickAgain0'] -eq 'sel=0 chk=100') $v['similar.clickAgain0']
-Check '유사 묶음 더블클릭 = 토글' ($v['similar.dbl0'] -eq 'sel=0 chk=000') $v['similar.dbl0']
-Check '유사 묶음 단자 보호는 더블클릭해도 체크 안 됨' ($v['similar.dbl1Protected'] -eq 'sel=1 chk=000') $v['similar.dbl1Protected']
-Check '유사 묶음 검토 필요 더블클릭 = 체크' ($v['similar.dbl2'] -eq 'sel=2 chk=001') $v['similar.dbl2']
+Check '유사 묶음 더블클릭 = 체크 그대로' ($v['similar.dbl0'] -eq 'sel=0 chk=100') $v['similar.dbl0']
+Check '유사 묶음 체크 칸 클릭 = 토글' ($v['similar.glyph0'] -eq 'sel=0 chk=000') $v['similar.glyph0']
+Check '유사 묶음 단자 보호는 체크 칸을 눌러도 체크 안 됨' ($v['similar.glyph1Protected'] -eq 'sel=1 chk=000') $v['similar.glyph1Protected']
+Check '유사 묶음 검토 필요 체크 칸 클릭 = 체크' ($v['similar.glyph2'] -eq 'sel=2 chk=001') $v['similar.glyph2']
+
+# View Layer 목록: 시험 Layer 3개(모두 체크로 시작), 체크 칸으로만 바뀐다 (2026-10-20)
+Check 'View Layer 목록 CheckOnClick 꺼짐 / 체크 칸으로만 체크' ($v['viewLayerCheckOnClick'] -eq 'False' -and $v['viewLayerCheckBoxOnly'] -eq 'True') ("{0} / {1}" -f $v['viewLayerCheckOnClick'], $v['viewLayerCheckBoxOnly'])
+Check 'View Layer 시작 상태' ($v['viewLayer.start'] -like '* chk=111') $v['viewLayer.start']
+Check 'View 글자 클릭 = 선택만' ($v['viewLayer.click0'] -eq 'sel=0 chk=111') $v['viewLayer.click0']
+Check 'View 선택된 행 다시 클릭 = 체크 그대로' ($v['viewLayer.clickAgain0'] -eq 'sel=0 chk=111') $v['viewLayer.clickAgain0']
+Check 'View 글자 더블클릭 = 선택만' ($v['viewLayer.dbl1'] -eq 'sel=1 chk=111') $v['viewLayer.dbl1']
+Check 'View 체크 칸 클릭 = 토글' ($v['viewLayer.glyph2'] -eq 'sel=2 chk=110') $v['viewLayer.glyph2']
+Check 'View Space 키 = 체크 그대로' ($v['viewLayer.space2'] -eq 'sel=2 chk=110') $v['viewLayer.space2']
+Check 'View 체크 칸 다시 클릭 = 토글' ($v['viewLayer.glyph2Again'] -eq 'sel=2 chk=111') $v['viewLayer.glyph2Again']
+Check 'View 체크 칸 더블클릭 = 두 번 바뀌어 그대로' ($v['viewLayer.glyphDbl0'] -eq 'sel=0 chk=111') $v['viewLayer.glyphDbl0']
 
 # Setup Layer 목록: 샘플 GDS Layer 9개, 처음에는 모두 표시(체크)
-Check 'Setup Layer 목록 CheckOnClick 꺼짐' ($v['layerCheckOnClick'] -eq 'False') $v['layerCheckOnClick']
+Check 'Setup Layer 목록 CheckOnClick 꺼짐 / 체크 칸으로만 체크' ($v['layerCheckOnClick'] -eq 'False' -and $v['layerCheckBoxOnly'] -eq 'True') ("{0} / {1}" -f $v['layerCheckOnClick'], $v['layerCheckBoxOnly'])
 Check 'Setup Layer 9개 / 모두 체크로 시작' ($v['layer.count'] -eq '9' -and $v['layer.start'] -like '* chk=111111111') ("{0} / {1}" -f $v['layer.count'], $v['layer.start'])
 Check 'Setup 글자 클릭 = 선택만' ($v['layer.click0'] -eq 'sel=0 chk=111111111') $v['layer.click0']
 Check 'Setup 선택된 행 다시 클릭 = 체크 그대로' ($v['layer.clickAgain0'] -eq 'sel=0 chk=111111111') $v['layer.clickAgain0']
-Check 'Setup 체크 칸 클릭 = 선택만' ($v['layer.glyph1'] -eq 'sel=1 chk=111111111') $v['layer.glyph1']
-Check 'Setup Space 키 = 체크 그대로' ($v['layer.space1'] -eq 'sel=1 chk=111111111') $v['layer.space1']
-Check 'Setup 더블클릭 = 토글 + 도면 Layer 숨김' ($v['layer.dbl0'] -eq 'sel=0 chk=011111111 map0=False') $v['layer.dbl0']
-Check 'Setup 다시 더블클릭 = 토글 + 도면 Layer 표시' ($v['layer.dbl0Again'] -eq 'sel=0 chk=111111111 map0=True') $v['layer.dbl0Again']
+Check 'Setup 체크 칸 클릭 = 토글 + 도면 Layer 숨김' ($v['layer.glyph1'] -eq 'sel=1 chk=101111111 map1=False') $v['layer.glyph1']
+Check 'Setup Space 키 = 체크 그대로' ($v['layer.space1'] -eq 'sel=1 chk=101111111') $v['layer.space1']
+Check 'Setup 글자 더블클릭 = 선택만(체크 / 도면 그대로)' ($v['layer.dbl0'] -eq 'sel=0 chk=101111111 map0=True') $v['layer.dbl0']
+Check 'Setup 체크 칸 다시 클릭 = 토글 + 도면 Layer 표시' ($v['layer.glyph1Again'] -eq 'sel=1 chk=111111111 map1=True') $v['layer.glyph1Again']
+Check 'Setup 체크 칸 더블클릭 = 두 번 바뀌어 그대로' ($v['layer.glyphDbl0'] -eq 'sel=0 chk=111111111 map0=True') $v['layer.glyphDbl0']
 Check 'Setup Layer 버튼 2개 사용 가능(도면 읽은 뒤)' ($v['layer.buttonsEnabled'] -eq 'True/True') $v['layer.buttonsEnabled']
 Check 'Setup [전체 미체크] 버튼 클릭 동작' ($v['layer.none'] -eq 'sel=0 chk=000000000 map0=False') $v['layer.none']
 Check 'Setup [전체 체크] 버튼 클릭 동작' ($v['layer.all'] -eq 'sel=0 chk=111111111 map0=True') $v['layer.all']

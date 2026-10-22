@@ -1,0 +1,115 @@
+-- 테이블 / 인덱스 / LOB 를 영역별 테이블스페이스로 옮기기 (2026-10-21)
+-- 규칙(테이블 이름 기준, 인덱스는 그 테이블 영역의 _IDX, LOB 는 테이블과 같은 _TBL)
+--   TQP_GDS_* -> TS_GDS_TBL / TS_GDS_IDX
+--   TQC_*     -> TS_COM_TBL / TS_COM_IDX
+--   TQD_*     -> TS_DMS_TBL / TS_DMS_IDX
+--   그 밖     -> TS_TEST_TBL / TS_TEST_IDX (TQP_* / TD_* / G_* 등 YMS)
+-- 실행 계정: 객체를 가진 사용자(예: TRAINING)로 접속한다. 먼저 DBA 가 2026-10-21_tablespace_create.sql 로 8개 테이블스페이스와 QUOTA 를 만든다.
+-- 처리: 규칙과 다른 테이블은 MOVE(LOB 컬럼 포함), 그 뒤 규칙과 다르거나 UNUSABLE 인 인덱스는 REBUILD.
+--   MOVE 중에는 그 테이블을 쓸 수 없고, 행이 많으면 시간이 걸린다. 화면 / 서비스를 쓰지 않을 때 실행한다.
+--   이미 맞는 객체는 건너뛰므로 여러 번 실행해도 된다. 오류가 나면 멈추고, 다시 실행하면 남은 것부터 이어서 한다.
+-- 실행 기록: 현재 폴더의 tablespace_apply_run.log
+
+SET SERVEROUTPUT ON SIZE UNLIMITED
+SET FEEDBACK OFF
+SPOOL tablespace_apply_run.log
+WHENEVER SQLERROR EXIT SQL.SQLCODE
+
+PROMPT == 0. 대상 / 테이블스페이스 확인 ==
+SELECT USER AS CONNECTED_USER, SYS_CONTEXT('USERENV', 'DB_NAME') AS DB_NAME, TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MI:SS') AS RUN_AT FROM DUAL;
+DECLARE
+    n NUMBER;
+BEGIN
+    SELECT COUNT(*) INTO n FROM USER_TABLESPACES
+     WHERE TABLESPACE_NAME IN ('TS_COM_TBL', 'TS_COM_IDX', 'TS_DMS_TBL', 'TS_DMS_IDX', 'TS_TEST_TBL', 'TS_TEST_IDX', 'TS_GDS_TBL', 'TS_GDS_IDX');
+    IF n < 8 THEN
+        RAISE_APPLICATION_ERROR(-20001, 'STOP: only ' || n || ' of 8 tablespaces exist. DBA must run 2026-10-21_tablespace_create.sql first.');
+    END IF;
+END;
+/
+
+PROMPT == 1. 테이블 / LOB ==
+DECLARE
+    v_cnt NUMBER := 0;
+    v_lob VARCHAR2(4000);
+    v_ts  VARCHAR2(30);
+
+    FUNCTION area(p_table VARCHAR2) RETURN VARCHAR2 IS
+    BEGIN
+        IF p_table LIKE 'TQP\_GDS\_%' ESCAPE '\' THEN RETURN 'GDS';
+        ELSIF p_table LIKE 'TQC\_%' ESCAPE '\' THEN RETURN 'COM';
+        ELSIF p_table LIKE 'TQD\_%' ESCAPE '\' THEN RETURN 'DMS';
+        ELSE RETURN 'TEST';
+        END IF;
+    END;
+BEGIN
+    FOR t IN (SELECT TABLE_NAME, TABLESPACE_NAME FROM USER_TABLES
+               WHERE TEMPORARY = 'N' AND IOT_TYPE IS NULL AND NESTED = 'NO' AND SECONDARY = 'N' AND TABLE_NAME NOT LIKE 'BIN$%'
+               ORDER BY TABLE_NAME) LOOP
+        v_ts := 'TS_' || area(t.TABLE_NAME) || '_TBL';
+        v_lob := NULL;
+        FOR l IN (SELECT COLUMN_NAME FROM USER_LOBS WHERE TABLE_NAME = t.TABLE_NAME AND NVL(TABLESPACE_NAME, '-') <> v_ts ORDER BY COLUMN_NAME) LOOP
+            v_lob := v_lob || ' LOB ("' || l.COLUMN_NAME || '") STORE AS (TABLESPACE ' || v_ts || ')';
+        END LOOP;
+        IF NVL(t.TABLESPACE_NAME, '-') <> v_ts OR v_lob IS NOT NULL THEN
+            DBMS_OUTPUT.PUT_LINE('ALTER TABLE "' || t.TABLE_NAME || '" MOVE TABLESPACE ' || v_ts || v_lob || ';');
+            EXECUTE IMMEDIATE 'ALTER TABLE "' || t.TABLE_NAME || '" MOVE TABLESPACE ' || v_ts || v_lob;
+            v_cnt := v_cnt + 1;
+        END IF;
+    END LOOP;
+    DBMS_OUTPUT.PUT_LINE('tables moved: ' || v_cnt);
+END;
+/
+
+PROMPT == 2. 인덱스 ==
+DECLARE
+    v_cnt NUMBER := 0;
+    v_ts  VARCHAR2(30);
+
+    FUNCTION area(p_table VARCHAR2) RETURN VARCHAR2 IS
+    BEGIN
+        IF p_table LIKE 'TQP\_GDS\_%' ESCAPE '\' THEN RETURN 'GDS';
+        ELSIF p_table LIKE 'TQC\_%' ESCAPE '\' THEN RETURN 'COM';
+        ELSIF p_table LIKE 'TQD\_%' ESCAPE '\' THEN RETURN 'DMS';
+        ELSE RETURN 'TEST';
+        END IF;
+    END;
+BEGIN
+    FOR i IN (SELECT INDEX_NAME, TABLE_NAME, TABLESPACE_NAME, STATUS FROM USER_INDEXES
+               WHERE INDEX_TYPE NOT IN ('LOB', 'IOT - TOP') AND TEMPORARY = 'N' AND TABLE_NAME NOT LIKE 'BIN$%'
+               ORDER BY TABLE_NAME, INDEX_NAME) LOOP
+        v_ts := 'TS_' || area(i.TABLE_NAME) || '_IDX';
+        IF NVL(i.TABLESPACE_NAME, '-') <> v_ts OR i.STATUS = 'UNUSABLE' THEN
+            DBMS_OUTPUT.PUT_LINE('ALTER INDEX "' || i.INDEX_NAME || '" REBUILD TABLESPACE ' || v_ts || ';');
+            EXECUTE IMMEDIATE 'ALTER INDEX "' || i.INDEX_NAME || '" REBUILD TABLESPACE ' || v_ts;
+            v_cnt := v_cnt + 1;
+        END IF;
+    END LOOP;
+    DBMS_OUTPUT.PUT_LINE('indexes rebuilt: ' || v_cnt);
+END;
+/
+
+WHENEVER SQLERROR CONTINUE
+PROMPT == 3. 확인 (테이블스페이스별 개수 / 규칙과 다른 것 0 / UNUSABLE 0) ==
+SET PAGESIZE 100 LINESIZE 200 FEEDBACK ON
+COLUMN KIND FORMAT A6
+COLUMN TABLESPACE_NAME FORMAT A15
+SELECT 'TABLE' KIND, TABLESPACE_NAME, COUNT(*) CNT FROM USER_TABLES WHERE TEMPORARY = 'N' AND TABLE_NAME NOT LIKE 'BIN$%' GROUP BY TABLESPACE_NAME
+UNION ALL
+SELECT 'INDEX', TABLESPACE_NAME, COUNT(*) FROM USER_INDEXES WHERE INDEX_TYPE <> 'LOB' AND TABLE_NAME NOT LIKE 'BIN$%' GROUP BY TABLESPACE_NAME
+UNION ALL
+SELECT 'LOB', TABLESPACE_NAME, COUNT(*) FROM USER_LOBS GROUP BY TABLESPACE_NAME
+ ORDER BY 1, 2;
+SELECT COUNT(*) WRONG_PLACE FROM (
+  SELECT TABLE_NAME, TABLESPACE_NAME,
+         'TS_' || CASE WHEN TABLE_NAME LIKE 'TQP\_GDS\_%' ESCAPE '\' THEN 'GDS' WHEN TABLE_NAME LIKE 'TQC\_%' ESCAPE '\' THEN 'COM'
+                       WHEN TABLE_NAME LIKE 'TQD\_%' ESCAPE '\' THEN 'DMS' ELSE 'TEST' END || '_TBL' WANT
+    FROM USER_TABLES WHERE TEMPORARY = 'N' AND TABLE_NAME NOT LIKE 'BIN$%'
+  UNION ALL
+  SELECT TABLE_NAME, TABLESPACE_NAME,
+         'TS_' || CASE WHEN TABLE_NAME LIKE 'TQP\_GDS\_%' ESCAPE '\' THEN 'GDS' WHEN TABLE_NAME LIKE 'TQC\_%' ESCAPE '\' THEN 'COM'
+                       WHEN TABLE_NAME LIKE 'TQD\_%' ESCAPE '\' THEN 'DMS' ELSE 'TEST' END || '_IDX'
+    FROM USER_INDEXES WHERE INDEX_TYPE NOT IN ('LOB', 'IOT - TOP') AND TABLE_NAME NOT LIKE 'BIN$%')
+ WHERE NVL(TABLESPACE_NAME, '-') <> WANT;
+SELECT COUNT(*) UNUSABLE_INDEX FROM USER_INDEXES WHERE STATUS = 'UNUSABLE';
+SPOOL OFF

@@ -26,6 +26,18 @@ namespace NexplantQMS.GdsMap
         public bool Selected;
     }
 
+    /// <summary>Defect 표시 모양 (2026-10-22).</summary>
+    public enum DefectOverlayStyle
+    {
+        /// <summary>연관 분석 상세보기: Chain 영역 = 빨강 채움, 밖 = 노랑 외곽선, 고른 Defect = 흰 테두리 + 허용오차 흰 점선 + "#번호".</summary>
+        Standard,
+        /// <summary>
+        /// Simple 화면 상세보기: Chain 영역 = 빨강 채움, 밖 = 노랑 채움. 흰 테두리 / 흰 점선 / 번호는 그리지 않고,
+        /// 고른 Defect 는 같은 색 계열의 진한 테두리를 굵게만 그린다(설계 문서/설계/05_연관분석/2026-10-22_GDS_KLARF_연관분석_Simple_화면_설계.md 15절).
+        /// </summary>
+        Filled
+    }
+
     /// <summary>
     /// KLARF Defect 표시(Die 상세 분석 화면 전용). 수가 적어(수십 ~ 수백) GPU 버퍼 대신 Chain 단자 Marker 와 같은
     /// GDI+ 오버레이(SwapBuffers 뒤 CreateGraphics)로 그린다. 확대 배율과 관계없이 최소 크기를 둬 Chip 전체 보기에서도 보이게 한다.
@@ -44,6 +56,19 @@ namespace NexplantQMS.GdsMap
 
         /// <summary>표시 중인 Defect 수.</summary>
         public int DefectMarkerCount { get { return _defectMarkers.Count; } }
+
+        /// <summary>Defect 표시 모양(기본 Standard = 지금 연관 분석 상세보기). 바꾼 뒤 다시 그린다.</summary>
+        public DefectOverlayStyle DefectStyle
+        {
+            get { return _defectStyle; }
+            set
+            {
+                if (_defectStyle == value) return;
+                _defectStyle = value;
+                Invalidate();
+            }
+        }
+        private DefectOverlayStyle _defectStyle = DefectOverlayStyle.Standard;
 
         /// <summary>Defect 표시를 바꾼다. toleranceUm 은 고른 Defect 의 허용오차 점선 사각형에 쓴다.</summary>
         public void SetDefectMarkers(IEnumerable<DefectOverlayMarker> markers, double toleranceUm)
@@ -93,6 +118,11 @@ namespace NexplantQMS.GdsMap
         private void DrawDefectOverlay()
         {
             if (_defectMarkers.Count == 0) return;
+            if (_defectStyle == DefectOverlayStyle.Filled)
+            {
+                DrawFilledDefectOverlay();
+                return;
+            }
             using (Graphics graphics = CreateGraphics())
             using (var inFill = new SolidBrush(Color.FromArgb(170, DefectInChainColor)))
             using (var inPen = new Pen(Color.FromArgb(255, 120, 0, 0), 1.5f))
@@ -121,6 +151,33 @@ namespace NexplantQMS.GdsMap
                     string text = "#" + m.Id;
                     graphics.DrawString(text, font, Brushes.Black, r.Right + 5, r.Top - 1);
                     graphics.DrawString(text, font, Brushes.White, r.Right + 4, r.Top - 2);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Filled 모양(Simple 화면 상세보기, 2026-10-22): Chain 밖 -> Chain 영역 -> 고른 Defect 순서로 모두 채워 그린다.
+        /// 크기는 호출하는 쪽이 넣은 Width / Height 그대로(분석 Defect 영역)이고 허용오차 점선은 그리지 않는다.
+        /// 고른 Defect 는 진한 테두리를 굵게(3px) 그려 위치만 알 수 있게 하고 흰 테두리 / 번호 글자는 쓰지 않는다.
+        /// </summary>
+        private void DrawFilledDefectOverlay()
+        {
+            using (Graphics graphics = CreateGraphics())
+            using (var inFill = new SolidBrush(Color.FromArgb(170, DefectInChainColor)))
+            using (var outFill = new SolidBrush(Color.FromArgb(170, DefectOutChainColor)))
+            using (var inPen = new Pen(Color.FromArgb(255, 120, 0, 0), 1.5f))
+            using (var outPen = new Pen(Color.FromArgb(255, 150, 110, 0), 1.5f))
+            using (var inSelectedPen = new Pen(Color.FromArgb(255, 120, 0, 0), 3f))
+            using (var outSelectedPen = new Pen(Color.FromArgb(255, 150, 110, 0), 3f))
+            {
+                graphics.SmoothingMode = SmoothingMode.AntiAlias;
+                foreach (DefectOverlayMarker m in _defectMarkers.Where(m => !m.InChain && !m.Selected)
+                    .Concat(_defectMarkers.Where(m => m.InChain && !m.Selected))
+                    .Concat(_defectMarkers.Where(m => m.Selected)))
+                {
+                    RectangleF r = MarkerRect(m, 0);
+                    graphics.FillRectangle(m.InChain ? inFill : outFill, r);
+                    graphics.DrawRectangle(m.Selected ? (m.InChain ? inSelectedPen : outSelectedPen) : (m.InChain ? inPen : outPen), ToRectangle(r));
                 }
             }
         }

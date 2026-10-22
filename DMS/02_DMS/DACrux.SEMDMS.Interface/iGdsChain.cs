@@ -82,5 +82,48 @@ namespace DACrux.SEMDMS.Interface
         DataTable GetChainEdits(string strFactory, string strDeviceID, string strChainSeq);
 
         #endregion
+
+        #region [Chain 상세 범위 조회 (2026-10-21)]
+
+        /// <summary>Chain 번호 범위(시작 ~ 끝)의 탐색 Layer. 반환 열: CHAIN_SEQ / LAYER_ID / DATA_TYPE</summary>
+        DataTable GetChainLayersRange(string strFactory, string strDeviceID, string strFromSeq, string strToSeq);
+
+        /// <summary>Chain 번호 범위의 Layer 연결 규칙. 반환 열: CHAIN_SEQ / FIRST_LAYER_ID / FIRST_DATA_TYPE / SECOND_LAYER_ID / SECOND_DATA_TYPE / TOLERANCE</summary>
+        DataTable GetChainRulesRange(string strFactory, string strDeviceID, string strFromSeq, string strToSeq);
+
+        /// <summary>Chain 번호 범위의 포함 도형. 반환 열: CHAIN_SEQ / PLACED_ELEMENT_ID / ROLE_CODE / INCLUSION_SOURCE / MARKER_X / MARKER_Y / LAYER_ID / DATA_TYPE</summary>
+        DataTable GetChainMembersRange(string strFactory, string strDeviceID, string strFromSeq, string strToSeq);
+
+        /// <summary>Chain 번호 범위의 수동 편집 기록. 반환 열: CHAIN_SEQ / EDIT_SEQ / PLACED_ELEMENT_ID / ACTION_CODE / BATCH_EDIT_SEQ</summary>
+        DataTable GetChainEditsRange(string strFactory, string strDeviceID, string strFromSeq, string strToSeq);
+
+        #endregion
+
+        #region [Chain 일괄 저장 (2026-10-20, GDS Map View U8)]
+
+        /// <summary>
+        /// Chain 여러 개를 한 번에 저장한다(새 Chain 만, 같은 Code 가 이미 있으면 건너뜀).
+        /// aKey: Factory / Device / Layer 규칙 적용(0 / 1) / 격자 크기
+        /// aChains 열: CHAIN_CODE / CHAIN_NAME / COLOR_ARGB
+        /// aLayers 열: LAYER_ID / DATA_TYPE (모든 Chain 의 탐색 Layer)
+        /// aMembers 열: CHAIN_INDEX(aChains 행 번호, 0부터) / PLACED_ELEMENT_ID / ROLE_CODE / INCLUSION_SOURCE / MARKER_X / MARKER_Y (1만 행 이하)
+        /// Chain 마다 INPUT 이 1개여야 한다. 중간에 실패하면 이번 호출에서 만든 Chain 을 지우고 오류를 낸다.
+        /// 반환 열: CHAIN_CODE / CHAIN_SEQ / RESULT(CREATED / SKIPPED) / MEMBER_COUNT
+        /// </summary>
+        DataTable CreateChainBulk(string[] aKey, string[,] aChains, string[,] aLayers, string[,] aMembers, string strUpdateUser);
+
+        /// <summary>Device 의 Chain 목록(포함 도형 수 계산 없음). 반환 열: CHAIN_SEQ / CHAIN_CODE / CHAIN_NAME / COLOR_ARGB / VERSION_STATUS / UPDATE_TIME</summary>
+        DataTable GetChainCodeList(string strFactory, string strDeviceID);
+
+        /// <summary>Chain 여러 개를 한 번에 실제로 삭제한다(하위 테이블은 FK CASCADE). 반환: 요청한 Chain 수</summary>
+        int DeleteChainBulk(string strFactory, string strDeviceID, string[] aChainSeqs, string strUpdateUser);
+
+        /// <summary>
+        /// Chain 여러 개의 색을 한 번에 바꾼다(저장 내용 VERSION 1 의 COLOR_ARGB 만, 포함 도형은 그대로) (2026-10-21).
+        /// aChainSeqs 1만 개 이하. strColorArgb = Color.ToArgb() 정수 글자. 반환: 요청한 Chain 수
+        /// </summary>
+        int UpdateChainColorBulk(string strFactory, string strDeviceID, string[] aChainSeqs, string strColorArgb, string strUpdateUser);
+
+        #endregion
     }
 }

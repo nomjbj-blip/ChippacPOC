@@ -79,9 +79,17 @@ namespace DACrux.SEMDMS.ENGUI
         /// <summary>Die 안 숫자를 그릴지 여부.</summary>
         public bool ShowDieCount { get; set; }
 
+        /// <summary>
+        /// 우클릭 [Detail Analysis] 를 보일지 여부(기본 true = 지금 연관 분석 화면 그대로).
+        /// Simple 화면(frmGdsKlarfSimple)은 Die 상세를 연결하기 전까지 끈다 (2026-10-22, 설계 문서/설계/05_연관분석/2026-10-22_GDS_KLARF_연관분석_Simple_화면_설계.md 결정 S9).
+        /// </summary>
+        [System.ComponentModel.DefaultValue(true)]
+        public bool ShowDetailMenu { get; set; }
+
         public GdsKlarfAnalysisMap()
         {
             ShowDieCount = true;
+            ShowDetailMenu = true;
             // 기반 클래스 생성자(InitializeComponent)가 ctxmWaferMap 을 만든 뒤라 바로 항목을 붙일 수 있다.
             // Popup 처리기는 WaferMap / DefectMap 처리기 뒤에 등록되므로 그 처리가 끝난 뒤 표시 여부를 정한다.
             _crossSeparator = ctxmWaferMap.MenuItems.Add("-");
@@ -110,7 +118,7 @@ namespace DACrux.SEMDMS.ENGUI
         private void ctxmWaferMap_PopupFilter(object sender, EventArgs e)
         {
             foreach (MenuItem item in ctxmWaferMap.MenuItems)
-                item.Visible = item == _detailMenu || item == _detailSeparator || item == _crossMenu || item == _crossSeparator
+                item.Visible = ((item == _detailMenu || item == _detailSeparator) && ShowDetailMenu) || item == _crossMenu || item == _crossSeparator
                     || VisibleMenuTexts.Contains(item.Text);
             _detailMenu.Enabled = m_SelectedDies != null && m_SelectedDies.Count > 0;
             _crossMenu.Checked = CenterMark;

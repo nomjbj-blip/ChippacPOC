@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+  클라이언트 Setup 만들기 설정 (2026-10-21).
+  DACrux_SCK_Setup.csproj 가 읽는다. 값을 바꾸고 저장한 뒤 VS 에서 DACrux_SCK_Setup 프로젝트를 빌드하면 그대로 반영된다.
+-->
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <!-- 설치 화면의 서버 주소 기본값 (설치하는 사람이 화면에서 바꿀 수 있다) -->
+    <SetupServerIP>10.86.253.162</SetupServerIP>
+
+    <!-- 솔루션 빌드 구성 Debug / Release. 비워 두면 VS 도구 막대에서 고른 구성(Debug / Release)을 따른다.
+         Debug = 개발 PC 와 같은 빌드(DEBUG 기호만 뺌, 최적화 없음) / Release = 최적화된 배포용 빌드(고객 전달 권장) -->
+    <SetupConfiguration></SetupConfiguration>
+
+    <!-- 버전 yyyy.M.d.N. 비워 두면 오늘 날짜 + 순번으로 자동 (예: 2026.10.21.2). 같은 버전을 다시 쓰면 그 폴더를 덮어쓴다 -->
+    <SetupVersion></SetupVersion>
+
+    <!-- true: Setup 을 만든 뒤 자동 검사(시험용 이름으로 설치 -> 재설치 -> 실행 -> 삭제, 로그인 창이 몇 초 떴다 닫힘) -->
+    <SetupVerify>true</SetupVerify>
+
+    <!-- true: .NET 4.8 설치 파일을 넣지 않는다 (Setup 이 약 120 MB 작아짐, .NET 4.8 이 없는 PC 에서는 설치 안내 후 중단) -->
+    <SetupNoDotNet>false</SetupNoDotNet>
+
+    <!-- true: pdb(오류 위치 정보) 파일을 넣지 않는다 -->
+    <SetupNoPdb>false</SetupNoPdb>
+
+    <!-- true: 같은 빌드의 서버 DLL / EXE 묶음(zip)을 만들지 않는다 -->
+    <SetupNoServerBundle>false</SetupNoServerBundle>
+
+    <!-- true: 끝나면 탐색기로 Setup 파일 위치를 연다 -->
+    <SetupOpenFolder>false</SetupOpenFolder>
+
+    <!-- true: 솔루션 빌드 경고 줄도 출력 창에 모두 보인다 (기본은 개수만) -->
+    <SetupShowWarnings>false</SetupShowWarnings>
+  </PropertyGroup>
+</Project>

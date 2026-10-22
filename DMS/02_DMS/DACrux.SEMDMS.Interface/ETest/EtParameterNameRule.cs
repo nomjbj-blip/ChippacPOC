@@ -20,7 +20,7 @@ namespace DACrux.SEMDMS.Interface
     //   -> '@' 앞 = Parameter 종류('=' 뒤는 조건 값), '@' 뒤 = Chain 이름, ':' 가 있으면 Chain 2개
     //
     //  이름 변환 (원래 헤더에서 문제 문자 '=' '@' ':' '.' 공백 '#' 만 바꾸고 글자 순서는 그대로 둔다)
-    //   Parameter 이름 = EtYmsRule.ToParamName. YMS 컬럼 이름과 같은 값이 되도록 같은 규칙을 쓴다.
+    //   Parameter 이름 = EtYmsRule.ToParamName (50자). YMS TD 컬럼 이름은 EtYmsRule.ToYmsName (30자, 2026-10-21) 으로 따로 만든다.
     //   Chain / 대표 Chain / GDS Chain 비교 이름 = ToSafeName: 대문자 / '.' -> 'P' / A~Z 0~9 '_' 밖 문자는 '_' /
     //   연속 '_' 하나로 / 앞뒤 '_' 제거. 영문자로 시작해야 한다.
     //   원문 헤더는 CleanHeader(공백 정리 / 끝 '#번호' 제거, 대소문자 유지)로 따로 보관한다.
@@ -63,7 +63,7 @@ namespace DACrux.SEMDMS.Interface
             return SuffixRegex.Replace(clean, string.Empty).Trim();
         }
 
-        /// <summary>Parameter 이름(DB / 소스용). YMS 컬럼 이름 규칙(EtYmsRule.ToParamName)과 같은 결과다. 만들 수 없으면 빈 문자열.</summary>
+        /// <summary>Parameter 이름(DB / 소스용, EtYmsRule.ToParamName). 만들 수 없으면 빈 문자열.</summary>
         public static string ToParameterName(string header)
         {
             return EtYmsRule.ToParamName(CleanHeader(header));
@@ -159,6 +159,11 @@ namespace DACrux.SEMDMS.Interface
             if (!EtYmsRule.IsValidParamName(parts.ParameterName))
                 return parts.Fail("Parameter 이름을 만들 수 없습니다: " + parts.HeaderText);
 
+            // YMS TD 컬럼 이름 (30자, 2026-10-21). 등록 때 한 번 저장하고 이후 다시 계산하지 않는다.
+            parts.YmsName = EtYmsRule.ToYmsName(parts);
+            if (!EtYmsRule.IsValidYmsName(parts.YmsName))
+                return parts.Fail("YMS 이름을 만들 수 없습니다: " + parts.HeaderText);
+
             parts.ForceLeg1 = ForceLegOf(parts.Chain1);
             parts.ForceLeg2 = ForceLegOf(parts.Chain2);
             parts.ChainType = ChainTypeOf(parts.Chain1);
@@ -168,8 +173,8 @@ namespace DACrux.SEMDMS.Interface
         }
 
         /// <summary>
-        /// 함께 등록할 헤더 목록을 검사한다. 분해 실패 / 같은 헤더 두 번 / 서로 다른 헤더가 같은 Parameter 이름이 되는 것을 문장 목록으로 돌려준다.
-        /// 비어 있으면 통과. 헤더 비교는 원문 정리 후 대소문자 무시.
+        /// 함께 등록할 헤더 목록을 검사한다. 분해 실패 / 같은 헤더 두 번 / 서로 다른 헤더가 같은 Parameter 이름이나 같은 YMS 이름이 되는 것을
+        /// 문장 목록으로 돌려준다. 비어 있으면 통과. 헤더 비교는 원문 정리 후 대소문자 무시.
         /// </summary>
         public static string[] FindNameProblems(IEnumerable<string> headers)
         {
@@ -177,6 +182,7 @@ namespace DACrux.SEMDMS.Interface
             if (headers == null)
                 return problems.ToArray();
             Dictionary<string, string> owners = new Dictionary<string, string>(StringComparer.Ordinal);
+            Dictionary<string, string> ymsOwners = new Dictionary<string, string>(StringComparer.Ordinal);
             HashSet<string> seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             foreach (string header in headers)
             {
@@ -197,7 +203,13 @@ namespace DACrux.SEMDMS.Interface
                     problems.Add("서로 다른 헤더가 같은 Parameter 이름 " + parts.ParameterName + " 이 됩니다: " + owner + " / " + parts.HeaderText);
                     continue;
                 }
+                if (ymsOwners.TryGetValue(parts.YmsName, out owner))
+                {
+                    problems.Add("서로 다른 헤더가 같은 YMS 이름 " + parts.YmsName + " 이 됩니다: " + owner + " / " + parts.HeaderText);
+                    continue;
+                }
                 owners.Add(parts.ParameterName, parts.HeaderText);
+                ymsOwners.Add(parts.YmsName, parts.HeaderText);
             }
             return problems.ToArray();
         }
@@ -213,6 +225,8 @@ namespace DACrux.SEMDMS.Interface
         public string HeaderText = string.Empty;
         /// <summary>Parameter 이름 (ITEM_NAME, 예: RESISTANCE_IFORCE_8P0MA_TSVDC_TR_FH)</summary>
         public string ParameterName = string.Empty;
+        /// <summary>YMS TD 컬럼 이름 (YMS_PARAM_NAME, 30자 이하, 예: RES_8P0MA_TSVDC_TR_FH)</summary>
+        public string YmsName = string.Empty;
         /// <summary>'=' / '@' 앞 이름 (PARA_NAME, 예: RESISTANCE_IFORCE / LEAKAGE_SERIAL)</summary>
         public string ParaName = string.Empty;
         /// <summary>'=' 뒤 조건 값 (COND_VALUE, 예: 8.0MA). 없으면 빈 문자열</summary>

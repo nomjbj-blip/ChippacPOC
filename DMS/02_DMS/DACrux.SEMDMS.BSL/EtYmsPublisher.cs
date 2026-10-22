@@ -42,7 +42,7 @@ namespace DACrux.SEMDMS.BSL
     {
         /// <summary>E-Test Parameter 이름 (헤더 정리 값)</summary>
         public string ParameterName { get; set; }
-        /// <summary>YMS 컬럼 이름 (EtYmsRule.ToParamName 으로 만든 값)</summary>
+        /// <summary>YMS 컬럼 이름 (TQP_GDS_ET_ITEM.YMS_PARAM_NAME, 30자 이하. 2026-10-21 부터 등록 때 저장한 값)</summary>
         public string YmsName { get; set; }
         /// <summary>TQP_PARASPEC.PARAM_DESC 에 넣을 헤더 원문 (없으면 ParameterName)</summary>
         public string Description { get; set; }
@@ -323,7 +323,7 @@ namespace DACrux.SEMDMS.BSL
             HashSet<string> names = new HashSet<string>(StringComparer.Ordinal);
             foreach (EtYmsParameter parameter in parameters)
             {
-                if (parameter == null || !EtYmsRule.IsValidParamName(parameter.YmsName))
+                if (parameter == null || !EtYmsRule.IsValidYmsName(parameter.YmsName))
                     throw new ArgumentException("YMS 컬럼 이름이 올바르지 않습니다: " + (parameter == null ? "(null)" : parameter.YmsName + " / " + parameter.ParameterName));
                 if (!names.Add(parameter.YmsName))
                     throw new ArgumentException("같은 YMS 컬럼 이름이 두 번 있습니다: " + parameter.YmsName);

@@ -1,0 +1,8 @@
+﻿원본: 단위 1e-09 m (= 0.001 µm) / 구조 1 / TOP 요소 636970
+PASS / G1 Map 정보: 파일 이름 / 최상위 구조 / 저장 기준 FRONT / READY / OMM all layer2.gds / TOP / FRONT
+PASS / G2 Layer 3 / 5 / 775 도형 수 / 점 수 = 원본(완전히 같은 도형은 한 번)  / L3 원본 62133(같은 도형 빼면 62133, 점 2076581) / DB 62133(점 2076581) ; L5 원본 112605(같은 도형 빼면 111773, 점 4155270) / DB 111773(점 4155270) ; L775 원본 61982(같은 도형 빼면 30992, 점 30992) / DB 30992(점 30992)
+PASS / G2b Map 합계 = Layer 합계 / 204898 / 6262843
+PASS / G3 Chain Member 도형 62609개 = 원본 요소(같은 Layer / 종류 / nm 좌표 전체 / DataType / PATH 폭 · 타입, BOUNDARY Bounds) / 다른 값 {} 예 {} / 종류 {'BOUNDARY': 34728, 'PATH': 27881} / 같은 모양 원본이 2개 이상인 Member 431
+PASS / G4 Chain 19개: 목록 MEMBER_COUNT = Member 행 수 = 분석 CHAIN.MEMBER_COUNT, Member 가 모두 Map 도형에 있음 / 다른 Chain [] / READY 19
+
+GDS_CHECK_PROBE=PASS (5/5)

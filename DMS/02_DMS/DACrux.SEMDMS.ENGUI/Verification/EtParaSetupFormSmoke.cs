@@ -17,7 +17,9 @@ using DACrux.SEMDMS.Interface;
 ///     (더블클릭 / Ctrl+V / 오른쪽 목록 복사) / 사용 · 비고 · Lower · Upper · Enable 수정 표시 -> 수정 행만 저장 -> 다시 판정(#44 Fail 6 -> 4) ->
 ///     Upper 지우기(Spec 삭제) / 원래 값으로 되돌리기 / 거르기 / 필터 콤보(2026-10-15) / 공정 콤보(수정 버림 질문) / 삭제, 화면 아래 진행 표시줄(ProgressStatusBar)
 ///     (2026-10-15 화면에서 정보 줄 / 우클릭 메뉴(Spec 비우기 / 수정 취소)가 빠져, 수정 행 수 / 주황 칸 수는 표에서 직접 센다)
+///     YMS 이름 열(2026-10-21): 표시 / 수정(대문자, 형식 · 겹침 붉은 칸) / 저장 / YMS 반영 뒤 수정 불가
 ///  C) 등록 화면에서 파일을 다시 열면 설정 화면에서 넣은 GDS Chain / Spec 이 보임
+///  D) 등록 화면 [Device 삭제](2026-10-22): 아니요 = 그대로 / 예 = 업로드 파일 + 모든 공정 Parameter · Spec 삭제, 열어 둔 파일 헤더가 신규로 (keep 이면 건너뜀)
 /// Service(Remoting) 대신 RO.GdsEtResult(iGdsEtResult) 생성자로 BSL.GdsEtResult 를 같은 프로세스에 붙인다(화면 -> RO -> BSL -> 로컬 DB).
 /// 시험 데이터: FACTORY=PROBE / E-Test Device = 파일명 Device(OMM) / 공정 TSVET (Spec 표로 COWET / FT 도 등록) / 업로드 Slot 4 (RH-HS2615-04),
 ///   GDS Device = E-Test Device 와 같은 이름의 시험 Map (PROBE 시험 Map LAYER_FILTER_PROBE 를 OMM 으로 복사, 시험 GDS Chain Code ZZETU*, 2026-10-15). keep 이 없으면 끝에 모두 지운다.
@@ -220,6 +222,26 @@ internal static class EtParaSetupFormSmoke
                 && cboProgram.Text == "TSVET" && Items(cboProgram) == "COWET,FT,TSVET" && para.Rows.Count == 37 && Cell(pTr, "colPUpper") == "715" && Cell(pTr, "colPLower") == ""
                 && Checked(pTr, "colPEnable") && Cell(pTr, "colPSpecText") == "If val > 715, Fail; otherwise, Pass", status.Text);
 
+            // YMS 이름 열 (2026-10-21): 저장 이름 오른쪽 / DB 값 / 더블클릭 수정(대문자) / 형식 · 표 안 겹침 붉은 칸 / 저장 -> DB (YMS 반영 전)
+            DataGridViewColumn colYms = para.Columns["colPYms"];
+            DataGridViewRow pLpY = ParaRow(para, ResLP);
+            string lpYms = SetupRow(bsl, ResLP)["YMS_PARAM_NAME"].ToString();
+            bool ymsShown = colYms != null && colYms.HeaderText == "YMS 이름" && colYms.DisplayIndex == para.Columns["colPName"].DisplayIndex + 1
+                && para.Rows.Cast<DataGridViewRow>().All(r => Cell(r, "colPYms").Length > 0 && Cell(r, "colPYms").Length <= EtYmsRule.MaxYmsNameLength)
+                && Cell(pLpY, "colPYms") == lpYms;
+            EditCell(type, form, para, pLpY, "colPYms", " zz_smoke_yms ");
+            bool ymsDirty = Cell(pLpY, "colPYms") == "ZZ_SMOKE_YMS" && pLpY.Cells["colPYms"].Style.BackColor == Color.LightYellow && Dirty(type, form) == 1;
+            EditCell(type, form, para, pLpY, "colPYms", Cell(ParaRow(para, ResTR), "colPYms"));
+            bool ymsDupRed = pLpY.Cells["colPYms"].Style.BackColor == Color.MistyRose;
+            EditCell(type, form, para, pLpY, "colPYms", "1BAD");
+            bool ymsBadRed = pLpY.Cells["colPYms"].Style.BackColor == Color.MistyRose;
+            Check("YMS 이름 열: 저장 이름 오른쪽 / DB 값(30자 이하) / 더블클릭 수정 -> 공백 제거 · 대문자 · 노란색 / 다른 행과 같은 이름 · 숫자 시작 -> 붉은색",
+                ymsShown && ymsDirty && ymsDupRed && ymsBadRed, lpYms + " -> " + Cell(pLpY, "colPYms"));
+            EditCell(type, form, para, pLpY, "colPYms", "ZZ_SMOKE_YMS");
+            Invoke(type, form, "btnSave_Click");
+            Check("YMS 이름 저장: 상태 줄 'YMS 이름 1' / DB YMS_PARAM_NAME / 다시 조회 수정 표시 없음", status.Text.Contains("YMS 이름 1")
+                && SetupRow(bsl, ResLP)["YMS_PARAM_NAME"].ToString() == "ZZ_SMOKE_YMS" && Cell(ParaRow(para, ResLP), "colPYms") == "ZZ_SMOKE_YMS" && Dirty(type, form) == 0, status.Text);
+
             // 업로드 (등록 Parameter 37 만 저장 + 판정) -> 다시 조회: 값 통계 / Fail 6
             seq = Upload(bsl, args[0]);
             DataRow upFile = bsl.GetEtFile(seq).Rows[0];
@@ -230,6 +252,23 @@ internal static class EtParaSetupFormSmoke
             Check("업로드 뒤 조회 37행 / 값 통계 열(파일 수 ~ Fail) 없음 / #44 Fail 6 (RES 718~719 > 715)", para.Rows.Count == 37
                 && !para.Columns.Contains("colPFiles") && !para.Columns.Contains("colPMax") && !para.Columns.Contains("colPFail")
                 && Convert.ToInt32(d44Before["FAIL_COUNT"]) == 6, para.Columns.Count + "열");
+            // YMS 에 반영된 Parameter(YMS_PUBLISHED = Y)는 YMS 이름을 고칠 수 없다(더블클릭해도 편집 안 됨 + 상태 줄 안내).
+            // 시험 Map 이 YMS 에 없어 반영이 WAIT 이면 화면 잠금만 보려고 그 행 상태를 반영됨으로 바꿔 본다(실제 반영 후 잠금은 EtYmsServiceProbe)
+            DataRow ymsFile = new DACrux.SEMDMS.DSL.TQP_GDS_ET_YMS().GetData("SELECT_ET_YMS_FILE", null, new[] { seq }).Rows[0];
+            string ymsStatus = ymsFile["YMS_STATUS"].ToString();
+            bool lpPublished = SetupRow(bsl, ResLP)["YMS_PUBLISHED"].ToString() == "Y";
+            DataGridViewRow pLpLock = ParaRow(para, ResLP);
+            object lpState = pLpLock.Tag;
+            FieldInfo publishedField = lpState.GetType().GetField("YmsPublished");
+            if (!lpPublished) publishedField.SetValue(lpState, true);
+            InvokeCell(type, form, "dgvPara_CellDoubleClick", para, pLpLock.Index, para.Columns["colPYms"].Index);
+            bool ymsEditing = para.IsCurrentCellInEditMode;
+            if (ymsEditing) { para.CancelEdit(); para.EndEdit(); }
+            string lockStatus = status.Text;
+            if (!lpPublished) publishedField.SetValue(lpState, false);
+            Check("YMS 반영 여부 = 업로드 YMS 상태(DONE 이면 Y) / 반영된 행은 YMS 이름 더블클릭 편집 안 됨 + 상태 줄 안내", lpPublished == (ymsStatus == "DONE") && ymsStatus != "FAIL"
+                && !ymsEditing && lockStatus.Contains("고칠 수 없습니다") && (!lpPublished || pLpLock.Cells["colPYms"].Style.ForeColor == Color.Gray),
+                "YMS " + ymsStatus + " (" + ymsFile["YMS_MESSAGE"] + ") / 반영됨 " + lpPublished + " / 편집 시작 " + ymsEditing + " / " + lockStatus);
 
             // GDS Chain 직접 입력: 더블클릭 편집(앞뒤 공백 제거, 대소문자 무시 비교) / Ctrl+V / 오른쪽 목록 복사
             pTr = ParaRow(para, ResTR);
@@ -344,7 +383,7 @@ internal static class EtParaSetupFormSmoke
             InvokeWith(type, form, "cboFlt_DropDown", cboFltUse);
             Check("필터 콤보 6개(목록에서만 고름) 모두 (전체) / [필터 해제] 꺼짐 / 조건 목록 (전체) 37 · " + condRes + " 28 · SERIAL 9 / 사용 목록 N 1 · Y 36",
                 filterCombos.All(c => c.DropDownStyle == ComboBoxStyle.DropDownList && c.Text.StartsWith("(전체) (", StringComparison.Ordinal)) && !btnClearFilter.Enabled
-                && Items(cboFltCond) == "(전체) (37)," + condRes + " (28),SERIAL (9)" && Items(cboFltUse) == "(전체) (37),N (1),Y (36)",
+                && Items(cboFltCond) == "(전체)," + condRes + ",SERIAL" && Items(cboFltUse) == "(전체),N,Y",
                 Items(cboFltCond) + " / " + Items(cboFltUse));
             SelectItem(cboFltCond, condRes);
             int condVisible = Visible(para);
@@ -352,8 +391,8 @@ internal static class EtParaSetupFormSmoke
             string gdsItems = Items(cboFltGds);
             SelectItem(cboFltGds, "(빈 값)");
             Check("조건 고름 -> 28 / GDS Chain 목록은 조건을 통과한 행만(이름 2 + (빈 값) 26, (빈 값)은 끝) / (빈 값) 고름 -> 26 / [필터 해제] 켜짐 / 상태 줄",
-                condVisible == 28 && gdsItems == "(전체) (28),TSVDC_ASIC1_P_FL (1),tsvdc_tr_fl (1),(빈 값) (26)" && Visible(para) == 26 && btnClearFilter.Enabled
-                && status.Text == "필터 조건=" + condRes + ", GDS Chain (Chain 1)=(빈 값) / 표시 26 / 전체 37",
+                condVisible == 28 && gdsItems == "(전체),TSVDC_ASIC1_P_FL,tsvdc_tr_fl,(빈 값)" && Visible(para) == 26 && btnClearFilter.Enabled
+                && status.Text == "필터 조건=" + condRes + ", GDS Chain=(빈 값) / 표시 26 / 전체 37",
                 condVisible + " / " + gdsItems + " / " + status.Text);
             DataGridViewRow pShown = para.Rows.Cast<DataGridViewRow>().First(r => r.Visible);
             EditCell(type, form, para, pShown, "colPGds", "TSVDC_TR_FL");
@@ -363,16 +402,16 @@ internal static class EtParaSetupFormSmoke
             string gdsWhileEditing = Items(cboFltGds);
             EditCell(type, form, para, pShown, "colPGds", "");
             Check("필터에 맞지 않게 고친 행(GDS 입력)도 수정 중이면 보임 / 펼치면 수정 중인 값으로 다시 셈 -> 되돌리면 수정 없음", dirtyShown && Dirty(type, form) == 0 && pShown.Visible
-                && gdsWhileEditing == "(전체) (28),TSVDC_ASIC1_P_FL (1),TSVDC_TR_FL (1),tsvdc_tr_fl (1),(빈 값) (25)" && cboFltGds.Text == "(빈 값) (25)", gdsWhileEditing);
+                && gdsWhileEditing == "(전체),TSVDC_ASIC1_P_FL,TSVDC_TR_FL,tsvdc_tr_fl,(빈 값)" && cboFltGds.Text == "(빈 값)", gdsWhileEditing);
             InvokeWith(type, form, "cboFlt_DropDown", cboFltMeas);
-            Check("측정 목록 = 다른 콤보(조건 / GDS Chain)를 통과한 행만", Items(cboFltMeas) == "(전체) (26),RESISTANCE (26)", Items(cboFltMeas));
+            Check("측정 목록 = 다른 콤보(조건 / GDS Chain)를 통과한 행만", Items(cboFltMeas) == "(전체),RESISTANCE", Items(cboFltMeas));
             Invoke(type, form, "btnClearFilter_Click");
             Check("[필터 해제] -> 모두 (전체) / 37 모두 보임 / 버튼 꺼짐 / 상태 줄", Visible(para) == 37 && filterCombos.All(c => c.SelectedIndex == 0) && !btnClearFilter.Enabled
                 && status.Text == "필터 해제 / 표시 37 / 전체 37", status.Text);
             InvokeWith(type, form, "cboFlt_DropDown", cboFltCond);
             SelectItem(cboFltCond, condRes);
             Invoke(type, form, "btnSearch_Click");
-            Check("같은 Device / 공정 다시 조회 -> 고른 조건 유지 28 / 상태 줄에 필터 표시", cboFltCond.Text == condRes + " (28)" && Visible(para) == 28 && btnClearFilter.Enabled
+            Check("같은 Device / 공정 다시 조회 -> 고른 조건 유지 28 / 상태 줄에 필터 표시", cboFltCond.Text == condRes && Visible(para) == 28 && btnClearFilter.Enabled
                 && status.Text.EndsWith("/ 필터 조건=" + condRes + " 표시 28", StringComparison.Ordinal), status.Text);
 
             // GDS Device 는 고르지 않고 위 E-Test Device 이름으로 조회(2026-10-15): 그 이름의 GDS(시험 Map / Chain)를 지우고 다시 조회하면 빈 목록 그대로
@@ -404,7 +443,7 @@ internal static class EtParaSetupFormSmoke
             cboProgram.SelectedItem = "COWET";
             Application.DoEvents();
             Check("공정 COWET 고름 -> 수정 버림 질문(아니요) -> 원래 공정 TSVET 로 되돌림 / 필터 조건 그대로 28", cboProgram.Text == "TSVET" && para.Rows.Count == 37
-                && form.LastQuestion.Contains("수정 1행") && cboFltCond.Text == condRes + " (28)" && Visible(para) == 28, cboProgram.Text);
+                && form.LastQuestion.Contains("수정 1행") && cboFltCond.Text == condRes && Visible(para) == 28, cboProgram.Text);
             form.Answers.Enqueue(DialogResult.Yes);
             cboProgram.SelectedItem = "COWET";
             Application.DoEvents();
@@ -421,6 +460,47 @@ internal static class EtParaSetupFormSmoke
             Check("진행 표시줄: 삭제 끝 문구 '삭제 (2개) 완료'(처리 시간 없음) / 작업 없음 / 모래시계 풀림",
                 busyBar.LastResult == "삭제 (2개) 완료" && busyBar.DisplayText == "삭제 (2개) 완료" && !busyBar.IsBusy && !form.UseWaitCursor,
                 busyBar.DisplayText);
+
+            // 여러 칸 복사 / 붙여넣기(2026-10-21): Excel 같은 탭 / 줄바꿈 글자를 고른 칸부터 같은 모양으로, 표 복사(Ctrl+C) -> 다른 행에 Ctrl+V,
+            // 한 값을 여러 칸에, 읽기 전용 칸 건너뜀 / 체크 열 Y·N, 표 밖 버림
+            form.Clipboard = "ZZ_A\t1\t2\r\nZZ_B\t3\t4\r\n";
+            SelectOnly(para, para.Rows[0].Cells["colPGds"]);
+            Key(type, form, "dgvPara_KeyDown", Keys.Control | Keys.V);
+            DataGridViewRow c0 = para.Rows[0], c1 = para.Rows[1];
+            Check("Excel 2행 x 3칸 붙여넣기 -> GDS Chain / Lower / Upper 6칸 / 노란색 / 수정 2행 / 상태 줄", Cell(c0, "colPGds") == "ZZ_A" && Cell(c0, "colPLower") == "1"
+                && Cell(c0, "colPUpper") == "2" && Cell(c1, "colPGds") == "ZZ_B" && Cell(c1, "colPLower") == "3" && Cell(c1, "colPUpper") == "4"
+                && c1.Cells["colPUpper"].Style.BackColor == Color.LightYellow && Dirty(type, form) == 2 && status.Text == "붙여넣기 6칸 (저장 전)", status.Text);
+            para.ClearSelection();
+            foreach (DataGridViewRow r in new[] { c0, c1 })
+                foreach (string col in new[] { "colPGds", "colPLower", "colPUpper" }) r.Cells[col].Selected = true;
+            string copiedBlock = para.GetClipboardContent().GetText();
+            form.Clipboard = copiedBlock;
+            SelectOnly(para, para.Rows[2].Cells["colPGds"]);
+            Key(type, form, "dgvPara_KeyDown", Keys.Control | Keys.V);
+            DataGridViewRow c2 = para.Rows[2], c3 = para.Rows[3];
+            Check("표에서 여러 칸 드래그 복사(머리글 없이) -> 다른 행에 Ctrl+V = 같은 모양 6칸", para.ClipboardCopyMode == DataGridViewClipboardCopyMode.EnableWithoutHeaderText
+                && copiedBlock.TrimEnd() == "ZZ_A\t1\t2\r\nZZ_B\t3\t4" && Cell(c2, "colPGds") == "ZZ_A" && Cell(c2, "colPUpper") == "2" && Cell(c3, "colPGds") == "ZZ_B"
+                && Cell(c3, "colPLower") == "3" && Dirty(type, form) == 4 && status.Text == "붙여넣기 6칸 (저장 전)", copiedBlock.Replace("\t", "|").Replace("\r\n", " / "));
+            form.Clipboard = "채움\r\n";
+            para.ClearSelection();
+            foreach (DataGridViewRow r in new[] { c0, c1, c2 }) r.Cells["colPRemark"].Selected = true;
+            Key(type, form, "dgvPara_KeyDown", Keys.Control | Keys.V);
+            Check("한 값을 고른 3칸 모두에", new[] { c0, c1, c2 }.All(r => Cell(r, "colPRemark") == "채움") && status.Text == "붙여넣기 3칸 (저장 전)", status.Text);
+            List<DataGridViewColumn> shown = para.Columns.Cast<DataGridViewColumn>().Where(c => c.Visible).OrderBy(c => c.DisplayIndex).ToList();
+            DataGridViewColumn afterUnit = shown[shown.IndexOf(para.Columns["colPUnit"]) + 1];
+            DataGridViewRow c4 = para.Rows[4], c5 = para.Rows[5];
+            string unit4 = Cell(c4, "colPUnit");
+            form.Clipboard = "x\tN\r\nx\tQ\r\n";
+            SelectOnly(para, c4.Cells["colPUnit"]);
+            Key(type, form, "dgvPara_KeyDown", Keys.Control | Keys.V);
+            Check("읽기 전용 칸(단위)은 자리만 차지하고 그대로 / 사용 열 N -> 해제 / Y·N 아닌 값(Q)은 건너뜀", afterUnit.Name == "colPUse" && Cell(c4, "colPUnit") == unit4
+                && !Checked(c4, "colPUse") && Checked(c5, "colPUse")
+                && status.Text == "붙여넣기 1칸 (저장 전) / 바꿀 수 없는 칸 2개 건너뜀 / 사용 · Enable 에 Y / N 이 아닌 값 1개 건너뜀", afterUnit.Name + " / " + status.Text);
+            form.Clipboard = "ZZ_C\r\nZZ_D\r\n";
+            DataGridViewRow last = para.Rows[para.Rows.Count - 1];
+            SelectOnly(para, last.Cells["colPGds"]);
+            Key(type, form, "dgvPara_KeyDown", Keys.Control | Keys.V);
+            Check("마지막 행에 2행 붙여넣기 -> 1칸만 / 표 밖 1칸 버림", Cell(last, "colPGds") == "ZZ_C" && status.Text == "붙여넣기 1칸 (저장 전) / 표 밖 1칸 버림", status.Text);
 
             // 진행 표시줄: 작업 중 문구 / 모래시계 / 키 입력 막기, 끝나면 입력 받음 / 예외는 그대로 전달
             // Factory 칸은 2026-10-15 부터 읽기 전용(로그인 Factory)이라 키 입력 막기 검사 동안만 입력 가능하게 둔다
@@ -484,6 +564,37 @@ internal static class EtParaSetupFormSmoke
             int done = header.Rows.Cast<DataGridViewRow>().Count(r => Cell(r, "colHStatus") == "등록됨");
             Check("등록 화면 다시 열기: 등록됨 37 / TR 행 GDS Chain(tsvdc_tr_fl) · Spec(~ 715) 열", done == 37 && Cell(trRow, "colHGds") == "tsvdc_tr_fl"
                 && Cell(trRow, "colHSpec").Trim() == "~ 715" && !Checked(trRow, "colHCheck") && trRow.Cells["colHCheck"].ReadOnly, Cell(trRow, "colHGds") + " / " + Cell(trRow, "colHSpec"));
+
+            // ================= D) Device 삭제 (2026-10-22): 등록 Device 콤보 / 확인 아니요 = 그대로 / 예 = 업로드 파일 + 모든 공정 Parameter · Spec 삭제 =================
+            if (!keep)
+            {
+                var cboRegDevice = (ComboBox)Get(rtype, form, "cboRegDevice");
+                var btnDeleteDevice = (Button)Get(rtype, form, "btnDeleteDevice");
+                var regStatus = (Label)Get(rtype, form, "lblStatus");
+                List<DataRow> progRows = bsl.GetEtParaProgramList(Factory).Rows.Cast<DataRow>().Where(r => r["DEVICE_ID"].ToString() == etDevice).ToList();
+                int paraTotal = progRows.Sum(r => Convert.ToInt32(r["PARA_COUNT"], CultureInfo.InvariantCulture));
+                int fileTotal = bsl.GetEtFileList(Factory, etDevice).Rows.Count;
+                string tsvetLine = "TSVET: Parameter " + bsl.GetEtParameterList(Factory, etDevice, "TSVET").Rows.Count + " / Spec " + bsl.GetEtLimit(Factory, etDevice, "TSVET").Rows.Count
+                    + " / 업로드 파일 " + fileTotal;
+                string itemText = Convert.ToString(cboRegDevice.SelectedItem);
+                form.Answers.Enqueue(DialogResult.No);
+                Invoke(rtype, form, "btnDeleteDevice_Click");
+                string question = form.LastQuestion;
+                bool kept = bsl.GetEtParaProgramList(Factory).Rows.Cast<DataRow>().Count(r => r["DEVICE_ID"].ToString() == etDevice) == progRows.Count
+                    && bsl.GetEtFileList(Factory, etDevice).Rows.Count == fileTotal;
+                Check("Device 삭제: 콤보 = 파일 Device 이름만 / 버튼 켜짐 / 확인 창 공정별 Parameter · Spec · 업로드 파일 / 아니요 -> 그대로",
+                    itemText == etDevice && btnDeleteDevice.Enabled && fileTotal == 1
+                    && question.Contains("Device " + etDevice + " 를 삭제합니다") && question.Contains(tsvetLine) && question.Contains("업로드 파일 " + fileTotal + "개는") && kept,
+                    itemText + " / " + question.Replace("\r\n", " | "));
+                form.Answers.Enqueue(DialogResult.Yes);
+                Invoke(rtype, form, "btnDeleteDevice_Click");
+                int newAfter = header.Rows.Cast<DataGridViewRow>().Count(r => Cell(r, "colHStatus") == "신규");
+                Check("Device 삭제(예): 업로드 파일 0 / 등록 공정 0 / Spec 0 / 콤보에서 빠짐 / 열어 둔 파일 헤더 2,755 신규 / 상태 줄",
+                    bsl.GetEtFileList(Factory, etDevice).Rows.Count == 0 && !bsl.GetEtParaProgramList(Factory).Rows.Cast<DataRow>().Any(r => r["DEVICE_ID"].ToString() == etDevice)
+                    && bsl.GetEtLimit(Factory, etDevice, "TSVET").Rows.Count == 0 && !cboRegDevice.Items.Cast<object>().Any(o => o.ToString() == etDevice)
+                    && newAfter == 2755 && regStatus.Text == "Device " + etDevice + " 삭제 / 업로드 파일 " + fileTotal + " / Parameter " + paraTotal + " (공정 " + progRows.Count + ")",
+                    regStatus.Text + " / 신규 " + newAfter);
+            }
             form.Close();
         }
 
@@ -618,12 +729,12 @@ internal static class EtParaSetupFormSmoke
         Application.DoEvents();
     }
 
-    /// <summary>콤보에서 글자가 "값 (" 로 시작하는 항목을 고른다(사용자가 고른 것과 같이 SelectedIndexChanged 가 돈다).</summary>
+    /// <summary>콤보에서 글자가 값과 같은 항목을 고른다(사용자가 고른 것과 같이 SelectedIndexChanged 가 돈다).</summary>
     private static void SelectItem(ComboBox combo, string value)
     {
         for (int i = 0; i < combo.Items.Count; i++)
         {
-            if (!combo.Items[i].ToString().StartsWith(value + " (", StringComparison.Ordinal)) continue;
+            if (combo.Items[i].ToString() != value) continue;
             combo.SelectedIndex = i;
             Application.DoEvents();
             return;
@@ -691,6 +802,14 @@ internal static class EtParaSetupFormSmoke
     {
         type.GetMethod(method, BindingFlags.Instance | BindingFlags.NonPublic).Invoke(instance, new object[] { grid, new DataGridViewCellEventArgs(column, row) });
         Application.DoEvents();
+    }
+
+    /// <summary>다른 선택을 풀고 칸 하나만 지금 칸 + 선택으로 둔다(사용자가 그 칸을 클릭한 것과 같음).</summary>
+    private static void SelectOnly(DataGridView grid, DataGridViewCell cell)
+    {
+        grid.ClearSelection();
+        grid.CurrentCell = cell;
+        cell.Selected = true;
     }
 
     private static void Key(Type type, object instance, string method, Keys keys)

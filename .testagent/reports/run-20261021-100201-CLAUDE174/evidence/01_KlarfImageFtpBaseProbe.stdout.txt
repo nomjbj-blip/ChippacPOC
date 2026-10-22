@@ -1,0 +1,17 @@
+BSL: C:\Users\USER\AppData\Local\Temp\ChippacBuild\CLAUDE-174\DACrux.SEMDMS.BSL.dll
+PASS / P1 기준 없음 = 지금 규칙(드라이브 루트 뺌) / FTP/SCK/20261021/LOT_A
+PASS / P1b 기준 빈 칸 = 지금 규칙 / FTP/SCK/20261021/LOT_A
+PASS / P2 기준 = DMS_IMAGE 폴더 -> 날짜/Lot / 20261021/LOT_A
+PASS / P3 기준 끝 \ / 앞뒤 공백 / 20261021/LOT_A
+PASS / P4 대소문자 다름 / 20261021/LOT_A
+PASS / P5 기준 = FTP 루트(C:\FTP) -> DMS_IMAGE/날짜/Lot / DMS_IMAGE/20261021/LOT_A
+PASS / P6 저장 폴더가 기준 밖 -> 오류 / ERR:이미지 저장 폴더가 FTP 기준 폴더(KLARF_IMAGE_FTP_BASE) 아래가 아닙니다. KLARF_IMAGE_ROOT 를 확인하세요: D:\FTP\SCK\20261021\LOT_A / 기준 C:\FTP\DMS_IMAGE\
+PASS / P7 이름 앞부분만 같은 기준(C:\FTP\DMS) -> 오류 / ERR:이미지 저장 폴더가 FTP 기준 폴더(KLARF_IMAGE_FTP_BASE) 아래가 아닙니다. KLARF_IMAGE_ROOT 를 확인하세요: C:\FTP\DMS_IMAGE\20261021\LOT_A / 기준 C:\FTP\DMS\
+PASS / P8 기준이 상대 경로 -> 오류 / ERR:이미지 FTP 기준 폴더 설정(KLARF_IMAGE_FTP_BASE)은 절대 경로여야 합니다: FTP\DMS_IMAGE
+PASS / P9 화면 FTP 경로 = MAIN_PATH + DB 경로 + 파일 / /DMS_IMAGE/20261021/LOT_A/a.jpg | /DMS_IMAGE/20261021/LOT_A/a.jpg | /%2f/FTP/SCK/20261021/LOT_A/a.jpg
+PASS / E1 ROOT = BASE = DMS_IMAGE 폴더: DB 경로 = 날짜/Lot, 이미지 15 + KLARF 복사 / DB 경로 20261021/PFIC_RH-HS2615_C4BUMP / 저장 이미지 15 / 폴더 파일 31
+PASS / E1b 화면 경로(/DMS_IMAGE + DB 경로)가 실제 파일을 가리킴(FTP 루트 = 작업\FTP 로 가정) / /DMS_IMAGE/20261021/PFIC_RH-HS2615_C4BUMP/XD106.02_-1_1_0_12_RDLopen_53.jpg -> C:\Users\USER\AppData\Local\Temp\chippac\ftpbase_probe\FTP\DMS_IMAGE\20261021\PFIC_RH-HS2615_C4BUMP\XD106.02_-1_1_0_12_RDLopen_53.jpg
+PASS / E2 BASE 없음 = 지금 규칙(드라이브 루트 뺌) / DB 경로 Users/USER/AppData/Local/Temp/chippac/ftpbase_probe/D_FTP/SCK/20261021/PFIC_RH-HS2615_C4BUMP
+PASS / E3 ROOT 가 BASE 밖 -> 복사 전에 오류(폴더 안 만듦) / ERR:이미지 저장 폴더가 FTP 기준 폴더(KLARF_IMAGE_FTP_BASE) 아래가 아닙니다. KLARF_IMAGE_ROOT 를 확인하세요: C:\Users\USER\AppData\Local\Temp\chippac\ftpbase_probe\OTHER\DMS_IMAGE\20261021\PFIC_RH-HS2615_C4BUMP / 기준 C:\Users\USER\AppData\Local\Temp\chippac\ftpbase_probe\FTP\DMS_IMAGE\ / 폴더 있음 False
+
+KLARF_IMAGE_FTP_BASE_PROBE=PASS (14/14)

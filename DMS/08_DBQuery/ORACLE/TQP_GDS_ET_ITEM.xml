@@ -60,12 +60,15 @@
             <param direction="Input" dbtype="VarChar" size="200">:test_program</param>
         </parameters>
     </query>
-    <query statement="Select" queryid="SELECT_ET_PARA_SETUP_LIST" commandtype="Text" description="Para 설정 화면: 등록 Parameter + GDS Chain + Spec (2026-10-14, 같은 날 값 통계 열은 화면에서 쓰지 않아 삭제)" commandtimeout="120">
+    <query statement="Select" queryid="SELECT_ET_PARA_SETUP_LIST" commandtype="Text" description="Para 설정 화면: 등록 Parameter + YMS 이름 / YMS 반영 여부(2026-10-21) + GDS Chain + Spec (2026-10-14, 같은 날 값 통계 열은 화면에서 쓰지 않아 삭제). 바인드 순서 f1 d1 t1 p f2 d2 t2" commandtimeout="120">
         <commandtext><![CDATA[WITH L AS (SELECT S.ITEM_NAME, S.LOWER_LIMIT, S.UPPER_LIMIT, S.ENABLE_FLAG, S.UNIT, S.SPEC_TEXT,
                   NVL(S.UPDATE_USER, S.CREATE_USER) AS SPEC_USER, NVL(S.UPDATE_TIME, S.CREATE_TIME) AS SPEC_TIME
              FROM TQP_GDS_ET_LIMIT S
             WHERE S.FACTORY = :f1 AND S.DEVICE_ID = :d1 AND S.TEST_PROGRAM = :t1)
-SELECT I.ET_ITEM_SEQ, I.ITEM_NAME, I.HEADER_TEXT, I.MEAS_TYPE, I.PARA_NAME, I.COND_VALUE, I.CHAIN_NAME, I.CHAIN_NAME2,
+SELECT I.ET_ITEM_SEQ, I.ITEM_NAME, I.YMS_PARAM_NAME,
+       CASE WHEN EXISTS (SELECT 1 FROM TQP_PARASPEC P
+                          WHERE P.FACTORY = I.FACTORY AND P.PROGRAM = :p AND P.PARAM_NAME = I.YMS_PARAM_NAME) THEN 'Y' ELSE 'N' END AS YMS_PUBLISHED,
+       I.HEADER_TEXT, I.MEAS_TYPE, I.PARA_NAME, I.COND_VALUE, I.CHAIN_NAME, I.CHAIN_NAME2,
        I.UNIT AS ITEM_UNIT, I.TEST_NO, I.DISPLAY_ORDER, I.USE_FLAG, I.REG_SOURCE, I.REG_FILE_NAME, I.REMARK, I.GDS_CHAIN_NAME,
        CASE WHEN L.ITEM_NAME IS NOT NULL THEN 'Y' ELSE 'N' END AS HAS_SPEC,
        L.LOWER_LIMIT, L.UPPER_LIMIT, L.ENABLE_FLAG, NVL(L.UNIT, I.UNIT) AS UNIT, L.SPEC_TEXT,
@@ -81,13 +84,14 @@ SELECT I.ET_ITEM_SEQ, I.ITEM_NAME, I.HEADER_TEXT, I.MEAS_TYPE, I.PARA_NAME, I.CO
             <param direction="Input" dbtype="VarChar" size="120">:f1</param>
             <param direction="Input" dbtype="VarChar" size="200">:d1</param>
             <param direction="Input" dbtype="VarChar" size="200">:t1</param>
+            <param direction="Input" dbtype="VarChar" size="200">:p</param>
             <param direction="Input" dbtype="VarChar" size="120">:f2</param>
             <param direction="Input" dbtype="VarChar" size="200">:d2</param>
             <param direction="Input" dbtype="VarChar" size="200">:t2</param>
         </parameters>
     </query>
-    <query statement="Select" queryid="SELECT_ET_PARA_BY_PROGRAM" commandtype="Text" description="Para 등록 검사: Device + 공정의 등록 Parameter 이름 / 원문 / 단위 (2026-10-14)" commandtimeout="60">
-        <commandtext><![CDATA[SELECT ET_ITEM_SEQ, ITEM_NAME, HEADER_TEXT, UNIT, USE_FLAG
+    <query statement="Select" queryid="SELECT_ET_PARA_BY_PROGRAM" commandtype="Text" description="Para 등록 검사: Device + 공정의 등록 Parameter 이름 / YMS 이름(2026-10-21) / 원문 / 단위 (2026-10-14)" commandtimeout="60">
+        <commandtext><![CDATA[SELECT ET_ITEM_SEQ, ITEM_NAME, YMS_PARAM_NAME, HEADER_TEXT, UNIT, USE_FLAG
   FROM TQP_GDS_ET_ITEM
  WHERE FACTORY = :factory
    AND DEVICE_ID = :device_id
@@ -98,13 +102,14 @@ SELECT I.ET_ITEM_SEQ, I.ITEM_NAME, I.HEADER_TEXT, I.MEAS_TYPE, I.PARA_NAME, I.CO
             <param direction="Input" dbtype="VarChar" size="200">:test_program</param>
         </parameters>
     </query>
-    <query statement="Insert" queryid="CREATE_ET_PARA" commandtype="Text" description="Parameter 등록 (InsertExecuteMultiple, 번호는 시퀀스 ET_ITEM_SEQ, 2026-10-14)" commandtimeout="600">
+    <query statement="Insert" queryid="CREATE_ET_PARA" commandtype="Text" description="Parameter 등록 (InsertExecuteMultiple, 번호는 시퀀스 ET_ITEM_SEQ, 2026-10-14 / YMS_PARAM_NAME 2026-10-21)" commandtimeout="600">
         <commandtext><![CDATA[INSERT INTO TQP_GDS_ET_ITEM
     (ET_ITEM_SEQ,
     FACTORY,
     DEVICE_ID,
     TEST_PROGRAM,
     ITEM_NAME,
+    YMS_PARAM_NAME,
     HEADER_TEXT,
     PARA_NAME,
     COND_VALUE,
@@ -130,6 +135,7 @@ VALUES
     :device_id,
     :test_program,
     :item_name,
+    :yms_param_name,
     :header_text,
     :para_name,
     :cond_value,
@@ -154,6 +160,7 @@ VALUES
             <param direction="Input" dbtype="VarChar" size="200">:device_id</param>
             <param direction="Input" dbtype="VarChar" size="200">:test_program</param>
             <param direction="Input" dbtype="VarChar" size="800">:item_name</param>
+            <param direction="Input" dbtype="VarChar" size="120">:yms_param_name</param>
             <param direction="Input" dbtype="VarChar" size="800">:header_text</param>
             <param direction="Input" dbtype="VarChar" size="200">:para_name</param>
             <param direction="Input" dbtype="VarChar" size="80">:cond_value</param>
@@ -192,6 +199,34 @@ VALUES
             <param direction="Input" dbtype="VarChar" size="200">:device_id</param>
             <param direction="Input" dbtype="VarChar" size="200">:test_program</param>
             <param direction="Input" dbtype="VarChar" size="800">:item_name</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="UPDATE_ET_YMS_NAME" commandtype="Text" description="Para 설정 저장: YMS 이름 수정 (바뀐 행만, YMS 반영 전 Parameter 만, UpdateExecuteMultiple 1회, 2026-10-21)" commandtimeout="300">
+        <commandtext><![CDATA[UPDATE TQP_GDS_ET_ITEM
+   SET YMS_PARAM_NAME = :yms_param_name,
+       UPDATE_USER = :update_user,
+       UPDATE_TIME = SYSDATE
+ WHERE FACTORY = :factory
+   AND DEVICE_ID = :device_id
+   AND TEST_PROGRAM = :test_program
+   AND ITEM_NAME = :item_name]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="120">:yms_param_name</param>
+            <param direction="Input" dbtype="VarChar" size="120">:update_user</param>
+            <param direction="Input" dbtype="VarChar" size="120">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="200">:device_id</param>
+            <param direction="Input" dbtype="VarChar" size="200">:test_program</param>
+            <param direction="Input" dbtype="VarChar" size="800">:item_name</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ET_YMS_PUBLISHED_NAMES" commandtype="Text" description="YMS 이름 수정 검사: YMS 에 이미 반영된 컬럼 이름(TQP_PARASPEC.PARAM_NAME) 목록. Program = Device_공정 (2026-10-21)" commandtimeout="60">
+        <commandtext><![CDATA[SELECT DISTINCT PARAM_NAME
+  FROM TQP_PARASPEC
+ WHERE FACTORY = :factory
+   AND PROGRAM = :program]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="120">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="200">:program</param>
         </parameters>
     </query>
     <query statement="Select" queryid="SELECT_ET_GDS_SETUP_CHAIN" commandtype="Text" description="Para 설정 오른쪽 목록: GDS Device 의 Setup Chain (ACTIVE + 현재 READY 버전) (2026-10-14, 대표 Chain XML 에서 옮김)" commandtimeout="60">

@@ -1,0 +1,26 @@
+﻿{
+    "id":  "02",
+    "name":  "MarkDump",
+    "scenarios":  [
+                      "SCN-M"
+                  ],
+    "status":  "PASS",
+    "exitCode":  0,
+    "timedOut":  false,
+    "durationMs":  45015,
+    "started":  "2026-10-20 10:02:41",
+    "command":  "C:\\Users\\USER\\AppData\\Local\\Temp\\ChippacGdsKlarfAnalysisVerification\\bin\\F07MarkCheck.exe \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\reports\\run-20261020-095726-CLAUDE-153\\evidence\\ui\" 603 SCK OMM_TCB SCKLOTIDA-01 SCKLOTIDA OMM_TCB",
+    "workingDir":  "C:\\Users\\USER\\AppData\\Local\\Temp\\ChippacGdsKlarfAnalysisVerification\\bin",
+    "keys":  {
+                 "MARK_DUMP":  "PASS"
+             },
+    "passLines":  0,
+    "failLines":  [
+
+                  ],
+    "skipLines":  [
+
+                  ],
+    "stdout":  "02_MarkDump.stdout.txt",
+    "stderr":  "02_MarkDump.stderr.txt"
+}

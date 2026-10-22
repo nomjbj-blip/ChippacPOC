@@ -1,0 +1,14 @@
+﻿원본: 열 2766 (고정 11 + 측정 2755, 같은 이름 머리 0) / DUT 73 / Wafer ID 열 {'U9-HS2635-01': 73}
+PASS / E1 파일 정보: 파일 이름 / 공정 TSVET / 시각(파일 이름) / DUT 수 / 머리 수 / DB CAI_OMMTCB_ATV_A0_TSVET_20261002161846_SCKLOTIDA_SCKLOTIDA-01$Silterra$.xlsx / TSVET / 20261002161846 / DUT 73 / 머리 2755
+FAIL / E2 Wafer: DB WAFER_ID(파일 이름 Lot-Wafer No) = 내용의 Wafer ID 열 / DB SCKLOTIDA-01(LOT SCKLOTIDA, SLOT 1) / 내용 {'U9-HS2635-01': 73} -> 이 파일은 내용상 다른 Wafer 의 E-Test
+PASS / E3 Die 73행: (X, Y) / HW Bin / SW Bin / DUT Flag(P/F) / Test 시각 / Tests Executed / Head-Site 1:1 / 다른 값 {} 예 {} / DB Die 73
+FAIL / E5 측정 값: 저장 항목 85 x DUT 73 = 6205 값이 원본 칸과 같음(HEADER_TEXT 로 열 찾기) / 열 못 찾음 [] / 다른 값 1 예 [(1, 'Connectivity_iforce=8.0mA@TSVDC_TR_FH', 5.75, '6.75', 'V')] / DB 값 6205 / VALUE_COUNT 6205
+PASS / E5b 저장 항목의 머리 원문이 파일 안에서 한 번만 나옴(같은 이름 머리를 잘못 고르지 않음) / 중복 머리 []
+PASS / E6 값 판정(JUDGE_FLAG) = DB Spec(하한 ≤ 값 ≤ 상한, '-' / 빈 값 Fail) 다시 계산 6205 값 / 다른 판정 0 예 [] / Spec 문구 모양 {'If val = "-" or abs(val) > N, Fail; otherwise, Pass': 9, 'If val > N, Fail; otherwise, Pass': 28}
+PASS / E7 Die 판정(JUDGE_FLAG / FAIL_COUNT) = 그 Die 의 Fail 값 수(1개 이상이면 F) / 다른 Die [] / Spec Fail Die 25
+PASS / E4 DB Pass / Fail Die 수(TQP_GDS_ET_FILE, [E-Test] 표 Fail Die) = 다시 계산한 Spec 판정 Die 수 / DB Pass 48 / Fail 25 / 다시 계산 Pass 48 / Fail 25 (참고: 파일 DUT Flag Pass 0 / Fail 73)
+참고 / DMS Spec 판정과 파일 DUT Flag 가 다른 Die 48 개 (Spec Out F 25 / 파일 Fail 73)
+참고 / 파일 Upper·Lower 행과 DB Spec 이 다른 항목 28 개 예 [('RESISTANCE_IFORCE_8P0MA_TSVDC_TR_FH', (0.0, 700.0), ('', '715')), ('RESISTANCE_IFORCE_8P0MA_TSVDC_R_N_FH', (0.0, 700.0), ('', '715')), ('RESISTANCE_IFORCE_8P0MA_TSVDC_R_P_FH', (0.0, 700.0), ('', '715'))]
+PASS / E9 E-Test 좌표 -> DMS Map 좌표 = 고객 대응표(Back-side KLARF) + KLARF->DMS 이동(7, 5), 모두 KLARF 검사 Die 안 / 대응표와 다른 Die 0 예 [] / 대응표 행 76 / 검사 Die 밖 [] / 겹침 0
+
+ETEST_CHECK_PROBE=FAIL (7/9)

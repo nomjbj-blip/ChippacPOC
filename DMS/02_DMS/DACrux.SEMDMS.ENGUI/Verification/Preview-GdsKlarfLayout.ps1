@@ -67,7 +67,7 @@ foreach ($dir in $clientBin, $serverBin) {
 & $csc /nologo /target:exe /platform:anycpu "/out:$out\GdsKlarfLayoutPreview.exe" /r:System.Windows.Forms.dll /r:System.Drawing.dll /r:System.Data.dll /r:System.Core.dll `
     "/r:$out\DACrux.SEMDMS.ENGUI.dll" "/r:$out\DACrux.Framework.Base.dll" "/r:$out\DACrux.Base.dll" "/r:$out\DACrux.Map.dll" `
     "/r:$out\DACrux.SEMDMS.RO.dll" "/r:$out\DACrux.SEMDMS.Interface.dll" "/r:$out\DACrux.SEMDMS.BSL.dll" "/r:$out\Miracom.Middleware.dll" `
-    "/r:$out\NexplantQMS.GdsMap.exe" "/r:$out\OpenTK.dll" "/r:$out\OpenTK.GLControl.dll" "$PSScriptRoot\GdsKlarfLayoutPreview.cs"
+    "/r:$out\NexplantQMS.GdsMap.dll" "/r:$out\OpenTK.dll" "/r:$out\OpenTK.GLControl.dll" "$PSScriptRoot\GdsKlarfLayoutPreview.cs"
 if ($LASTEXITCODE -ne 0) { throw '시안 실행 파일 빌드 실패' }
 [xml]$x = Get-Content (Join-Path $serverBin 'DACrux.SEMDMS.Service.exe.config') -Encoding UTF8
 $remoting = $x.configuration.'system.runtime.remoting'

@@ -1,0 +1,26 @@
+﻿{
+    "id":  "02",
+    "name":  "DetailDump",
+    "scenarios":  [
+                      "SCN-B"
+                  ],
+    "status":  "PASS",
+    "exitCode":  0,
+    "timedOut":  false,
+    "durationMs":  21351,
+    "started":  "2026-10-19 16:54:50",
+    "command":  "C:\\Users\\USER\\AppData\\Local\\Temp\\ChippacGdsKlarfAnalysisVerification\\bin\\F07DetailCheck.exe \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\reports\\run-20261019-164515-CLAUDE-148\\evidence\\ui\" SCK OMM_TCB SCKLOTIDA-01 582 331 4 6",
+    "workingDir":  "C:\\Users\\USER\\AppData\\Local\\Temp\\ChippacGdsKlarfAnalysisVerification\\bin",
+    "keys":  {
+                 "DETAIL_DUMP":  "PASS"
+             },
+    "passLines":  0,
+    "failLines":  [
+
+                  ],
+    "skipLines":  [
+
+                  ],
+    "stdout":  "02_DetailDump.stdout.txt",
+    "stderr":  "02_DetailDump.stderr.txt"
+}

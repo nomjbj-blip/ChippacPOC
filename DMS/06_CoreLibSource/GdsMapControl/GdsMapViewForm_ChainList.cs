@@ -76,10 +76,24 @@ namespace NexplantQMS.GdsMap
         private ChainDefinition _activeChain;
         private bool _switchingChain;
         private bool _chainTraceInProgress;
-        /// <summary>더블클릭으로 체크를 바꾸는 중인지. 이때만 목록 체크 변경을 받는다(2026-10-13).</summary>
-        private bool _chainCheckByDoubleClick;
         private bool _showingHiddenChainStatus;
         private int _nextChainOrdinal;
+        /// <summary>
+        /// Chain 별로 만든 지도 외곽선(표시 키 / Code / 색이 같으면 다시 만들지 않음). Chain 을 하나 고를 때마다
+        /// 보이는 Chain 전체의 도형을 다시 찾으면 Chain 이 수만 개일 때 클릭마다 수 초가 걸렸다 (2026-10-21).
+        /// 지도를 다시 그리면(도형 객체가 바뀜) 비운다(_chainOverlayCacheMap).
+        /// </summary>
+        private readonly Dictionary<ChainDefinition, ChainOverlayCache> _chainOverlayCache = new Dictionary<ChainDefinition, ChainOverlayCache>();
+        private object _chainOverlayCacheMap;
+
+        /// <summary>Chain 하나의 저장된 외곽선과 그때의 표시 키 / Code / 색.</summary>
+        private sealed class ChainOverlayCache
+        {
+            public HashSet<string> Keys;
+            public string Code;
+            public Color Color;
+            public ChainVisibleOverlay Overlay;
+        }
 
         /// <summary>목록에서 선택한 행이 실제 편집 대상 Chain인지 확인해 빈 목록의 잔여 상태를 차단한다.</summary>
         private bool HasSelectedChain => _activeChain != null && _chains.Contains(_activeChain)
@@ -109,31 +123,59 @@ namespace NexplantQMS.GdsMap
             DeleteActiveChain();
         }
 
-        /// <summary>Chain 목록 행을 더블클릭하면 지도 표시 체크를 바꾼다. 한 번 클릭은 행 선택(편집 대상)만 한다(2026-10-13).</summary>
-        private void ChainList_MouseDoubleClick(object sender, MouseEventArgs e)
+        /// <summary>
+        /// [전체 체크]: 목록의 모든 Chain 을 지도에 표시한다(Layer 목록 [전체 체크]와 같은 방식) (2026-10-21).
+        /// Chain 이 많으면(ChainLoadVisibleLimit 초과) 외곽선이 수천만 점이 되어 오래 걸리고 메모리를 많이 쓰므로 먼저 묻는다.
+        /// </summary>
+        private void BtnChainCheckAll_Click(object sender, EventArgs e)
         {
-            ToggleCheckByDoubleClick(_chainList, e);
+            if (_chains.Count > ChainLoadVisibleLimit
+                && MessageBox.Show(this, "Chain " + _chains.Count.ToString("N0") + "개를 모두 지도에 표시합니다.\r\n\r\n"
+                    + "외곽선이 많아 표시까지 오래 걸리고 메모리를 많이 쓸 수 있습니다. 계속하시겠습니까?",
+                    "전체 체크", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+                return;
+            SetAllChainsVisible(true);
+        }
+
+        /// <summary>[전체 미체크]: 목록의 모든 Chain 을 지도에서 숨긴다(목록과 편집 내용은 그대로) (2026-10-21).</summary>
+        private void BtnChainCheckNone_Click(object sender, EventArgs e)
+        {
+            SetAllChainsVisible(false);
         }
 
         /// <summary>
-        /// 더블클릭한 행의 체크를 뒤집는다. Chain 목록 / 유사 묶음 목록이 함께 쓴다.
-        /// CheckedListBox 는 이미 선택된 행을 다시 클릭하거나 Space 키를 누르면 스스로 체크를 바꾸므로,
-        /// 각 목록의 ItemCheck 는 이 함수가 바꿀 때(_chainCheckByDoubleClick)만 받고 나머지는 되돌린다.
+        /// 모든 Chain 의 지도 표시(체크)를 한 번에 바꾼다. 편집 대상(선택 행)은 바꾸지 않는다.
+        /// 처리 흐름: 편집 중 내용 보관 -> 목록 그리기를 멈추고 행마다 체크와 Visible 을 맞춤(_switchingChain 으로 행마다 ItemCheck 처리를 건너뜀)
+        ///  -> 외곽선을 한 번만 다시 만든다. 행마다 ItemCheck 로 외곽선을 다시 만들면 Chain 이 많을 때 매우 느리다.
         /// </summary>
-        private void ToggleCheckByDoubleClick(CheckedListBox list, MouseEventArgs e)
+        private void SetAllChainsVisible(bool visible)
         {
-            if (e.Button != MouseButtons.Left) return;
-            int index = list.IndexFromPoint(e.Location);
-            if (index < 0 || index >= list.Items.Count || !list.GetItemRectangle(index).Contains(e.Location)) return;
-            _chainCheckByDoubleClick = true;
-            try
+            if (_chainList.Items.Count == 0) return;
+            CaptureActiveChain();
+            if (!visible && _activeChain != null)
+                ClearChainExampleSelection();
+            using (ViewBusy.Busy())
             {
-                list.SetItemChecked(index, !list.GetItemChecked(index));
+                _switchingChain = true;
+                _chainList.BeginUpdate();
+                try
+                {
+                    for (int i = 0; i < _chainList.Items.Count; i++)
+                    {
+                        ((ChainDefinition)_chainList.Items[i]).Visible = visible;
+                        if (_chainList.GetItemChecked(i) != visible)
+                            _chainList.SetItemChecked(i, visible);
+                    }
+                }
+                finally
+                {
+                    _chainList.EndUpdate();
+                    _switchingChain = false;
+                }
+                RefreshChainDisplay();
             }
-            finally
-            {
-                _chainCheckByDoubleClick = false;
-            }
+            UpdateChainSelectionButtons();
+            SetChainStatus("Chain " + _chainList.Items.Count.ToString("N0") + "개를 모두 " + (visible ? "지도에 표시했습니다." : "지도에서 숨겼습니다."));
         }
 
         /// <summary>새 GDS가 로드되면 이전 화면의 SCENE 키와 Chain 초안을 함께 비운다.</summary>
@@ -292,16 +334,14 @@ namespace NexplantQMS.GdsMap
             RestoreActiveChain(next);
         }
 
-        /// <summary>체크 변경은 Chain의 지도 표시만 바꾸고 활성 편집 대상은 바꾸지 않는다. 체크는 더블클릭으로만 바뀐다(2026-10-13).</summary>
+        /// <summary>
+        /// 체크 변경은 Chain의 지도 표시만 바꾸고 활성 편집 대상은 바꾸지 않는다.
+        /// 체크는 행 왼쪽 체크 박스를 눌렀을 때만 바뀐다(2026-10-21, 목록 CheckOnCheckBoxOnly). 행 클릭 / 더블클릭 / Space 키는 행 선택만 한다.
+        /// </summary>
         private void ChainList_ItemCheck(object sender, ItemCheckEventArgs e)
         {
             if (_switchingChain || e.Index < 0 || e.Index >= _chainList.Items.Count)
                 return;
-            if (!_chainCheckByDoubleClick)
-            {
-                e.NewValue = e.CurrentValue;
-                return;
-            }
             if (ReferenceEquals(_chainList.Items[e.Index], _activeChain)
                 && e.NewValue != CheckState.Checked)
                 ClearChainExampleSelection();
@@ -413,13 +453,37 @@ namespace NexplantQMS.GdsMap
                     _showingHiddenChainStatus = true;
                 }
             }
+            // 지도를 다시 그렸으면 저장한 외곽선을 버린다(도형 객체 / 좌표가 새 지도와 다를 수 있음) (2026-10-21)
+            if (!ReferenceEquals(_chainOverlayCacheMap, map.Structure))
+            {
+                _chainOverlayCache.Clear();
+                _chainOverlayCacheMap = map.Structure;
+            }
             var overlays = new List<ChainVisibleOverlay>();
+            var shown = new HashSet<ChainDefinition>();
             foreach (ChainDefinition chain in _chains.Where(item => item.Visible))
             {
                 HashSet<string> keys = GetChainKeys(chain);
-                overlays.Add(new ChainVisibleOverlay(chain.Code, chain.Color,
-                    map.GetChainTraceElements(keys)));
+                // 표시 키 / Code / 색이 그대로인 Chain 은 저장한 외곽선을 쓰고, 바뀐 Chain(편집 중인 Chain 등)만 도형을 다시 찾는다.
+                if (!_chainOverlayCache.TryGetValue(chain, out ChainOverlayCache cached) || cached.Code != chain.Code
+                    || cached.Color != chain.Color || !cached.Keys.SetEquals(keys))
+                {
+                    cached = new ChainOverlayCache
+                    {
+                        Keys = keys,
+                        Code = chain.Code,
+                        Color = chain.Color,
+                        Overlay = new ChainVisibleOverlay(chain.Code, chain.Color, map.GetChainTraceElements(keys))
+                    };
+                    _chainOverlayCache[chain] = cached;
+                }
+                shown.Add(chain);
+                overlays.Add(cached.Overlay);
             }
+            // 지웠거나 숨긴 Chain 의 외곽선은 버린다(다시 보이면 그때 만든다).
+            if (_chainOverlayCache.Count > shown.Count)
+                foreach (ChainDefinition chain in _chainOverlayCache.Keys.Where(item => !shown.Contains(item)).ToList())
+                    _chainOverlayCache.Remove(chain);
             map.SetVisibleChainOverlays(overlays);
             _chainList.Invalidate();
         }
@@ -558,6 +622,8 @@ namespace NexplantQMS.GdsMap
             _btnChainRename.Enabled = free && !_chainExampleSelecting && HasSelectedChain;
             _btnChainDelete.Enabled = free && !_chainExampleSelecting && HasSelectedChain;
             _btnChainDbSave.Enabled = free && !_chainExampleSelecting;
+            _btnChainCheckAll.Enabled = free && !_chainExampleSelecting;
+            _btnChainCheckNone.Enabled = free && !_chainExampleSelecting;
         }
     }
 }

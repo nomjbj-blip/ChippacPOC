@@ -186,23 +186,14 @@ internal static class GdsKlarfLayoutPreview
                 detail.Activate();
                 Application.DoEvents();
                 System.Threading.SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext());
-                // 기능 탭 [GDS / KLARF] [E-Test] [종합 (Die)] (2026-10-19, GDS / KLARF 합침 2026-10-20): 역추적으로 열면 [GDS / KLARF], Die 전체로 열면 [종합 (Die)]
+                // 오른쪽 한 패널 (2026-10-22, 탭 없음): 역추적으로 열면 그 Chain 묶음을 고르고 아래 E-Test 값 = 그 Chain, Die 전체로 열면 아래 = Die 전체
                 Wait(detail.ShowDieAsync(sample, x, y, seq), 600);
                 Pump(1500);
-                Capture(detail, Path.Combine(outDir, "B1_상세_역추적_GDS_KLARF탭.png"));
-                images++;
-                var tabMain = (TabControl)Get(typeof(NexplantQMS.GdsMap.GdsDieAnalysisForm), detail, "tabMain");
-                tabMain.SelectedTab = (TabPage)Get(typeof(NexplantQMS.GdsMap.GdsDieAnalysisForm), detail, "tabEt");
-                Pump(800);
-                Capture(detail, Path.Combine(outDir, "B2_상세_역추적_ETest탭.png"));
+                Capture(detail, Path.Combine(outDir, "B1_상세_역추적_아래ETest값.png"));
                 images++;
                 Wait(detail.ShowDieAsync(sample, x, y, null), 60);
                 Pump(1500);
-                Capture(detail, Path.Combine(outDir, "B3_상세_Die전체_종합탭.png"));
-                images++;
-                tabMain.SelectedTab = (TabPage)Get(typeof(NexplantQMS.GdsMap.GdsDieAnalysisForm), detail, "tabChainDefect");
-                Pump(800);
-                Capture(detail, Path.Combine(outDir, "B4_상세_Die전체_GDS_KLARF탭.png"));
+                Capture(detail, Path.Combine(outDir, "B2_상세_Die전체.png"));
                 images++;
                 Console.WriteLine("화면 B: Die (" + x + ", " + y + ") / Chain " + focus["CHAIN_CODE"] + " / 표시 Fail Chain " + detail.FailChainOverlayCount +" / 상태 " + detail.StatusText);
             }

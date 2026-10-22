@@ -5,7 +5,7 @@
 #       - 호스트 500 x 400 처럼 아주 작게 붙인 뒤 1900 x 1000 으로 키움
 #       - 단독 실행(TopLevel) 1900 x 1000
 #       화면은 화면 밖에 띄우고 DB / Service / GDS 파일을 쓰지 않는다.
-# 실행: powershell -NoProfile -STA -ExecutionPolicy Bypass -File GdsSetupLayoutSmoke.ps1 -GdsExe <빌드한 NexplantQMS.GdsMap.exe>
+# 실행: powershell -NoProfile -STA -ExecutionPolicy Bypass -File GdsSetupLayoutSmoke.ps1 -GdsExe <빌드한 NexplantQMS.GdsMap.dll>
 param(
     [Parameter(Mandatory = $true)][string]$GdsExe
 )

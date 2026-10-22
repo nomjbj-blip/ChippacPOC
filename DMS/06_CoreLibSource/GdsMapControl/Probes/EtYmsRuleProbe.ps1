@@ -114,6 +114,48 @@ $fileMax = ($fileYms | Measure-Object -Property Length -Maximum).Maximum
 $fileDistinct = @($fileYms | Sort-Object -Unique).Count
 Check '샘플 파일 헤더 전체' ($headers.Count -eq 2755 -and $fileProblems.Length -eq 0 -and $fileMax -le 50 -and $fileDistinct -eq 2755) "헤더 $($headers.Count) / 문제 $($fileProblems.Length) / 최대 $fileMax 자 / 서로 다른 이름 $fileDistinct"
 
+# 9. YMS 컬럼 이름 30자 (2026-10-21, 설계: 문서/설계/04_ETest/2026-10-21_ETest_YMS_컬럼이름_30자_설계.md 5절)
+$N = [DACrux.SEMDMS.Interface.EtParameterNameRule]
+$ymsCases = @(
+    @('Resistance_iforce=8.0mA@TSVDC_ASIC_HBM_N_FH', 'RES_8P0MA_TSVDC_ASIC_HBM_N_FH'),
+    @('Connectivity_iforce=8.0mA@TSVDC_ASIC_HBM_P_FH', 'CONN_8P0MA_TSVDC_ASIC_HBM_P_FH'),
+    @('Connectivity_iforce=1.0mA@PIC_SERP1_M2_FH', 'CONN_1P0MA_PIC_SERP1_M2_FH'),
+    @('Resistance_iforce=1.0mA@PIC_EDM_R_FH', 'RES_1P0MA_PIC_EDM_R_FH'),
+    @('Leakage_Parallel@TSVDC_ASIC_HBM_N_FH', 'LKG_PAR_TSVDC_ASIC_HBM_N_FH'),
+    @('Leakage_Serial@TSVDC_ASIC1_N_FH:TSVDC_ASIC1_P_FL', 'LKG_SER_TSVDC_ASIC1_N_FH_P_FL'),
+    @('Leakage_Serial@PIC_SERP1_M2_FL:PIC_SERP1_M3_FL', 'LKG_SER_PIC_SERP1_M2_FL_M3_FL'),
+    @('Leakage_Serial@TSVDC_ASIC_HBM_N_FH:TSVDC_ASIC_HBM_P_FL', 'LKG_SER_TSVDC_ASIC_HB_39C6541C'),
+    @('Resistance@C4DC_1_FH', 'RESISTANCE_C4DC_1_FH')
+)
+foreach ($c in $ymsCases) {
+    $p = $N::Parse($c[0])
+    Check "YMS 이름 $($c[0])" ($p.IsValid -and $p.YmsName -eq $c[1]) "$($p.YmsName) (기대 $($c[1]), $($p.YmsName.Length)자 / Parameter $($p.ParameterName))"
+}
+$short = $N::Parse('Res@X_1')
+Check '30자 이하는 Parameter 이름 그대로' ($short.ParameterName -eq 'RES_X_1' -and $short.YmsName -eq 'RES_X_1') "$($short.ParameterName) -> $($short.YmsName)"
+$plain = $R::ToYmsName('RESISTANCE_SOMETHING_VERY_LONG_NAME_WITHOUT_CHAIN_PARTS', '', '', '', '', '')
+Check '분해 정보 없음 -> 기존 규칙 30자' ($plain.Length -le 30 -and $R::IsValidYmsName($plain) -and $plain -eq $R::ToYmsName('RESISTANCE_SOMETHING_VERY_LONG_NAME_WITHOUT_CHAIN_PARTS', '', '', '', '', '')) "$plain ($($plain.Length)자)"
+Check 'IsValidYmsName' (($R::IsValidYmsName('A' * 30)) -and -not ($R::IsValidYmsName('A' * 31)) -and -not ($R::IsValidYmsName('BIN')) -and -not ($R::IsValidYmsName('1A')) -and -not ($R::IsValidYmsName(''))) '30자 / 31자 / 예약 / 숫자 시작 / 빈 값'
+Check 'IsValidProgramName (26자)' (($R::IsValidProgramName('OMM_TSVET')) -and ($R::IsValidProgramName('08EYP1')) -and ($R::IsValidProgramName('A' * 26)) -and -not ($R::IsValidProgramName('A' * 27)) -and -not ($R::IsValidProgramName('omm')) -and $R::MaxProgramLength -eq 26) 'OMM_TSVET / 08EYP1 / 26자 / 27자 / 소문자'
+$yp = $R::FindYmsNameProblems([string[]]@('A_ITEM', 'B_ITEM', 'A_ITEM', 'C_ITEM'), [string[]]@('X_1', 'X_1', 'X_1', 'bad'))
+Check 'YMS 이름 겹침 / 형식 검사' ($yp.Length -eq 2) ([string]::Join(' | ', $yp))
+$hp = $N::FindNameProblems([string[]]@('Leakage_Serial@A_1_N_FH:A_1_P_FL', 'Leakage_Serial@A_1_N_FH:B_1_P_FL'))
+Check '헤더 검사: 서로 다른 YMS 이름이면 통과' ($hp.Length -eq 0) ([string]::Join(' | ', $hp))
+
+# 샘플 파일 측정 헤더 전체 / Spec 표: YMS 이름 30자 이하, 겹침 없음
+$fileParts = @($headers | ForEach-Object { $N::Parse($_) })
+$bad = @($fileParts | Where-Object { -not $_.IsValid })
+$fileYmsNames = @($fileParts | Where-Object { $_.IsValid } | ForEach-Object { $_.YmsName })
+$ymsMax = ($fileYmsNames | Measure-Object -Property Length -Maximum).Maximum
+$ymsDistinct = @($fileYmsNames | Sort-Object -Unique).Count
+$ymsHashed = @($fileYmsNames | Where-Object { $_ -match '_[0-9A-F]{8}$' }).Count
+$headerProblems = $N::FindNameProblems([string[]]$headers.ToArray())
+Check '샘플 파일 헤더 YMS 이름' ($bad.Count -eq 0 -and $ymsMax -le 30 -and $ymsDistinct -eq $headers.Count -and $headerProblems.Length -eq 0) "헤더 $($headers.Count) / 분해 실패 $($bad.Count) / 최대 $ymsMax 자 / 서로 다른 이름 $ymsDistinct / 해시 $ymsHashed / 검사 문제 $($headerProblems.Length)"
+$specParts = @($specNames | ForEach-Object { $N::Parse($_) } | Where-Object { $_.IsValid })
+$specYmsNames = @($specParts | ForEach-Object { $_.YmsName })
+$specYmsMax = ($specYmsNames | Measure-Object -Property Length -Maximum).Maximum
+Check 'Spec 표 TSVET YMS 이름' ($specParts.Count -eq 37 -and $specYmsMax -le 30 -and @($specYmsNames | Sort-Object -Unique).Count -eq 37) "Parameter $($specParts.Count) / 최대 $specYmsMax 자 / 해시 $(@($specYmsNames | Where-Object { $_ -match '_[0-9A-F]{8}$' }).Count)"
+
 $pass = @($results | Where-Object { $_.StartsWith('PASS') }).Count
 $total = $results.Count
 Write-Host ''

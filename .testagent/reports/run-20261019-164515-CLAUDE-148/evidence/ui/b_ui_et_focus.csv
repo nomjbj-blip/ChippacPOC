@@ -1,0 +1,4 @@
+﻿ROW_TAG,"판정","Parameter","값","Lower","Upper","GDS Chain","Chain","헤더 원문","SEQ[숨김]"
+"","F","RESISTANCE_IFORCE_8P0MA_TSVDC_BOT1_P_FH","719","","715","TSVDC_BOT1_P_FH","TSVDC_BOT1_P_FH","Resistance_iforce=8.0mA@TSVDC_BOT1_P_FH","317"
+"","","CONNECTIVITY_IFORCE_8P0MA_TSVDC_BOT1_P_FH","5.75","","","TSVDC_BOT1_P_FH","TSVDC_BOT1_P_FH","Connectivity_iforce=8.0mA@TSVDC_BOT1_P_FH","317"
+"","","LEAKAGE_PARALLEL_TSVDC_BOT1_P_FL","0.00841","","","TSVDC_BOT1_P_FH","TSVDC_BOT1_P_FL","Leakage_Parallel@TSVDC_BOT1_P_FL","317"

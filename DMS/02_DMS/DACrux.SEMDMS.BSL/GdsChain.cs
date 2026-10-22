@@ -365,6 +365,291 @@ namespace DACrux.SEMDMS.BSL
 
         #endregion
 
+        #region [Chain 상세 범위 조회 (2026-10-21)]
+
+        // Chain 이 수만 개인 Map(U8 같은 형태 Chain 일괄 생성)을 GDS Map View 로 열 때 Chain 마다 4번씩 부르던 상세 조회를
+        // Chain 번호 범위 단위로 묶는다. 화면은 Chain 목록(CHAIN_SEQ)을 받은 뒤 일정 개수씩 범위를 나눠 부르고 CHAIN_SEQ 로 다시 나눈다.
+        // 결과가 큰 표라 Remoting 전송을 Binary 형식으로 한다(XML 대비 크기 약 1/4). 설계: 문서/설계/02_GDS/2026-10-21_U8_Chain_View_조회속도_분석.md S1
+
+        /// <summary>Chain 번호 범위의 탐색 Layer. 결과: CHAIN_SEQ / LAYER_ID / DATA_TYPE.</summary>
+        public DataTable GetChainLayersRange(string strFactory, string strDeviceID, string strFromSeq, string strToSeq)
+        {
+            return BinaryRemoting(new DACrux.SEMDMS.DSL.TQP_GDS_CHAIN_LAYER().GetData("SELECT_CHAIN_LAYER_RANGE", null,
+                ChainRangeKey(strFactory, strDeviceID, strFromSeq, strToSeq)));
+        }
+
+        /// <summary>Chain 번호 범위의 Layer 연결 규칙. 결과: CHAIN_SEQ / FIRST_LAYER_ID / FIRST_DATA_TYPE / SECOND_LAYER_ID / SECOND_DATA_TYPE / TOLERANCE.</summary>
+        public DataTable GetChainRulesRange(string strFactory, string strDeviceID, string strFromSeq, string strToSeq)
+        {
+            return BinaryRemoting(new DACrux.SEMDMS.DSL.TQP_GDS_CHAIN_RULE().GetData("SELECT_CHAIN_RULE_RANGE", null,
+                ChainRangeKey(strFactory, strDeviceID, strFromSeq, strToSeq)));
+        }
+
+        /// <summary>Chain 번호 범위의 포함 도형 + 도형 Layer. 결과: CHAIN_SEQ / PLACED_ELEMENT_ID / ROLE_CODE / INCLUSION_SOURCE / MARKER_X / MARKER_Y / LAYER_ID / DATA_TYPE.</summary>
+        public DataTable GetChainMembersRange(string strFactory, string strDeviceID, string strFromSeq, string strToSeq)
+        {
+            return BinaryRemoting(new DACrux.SEMDMS.DSL.TQP_GDS_CHAIN_MEMBER().GetData("SELECT_CHAIN_MEMBER_RANGE", null,
+                ChainRangeKey(strFactory, strDeviceID, strFromSeq, strToSeq)));
+        }
+
+        /// <summary>Chain 번호 범위의 수동 편집 기록. 결과: CHAIN_SEQ / EDIT_SEQ / PLACED_ELEMENT_ID / ACTION_CODE / BATCH_EDIT_SEQ.</summary>
+        public DataTable GetChainEditsRange(string strFactory, string strDeviceID, string strFromSeq, string strToSeq)
+        {
+            return BinaryRemoting(new DACrux.SEMDMS.DSL.TQP_GDS_CHAIN_EDIT().GetData("SELECT_CHAIN_EDIT_RANGE", null,
+                ChainRangeKey(strFactory, strDeviceID, strFromSeq, strToSeq)));
+        }
+
+        /// <summary>범위 조회 키(Factory / Device / 시작 Chain 번호 / 끝 Chain 번호)를 검증한다. 시작이 끝보다 크면 오류.</summary>
+        private static string[] ChainRangeKey(string strFactory, string strDeviceID, string strFromSeq, string strToSeq)
+        {
+            string strFrom = RequiredSeq(strFromSeq, "시작 Chain 번호");
+            string strTo = RequiredSeq(strToSeq, "끝 Chain 번호");
+            if (long.Parse(strFrom, CultureInfo.InvariantCulture) > long.Parse(strTo, CultureInfo.InvariantCulture))
+                throw new ArgumentException("시작 Chain 번호가 끝 Chain 번호보다 큽니다: " + strFrom + " > " + strTo, "strFromSeq");
+            return new string[] { Required(strFactory, "Factory", 30), Required(strDeviceID, "Device ID", 50), strFrom, strTo };
+        }
+
+        /// <summary>Remoting 으로 돌려줄 표를 XML 대신 Binary 형식으로 보내게 한다(받는 쪽은 형식을 스스로 판별).</summary>
+        private static DataTable BinaryRemoting(DataTable table)
+        {
+            if (table != null) table.RemotingFormat = SerializationFormat.Binary;
+            return table;
+        }
+
+        #endregion
+
+        #region [Chain 일괄 저장 (2026-10-20, GDS Map View U8)]
+
+        /// <summary>
+        /// Chain 여러 개를 한 번에 저장한다(GDS Map View U8 [Chain 생성(DB)]). 설계: 문서/설계/02_GDS/2026-10-20_GDS_Map_View_U8_화면_설계.md 7절.
+        /// 처리 흐름: 입력 검사(Chain 마다 INPUT 1개, 같은 호출 안 Code 중복 금지) -> Map READY 확인 -> 이미 있는 Code 는 건너뜀
+        ///  -> 새 Chain 수만큼 CHAIN_SEQ 채번 -> CHAIN / VER(DRAFT) / LAYER / MEMBER 를 InsertExecuteMultiple -> VER READY 일괄 변경.
+        /// 문장마다 자동 Commit 이라 중간에 실패하면 이번 호출에서 만든 Chain 을 지우고(하위 테이블 FK CASCADE) 오류를 다시 던진다.
+        /// 저장 형식은 BeginChainSave / CompleteChainSave 로 만든 Chain 과 같다(편집 기록 / 규칙 없음).
+        /// </summary>
+        public DataTable CreateChainBulk(string[] aKey, string[,] aChains, string[,] aLayers, string[,] aMembers, string strUpdateUser)
+        {
+            if (aKey == null || aKey.Length != 4)
+                throw new ArgumentException("일괄 저장 키는 Factory / Device / Layer 규칙 적용 / 격자 크기 4개여야 합니다.", "aKey");
+            string strFactory = Required(aKey[0], "Factory", 30);
+            string strDevice = Required(aKey[1], "Device ID", 50);
+            int iApplyRules = ParseInt(aKey[2], "Layer 규칙 적용");
+            if (iApplyRules != 0 && iApplyRules != 1)
+                throw new ArgumentException("Layer 규칙 적용 값은 0 또는 1이어야 합니다.", "aKey");
+            decimal dCellSize;
+            if (!decimal.TryParse(aKey[3], NumberStyles.Number, CultureInfo.InvariantCulture, out dCellSize) || dCellSize <= 0)
+                throw new ArgumentException("격자 크기는 0보다 큰 숫자여야 합니다.", "aKey");
+            string strUser = Required(strUpdateUser, "User", 30);
+            if (aChains == null || aChains.GetLength(0) == 0 || aChains.GetLength(1) != 3)
+                throw new ArgumentException("Chain 은 1행 이상, 열은 CHAIN_CODE / CHAIN_NAME / COLOR_ARGB 3개여야 합니다.", "aChains");
+            if (aLayers == null || aLayers.GetLength(0) == 0 || aLayers.GetLength(1) != 2)
+                throw new ArgumentException("탐색 Layer 는 1개 이상, 열은 LAYER_ID / DATA_TYPE 2개여야 합니다.", "aLayers");
+            CheckBatchParas(aMembers, 6);
+
+            int iChains = aChains.GetLength(0);
+            var aCode = new string[iChains];
+            var aName = new string[iChains];
+            var aColor = new string[iChains];
+            var setCode = new HashSet<string>(StringComparer.Ordinal);
+            for (int i = 0; i < iChains; i++)
+            {
+                aCode[i] = Required(aChains[i, 0], "Chain Code", 32);
+                if (!setCode.Add(aCode[i]))
+                    throw new ArgumentException("같은 Chain Code 가 두 번 있습니다: " + aCode[i], "aChains");
+                aName[i] = Required(aChains[i, 1], "Chain 이름", 800);
+                if (aName[i].Length > 200)
+                    throw new ArgumentException("Chain 이름은 200자 이하로 입력하세요: " + aName[i], "aChains");
+                aColor[i] = ParseInt(aChains[i, 2], "색상").ToString(CultureInfo.InvariantCulture);
+            }
+            int iLayers = aLayers.GetLength(0);
+            var aLayerId = new string[iLayers];
+            var aDataType = new string[iLayers];
+            for (int i = 0; i < iLayers; i++)
+            {
+                aLayerId[i] = ParseInt(aLayers[i, 0], "LAYER_ID").ToString(CultureInfo.InvariantCulture);
+                aDataType[i] = ParseDataType(aLayers[i, 1], "DATA_TYPE").ToString(CultureInfo.InvariantCulture);
+            }
+
+            int iRows = aMembers.GetLength(0);
+            var aMemberChain = new int[iRows];
+            var aMemberRow = new string[iRows][];
+            var aMemberCount = new int[iChains];
+            var aInputCount = new int[iChains];
+            for (int r = 0; r < iRows; r++)
+            {
+                int iChain = ParseInt(aMembers[r, 0], "CHAIN_INDEX");
+                if (iChain < 0 || iChain >= iChains)
+                    throw new ArgumentException("CHAIN_INDEX 가 Chain 행 범위 밖입니다: " + aMembers[r, 0], "aMembers");
+                string strRole = Required(aMembers[r, 2], "ROLE_CODE", 10);
+                aMemberChain[r] = iChain;
+                aMemberRow[r] = new string[] { RequiredId(aMembers[r, 1]), strRole, Required(aMembers[r, 3], "INCLUSION_SOURCE", 10),
+                    OptionalDouble(aMembers[r, 4], "MARKER_X"), OptionalDouble(aMembers[r, 5], "MARKER_Y") };
+                aMemberCount[iChain]++;
+                if (string.Equals(strRole, "INPUT", StringComparison.Ordinal)) aInputCount[iChain]++;
+            }
+            for (int i = 0; i < iChains; i++)
+                if (aInputCount[i] != 1)
+                    throw new ArgumentException("Chain " + aCode[i] + " 의 INPUT 이 " + aInputCount[i] + "개입니다(1개여야 함).", "aMembers");
+
+            CheckMapReady(strFactory, strDevice);
+
+            // 이미 있는 Code 는 건너뛴다(설계 D5).
+            DACrux.SEMDMS.DSL.TQP_GDS_CHAIN oTQP_GDS_CHAIN = new DACrux.SEMDMS.DSL.TQP_GDS_CHAIN();
+            var dicExisting = new Dictionary<string, string>(StringComparer.Ordinal);
+            using (DataTable dt = oTQP_GDS_CHAIN.GetData("SELECT_CHAIN_CODE_LIST", null, new string[] { strFactory, strDevice }))
+            {
+                foreach (DataRow dr in dt.Rows)
+                    dicExisting[dr["CHAIN_CODE"].ToString()] = dr["CHAIN_SEQ"].ToString();
+            }
+            var lstCreate = new List<int>();
+            for (int i = 0; i < iChains; i++)
+                if (!dicExisting.ContainsKey(aCode[i])) lstCreate.Add(i);
+
+            var aSeq = new string[iChains];
+            if (lstCreate.Count > 0)
+            {
+                using (DataTable dt = oTQP_GDS_CHAIN.GetData("SELECT_NEXT_CHAIN_SEQ_MULTI", null,
+                    new string[] { lstCreate.Count.ToString(CultureInfo.InvariantCulture) }))
+                {
+                    if (dt.Rows.Count != lstCreate.Count)
+                        throw new DataException("Chain 번호를 " + lstCreate.Count + "개 받지 못했습니다(" + dt.Rows.Count + "개).");
+                    for (int k = 0; k < lstCreate.Count; k++)
+                        aSeq[lstCreate[k]] = dt.Rows[k][0].ToString();
+                }
+
+                string[,] aChain = new string[lstCreate.Count, 5];
+                for (int k = 0; k < lstCreate.Count; k++)
+                {
+                    int i = lstCreate[k];
+                    aChain[k, 0] = strFactory; aChain[k, 1] = strDevice; aChain[k, 2] = aSeq[i]; aChain[k, 3] = aCode[i]; aChain[k, 4] = strUser;
+                }
+                oTQP_GDS_CHAIN.InsertExecuteMultiple("CREATE_CHAIN", aChain);
+                try
+                {
+                    string strApply = iApplyRules.ToString(CultureInfo.InvariantCulture);
+                    string strCell = dCellSize.ToString(CultureInfo.InvariantCulture);
+                    string[,] aVer = new string[lstCreate.Count, 8];
+                    string[,] aLayer = new string[lstCreate.Count * iLayers, 5];
+                    string[,] aReady = new string[lstCreate.Count, 4];
+                    for (int k = 0; k < lstCreate.Count; k++)
+                    {
+                        int i = lstCreate[k];
+                        aVer[k, 0] = strFactory; aVer[k, 1] = strDevice; aVer[k, 2] = aSeq[i]; aVer[k, 3] = aName[i];
+                        aVer[k, 4] = aColor[i]; aVer[k, 5] = strApply; aVer[k, 6] = strCell; aVer[k, 7] = strUser;
+                        for (int l = 0; l < iLayers; l++)
+                        {
+                            int row = k * iLayers + l;
+                            aLayer[row, 0] = strFactory; aLayer[row, 1] = strDevice; aLayer[row, 2] = aSeq[i];
+                            aLayer[row, 3] = aLayerId[l]; aLayer[row, 4] = aDataType[l];
+                        }
+                        aReady[k, 0] = strUser; aReady[k, 1] = strFactory; aReady[k, 2] = strDevice; aReady[k, 3] = aSeq[i];
+                    }
+                    DACrux.SEMDMS.DSL.TQP_GDS_CHAIN_VER oTQP_GDS_CHAIN_VER = new DACrux.SEMDMS.DSL.TQP_GDS_CHAIN_VER();
+                    oTQP_GDS_CHAIN_VER.InsertExecuteMultiple("CREATE_CHAIN_VER", aVer);
+                    new DACrux.SEMDMS.DSL.TQP_GDS_CHAIN_LAYER().InsertExecuteMultiple("CREATE_CHAIN_LAYER_DT", aLayer);
+
+                    int iCreateRows = 0;
+                    for (int r = 0; r < iRows; r++)
+                        if (aSeq[aMemberChain[r]] != null) iCreateRows++;
+                    string[,] aMember = new string[iCreateRows, 8];
+                    int m = 0;
+                    for (int r = 0; r < iRows; r++)
+                    {
+                        string strSeq = aSeq[aMemberChain[r]];
+                        if (strSeq == null) continue;
+                        aMember[m, 0] = strFactory; aMember[m, 1] = strDevice; aMember[m, 2] = strSeq;
+                        for (int c = 0; c < 5; c++) aMember[m, 3 + c] = aMemberRow[r][c];
+                        m++;
+                    }
+                    new DACrux.SEMDMS.DSL.TQP_GDS_CHAIN_MEMBER().InsertExecuteMultiple("CREATE_CHAIN_MEMBER", aMember);
+                    oTQP_GDS_CHAIN_VER.UpdateExecuteMultiple("UPDATE_CHAIN_VER_READY", aReady);
+                }
+                catch
+                {
+                    // 이번 호출에서 만든 Chain 만 지운다. 정리 실패는 원래 오류를 가리지 않게 무시한다(화면 [저장된 Chain] 에서 다시 지울 수 있다).
+                    try
+                    {
+                        string[,] aDelete = new string[lstCreate.Count, 3];
+                        for (int k = 0; k < lstCreate.Count; k++)
+                        {
+                            aDelete[k, 0] = strFactory; aDelete[k, 1] = strDevice; aDelete[k, 2] = aSeq[lstCreate[k]];
+                        }
+                        oTQP_GDS_CHAIN.DeleteExecuteMultiple("DELETE_CHAIN_ONE", aDelete);
+                    }
+                    catch { }
+                    throw;
+                }
+            }
+
+            DataTable dtResult = new DataTable("CHAIN_BULK");
+            dtResult.Columns.Add("CHAIN_CODE", typeof(string));
+            dtResult.Columns.Add("CHAIN_SEQ", typeof(string));
+            dtResult.Columns.Add("RESULT", typeof(string));
+            dtResult.Columns.Add("MEMBER_COUNT", typeof(int));
+            for (int i = 0; i < iChains; i++)
+            {
+                bool bCreated = aSeq[i] != null;
+                dtResult.Rows.Add(aCode[i], bCreated ? aSeq[i] : dicExisting[aCode[i]], bCreated ? "CREATED" : "SKIPPED", aMemberCount[i]);
+            }
+            return dtResult;
+        }
+
+        /// <summary>Device 의 Chain 목록(번호 / Code / 이름 / 색 / 저장 상태). 포함 도형 수를 세지 않아 Chain 이 많아도 빠르다.</summary>
+        public DataTable GetChainCodeList(string strFactory, string strDeviceID)
+        {
+            return new DACrux.SEMDMS.DSL.TQP_GDS_CHAIN().GetData("SELECT_CHAIN_CODE_LIST", null,
+                new string[] { Required(strFactory, "Factory", 30), Required(strDeviceID, "Device ID", 50) });
+        }
+
+        /// <summary>Chain 여러 개를 한 번에 실제로 삭제한다(DeleteExecuteMultiple 1회, 하위 테이블 FK CASCADE). 반환: 요청한 Chain 수.</summary>
+        public int DeleteChainBulk(string strFactory, string strDeviceID, string[] aChainSeqs, string strUpdateUser)
+        {
+            string strFactoryKey = Required(strFactory, "Factory", 30);
+            string strDevice = Required(strDeviceID, "Device ID", 50);
+            Required(strUpdateUser, "Update User", 30);
+            if (aChainSeqs == null || aChainSeqs.Length == 0) return 0;
+            if (aChainSeqs.Length > MaxBatchRows)
+                throw new ArgumentException("한 번에 지울 Chain 은 " + MaxBatchRows + "개 이하여야 합니다.", "aChainSeqs");
+            string[,] aDelete = new string[aChainSeqs.Length, 3];
+            for (int i = 0; i < aChainSeqs.Length; i++)
+            {
+                aDelete[i, 0] = strFactoryKey;
+                aDelete[i, 1] = strDevice;
+                aDelete[i, 2] = RequiredSeq(aChainSeqs[i], "Chain 번호");
+            }
+            new DACrux.SEMDMS.DSL.TQP_GDS_CHAIN().DeleteExecuteMultiple("DELETE_CHAIN_ONE", aDelete);
+            return aChainSeqs.Length;
+        }
+
+        /// <summary>
+        /// Chain 여러 개의 색을 한 번에 바꾼다(VERSION 1 의 COLOR_ARGB 만, 포함 도형 / 상태는 그대로) (2026-10-21).
+        /// 처리: 입력 검사(Factory / Device / User / 색 정수 / Chain 번호, 1만 개 이하) -> UPDATE_CHAIN_VER_COLOR 다건 실행.
+        /// 반환: 요청한 Chain 수(없는 Chain 번호는 바뀌는 행 없이 지나간다).
+        /// </summary>
+        public int UpdateChainColorBulk(string strFactory, string strDeviceID, string[] aChainSeqs, string strColorArgb, string strUpdateUser)
+        {
+            string strFactoryKey = Required(strFactory, "Factory", 30);
+            string strDevice = Required(strDeviceID, "Device ID", 50);
+            string strUser = Required(strUpdateUser, "Update User", 30);
+            string strColor = ParseInt(strColorArgb, "색상").ToString(CultureInfo.InvariantCulture);
+            if (aChainSeqs == null || aChainSeqs.Length == 0) return 0;
+            if (aChainSeqs.Length > MaxBatchRows)
+                throw new ArgumentException("한 번에 색을 바꿀 Chain 은 " + MaxBatchRows + "개 이하여야 합니다.", "aChainSeqs");
+            string[,] aUpdate = new string[aChainSeqs.Length, 5];
+            for (int i = 0; i < aChainSeqs.Length; i++)
+            {
+                aUpdate[i, 0] = strColor;
+                aUpdate[i, 1] = strUser;
+                aUpdate[i, 2] = strFactoryKey;
+                aUpdate[i, 3] = strDevice;
+                aUpdate[i, 4] = RequiredSeq(aChainSeqs[i], "Chain 번호");
+            }
+            new DACrux.SEMDMS.DSL.TQP_GDS_CHAIN_VER().UpdateExecuteMultiple("UPDATE_CHAIN_VER_COLOR", aUpdate);
+            return aChainSeqs.Length;
+        }
+
+        #endregion
+
         #region [Validation]
 
         /// <summary>Factory / Device / Chain 번호를 검증해 DSL 키 배열로 만든다.</summary>

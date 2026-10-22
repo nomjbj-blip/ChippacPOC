@@ -547,7 +547,10 @@ namespace DACrux.SEMDMS.ENGUI
             }
         }
 
-        /// <summary>서버 결과(Begin / Commit)를 Slot 으로 Wafer 목록 행에 맞춰 상태 / STEP_SEQ / 메시지를 표시한다.</summary>
+        /// <summary>
+        /// 서버 결과(Begin / Commit)를 Slot 으로 Wafer 목록 행에 맞춰 상태 / STEP_SEQ / 메시지를 표시한다.
+        /// STEP_SEQ / 메시지 열은 화면에서 숨기고 값만 채운다(2026-10-22). 메시지는 입력 오류 / 저장 결과 안내 창에 같이 나온다.
+        /// </summary>
         private void ApplyServerRows(DataTable table)
         {
             foreach (DataRow r in table.Rows)
@@ -583,7 +586,7 @@ namespace DACrux.SEMDMS.ENGUI
         }
 
         /// <summary>
-        /// 저장 결과를 상태 표시줄과 완료 안내 창으로 알린다(Wafer 별 상세는 Wafer 목록의 상태 / STEP_SEQ / 메시지 열).
+        /// 저장 결과를 상태 표시줄과 완료 안내 창으로 알린다(Wafer 별 STEP_SEQ / 메시지는 이 안내 창에서 본다. 목록에서는 숨김).
         /// 기존 Defect 조회 화면에서 찾는 방법(Lot / 기간)도 함께 알려 준다.
         /// </summary>
         private void ReportResult(DataTable result)

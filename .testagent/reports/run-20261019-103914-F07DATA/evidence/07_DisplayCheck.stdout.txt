@@ -1,0 +1,14 @@
+﻿PASS / D1 자동 색 구간 = 1 ~ 최대 N(31) 을 5구간(폭 7), 마지막 "이상", 색 = 기본 5색 / 화면 [(1, 7, '#DAF7A6'), (8, 14, '#FFC300'), (15, 21, '#FF5733'), (22, 28, '#C70039'), (29, 999, '#900C3F')]
+PASS / D2 Map 범례 = 구간 표 = 분석 Die 표로 센 Die 수(구간 / 기준 미만 / Defect 없음 / Spec Out = ET_STATE F) = 사용자 사진 / 화면 ['1 ~ 7   19', '8 ~ 14   12', '15 ~ 21   7', '22 ~ 28   3', '29 이상   2', '기준 미만   8', 'Defect 없음   25', 'Spec Out Die   25'] / 계산 ['1 ~ 7   19', '8 ~ 14   12', '15 ~ 21   7', '22 ~ 28   3', '29 이상   2', '기준 미만   8', 'Defect 없음   25', 'Spec Out Die   25']
+PASS / D3 Map Die 76: 채움색(Defect 없음 흰색 / Chain 밖만 연회색 / 구간 색) · 숫자 = Chain In 수(Defect Die 만) · 빨간 삼각형 = Spec Out / 다른 Die 0 [] / 화면 Die 76 / 삼각형 25
+PASS / D4 탭 제목 Defect (472) = Chain In Defect / E-Test Fail (149) = (Die, Chain) E-Test F = 사용자 사진 / Defect (472) / E-Test Fail (149)
+PASS / D5 지금 기준 요약 / 상태줄 = 분석 조건(Chain FS · 검사 BS -> 반전 / 크기 + 허용오차 5 / Chain 19 / Defect 1122 중 Chain In 472 / E-Test 공정) / GDS · Chain FS · 검사 BS -> 반전 | KLARF · Step 1개 · 크기 + 허용오차 5 µm · 보정 (0, 0) | E-Test · TSVET · 빨간 삼각형 = Spec Out | Wafer Key SCKLOTIDA-01 (Step 1개) / GDS OMM_TCB / BACK 보기 (Chain FS · 검사 BS -> 반전) / 크기 + 허용오차 5 µm / Chain 19 / Defect 1122 중 Chain In 472 / E-Test SCKLOTIDA-01 TSVET | 
+PASS / D6 종합 (Die) 탭 53 행 = Defect 있거나 E-Test F 인 Die 53 (Defect 전체 / Chain In · Out / Chain 수 / ET 판정 / Fail · 일치 Chain / 검사) / 다른 행 []
+PASS / D7 Defect 탭 472 행 = Chain In Defect 472 (Die / 걸린 Chain 이름 / Gap 소수 1자리 / GDS X·Y / RoughBin) / 다른 행 0 []
+PASS / D8 Die 76 개를 하나씩 선택: Defect 탭(Chain In) 행 수 / 제목 = 그 Die Chain In 수 / 다른 Die []
+PASS / D9 Die 선택 시 GDS > Chain 탭 = 그 Die 의 (Die, Chain) 298 행 (Chain 이름 / Defect 수 / 분류 / ET / 가까운 거리 / Fail Para / Defect ID / Member) / 다른 Die [] / 분류 {'비교 불가': 43, 'Defect만': 106, '일치': 26, 'Fail만': 123}
+PASS / D10 GDS > Chain 탭(Wafer 전체) 19 행 = Chain 표 19 (Defect 수 / Die 수 / E-Test 연결 / Defect · Fail · 일치 Die / Fail률 % / Para / Member, 정렬) / 다른 행 [] / 정렬 True
+PASS / D11 E-Test Fail 탭 149 행 = E-Test F 인 (Die, Chain) 149 (Die / Chain / 분류 / 가까운 Defect / 걸린 Defect / Fail Para / 첫 Fail 항목 / Step, 정렬 일치 -> 거리) / 다른 행 [] / 분류 {'일치': 26, 'Fail만': 123}
+PASS / D12 허용오차 탭 = TOL_CURVE 6 행 / E-Test 연결 탭 = ET_LINK 17 행(등록 원문 이름 / 연결 Chain / 상태 / Parameter 수) / 허용오차 [('0', '437', '43'), ('2', '450', '43'), ('5', '472', '43'), ('10', '511', '43'), ('20', '574', '43'), ('50', '637', '44')] / 연결 17 행
+
+DISPLAY_CHECK_PROBE=PASS (12/12)

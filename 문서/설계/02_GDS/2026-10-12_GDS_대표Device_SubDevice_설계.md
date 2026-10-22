@@ -2,6 +2,8 @@
 
 작성: 2026-10-12 Claude / 작업 ID: CLAUDE-055 / 상태: 설계 + 구현 시작
 
+> **폐기 (2026-10-15, CLAUDE-109):** Sub Device 기능은 GDS Map 복사로 대체되어 제거했다. KLARF Product / E-Test Device 는 이름이 같은(대소문자 무시) READY GDS Map 에 연결된다. [2026-10-15_GDS_Map_복사_설계.md](2026-10-15_GDS_Map_복사_설계.md) 참고. 아래 내용은 이력이다.
+
 ## 1. 요청
 
 사용자 지시: "GDS View 화면에서 대표 디바이스를 U9으로 하고 사용가능한 Sub 디바이스를 U9, OMM, OMM Hybrid 등등 메뉴얼로 Setup 할 수 있도록 기능 구현. 다른 디바이스 조회 및 연동하는 부분을 Sub Device 로 연동되도록."

@@ -12,7 +12,8 @@ namespace DACrux.SEMDMS.BSL
     ///  - 저장 확정(CompleteEtFile) / 다시 판정(RejudgeEtFiles) / Map 좌표 다시 계산(RemapEtFiles, 2026-10-15 부터 검사 스크립트 전용) 끝에서 자동으로 부른다.
     ///    업로드 화면을 바꾸지 않아도 올린 파일이 YMS 화면(TEST Map View / Gallery / Yield 등)에 나온다.
     ///  - E-Test 테이블(파일 / 판정·Map 좌표가 들어간 Die / 값 / 등록 Parameter / Spec)을 읽어 EtYmsWafer 로 만들고
-    ///    EtYmsPublisher(기존 YMS 적재 함수 호출)에 넘긴다. Parameter 저장 이름이 곧 YMS 컬럼 이름이다(EtYmsRule.ToParamName).
+    ///    EtYmsPublisher(기존 YMS 적재 함수 호출)에 넘긴다. YMS 컬럼 이름은 등록 때 저장한 YMS_PARAM_NAME(30자 이하)이다
+    ///    (2026-10-21, 문서/설계/04_ETest/2026-10-21_ETest_YMS_컬럼이름_30자_설계.md. 그 전에는 저장 이름 ITEM_NAME 그대로).
     ///  - Map 이 없는 파일(MAP_ID 없음)은 좌표가 없어 YMS Map 에 그릴 수 없으므로 WAIT 로 두고 이전 반영을 지운다.
     ///    2026-10-15 부터 업로드 화면이 Map 없는 파일을 저장하지 않으므로 그 전에 올린 파일만 해당한다. File Map Setup 에 Map 을 만든 뒤 파일을 다시 업로드하면 반영된다.
     ///  - 결과는 TQP_GDS_SRC_FILE.YMS_* 에 남긴다. YMS 반영이 실패해도 예외를 던지지 않는다(E-Test 저장 / 판정은 그대로 둔다).
@@ -111,7 +112,7 @@ namespace DACrux.SEMDMS.BSL
 
         /// <summary>
         /// E-Test 테이블 -> EtYmsWafer.
-        /// Parameter = 그 파일에 값이 저장된 등록 Parameter (YMS 컬럼 이름 = 저장 이름, 설명 = 헤더 원문, Spec = 사용 Y 인 것만).
+        /// Parameter = 그 파일에 값이 저장된 등록 Parameter (YMS 컬럼 이름 = YMS_PARAM_NAME, 설명 = 헤더 원문, Spec = 사용 Y 인 것만).
         /// Die = 시스템 Map 좌표(없으면 Map 밖 -> Publisher 가 제외) / 파일 Hardware · Software Bin / 파일 DUT 결과(P / F).
         /// YMS BIN 은 파일 Bin 이며 E-Test Spec 판정(JUDGE_FLAG)은 쓰지 않는다 (2026-10-14). 값이 없는('-' / 빈 칸) Parameter 는 null.
         /// </summary>
@@ -142,7 +143,8 @@ namespace DACrux.SEMDMS.BSL
                 {
                     EtYmsParameter parameter = new EtYmsParameter();
                     parameter.ParameterName = YmsText(dr["ITEM_NAME"]);
-                    parameter.YmsName = parameter.ParameterName;
+                    // YMS 컬럼 이름은 등록 때 저장한 YMS_PARAM_NAME (30자 이하, 2026-10-21). 비어 있으면 EtYmsPublisher 입력 확인에서 실패한다.
+                    parameter.YmsName = YmsText(dr["YMS_PARAM_NAME"]);
                     parameter.Description = YmsText(dr["HEADER_TEXT"]);
                     parameter.Unit = YmsText(dr["UNIT"]);
                     parameter.Lower = YmsDouble(dr["LOWER_LIMIT"]);

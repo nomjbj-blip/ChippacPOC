@@ -1,0 +1,28 @@
+﻿{
+    "id":  "08e",
+    "name":  "RG_Display",
+    "scenarios":  [
+                      "RG"
+                  ],
+    "status":  "FAIL",
+    "exitCode":  1,
+    "timedOut":  false,
+    "durationMs":  597,
+    "started":  "2026-10-19 11:08:38",
+    "command":  "python -I -X utf8 \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\probes\\f07data_display_check.py\" C:\\Users\\USER\\AppData\\Local\\Temp\\claude\\D--1---------18-------POC\\957adbdd-9676-41cc-8e41-8662274edcca\\scratchpad\\verify\\db_mut C:\\Users\\USER\\AppData\\Local\\Temp\\claude\\D--1---------18-------POC\\957adbdd-9676-41cc-8e41-8662274edcca\\scratchpad\\verify\\ui_mut",
+    "workingDir":  "D:\\1_프로젝트 문서\\18.스테츠칩팩_POC",
+    "keys":  {
+                 "DISPLAY_CHECK_PROBE":  "FAIL (9/12)"
+             },
+    "passLines":  9,
+    "failLines":  [
+                      "FAIL / D3 Map Die 76: 채움색(Defect 없음 흰색 / Chain 밖만 연회색 / 구간 색) · 숫자 = Chain In 수(Defect Die 만) · 빨간 삼각형 = Spec Out / 다른 Die 1 [((6, 1), {\u0027X\u0027: \u00276\u0027, \u0027Y\u0027: \u00271\u0027, \u0027FILL\u0027: \u0027#DAF7A6\u0027, \u0027LABEL\u0027: \u00278\u0027, \u0027FAIL_MARK\u0027: \u0027\u0027}, \u0027#DAF7A6\u0027, 7, \u0027P\u0027)] / 화면 Die 76 / 삼각형 25",
+                      "FAIL / D9 Die 선택 시 GDS \u003e Chain 탭 = 그 Die 의 (Die, Chain) 298 행 (Chain 이름 / Defect 수 / 분류 / ET / 가까운 거리 / Fail Para / Defect ID / Member) / 다른 Die [(4, 6)] / 분류 {\u0027비교 불가\u0027: 43, \u0027Defect만\u0027: 106, \u0027일치\u0027: 26, \u0027Fail만\u0027: 123}",
+                      "FAIL / D11 E-Test Fail 탭 149 행 = E-Test F 인 (Die, Chain) 149 (Die / Chain / 분류 / 가까운 Defect / 걸린 Defect / Fail Para / 첫 Fail 항목 / Step, 정렬 일치 -\u003e 거리) / 다른 행 [\u0027(4, 6) TSVDC_BR_FH\u0027] / 분류 {\u0027일치\u0027: 26, \u0027Fail만\u0027: 123}"
+                  ],
+    "skipLines":  [
+
+                  ],
+    "stdout":  "08e_RG_Display.stdout.txt",
+    "stderr":  "08e_RG_Display.stderr.txt"
+}

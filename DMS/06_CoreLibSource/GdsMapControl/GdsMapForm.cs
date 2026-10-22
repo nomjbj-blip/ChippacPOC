@@ -22,8 +22,6 @@ namespace NexplantQMS.GdsMap
 		public static readonly string SAMPLE_FILE = @"D:\PROJECT\스태츠칩팩\Defect E-Test\sample\OMM all layer2\OMM all layer2.gds";
 		private int _lastCoordinateUpdateTick;
 		private bool _updatingLayerChecks;
-		/// <summary>더블클릭으로 Layer 체크를 바꾸는 중인지. 이때만 목록 체크 변경을 받는다(2026-10-13).</summary>
-		private bool _layerCheckByDoubleClick;
 		/// <summary>
 		/// 오른쪽 Layer 목록 폭(px). Map(왼쪽 Tab)이 남는 폭을 모두 쓰도록 이 폭을 유지한다(2026-10-13).
 		/// 처음 값은 Layer 패널 최소 폭(Panel2MinSize). 사용자가 분할선을 끌면 그 폭을 기억한다.
@@ -488,35 +486,13 @@ namespace NexplantQMS.GdsMap
 		/// <summary>
 		/// 개별 Layer 체크가 바뀌면 즉시 도면에 적용한다.
 		/// ItemCheck는 목록 상태 변경 전에 발생하므로 이벤트의 새 상태를 사용한다.
-		/// 체크는 더블클릭으로만 바뀐다(2026-10-13). 한 번 클릭 / 선택된 행 다시 클릭 / Space 키로 바뀌는 체크는 되돌린다.
+		/// 체크는 행 왼쪽 체크 박스를 눌렀을 때만 바뀐다(2026-10-20, 목록 CheckOnCheckBoxOnly). 행 클릭 / 더블클릭 / Space 키는 행 선택만 한다.
 		/// [전체 체크] / [전체 미체크]는 _updatingLayerChecks 로 먼저 빠져나가므로 그대로 동작한다.
 		/// </summary>
 		private void ChkLayerItems_ItemCheck(object sender, ItemCheckEventArgs e)
 		{
 			if (_updatingLayerChecks) return;
-			if (!_layerCheckByDoubleClick)
-			{
-				e.NewValue = e.CurrentValue;
-				return;
-			}
 			ApplyLayerVisibility(e.Index, e.NewValue);
-		}
-
-		/// <summary>Layer 행을 더블클릭하면 체크(표시 / 저장 대상)를 바꾼다. 한 번 클릭은 행 선택만 한다(2026-10-13).</summary>
-		private void ChkLayerItems_MouseDoubleClick(object sender, MouseEventArgs e)
-		{
-			if (e.Button != MouseButtons.Left) return;
-			int index = chkLayerItems.IndexFromPoint(e.Location);
-			if (index < 0 || index >= chkLayerItems.Items.Count || !chkLayerItems.GetItemRectangle(index).Contains(e.Location)) return;
-			_layerCheckByDoubleClick = true;
-			try
-			{
-				chkLayerItems.SetItemChecked(index, !chkLayerItems.GetItemChecked(index));
-			}
-			finally
-			{
-				_layerCheckByDoubleClick = false;
-			}
 		}
 
 		/// <summary>모든 Layer를 체크한 뒤 한 번만 Map 표시 상태를 적용한다.</summary>
@@ -597,7 +573,7 @@ namespace NexplantQMS.GdsMap
 				selectedLayers++;
 				selected += count;
 			}
-			lblLayerSummary.Text = layerCount == 0 ? "Layer (도형 수)"
+			lblLayerSummary.Text = layerCount == 0 ? "Layer"
 				: "선택 " + selectedLayers + " / " + layerCount + " Layer · 도형 " + selected.ToString("N0") + " / " + total.ToString("N0");
 		}
 

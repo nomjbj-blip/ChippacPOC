@@ -70,6 +70,7 @@
     <Compile Include="iGdsChain.cs" />
     <Compile Include="iGdsEtResult.cs" />
     <Compile Include="iGdsEtResult_Para.cs" />
+    <Compile Include="iGdsEtResult_Bin.cs" />
     <Compile Include="Coordinate\DieCoordinateMapper.cs" />
     <Compile Include="Coordinate\WaferKeyRule.cs" />
     <Compile Include="ETest\EtYmsRule.cs" />

@@ -21,7 +21,7 @@ $dms = (Resolve-Path (Join-Path $PSScriptRoot '..\..\..')).Path
 $serverBin = Join-Path $dms '101_ServerBin'
 if ($BslDir -eq '') { $BslDir = $serverBin }
 # 2026-10-07부터 GdsMap Debug 출력 경로가 100_ClientBin\GdsMap 이라 기본값을 그 EXE로 한다(bin\Debug는 예전 빌드).
-$gdsExe = if ($GdsExe -ne '') { $GdsExe } else { Join-Path $dms '100_ClientBin\GdsMap\NexplantQMS.GdsMap.exe' }
+$gdsExe = if ($GdsExe -ne '') { $GdsExe } else { Join-Path $dms '100_ClientBin\GdsMap\NexplantQMS.GdsMap.dll' }
 if ($GdsPath -eq '') { $GdsPath = Join-Path (Split-Path $dms -Parent) 'SampleFile\OMM all layer2.gds\OMM all layer2.gds' }
 
 [AppDomain]::CurrentDomain.SetData('APP_CONFIG_FILE', (Join-Path $serverBin 'DACrux.SEMDMS.Service.exe.config'))

@@ -60,7 +60,7 @@ frmKlarfUpload (신규, SEMDMS.ENGUI/DefectMapAnalysis)
 
 - 화면 [frmKlarfUpload.cs](../../02_DMS/DACrux.SEMDMS.ENGUI/DefectMapAnalysis/frmKlarfUpload.cs) / Designer, 메뉴 `MNU_KLARF_UPLOAD`(DMS > KLARF 업로드, F03119). [분석] 은 DB 를 쓰지 않고, [DB 저장] 이 Begin -> 재등록 확인 -> 이미지 전송 -> Commit 을 호출한다. 이미지 폴더는 비워 두면 KLARF 폴더 / `Defect Images` 중 더 많이 찾는 곳을 쓴다.
 - Smoke: [Verify-KlarfUpload.ps1](../../02_DMS/DACrux.SEMDMS.ENGUI/Verification/Verify-KlarfUpload.ps1) (화면 -> RO -> BSL 을 Service 없이 한 프로세스에서, 로컬 DB 사용, `-Keep`).
-- Service config: wellknown `KlarfUpload` + `KLARF_IMAGE_ROOT = D:\FTP\SCK`. 저장 폴더 = 루트 \ yyyyMMdd(저장일) \ Lot (2026-10-07 사용자 지시). DB 이미지 경로 예: `FTP/SCK/20261007/PFIC_RH-HS2615_C4BUMP`.
+- Service config: wellknown `KlarfUpload` + `KLARF_IMAGE_ROOT = D:\FTP\SCK`. 저장 폴더 = 루트 \ yyyyMMdd(저장일) \ Lot (**2026-10-21 부터 \ Device \ Lot, 아래 CLAUDE-185**) (2026-10-07 사용자 지시). DB 이미지 경로 예: `FTP/SCK/20261007/PFIC_RH-HS2615_C4BUMP`.
 - FTP: Docker 컨테이너 `dms-ftp`(vsftpd, 127.0.0.1:21 / Passive 21000~21010, 계정 dacrux, D:\FTP -> /FTP 읽기 전용). TQC_CONFIG DEFECT_FTP = IP 127.0.0.1 / PORT 21 / MAIN_PATH /%2f/ / PASS 는 새 시험 값(문서에 적지 않음). 기존 HFtpClient 로 다운로드 확인(2026-10-07).
 - 배포 DLL 은 E-Test(CLAUDE-029) 진행 중 파일을 뺀 임시 csproj 로 빌드했다. E-Test 쪽이 나중에 전체 소스로 배포하면 KLARF 업로드 코드도 함께 들어간다(정상).
 
@@ -71,6 +71,7 @@ frmKlarfUpload (신규, SEMDMS.ENGUI/DefectMapAnalysis)
 
 - [분석] 버튼 / 처리 기록 없음. [파일 선택] / [폴더 선택] 을 누르면 바로 읽는다(입력란은 읽기 전용).
 - 위: 파일 묶음 + 저장 값 묶음 + 큰 [DB 저장], 그 아래 KLARF 요약 한 줄, 본문: Wafer Map | Wafer 목록 + KLARF Defect Grid(저장 Class / 분류명 / 이미지 여부 / 좌표 / Bin). 2026-10-14 CLAUDE-100 기능 최소화: 행 선택 -> Map 강조 / 더블클릭 -> 이미지 열기 / Map 아래 정보 글 삭제.
+- 2026-10-22 CLAUDE-194: Wafer 목록 STEP_SEQ / 메시지 열 숨김(`Visible = false`, 값은 그대로 채움). Wafer 별 STEP_SEQ / 메시지는 입력 오류 창 / 이미 등록 확인 창 / 저장 결과 창에서 본다. Smoke 는 숨긴 열 값으로 그대로 검사.
 - 속도 (2026-10-14 CLAUDE-100): Defect Grid 는 열 자동 너비(AllCells)를 쓰지 않는다. 행 1개마다 전체 행 너비를 다시 재서 1,122건 파일(1107236219.SINF)이 239초 걸렸다. 행 한 번에 추가 + 보이는 행 기준 너비 1회 -> 1.4초.
 - 버튼 아이콘: `DMS/99_Resource/ByModule/POC/BTN_*.png`(make_button_icons.ps1, 메뉴 아이콘과 같은 그림 방식) 를 `frmKlarfUpload.resx` 에 이미지(base64)로 넣어 사용 (2026-10-14 확인, 빌드 때 PNG 파일을 읽지 않음).
 
@@ -132,4 +133,17 @@ frmKlarfUpload (신규, SEMDMS.ENGUI/DefectMapAnalysis)
 
 - 업로드한 이미지를 보는 Defect Map Viewer 이미지 목록과 상세보기 이미지 창의 카드를 `Control/DPUCDefectImageCard`(컨트롤 1개 / 원본 비율 / 2줄 `Defect / Die`, `Class / Bin / 크기` / 더블클릭 = 기존 ImagePopUp + 제목 줄 전체 정보)로 바꿨다. 기존 `DPUCDefectInfo` 는 Defect Source Analysis / TEST Wafer Map Matching 이 계속 쓴다.
 - Bin 을 카드에 보이는 이유: 표준 업로드(CLAUDE-112) 이후 고객 데이터는 CLASSNUMBER 0, 분류 코드는 ROUGHBIN 이다.
-- 확인: TEMP 빌드 + 카드 확인 16/16(STEP 528). 연관 분석 Image 탭은 CLAUDE-160 뒤에 교체. 배포 / DMS 화면 확인 대기. 설계: `문서/설계/03_KLARF_Map/2026-10-20_Defect_Image_카드_단순화_설계.md`
+- 확인: TEMP 빌드 + 카드 확인 16/16(STEP 528). 연관 분석 Image 탭도 2026-10-21 교체(Smoke 75/75). 카드 · Viewer · 상세보기는 운영 ClientBin(10-20 16:36 VS 빌드)에 들어 있고 Image 탭은 다음 ENGUI 빌드부터. DMS 화면 확인 대기. 설계: `문서/설계/03_KLARF_Map/2026-10-20_Defect_Image_카드_단순화_설계.md`
+
+## 2026-10-21 이미지 FTP 기준 폴더 (CLAUDE-174)
+
+- 서버 FTP 가 드라이브 루트가 아닌 폴더를 공개할 때(10.86.253.162 `/DMS_IMAGE`) 쓰는 Service 설정 `KLARF_IMAGE_FTP_BASE` 추가. 있으면 DB 이미지 경로 = 그 폴더 기준(`yyyyMMdd/Lot`), 없으면 기존 규칙(드라이브 루트 뺌). 화면 = `DEFECT_FTP.MAIN_PATH` + 이 경로.
+- DEFECT_FTP 값 스크립트 `Assistant/DB/sql/2026-10-21_defect_ftp_set.sql`(10.86.253.162 / 21 / POC / `/DMS_IMAGE`).
+- 확인: `KLARF_IMAGE_FTP_BASE_PROBE=PASS (14/14)`. 서버 설정 순서: `문서/설계/06_환경_운영/2026-10-21_Defect_이미지_FTP_서버_설정.md`. 서버 / TRAINING 적용 대기.
+
+## 2026-10-21 이미지 폴더에 Device 추가 / 썸네일 JPEG 내재화 (CLAUDE-185)
+
+- 저장 폴더: `KLARF_IMAGE_ROOT \ yyyyMMdd(업로드한 날) \ Device \ LotID` (예: `D:\FTP\SCK\20261021\OMM_TCB\PFIC_U9-FS2635_C4BUMP`). Device = 저장하는 Product 값(화면 Product, 빈 값이면 KLARF DeviceID). DB IMAGE_PATH / INSP_FILEPATH 도 같은 폴더의 FTP 상대 경로. 새로 올리는 것부터 적용되고 이미 올린 파일 / DB 경로는 그대로.
+- 썸네일: 업로드 서버(`BSL/KlarfUpload.cs` `SaveThumbnailFromFile` / `SaveFrameImagesAndThumbnails` / `SaveJpegThumbnail`)가 직접 만든다. 원본 가로세로 절반, JPEG 품질 85, 이름은 `thumb_` + 원본 이름 그대로(DB THUMB_FILENAME 규칙). 여러 장 TIFF 프레임은 `이름_0001.확장자`(원본 형식) + JPEG 썸네일. 이미지를 읽을 수 없으면 원본을 썸네일로 복사.
+- 이유: Core `ImageLoader.SaveThumbnailImage` 가 형식 없이 저장해 thumb_*.jpg 가 실제 PNG(원본의 약 5배, D:\FTP\SCK 45쌍 원본 11.6 MB / 썸네일 59.8 MB). Core 는 기존 자동 적재도 쓰므로 고치지 않음(사용자 지시: 내재화).
+- 검증: TEMP 빌드 오류 0, `KLARF_IMAGE_FTP_BASE_PROBE=PASS (17/17)`(경로 날짜/Device/Lot + 썸네일 15장 JPEG 절반 · 원본보다 작음(예 226 KB -> 85 KB) + 2장 TIFF + 깨진 이미지), `KLARF_SETUPMAP_PROBE=PASS (19)`, `KLARF_UPLOAD_FORM_SMOKE=PASS`(읽기). `KlarfUploadProbe` 는 사용자 STEP 528 보호로 건너뜀(저장 폴더 기대값만 Device 포함으로 수정). 운영 D:\FTP\SCK 에 Probe 파일 안 생김.

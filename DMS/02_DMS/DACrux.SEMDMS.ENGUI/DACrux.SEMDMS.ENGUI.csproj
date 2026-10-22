@@ -196,6 +196,18 @@
     <Compile Include="DefectMapAnalysis\frmGdsKlarfSourceFind.Designer.cs">
       <DependentUpon>frmGdsKlarfSourceFind.cs</DependentUpon>
     </Compile>
+    <Compile Include="DefectMapAnalysis\frmGdsKlarfSimple.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DefectMapAnalysis\frmGdsKlarfSimple.Designer.cs">
+      <DependentUpon>frmGdsKlarfSimple.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DefectMapAnalysis\GdsKlarfBandPopup.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DefectMapAnalysis\GdsKlarfBandPopup.Designer.cs">
+      <DependentUpon>GdsKlarfBandPopup.cs</DependentUpon>
+    </Compile>
     <Compile Include="ETest\EtResultFileParser.cs" />
     <Compile Include="ETest\EtJudgeRule.cs" />
     <Compile Include="ETest\EtSpecTable.cs" />
@@ -217,6 +229,12 @@
     </Compile>
     <Compile Include="ETest\frmEtResultView.Designer.cs">
       <DependentUpon>frmEtResultView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ETest\frmEtBinSetup.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ETest\frmEtBinSetup.Designer.cs">
+      <DependentUpon>frmEtBinSetup.cs</DependentUpon>
     </Compile>
     <Compile Include="ETest\frmEtParaRegister.cs">
       <SubType>Form</SubType>
@@ -242,6 +260,13 @@
     <Compile Include="GdsMap\frmGdsMapView.Designer.cs">
       <DependentUpon>frmGdsMapView.cs</DependentUpon>
     </Compile>
+    <Compile Include="GdsMap\frmGdsMapViewU8.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GdsMap\frmGdsMapViewU8.Designer.cs">
+      <DependentUpon>frmGdsMapViewU8.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GdsMap\GdsMapAssembly.cs" />
     <Compile Include="GdsMap\frmGdsDieAnalysis.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -367,6 +392,9 @@
     <EmbeddedResource Include="DefectMapAnalysis\frmGdsKlarfAnalysis.resx">
       <DependentUpon>frmGdsKlarfAnalysis.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="DefectMapAnalysis\frmGdsKlarfSimple.resx">
+      <DependentUpon>frmGdsKlarfSimple.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Admin\frmConfiguration.resx">
       <DependentUpon>frmConfiguration.cs</DependentUpon>
     </EmbeddedResource>
@@ -448,11 +476,17 @@
     <EmbeddedResource Include="ETest\frmEtResultView.resx">
       <DependentUpon>frmEtResultView.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="ETest\frmEtBinSetup.resx">
+      <DependentUpon>frmEtBinSetup.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="DefectMapAnalysis\frmKlarfFileViewer.resx">
       <DependentUpon>frmKlarfFileViewer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="DefectMapAnalysis\frmGdsKlarfSourceFind.resx">
       <DependentUpon>frmGdsKlarfSourceFind.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GdsMap\frmGdsDieAnalysis.resx">
+      <DependentUpon>frmGdsDieAnalysis.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\licenses.licx" />
     <EmbeddedResource Include="Properties\Resources.resx">

@@ -179,7 +179,8 @@ function Commit-Checked($key, $overwrite, $label) {
 $bytes = [IO.File]::ReadAllBytes($sample)
 $lot = 'PFIC_RH-HS2615_C4BUMP'
 $setupIdFull = 'ROOT-CAI-OMM_Hybrid-OMM_Hybrid_C4Bump_Silterra'
-$storeFolder = Join-Path $imageRoot ((Get-Date).ToString('yyyyMMdd') + "\$lot")   # 저장일 yyyyMMdd \ Lot (2026-10-07 요청)
+$device = [regex]::Match([IO.File]::ReadAllText($sample), 'DeviceID\s+"?([^";]*)"?').Groups[1].Value.Trim()   # Product 빈 값 = KLARF DeviceID
+$storeFolder = Join-Path $imageRoot ((Get-Date).ToString('yyyyMMdd') + "\$device\$lot")   # 저장일 yyyyMMdd \ Device \ Lot (2026-10-21)
 $expectedRel = ($storeFolder.Substring([IO.Path]::GetPathRoot($storeFolder).Length)).Replace('\', '/')
 
 # ---- 1) 입력 검증 ----

@@ -448,7 +448,35 @@
         Y7DsP/AD0lMMbIPbd/0AAAAASUVORK5CYII=
     </value>
   </data>
+  <data name="_btnChainCheckAll.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABhUlEQVR4nKVTu0oDURA9+0jS5B/sVIhg
+        KShCfEAqEYIPCOniI1oFtdN8Q1QQTGVhZScxKMQQhAj+gI19Cj8gRbJ7567MbBLzWAOSA/feYXbPmTN7
+        Zw3P8zAJbN6e6l+iwmJa675F0KRBQyfn97bjRk+A8fD4Ak0ERQrKVVDKgeu6cB1XYsmRQmJ9BavLC+jC
+        5k2qEeG+kMM4KAWU3j5hmlJcYHYFWH0cGo1vOI4fW6Y56kC5fwtUX2so3NxhLb6IqdgSLOtXwOSNuHfl
+        yzebzQHye/0DF+d5Iad2j6WYbQ07IJIPxuTTszxmZqexn0mjWqnh8uoaO6m0kNstA0QBAsQCjotoNCrk
+        SrkEG4Ry+Rmbya0eudXyi4XsAAHVaeEkdyRnsXiLzGF2gMyLZyHQgep8RL6q7IEvMkx22tzCoIDp30Jn
+        gBTkqvjFIDI/4xasUQca83MxGRKG5/mjzHkmsG2uLDHp4DlIbiTEWihkIRKyEQnbCIdtiTnXb7sfxqR/
+        Y7DsP/AD0lMMbIPbd/0AAAAASUVORK5CYII=
+    </value>
+  </data>
   <data name="btnLayerNone.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACa0lEQVR4nI2STUwTURDH/++1bGyhlEKR
+        iInxgBVQD+rNA4mejJBw80BiauIJ4wUTvEGUmGiIeuAAB7+yVKIHOWg2GgNGWIhKRC9QoLUGKNqK0C6G
+        Qpd2u8+8LUso1o9JZnaTeb+Z/5s3BP9hkcdP+oRSV5O6tIR4Yu38JemtT5ZEnefIv+CF3t57xZ6qC4Ra
+        AKYDjCE0+FoLhr/Wd0fUgb8WmL97v7uk1tNMLBYwnW0VYIYDjZ0P9lv/BM/29Nwp9lQ183+maQYEfbMA
+        gNE3Q+sAKvIWCHV1dZZUe1oIzcJmV6MtY5gMBpXlYMAG7GJ0Jxy8favdVXOwlRCS7ZzJGI7N72JaUyJ+
+        vys+N8sVLOcUmL55o630UO01yu/MIS0Lmb5W5Pg5+fKFK6NpeF5WfRbA4tYV/Nc7LruPHO6wWK1Z2JS8
+        aeny3WsffL1OpuuIrqfbGUhAlsR1Q8H4ldaj+xobr1oEAfyAOSzTMs4S7X3fo0I+h5VvkbFncf0pXw+e
+        ozxYoL9ShocdsBcGt4MGbLNjrL/fyuH4zLTqSxVfBPDZXCTKg3NPZTkVBCSn/J5ULKZQmz1LFwj4NDgA
+        nelQAjO6z1p5EsCkLIma2YDyEFiIeDcSCdCCAiCddm3MzUIvc89/HBlBOpnE6vwcHpKKUwAmZElMbVdI
+        eKhr8NIau7Xq3N7CwIFjx41EUlXhD4WwGo2iJ05PM5BxWRJjO589Z5XrGrzuFkfyx4kz9eRLOIxIOIzB
+        JbVpKkWHZEmM5lu6nE2UJXEZDV6nfXRkYkVR3AGVtU3pjncAvueDf1OwTYkAoAgAH1bCnHg++wX220HX
+        c17E+gAAAABJRU5ErkJggg==
+    </value>
+  </data>
+  <data name="_btnChainCheckNone.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACa0lEQVR4nI2STUwTURDH/++1bGyhlEKR
         iInxgBVQD+rNA4mejJBw80BiauIJ4wUTvEGUmGiIeuAAB7+yVKIHOWg2GgNGWIhKRC9QoLUGKNqK0C6G

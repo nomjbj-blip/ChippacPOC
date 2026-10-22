@@ -202,7 +202,7 @@ namespace DACrux.SEMDMS.ENGUI
                     parts.Add("(NAME LIKE '*" + like + "*' OR HEADER LIKE '*" + like + "*' OR CHAIN LIKE '*" + like + "*' OR GDS LIKE '*" + like + "*')");
                 }
                 valueView.RowFilter = string.Join(" AND ", parts.ToArray());
-                lblValueTitle.Text = "2단계: 정의 Para 값" + (dies.Count == 0 ? " (전체 Die)" : dies.Count == 1 ? " (DUT " + data.Dies[dies[0]].Dut + ")" : " (Die " + dies.Count + "개)");
+                lblValueTitle.Text = "2단계: 정의 Para 값" + (dies.Count == 0 ? " / 전체 Die" : dies.Count == 1 ? " / DUT " + data.Dies[dies[0]].Dut : " / Die " + dies.Count + "개");
                 lblCount.Text = "표시 " + valueView.Count.ToString("N0", CultureInfo.InvariantCulture) + " / 전체 " + valueView.Table.Rows.Count.ToString("N0", CultureInfo.InvariantCulture)
                     + " (Parameter " + data.Params.Count + " x Die " + data.Dies.Count + ")";
             }

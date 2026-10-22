@@ -289,15 +289,15 @@ FROM ??
 WHERE ROWNUM = 1]]></commandtext>
     </query>
     <query statement="Delete" queryid="DROP_VIEW" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[DROP VIEW DMSMGR.??]]></commandtext>
+        <commandtext><![CDATA[DROP VIEW ??]]></commandtext>
     </query>
     <query statement="Delete" queryid="DROP_TABLE_01" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[ALTER TABLE DMSMGR.??
+        <commandtext><![CDATA[ALTER TABLE ??
 DROP PRIMARY KEY CASCADE
 ]]></commandtext>
     </query>
     <query statement="Delete" queryid="DROP_TABLE_02" commandtype="Text" commandtimeout="60">
-        <commandtext><![CDATA[DROP TABLE DMSMGR.?? CASCADE CONSTRAINTS]]></commandtext>
+        <commandtext><![CDATA[DROP TABLE ?? CASCADE CONSTRAINTS]]></commandtext>
     </query>
     <query statement="Select" queryid="GET_TEST_PARAMETER" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[-- Create Date : 2019-10-17 21:40:47

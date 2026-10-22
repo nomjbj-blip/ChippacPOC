@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{393FF757-F840-4205-B983-6788698C499B}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Library</OutputType>
     <RootNamespace>NexplantQMS.GdsMap</RootNamespace>
     <AssemblyName>NexplantQMS.GdsMap</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
@@ -84,6 +84,9 @@
     </Compile>
     <Compile Include="Chain\ChainTraceModels.cs" />
     <Compile Include="Chain\ChainSimilarGroupFinder.cs" />
+    <Compile Include="Chain\ChainComponentExtractor.cs" />
+    <Compile Include="Chain\ChainShapeTemplate.cs" />
+    <Compile Include="Chain\ChainNetNameRule.cs" />
     <Compile Include="Chain\ChainSimilarBatchEdit.cs" />
     <Compile Include="Controls\GdsMapControl.cs" />
     <Compile Include="Controls\GdsMapControl_Chain.cs">
@@ -178,6 +181,28 @@
     <Compile Include="MapCopyForm.Designer.cs">
       <DependentUpon>MapCopyForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="GdsMapViewU8Form.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GdsMapViewU8Form.Designer.cs">
+      <DependentUpon>GdsMapViewU8Form.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GdsMapViewU8Form_Label.cs">
+      <DependentUpon>GdsMapViewU8Form.cs</DependentUpon>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GdsMapViewU8Form_Template.cs">
+      <DependentUpon>GdsMapViewU8Form.cs</DependentUpon>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GdsMapViewU8Form_Extract.cs">
+      <DependentUpon>GdsMapViewU8Form.cs</DependentUpon>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GdsMapViewU8Form_ChainDb.cs">
+      <DependentUpon>GdsMapViewU8Form.cs</DependentUpon>
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="GdsMapForm.Designer.cs">
       <DependentUpon>GdsMapForm.cs</DependentUpon>
     </Compile>
@@ -219,7 +244,6 @@
     <Compile Include="Persistence\GdsLabelIndex.cs" />
     <Compile Include="Persistence\GdsMapPlacedRowBuilder.cs" />
     <Compile Include="Persistence\GdsMapPlacedRowReader.cs" />
-    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="GdsMapForm.resx">
       <DependentUpon>GdsMapForm.cs</DependentUpon>
@@ -232,6 +256,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="MapCopyForm.resx">
       <DependentUpon>MapCopyForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GdsMapViewU8Form.resx">
+      <DependentUpon>GdsMapViewU8Form.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

@@ -16,6 +16,7 @@ namespace DACrux.TEST.ENGUI
     /// 2. 목록에서 Map 을 고르면 GetMapDef + GetDies 로 정의 1행과 Die 행을 읽고 StoredMapLayout 으로 화면 기준 값과 확인 항목을 만든다.
     /// 3. Map 컨트롤은 LeftBottom 번호로 그린다 (StoredMapLayout 주석 참고). 좌표 표시는 저장 방향 번호와 LeftBottom 번호를 함께 보인다.
     /// 4. 오른쪽 탭: Map 정보 (TQP_MAPDEF 값) 하나만 둔다. Device 검색칸 / 데이터 확인 탭 / Die 목록 탭은 지웠다 (2026-10-15).
+    ///    오른쪽 탭은 화면에서 숨기고 Map 이 그 폭까지 쓴다. 값은 그대로 채워 다시 보이게 하면 바로 쓸 수 있다 (2026-10-22).
     ///    Map 을 그리지 못하면(XY 방향 값 오류 / 그리기 예외) 이유를 상태줄에 보인다.
     /// 5. Die 번호: 저장 XY 방향 기준으로 화면에서 계산해 Die 위에 그린다 (DieNumberRule, 2026-10-13).
     /// Factory 선택은 두지 않는다. 저장 쿼리(CREATE_MAP)가 FACTORY 를 넣지 않아 Factory 로 거르면 새로 만든 Map 이 빠질 수 있다.
@@ -238,7 +239,7 @@ namespace DACrux.TEST.ENGUI
 
             currentLayout = layout;
             ShowInfo(layout);
-            // XY 방향 / 원점 등 나머지 값은 [Map 정보] 탭에 있으므로 개수 줄은 한 줄에 들어가는 값만 보인다.
+            // XY 방향 / 원점 등 나머지 값은 [Map 정보] 탭(화면에서 숨김)에 있으므로 개수 줄은 한 줄에 들어가는 값만 보인다.
             lblDieCount.Text = string.Format(CultureInfo.InvariantCulture,
                 "{0}  /  사용(1) {1:#,0}  /  제거(-1) {2:#,0}  /  기타 {3:#,0}  /  Die 행 {4:#,0}",
                 layout.MapId, layout.UsedCount, layout.RemovedCount, layout.OtherCount, layout.Dies.Count);
@@ -312,23 +313,23 @@ namespace DACrux.TEST.ENGUI
         {
             DataRow row = null;
             grdInfo.Rows.Clear();
-            AddInfo("Device (Map ID)", layout.MapId);
+            AddInfo("Device", layout.MapId);
             AddInfo("Factory", Dash(layout.Factory));
-            AddInfo("Wafer 크기", string.Format(CultureInfo.InvariantCulture, "{0:#,0.###} µm ({1:0.###} mm)", layout.WaferSize, layout.WaferSize / 1000d));
-            AddInfo("Die 크기 X / Y", string.Format(CultureInfo.InvariantCulture, "{0:#,0.###} / {1:#,0.###} µm", layout.DieSizeX, layout.DieSizeY));
-            AddInfo("Edge", string.Format(CultureInfo.InvariantCulture, "{0:0.###} mm", layout.EdgeSizeMm)
-                + (layout.IsEdgeValid ? string.Empty : " (0 ~ 5 mm 밖 / Map 은 Edge 0 으로 그림)"));
+            AddInfo("Wafer 크기", string.Format(CultureInfo.InvariantCulture, "{0:#,0.###}", layout.WaferSize));
+            AddInfo("Die 크기 X / Y", string.Format(CultureInfo.InvariantCulture, "{0:#,0.###} / {1:#,0.###}", layout.DieSizeX, layout.DieSizeY));
+            AddInfo("Edge", string.Format(CultureInfo.InvariantCulture, "{0:0.###}", layout.EdgeSizeMm)
+                + (layout.IsEdgeValid ? string.Empty : " (0 ~ 5 밖 / Map 은 Edge 0 으로 그림)"));
             AddInfo("Notch", string.Format(CultureInfo.InvariantCulture, "{0} / {1}°", layout.NotchType, layout.NotchAngle));
             AddInfo("XY 방향", layout.IsDirectionValid
                 ? string.Format(CultureInfo.InvariantCulture, "{0} ({1})", layout.Direction, layout.StoredXYDirection)
                 : "알 수 없음 (" + layout.StoredXYDirection + ")");
-            AddInfo("원점 X / Y (µm)", string.Format(CultureInfo.InvariantCulture, "{0:#,0.###} / {1:#,0.###}", layout.OriginX, layout.OriginY));
-            AddInfo("원점 인덱스 (저장)", string.Format(CultureInfo.InvariantCulture, "{0}, {1}", layout.StoredOriginIndex.X, layout.StoredOriginIndex.Y));
-            AddInfo("원점 인덱스 (LeftBottom)", string.Format(CultureInfo.InvariantCulture, "{0}, {1}", layout.LeftBottomOriginIndex.X, layout.LeftBottomOriginIndex.Y));
+            AddInfo("원점 X / Y", string.Format(CultureInfo.InvariantCulture, "{0:#,0.###} / {1:#,0.###}", layout.OriginX, layout.OriginY));
+            AddInfo("저장 원점 인덱스", string.Format(CultureInfo.InvariantCulture, "{0}, {1}", layout.StoredOriginIndex.X, layout.StoredOriginIndex.Y));
+            AddInfo("LeftBottom 원점 인덱스", string.Format(CultureInfo.InvariantCulture, "{0}, {1}", layout.LeftBottomOriginIndex.X, layout.LeftBottomOriginIndex.Y));
             AddInfo("First Index", string.Format(CultureInfo.InvariantCulture, "{0}, {1}", layout.FirstIndexX, layout.FirstIndexY));
-            AddInfo("Die 범위 (저장)", string.Format(CultureInfo.InvariantCulture, "X {0}~{1} / Y {2}~{3}",
+            AddInfo("저장 Die 범위", string.Format(CultureInfo.InvariantCulture, "X {0}~{1} / Y {2}~{3}",
                 layout.StoredGrid.MinX, layout.StoredGrid.MaxX, layout.StoredGrid.MinY, layout.StoredGrid.MaxY));
-            AddInfo("Net Die (저장)", layout.StoredNetDie.ToString(CultureInfo.InvariantCulture));
+            AddInfo("저장 Net Die", layout.StoredNetDie.ToString(CultureInfo.InvariantCulture));
             AddInfo("Reference Die", layout.ReferenceDieSetting.ToString(CultureInfo.InvariantCulture));
             if (mapList != null)
             {
@@ -397,7 +398,7 @@ namespace DACrux.TEST.ENGUI
             int number;
             string numberText = m_wMap.DieNumbers.TryGetValue(lb, out number) ? number.ToString(CultureInfo.InvariantCulture) : "-";
             lblCoordinates.Text = string.Format(CultureInfo.InvariantCulture,
-                "Die ({0}) X/Y: {1}, {2} / LeftBottom: {3}, {4} / USECODE: {5} ({6}) / Die 번호: {7}   |   마우스 X={8:#,0.###}, Y={9:#,0.###} µm",
+                "Die ({0}) X/Y: {1}, {2} / LeftBottom: {3}, {4} / USECODE: {5} ({6}) / Die 번호: {7}   |   마우스 X={8:#,0.###}, Y={9:#,0.###}",
                 currentLayout.Direction, stored.X, stored.Y, lb.X, lb.Y, hoverDie.DieProp, UseCodeName(hoverDie.DieProp), numberText,
                 point.X, point.Y);
         }

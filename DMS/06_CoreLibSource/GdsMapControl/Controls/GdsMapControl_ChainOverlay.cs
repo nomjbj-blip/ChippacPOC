@@ -166,9 +166,26 @@ namespace NexplantQMS.GdsMap
         /// <summary>Visible Chain이 변경될 때만 화면 외곽선 정점을 다시 구성하고 GPU 업로드를 예약한다.</summary>
         public void SetVisibleChainOverlays(IEnumerable<ChainVisibleOverlay> overlays)
         {
-            _visibleChainOverlays = (overlays ?? Enumerable.Empty<ChainVisibleOverlay>()).ToList();
+            List<ChainVisibleOverlay> next = (overlays ?? Enumerable.Empty<ChainVisibleOverlay>()).ToList();
+            // 같은 외곽선 객체가 같은 순서로 다시 오면(목록에서 Chain 선택만 바뀜) 정점을 다시 만들지 않는다.
+            // Chain 이 많으면 정점이 수백만 개라 클릭마다 다시 만들면 수백 ms ~ 수 초가 걸렸다 (2026-10-21)
+            if (SameChainOverlays(_visibleChainOverlays, next))
+            {
+                Invalidate();
+                return;
+            }
+            _visibleChainOverlays = next;
             BuildChainOverlayVertices();
             Invalidate();
+        }
+
+        /// <summary>두 외곽선 목록이 같은 객체를 같은 순서로 가졌는지(내용 비교 없이 참조만 본다).</summary>
+        private static bool SameChainOverlays(IList<ChainVisibleOverlay> current, IList<ChainVisibleOverlay> next)
+        {
+            if (current.Count != next.Count) return false;
+            for (int i = 0; i < current.Count; i++)
+                if (!ReferenceEquals(current[i], next[i])) return false;
+            return true;
         }
 
         /// <summary>현재 Chain에서 엔지니어가 고른 예시 도형만 자주색 외곽선으로 강조한다.</summary>
@@ -207,8 +224,7 @@ namespace NexplantQMS.GdsMap
         {
             _chainOverlayVertices.Clear();
             _chainOverlayDrawRanges.Clear();
-            foreach (ChainVisibleOverlay chain in _visibleChainOverlays)
-                AppendChainOverlayElements(chain.Elements, chain.Color, false, true);
+            AppendVisibleChainOverlays();
             // 겹침/분기는 현재 후보의 상태 표시이므로 Chain Visible과 독립적으로 그린다.
             AppendChainOverlayElements(_chainOverlayOverlaps, Color.DeepSkyBlue, false, false);
             AppendChainOverlayElements(_chainOverlayBranches, Color.OrangeRed, true, false);
@@ -231,36 +247,81 @@ namespace NexplantQMS.GdsMap
             {
                 int lineStart = _chainOverlayVertices.Count;
                 foreach (ChainTraceElement element in layerGroup)
-                {
-                    GPoint[] points = element.WorldPoints;
-                    if (points == null || points.Length < 2) continue;
-                    bool closed = !string.Equals(element.ElementType, "PATH", StringComparison.OrdinalIgnoreCase)
-                        && points.Length >= 3;
-                    int segmentCount = closed ? points.Length : points.Length - 1;
-                    for (int i = 0; i < segmentCount; i++)
-                    {
-                        GPoint first = points[i];
-                        GPoint second = points[(i + 1) % points.Length];
-                        double dx = second.X - first.X;
-                        double dy = second.Y - first.Y;
-                        float distance = (float)Math.Sqrt(dx * dx + dy * dy);
-                        _chainOverlayVertices.Add(new ChainOverlayVertex(first, color, 0f));
-                        _chainOverlayVertices.Add(new ChainOverlayVertex(second, color, distance));
-                    }
-                }
+                    AppendChainOverlayLines(element, color);
                 AddChainOverlayRange(layerGroup.Key, lineStart, PrimitiveType.Lines,
                     dashed, respectLayerVisibility);
 
                 int pointStart = _chainOverlayVertices.Count;
                 foreach (ChainTraceElement element in layerGroup)
-                {
-                    GPoint[] points = element.WorldPoints;
-                    if (points == null || points.Length != 1) continue;
-                    _chainOverlayVertices.Add(new ChainOverlayVertex(points[0], color, 0f));
-                }
+                    AppendChainOverlayPoint(element, color);
                 AddChainOverlayRange(layerGroup.Key, pointStart, PrimitiveType.Points,
                     false, respectLayerVisibility);
             }
+        }
+
+        /// <summary>
+        /// Visible Chain 외곽선을 Chain 구분 없이 Layer 별로 모아 Layer 마다 선 구간 1개 / 점 구간 1개로 만든다(색은 정점마다 있음).
+        /// Chain 마다 구간을 따로 만들면 Chain 이 수만 개일 때 그릴 때마다 OpenGL 호출이 수만 번이 되었다 (2026-10-21).
+        /// 같은 Layer 안에서는 Chain 순서대로 넣어 같은 도형이 두 Chain 에 있으면 지금처럼 뒤 Chain 색이 위에 그려진다.
+        /// </summary>
+        private void AppendVisibleChainOverlays()
+        {
+            var layerOrder = new List<int>();
+            var byLayer = new Dictionary<int, List<KeyValuePair<ChainTraceElement, Color>>>();
+            foreach (ChainVisibleOverlay chain in _visibleChainOverlays)
+            {
+                foreach (ChainTraceElement element in chain.Elements)
+                {
+                    if (!byLayer.TryGetValue(element.LayerKey, out List<KeyValuePair<ChainTraceElement, Color>> list))
+                    {
+                        list = new List<KeyValuePair<ChainTraceElement, Color>>();
+                        byLayer.Add(element.LayerKey, list);
+                        layerOrder.Add(element.LayerKey);
+                    }
+                    list.Add(new KeyValuePair<ChainTraceElement, Color>(element, chain.Color));
+                }
+            }
+            foreach (int layerKey in layerOrder)
+            {
+                List<KeyValuePair<ChainTraceElement, Color>> list = byLayer[layerKey];
+                int lineStart = _chainOverlayVertices.Count;
+                foreach (var item in list)
+                    AppendChainOverlayLines(item.Key, item.Value);
+                AddChainOverlayRange(layerKey, lineStart, PrimitiveType.Lines, false, true);
+
+                int pointStart = _chainOverlayVertices.Count;
+                foreach (var item in list)
+                    AppendChainOverlayPoint(item.Key, item.Value);
+                AddChainOverlayRange(layerKey, pointStart, PrimitiveType.Points, false, true);
+            }
+        }
+
+        /// <summary>도형 하나의 외곽 선분(닫힌 도형은 끝점과 첫 점도 잇는다)을 정점으로 넣는다. 두 번째 점에는 선분 길이를 넣어 점선 계산에 쓴다.</summary>
+        private void AppendChainOverlayLines(ChainTraceElement element, Color color)
+        {
+            GPoint[] points = element.WorldPoints;
+            if (points == null || points.Length < 2) return;
+            bool closed = !string.Equals(element.ElementType, "PATH", StringComparison.OrdinalIgnoreCase)
+                && points.Length >= 3;
+            int segmentCount = closed ? points.Length : points.Length - 1;
+            for (int i = 0; i < segmentCount; i++)
+            {
+                GPoint first = points[i];
+                GPoint second = points[(i + 1) % points.Length];
+                double dx = second.X - first.X;
+                double dy = second.Y - first.Y;
+                float distance = (float)Math.Sqrt(dx * dx + dy * dy);
+                _chainOverlayVertices.Add(new ChainOverlayVertex(first, color, 0f));
+                _chainOverlayVertices.Add(new ChainOverlayVertex(second, color, distance));
+            }
+        }
+
+        /// <summary>점 하나짜리 도형은 점으로 넣는다.</summary>
+        private void AppendChainOverlayPoint(ChainTraceElement element, Color color)
+        {
+            GPoint[] points = element.WorldPoints;
+            if (points == null || points.Length != 1) return;
+            _chainOverlayVertices.Add(new ChainOverlayVertex(points[0], color, 0f));
         }
 
         /// <summary>정점이 있는 Chain/Layer 구간만 그리기 목록에 추가한다.</summary>

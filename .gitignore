@@ -18,3 +18,7 @@ _codex_build/
 
 # 일일 브리핑 기록 (2026-10-14, 저장소 / 납품 소스에서 제외)
 브리핑/
+
+# 클라이언트 Setup 산출물 / .NET 설치 파일 (2026-10-14, 빌드 PC 에서 생성 / 보관)
+DMS/104_ClientSetup/
+DMS/12_Setup/Prerequisites/

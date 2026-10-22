@@ -16,7 +16,7 @@ if ($GdsPath -eq '') { $GdsPath = Join-Path (Split-Path $dms -Parent) 'SampleFil
 # Add-Type(CodeDom)은 .exe를 참조로 받지 못하므로 시험용 임시 폴더에 .dll 이름으로 복사해 참조 / 로드한다.
 $probeDir = Join-Path $env:TEMP 'chippac\gdschainlabelprobe'
 New-Item -ItemType Directory -Force $probeDir | Out-Null
-Copy-Item (Join-Path $BinDir 'NexplantQMS.GdsMap.exe') (Join-Path $probeDir 'NexplantQMS.GdsMap.dll') -Force
+Copy-Item (Join-Path $BinDir 'NexplantQMS.GdsMap.dll') (Join-Path $probeDir 'NexplantQMS.GdsMap.dll') -Force
 foreach ($d in 'OpenTK.dll', 'OpenTK.GLControl.dll') { Copy-Item (Join-Path $BinDir $d) $probeDir -Force }
 foreach ($d in 'OpenTK.dll', 'OpenTK.GLControl.dll', 'NexplantQMS.GdsMap.dll') { [void][Reflection.Assembly]::LoadFrom((Join-Path $probeDir $d)) }
 Add-Type -AssemblyName System.Windows.Forms

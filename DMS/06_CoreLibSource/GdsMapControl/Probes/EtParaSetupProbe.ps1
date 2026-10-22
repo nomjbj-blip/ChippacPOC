@@ -1,7 +1,7 @@
 ﻿# E-Test Para 설정 서비스 검증 스크립트 (2026-10-14)
 # 설계: 문서/설계/04_ETest/2026-10-14_ETest_Para_Setup_설계.md (등록 / 이름 변환), 문서/설계/04_ETest/2026-10-14_ETest_Para_화면_재구성_설계.md (GDS Chain / Spec 편집)
 # 목적: 이름 분해 / 변환 규칙(EtParameterNameRule)과 BSL GdsEtResult 의 Parameter 등록 / [등록 Parameter] 탭 저장(수정 행만, GDS Chain + Spec) /
-#       GDS Chain 참고 목록 / 인계 API 를 같은 프로세스에서 직접 호출해 확인한다. DB 접속은 BSL -> DSL -> Miracom.Middleware 경로다(Service Remoting 경유 아님).
+#       GDS Chain 참고 목록 / 인계 API 를 같은 프로세스에서 직접 호출해 확인한다. 2026-10-21: YMS 이름(등록 때 저장 / 8번째 열 수정 / 거부) 검사 추가. DB 접속은 BSL -> DSL -> Miracom.Middleware 경로다(Service Remoting 경유 아님).
 # 전제: FACTORY=PROBE / DEVICE_ID=LAYER_FILTER_PROBE 에 READY GDS Map 이 있어야 한다(GdsChainProbe 와 같은 전제, Layer 1 도형 사용).
 # 결과: E-Test Device PRB_PARA 에 Parameter 를 등록하고, LAYER_FILTER_PROBE 를 E-Test Device 이름(PRB_PARA)으로 복사한 GDS Map 에
 #       시험 Chain(Code ZZETP*)을 만들었다가 -Keep 이 없으면 마지막에 모두 지운다(GDS Device = E-Test Device 와 같은 이름, 2026-10-15).
@@ -194,6 +194,32 @@ $limKey = @($bsl.GetEtLimit($Factory, $EtDevice, 'TSVET').Rows | ForEach-Object 
 $e9 = Throws { $bsl.SaveEtLimit([string[]]@($Factory, $EtDevice, 'TSVET'), (Rows @(,@('Resistance_iforce=8.0mA@ZZ_NOT_REG_FH', '', '1', 'Y', '', '', '')) 7), 'probe') }
 $fk = Throws { (New-Object DACrux.SEMDMS.DSL.TQP_GDS_ET_LIMIT).InsertExecuteMultiple('MERGE_ET_LIMIT', (Rows @(,@($Factory, $EtDevice, 'TSVET', 'ZZ_NOT_REGISTERED', '', '1', '', 'Y', '', '', 'probe')) 11)) }
 Check '헤더 원문으로 Spec 저장(붙여넣기 경로) -> 저장 이름 키 / 등록 안 된 Parameter: 서비스 거부 · DB FK 거부(ORA-02291)' (($limKey -join ',') -eq $TR -and $e9 -match '등록되지 않은' -and $fk -match 'ORA-02291') "$($limKey -join ',') | $e9 | $fk"
+
+# 2-2b. YMS 이름 (2026-10-21, 문서/설계/04_ETest/2026-10-21_ETest_YMS_컬럼이름_30자_설계.md):
+#       등록 때 규칙 값(EtYmsRule.ToYmsName, 30자 이하) 저장 / [등록 Parameter] 탭 8번째 열로 수정 / 형식 · 겹침 거부 / 등록 때 겹침 거부
+#       YMS 에 반영된 Parameter 의 수정 거부는 EtYmsServiceProbe 에서 본다(이 Probe 는 YMS 반영을 하지 않음)
+$Yms = [DACrux.SEMDMS.Interface.EtYmsRule]
+function SaveSetup8($t, $rows, $user) { return $bsl.SaveEtParameterSetup([string[]]@($Factory, $EtDevice, $t), (Rows $rows 8), $user).Rows[0] }
+$st = $bsl.GetEtParameterSetupList($Factory, $EtDevice, 'TSVET')
+$ymsBad = @($st.Rows | Where-Object { [string]$_['YMS_PARAM_NAME'] -ne $Yms::ToYmsName($rule::Parse([string]$_['HEADER_TEXT'])) -or -not $Yms::IsValidYmsName([string]$_['YMS_PARAM_NAME']) })
+$ymsHashed = @($st.Rows | Where-Object { [string]$_['YMS_PARAM_NAME'] -match '_[0-9A-F]{8}$' }).Count
+$ymsPub = @($st.Rows | Where-Object { [string]$_['YMS_PUBLISHED'] -ne 'N' }).Count
+$ymsMax = ($st.Rows | ForEach-Object { ([string]$_['YMS_PARAM_NAME']).Length } | Measure-Object -Maximum).Maximum
+Check 'YMS 이름: 등록 때 규칙 값 저장(30자 이하) / YMS 반영 전이라 YMS_PUBLISHED N' ($st.Columns.Contains('YMS_PARAM_NAME') -and $st.Columns.Contains('YMS_PUBLISHED') -and $ymsBad.Count -eq 0 -and $ymsHashed -eq 1 -and $ymsPub -eq 0 -and $ymsMax -le 30) "규칙과 다른 행 $($ymsBad.Count) / 해시 $ymsHashed / 반영됨 $ymsPub / 최대 $ymsMax 자"
+$rnYms = [string](SetupRow 'TSVET' $RN)['YMS_PARAM_NAME']
+$sv = SaveSetup8 'TSVET' @(,@($LP, 'Y', 'YMS 이름 수정', '', '', '', 'N', ' zz_probe_yms_1 ')) 'probe'
+$lp1 = SetupRow 'TSVET' $LP
+Check 'YMS 이름 수정: 8번째 열(공백 제거 / 대문자) + 비고 같이 저장 / YMS_RENAMED 1' ([int]$sv['YMS_RENAMED'] -eq 1 -and [int]$sv['UPDATED'] -eq 1 -and [string]$lp1['YMS_PARAM_NAME'] -eq 'ZZ_PROBE_YMS_1' -and [string]$lp1['REMARK'] -eq 'YMS 이름 수정') "RENAMED $($sv['YMS_RENAMED']) / $($lp1['YMS_PARAM_NAME']) / $($lp1['REMARK'])"
+$sv = SaveSetup8 'TSVET' @(@($LP, 'Y', 'YMS 이름 수정', '', '', '', 'N', 'ZZ_PROBE_YMS_1'), @($RN, 'Y', '', '', '', '', 'N', '')) 'probe'
+Check 'YMS 이름 같은 값 / 빈 값 -> 고치지 않음 (7열 저장도 그대로 됨은 위 검사)' ([int]$sv['YMS_RENAMED'] -eq 0 -and [int]$sv['UPDATED'] -eq 2 -and [string](SetupRow 'TSVET' $RN)['YMS_PARAM_NAME'] -eq $rnYms) "RENAMED $($sv['YMS_RENAMED']) / R_N $rnYms"
+$e10 = Throws { SaveSetup8 'TSVET' @(@($RN, 'Y', '', '', '', '', 'N', ('A' * 31)), @($LP, 'Y', '', '', '', '', 'N', 'BIN'), @($TR, 'Y', '', 'tsvdc_tr_fh', '', '715', 'Y', '1ABC')) 'probe' }
+$e11 = Throws { SaveSetup8 'TSVET' @(,@($RN, 'Y', '', '', '', '', 'N', 'ZZ_PROBE_YMS_1')) 'probe' }
+Check 'YMS 이름 거부: 31자 / 예약 이름 / 숫자 시작 / 다른 Parameter 와 겹침 (아무것도 고치지 않음)' ($e10 -match '3건' -and $e11 -match '같은 YMS 이름 ZZ_PROBE_YMS_1' -and [string](SetupRow 'TSVET' $RN)['YMS_PARAM_NAME'] -eq $rnYms -and [string](SetupRow 'TSVET' $LP)['YMS_PARAM_NAME'] -eq 'ZZ_PROBE_YMS_1') "$e10 | $e11"
+$newHeader = 'Resistance_iforce=8.0mA@TSVDC_ZZYMS_FH'
+$newYms = $Yms::ToYmsName($rule::Parse($newHeader))
+[void](SaveSetup8 'TSVET' @(,@($LP, 'Y', '', '', '', '', 'N', $newYms)) 'probe')
+$e12 = Throws { $bsl.RegisterEtParameters([string[]]@($Factory, $EtDevice, 'TSVET', 'SPEC', ''), (Rows @(,@($newHeader, 'Ohm', '', '')) 4), 'probe') }
+Check '등록: 이미 등록된 Parameter 의 YMS 이름과 같으면 거부' ($e12 -match "YMS 이름 $newYms" -and $e12 -match $LP -and @($bsl.GetEtParameterList($Factory, $EtDevice, 'TSVET').Rows).Count -eq 37) "$newYms | $e12"
 
 # 2-3. GDS Chain 참고 목록 / GDS Device(E-Test Device 와 같은 이름) / 인계 API(GDS Chain 이름 -> 모든 공정 Parameter + Spec)
 $sTr = New-ProbeChain 'ZZETP1' 'TSVDC_TR_FH'

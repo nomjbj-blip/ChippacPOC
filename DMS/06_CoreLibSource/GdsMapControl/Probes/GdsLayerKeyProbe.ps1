@@ -1,9 +1,9 @@
 ﻿# Layer / DataType 분리 검증 (2026-10-20). 설계: 문서/설계/02_GDS/2026-10-20_U8_GDS_로딩_원인분석_설계.md 9절
 # 확인: U8 제품 Cell / TOP Cell 의 Layer 목록이 KLayout 과 같은 (번호, DataType) 키인지, 키별 도형 수 / 전체 도형 수,
 #       저장 데이터(VisitPlacedElements)가 고른 키만 방문하고 TEXT 의 DataType = TEXTTYPE 인지. DB 없음.
-# 실행: powershell -NoProfile -ExecutionPolicy Bypass -File GdsLayerKeyProbe.ps1 [-ExePath <NexplantQMS.GdsMap.exe>]
+# 실행: powershell -NoProfile -ExecutionPolicy Bypass -File GdsLayerKeyProbe.ps1 [-ExePath <NexplantQMS.GdsMap.dll>]
 param([string]$ExePath = '', [string]$WorkName = 'layerkeyprobe')
-if ($ExePath -eq '') { $ExePath = Join-Path (Resolve-Path (Join-Path $PSScriptRoot '..\..\..')).Path '100_ClientBin\GdsMap\NexplantQMS.GdsMap.exe' }
+if ($ExePath -eq '') { $ExePath = Join-Path (Resolve-Path (Join-Path $PSScriptRoot '..\..\..')).Path '100_ClientBin\GdsMap\NexplantQMS.GdsMap.dll' }
 $ErrorActionPreference = 'Stop'
 $sample = (Resolve-Path (Join-Path $PSScriptRoot '..\..\..\..\SampleFile')).Path
 $work = Join-Path $env:TEMP ('chippac\' + $WorkName)

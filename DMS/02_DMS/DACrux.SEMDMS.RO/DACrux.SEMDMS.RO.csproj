@@ -74,6 +74,7 @@
     <Compile Include="GdsChain.cs" />
     <Compile Include="GdsEtResult.cs" />
     <Compile Include="GdsEtResult_Para.cs" />
+    <Compile Include="GdsEtResult_Bin.cs" />
     <Compile Include="KlarfUpload.cs" />
     <Compile Include="GdsKlarfAnalysis.cs" />
     <Compile Include="DefectMapAnalysis.cs" />

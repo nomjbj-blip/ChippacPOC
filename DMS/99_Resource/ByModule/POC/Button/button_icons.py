@@ -57,6 +57,9 @@ COMMON = [
     ('VALIDATE',    '검증',              '검증',                                    r'ICON\CheckGrammar.png'),
     ('MOVE_UP',     '위로',              '▲',                                       r'16x16Icon\arrow_top.png'),
     ('MOVE_DOWN',   '아래로',            '▼',                                       r'16x16Icon\arrow_down.png'),
+    # 좌 / 우는 위 / 아래(arrow_top / arrow_down)와 같은 회색 그림. arrow_back 은 VALUE_FROM 과 같은 그림이다 (2026-10-22)
+    ('MOVE_LEFT',   '왼쪽으로',          '◀ (위치 조정)',                           r'16x16Icon\arrow_back.png'),
+    ('MOVE_RIGHT',  '오른쪽으로',        '▶ (위치 조정)',                           r'16x16Icon\arrow_next.png'),
     ('EXPAND',      '모두 펼치기',       '모두 펼치기',                             r'ICON\Expand_large.png'),
     ('COLLAPSE',    '모두 접기',         '모두 접기',                               r'ICON\Collapse_large.png'),
 ]
@@ -71,6 +74,7 @@ SCREEN = [
     ('CHAIN_OUTPUT', 'Chain 끝 단자',    'Output 지정',                             r'ICON\112_RightArrowShort_Orange_16x16_72.png'),
     ('TRACE',       '경로 찾기',         '후보 경로 찾기',                          r'16x16Icon\arrow_branch.png'),
     ('EXAMPLE',     '예시 묶음',         '예시 묶음 지정',                          r'16x16Icon\shape_group.png'),
+    ('COLOR',       'Chain 색 변경',     '색 변경',                                 r'16x16Icon\palette.png'),
 ]
 CATALOG = COMMON + SCREEN
 KEYS = {k: (name, use, src) for k, name, use, src in CATALOG}

@@ -1,0 +1,8 @@
+﻿ROW_TAG,"분류","Chain","Defect 수","가까운 거리(µm)","ET","Fail Para","Fail Parameter","값","SEQ[숨김]"
+"","일치","TSVDC_BR_FH","15","0.0","F","1 / 8","RESISTANCE_IFORCE_8P0MA_TSVDC_BL_FH","718","320"
+"","일치","TSVDC_BOT1_P_FH","4","0.0","F","1 / 3","RESISTANCE_IFORCE_8P0MA_TSVDC_BOT1_P_FH","719","317"
+"","Fail만","TSVDC_BOT1_N_FH","0","26.7","F","1 / 4","RESISTANCE_IFORCE_8P0MA_TSVDC_BOT1_N_FH","719","318"
+"","Fail만","TSVDC_L_N_FH","0","","F","2 / 4","RESISTANCE_IFORCE_8P0MA_TSVDC_L_N_FH","719","298"
+"","Defect만","TSVDC_R_P_FH","4","0.0","P","0 / 4","","","296"
+"","Defect만","TSVDC_ASIC4_P_FH","2","0.0","P","0 / 7","","","307"
+"","Defect만","TSVDC_HBM0_N_FH","1","0.0","P","0 / 7","","","315"

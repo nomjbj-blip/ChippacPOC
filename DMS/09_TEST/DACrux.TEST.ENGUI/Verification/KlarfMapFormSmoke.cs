@@ -581,7 +581,7 @@ internal static class KlarfMapFormSmoke
         Check("Pitch 초기값 = KLARF", px.Value == 23834m && py.Value == 30060.1m);
         Check("Pitch 범위 = KLARF 50% ~ 200%", px.Minimum == 11917m && px.Maximum == 47668m && py.Minimum == 15030.05m && py.Maximum == 60120.2m);
         Check("Pitch 그대로면 Die 크기 = 파일 값", (double)Prop(map, "DieSizeX") == PitchX && (double)Prop(map, "DieSizeY") == PitchY);
-        Check("Pitch 그대로면 경고 없음", info.Text.Contains("Die Pitch(KLARF): 23,834 x 30,060.1 µm") && !info.Text.Contains("KLARF Pitch 와 다름"));
+        Check("Pitch 그대로면 경고 없음", info.Text.Contains("Die Pitch(KLARF): 23,834 x 30,060.1") && !info.Text.Contains("KLARF Pitch 와 다름"));
         Check("[KLARF 값으로] 활성", reset.Enabled);
 
         const double newX = 23830d, newY = 30064d;
@@ -609,7 +609,7 @@ internal static class KlarfMapFormSmoke
         string warning = Array.Find(info.Lines, l => l.Contains("KLARF Pitch 와 다름")) ?? "";
         Console.WriteLine("Pitch 경고: " + warning);
         Check("변경 Pitch -> 정보창 경고 / 차이 / 격자 끝 최대",
-            warning.Contains("차이 X -4 / Y +3.9 µm") && warning.Contains("최대 X 24 / Y 19.5 µm") && info.Text.Contains("Die Pitch(적용 / 저장): 23,830 x 30,064 µm"));
+            warning.Contains("차이 X -4 / Y +3.9 /") && warning.EndsWith("최대 X 24 / Y 19.5") && info.Text.Contains("Die Pitch(적용 / 저장): 23,830 x 30,064"));
         Console.WriteLine("Pitch 변경 사용 Die " + CountUsed(map) + " / " + ((Label)Field(type, form, "lblDieCount")).Text);
         string direction = ((ComboBox)Field(type, form, "cmbXYDirection")).Text;
         CheckMapDefineReadBack(assembly, type, form, map, stored, direction + " (Pitch 변경)", false);

@@ -1,0 +1,26 @@
+﻿{
+    "id":  "06",
+    "name":  "DisplayDump",
+    "scenarios":  [
+                      "2"
+                  ],
+    "status":  "PASS",
+    "exitCode":  0,
+    "timedOut":  false,
+    "durationMs":  22171,
+    "started":  "2026-10-19 11:05:17",
+    "command":  "C:\\Users\\USER\\AppData\\Local\\Temp\\ChippacGdsKlarfAnalysisVerification\\bin\\F07DisplayDump.exe \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\reports\\run-20261019-103914-F07DATA\\evidence\\ui\" 582 SCK OMM_TCB SCKLOTIDA-01 SCKLOTIDA OMM_TCB",
+    "workingDir":  "C:\\Users\\USER\\AppData\\Local\\Temp\\ChippacGdsKlarfAnalysisVerification\\bin",
+    "keys":  {
+                 "DISPLAY_DUMP":  "PASS"
+             },
+    "passLines":  0,
+    "failLines":  [
+
+                  ],
+    "skipLines":  [
+
+                  ],
+    "stdout":  "06_DisplayDump.stdout.txt",
+    "stderr":  "06_DisplayDump.stderr.txt"
+}

@@ -11,6 +11,10 @@
   같은 :이름 을 두 번 쓰지 않는다 (Middleware 는 순서대로 바인딩).
   2026-10-14 추가: E-Test 파일 -> YMS 반영(GdsEtResult_Yms.cs)이 E-Test 테이블을 읽는 쿼리(SELECT_ET_YMS_*)와
   반영 상태 기록(UPDATE_SRC_FILE_YMS*). Parameter 저장 이름(TQP_GDS_ET_ITEM.ITEM_NAME)이 곧 YMS 컬럼 이름이다.
+  2026-10-22 추가: E-Test Bin 설정(GdsEtResult_Bin.cs) 쿼리 *_ET_BIN_*. 설계: 문서/설계/04_ETest/2026-10-22_ETest_Bin_Setup_화면_설계.md
+  Bin 정의(TQP_BINDESC)는 기존 TQP_BINDESC.xml MERGE_BIN(10열 모두 UPDATE) 대신 MERGE_ET_BIN 으로 화면에서 고치는 4열만 바꾸고 Map 기호 / 표시 / Limit 은 그대로 둔다.
+  처음에는 기존 쿼리의 바인딩 크기(SELECT_BIN_EDITABLE :program 25 / MERGE_BIN 40) 때문에 긴 Program / 설명이 잘려 쓰지 않았고(Probe 실측 60 -> 40),
+  같은 날 TQP_BINDESC.xml 의 두 쿼리 크기도 0 으로 고쳤다.
 -->
 <queryxml conid="DMSMGR" logging="TRUE" xmlns="http://www.miracom.co.kr/XMLSchema">
     <query statement="Select" queryid="SELECT_ET_YMS_FILE" commandtype="Text" description="YMS 반영용 E-Test 파일 1건 + 반영 상태 + Map Wafer 크기(µm). 없으면 0행" commandtimeout="60">
@@ -23,8 +27,8 @@
             <param direction="Input" dbtype="VarChar" size="40">:f_seq</param>
         </parameters>
     </query>
-    <query statement="Select" queryid="SELECT_ET_YMS_PARAM" commandtype="Text" description="파일에 값이 저장된 등록 Parameter (저장 이름 = YMS 컬럼 이름) + 헤더 원문 / 단위 + Spec(사용 Y 인 것만)" commandtimeout="60">
-        <commandtext><![CDATA[SELECT I.ET_ITEM_SEQ, I.ITEM_NAME, I.HEADER_TEXT, NVL(I.UNIT, L.UNIT) AS UNIT,
+    <query statement="Select" queryid="SELECT_ET_YMS_PARAM" commandtype="Text" description="파일에 값이 저장된 등록 Parameter + YMS 컬럼 이름(YMS_PARAM_NAME, 30자, 2026-10-21) + 헤더 원문 / 단위 + Spec(사용 Y 인 것만)" commandtimeout="60">
+        <commandtext><![CDATA[SELECT I.ET_ITEM_SEQ, I.ITEM_NAME, I.YMS_PARAM_NAME, I.HEADER_TEXT, NVL(I.UNIT, L.UNIT) AS UNIT,
        CASE WHEN L.ENABLE_FLAG = 'Y' THEN L.LOWER_LIMIT END AS LOWER_LIMIT,
        CASE WHEN L.ENABLE_FLAG = 'Y' THEN L.UPPER_LIMIT END AS UPPER_LIMIT
   FROM TQP_GDS_ET_ITEM I
@@ -108,6 +112,76 @@
             <param direction="Input" dbtype="VarChar" size="200">:program</param>
             <param direction="Input" dbtype="VarChar" size="20">:program_rev</param>
             <param direction="Input" dbtype="VarChar" size="200">:param_name</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ET_BIN_PROGRAM_LIST" commandtype="Text" description="Bin 설정: READY 파일이 있는 Device + 공정, 파일 수 / YMS 반영(DONE) 파일 수 (2026-10-22)" commandtimeout="60">
+        <commandtext><![CDATA[SELECT F.DEVICE_ID, F.TEST_PROGRAM, COUNT(*) AS FILE_COUNT,
+       SUM(CASE WHEN F.YMS_STATUS = 'DONE' THEN 1 ELSE 0 END) AS YMS_FILE_COUNT
+  FROM TQP_GDS_SRC_FILE F
+ WHERE F.FACTORY = :factory
+   AND F.LOAD_STATUS = 'READY'
+ GROUP BY F.DEVICE_ID, F.TEST_PROGRAM
+ ORDER BY F.DEVICE_ID, F.TEST_PROGRAM]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="120">:factory</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ET_BIN_USE" commandtype="Text" description="Bin 설정: Device + 공정 READY 파일 Die 를 Hardware Bin / Software Bin / 파일로 묶은 수. 합치기는 BSL (LISTAGG DISTINCT 는 19c 부터라 쓰지 않음, 2026-10-22)" commandtimeout="120">
+        <commandtext><![CDATA[SELECT D.HW_BIN, D.SW_BIN, D.SRC_FILE_SEQ, COUNT(*) AS DIE_COUNT,
+       SUM(CASE WHEN D.PASS_FLAG = 'P' THEN 1 ELSE 0 END) AS PASS_COUNT,
+       SUM(CASE WHEN D.PASS_FLAG = 'F' THEN 1 ELSE 0 END) AS FAIL_COUNT
+  FROM TQP_GDS_ET_DIE D
+  JOIN TQP_GDS_SRC_FILE F ON F.SRC_FILE_SEQ = D.SRC_FILE_SEQ
+ WHERE F.FACTORY = :factory
+   AND F.DEVICE_ID = :device_id
+   AND F.TEST_PROGRAM = :test_program
+   AND F.LOAD_STATUS = 'READY'
+ GROUP BY D.HW_BIN, D.SW_BIN, D.SRC_FILE_SEQ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="120">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="200">:device_id</param>
+            <param direction="Input" dbtype="VarChar" size="200">:test_program</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_ET_BIN_DEF" commandtype="Text" description="Bin 설정: YMS Program 의 Bin 정의 (TQP_BINDESC, 2026-10-22)" commandtimeout="60">
+        <commandtext><![CDATA[SELECT B.BIN, B.BIN_NAME, B.HIGH_GEC, B.COLOR, B.DESCRIPTION
+  FROM TQP_BINDESC B
+ WHERE B.PROGRAM = :program
+ ORDER BY B.BIN]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="200">:program</param>
+        </parameters>
+    </query>
+    <query statement="Update" queryid="MERGE_ET_BIN" commandtype="Text" description="Bin 설정 저장 (ExecuteMultiple): 있으면 이름 / 양품 / 색 / 설명만, 없으면 새 정의(표시 Y, Map 기호 / Limit 없음 = 업로드 자동 등록과 같음, 2026-10-22)" commandtimeout="60">
+        <commandtext><![CDATA[MERGE INTO TQP_BINDESC T
+USING (SELECT :program AS PROGRAM, TO_NUMBER(:bin) AS BIN, :bin_name AS BIN_NAME, :high_gec AS HIGH_GEC,
+              :color AS COLOR, :description AS DESCRIPTION
+         FROM DUAL) S
+   ON (T.PROGRAM = S.PROGRAM AND T.BIN = S.BIN)
+ WHEN MATCHED THEN
+      UPDATE SET T.BIN_NAME = S.BIN_NAME,
+                 T.HIGH_GEC = S.HIGH_GEC,
+                 T.COLOR = S.COLOR,
+                 T.DESCRIPTION = S.DESCRIPTION
+ WHEN NOT MATCHED THEN
+      INSERT (PROGRAM, BIN, BIN_NAME, HIGH_GEC, DISPLAY, COLOR, DESCRIPTION)
+      VALUES (S.PROGRAM, S.BIN, S.BIN_NAME, S.HIGH_GEC, 'Y', S.COLOR, S.DESCRIPTION)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="200">:program</param>
+            <param direction="Input" dbtype="VarChar" size="20">:bin</param>
+            <param direction="Input" dbtype="VarChar" size="200">:bin_name</param>
+            <param direction="Input" dbtype="VarChar" size="10">:high_gec</param>
+            <param direction="Input" dbtype="VarChar" size="40">:color</param>
+            <param direction="Input" dbtype="VarChar" size="400">:description</param>
+        </parameters>
+    </query>
+    <query statement="Delete" queryid="DELETE_ET_BIN" commandtype="Text" description="Bin 설정 삭제 (ExecuteMultiple, 2026-10-22)" commandtimeout="60">
+        <commandtext><![CDATA[DELETE FROM TQP_BINDESC
+ WHERE PROGRAM = :program
+   AND BIN = TO_NUMBER(:bin)]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="200">:program</param>
+            <param direction="Input" dbtype="VarChar" size="20">:bin</param>
         </parameters>
     </query>
 </queryxml>

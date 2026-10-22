@@ -1,0 +1,26 @@
+﻿{
+    "id":  "03",
+    "name":  "EtestCheck",
+    "scenarios":  [
+                      "SCN-E"
+                  ],
+    "status":  "FAIL",
+    "exitCode":  1,
+    "timedOut":  false,
+    "durationMs":  1746,
+    "started":  "2026-10-19 10:48:05",
+    "command":  "python -X utf8 \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\probes\\f07data_etest_check.py\" \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\SampleFile\\26_10_14 Sample File\\CAI_OMMTCB_ATV_A0_TSVET_20261002161846_SCKLOTIDA_SCKLOTIDA-01$Silterra$.xlsx\" \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\reports\\run-20261019-103914-F07DATA\\evidence\\db\" \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\SampleFile\\U9_Die좌표_대응표_20261012.tsv\" 7 5",
+    "workingDir":  "D:\\1_프로젝트 문서\\18.스테츠칩팩_POC",
+    "keys":  {
+                 "ETEST_CHECK_PROBE":  "FAIL (8/9)"
+             },
+    "passLines":  8,
+    "failLines":  [
+                      "FAIL / E2 Wafer: DB WAFER_ID(파일 이름 Lot-Wafer No) = 내용의 Wafer ID 열 / DB SCKLOTIDA-01(LOT SCKLOTIDA, SLOT 1) / 내용 {\u0027U9-HS2635-01\u0027: 73} -\u003e 이 파일은 내용상 다른 Wafer 의 E-Test"
+                  ],
+    "skipLines":  [
+
+                  ],
+    "stdout":  "03_EtestCheck.stdout.txt",
+    "stderr":  "03_EtestCheck.stderr.txt"
+}

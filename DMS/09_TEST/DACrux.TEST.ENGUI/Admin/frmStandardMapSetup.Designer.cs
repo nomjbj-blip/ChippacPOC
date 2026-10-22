@@ -204,7 +204,7 @@
             this.lblWafer.Name = "lblWafer";
             this.lblWafer.Size = new System.Drawing.Size(280, 22);
             this.lblWafer.TabIndex = 1;
-            this.lblWafer.Text = "Wafer 크기 (mm)";
+            this.lblWafer.Text = "Wafer 크기";
             // 
             // cmbWaferSize
             // 
@@ -228,7 +228,7 @@
             this.lblEdge.Name = "lblEdge";
             this.lblEdge.Size = new System.Drawing.Size(135, 22);
             this.lblEdge.TabIndex = 11;
-            this.lblEdge.Text = "Edge (µm)";
+            this.lblEdge.Text = "Edge";
             // 
             // numEdge
             // 
@@ -298,7 +298,7 @@
             this.lblMarkType.Name = "lblMarkType";
             this.lblMarkType.Size = new System.Drawing.Size(135, 22);
             this.lblMarkType.TabIndex = 21;
-            this.lblMarkType.Text = "형태 (Notch / Flat)";
+            this.lblMarkType.Text = "형태";
             // 
             // cmbMarkType
             // 
@@ -318,7 +318,7 @@
             this.lblOrigin.Name = "lblOrigin";
             this.lblOrigin.Size = new System.Drawing.Size(290, 22);
             this.lblOrigin.TabIndex = 2;
-            this.lblOrigin.Text = "원점 (µm)";
+            this.lblOrigin.Text = "원점";
             // 
             // lblOriginX
             // 
@@ -380,7 +380,7 @@
             this.lblPitch.Name = "lblPitch";
             this.lblPitch.Size = new System.Drawing.Size(290, 22);
             this.lblPitch.TabIndex = 23;
-            this.lblPitch.Text = "Die Pitch (µm)";
+            this.lblPitch.Text = "Die Pitch";
             // 
             // lblPitchX
             // 

@@ -72,6 +72,23 @@ VALUES
             <param direction="Input" dbtype="Number" size="0">:chain_seq</param>
         </parameters>
     </query>
+    <query statement="Update" queryid="UPDATE_CHAIN_VER_COLOR" commandtype="Text" description="Chain 색 변경 (VERSION 1, 2026-10-21)" commandtimeout="60">
+        <commandtext><![CDATA[UPDATE TQP_GDS_CHAIN_VER
+   SET COLOR_ARGB = :color_argb,
+       UPDATE_USER = :update_user,
+       UPDATE_TIME = SYSDATE
+ WHERE FACTORY = :factory
+   AND DEVICE_ID = :device_id
+   AND CHAIN_SEQ = :chain_seq
+   AND VERSION_NO = 1 ]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:color_argb</param>
+            <param direction="Input" dbtype="VarChar" size="30">:update_user</param>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
+            <param direction="Input" dbtype="Number" size="0">:chain_seq</param>
+        </parameters>
+    </query>
     <query statement="Delete" queryid="DELETE_CHAIN_VER" commandtype="Text" description="다시 저장 전 이전 저장 내용 삭제 (MEMBER / LAYER / RULE / EDIT는 FK CASCADE)" commandtimeout="600">
         <commandtext><![CDATA[DELETE FROM TQP_GDS_CHAIN_VER
  WHERE FACTORY = :factory

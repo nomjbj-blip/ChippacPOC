@@ -2,14 +2,14 @@
 # 목적: ChainColorPicker가 기존 Chain 색과 최대한 다른 색을 고르는지 확인한다.
 #       예전 방식(고정 8색 순환)과 새 방식으로 Chain 8개를 만들 때 "가장 비슷한 두 색의 차이(ΔE)"를 비교한다.
 #       ΔE는 CIE Lab 거리이며 약 10 이하면 화면에서 같은 계열로 보이기 쉽다.
-# 대상: GdsMapControl\bin\Debug\NexplantQMS.GdsMap.exe (DB / Service 사용 안 함)
+# 대상: GdsMapControl\bin\Debug\NexplantQMS.GdsMap.dll (DB / Service 사용 안 함)
 # 실행: powershell -NoProfile -ExecutionPolicy Bypass -File GdsChainColorProbe.ps1 [-BinDir <EXE 폴더>]
 param([string]$BinDir = '')
 $ErrorActionPreference = 'Stop'
 if ($BinDir -eq '') { $BinDir = Join-Path $PSScriptRoot '..\bin\Debug' }
 Add-Type -AssemblyName System.Drawing
 # EXE를 잠그지 않도록 바이트로 읽어 로드한다.
-$asm = [Reflection.Assembly]::Load([IO.File]::ReadAllBytes((Join-Path $BinDir 'NexplantQMS.GdsMap.exe')))
+$asm = [Reflection.Assembly]::Load([IO.File]::ReadAllBytes((Join-Path $BinDir 'NexplantQMS.GdsMap.dll')))
 $picker = $asm.GetType('NexplantQMS.GdsMap.Chain.ChainColorPicker', $true)
 function Pick($used, $layers) { return $picker.GetMethod('Pick').Invoke($null, @([Drawing.Color[]]$used, [Drawing.Color[]]$layers)) }
 function Get-ColorDiff($a, $b) { return [double]$picker.GetMethod('Difference').Invoke($null, @($a, $b)) }

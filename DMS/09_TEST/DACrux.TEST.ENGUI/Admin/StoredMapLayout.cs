@@ -264,18 +264,18 @@ namespace DACrux.TEST.ENGUI
                 OtherCount == 0 ? StoredMapCheckResult.Match : StoredMapCheckResult.Note,
                 "File Map Setup 은 사용 1 / 제거 -1 만 저장한다"));
 
-            Checks.Add(new StoredMapCheck("Edge 단위 (mm)", EdgeSizeMm.ToString("0.###", CultureInfo.InvariantCulture), "0 ~ 5",
+            Checks.Add(new StoredMapCheck("Edge 단위", EdgeSizeMm.ToString("0.###", CultureInfo.InvariantCulture), "0 ~ 5",
                 IsEdgeValid ? StoredMapCheckResult.Match : StoredMapCheckResult.Differ,
-                "범위 밖이면 Map Define 에서 불러올 때 오류 (µm 로 저장된 값일 수 있음). 이 화면은 Edge 0 으로 그림"));
+                "범위 밖이면 Map Define 에서 불러올 때 오류. 이 화면은 Edge 0 으로 그림"));
 
-            Checks.Add(new StoredMapCheck("Wafer 크기 단위 (µm)", WaferSize.ToString("#,0.###", CultureInfo.InvariantCulture), "1,000 이상",
+            Checks.Add(new StoredMapCheck("Wafer 크기 단위", WaferSize.ToString("#,0.###", CultureInfo.InvariantCulture), "1,000 이상",
                 WaferSize >= MinWaferMicron ? StoredMapCheckResult.Match : StoredMapCheckResult.Differ,
-                "mm 로 저장되면 Map 이 아주 작게 그려짐"));
+                "단위가 다르게 저장되면 Map 이 아주 작게 그려짐"));
 
-            Checks.Add(new StoredMapCheck("Die 크기 단위 (µm)",
+            Checks.Add(new StoredMapCheck("Die 크기 단위",
                 string.Format(CultureInfo.InvariantCulture, "{0:#,0.###} x {1:#,0.###}", DieSizeX, DieSizeY), "10 이상",
                 DieSizeX >= MinDieMicron && DieSizeY >= MinDieMicron ? StoredMapCheckResult.Match : StoredMapCheckResult.Differ,
-                "mm 로 저장되면 Die 가 점처럼 작게 그려져 마우스로 잡을 수 없음"));
+                "단위가 다르게 저장되면 Die 가 점처럼 작게 그려져 마우스로 잡을 수 없음"));
 
             Checks.Add(new StoredMapCheck("XY 방향", StoredXYDirection.ToString(CultureInfo.InvariantCulture),
                 IsDirectionValid ? Direction.ToString() : "알 수 없는 값",

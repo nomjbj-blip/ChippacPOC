@@ -3,13 +3,15 @@
 # 운영 폴더(100_ClientBin / 101_ServerBin / 71_CoreLib)와 Git 추적 obj 를 바꾸지 않도록 DMS 빌드 대상 폴더를
 # %TEMP%\chippac\setup_build\<버전> 에 복사한 뒤 그 복사본에서 솔루션을 다시 빌드한다.
 #
-# 빌드 구성 = Debug 구성 + DEBUG 기호 제외 (/p:Configuration=Debug /p:DefineConstants=TRACE)
-#   - 100_ClientBin 의 Debug 빌드는 로그인 없이 ADMIN 으로 들어가므로(#if DEBUG) 그대로 줄 수 없다.
-#   - Release 구성은 Debug 와 참조 / 플랫폼이 달라 개발 PC 에서 시험한 것과 다른 결과가 나온다 (2026-10-14 확인).
-#     Miracom.Middleware 가 Oracle Client 가 필요한 x64 판으로 바뀌고, DACrux.ProjectManager 가 x86 전용이 되어
-#     64비트로 실행되는 DACrux 메인 화면(로그인 직후)에서 로드 오류가 난다. 서버 서비스 6개도 플랫폼이 바뀐다.
-#   - 그래서 개발 PC 와 같은 Debug 구성의 참조 / 플랫폼으로 빌드하고 DEBUG 기호만 뺀다. 모든 프로젝트의 Debug 기호가
-#     DEBUG;TRACE 이므로 TRACE 만 남기면 #if DEBUG 코드(자동 로그인 / 스택 표시 등)만 빠진다.
+# 빌드 구성 (-Configuration, 기본 Debug)
+#   - Debug  : Debug 구성 + DEBUG 기호 제외 (/p:Configuration=Debug /p:DefineConstants=TRACE).
+#              100_ClientBin 의 Debug 빌드는 로그인 없이 ADMIN 으로 들어가므로(#if DEBUG) 그대로 줄 수 없어 DEBUG 기호만 뺀다.
+#              모든 프로젝트의 Debug 기호가 DEBUG;TRACE 이므로 TRACE 만 남기면 #if DEBUG 코드(자동 로그인 / 스택 표시 등)만 빠진다.
+#              개발 PC 에서 시험한 것과 같은 참조 / 플랫폼, 최적화 없음.
+#   - Release: Release 구성 그대로 (/p:Configuration=Release, 기호는 프로젝트별 Release 값). 최적화된 배포용 빌드.
+#              2026-10-14 에 Release 의 참조 / 플랫폼(Miracom.Middleware / DACrux.ProjectManager / 서버 서비스 6개)을 Debug 와 맞췄다.
+#              클라이언트는 Debug 와 같은 코드 경로(DEBUG 없음)이고, 서버 묶음의 데이터 서비스는 SINGLE_EQUIP(설비별 Windows 서비스)로 빌드된다.
+#   - 어느 쪽이든 5단계 검사가 자동 로그인 코드 / x86 전용 DLL / Middleware 판을 확인한다.
 #
 # 단계
 #   1. 도구 확인 (MSBuild / ISCC / .NET 4.8 설치 파일 서명)
@@ -24,10 +26,12 @@
 # 예)
 #   powershell -NoProfile -ExecutionPolicy Bypass -File Build-ClientSetup.ps1 -ServerIP 10.10.1.20
 #   powershell -NoProfile -ExecutionPolicy Bypass -File Build-ClientSetup.ps1 -Version 2026.10.14.1 -ServerIP LOCALHOST
+#   powershell -NoProfile -ExecutionPolicy Bypass -File Build-ClientSetup.ps1 -Configuration Release -ServerIP 10.86.253.162
 # 결과 마지막 줄: CLIENT_SETUP_BUILD=PASS <Setup 경로> 또는 CLIENT_SETUP_BUILD=FAIL <이유>
 param(
     [string]$Version,
     [string]$ServerIP = 'LOCALHOST',
+    [ValidateSet('Debug', 'Release')][string]$Configuration = 'Debug',
     [switch]$NoPdb,
     [switch]$NoDotNet,
     [switch]$NoServerBundle,
@@ -70,8 +74,14 @@ $AppExeName = 'DACrux SCK POC.exe'
 # 프로그램 아이콘 (실행 파일 / Setup / 점검 도구 공통, 2026-10-14 통일)
 $MainIcon = Join-Path $DmsRoot '01_WinApp\DACruxV5\Resources\MainIcon.ico'
 
+# 솔루션 빌드 구성 (머리말 참고)
+$ConfigText = if ($Configuration -eq 'Release') { 'Release 구성 (최적화, 프로젝트별 Release 기호)' } else { 'Debug 구성 + DEBUG 기호 제외' }
+# 인수가 하나여도 배열로 남도록 @() 로 감싼다(그대로 두면 문자열 하나가 되어 @ConfigArgs 가 글자 단위로 펼쳐진다)
+$ConfigArgs = @(if ($Configuration -eq 'Release') { '/p:Configuration=Release' } else { '/p:Configuration=Debug', '/p:DefineConstants=TRACE' })
+
 Write-Host "$ProductName 클라이언트 Setup 빌드"
 Write-Host "  버전       : $Version"
+Write-Host "  빌드 구성  : $ConfigText"
 Write-Host "  서버 기본값: $ServerIP"
 Write-Host "  빌드 폴더  : $BuildRoot"
 Write-Host "  출력 폴더  : $OutDir"
@@ -105,12 +115,16 @@ if ($IncludeDotNet) {
 
 # ---- 2. DMS 복사 / 솔루션 빌드 --------------------------------------------------
 $BuildStartFile = Join-Path $BuildRoot 'build_start.txt'
+$BuildConfigFile = Join-Path $BuildRoot 'build_config.txt'
 if ($SkipBuild) {
     Step '2. 솔루션 빌드 건너뜀 (-SkipBuild)'
     if (-not (Test-Path $BuildStartFile)) { Fail "이전 빌드 결과가 없습니다: $BuildRoot" }
+    # 구성 기록이 없는 이전 빌드는 Debug 로 만든 것이다
+    $prevConfig = if (Test-Path $BuildConfigFile) { (Get-Content $BuildConfigFile).Trim() } else { 'Debug' }
+    if ($prevConfig -ne $Configuration) { Fail "이전 빌드는 $prevConfig 구성입니다. -Configuration $prevConfig 로 실행하거나 -SkipBuild 없이 다시 빌드하세요" }
     $BuildStart = [datetime]::ParseExact((Get-Content $BuildStartFile), 'yyyy-MM-dd HH:mm:ss', $null)
 } else {
-    Step '2. DMS 복사 -> 솔루션 빌드 (Debug 구성 + DEBUG 기호 제외)'
+    Step "2. DMS 복사 -> 솔루션 빌드 ($ConfigText)"
     if (Test-Path $CopyDms) { Remove-Item $CopyDms -Recurse -Force }
     New-Item -ItemType Directory -Force $CopyDms | Out-Null
 
@@ -134,10 +148,11 @@ if ($SkipBuild) {
 
     $BuildStart = (Get-Date).AddSeconds(-2)
     Set-Content -Path $BuildStartFile -Value $BuildStart.ToString('yyyy-MM-dd HH:mm:ss') -Encoding ASCII
+    Set-Content -Path $BuildConfigFile -Value $Configuration -Encoding ASCII
     $log = Join-Path $BuildRoot 'build_solution.log'
-    Write-Host '  솔루션 다시 빌드 중: Debug 구성 + DEBUG 기호 제외 (몇 분 걸림)...'
+    Write-Host "  솔루션 다시 빌드 중: $ConfigText (몇 분 걸림)..."
     # 모든 프로젝트가 같은 출력 폴더로 복사되므로 병렬 빌드의 파일 경합을 피해 순서대로 빌드한다.
-    & $MsBuild $Sln /t:Rebuild /p:Configuration=Debug /p:DefineConstants=TRACE "/p:Platform=Any CPU" /m:1 /nr:false /nologo /v:quiet "/fl" "/flp:LogFile=$log;Verbosity=normal;Encoding=UTF-8" | Out-Host
+    & $MsBuild $Sln /t:Rebuild @ConfigArgs "/p:Platform=Any CPU" /m:1 /nr:false /nologo /v:quiet "/fl" "/flp:LogFile=$log;Verbosity=normal;Encoding=UTF-8" | Out-Host
     $code = $LASTEXITCODE
     $summary = Select-String -Path $log -Pattern '^\s+\d+ (Warning|Error)\(s\)|^\s+\d+개 경고|^\s+\d+개 오류|경고 \d+개|오류 \d+개' | ForEach-Object { $_.Line.Trim() }
     Write-Host ('  결과: ' + ($summary -join ' / '))
@@ -254,7 +269,7 @@ $info = @(
     "제품 = $ProductName 클라이언트",
     "버전 = $Version",
     ('빌드 시각 = ' + (Get-Date).ToString('yyyy-MM-dd HH:mm:ss')),
-    '빌드 구성 = Debug 구성(개발 PC 와 같은 참조 / 플랫폼) + DEBUG 기호 제외(로그인 필요)',
+    $(if ($Configuration -eq 'Release') { '빌드 구성 = Release 구성(최적화, 프로젝트별 Release 기호, 참조 / 플랫폼은 Debug 와 같음)' } else { '빌드 구성 = Debug 구성(개발 PC 와 같은 참조 / 플랫폼) + DEBUG 기호 제외(로그인 필요)' }),
     "Git commit = $commit (DMS 미커밋 변경 $dirty 개 포함)",
     "빌드 PC = $env:COMPUTERNAME",
     "서버 주소 기본값 = $ServerIP",
@@ -309,12 +324,16 @@ if (-not $NoServerBundle -and -not $TestMode) {
     $readme = @(
         "$ProductName 서버 묶음 $Version",
         '',
-        '포함: 이 버전 클라이언트 Setup 과 같은 소스 / 같은 빌드(Debug 구성 + DEBUG 기호 제외)로 만든 서버 DLL / EXE (/ PDB).',
+        "포함: 이 버전 클라이언트 Setup 과 같은 소스 / 같은 빌드($ConfigText)로 만든 서버 DLL / EXE (/ PDB).",
         '제외: *.config (DB 접속 / wellknown / KLARF_IMAGE_ROOT), 외부 DLL, Query XML. 서버에 있는 것을 그대로 둔다.',
         '',
         '배포: 서비스를 멈춘 뒤 101_ServerBin 에 덮어쓰고 버전정보.txt 도 같이 둔다. 그 다음 서비스를 다시 시작한다.',
         '주의: DEBUG 기호 없이 빌드해 서비스 시작 / 중지 로그를 DB 에 남긴다 (개발 PC 의 Debug 서버와 다른 점).'
     )
+    if ($Configuration -eq 'Release') {
+        $readme += '주의: Release 구성이라 데이터 서비스(Inspection / PreConverting / Review / CP / PCM)는 SINGLE_EQUIP(설비별 Windows 서비스 이름)으로 빌드된다.'
+        $readme += '      DACrux.SEMDMS.BSL 은 Release 구성에도 DEBUG 기호가 있다(그 소스에 DEBUG 분기 / Debug 호출 없음, 2026-10-21 확인).'
+    }
     [IO.File]::WriteAllLines((Join-Path $bundle '읽어보기.txt'), [string[]]$readme, $Utf8Bom)
     Copy-Item (Join-Path $Stage '버전정보.txt') $bundle
     $zip = Join-Path $OutDir "${FilePrefix}_Server_${Version}_DLL.zip"
@@ -331,6 +350,7 @@ $report = @(
     "Setup = $($setupFile.FullName)",
     ('크기 = {0:N1} MB' -f ($setupFile.Length / 1MB)),
     "SHA-256 = $setupHash",
+    "빌드 구성 = $ConfigText",
     "stage 파일 수 = $($stageFiles.Count)",
     "빌드 폴더 = $BuildRoot",
     ('경고 = ' + $Warnings.Count)

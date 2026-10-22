@@ -32,6 +32,7 @@
             this.dgvPara = new System.Windows.Forms.DataGridView();
             this.colPHeader = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colPName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colPYms = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colPMeas = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colPCond = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colPChain1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -207,10 +208,12 @@
             this.dgvPara.AllowUserToDeleteRows = false;
             this.dgvPara.AllowUserToResizeRows = false;
             this.dgvPara.BackgroundColor = System.Drawing.SystemColors.Window;
+            this.dgvPara.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
             this.dgvPara.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvPara.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.colPHeader,
             this.colPName,
+            this.colPYms,
             this.colPMeas,
             this.colPCond,
             this.colPChain1,
@@ -245,7 +248,7 @@
             // colPHeader
             // 
             this.colPHeader.Frozen = true;
-            this.colPHeader.HeaderText = "Parameter (헤더 원문)";
+            this.colPHeader.HeaderText = "Parameter";
             this.colPHeader.MinimumWidth = 8;
             this.colPHeader.Name = "colPHeader";
             this.colPHeader.ReadOnly = true;
@@ -258,7 +261,16 @@
             this.colPName.Name = "colPName";
             this.colPName.ReadOnly = true;
             this.colPName.Width = 220;
-            // 
+            //
+            // colPYms
+            //
+            this.colPYms.HeaderText = "YMS 이름";
+            this.colPYms.MaxInputLength = 30;
+            this.colPYms.MinimumWidth = 8;
+            this.colPYms.Name = "colPYms";
+            this.colPYms.Visible = false;
+            this.colPYms.Width = 200;
+            //
             // colPMeas
             // 
             this.colPMeas.HeaderText = "측정";
@@ -273,6 +285,7 @@
             this.colPCond.MinimumWidth = 8;
             this.colPCond.Name = "colPCond";
             this.colPCond.ReadOnly = true;
+            this.colPCond.Visible = false;
             this.colPCond.Width = 150;
             // 
             // colPChain1
@@ -309,7 +322,7 @@
             // 
             // colPGds
             // 
-            this.colPGds.HeaderText = "GDS Chain (Chain 1)";
+            this.colPGds.HeaderText = "GDS Chain";
             this.colPGds.MinimumWidth = 8;
             this.colPGds.Name = "colPGds";
             this.colPGds.Width = 160;
@@ -349,6 +362,7 @@
             this.colPSpecText.MinimumWidth = 8;
             this.colPSpecText.Name = "colPSpecText";
             this.colPSpecText.ReadOnly = true;
+            this.colPSpecText.Visible = false;
             this.colPSpecText.Width = 200;
             // 
             // colPSource
@@ -357,6 +371,7 @@
             this.colPSource.MinimumWidth = 8;
             this.colPSource.Name = "colPSource";
             this.colPSource.ReadOnly = true;
+            this.colPSource.Visible = false;
             this.colPSource.Width = 70;
             // 
             // colPRegFile
@@ -592,7 +607,7 @@
             // btnClearFilter
             //
             this.btnClearFilter.Enabled = false;
-            this.btnClearFilter.Location = new System.Drawing.Point(1485, 9);
+            this.btnClearFilter.Location = new System.Drawing.Point(1223, 9);
             this.btnClearFilter.Margin = new System.Windows.Forms.Padding(4);
             this.btnClearFilter.Name = "btnClearFilter";
             this.btnClearFilter.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
@@ -632,6 +647,7 @@
             this.lblFltCond.Name = "lblFltCond";
             this.lblFltCond.TabIndex = 11;
             this.lblFltCond.Text = "조건";
+            this.lblFltCond.Visible = false;
             // 
             // cboFltCond
             // 
@@ -642,13 +658,14 @@
             this.cboFltCond.Name = "cboFltCond";
             this.cboFltCond.Size = new System.Drawing.Size(200, 26);
             this.cboFltCond.TabIndex = 12;
+            this.cboFltCond.Visible = false;
             this.cboFltCond.DropDown += new System.EventHandler(this.cboFlt_DropDown);
             this.cboFltCond.SelectedIndexChanged += new System.EventHandler(this.cboFlt_SelectedIndexChanged);
             // 
             // lblFltChain1
             // 
             this.lblFltChain1.AutoSize = true;
-            this.lblFltChain1.Location = new System.Drawing.Point(473, 21);
+            this.lblFltChain1.Location = new System.Drawing.Point(211, 21);
             this.lblFltChain1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblFltChain1.Name = "lblFltChain1";
             this.lblFltChain1.TabIndex = 13;
@@ -658,7 +675,7 @@
             // 
             this.cboFltChain1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboFltChain1.DropDownWidth = 320;
-            this.cboFltChain1.Location = new System.Drawing.Point(545, 17);
+            this.cboFltChain1.Location = new System.Drawing.Point(283, 17);
             this.cboFltChain1.Margin = new System.Windows.Forms.Padding(4);
             this.cboFltChain1.Name = "cboFltChain1";
             this.cboFltChain1.Size = new System.Drawing.Size(210, 26);
@@ -669,7 +686,7 @@
             // lblFltGds
             // 
             this.lblFltGds.AutoSize = true;
-            this.lblFltGds.Location = new System.Drawing.Point(769, 21);
+            this.lblFltGds.Location = new System.Drawing.Point(507, 21);
             this.lblFltGds.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblFltGds.Name = "lblFltGds";
             this.lblFltGds.TabIndex = 15;
@@ -679,7 +696,7 @@
             // 
             this.cboFltGds.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboFltGds.DropDownWidth = 320;
-            this.cboFltGds.Location = new System.Drawing.Point(867, 17);
+            this.cboFltGds.Location = new System.Drawing.Point(605, 17);
             this.cboFltGds.Margin = new System.Windows.Forms.Padding(4);
             this.cboFltGds.Name = "cboFltGds";
             this.cboFltGds.Size = new System.Drawing.Size(210, 26);
@@ -690,7 +707,7 @@
             // lblFltUse
             // 
             this.lblFltUse.AutoSize = true;
-            this.lblFltUse.Location = new System.Drawing.Point(1091, 21);
+            this.lblFltUse.Location = new System.Drawing.Point(829, 21);
             this.lblFltUse.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblFltUse.Name = "lblFltUse";
             this.lblFltUse.TabIndex = 17;
@@ -700,7 +717,7 @@
             // 
             this.cboFltUse.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboFltUse.DropDownWidth = 120;
-            this.cboFltUse.Location = new System.Drawing.Point(1139, 17);
+            this.cboFltUse.Location = new System.Drawing.Point(877, 17);
             this.cboFltUse.Margin = new System.Windows.Forms.Padding(4);
             this.cboFltUse.Name = "cboFltUse";
             this.cboFltUse.Size = new System.Drawing.Size(125, 26);
@@ -711,7 +728,7 @@
             // lblFltEnable
             // 
             this.lblFltEnable.AutoSize = true;
-            this.lblFltEnable.Location = new System.Drawing.Point(1278, 21);
+            this.lblFltEnable.Location = new System.Drawing.Point(1016, 21);
             this.lblFltEnable.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblFltEnable.Name = "lblFltEnable";
             this.lblFltEnable.TabIndex = 19;
@@ -721,7 +738,7 @@
             // 
             this.cboFltEnable.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboFltEnable.DropDownWidth = 120;
-            this.cboFltEnable.Location = new System.Drawing.Point(1346, 17);
+            this.cboFltEnable.Location = new System.Drawing.Point(1084, 17);
             this.cboFltEnable.Margin = new System.Windows.Forms.Padding(4);
             this.cboFltEnable.Name = "cboFltEnable";
             this.cboFltEnable.Size = new System.Drawing.Size(125, 26);
@@ -804,6 +821,7 @@
         private System.Windows.Forms.DataGridView dgvPara;
         private System.Windows.Forms.DataGridViewTextBoxColumn colPHeader;
         private System.Windows.Forms.DataGridViewTextBoxColumn colPName;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colPYms;
         private System.Windows.Forms.DataGridViewTextBoxColumn colPMeas;
         private System.Windows.Forms.DataGridViewTextBoxColumn colPCond;
         private System.Windows.Forms.DataGridViewTextBoxColumn colPChain1;

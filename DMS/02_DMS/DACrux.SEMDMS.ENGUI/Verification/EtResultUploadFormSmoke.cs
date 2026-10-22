@@ -139,10 +139,9 @@ internal static class EtResultUploadFormSmoke
             Invoke(type, form, "btnSave_Click");
             string q = form.LastQuestion;
             string seq4 = SeqOf(lblMessage.Text);
-            Check("저장 확인 문구: 파일 / WAFER_ID RH-HS2615-04 · 공정 TSVET / 'Parameter 37 x Die 24 = 값 888' / 등록 안 된 헤더 2,718개 / 다시 업로드 안내",
-                q.StartsWith("E-Test 결과 파일을 저장합니다. 등록 Parameter(사용 Y)만 저장합니다.") && q.Contains("파일: " + Path.GetFileName(noSlot))
-                && q.Contains("WAFER_ID RH-HS2615-04 / 공정 TSVET") && q.Contains("저장: Parameter 37 x Die 24 = 값 888") && q.Contains("등록되지 않은 헤더는 저장하지 않습니다 (2,718개)")
-                && q.Contains("다시 업로드해야 보입니다"), q.Replace("\r\n", " / "));
+            Check("저장 확인 문구: 첫 문장 / 등록 안 된 헤더 2,718개 / 다시 업로드 안내 / 파일 · WAFER_ID · 저장 건수 줄 없음(2026-10-22)",
+                q.StartsWith("E-Test 결과 파일을 저장합니다. 등록 Parameter(사용 Y)만 저장합니다.") && q.Contains("등록되지 않은 헤더는 저장하지 않습니다 (2,718개)")
+                && q.Contains("다시 업로드해야 보입니다") && !q.Contains("파일: ") && !q.Contains("WAFER_ID") && !q.Contains("저장: Parameter"), q.Replace("\r\n", " / "));
             Check("저장 뒤: 상태 저장됨 / 메시지 파일 번호 / 제목 '업로드 결과 - 저장됨 (파일 번호)' / [저장] 꺼짐 / Slot · 정보 표 잠김 / 안내에 조회 화면",
                 lblState.Text == "저장됨" && lblMessage.Text.StartsWith("저장 완료 / 파일 번호 " + seq4) && infoTitle.Text == "업로드 결과 - 저장됨 (파일 번호 " + seq4 + ")"
                 && !btnSave.Enabled && txtSlot.ReadOnly && !Editable(info, "Device") && form.LastNotice.Contains("E-Test 결과 조회 화면") && bsl.GetEtFile(seq4).Rows.Count == 1, lblMessage.Text);
@@ -232,9 +231,8 @@ internal static class EtResultUploadFormSmoke
             form.Answers.Enqueue(DialogResult.OK);
             Invoke(type, form, "btnSave_Click");
             string seqA = SeqOf(lblMessage.Text);
-            Check("샘플 저장: 확인 문구 WAFER_ID RH-HS2615-02 / 저장됨 / 메시지 Spec Fail Die 1 · 값 888 · Map OMM 좌표 Die 24",
-                form.LastQuestion.Contains("WAFER_ID RH-HS2615-02 / 공정 TSVET") && lblState.Text == "저장됨" && lblMessage.Text.Contains("Spec Fail Die 1")
-                && lblMessage.Text.Contains("값 888") && lblMessage.Text.Contains("Map OMM 좌표 Die 24"), lblMessage.Text);
+            Check("샘플 저장: 저장됨 / 메시지 '저장 완료 / 파일 번호 n / WAFER_ID RH-HS2615-02' 까지만(Spec Fail · 값 · Map 표시 없음, 2026-10-22)",
+                lblState.Text == "저장됨" && lblMessage.Text == "저장 완료 / 파일 번호 " + seqA + " / WAFER_ID RH-HS2615-02", lblMessage.Text);
             var busyBar = (DACrux.SEMDMS.Control.ProgressStatusBar)Get(type, form, "busyBar");
             Check("진행 표시줄: '저장 완료'(처리 시간 없음) / 작업 없음", busyBar.LastResult == "저장 완료" && !busyBar.IsBusy, busyBar.DisplayText);
             DataRow saved = bsl.GetEtFile(seqA).Rows[0];

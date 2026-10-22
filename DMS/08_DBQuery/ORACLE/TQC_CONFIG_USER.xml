@@ -9,7 +9,7 @@ SELECT DECODE(T2."CATEGORY", NULL, T1."CATEGORY", T2."CATEGORY") AS "CATEGORY",
        T2.USERID AS "USER_ID",
        T2.ORDERED,
        DECODE(T2."COMMENT", NULL, T1."COMMENT", T2."COMMENT") AS "COMMENT"
-  FROM DMSMGR.TQC_CONFIG T1, DMSMGR.TQC_CONFIG_USER T2
+  FROM TQC_CONFIG T1, TQC_CONFIG_USER T2
  WHERE 1=1 
    AND T1.CATEGORY = T2.CATEGORY(+)
    AND T1.NAME = T2.NAME(+)
@@ -55,7 +55,7 @@ DELETE FROM TQC_CONFIG_USER
     <query statement="Select" queryid="SELECT_CONFIG_USER_02" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[-- Create Date : 2019-06-06 11:16:44
 SELECT ORDERED, NAME, VALUE
-  FROM DMSMGR.TQC_CONFIG_USER 
+  FROM TQC_CONFIG_USER 
  WHERE 1=1 
        AND FACTORY = :factory 
        AND CATEGORY = :category 
@@ -68,7 +68,7 @@ SELECT ORDERED, NAME, VALUE
     </query>
     <query statement="Select" queryid="SELECT_CONFIG_USER_03" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[SELECT *
-  FROM DMSMGR.TQC_CONFIG_USER
+  FROM TQC_CONFIG_USER
  WHERE 1 = 1    
    AND FACTORY = :factory
    AND CATEGORY = NVL(:cat, CATEGORY)
@@ -83,7 +83,7 @@ SELECT ORDERED, NAME, VALUE
     <query statement="Select" queryid="SELECT_CONFIG_USER_04" commandtype="Text" commandtimeout="60">
         <commandtext><![CDATA[ SELECT 
        DECODE(T2."VALUE", NULL, T1."VALUE", T2."VALUE") AS "VALUE"
-  FROM DMSMGR.TQC_CONFIG T1, DMSMGR.TQC_CONFIG_USER T2
+  FROM TQC_CONFIG T1, TQC_CONFIG_USER T2
  WHERE 1=1 
    AND T1.CATEGORY = T2.CATEGORY(+)
    AND T1.NAME = T2.NAME(+)

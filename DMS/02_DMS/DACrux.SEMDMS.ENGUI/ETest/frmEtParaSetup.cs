@@ -20,11 +20,19 @@ namespace DACrux.SEMDMS.ENGUI
     /// 처리 흐름:
     ///  1) Device / 공정 콤보를 고르면 바로 조회한다(저장 안 한 수정이 있으면 먼저 묻고, 아니요면 원래 값으로 되돌림).
     ///  2) GDS Chain / Lower / Upper / 비고는 더블클릭(F2)으로, 사용 / Enable 은 클릭으로 고친다.
+    ///     여러 칸을 드래그해 Ctrl+C -> 다른 칸에서 Ctrl+V 하면 같은 모양으로 붙는다(Excel 에서 복사한 칸도 같음, 2026-10-21 PasteCells).
     ///     행 Tag(ParaState)에 조회 당시 값을 두고 바뀐 칸은 노란색 + 행 머리글 '*'. [저장] -> SaveEtParameterSetup(수정 행만) -> 다시 판정 질문.
     ///  3) [Spec 표 붙여넣기] 는 고객 Spec 표(클립보드)를 공정별로 등록 + 저장한다. [선택 삭제] 는 Parameter 와 Spec 을 지운다.
-    ///  4) 필터 콤보(2026-10-15): 표 위 측정 / 조건 / Chain 1 / GDS Chain / 사용 / Enable 콤보. 펼치면 (전체) + 그 열 값(건수)이 나오고, 고르면 그 값의 행만 보인다.
-    ///     건수는 다른 콤보에서 고른 값을 통과한 행으로 센다(여러 콤보는 AND). 수정한 행은 필터와 상관없이 보인다.
+    ///  4) 필터 콤보(2026-10-15): 표 위 측정 / 조건 / Chain 1 / GDS Chain / 사용 / Enable 콤보. 펼치면 (전체) + 그 열 값이 나오고, 고르면 그 값의 행만 보인다.
+    ///     목록은 다른 콤보에서 고른 값을 통과한 행의 값만 보인다(여러 콤보는 AND, 2026-10-22 건수 표시 삭제). 수정한 행은 필터와 상관없이 보인다.
     ///     같은 Device / 공정을 다시 조회(저장 뒤 포함)하면 고른 값을 유지하고, Device / 공정이 바뀌면 (전체)로 돌린다. [필터 해제] = 모두 (전체).
+    ///  5) YMS 이름(2026-10-21): YMS TD 컬럼 이름(30자 이하, 등록 때 규칙으로 만든 값). 더블클릭(F2)으로 고친다. 형식 / 표 안 겹침은 붉은 칸.
+    ///     YMS 에 이미 반영된 Parameter(YMS_PUBLISHED = Y)는 회색 글자이고 고칠 수 없다.
+    ///     설계: 문서/설계/04_ETest/2026-10-21_ETest_YMS_컬럼이름_30자_설계.md Y6
+    ///  6) 표의 YMS 이름 / 조건 / Spec 원문 / 출처 열은 화면에서 숨긴다(Visible = false, 2026-10-22). Chain 1 / Chain 2 열은 보인다.
+    ///     값은 그대로 채우므로 찾기는 숨긴 열 값으로도 거른다. 여러 칸 붙여넣기는 보이는 열에만 붙는다.
+    ///     필터 줄의 조건 콤보도 숨기고 뒤의 Chain 1 / GDS Chain / 사용 / Enable / [필터 해제] 를 왼쪽으로 당겼다(2026-10-22).
+    ///     숨긴 콤보는 (전체) 로 남아 거르지 않는다. 필터 처리 목록(FilterCombos)에는 그대로 두어 다시 보이게 하면 바로 쓴다.
     /// 진행 표시: 서버 호출은 화면 아래 busyBar(ProgressStatusBar)가 별도 스레드에서 돌리고 작업 이름과 모래시계 커서를 보여 준다.
     ///  버튼 하나의 처리(서버 호출 + 다시 조회 + 표 채우기)는 busyBar.Begin 으로 묶고, 콤보 변경 중 짧은 조회는 RunHere(화면 스레드)로 한다.
     /// </summary>
@@ -40,6 +48,8 @@ namespace DACrux.SEMDMS.ENGUI
         private string loadedProgram = string.Empty;
         private string loadedGdsDevice = string.Empty;
         private bool filling;
+        /// <summary>여러 칸 붙여넣기 중: 칸마다 하던 GDS 사용 수 / 정보 다시 세기를 끝난 뒤 한 번만 한다</summary>
+        private bool pasting;
         /// <summary>Factory 의 등록 Parameter 가 있는 Device + 공정 (콤보 목록)</summary>
         private DataTable programList;
         /// <summary>지금 GDS Device 의 Setup Chain 이름 (대소문자 무시)</summary>
@@ -245,19 +255,26 @@ namespace DACrux.SEMDMS.ENGUI
                     string upper = Number(dr["UPPER_LIMIT"], "R");
                     bool enable = hasSpec && dr["ENABLE_FLAG"].ToString() == "Y";
                     string remark = dr["REMARK"].ToString();
+                    string yms = dr["YMS_PARAM_NAME"].ToString();
+                    bool published = dr["YMS_PUBLISHED"].ToString() == "Y";
                     if (hasSpec) specCount++;
 
                     DataGridViewRow row = new DataGridViewRow();
-                    row.CreateCells(dgvPara, dr["HEADER_TEXT"], name, dr["MEAS_TYPE"],
+                    row.CreateCells(dgvPara, dr["HEADER_TEXT"], name, yms, dr["MEAS_TYPE"],
                         ConditionText(dr["PARA_NAME"].ToString(), dr["MEAS_TYPE"].ToString(), dr["COND_VALUE"].ToString()),
                         dr["CHAIN_NAME"], dr["CHAIN_NAME2"], dr["UNIT"], use, gds, lower, upper, enable,
                         remark, dr["SPEC_TEXT"], SourceText(dr["REG_SOURCE"].ToString()),
                         dr["REG_FILE_NAME"], dr["UPDATE_USER"] + " " + FormatDate(dr["UPDATE_TIME"]));
                     row.Tag = new ParaState
                     {
-                        Name = name, Use = use, Gds = gds, Lower = lower, Upper = upper, Enable = enable, Remark = remark,
+                        Name = name, Yms = yms, YmsPublished = published, Use = use, Gds = gds, Lower = lower, Upper = upper, Enable = enable, Remark = remark,
                         HasSpec = hasSpec
                     };
+                    if (published)
+                    {
+                        row.Cells[colPYms.Index].ReadOnly = true;
+                        row.Cells[colPYms.Index].ToolTipText = "YMS 에 반영된 Parameter 라 YMS 이름을 고칠 수 없습니다.";
+                    }
                     PaintRow(row);
                     rows.Add(row);
                     busyBar.Pulse();
@@ -289,7 +306,7 @@ namespace DACrux.SEMDMS.ENGUI
         {
             if (dgvPara.IsCurrentCellInEditMode) dgvPara.EndEdit();
             string find = txtParaFind.Text.Trim();
-            DataGridViewColumn[] findColumns = { colPHeader, colPName, colPChain1, colPChain2, colPGds };
+            DataGridViewColumn[] findColumns = { colPHeader, colPName, colPYms, colPChain1, colPChain2, colPGds };
             dgvPara.CurrentCell = null;
             foreach (DataGridViewRow row in dgvPara.Rows)
             {
@@ -359,7 +376,7 @@ namespace DACrux.SEMDMS.ENGUI
             return item == null ? null : item.Value;
         }
 
-        /// <summary>행이 필터 콤보에서 고른 값과 모두 맞는지. except 콤보는 빼고 본다(그 콤보 목록의 건수를 셀 때).</summary>
+        /// <summary>행이 필터 콤보에서 고른 값과 모두 맞는지. except 콤보는 빼고 본다(그 콤보 목록을 만들 때).</summary>
         private bool MatchesFilters(DataGridViewRow row, ComboBox except)
         {
             foreach (KeyValuePair<ComboBox, DataGridViewColumn> filter in FilterCombos())
@@ -379,27 +396,19 @@ namespace DACrux.SEMDMS.ENGUI
         }
 
         /// <summary>
-        /// 필터 콤보 목록 = (전체) + 그 열 값(건수). 건수는 다른 콤보에서 고른 값을 통과한 행만 센다. 순서: 글자 순(대소문자 무시), (빈 값)은 끝.
-        /// 고른 값이 지금 표에 없어도 고른 상태를 유지하려고 0건으로 넣는다.
+        /// 필터 콤보 목록 = (전체) + 그 열 값. 값은 다른 콤보에서 고른 값을 통과한 행에서만 모은다. 순서: 글자 순(대소문자 무시), (빈 값)은 끝.
+        /// 고른 값이 지금 표에 없어도 고른 상태를 유지하려고 목록에 넣는다.
         /// </summary>
         private void FillFilterCombo(ComboBox combo, DataGridViewColumn column)
         {
             string selected = FilterSelected(combo);
-            Dictionary<string, int> counts = new Dictionary<string, int>(StringComparer.Ordinal);
-            int total = 0;
+            HashSet<string> values = new HashSet<string>(StringComparer.Ordinal);
             foreach (DataGridViewRow row in dgvPara.Rows)
-            {
-                if (!MatchesFilters(row, combo)) continue;
-                string value = FilterValue(row, column);
-                int n;
-                counts.TryGetValue(value, out n);
-                counts[value] = n + 1;
-                total++;
-            }
-            if (selected != null && !counts.ContainsKey(selected)) counts[selected] = 0;
-            List<FilterItem> items = new List<FilterItem> { new FilterItem(null, total) };
-            items.AddRange(counts.OrderBy(p => p.Key.Length == 0 ? 1 : 0).ThenBy(p => p.Key, StringComparer.OrdinalIgnoreCase)
-                .ThenBy(p => p.Key, StringComparer.Ordinal).Select(p => new FilterItem(p.Key, p.Value)));
+                if (MatchesFilters(row, combo)) values.Add(FilterValue(row, column));
+            if (selected != null) values.Add(selected);
+            List<FilterItem> items = new List<FilterItem> { new FilterItem(null) };
+            items.AddRange(values.OrderBy(v => v.Length == 0 ? 1 : 0).ThenBy(v => v, StringComparer.OrdinalIgnoreCase)
+                .ThenBy(v => v, StringComparer.Ordinal).Select(v => new FilterItem(v)));
             bool wasFilling = filling;
             filling = true;
             try
@@ -416,7 +425,7 @@ namespace DACrux.SEMDMS.ENGUI
             }
         }
 
-        /// <summary>콤보를 펼칠 때 목록을 지금 표 값(수정 중인 값 포함)과 다른 콤보 선택으로 다시 센다.</summary>
+        /// <summary>콤보를 펼칠 때 목록을 지금 표 값(수정 중인 값 포함)과 다른 콤보 선택으로 다시 만든다.</summary>
         private void cboFlt_DropDown(object sender, EventArgs e)
         {
             ComboBox combo = (ComboBox)sender;
@@ -478,16 +487,14 @@ namespace DACrux.SEMDMS.ENGUI
             return " / 필터 " + summary + " 표시 " + visible;
         }
 
-        /// <summary>필터 콤보 한 줄: Value null = (전체), "" = (빈 값). 콤보 글자 = 값 (건수)</summary>
+        /// <summary>필터 콤보 한 줄: Value null = (전체), "" = (빈 값). 콤보 글자 = 값</summary>
         private sealed class FilterItem
         {
             public readonly string Value;
-            public readonly int Count;
 
-            public FilterItem(string value, int count)
+            public FilterItem(string value)
             {
                 Value = value;
-                Count = count;
             }
 
             public static string Display(string value)
@@ -497,7 +504,7 @@ namespace DACrux.SEMDMS.ENGUI
 
             public override string ToString()
             {
-                return Display(Value) + " (" + Count + ")";
+                return Display(Value);
             }
         }
 
@@ -505,16 +512,30 @@ namespace DACrux.SEMDMS.ENGUI
 
         #region [편집 / 수정 표시]
 
-        /// <summary>편집할 수 있는 열: 사용 / GDS Chain / Lower / Upper / Enable / 비고</summary>
+        /// <summary>편집할 수 있는 열: YMS 이름 / 사용 / GDS Chain / Lower / Upper / Enable / 비고</summary>
         private DataGridViewColumn[] EditColumns()
         {
-            return new DataGridViewColumn[] { colPUse, colPGds, colPLower, colPUpper, colPEnable, colPRemark };
+            return new DataGridViewColumn[] { colPYms, colPUse, colPGds, colPLower, colPUpper, colPEnable, colPRemark };
         }
 
         /// <summary>더블클릭 / F2 로 편집하는 글자 열</summary>
         private bool IsTextEditColumn(int columnIndex)
         {
-            return columnIndex == colPGds.Index || columnIndex == colPLower.Index || columnIndex == colPUpper.Index || columnIndex == colPRemark.Index;
+            return columnIndex == colPYms.Index || columnIndex == colPGds.Index || columnIndex == colPLower.Index || columnIndex == colPUpper.Index || columnIndex == colPRemark.Index;
+        }
+
+        /// <summary>이 칸을 글자 편집할 수 있는지. YMS 에 반영된 Parameter 의 YMS 이름은 고칠 수 없다.</summary>
+        private bool CanEditText(DataGridViewCell cell)
+        {
+            if (!IsTextEditColumn(cell.ColumnIndex)) return false;
+            if (cell.ColumnIndex != colPYms.Index) return true;
+            ParaState s = cell.OwningRow.Tag as ParaState;
+            if (s != null && s.YmsPublished)
+            {
+                SetStatus(s.Name + " 은 YMS 에 반영된 Parameter 라 YMS 이름(" + s.Yms + ")을 고칠 수 없습니다.");
+                return false;
+            }
+            return true;
         }
 
         private bool IsCheckColumn(int columnIndex)
@@ -524,7 +545,7 @@ namespace DACrux.SEMDMS.ENGUI
 
         private void dgvPara_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (e.RowIndex < 0 || !IsTextEditColumn(e.ColumnIndex)) return;
+            if (e.RowIndex < 0 || !CanEditText(dgvPara.Rows[e.RowIndex].Cells[e.ColumnIndex])) return;
             dgvPara.CurrentCell = dgvPara.Rows[e.RowIndex].Cells[e.ColumnIndex];
             dgvPara.BeginEdit(true);
         }
@@ -536,30 +557,151 @@ namespace DACrux.SEMDMS.ENGUI
             Toggle(dgvPara.Rows[e.RowIndex].Cells[e.ColumnIndex]);
         }
 
-        /// <summary>F2 = 편집 시작, Space = 체크 바꾸기, Ctrl+V = 지금 칸에 클립보드 글자(첫 칸) 넣기.</summary>
+        /// <summary>
+        /// F2 = 편집 시작, Space = 체크 바꾸기, Ctrl+V = 클립보드 표(여러 칸)를 고른 칸부터 붙여넣기(PasteCells).
+        /// Ctrl+C 는 표 기본 복사(고른 칸을 탭 / 줄바꿈 글자로, 머리글 없이)를 그대로 쓴다.
+        /// </summary>
         private void dgvPara_KeyDown(object sender, KeyEventArgs e)
         {
             DataGridViewCell cell = dgvPara.CurrentCell;
             if (cell == null || dgvPara.IsCurrentCellInEditMode) return;
             if (e.KeyCode == Keys.F2 && IsTextEditColumn(cell.ColumnIndex))
-                dgvPara.BeginEdit(true);
+            {
+                if (CanEditText(cell)) dgvPara.BeginEdit(true);
+            }
             else if (e.KeyCode == Keys.Space && !e.Control && IsCheckColumn(cell.ColumnIndex))
                 Toggle(cell);
-            else if (e.Control && e.KeyCode == Keys.V && IsTextEditColumn(cell.ColumnIndex))
-                cell.Value = FirstCellText(ClipboardText());
+            else if (e.Control && e.KeyCode == Keys.V)
+                PasteCells(ClipboardText());
             else
                 return;
             e.Handled = true;
             e.SuppressKeyPress = true;
         }
 
-        /// <summary>편집이 끝나면 앞뒤 공백을 지운다.</summary>
+        /// <summary>
+        /// 클립보드 표(Excel 이나 이 표에서 복사한 탭 / 줄바꿈 글자)를 여러 칸에 붙여 넣는다 (2026-10-21).
+        ///  - 값이 한 칸이고 여러 칸을 골랐으면 고른 칸 모두에 같은 값을 넣는다.
+        ///  - 그 밖에는 고른 칸의 왼쪽 위(고른 칸이 없으면 지금 칸)부터 보이는 행 / 보이는 열 순서로 채운다. 필터로 숨긴 행은 건너뛴다.
+        ///  - 바꾸는 열: YMS 이름(대문자, YMS 에 반영된 행은 건너뜀) / GDS Chain / Lower / Upper / 비고 = 글자, 사용 / Enable = Y · N · TRUE · FALSE · 1 · 0.
+        ///    읽기 전용 열은 자리만 차지하고 바꾸지 않는다. 표 밖으로 나가는 값은 버린다.
+        ///  - 바뀐 칸은 직접 입력과 같이 노란색 / 오류 붉은색 / Enable 자동 켜기가 적용된다. 저장은 [저장].
+        /// </summary>
+        private void PasteCells(string text)
+        {
+            List<string[]> table = ClipboardTable(text);
+            if (table.Count == 0)
+            {
+                SetStatus("붙여넣기: 클립보드에 글자가 없습니다.");
+                return;
+            }
+            List<DataGridViewRow> rows = dgvPara.Rows.Cast<DataGridViewRow>().Where(r => r.Visible).ToList();
+            List<DataGridViewColumn> columns = dgvPara.Columns.Cast<DataGridViewColumn>().Where(c => c.Visible).OrderBy(c => c.DisplayIndex).ToList();
+            Dictionary<int, int> rowAt = new Dictionary<int, int>();
+            for (int i = 0; i < rows.Count; i++) rowAt[rows[i].Index] = i;
+            Dictionary<int, int> columnAt = new Dictionary<int, int>();
+            for (int i = 0; i < columns.Count; i++) columnAt[columns[i].Index] = i;
+            List<DataGridViewCell> selected = dgvPara.SelectedCells.Cast<DataGridViewCell>()
+                .Where(c => rowAt.ContainsKey(c.RowIndex) && columnAt.ContainsKey(c.ColumnIndex)).ToList();
+            if (selected.Count == 0 && dgvPara.CurrentCell != null) selected.Add(dgvPara.CurrentCell);
+            if (selected.Count == 0)
+            {
+                SetStatus("붙여넣기: 붙여 넣을 칸을 고르세요.");
+                return;
+            }
+
+            List<KeyValuePair<DataGridViewCell, string>> targets = new List<KeyValuePair<DataGridViewCell, string>>();
+            int outside = 0;
+            if (table.Count == 1 && table[0].Length == 1 && selected.Count > 1)
+            {
+                foreach (DataGridViewCell cell in selected)
+                    targets.Add(new KeyValuePair<DataGridViewCell, string>(cell, table[0][0]));
+            }
+            else
+            {
+                int top = selected.Min(c => rowAt[c.RowIndex]);
+                int left = selected.Min(c => columnAt[c.ColumnIndex]);
+                for (int r = 0; r < table.Count; r++)
+                {
+                    for (int c = 0; c < table[r].Length; c++)
+                    {
+                        if (top + r >= rows.Count || left + c >= columns.Count)
+                        {
+                            outside++;
+                            continue;
+                        }
+                        targets.Add(new KeyValuePair<DataGridViewCell, string>(rows[top + r].Cells[columns[left + c].Index], table[r][c]));
+                    }
+                }
+            }
+
+            int written = 0, skipped = 0, bad = 0;
+            pasting = true;
+            try
+            {
+                foreach (KeyValuePair<DataGridViewCell, string> target in targets)
+                {
+                    int result = PasteValue(target.Key, target.Value);
+                    if (result > 0) written++;
+                    else if (result == 0) skipped++;
+                    else bad++;
+                }
+            }
+            finally
+            {
+                pasting = false;
+            }
+            RefreshGdsUse();
+            UpdateParaInfo();
+            SetStatus("붙여넣기 " + written + "칸 (저장 전)" + (skipped > 0 ? " / 바꿀 수 없는 칸 " + skipped + "개 건너뜀" : string.Empty)
+                + (bad > 0 ? " / 사용 · Enable 에 Y / N 이 아닌 값 " + bad + "개 건너뜀" : string.Empty)
+                + (outside > 0 ? " / 표 밖 " + outside + "칸 버림" : string.Empty));
+        }
+
+        /// <summary>붙여넣기 한 칸. 반환: 1 = 넣음, 0 = 바꿀 수 없는 칸(읽기 전용 열 / YMS 에 반영된 행의 YMS 이름 / 빈 체크 값), -1 = 체크 열에 맞지 않는 값.</summary>
+        private int PasteValue(DataGridViewCell cell, string raw)
+        {
+            string value = (raw ?? string.Empty).Trim();
+            if (IsCheckColumn(cell.ColumnIndex))
+            {
+                if (value.Length == 0) return 0;
+                string upper = value.ToUpperInvariant();
+                if (upper == "Y" || upper == "TRUE" || upper == "1") cell.Value = true;
+                else if (upper == "N" || upper == "FALSE" || upper == "0") cell.Value = false;
+                else return -1;
+                return 1;
+            }
+            if (!IsTextEditColumn(cell.ColumnIndex)) return 0;
+            if (cell.ColumnIndex == colPYms.Index)
+            {
+                ParaState s = cell.OwningRow.Tag as ParaState;
+                if (s != null && s.YmsPublished) return 0;
+                value = value.ToUpperInvariant();
+            }
+            cell.Value = value;
+            return 1;
+        }
+
+        /// <summary>클립보드 글자 -> 행(줄바꿈) x 칸(탭). 끝 줄바꿈(Excel / 표 복사 끝에 붙음)은 뺀다.</summary>
+        private static List<string[]> ClipboardTable(string text)
+        {
+            List<string[]> table = new List<string[]>();
+            string value = (text ?? string.Empty).Replace("\r\n", "\n").Replace('\r', '\n');
+            if (value.EndsWith("\n", StringComparison.Ordinal)) value = value.Substring(0, value.Length - 1);
+            if (value.Length == 0) return table;
+            foreach (string line in value.Split('\n'))
+                table.Add(line.Split('\t'));
+            return table;
+        }
+
+        /// <summary>편집이 끝나면 앞뒤 공백을 지운다. YMS 이름은 대문자로 바꾼다.</summary>
         private void dgvPara_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex < 0) return;
             DataGridViewCell cell = dgvPara.Rows[e.RowIndex].Cells[e.ColumnIndex];
             string raw = Convert.ToString(cell.Value, CultureInfo.InvariantCulture);
-            if (raw != raw.Trim()) cell.Value = raw.Trim();
+            string value = e.ColumnIndex == colPYms.Index ? raw.Trim().ToUpperInvariant() : raw.Trim();
+            if (raw != value) cell.Value = value;
         }
 
         /// <summary>
@@ -592,6 +734,7 @@ namespace DACrux.SEMDMS.ENGUI
                 }
             }
             PaintRow(row);
+            if (pasting) return; // 여러 칸 붙여넣기는 끝난 뒤 한 번만 다시 센다
             if (e.ColumnIndex == colPGds.Index) RefreshGdsUse();
             UpdateParaInfo();
         }
@@ -600,6 +743,7 @@ namespace DACrux.SEMDMS.ENGUI
         private bool Changed(DataGridViewRow row, DataGridViewColumn column)
         {
             ParaState s = (ParaState)row.Tag;
+            if (column == colPYms) return CellText(row, colPYms) != s.Yms;
             if (column == colPUse) return Checked(row, colPUse) != s.Use;
             if (column == colPEnable) return Checked(row, colPEnable) != s.Enable;
             if (column == colPGds) return CellText(row, colPGds) != s.Gds;
@@ -645,6 +789,16 @@ namespace DACrux.SEMDMS.ENGUI
             if (CellText(row, colPGds).Length > MaxTextLength) return "GDS Chain 은 " + MaxTextLength + "자 이하입니다.";
             column = colPRemark;
             if (CellText(row, colPRemark).Length > MaxTextLength) return "비고는 " + MaxTextLength + "자 이하입니다.";
+            column = colPYms;
+            if (Changed(row, colPYms))
+            {
+                string yms = CellText(row, colPYms);
+                if (!EtYmsRule.IsValidYmsName(yms))
+                    return "YMS 이름은 영문 대문자로 시작하고 대문자·숫자·'_' " + EtYmsRule.MaxYmsNameLength + "자 이하입니다(X / Y / BIN 등 예약 이름 불가).";
+                DataGridViewRow other = dgvPara.Rows.Cast<DataGridViewRow>()
+                    .FirstOrDefault(r => r.Index != row.Index && string.Equals(CellText(r, colPYms), yms, StringComparison.Ordinal));
+                if (other != null) return "YMS 이름이 " + CellText(other, colPName) + " 과 같습니다.";
+            }
             column = null;
             return string.Empty;
         }
@@ -667,6 +821,7 @@ namespace DACrux.SEMDMS.ENGUI
             row.HeaderCell.Value = dirty ? "*" : null;
             row.HeaderCell.ToolTipText = error.Length > 0 ? error : dirty ? "수정됨 (저장 전)" : string.Empty;
             row.DefaultCellStyle.ForeColor = Checked(row, colPUse) ? Color.Empty : Color.Gray;
+            row.Cells[colPYms.Index].Style.ForeColor = ((ParaState)row.Tag).YmsPublished ? Color.Gray : Color.Empty;
             PaintGds(row);
         }
 
@@ -698,7 +853,8 @@ namespace DACrux.SEMDMS.ENGUI
         #region [저장 / 삭제 / Spec 표 붙여넣기]
 
         /// <summary>
-        /// 수정한 행만 저장한다(SaveEtParameterSetup: 사용 / 비고 / GDS Chain / Lower / Upper / Enable).
+        /// 수정한 행만 저장한다(SaveEtParameterSetup: 사용 / 비고 / GDS Chain / Lower / Upper / Enable / YMS 이름).
+        /// YMS 이름은 8번째 열로 보내고 서버가 바뀐 행만 고친다(YMS 반영 여부 / Device + 공정 전체 겹침은 서버가 다시 검사).
         /// Lower / Upper 를 모두 지운 행 중 Spec 이 있던 행은 Spec 삭제라 먼저 묻는다. Spec 을 바꿨으면 다시 판정할지 묻고 다시 조회한다.
         /// </summary>
         private void btnSave_Click(object sender, EventArgs e)
@@ -707,7 +863,7 @@ namespace DACrux.SEMDMS.ENGUI
             List<DataGridViewRow> rows = DirtyParaRows();
             if (rows.Count == 0)
             {
-                Notify("저장할 수정이 없습니다. (GDS Chain / Lower / Upper / 비고 = 더블클릭, 사용 / Enable = 클릭)", MessageBoxIcon.Information);
+                Notify("저장할 수정이 없습니다. (YMS 이름 / GDS Chain / Lower / Upper / 비고 = 더블클릭, 사용 / Enable = 클릭)", MessageBoxIcon.Information);
                 return;
             }
             if (!EnsureLoaded()) return;
@@ -730,7 +886,7 @@ namespace DACrux.SEMDMS.ENGUI
                     + "\r\n\r\n계속할까요?", MessageBoxButtons.YesNo) != DialogResult.Yes)
                 return;
 
-            string[,] data = new string[rows.Count, 7];
+            string[,] data = new string[rows.Count, 8];
             for (int i = 0; i < rows.Count; i++)
             {
                 DataGridViewRow row = rows[i];
@@ -742,6 +898,7 @@ namespace DACrux.SEMDMS.ENGUI
                 data[i, 4] = lower;
                 data[i, 5] = upper;
                 data[i, 6] = Checked(row, colPEnable) && (lower.Length > 0 || upper.Length > 0) ? "Y" : "N";
+                data[i, 7] = CellText(row, colPYms);
             }
             bool specChanged = rows.Any(IsSpecChanged);
             string[] key = { loadedFactory, loadedDevice, loadedProgram };
@@ -762,6 +919,7 @@ namespace DACrux.SEMDMS.ENGUI
                 string rejudge = specChanged ? AskRejudge(loadedFactory, loadedDevice, new[] { loadedProgram }) : string.Empty;
                 LoadParameters();
                 SetStatus("저장 완료 / 수정 " + result["UPDATED"] + "행 / Spec 저장 " + result["SPEC_SAVED"] + " / Spec 삭제 " + result["SPEC_DELETED"]
+                    + (result.Table.Columns.Contains("YMS_RENAMED") ? " / YMS 이름 " + result["YMS_RENAMED"] : string.Empty)
                     + " / Device " + loadedDevice + " / 공정 " + loadedProgram + rejudge);
             }
         }
@@ -1107,14 +1265,6 @@ namespace DACrux.SEMDMS.ENGUI
             cell.Value = !(cell.Value is bool && (bool)cell.Value);
         }
 
-        /// <summary>클립보드 글자의 첫 칸(탭 / 줄바꿈 앞). Excel 에서 칸 하나를 복사해도 끝 줄바꿈이 붙는다.</summary>
-        private static string FirstCellText(string text)
-        {
-            string value = text ?? string.Empty;
-            int cut = value.IndexOfAny(new[] { '\t', '\r', '\n' });
-            return (cut >= 0 ? value.Substring(0, cut) : value).Trim();
-        }
-
         private static bool TryNumber(string text, out double value)
         {
             return double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out value) && !double.IsNaN(value) && !double.IsInfinity(value);
@@ -1196,6 +1346,10 @@ namespace DACrux.SEMDMS.ENGUI
         private sealed class ParaState
         {
             public string Name;
+            /// <summary>YMS 컬럼 이름 (조회 당시)</summary>
+            public string Yms;
+            /// <summary>YMS 에 반영됨 (YMS 이름 수정 불가)</summary>
+            public bool YmsPublished;
             public bool Use;
             public string Gds;
             public string Lower;

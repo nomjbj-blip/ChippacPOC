@@ -31,7 +31,7 @@ namespace DACrux.SEMDMS.ENGUI
     ///
     /// 결과 DataSet 은 2026-10-15 통합 분석 설계 10.2절 열을 읽는다. 열이 없으면(이전 서버) 해당 칸을 비워 둔다.
     /// </summary>
-    public partial class frmGdsKlarfAnalysis : DACruxUXBasic01, iSEMControl
+    public partial class frmGdsKlarfAnalysis : DACruxUXBasic01, iSEMControl, frmGdsDieAnalysis.IDetailSource
     {
         /// <summary>
         /// Die 상세 화면 메뉴 키(숨김 메뉴, 설계 결정 A9). 2026-10-12 부터 상세 화면을 여는 데는 쓰지 않는다(설계 14.1절, ShowForm 중복 생성 버그).
@@ -842,6 +842,12 @@ namespace DACrux.SEMDMS.ENGUI
             if (!IsDisposed) FinishAnalysis(request, ds, failure);
         }
 
+        /// <summary>상세보기 [다시 분석] (2026-10-22): [분석] 과 같다. 결과를 반영하면 상세보기 창도 새 결과로 바뀐다(SourceAnalyzed).</summary>
+        public void AnalyzeAgain()
+        {
+            btnAnalyze_Click(this, EventArgs.Empty);
+        }
+
         /// <summary>Smoke 검사용: 현재 조건으로 같은 스레드에서 분석하고 화면에 반영한다. 조건 오류면 예외.</summary>
         public DataSet AnalyzeNow()
         {
@@ -924,11 +930,12 @@ namespace DACrux.SEMDMS.ENGUI
             }
             _sideText = request.SideText;
             _lastRequest = request.Request;
+            // 상세보기 도면 데이터를 백그라운드로 미리 읽는다. 첫 상세보기도 도면 읽기(약 6초)를 기다리지 않는다 (2026-10-16 설계 5.3절).
+            // 결과 반영 끝에 열린 상세보기도 새 결과로 바꾸므로(도면 키가 바뀌면 그 읽기를 기다림) 반영보다 먼저 시작한다 (2026-10-22)
+            frmGdsDieAnalysis.Preload(this, ds);
             // 결과 반영(Map 색 / 표)도 화면 스레드에서 시간이 걸려 모래시계 커서를 유지한다 (2026-10-15)
             using (DACrux.SEMDMS.Control.BusyCursor.Show(this))
                 ApplyResult(ds);
-            // 상세보기 도면 데이터를 백그라운드로 미리 읽는다. 첫 상세보기도 도면 읽기(약 6초)를 기다리지 않는다 (2026-10-16 설계 5.3절)
-            frmGdsDieAnalysis.Preload(this, ds);
         }
 
         /// <summary>화면을 닫으면 상세보기 공유 도면을 놓는다(열린 상세보기 창도 없으면 메모리를 돌려준다, 2026-10-16 설계 5.4절).</summary>
@@ -955,14 +962,15 @@ namespace DACrux.SEMDMS.ENGUI
             ApplyResult(ds);
         }
 
-        /// <summary>분석 결과를 화면에 반영한다: 자동 구간 -> Fail 표식 -> Map 색 -> 구간 표 -> 목록 -> 상태줄. 이 Wafer 의 처음 결과면 [종합 (Die)] 탭을 연다(2026-10-19 결정 L4).</summary>
+        /// <summary>
+        /// 분석 결과를 화면에 반영한다: 자동 구간 -> Fail 표식 -> Map 색 -> 구간 표 -> 목록 -> 상태줄. 이 Wafer 의 처음 결과면 [종합 (Die)] 탭을 연다(2026-10-19 결정 L4).
+        /// 마지막에 이 화면에서 연 상세보기 창도 새 결과로 바꾼다(2026-10-22 동기화, 상세보기 창 SourceAnalyzed).
+        /// </summary>
         private void ApplyResult(DataSet ds)
         {
             bool firstResult = _result == null;
             _result = ds;
             _analysisVersion++;
-            // 이미 열린 상세보기 창은 이전 결과 그대로 두고 탭 제목으로 구분한다(그 Die 를 다시 열면 새 결과, 2026-10-16)
-            frmGdsDieAnalysis.MarkOutdated(this, _analysisVersion);
             _dirty = false;
             if (_focusChainSeq != null && FindChainRow(_focusChainSeq) == null) _focusChainSeq = null;
             if (_focusChainSeq == null) _focusChainSeq = DefaultFocusChain();
@@ -975,6 +983,7 @@ namespace DACrux.SEMDMS.ENGUI
             BindResultTabs();
             UpdateStatus();
             if (firstResult) tabList.SelectedTab = tabDie;
+            frmGdsDieAnalysis.SourceAnalyzed(this, _analysisVersion, _result, _lastRequest, AnalysisService);
         }
 
         private int Threshold { get { return (int)numThreshold.Value; } }
@@ -1212,7 +1221,7 @@ namespace DACrux.SEMDMS.ENGUI
 
         /// <summary>색 구간 표 E-Test 표식 행 이름 (2026-10-20).</summary>
         private const string SpecMarkRowText = "Spec Out Die";
-        private const string FileMarkRowText = "Fail Die (결과 파일)";
+        private const string FileMarkRowText = "Fail Die";
 
         /// <summary>
         /// E-Test 표식 행 (2026-10-16, 2026-10-20 두 행): 켠 표식마다 한 행, Map 표식과 같은 Die 를 센다.
@@ -1384,15 +1393,15 @@ namespace DACrux.SEMDMS.ENGUI
                 table.Columns.Add("Defect Die", typeof(string));
                 table.Columns.Add("Fail Die", typeof(string));
                 table.Columns.Add("일치 Die", typeof(string));
-                table.Columns.Add("Fail률 (Defect 있음)", typeof(string));
-                table.Columns.Add("Fail률 (Defect 없음)", typeof(string));
+                table.Columns.Add("Defect 있는 Fail률", typeof(string));
+                table.Columns.Add("Defect 없는 Fail률", typeof(string));
                 table.Columns.Add("Para", typeof(string));
             }
             else
             {
                 table.Columns.Add("분류", typeof(string));
                 table.Columns.Add("ET", typeof(string));
-                table.Columns.Add("가까운 거리(µm)", typeof(string));
+                table.Columns.Add("가까운 거리", typeof(string));
                 table.Columns.Add("Fail Para", typeof(string));
                 table.Columns.Add("Defect ID", typeof(string));
             }
@@ -1450,7 +1459,7 @@ namespace DACrux.SEMDMS.ENGUI
             table.Columns.Add("RoughBin", typeof(string));
             table.Columns.Add("Class", typeof(int));
             table.Columns.Add("Chain", typeof(string));
-            table.Columns.Add("Gap(µm)", typeof(string));
+            table.Columns.Add("Gap", typeof(string));
             table.Columns.Add("XSIZE", typeof(double));
             table.Columns.Add("YSIZE", typeof(double));
             table.Columns.Add("큰 Defect", typeof(string));
@@ -1488,7 +1497,7 @@ namespace DACrux.SEMDMS.ENGUI
         private void BindToleranceGrid()
         {
             var table = new DataTable();
-            table.Columns.Add("허용오차(µm)", typeof(string));
+            table.Columns.Add("허용오차", typeof(string));
             table.Columns.Add("Chain In Defect", typeof(string));
             table.Columns.Add("걸린 Die", typeof(string));
             foreach (DataRow r in Rows(_result, "TOL_CURVE"))
@@ -1529,7 +1538,7 @@ namespace DACrux.SEMDMS.ENGUI
             table.Columns.Add("Die", typeof(string));
             table.Columns.Add("Chain", typeof(string));
             table.Columns.Add("분류", typeof(string));
-            table.Columns.Add("가까운 Defect(µm)", typeof(string));
+            table.Columns.Add("가까운 Defect", typeof(string));
             table.Columns.Add("걸린 Defect", typeof(string));
             table.Columns.Add("Fail Para", typeof(string));
             table.Columns.Add("Fail Parameter", typeof(string));
@@ -1575,7 +1584,10 @@ namespace DACrux.SEMDMS.ENGUI
             OpenDetail(System.Convert.ToInt32(row.Cells["X"].Value), System.Convert.ToInt32(row.Cells["Y"].Value), System.Convert.ToString(row.Cells["SEQ"].Value));
         }
 
-        /// <summary>Image 탭: 선택 Die(없으면 비움)의 Defect 이미지를 기존 DPUCDefectInfo 썸네일로 보여 준다(FTP 다운로드는 컨트롤이 한다).</summary>
+        /// <summary>
+        /// Image 탭: 선택 Die(없으면 비움)의 Defect 이미지를 이미지 카드(DPUCDefectImageCard, 폭 220)로 보여 준다.
+        /// FTP 다운로드는 카드 대기열이 한다. 더블클릭하면 큰 이미지 창 제목 줄에 REL / Cluster 까지 나온다. (2026-10-21 카드 교체)
+        /// </summary>
         private void RefreshImages()
         {
             if (!ImageTabShown) return;
@@ -1595,8 +1607,7 @@ namespace DACrux.SEMDMS.ENGUI
                 string path = String.Format("{0}/{1}", row["IMAGE_PATH"].ToString().Trim(), row["IMAGE_FILENAME"].ToString().Trim());
                 try
                 {
-                    flowImage.Controls.Add(new DACrux.SEMDMS.Control.DPUCDefectInfo(d.DEFECTID.ToString(), path, d.XINDEX.ToString(), d.YINDEX.ToString(),
-                        d.CLASSNUMBER.ToString(), d.CLUSTERNUMBER.ToString(), d.XREL.ToString(), d.YREL.ToString(), d.XSIZE.ToString(), d.YSIZE.ToString()));
+                    flowImage.Controls.Add(new DACrux.SEMDMS.Control.DPUCDefectImageCard(d, path));
                 }
                 catch (Exception ex)
                 {
@@ -1635,7 +1646,40 @@ namespace DACrux.SEMDMS.ENGUI
 
         private DataRow FindChainRow(string chainSeq)
         {
-            return Rows(_result, "CHAIN").FirstOrDefault(r => ColText(r, "CHAIN_SEQ") == chainSeq);
+            DataRow row;
+            return chainSeq != null && ChainIndex().BySeq.TryGetValue(chainSeq, out row) ? row : null;
+        }
+
+        /// <summary>
+        /// 결과 CHAIN 표의 찾기 사전(Chain 번호 -> 행, Chain 코드 -> 이름). 결과(_result)가 바뀌면 다시 만든다 (2026-10-21).
+        /// U8 처럼 Chain 이 2만 7천 개면 행마다 CHAIN 표를 훑던 방식이 Defect 탭 199행에 2.4초 걸렸다.
+        /// 근거: 문서/설계/05_연관분석/2026-10-21_U8_연관분석_영향_확인.md A3
+        /// </summary>
+        private ChainLookup ChainIndex()
+        {
+            if (_chainIndex == null || !ReferenceEquals(_chainIndex.Source, _result)) _chainIndex = new ChainLookup(_result, Rows(_result, "CHAIN"));
+            return _chainIndex;
+        }
+
+        private ChainLookup _chainIndex;
+
+        private sealed class ChainLookup
+        {
+            public readonly DataSet Source;
+            public readonly Dictionary<string, DataRow> BySeq = new Dictionary<string, DataRow>(StringComparer.Ordinal);
+            public readonly Dictionary<string, string> NameByCode = new Dictionary<string, string>(StringComparer.Ordinal);
+
+            public ChainLookup(DataSet source, IEnumerable<DataRow> chains)
+            {
+                Source = source;
+                foreach (DataRow r in chains)
+                {
+                    string seq = ColText(r, "CHAIN_SEQ");
+                    if (!BySeq.ContainsKey(seq)) BySeq.Add(seq, r);
+                    string code = ColText(r, "CHAIN_CODE");
+                    if (!NameByCode.ContainsKey(code)) NameByCode.Add(code, ColText(r, "CHAIN_NAME"));
+                }
+            }
         }
 
         /// <summary>Chain 번호 -> 이름. 화면에는 Chain 코드(A, B, AA ..)를 쓰지 않는다 (2026-10-16).</summary>
@@ -1652,8 +1696,7 @@ namespace DACrux.SEMDMS.ENGUI
         private string ChainNamesOf(string codes)
         {
             if (String.IsNullOrEmpty(codes)) return "";
-            Dictionary<string, string> names = Rows(_result, "CHAIN").GroupBy(r => ColText(r, "CHAIN_CODE"))
-                .ToDictionary(g => g.Key, g => ColText(g.First(), "CHAIN_NAME"), StringComparer.Ordinal);
+            Dictionary<string, string> names = ChainIndex().NameByCode;
             return String.Join(", ", codes.Split(',').Select(s => s.Trim()).Where(s => s.Length > 0)
                 .Select(s => { string n; return names.TryGetValue(s, out n) && n.Length > 0 ? n : s; }).ToArray());
         }
@@ -1727,13 +1770,12 @@ namespace DACrux.SEMDMS.ENGUI
 
         /// <summary>
         /// 선택 Chip 의 상세 화면(화면 B)을 연다(설계 7.3 / 14.1절). 탭 제목 = "상세보기 (X, Y)". focusChainSeq 가 있으면 그 Chain 역추적으로 연다(설계 15.3절).
-        /// 상세보기 창은 Die 마다 하나다 (2026-10-16 요청 "1,1 을 봤으면 해당 상세보기는 그대로 있고 1,2를 상세보기하면 하나가 더생겨야 한다",
-        /// 문서/설계/05_연관분석/2026-10-16_Die상세_여러화면_GDS재사용_설계.md 5.1절):
-        ///  - 그 Die 창이 없으면 새로 만든다(기존 창은 그대로). GDS 도면은 모든 창이 하나를 같이 쓰므로 두 번째 창부터 도면을 다시 읽지 않는다.
-        ///  - 같은 Die 창이 같은 분석 결과로 열려 있으면 그 창을 앞으로 가져온다(역추적 Chain 을 받았으면 그 Chain 으로 다시 계산해 넘김).
-        ///  - [분석] 을 다시 했으면 그 창에 새 결과를 넘긴다.
+        /// 상세보기 창은 하나다 (2026-10-22 요청 "상세 화면이 열려 있는 상태에서 분석화면에서 다른 die 를 더블클릭하면 열려 있는 화면 그대로 조회",
+        /// 문서/설계/05_연관분석/2026-10-22_Die상세_DLL로딩_Die목록_설계.md 5절):
+        ///  - 창이 없으면 새로 만들고, 있으면 그 창 왼쪽 Die 목록에서 그 Die 를 고른다. 목록은 이 화면의 마지막 분석 결과다.
+        ///  - 상세보기 창이 마지막 분석 요청으로 그 Die 만 다시 계산한다(AnalyzeDie, 결과를 직접 받아 요청이 없으면 Wafer 결과 그대로).
         /// DACrux ShowForm 은 ENGUI DLL 을 Assembly.Load(byte[]) 로 새로 읽어 다른 어셈블리 사본의 화면을 만든다. 그 화면은 형식으로 찾을 수 없어
-        /// 상세 화면이 두 개 생겼으므로(2026-10-12 확인 -> 버그) ShowForm 을 쓰지 않고 이 화면이 직접 만든다.
+        /// 상세 화면이 두 개 생겼으므로(2026-10-12 확인 -> 버그) ShowForm 을 쓰지 않고 상세보기 창 Open 으로 직접 만든다.
         /// </summary>
         private void OpenDetail(int x, int y, string focusChainSeq)
         {
@@ -1743,49 +1785,16 @@ namespace DACrux.SEMDMS.ENGUI
                 return;
             }
             if (_dirty) SetStatus("조건 변경됨: 상세 화면은 마지막 분석 조건");
-            frmGdsDieAnalysis window = frmGdsDieAnalysis.FindWindow(this, x, y);
-            if (window != null && window.AnalysisVersion == _analysisVersion && focusChainSeq == null)
-            {
-                window.Activate();
-                return;
-            }
-            // 상세 화면 만들기(GDS EXE 읽기 포함) 동안 모래시계 커서 (2026-10-15)
+            // 상세 화면 만들기(GDS DLL 읽기 포함) / 그 Die 계산 동안 모래시계 커서 (2026-10-15)
             using (DACrux.SEMDMS.Control.BusyCursor.Show(this))
             {
-                DataSet data;
-                try { data = DetailData(x, y, focusChainSeq); }
+                try { frmGdsDieAnalysis.Open(this, _analysisVersion, _result, _lastRequest, AnalysisService, x, y, focusChainSeq); }
                 catch (Exception ex)
                 {
                     SetStatus("Die 상세 분석 실패: " + ex.Message);
                     if (_showErrorDialogs) MessageBox.Show(this, ex.Message, "Detail Analysis", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
                 }
-                if (window == null)
-                {
-                    window = new frmGdsDieAnalysis { Source = this, AnalysisVersion = _analysisVersion };
-                    if (MdiParent != null) window.MdiParent = MdiParent;
-                    // 탭 제목과 넘길 값을 먼저 정한다. 창이 활성화되면(또는 Shown) 공유 GDS 상세 화면을 가져와 그 값을 넘긴다.
-                    window.ShowDie(data, x, y, focusChainSeq);
-                    window.Show();
-                    return;
-                }
-                window.AnalysisVersion = _analysisVersion;
-                window.ShowDie(data, x, y, focusChainSeq);
-                window.Activate();
             }
-        }
-
-        /// <summary>
-        /// 상세 화면에 넘길 결과 (2026-10-16). 마지막 [분석] 요청이 있으면 같은 조건으로 그 Die 만 다시 계산한다
-        /// (AnalyzeDie: 그 Die 의 Defect 전체 / Member 단위 걸림 / 역추적 Chain 거리 / E-Test 값, 설계 8.2 / 15.3절).
-        /// 요청이 없으면(결과를 직접 받은 경우) Wafer 결과를 그대로 넘긴다. x / y = Map Die Index.
-        /// </summary>
-        public DataSet DetailData(int x, int y, string focusChainSeq)
-        {
-            if (_lastRequest == null) return _result;
-            RO.GdsKlarfAnalysis svc = AnalysisService ?? new RO.GdsKlarfAnalysis();
-            GdsKlarfAnalysisRequest request = _lastRequest;
-            return busyBar.RunHere("Die 상세 (" + x + ", " + y + ")", () => svc.AnalyzeDie(request, x, y, focusChainSeq));
         }
 
         #endregion
@@ -1888,8 +1897,8 @@ namespace DACrux.SEMDMS.ENGUI
             double tol;
             double.TryParse(ColText(info, "TOLERANCE_UM"), NumberStyles.Float, CultureInfo.InvariantCulture, out tol);
             return ColText(info, "USE_DEFECT_SIZE") == "Y"
-                ? "크기 + 허용오차 " + tol.ToString("0.#", CultureInfo.InvariantCulture) + " µm"
-                : "중심 사각형 한 변 " + (tol * 2).ToString("0.#", CultureInfo.InvariantCulture) + " µm";
+                ? "크기 + 허용오차 " + tol.ToString("0.#", CultureInfo.InvariantCulture)
+                : "중심 사각형 한 변 " + (tol * 2).ToString("0.#", CultureInfo.InvariantCulture);
         }
 
         private void SetStatus(string text)

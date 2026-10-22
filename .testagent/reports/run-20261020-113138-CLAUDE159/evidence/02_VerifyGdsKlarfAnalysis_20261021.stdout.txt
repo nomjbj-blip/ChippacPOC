@@ -1,0 +1,99 @@
+﻿빌드: DACrux.SEMDMS.Interface (경고 0)
+빌드: DACrux.SEMDMS.DSL (경고 0)
+빌드: DACrux.SEMDMS.BSL (경고 0)
+빌드: DACrux.SEMDMS.RO (경고 0)
+빌드: DACrux.SEMDMS.Control (경고 12)
+빌드: DACrux.SEMDMS.ENGUI (경고 4)
+빌드: NexplantQMS.GdsMap (경고 0)
+BSL 기준: Defect 15 / Chain 영역 1 / 첫 Die (6, 6) N=1
+PASS / Wafer Map Defect 수 / 15
+PASS / Map Die 격자 / Die 76
+PASS / GDS Device = Wafer Product(읽기 전용) / Chain 메뉴(READY 전체) / OMM_Hybrid / Chain: 전체(15) ▼
+PASS / 분류 메뉴(기본 RoughBin, 전체) / RoughBin: 전체(1) ▼
+PASS / 숨김: 분류 기준 / 분류 / Chain 거르기 / Die Index / 큰 Defect 제외 / 색 기준 / 콤보 없음
+PASS / Wafer 여러 개 선택 -> 오류(화면 그대로, 문구 = 1개 Wafer 만 분석) / 1개 Wafer 만 분석할 수 있습니다. Wafer 를 하나만 선택하세요. (선택 2개)
+PASS / 분석 전 상태 줄 = 결과만(사용법 안내 없음) / PFIC_RH-HS2615_C4BUMP-02 / OMM_Hybrid_C4Bump_Silterra / Defect 15 / 검사 Die 76 / E-Test 1개는 Device 가 GDS Device OMM_Hybrid 와 달라 목록에서 뺌(OMM TSVET)
+PASS / [준비] 탭 = 서버 Ready 조회(Wafer Key / GDS / 고른 Step / 점검, 서버 실패 행 없음) / RH-HS2615-02 / OMM_Hybrid / Step 1 / KLARF_ONE,ET_OTHER_DEVICE,ET_NONE,RULE_TENTATIVE,PITCH_SOURCE
+PASS / E-Test 목록 = 분석 GDS Device 파일만 / Device 다른 파일은 상태줄 결과(사용법 안내 없음) / E-Test 0개 / PFIC_RH-HS2615_C4BUMP-02 / OMM_Hybrid_C4Bump_Silterra / Defect 15 / 검사 Die 76 / E-Test 1개는 Device 가 GDS Device OMM_Hybrid 와 달라 목록에서 뺌(OMM TSVET)
+PASS / E-Test Step 콤보: Step = TSVET, COWET(최신 순) / 고른 Step 파일만 · 체크 1개(최신) / Step 바꾸면 그 Step 최신 / Step 안 다른 파일 체크 = 1개만 / TSVET,COWET | TSVET [9001*,9003] 9001 | COWET [9002*] 9002 | TSVET [9001*,9003] 9001 | [9001,9003*] 9003 | 열 Step
+PASS / E-Test 머리 줄 배치: 제목 < Step 라벨 < 콤보 < [직접 찾기] (겹침 없음) / 제목 4~245 / Step 255~286 / 콤보 290~382 / 찾기 522
+PASS / E-Test 파일 없음: Step 콤보 꺼짐 / 표 0행 / 분석 E-Test 없음(0) / False / Step 0 / 행 0 / 파일 0
+[E-Test] 표 파일 0개 - 이 Smoke 는 E-Test 선택을 끄고 분석
+PASS / KLARF 탭: Step 표 · [직접 찾기] · 검사 면 콤보 없음 / 고른 Step 정보 / Ready 검사 면 FRONT / Pitch 출처 / 탭 제목 3개 = Wafer 1개만 분석 / Step OMM_Hybrid_C4Bump_Silterra  /  Lot PFIC_RH-HS2615_C4BUMP | 검사 2026-06-05 12:01:42  /  Defect 15  /  검사 Die 26 / Ready 검사 면 FRONT / Pitch 출처: Map Setup / GDS Map (Wafer 1개만 분석) | KLARF Step (Wafer 1개만 분석) | E-Test (Wafer 1개만 분석, Step 1개 선택)
+PASS / 화면 배치: 기능 탭 GDS / KLARF / E-Test / 종합 (Die) · 결과 하위 탭 / 준비 탭 · 점검 표 없음 / 색 구간 표 = 팝업 / 지금 기준 요약 · Map 범례 없음 / Chain 면 기본 BS / Wafer 받으면 KLARF 탭 / GDS,KLARF,E-Test,종합 (Die) / KLARF / 요약 · 범례 없음 True / Chain 면 BS (Ready BACK)
+PASS / Product 같은 이름(대소문자 무시) -> GDS Device / 없는 Product -> Device 없음 + 분석 불가 / OMM_Hybrid /  / Product ZZ_NO_SUCH_PRODUCT: 같은 이름의 READY GDS Map 없음 (분석 불가) / Product ZZ_NO_SUCH_PRODUCT 와 같은 이름의 READY GDS Map 이 없어 분석할 수 없습니다.
+
+PASS / 분석 결과 = BSL 직접 호출 (기본 Chain BS · KLARF 검사 FS 고정 = 반전, 요청 Step 1개) / Chain 영역 1 / BACK / 반전 Y / 검사 FRONT
+PASS / 자동 구간 = Auto(1, 최대 N) / 1-999
+PASS / Die 채움색 = 검사 Die 전체 / 숫자 = Defect Die / fill 76 / label 4
+PASS / 최다 Die 색 = 마지막 구간 색 / #DAF7A6
+PASS / Chain 밖 Defect 만 있는 Die = 연회색 / {X=6,Y=8}
+PASS / Defect 없는 Die = 흰색 / {X=5,Y=9}
+PASS / 구간 표 = 구간 + 고정 2행 / Die 수 합 = 결과 Die 수 / rows 3 / dies 76
+PASS / [분석] 뒤 종합 (Die) 탭 / Map 범례 없음(색 구간은 팝업 표) / 종합 (Die) / Map 위 범례 패널 0 / 팝업 표 3행
+PASS / KLARF 기준 접기 -> 펴기 / 결과 탭 열기(E-Test Fail -> E-Test 기능 탭) / 펼침 True / 접힘 True / 다시 펼침 True / E-Test Fail True
+PASS / [색 구간 설정] 팝업 = 색 구간 표(화면 밖 별도 창, 보임) / 색 구간 설정
+구간 표 이미지(E-Test 표식 2행): C:\Users\USER\AppData\Local\Temp\ChippacBuild\CLAUDE-159-smoke\ChippacGdsKlarfAnalysisVerification\band_fail_mark.png
+PASS / E-Test 표식 체크 2개(Spec Out / Fail Die): 판정 없으면 행 없음 / 둘 다 = 끝 2행 · Map 표식 2종 / 하나씩 끄기 / 다시 켜기 / 서버 ET_FILE_FLAG 열 / 원래 결과로 되돌림 / 체크 True / 둘 다 [Spec Out Die 2 | Fail Die (결과 파일) 3] / Spec 만 [Spec Out Die 2] / Fail 만 [Fail Die (결과 파일) 3] / 되돌림 True / other 76 / 서버 열 True / restored True
+PASS / Die 탭 = Defect Die, 첫 행 = Chain In 최다 / 열 X · Y · Defect 전체 · Chain In · Chain Out (Die · 주요 Chain 열 없음) / 4 / X,Y,Defect 전체,Chain In,Chain Out,Chain 수,ET 판정,Fail Chain,일치 Chain,검사 / 첫 행 (6, 6)
+PASS / 상태줄 분석 기준(Chain 면 + 반전, 검사 면 안 보임 / 임시 안내 없음) / Wafer Key RH-HS2615-02 (Step 1개) / GDS OMM_Hybrid / BACK 보기 (Chain BS -> 반전) / 크기 + 허용오차 5 µm / Chain 15 / Defect 15 중 Chain In 1 / Pitch = Map Setup | 
+PASS / 상세 데이터 = AnalyzeDie(Die 1행 / Defect = 그 Die 전체 / DEFECT_HIT / ET_VALUE) / Defect 5 / Member 행 1
+PASS / 선택 Die 의 Chain 탭 = DIE_CHAIN / 1 / 1
+PASS / 선택 Die 의 Defect 탭(Chain In) = N / 1
+PASS / Chain 탭 / Defect 탭의 Chain = 이름(코드 없음, 이름 열 따로 없음) / TSVDC_L_P_FH / TSVDC_L_P_FH
+PASS / Map 선택 Die 빨간 테두리 목록 / 1
+PASS / 마우스 Die 이동 -> 상태줄(예외 없음, Defect 전체 / Chain In / Chain Out) / Wafer Key RH-HS2615-02 (Step 1개) / GDS OMM_Hybrid / BACK 보기 (Chain BS -> 반전) / 크기 + 허용오차 5 µm / Chain 15 / Defect 15 중 Chain In 1 / Pitch = Map Setup | Die (6, 6) Defect 전체 5 / Chain In 1 / Chain Out 4 / 걸린 Chain 1
+PASS / 우클릭 메뉴 = Free Zoom / Fit Size / - / Center Cross / - / Detail Analysis (Defect / Die Select 없음, 선택 Chip 있으면 사용 가능) / Free Zoom / Fit Size / - / Center Cross / - / Detail Analysis / enabled=True
+PASS / 우클릭 -> 커서 아래 Chip 선택 / {X=6,Y=8} -> {X=6,Y=8}
+PASS / 상세보기 Die 마다 창(첫 창 그대로 + 하나 더) / 같은 Die 다시 = 창 늘지 않음 / 탭 제목 상세보기(좌표) / 1 -> 2 -> 2 / 상세보기 (6, 6) , 상세보기 (6, 8)
+PASS / 표시 기준 2: N=1 Die 연회색 / {X=6,Y=6}
+PASS / 표시 기준 2: 구간 시작 2 / 2
+PASS / 구간 TO 칸 편집 후 다른 칸 이동 -> 사용자 구간(예외 없음, 자동 해제) / auto=False to=2
+PASS / 구간 FROM 잘못된 값 -> 되돌림(예외 없음) / from=1
+PASS / 조건 변경 경고 / 
+PASS / 허용오차 50 재분석 >= 5 µm / 1 -> 1
+PASS / Defect 중심 사각형 한 변 10 -> 크기 끔 + 허용오차 5 / 입력칸 전환 / 상태줄 문구 / N / 5 / Wafer Key RH-HS2615-02 (Step 1개) / GDS OMM_Hybrid / BACK 보기 (Chain BS -> 반전) / 중심 사각형 한 변 10 µm / Chain 15 / Defect 15 중 Chain In 1 / Pitch = Map Setup
+
+PASS / 기본 Chain BS ≠ 검사 FS -> 반전 / Chain FS = 검사 FS -> 반전 없음(보기 면 바뀜, 검사 면은 그대로 FRONT) / FRONT / Wafer Key RH-HS2615-02 (Step 1개) / GDS OMM_Hybrid / FRONT 보기 (Chain FS) / 크기 + 허용오차 5 µm / Chain 15 / Defect 15 중 Chain In 8 / Pitch = Map Setup
+
+화면 A 이미지: C:\Users\USER\AppData\Local\Temp\ChippacBuild\CLAUDE-159-smoke\ChippacGdsKlarfAnalysisVerification\analysis.png
+PASS / 화면 B 계약: 생성자(bool) / ShowDie(DataSet,int,int) / DefectImageRequested(Action<long,long>) / 
+화면 B 첫 표시(도면 + Chain Member 조회): 10.5초 / 상태: 도면 조회 완료: OMM_Hybrid / 도형 173,906
+PASS / 화면 B 도면 키 / SCK|OMM_Hybrid|BACK|CHAIN|355,356,357,358,359,360,361,362,363,364,365,366,367,368,369|2026-10-15 05:29:35
+PASS / 화면 B Defect 표시 = 선택 Die Defect / 5 / 5
+PASS / 화면 B Chain 표시(걸린 Chain) / 1 / 1
+PASS / 화면 B 반전 일치: 걸린 Member 도형 = Defect 위치(보기 기준) / 1 / 1
+PASS / 화면 B Chip 좌표 정보 / Chip 이동 컨트롤 없음 / Die (6, 6)  Defect 전체 5 / Chain In 1 / Chain Out 4 / 걸린 Chain 1
+PASS / 화면 B Chain 열 = 이름(코드 없음, 맨 아래 Chain 밖 Defect) / 이름 열 없음 / TSVDC_L_P_FH
+PASS / 화면 B 도면 Chain 색 = 저장 색 / Chain 칸 더블클릭(역추적) · 해제 뒤 묶음 순서와 고른 Chain 묶음 그대로 / 그린 Chain 1 / 색 다름 0 / 더블클릭 TSVDC_L_P_FH -> TSVDC_L_P_FH / 역추적 True / 해제 True
+PASS / 화면 B 배치: 기능 탭 GDS / KLARF(합침) / E-Test / 종합 (Die) · 표 위치 · 기준 제목(GDS / KLARF 2줄) · 분석 기준 3칸(화면 A 문구) · 도면 머리 보기 면 / GDS / KLARF,E-Test,종합 (Die) / 표 위치 True / 옛 컨트롤 없음 True / GDS · Chain BS -> 반전 | KLARF · Step 1개 · 크기 + 허용오차 5 µm · 보정 (0, 0) | E-Test · 없음 | 보기 = Back side(좌우 반전)
+PASS / 화면 B 용어 = 화면 A: Chain 칸 8열 + Defect 칸 10열(Defect ID / Gap / 가까운 Chain(Gap 바로 뒤, 2026-10-20) / RoughBin / Class / 크기 / GDS X / Y / XREL / YREL), 분류 '-' 없음, 정렬 안 됨 / 표시,색,Chain,Defect 수,분류,ET,Fail Para,Member,Defect ID,Gap(µm),가까운 Chain,RoughBin,Class,크기(µm),GDS X,GDS Y,XREL,YREL / 분류 비교 불가
+PASS / 화면 B [GDS / KLARF] 묶음: Chain 묶음 Defect = 그 Chain 에 걸린 Defect / 맨 아래 Chain 밖 = Chain Out(가까운 거리 순) / 머리 줄 수 / [Chain 밖 Defect] 끄기 · 켜기 / 묶음 TSVDC_L_P_FH,Chain 밖 Defect / 어긋남  / 순서 True / "Chain 1 / Defect 전체 5 / Chain In 1 / Chain Out 4" / 끄기 True 켜기 True
+PASS / 화면 B 두 Chain 에 걸린 Defect: 두 묶음 모두 / Defect ID 굵게 / Gap 바로 뒤 가까운 Chain = 함께 걸림 + 다른 Chain (복사본 결과, 되돌림) / Defect 15 / TSVDC_L_P_FH + TSVDC_TOP1_P / 행 2 / 굵게 2 / 다른 Defect 굵지 않음 True / TSVDC_TOP1_P: 함께 걸림: TSVDC_L_P_FH | TSVDC_L_P_FH: 함께 걸림: TSVDC_TOP1_P
+PASS / 화면 B [종합 (Die)]: 4분류 수 합 = Chain 수 / 표 행 = 일치 · Fail만 · Defect만 (Die, Chain) / Die 요약 Defect 전체 · Chain In / 4분류 합 15 / Chain 15 / 표 0 / 기대 0 / Defect 전체 5 / Chain In 1 / Chain Out 4 / 걸린 Chain 1  ·  E-Test 없음
+PASS / 화면 B 첫 탭: Die 전체 = [종합 (Die)] / 역추적 = [GDS / KLARF](그 Chain 묶음) + 탭 제목 (역추적) / 역추적 True / 전체 True / 지금 종합 (Die)
+PASS / 화면 B Die 변경 = 도면 다시 읽지 않음 / 0.76초 / Defect 5
+PASS / 화면 B Defect 행 선택 -> 상태줄 / Defect #1 / GDS (-11602.42, -3103.03) µm / 걸린 Member 0
+PASS / [분석] 뒤 미리 읽기: Wafer 결과 키 = 상세 결과 키 / DB 읽기 1번 / 9.7초 / SCK|OMM_Hybrid|BACK|CHAIN|355,356,357,358,359,360,361,362,363,364,365,366,367,368,369|2026-10-15 05:29:35
+PASS / 첫 상세보기 = 공유 화면 + 미리 읽은 도면(DB 다시 읽지 않음) / 2.0초 / 도면 조회 완료: OMM_Hybrid / 도형 173,906
+PASS / 두 번째 Die = 새 창(첫 창 그대로) / 공유 화면 옮김(같은 화면 · 같은 도면 핸들) / 첫 창 안내 문구 / 도면 다시 읽지 않음 / 1.60초 / 창 2 / 상세보기 (6, 6) , 상세보기 (6, 8)
+PASS / 같은 Die 다시 = 그 창으로(창 2개 그대로) / 창마다 Chain 밖 Defect · 확대 위치 되돌림 / 도면 다시 읽지 않음 / 창1 Chain 밖 False 위치 True / 창2 Chain 밖 True 위치 True
+PASS / 역추적으로 같은 Die 열기 = 그 창(창 2개 그대로) / 역추적 Chain 표시 / 역추적: Chain TSVDC_TOP1_P
+PASS / 공유 화면을 가진 창 닫기 -> 남은 창이 가져감(공유 화면 · 도면 핸들 그대로) / MDI 자동 활성 True
+PASS / 상세보기 창을 다 닫아도 화면 A 가 있으면 공유 화면 유지 / 화면 A 닫으면 공유 화면 · 미리 읽기 해제 / 유지 True / 해제 True
+PASS / 새 창은 앞 창 상태줄 / Chain 고른 행 · 스크롤 이어받지 않음 / 돌아가면 그 창 상태줄 · Chain 행 / w1 "Defect #14 / GDS (-6313.6, -13606.3) µm / 걸린 Member 0" / w2 "Die (6, 8) 표시" / w2 Chain 새 목록 True (선택 0 / 첫 행 -1) / w1 되돌림 "Defect #14 / GDS (-6313.6, -13606.3) µm / 걸린 Member 0" / w1 행 Chain 밖 Defect|14 (기대 Chain 밖 Defect|14)
+PASS / 재분석 -> 이전 결과 창 탭 제목 (이전 분석) / 미리 읽기 캐시 2칸(FRONT · BACK) / 상세보기 (6, 6) (이전 분석) , 상세보기 (6, 8) (이전 분석) / 캐시 2
+PASS / 도면 키 다른 창끼리 오가기 = DB 다시 읽지 않음(캐시 2칸) / 각 창 자기 도면 / 새 창 1.3초 / BACK 창으로 1.3초 / FRONT 창으로 1.2초 / DB 읽기 1
+PASS / 다른 키 도면 읽는 중 같은 키 창으로 전환 -> 늦게 끝난 읽기가 그 창 도면을 덮지 않음 / 읽기 시작 True / 도면 키 BACK / Defect 표시 5 (w2 5)
+PASS / 버린 읽기 데이터는 캐시에 남음(그 창으로 가면 DB 다시 읽지 않음) / 
+PASS / 재분석 뒤 같은 Die 다시 = 그 창 새 결과(FRONT) / 제목 되돌림 / 다른 창 (이전 분석) 그대로 / 상세보기 (6, 6) FRONT / 상세보기 (6, 8) (이전 분석)
+PASS / 메시지 루프 검사 정리: 창 / 화면 A 닫으면 공유 화면 · 캐시 해제 / 
+
+GDS_KLARF_FORM_SMOKE=PASS (75/75)
+DACrux.SEMDMS.Interface.dll md5=fef85f11
+DACrux.SEMDMS.DSL.dll md5=5cb02984
+DACrux.SEMDMS.BSL.dll md5=e56156c9
+DACrux.SEMDMS.RO.dll md5=0f0609d2
+DACrux.SEMDMS.ENGUI.dll md5=1412b743
+NexplantQMS.GdsMap.exe md5=09e85d3e
+

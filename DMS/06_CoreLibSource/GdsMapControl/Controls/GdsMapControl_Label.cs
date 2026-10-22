@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace NexplantQMS.GdsMap
 {
@@ -25,6 +26,8 @@ namespace NexplantQMS.GdsMap
 		// 보통 이름 폭을 잴 때 쓰는 이름 수와 글꼴 크기. 도면을 읽은 뒤 첫 그리기에서 한 번만 잰다 (2026-10-20)
 		private const int LabelReferenceSampleCount = 32;
 		private const float LabelMeasureFontPixels = 100.0f;
+		// 번호형 이름(접두어_숫자, 예: C4_7444 / TSV_19144). 같은 자리에 이름과 함께 있으면 아래 줄에 둔다 (2026-10-20)
+		private static readonly Regex LabelNumberNamePattern = new Regex(@"^[A-Za-z][A-Za-z0-9]*_\d+$", RegexOptions.Compiled);
 		private readonly List<LayerTextLabel> _textLabels = new List<LayerTextLabel>();
 		// 같은 좌표 Label 묶음(그리기 단위)과 Layer 키별 글자 크기 기준. CalculateTextLabelDisplayAreas 에서 만든다 (2026-10-20)
 		private readonly List<TextLabelSpot> _textLabelSpots = new List<TextLabelSpot>();
@@ -182,7 +185,8 @@ namespace NexplantQMS.GdsMap
 
 		/// <summary>
 		/// 같은 좌표의 Label 을 그리기 단위(자리)로 묶는다. 자리 순서는 처음 나온 순서(파일 순서)다.
-		/// 자리 안 순서: Layer 번호 -> TEXTTYPE 큰 쪽(U8: Net 이름 4 -> 핀 번호 3) -> 파일 순서. 그릴 때 이 순서로 줄을 나눈다.
+		/// 자리 안 순서: 이름 -> 번호형 이름(C4_7444 / TSV_19144) -> Layer 번호 -> TEXTTYPE 큰 쪽 -> 파일 순서. 그릴 때 이 순서로 줄을 나눈다(Net 위 / 핀 번호 아래).
+		/// U8 Layer 18 은 C4 자리의 핀 번호와 Net 이름이 같은 TEXTTYPE(18/3)이라 TEXTTYPE 만으로는 줄 순서를 정할 수 없다.
 		/// </summary>
 		private void BuildTextLabelSpots()
 		{
@@ -203,7 +207,8 @@ namespace NexplantQMS.GdsMap
 			foreach (var spot in _textLabelSpots)
 			{
 				if (spot.Labels.Count > 1)
-					spot.Labels = spot.Labels.OrderBy(label => label.LayerId).ThenByDescending(label => label.TextType).ToList();
+					spot.Labels = spot.Labels.OrderBy(label => LabelNumberNamePattern.IsMatch(label.Text))
+						.ThenBy(label => label.LayerId).ThenByDescending(label => label.TextType).ToList();
 			}
 		}
 
@@ -249,7 +254,7 @@ namespace NexplantQMS.GdsMap
 		/// 처리 흐름:
 		///  1) 글자 크기를 한 번 정한다 = 켜진 Label Layer 키마다 "대표 칸 40% 에 보통 이름이 들어가는 크기" 중 가장 작은 값,
 		///     최대 글꼴(10px x 배율 비율, 64px) 이하. 6px 미만이면 아무것도 그리지 않는다(멀리서는 안 보임)
-		///  2) 자리마다: 기준점이 화면 밖이면 제외 -> 켜진 Layer 키의 Label 만 모아 같은 글자는 한 번, 다른 글자는 줄을 나눈다(Net 위 / 핀 번호 아래)
+		///  2) 자리마다: 기준점이 화면 밖이면 제외 -> 켜진 Layer 키의 Label 만 모아 같은 글자는 한 번, 다른 글자는 줄을 나눈다(이름 위 / 번호 아래)
 		///  3) 모든 자리를 같은 크기로 재서 PRESENTATION 기준점에 놓고, 화면 밖 / 이미 그린 글자와 겹치면 제외
 		/// </summary>
 		internal List<TextLabelPlacement> LayoutTextLabels(Graphics graphics, int clientWidth, int clientHeight)

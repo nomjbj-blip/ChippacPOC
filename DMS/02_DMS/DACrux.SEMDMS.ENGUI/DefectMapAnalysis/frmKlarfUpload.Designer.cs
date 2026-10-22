@@ -508,7 +508,7 @@
             // 
             // colImages
             // 
-            this.colImages.HeaderText = "이미지(찾음/참조)";
+            this.colImages.HeaderText = "이미지";
             this.colImages.MinimumWidth = 8;
             this.colImages.Name = "colImages";
             this.colImages.ReadOnly = true;
@@ -528,6 +528,7 @@
             this.colStepSeq.MinimumWidth = 70;
             this.colStepSeq.Name = "colStepSeq";
             this.colStepSeq.ReadOnly = true;
+            this.colStepSeq.Visible = false;
             this.colStepSeq.Width = 128;
             // 
             // colMessage
@@ -536,6 +537,7 @@
             this.colMessage.MinimumWidth = 8;
             this.colMessage.Name = "colMessage";
             this.colMessage.ReadOnly = true;
+            this.colMessage.Visible = false;
             this.colMessage.Width = 95;
             // 
             // grpDefect
@@ -625,7 +627,7 @@
             // 
             // colX
             // 
-            this.colX.HeaderText = "X (um)";
+            this.colX.HeaderText = "X";
             this.colX.MinimumWidth = 8;
             this.colX.Name = "colX";
             this.colX.ReadOnly = true;
@@ -633,7 +635,7 @@
             // 
             // colY
             // 
-            this.colY.HeaderText = "Y (um)";
+            this.colY.HeaderText = "Y";
             this.colY.MinimumWidth = 8;
             this.colY.Name = "colY";
             this.colY.ReadOnly = true;

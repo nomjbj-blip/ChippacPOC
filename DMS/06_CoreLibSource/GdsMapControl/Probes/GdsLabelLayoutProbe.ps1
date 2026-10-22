@@ -3,8 +3,8 @@
 #   - 글자 크기는 배율마다 화면 전체에서 하나(Label 마다 이웃 거리로 바꾸지 않음), 배율이 2배면 글자도 약 2배.
 #   - OMM all layer2: 이전 규칙(아래 OldLayout, 2026-10-20 이전 계산을 그대로 옮김)과 같은 Label 이 보이고, 크기는 1종으로 맞춰진다(18 화면).
 #   - U8 제품 Cell: 같은 내용 사본은 그리지 않음 / 화면 크기 기준 칸 거의 없음 / 멀리서는 안 보임 / TSV 구역(빈 자리 옆) 크기 1종 /
-#     18/3(핀 번호) / 18/4(Net 이름)를 따로 켜고 끔 / 둘 다 켜면 Net 위 / 핀 번호 아래 두 줄
-# 실행: powershell -NoProfile -STA -ExecutionPolicy Bypass -File GdsLabelLayoutProbe.ps1 -GdsExe <빌드한 NexplantQMS.GdsMap.exe> [-SkipU8]
+#     Layer 키별로 켜고 끔(18/3 = C4 자리 핀 번호 + Net 이름, 18/4 = TSV 자리 Net 이름, 50/3 = TSV 번호) / 같은 자리는 이름 위 / 번호 아래 두 줄
+# 실행: powershell -NoProfile -STA -ExecutionPolicy Bypass -File GdsLabelLayoutProbe.ps1 -GdsExe <빌드한 NexplantQMS.GdsMap.dll> [-SkipU8]
 param(
     [Parameter(Mandatory = $true)][string]$GdsExe,
     [switch]$SkipU8
@@ -243,13 +243,14 @@ if (-not $SkipU8) {
     Check 'U8 배율 2배면 글자도 약 2배' ([Math]::Abs($px2 - 2 * $px1) -le 2) ("1.0 -> {0}px / 2.0 -> {1}px" -f $px1, $px2)
     $two = @($s2 | Where-Object { $_.Contains("`n") })
     $order = @($two | Where-Object { $parts = ($_ -split '\|')[0] -split "`n"; $parts.Count -eq 2 -and -not $parts[0].StartsWith('C4_') -and $parts[1].StartsWith('C4_') })
-    Check 'U8 18/3 + 18/4 = Net 위 / 핀 번호 아래' ($two.Count -gt 0 -and $order.Count -eq $two.Count) ("두 줄 {0} / 순서 맞음 {1} / 예: {2}" -f $two.Count, $order.Count, (($two | Select-Object -First 1) -replace "`n", ' / '))
+    Check 'U8 같은 자리 두 줄 = 이름 위 / 핀 번호 아래' ($two.Count -gt 0 -and $order.Count -eq $two.Count) ("두 줄 {0} / 순서 맞음 {1} / 예: {2}" -f $two.Count, $order.Count, (($two | Select-Object -First 1) -replace "`n", ' / '))
     [LabelLayoutProbe]::SetVisible($u8, [Func[int, bool]] { param($k) $k -eq $k183 })
     $pin = Layout $u8 $cx $cy 2.0
-    Check 'U8 18/3 만 켜면 핀 번호만' ($pin.Count -gt 0 -and @($pin | Where-Object { -not $_.StartsWith('C4_') }).Count -eq 0) "$($pin.Count)개"
+    $pinOk = @($pin | Where-Object { $ls = ($_ -split '\|')[0] -split "`n"; @($ls | Where-Object { $_.StartsWith('C4_') }).Count -eq 1 -and -not $_.Contains('TSV_') })
+    Check 'U8 18/3 만 켜면 C4 자리(이름 + 핀 번호)만' ($pin.Count -gt 0 -and $pinOk.Count -eq $pin.Count) ("{0}개 / 핀 번호 줄 있음 {1}" -f $pin.Count, $pinOk.Count)
     [LabelLayoutProbe]::SetVisible($u8, [Func[int, bool]] { param($k) $k -eq $k184 })
     $net = Layout $u8 $cx $cy 2.0
-    Check 'U8 18/4 만 켜면 Net 이름만' ($net.Count -gt 0 -and @($net | Where-Object { $_.Contains('C4_') }).Count -eq 0) "$($net.Count)개"
+    Check 'U8 18/4 만 켜면 TSV 자리 Net 이름만' ($net.Count -gt 0 -and @($net | Where-Object { $_.Contains('C4_') }).Count -eq 0) "$($net.Count)개"
     [LabelLayoutProbe]::SetVisible($u8, [Func[int, bool]] { param($k) $k -eq $k183 -or $k -eq $k184 -or $k -eq $k503 -or $k -eq $k504 })
     $both = Layout $u8 $cx $cy 1.0
     $dupLine = @($both | Where-Object { $p = ($_ -split '\|')[0] -split "`n"; ($p | Sort-Object -Unique).Count -ne $p.Count })
@@ -259,6 +260,7 @@ if (-not $SkipU8) {
     [LabelLayoutProbe]::SetVisible($u8, [Func[int, bool]] { param($k) $k -eq $k503 })
     $tsvView = Layout $u8 13300.0 21450.0 1.0
     Check 'U8 TSV 구역(50/3) 글자 크기 1종' ($tsvView.Count -gt 20 -and (Sizes $tsvView).Count -eq 1) ("{0}개 / 크기 {1}" -f $tsvView.Count, ((Sizes $tsvView) -join ','))
+    Check 'U8 50/3 만 켜면 TSV 번호만(한 줄)' (@($tsvView | Where-Object { -not $_.StartsWith('TSV_') -or $_.Contains("`n") }).Count -eq 0) "$($tsvView.Count)개"
     $u8.Dispose(); [GC]::Collect()
 }
 $g.Dispose(); $bmp.Dispose()

@@ -1,0 +1,26 @@
+﻿{
+    "id":  "03",
+    "name":  "MarkCheck",
+    "scenarios":  [
+                      "SCN-M"
+                  ],
+    "status":  "PASS",
+    "exitCode":  0,
+    "timedOut":  false,
+    "durationMs":  651,
+    "started":  "2026-10-20 10:03:26",
+    "command":  "python -I -X utf8 \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\probes\\f07data_mark_check.py\" \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\reports\\run-20261020-095726-CLAUDE-153\\evidence\\ui\" 25 73",
+    "workingDir":  "D:\\1_프로젝트 문서\\18.스테츠칩팩_POC",
+    "keys":  {
+                 "MARK_CHECK_PROBE":  "PASS (5/5)"
+             },
+    "passLines":  5,
+    "failLines":  [
+
+                  ],
+    "skipLines":  [
+
+                  ],
+    "stdout":  "03_MarkCheck.stdout.txt",
+    "stderr":  "03_MarkCheck.stderr.txt"
+}

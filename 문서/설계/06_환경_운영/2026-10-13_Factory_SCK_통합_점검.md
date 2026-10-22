@@ -87,3 +87,11 @@ FACILITY 컬럼(FACTORY 와 같은 의미로 사용): TQC_LOT_STS 47,965 / TQP_L
 - 소스: `TestCommon.cs` 수율 계산을 Factory 조건 없이 NETDIE 기준으로 통일, `101_ServerBin/*.vshost.exe.config` 2개 FACTORY = SCK, 쿼리 XML 5개 param 기본값 SCK. TEST.BSL 빌드(TEMP 사본) 오류 0.
 - 그대로 둔 것: `DACruxV5_FAB2` 클라이언트 프로젝트(Factory = FAB2 설정), Migration 도구 설정(FAB1), Handler / Parser `_Fab1` / `_Fab2` 이름.
 - 미확인: DMS 화면 조회(Lot / Wafer / Map / Defect), 서비스 재시작 후 신규 적재.
+
+## 2026-10-14 추가: 컬럼 기본값 FAB2 (CLAUDE-101)
+
+- 증상: File Map Setup 으로 OMM_TCB Map 을 만들었는데 KLARF Upload [DB 저장] 이 "Device OMM_TCB 의 Map 이 없습니다 (Factory SCK)". DB 의 `TQP_MAPDEF` 행이 FACTORY = FAB2.
+- 원인: 10-13 스크립트는 데이터만 바꾸고 컬럼 기본값은 그대로였다. `TQP_MAPDEF.FACTORY DEFAULT 'FAB2'` + Map Define / File Map Setup 저장 쿼리 `TQP_MAPDEF.xml` CREATE_MAP 이 FACTORY 를 넣지 않음 -> 10-13 이후 새로 만든 OMM / OMM_TCB 가 FAB2 (사용 Die `TQP_USEMAP` 은 로그인 Factory SCK 로 저장되어 둘이 어긋남).
+- 점검: DMSMGR 의 FACTORY 컬럼 기본값은 TQP_MAPDEF('FAB2') / TQC_SERVICE_LOG · TQD_PRODUCT(' ') 뿐. SCK 가 아닌 FACTORY 값은 TQP_MAPDEF FAB2 2건 + 시험 데이터 PROBE(GDS 4개 테이블 / TQP_PRODUCT)뿐.
+- 조치: `DMS/Assistant/DB/sql/2026-10-14_tqp_mapdef_factory_sck.sql` 로컬 실행 = 기본값 'SCK' + FAB2 2건(OMM, OMM_TCB) -> SCK (키 충돌 없음 확인 후). 결과 FAB1 / FAB2 0건, `ExistsMapID(SCK, OMM_TCB / OMM / OMM_Hybrid)` 모두 True.
+- 소스는 바꾸지 않음 (기존 Map Define 저장 경로는 FACTORY 를 DB 기본값에 맡기는 구조). **고객 DB 도 기본값이 FAB2 면 같은 스크립트 필요.**

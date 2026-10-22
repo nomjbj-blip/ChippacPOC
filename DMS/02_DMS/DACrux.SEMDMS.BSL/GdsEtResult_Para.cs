@@ -40,14 +40,21 @@ namespace DACrux.SEMDMS.BSL
         }
 
         /// <summary>
-        /// E-Test Para 설정 화면 목록: 등록 Parameter + GDS Chain + Spec. 쿼리 순서: f1 d1 t1 f2 d2 t2
+        /// E-Test Para 설정 화면 목록: 등록 Parameter + YMS 이름 / YMS 반영 여부 + GDS Chain + Spec. 쿼리 순서: f1 d1 t1 p f2 d2 t2
+        /// YMS_PUBLISHED = 그 YMS 이름이 YMS Program(Device_공정)의 Parameter 정의(TQP_PARASPEC)에 있음 -> 화면에서 YMS 이름 수정 불가 (2026-10-21)
         /// </summary>
         public DataTable GetEtParameterSetupList(string strFactory, string strDeviceID, string strTestProgram)
         {
             string f = Required(strFactory, "Factory", 30);
             string d = Required(strDeviceID, "Device ID", 50);
             string t = RequiredTestProgram(strTestProgram);
-            return new TQP_GDS_ET_ITEM().GetData("SELECT_ET_PARA_SETUP_LIST", null, new string[] { f, d, t, f, d, t });
+            return new TQP_GDS_ET_ITEM().GetData("SELECT_ET_PARA_SETUP_LIST", null, new string[] { f, d, t, YmsProgram(d, t), f, d, t });
+        }
+
+        /// <summary>E-Test Device + 공정의 YMS Program 이름 (EtYmsPublisher 와 같은 규칙: Device_공정 대문자)</summary>
+        private static string YmsProgram(string strDeviceID, string strTestProgram)
+        {
+            return EtYmsRule.ToProgramName(strDeviceID, EtYmsRule.ToTestArea(strTestProgram));
         }
 
         /// <summary>
@@ -56,7 +63,8 @@ namespace DACrux.SEMDMS.BSL
         ///  1) 입력 검증: 키 5개(Factory / Device / 공정 / 출처 FILE·SPEC / 파일 이름), 행 4열(헤더 원문 / 단위 / Test No / 열 순서)
         ///  2) 이미 등록된 Parameter 를 읽는다(같은 Device + 공정)
         ///  3) 행마다 EtParameterNameRule.Parse 로 분해 / 변환. 실패 / 같은 헤더 두 번 / 다른 헤더가 같은 Parameter 이름 / 등록된 것과 단위 다름은 모아서 한 번에 거부
-        ///  4) 이미 같은 헤더가 등록돼 있으면 건너뛰고, 새 행만 InsertExecuteMultiple 로 넣는다
+        ///     YMS 이름(EtYmsRule.ToYmsName, 30자)이 이미 등록된 Parameter 나 같은 요청의 다른 Parameter 와 같아도 거부한다 (2026-10-21)
+        ///  4) 이미 같은 헤더가 등록돼 있으면 건너뛰고, 새 행만 InsertExecuteMultiple 로 넣는다. YMS 이름은 이때 한 번 저장하고 자동으로 바꾸지 않는다
         /// 반환 1행: REGISTERED / SKIPPED
         /// </summary>
         public DataTable RegisterEtParameters(string[] aKey, string[,] aRows, string strUpdateUser)
@@ -80,9 +88,15 @@ namespace DACrux.SEMDMS.BSL
 
             TQP_GDS_ET_ITEM oItem = new TQP_GDS_ET_ITEM();
             Dictionary<string, DataRow> dicExist = new Dictionary<string, DataRow>(StringComparer.Ordinal);
+            Dictionary<string, string> dicYmsOwner = new Dictionary<string, string>(StringComparer.Ordinal);
             DataTable dtExist = oItem.GetData("SELECT_ET_PARA_BY_PROGRAM", null, new string[] { f, d, t });
             foreach (DataRow dr in dtExist.Rows)
+            {
                 dicExist[dr["ITEM_NAME"].ToString()] = dr;
+                string strYms = dr["YMS_PARAM_NAME"].ToString();
+                if (strYms.Length > 0)
+                    dicYmsOwner[strYms] = dr["ITEM_NAME"].ToString();
+            }
 
             List<string> lstError = new List<string>();
             List<string[]> lstInsert = new List<string[]>();
@@ -130,8 +144,17 @@ namespace DACrux.SEMDMS.BSL
                     continue;
                 }
 
+                string strYmsOwner;
+                if (dicYmsOwner.TryGetValue(parts.YmsName, out strYmsOwner))
+                {
+                    lstError.Add("YMS 이름 " + parts.YmsName + " 이 다른 Parameter 와 같습니다: " + strYmsOwner + " / " + parts.ParameterName
+                        + " (등록된 Parameter 의 YMS 이름을 Para 설정에서 바꾼 뒤 다시 등록하세요)");
+                    continue;
+                }
+                dicYmsOwner.Add(parts.YmsName, parts.ParameterName);
+
                 lstInsert.Add(new string[] {
-                    f, d, t, parts.ParameterName, parts.HeaderText, parts.ParaName, parts.CondValue, parts.MeasType,
+                    f, d, t, parts.ParameterName, parts.YmsName, parts.HeaderText, parts.ParaName, parts.CondValue, parts.MeasType,
                     parts.Chain1, parts.Chain2, parts.ChainType, parts.ForceLeg1, parts.ForceLeg2,
                     strUnit, strTestNo, strOrder, strSource, strFileName, strUser, strUser });
             }
@@ -140,13 +163,7 @@ namespace DACrux.SEMDMS.BSL
                 throw new ArgumentException("등록할 수 없는 헤더가 있습니다(" + lstError.Count + "건). " + string.Join(" / ", lstError.Take(10).ToArray()), "aRows");
 
             if (lstInsert.Count > 0)
-            {
-                string[,] aInsert = new string[lstInsert.Count, 20];
-                for (int r = 0; r < lstInsert.Count; r++)
-                    for (int c = 0; c < 20; c++)
-                        aInsert[r, c] = lstInsert[r][c];
-                oItem.InsertExecuteMultiple("CREATE_ET_PARA", aInsert);
-            }
+                oItem.InsertExecuteMultiple("CREATE_ET_PARA", ToArray(lstInsert));
 
             DataTable dtResult = new DataTable("ET_PARA_REGISTER");
             dtResult.Columns.Add("REGISTERED", typeof(int));
@@ -157,15 +174,18 @@ namespace DACrux.SEMDMS.BSL
 
         /// <summary>
         /// [등록 Parameter] 탭 저장 (2026-10-14 Para 화면 재구성). 화면에서 수정된 행만 받는다. aKey: 0 Factory / 1 Device / 2 공정.
-        /// aRows 열: 0 Parameter(저장 이름) / 1 사용(Y/N) / 2 비고 / 3 GDS Chain / 4 Lower / 5 Upper / 6 Enable(Y/N)
+        /// aRows 열: 0 Parameter(저장 이름) / 1 사용(Y/N) / 2 비고 / 3 GDS Chain / 4 Lower / 5 Upper / 6 Enable(Y/N) / 7 YMS 이름(선택, 2026-10-21)
         /// 처리 흐름:
         ///  1) 값 확인: 등록된 Parameter / 같은 행 두 번 / 사용 Y·N / 비고 200자 / GDS Chain 200자 / Lower·Upper 숫자 / Lower ≤ Upper /
         ///     Enable 이면 Limit 1개 이상. 틀린 것은 모아서 한 번에 거부(아무것도 저장하지 않음)
-        ///  2) 배열 UPDATE (사용 / 비고 / GDS Chain) - 받은 행 전부
-        ///  3) Limit 이 있고 Spec(Lower / Upper / Enable)이 기존과 다른 행: 배열 MERGE(MERGE_ET_LIMIT). 단위 = 기존 Spec 단위, 없으면 등록 단위.
+        ///     YMS 이름(8번째 열이 있고 값이 바뀐 행만): 30자 / 형식 / YMS 에 반영된 Parameter 는 수정 불가 / YMS 에 이미 있는 컬럼 이름 불가 /
+        ///     Device + 공정 전체에서 겹침 불가 (설계: 문서/설계/04_ETest/2026-10-21_ETest_YMS_컬럼이름_30자_설계.md Y6)
+        ///  2) YMS 이름 배열 UPDATE (바뀐 행만, 겹침이 DB 고유 제약에 걸리면 여기서 멈춘다)
+        ///  3) 배열 UPDATE (사용 / 비고 / GDS Chain) - 받은 행 전부
+        ///  4) Limit 이 있고 Spec(Lower / Upper / Enable)이 기존과 다른 행: 배열 MERGE(MERGE_ET_LIMIT). 단위 = 기존 Spec 단위, 없으면 등록 단위.
         ///     Spec 원문 / Spec 비고는 기존 값을 그대로 둔다. 같은 값이면 다시 쓰지 않는다(GDS Chain 만 고친 행의 Spec 수정자 / 시각 유지)
-        ///  4) Limit 이 모두 빈 행 중 Spec 이 있던 것: 배열 DELETE
-        /// 반환 1행: UPDATED / SPEC_SAVED(새로 만들거나 바뀐 Spec) / SPEC_DELETED
+        ///  5) Limit 이 모두 빈 행 중 Spec 이 있던 것: 배열 DELETE
+        /// 반환 1행: UPDATED / SPEC_SAVED(새로 만들거나 바뀐 Spec) / SPEC_DELETED / YMS_RENAMED
         /// </summary>
         public DataTable SaveEtParameterSetup(string[] aKey, string[,] aRows, string strUpdateUser)
         {
@@ -177,18 +197,25 @@ namespace DACrux.SEMDMS.BSL
             string strUser = Required(strUpdateUser, "Update User", 30);
             if (aRows == null || aRows.GetLength(0) == 0)
                 throw new ArgumentException("저장할 Parameter 가 없습니다.", "aRows");
-            if (aRows.GetLength(1) != 7)
-                throw new ArgumentException("저장 열 수는 7개(Parameter / 사용 / 비고 / GDS Chain / Lower / Upper / Enable)여야 합니다.", "aRows");
+            if (aRows.GetLength(1) != 7 && aRows.GetLength(1) != 8)
+                throw new ArgumentException("저장 열 수는 7개(Parameter / 사용 / 비고 / GDS Chain / Lower / Upper / Enable) 또는 8개(+ YMS 이름)여야 합니다.", "aRows");
             if (aRows.GetLength(0) > MaxBatchRows)
                 throw new ArgumentException("한 번에 " + MaxBatchRows + "행 이하로 저장하세요.", "aRows");
+            bool bYmsColumn = aRows.GetLength(1) == 8;
 
             TQP_GDS_ET_ITEM oItem = new TQP_GDS_ET_ITEM();
             Dictionary<string, string> dicUnit = new Dictionary<string, string>(StringComparer.Ordinal);
+            Dictionary<string, string> dicYms = new Dictionary<string, string>(StringComparer.Ordinal);
             using (DataTable dtItem = oItem.GetData("SELECT_ET_PARA_BY_PROGRAM", null, new string[] { f, d, t }))
             {
                 foreach (DataRow dr in dtItem.Rows)
+                {
                     dicUnit[dr["ITEM_NAME"].ToString()] = dr["UNIT"].ToString();
+                    dicYms[dr["ITEM_NAME"].ToString()] = dr["YMS_PARAM_NAME"].ToString();
+                }
             }
+            HashSet<string> setPublished = null;
+            List<string[]> lstRename = new List<string[]>();
             TQP_GDS_ET_LIMIT oLimit = new TQP_GDS_ET_LIMIT();
             Dictionary<string, DataRow> dicSpec = new Dictionary<string, DataRow>(StringComparer.Ordinal);
             DataTable dtSpec = oLimit.GetData("SELECT_ET_LIMIT", null, new string[] { f, d, t });
@@ -227,6 +254,23 @@ namespace DACrux.SEMDMS.BSL
                         throw new ArgumentException(strItem + " 의 Lower(" + strLower + ") 가 Upper(" + strUpper + ") 보다 큽니다.");
                     if (strEnable == "Y" && strLower.Length == 0 && strUpper.Length == 0)
                         throw new ArgumentException(strItem + " 은 Enable 인데 Lower / Upper 가 없습니다.");
+                    if (bYmsColumn)
+                    {
+                        string strYms = Clean(aRows[i, 7]).ToUpperInvariant();
+                        string strOldYms = dicYms[strItem];
+                        if (strYms.Length > 0 && !string.Equals(strYms, strOldYms, StringComparison.Ordinal))
+                        {
+                            if (!EtYmsRule.IsValidYmsName(strYms))
+                                throw new ArgumentException(strItem + " 의 YMS 이름은 영문 대문자로 시작하고 대문자·숫자·'_' " + EtYmsRule.MaxYmsNameLength + "자 이하여야 합니다: " + aRows[i, 7]);
+                            if (setPublished == null)
+                                setPublished = YmsPublishedNames(oItem, f, d, t);
+                            if (setPublished.Contains(strOldYms))
+                                throw new ArgumentException(strItem + " 은 YMS 에 반영된 Parameter 라 YMS 이름(" + strOldYms + ")을 바꿀 수 없습니다.");
+                            if (setPublished.Contains(strYms))
+                                throw new ArgumentException(strItem + " 의 YMS 이름 " + strYms + " 은 YMS 에 이미 있는 컬럼 이름입니다.");
+                            lstRename.Add(new string[] { strYms, strUser, f, d, t, strItem });
+                        }
+                    }
 
                     lstUpdate.Add(new string[] { strUse, strRemark, strGds, strUser, f, d, t, strItem });
                     DataRow drSpec;
@@ -246,9 +290,21 @@ namespace DACrux.SEMDMS.BSL
                 }
             }
             dtSpec.Dispose();
+            if (lstError.Count == 0 && lstRename.Count > 0)
+            {
+                // 바꾼 뒤의 Device + 공정 전체 YMS 이름으로 겹침 검사
+                foreach (string[] aRename in lstRename)
+                    dicYms[aRename[5]] = aRename[0];
+                List<string> lstItems = new List<string>(dicYms.Keys);
+                List<string> lstNames = lstItems.Select(s => dicYms[s]).ToList();
+                foreach (string strProblem in EtYmsRule.FindYmsNameProblems(lstItems, lstNames))
+                    lstError.Add(strProblem);
+            }
             if (lstError.Count > 0)
                 throw new ArgumentException("저장할 수 없는 행이 있습니다(" + lstError.Count + "건, 아무것도 저장하지 않음). " + string.Join(" / ", lstError.Take(10).ToArray()), "aRows");
 
+            if (lstRename.Count > 0)
+                oItem.UpdateExecuteMultiple("UPDATE_ET_YMS_NAME", ToArray(lstRename));
             oItem.UpdateExecuteMultiple("UPDATE_ET_PARA", ToArray(lstUpdate));
             if (lstMerge.Count > 0)
                 oLimit.InsertExecuteMultiple("MERGE_ET_LIMIT", ToArray(lstMerge));
@@ -259,8 +315,21 @@ namespace DACrux.SEMDMS.BSL
             dtResult.Columns.Add("UPDATED", typeof(int));
             dtResult.Columns.Add("SPEC_SAVED", typeof(int));
             dtResult.Columns.Add("SPEC_DELETED", typeof(int));
-            dtResult.Rows.Add(lstUpdate.Count, lstMerge.Count, lstDelete.Count);
+            dtResult.Columns.Add("YMS_RENAMED", typeof(int));
+            dtResult.Rows.Add(lstUpdate.Count, lstMerge.Count, lstDelete.Count, lstRename.Count);
             return dtResult;
+        }
+
+        /// <summary>YMS Program(Device_공정)의 Parameter 정의(TQP_PARASPEC)에 있는 컬럼 이름. 이 이름은 TD 컬럼이 있으므로 바꾸거나 새로 쓰지 않는다.</summary>
+        private static HashSet<string> YmsPublishedNames(TQP_GDS_ET_ITEM oItem, string f, string d, string t)
+        {
+            HashSet<string> setName = new HashSet<string>(StringComparer.Ordinal);
+            using (DataTable dt = oItem.GetData("SELECT_ET_YMS_PUBLISHED_NAMES", null, new string[] { f, YmsProgram(d, t) }))
+            {
+                foreach (DataRow dr in dt.Rows)
+                    setName.Add(dr["PARAM_NAME"].ToString());
+            }
+            return setName;
         }
 
         /// <summary>저장된 Spec 행이 있고 Lower / Upper(숫자로 비교, 빈 값 = NULL) / Enable 이 모두 같은지.</summary>

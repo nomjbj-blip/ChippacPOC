@@ -110,3 +110,21 @@ powershell -NoProfile -ExecutionPolicy Bypass -File '.\Probes\ChainOpenEndedProb
 - 2026-10-14 CLAUDE-094: GDS Map 조회 화면 상태 줄에 경과 시간 칸(`ElapsedStatusTicker`, 조회 / 삭제 / Chain 저장 중 `경과 n.n초` -> `걸린 시간`) 추가, Chain DB 저장 중에도 진행 막대(Marquee)를 켠다. 배포(GdsMap EXE) / DMS 화면 확인 대기. [POC 화면 진행 표시줄](../../../문서/설계/06_환경_운영/2026-10-14_POC_화면_진행표시줄.md)
 - 2026-10-19 CLAUDE-143: GDS Map 조회 화면 Chain 편집 버튼 이름 "경로 추가 / 경로 제외" -> **"도형 추가 / 도형 제외"**(지도에서 도형 하나씩 Chain 에 넣고 뺌, 경로는 [후보 경로 찾기]). 상태 줄 / 겹친 도형 메뉴도 "도형" 으로 통일. 배포(GdsMap EXE) / DMS 화면 확인 대기.
 - 2026-10-20 CLAUDE-163: Chain 탐색 Layer / 연결 규칙 / 미조회 판단이 Layer 키(번호 + DataType, `GdsLayerKey`)를 쓴다(`ChainTraceRequest.SelectedLayerIds`, `ChainLayerConnectionRule.First/SecondLayerId`, `ChainTraceElement.LayerKey`). DB 저장은 탐색 Layer 2열(LAYER_ID / DATA_TYPE) / 규칙 5열(첫 번호 / DataType / 둘째 번호 / DataType / 허용 오차), 서버가 (번호, DataType) 작은 쪽을 앞에 둔다. 예전 열 수(1열 / 3열)는 DataType 0. 기존 Chain 은 DDL 로 775 -> 775/237 변환(로컬 57개). 미조회 문구 "Layer 2/0 미조회". 검증 `GdsChainProbe` / `GdsChainLoadProbe`(새 형식) / `GdsChainDbTraceProbe` / `GdsFrontBackViewProbe` / Chain 탐색 5종 PASS. 배포 / DMS 화면 확인 대기.
+- 2026-10-20 CLAUDE-165: U8 같은 형태 Chain 자동 추출 검증(Probe `GdsChainAutoExtractProbe.ps1`): 연결 덩어리 일괄(Union-Find) + 예시 Chain 비교로 TSV_21063 과 같은 형태 27,341개(전체 27,413 중), 제품 추적기와 300 / 300 같음, 34초. 제품 기능은 범위 결정 대기. [설계](../../../문서/설계/02_GDS/2026-10-20_U8_같은형태_Chain_자동추출_설계.md)
+- 2026-10-20 CLAUDE-166: U8 전용 새 화면 GDS Map View U8(POC 메뉴 "GDS Map 조회 U8", F03128) **구현 완료 / 배포 대기**. 기존 화면 그대로, U9 연결 알고리즘 기능 제외. [예시 지정](도형 클릭 -> 연결 덩어리) / [같은 형태 찾기](Union-Find + 구성·배치 비교) / 찾기 결과 가상 목록 / 범위(E-Test Net 목록 · 전체 일치) / [Chain 생성(DB)](신규 일괄 저장 `CreateChainBulk`) / 저장된 Chain 목록 · 삭제. Smoke PASS 20(U8 복사본: 같은 형태 27,341 = Probe, E-Test Net 2개 생성 · 삭제). D1 ~ D8 권장안. [설계](../../../문서/설계/02_GDS/2026-10-20_GDS_Map_View_U8_화면_설계.md)
+
+**2026-10-21 U8 Chain 많은 Map 의 GDS Map View 조회 속도 분석(CLAUDE-176, 분석만):** 저장 Chain 27,342개인 U8 은 기존 View [조회]가 약 6분 20초(Chain 마다 서비스 4번 = 341초가 약 90%), 조회 뒤 Chain 클릭마다 약 2.2초. 개선안 S1 장치 단위 일괄 읽기 / S2 목록 BeginUpdate / S3 외곽선 Chain 별 저장 / S4 큰 표 Binary 전송(기존 함수 변경 승인 필요) -> 약 30초(S4 포함 약 20초). 결정 대기. [조회 속도 분석](../../../문서/설계/02_GDS/2026-10-21_U8_Chain_View_조회속도_분석.md).
+
+**2026-10-21 U8 Chain 색(CLAUDE-178):** GDS Map View U8 의 [Chain 생성(DB)] 한 번(같은 Rule)으로 만든 Chain 은 모두 한 색(이미 저장된 Chain 색 / Layer 색과 가장 먼 색). 이미 저장된 Chain 색은 바꾸지 않음. Smoke `GdsMapViewU8Smoke.ps1`.
+
+**2026-10-21 GDS Map View Chain 불러오기 속도 개선(CLAUDE-176 구현):** Chain 상세를 Chain 마다 4번 읽던 것을 Chain 번호 범위(5,000개)마다 한 번씩 읽는다(서버 `GdsChain.Get...Range` 4개 추가, Binary 전송). 목록 넣기 BeginUpdate, Chain 별 외곽선 저장 + Layer 별 그리기 구간 합치기. 불러온 Chain 이 1,000개를 넘으면 지도 표시(체크)는 끈 채로 불러온다(더블클릭으로 표시). U8 27,342개 상세 읽기 약 5분 -> 약 3초, 예상 [조회] 약 6분 20초 -> 약 30초. 서버 + 클라이언트 배포 / 화면 확인 대기. Probe `GdsChainRangeProbe.ps1`.
+
+**2026-10-21 Chain 목록 [전체 체크] / [전체 미체크](CLAUDE-181):** 기존 View Chain 탭에 [전체 체크] / [전체 미체크](모든 Chain 지도 표시 켜기 / 끄기, 선택 행 그대로, 1,000개 초과 [전체 체크]는 확인). U8 저장된 Chain 목록에 '표시' 체크 칸 + [전체 체크](찾기로 거른 목록의 행) / [전체 미체크](전체) 추가, 체크한 Chain 은 고르지 않아도 지도에 그림(목록 선택 표시는 그대로, 21개 이상은 CHAIN_SEQ 범위 조회). Smoke `GdsChainListDoubleClickSmoke.ps1` / `GdsMapViewU8Smoke.ps1`. 배포 / 화면 확인 대기.
+
+**2026-10-21 Chain 목록 체크는 체크 박스로만(CLAUDE-184, CLAUDE-079 대체):** GDS Map View Chain 목록(표시) / 유사 묶음 목록(제외)은 행 왼쪽 체크 박스를 눌렀을 때만 체크가 바뀐다. 행 클릭 / 더블클릭 / Space 는 선택만. 공용 `LayerColorCheckedListBox.CheckOnCheckBoxOnly`. Smoke `GdsChainListDoubleClickSmoke.ps1`.
+
+**2026-10-20 U8 Net 목록 삭제 / 생성 버튼 이동(CLAUDE-168):** GDS Map View U8 의 [Net 목록] / 범위 콤보 / E-Test Net 거르기를 뺐다. [Chain 생성(DB)] 는 찾기 결과 탭에서 지금 목록(분류 / 찾기로 거르고 [목록에서 빼기]로 뺀 뒤) 중 일치 + DB 없음만 만든다. 이름 = Net Label + 번호, 없으면 TSV Code.
+
+**2026-10-21 U8 저장된 Chain 색 변경(CLAUDE-187):** 저장된 Chain 탭 [색 변경] - 고른 Chain(여러 개 가능)의 색을 색 선택 창으로 정해 DB 에 바로 저장(서버 `UpdateChainColorBulk`, COLOR_ARGB 만), 목록 "색" 칸. Smoke PASS 35. 배포 대기(서버 + 클라이언트).
+
+**2026-10-21 Chain 을 다른 DB 의 같은 GDS Map 으로 복사(CLAUDE-188):** `Assistant/DB/sql/make_u9_chain_copy.py` 로 로컬 Chain 묶음(예 OMM_TCB 19개)을 SQL 로 만들어 같은 GDS / 같은 Layer 로 저장된 Map(예 고객 TRAINING U9)에 넣는다. PLACED_ELEMENT_ID(R0/E<n>)는 같은 GDS 면 같다. 사전 검사(시작 도형 Layer · 위치 비교) / 같은 이름 건너뜀 / Code 겹침 시 빈 Code / 건수 확인 후 COMMIT.

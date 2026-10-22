@@ -33,6 +33,7 @@
 - Die 번호 표시 (2026-10-13, CLAUDE-069): File Map Setup / Wafer Map 조회 두 화면이 `DieNumberRule` (XY 방향 시작 모서리부터 행 우선, 사용 Die 만 1 ~ N) 로 계산해 `StandardMapEditMap` 이 Die 위에 덧그린다 ([Die 번호] 체크, 기본 켬). 저장 `TQP_USEMAP.DIE_NUM` 은 방향 순서가 아니라 저장 행 순서(i + 1, DSL CreateUseMap) 이며 로컬 13개 Map 모두 Direction 번호와 다르다. 조회 화면 Die 목록 / 데이터 확인 "DIE_NUM 순서" 에서 비교한다.
 - 우클릭 메뉴 [Center Cross] (2026-10-13, CLAUDE-077): 두 화면 Map(`StandardMapEditMap`) 메뉴 = Free Zoom / Fit Size / Move View Center / - / Center Cross. 체크 = 중심 십자선 표시, 기본 켬. 같은 기능을 GDS-KLARF Analysis (기본 끔) / Defect Map Viewer (체크 없음, Release 끔 / Debug 켬) 에도 넣음.
 - 화면 정리 (2026-10-15, CLAUDE-111): Device 검색칸 삭제([조회] = 목록 다시 읽기 / 건수 / [Die 번호 표시] 만), 오른쪽 탭은 [Map 정보] 하나([데이터 확인] / [Die 목록] 탭 삭제). Map 을 못 그리면 이유를 상태줄에. `STANDARD_MAP_VIEW_SMOKE=PASS` 81 + DB 15개. 배포 안 함 / DMS 화면 확인 대기. 설계 14절.
+- 화면 정리 (2026-10-22, CLAUDE-194): 오른쪽 [Map 정보] 탭 숨김(`tabRight.Visible = false`). Map 이 그 폭까지 쓴다. 값 채우기(`ShowInfo`)는 그대로라 다시 보이게 하면 바로 쓸 수 있다. TEMP 빌드 + 화면 밖 띄워 보기 확인 / 배포는 사용자 VS 빌드.
 
 ## 목적과 파일
 

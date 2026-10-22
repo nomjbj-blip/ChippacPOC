@@ -1,6 +1,6 @@
 # E-Test 결과 Upload 재설계
 
-작성: 2026-10-13 Claude (CLAUDE-029 12단계) / 상태: **확정 설계 (권장안 전부 채택, 9절이 최신) — 구현 대기**. 4·7·8절은 검토 과정
+작성: 2026-10-13 Claude (CLAUDE-029 12단계) / 상태: **확정 설계 (권장안 전부 채택, 9절 + 10절 구현 기준) — 2026-10-14 구현 완료 (CLAUDE-090 5단계, 10.3절: 자동 검사 확인 / 배포 · DMS 화면 확인 대기)**. 4·7·8절은 검토 과정
 
 > 2026-10-14 (CLAUDE-086): [E-Test Para Setup 설계](2026-10-14_ETest_Para_Setup_설계.md) P7 이 결정되면 저장 대상이 "Spec 정의 Parameter" -> "등록 Parameter(사용 Y)" 로 바뀐다 (S1 / S4 변경, 9절 구현 전 반영). DDL 도 Para Setup DDL 과 같은 날 적용한다.
 
@@ -321,3 +321,46 @@ Map 표시용 조회 (다음 단계 Map 화면에서 사용):
 | 4 | 로컬 데이터 정리 (S5) + 샘플 다시 업로드 |
 | 5 | FT (파일 수령 후) |
 
+## 10. 구현 기준 (2026-10-14, Para Setup 반영)
+
+Para Setup 설계 P7(저장 대상 = 등록 Parameter)과 Limit 화면 정리(4단계) 뒤에 9절을 구현하면서 바꾼 것. 9절과 다르면 이 절이 우선한다.
+
+### 10.1 바뀐 기준
+
+| 9절 | 구현 |
+| --- | --- |
+| 저장 대상 = Spec 정의 Parameter | **등록 Parameter(사용 Y)** = E-Test Para 설정에서 Device + 공정으로 등록한 것. 판정은 Spec 이 있고 Enable = Y 인 것만, Spec 없는 등록 Parameter 는 값만 저장(JUDGE_FLAG NULL) |
+| S1 Spec 이 없으면 업로드 중단 | **등록 Parameter(사용 Y)가 없으면 중단** ("E-Test Para 설정에서 먼저 등록") |
+| 헤더 대조 = 헤더 정리 + 대문자 ↔ Spec Parameter | 헤더 -> `EtParameterNameRule` 저장 이름 ↔ 등록 Parameter 저장 이름. 등록된 헤더 원문과 대소문자만 다르면 같은 것. 원문이 다른데 저장 이름이 같으면 **이름 충돌**(건너뜀 + 경고). 파일 안에서 같은 저장 이름이 두 번이면 뒤 것 건너뜀 + 경고. 사용 안 함(N) Parameter 는 저장하지 않는다 |
+| S4 `MergeEtItem` 이 정의 항목인지 확인 | **`MergeEtItem` 삭제**. 측정 항목은 Para 설정에서만 등록한다. 화면은 `GetEtParameterList` 의 `ET_ITEM_SEQ` 로 값을 만들고, `CreateEtValueBatch` 가 항목 번호가 그 파일 Device + 공정의 등록 Parameter(사용 Y)인지 검사한다 |
+| "정의됐는데 파일에 없음" | "**등록됐는데 파일에 없음**"(누락). 경고 후 저장 (S6) |
+| DDL `2026-10-13_tqp_gds_et_defined_only.sql` / `..._local_reset.sql` | `2026-10-14_tqp_gds_et_upload_registered.sql` / `2026-10-14_tqp_gds_et_local_reset.sql`. 로컬 정리는 파일 / Die / 값 전부 + **예전 업로드 측정 항목(TEST_PROGRAM 없음)만** 지운다(등록 Parameter / Spec / 대표 Chain 은 남김). 정리 뒤 Para 2b(`TEST_PROGRAM` NOT NULL)를 같은 파일에서 적용 |
+| `TQP_GDS_SRC_FILE.DEFINED_COUNT` = Spec 수 | = 업로드 때 그 Device + 공정의 **등록 Parameter(사용 Y) 수**. `ITEM_COUNT` = 저장한 Parameter 수, `MISSING_COUNT` = 등록됐는데 파일에 없는 수, `HEADER_COUNT` = 파일 전체 헤더 수 |
+| Map ID = 파일 Device | 그대로. `TQP_USEMAP` 은 (Factory, MAPID) 의 가장 큰 PROGRAM_REV 를 쓴다. 로컬 샘플 Device `OMM` 은 Map 이 없어(`OMM_Hybrid` 만 있음) "Map 없음" 으로 저장되고, File Map Setup 에 Map ID `OMM` 을 만든 뒤 [Map 좌표 다시 계산] 으로 채운다 |
+| Fail Chain 패널 | 열에 **대표 Chain / GDS Chain** 추가(Para 설정의 연결) |
+
+### 10.2 서비스 (iGdsEtResult)
+
+| 메서드 | 내용 |
+| --- | --- |
+| `BeginEtFile(FileInfo 21항목)` | 0~17 이전과 같음(17 Fab 은 받되 저장 안 함) + 18 HEADER_COUNT / 19 DEFINED_COUNT / 20 MISSING_COUNT. 12 / 18항목은 거부. 등록 Parameter(사용 Y)가 0건이면 거부. PARSE_RULE_VER 3, FAB_NAME / VIEW_SIDE NULL |
+| `CreateEtValueBatch` | 항목 번호가 파일 Device + 공정 등록 Parameter(사용 Y)가 아니면 배치 거부 |
+| `CompleteEtFile` | 건수 확인 -> 판정(값 -> Die -> 파일, 9.2절 규칙) -> Map 좌표 -> READY. 반환 열 추가: SPEC_FAIL_DIE / MAP_ID / MAP_DIE / OUT_OF_MAP |
+| 신규 `RejudgeEtFiles(aKey{factory, device, 공정}, user)` | READY 파일 다시 판정. 반환 파일 수 |
+| 신규 `RemapEtFiles(aKey{factory, device}, user)` | READY 파일 Map 좌표 다시 계산. 반환 1행: FILE_COUNT / MAP_ID / MAP_DIE / OUT_OF_MAP |
+| 신규 `GetEtMapDieList(factory, mapId)` | Map 사용 Die (X / Y / USECODE, 최신 PROGRAM_REV). 업로드 미리보기의 Map 확인용 |
+| `GetEtDieList` / `GetEtValueList` / `GetEtFile` / `GetEtFileList` | 9.4절 열 추가. 값 목록은 등록 Parameter 정보(헤더 원문 / 저장 이름 / Para / 조건 / Chain / 단위 / 순서)를 같이 준다 |
+| 삭제 | `MergeEtItem` (+ `CREATE_ET_ITEM`). `GetEtItemList` 는 남김(조회 창은 더 이상 쓰지 않음) |
+
+### 10.3 구현 결과 (2026-10-14, CLAUDE-090 5단계)
+
+| 구분 | 내용 |
+| --- | --- |
+| DDL (로컬 적용) | `GdsMapControl/Persistence/2026-10-14_tqp_gds_et_local_reset.sql` (파일 1 / Die 24 / 값 66,120 / 예전 측정 항목 13,775 삭제, 등록 Parameter 는 남김) -> `2026-10-14_tqp_gds_et_upload_registered.sql` (ITEM.TEST_PROGRAM NOT NULL / SRC_FILE 판정·Map 컬럼 / DIE MAP_X·Y·JUDGE_FLAG·FAIL_COUNT·NOT_TESTED_COUNT / VALUE JUDGE_FLAG / VIEW_SIDE 기본값 NULL) |
+| 서버 | `BSL/GdsEtResult.cs` 파일·항목·Die·값 영역 다시 작성(BeginEtFile 21항목 검사 순서: 등록 0건 -> Die / 항목 수 -> 등록 수 변경 -> 중복), `CompleteEtFile` = 건수 -> 판정(값 -> Die -> 파일) -> Map 좌표 -> READY, `RejudgeEtFiles` / `RemapEtFiles` / `GetEtMapDieList`, 쿼리 `TQP_GDS_SRC_FILE` / `TQP_GDS_ET_DIE` / `TQP_GDS_ET_VALUE` / `TQP_GDS_ET_ITEM` |
+| 판정 규칙 | 서버 SQL 과 화면 미리보기 `ENGUI/ETest/EtJudgeRule.cs` 가 같은 규칙(Spec 없음·Enable N -> 판정 없음 / '-' -> F / 빈 칸 -> 없음 / 범위 밖 F, 경계 P / Die F = Fail 1개 이상). Probe 에서 888개 값 판정이 모두 같음을 확인 |
+| 화면 | `frmEtResultUpload` 다시 작성(여러 파일 대기 목록 / 상태 9종 / Slot 입력 / Die 판정 / Fail Chain(대표·GDS Chain) / 중복 건너뛰기·덮어쓰기 / [등록 파일] 탭 / [Map 좌표 다시 계산]), `frmEtResultView` 다시 작성(값 판정 색 / Die 판정 열 / Fail 있는 항목만), Spec 화면 저장·삭제·붙여넣기 뒤 다시 판정 질문 |
+| 자동 검사 | `GdsEtResultProbe.ps1` 18/18 / `Verify-EtResultUpload.ps1` ET_UPLOAD_FORM_SMOKE 19 + DIE_COORD_PROBE 11 / `Verify-EtLimitSetup.ps1` 43 (업로드는 등록 뒤 새 흐름, 다시 판정 #44 Fail 6 -> 4) / `Verify-EtParaSetup.ps1` 27 / `EtParaSetupProbe.ps1` 34 |
+| 함께 바꾼 것 (CLAUDE-094) | 화면 아래 공통 진행 표시줄(업로드 위쪽 진행 막대는 아래로 옮김), Para 삭제 / 사용 저장 서버 묶음 처리. [POC 화면 진행 표시줄](../06_환경_운영/2026-10-14_POC_화면_진행표시줄.md) |
+| 직접 시험 | [테스트 시나리오](2026-10-14_ETest_Para_Spec_Upload_테스트_시나리오.md) 4절 (U-01 ~ U-17) |
+| 남은 것 | 배포(Interface / DSL / BSL / RO / Control / ENGUI / TEST.ENGUI / GdsMap) + 서비스 · DACrux 재시작, DMS 화면 확인, YMS 적재 연결(`PublishEtFileToYms`, YMS 적재 설계 15.4) |

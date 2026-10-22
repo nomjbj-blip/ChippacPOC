@@ -1,0 +1,15 @@
+﻿원본: Lot "SCKLOTIDA" / Wafer "SCKLOTIDA" / Slot 1 / Device "OMMTCB" / Step "OMM_C4Bump_TCB_FullSilterra" / Pitch 23832.0 x 30058.0 / Center (10.0, 14758.0) / Defect 1122 / Test [(3, 76, 57670800000.0), (80, 761, 1e-06)] / Summary [['3', '1098', '1.9039085822e+000', '76', '51'], ['80', '0', '-1.#IND000000e+000', '1', '1']]
+PASS / K1 머리: Lot / Step / Slot / 검사 시각 / 파일 시각 / DB SCKLOTIDA / OMM_C4Bump_TCB_FullSilterra / slot 1 / 2026/09/28 21:31:50 / 2026/09/29 22:30:32
+PASS / K2 Wafer ID 규칙(LOT_CORE_SLOT): 원본 WaferID "SCKLOTIDA" + Slot 1 -> DMS "SCKLOTIDA-01" / DB SCKLOTIDA-01
+PASS / K3 Product: 원본 DeviceID "OMMTCB" / SetupID 안 OMM_TCB -> DB PRODUCT(업로드 화면 입력 우선) / DB OMM_TCB
+PASS / K4 Pitch / Pitch 출처 = KLARF / 23832 x 30058
+PASS / K5 Defect 행 수: 원본 DefectList = DB TQD_DEFECT = 분석 DEFECT_COUNT / 원본 1122 (DEFECTID 1..1122, 중복 0) / DB 1122 / 분석 1122 / 준비 1122 / 원본 TEST 분포 {'3': 1122}
+FAIL / K5b 원본 파일 Summary NDEFECT 와 DefectList 줄 수(파일 자체 일관성) / Summary {3: 1098, 80: 0} / DefectList TEST 분포 {'3': 1122}
+FAIL / K6 Defect 값 11개 열(XREL / YREL / XSIZE / YSIZE / DEFECTAREA / DSIZE / CLASS / TEST / CLUSTER / ROUGHBIN / FINEBIN) 1122건 1:1 (소수 2자리) / 다른 값 {'XREL': 1} 예 {'XREL': ('1', '12876.130', '12877.13')}
+PASS / K7 Die 번호: 원본 -> DB = 한 가지 평행 이동(Map Setup 원점 맞춤, 왼쪽 아래 기준) / 이동 {(7, 5): 1122} / (반전 가정 {(5, 5): 219, (3, 5): 198, (7, 5): 114})
+PASS / K8 Wafer 좌표 X / Y: DB = 원본 Die 번호 x Pitch + XREL / YREL - 중심 (원본 X / Y 와 차이 0.01 이내) / 차이(DB-원본 X, Y, 재계산 일치) 분포 {(-0.01, 0.0, True): 534, (0.0, 0.0, True): 286, (0.0, -0.01, True): 187, (-0.01, -0.01, True): 115}
+PASS / K9 검사 Die: 원본 Test 3 SampleTestPlan 76 = 분석 Die 표(IN_PLAN) 76 = 준비 INSPECTED_DIE / 원본 76 / 분석 76 / 준비 76 / 원본에만 [] / 분석에만 []
+PASS / K10 Die 별 Defect 수(분석 DIE.DEFECT_COUNT) = 원본에서 센 수 / Defect Die 수 = 원본 Summary NDEFDIE / 다른 Die [] / 계획 밖 Defect Die [] / Defect Die 원본 51 / 분석 51 / Summary 51
+FAIL / K11 TQD_INSP_INFO Test 80 행: DEFECTS / INSPECTED_DIE / DEFECTIVE_DIE 가 원본 Test 80 과 같음 / DB DEFECTS 0 / INSPECTED_DIE 761 / DEFECTIVE_DIE 51(6.70%) vs 원본 Summary NDEFECT 0 / NDIE 1 / NDEFDIE 1, SampleTestPlan 761
+
+KLARF_CHECK_PROBE=FAIL (9/12)

@@ -53,10 +53,8 @@
             this.chkDieIndex = new System.Windows.Forms.CheckBox();
             this.rdoDefectSize = new System.Windows.Forms.RadioButton();
             this.numTolerance = new System.Windows.Forms.NumericUpDown();
-            this.lblTolUnit = new System.Windows.Forms.Label();
             this.rdoSquare = new System.Windows.Forms.RadioButton();
             this.numSquare = new System.Windows.Forms.NumericUpDown();
-            this.lblSquareUnit = new System.Windows.Forms.Label();
             this.chkLargeDefect = new System.Windows.Forms.CheckBox();
             this.lblOffset = new System.Windows.Forms.Label();
             this.numOffsetX = new System.Windows.Forms.NumericUpDown();
@@ -394,16 +392,6 @@
             0});
             this.numTolerance.ValueChanged += new System.EventHandler(this.Condition_Changed);
             // 
-            // lblTolUnit
-            // 
-            this.lblTolUnit.AutoSize = true;
-            this.lblTolUnit.Location = new System.Drawing.Point(433, 16);
-            this.lblTolUnit.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.lblTolUnit.Name = "lblTolUnit";
-            this.lblTolUnit.Size = new System.Drawing.Size(34, 18);
-            this.lblTolUnit.TabIndex = 11;
-            this.lblTolUnit.Text = "µm";
-            // 
             // rdoSquare
             // 
             this.rdoSquare.AutoSize = true;
@@ -437,16 +425,6 @@
             0});
             this.numSquare.ValueChanged += new System.EventHandler(this.Condition_Changed);
             // 
-            // lblSquareUnit
-            // 
-            this.lblSquareUnit.AutoSize = true;
-            this.lblSquareUnit.Location = new System.Drawing.Point(830, 16);
-            this.lblSquareUnit.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.lblSquareUnit.Name = "lblSquareUnit";
-            this.lblSquareUnit.Size = new System.Drawing.Size(34, 18);
-            this.lblSquareUnit.TabIndex = 14;
-            this.lblSquareUnit.Text = "µm";
-            // 
             // chkLargeDefect
             // 
             this.chkLargeDefect.AutoSize = true;
@@ -468,7 +446,7 @@
             this.lblOffset.Name = "lblOffset";
             this.lblOffset.Size = new System.Drawing.Size(172, 18);
             this.lblOffset.TabIndex = 16;
-            this.lblOffset.Text = "좌표 보정 X / Y(µm)";
+            this.lblOffset.Text = "좌표 보정 X / Y";
             // 
             // numOffsetX
             // 
@@ -916,12 +894,12 @@
             this.chkMarkFile.AutoSize = true;
             this.chkMarkFile.Checked = true;
             this.chkMarkFile.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkMarkFile.Location = new System.Drawing.Point(300, 12);
+            this.chkMarkFile.Location = new System.Drawing.Point(316, 12);
             this.chkMarkFile.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.chkMarkFile.Name = "chkMarkFile";
             this.chkMarkFile.Size = new System.Drawing.Size(190, 22);
             this.chkMarkFile.TabIndex = 6;
-            this.chkMarkFile.Text = "Fail Die (결과 파일)";
+            this.chkMarkFile.Text = "Fail Die";
             this.chkMarkFile.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.chkMarkFile.UseVisualStyleBackColor = true;
             this.chkMarkFile.CheckedChanged += new System.EventHandler(this.chkEtMark_CheckedChanged);
@@ -1086,10 +1064,8 @@
             this.pnlKlarfCond.Controls.Add(this.lblArea);
             this.pnlKlarfCond.Controls.Add(this.rdoDefectSize);
             this.pnlKlarfCond.Controls.Add(this.numTolerance);
-            this.pnlKlarfCond.Controls.Add(this.lblTolUnit);
             this.pnlKlarfCond.Controls.Add(this.rdoSquare);
             this.pnlKlarfCond.Controls.Add(this.numSquare);
-            this.pnlKlarfCond.Controls.Add(this.lblSquareUnit);
             this.pnlKlarfCond.Controls.Add(this.lblOffset);
             this.pnlKlarfCond.Controls.Add(this.numOffsetX);
             this.pnlKlarfCond.Controls.Add(this.numOffsetY);
@@ -1256,7 +1232,7 @@
             this.lblReadyGds.Name = "lblReadyGds";
             this.lblReadyGds.Size = new System.Drawing.Size(88, 25);
             this.lblReadyGds.TabIndex = 0;
-            this.lblReadyGds.Text = "GDS Map (Wafer 1개만 분석)";
+            this.lblReadyGds.Text = "GDS Map";
             // 
             // lblChainSide
             // 
@@ -1321,7 +1297,7 @@
             this.lblReadyStep.Name = "lblReadyStep";
             this.lblReadyStep.Size = new System.Drawing.Size(223, 25);
             this.lblReadyStep.TabIndex = 0;
-            this.lblReadyStep.Text = "KLARF Step (Wafer 1개만 분석)";
+            this.lblReadyStep.Text = "KLARF Step";
             //
             // pnlStepInfo
             //
@@ -1342,7 +1318,7 @@
             this.lblStepInfo.Location = new System.Drawing.Point(8, 8);
             this.lblStepInfo.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblStepInfo.Name = "lblStepInfo";
-            this.lblStepInfo.Size = new System.Drawing.Size(885, 48);
+            this.lblStepInfo.Size = new System.Drawing.Size(885, 46);
             this.lblStepInfo.TabIndex = 0;
             this.lblStepInfo.Text = "-";
             //
@@ -1350,7 +1326,7 @@
             //
             this.lblPitchSource.AutoSize = true;
             this.lblPitchSource.ForeColor = System.Drawing.Color.DimGray;
-            this.lblPitchSource.Location = new System.Drawing.Point(8, 62);
+            this.lblPitchSource.Location = new System.Drawing.Point(8, 56);
             this.lblPitchSource.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblPitchSource.Name = "lblPitchSource";
             this.lblPitchSource.Size = new System.Drawing.Size(105, 18);
@@ -1379,7 +1355,7 @@
             this.lblReadyEt.Name = "lblReadyEt";
             this.lblReadyEt.Size = new System.Drawing.Size(299, 25);
             this.lblReadyEt.TabIndex = 0;
-            this.lblReadyEt.Text = "E-Test (Wafer 1개만 분석, Step 1개 선택)";
+            this.lblReadyEt.Text = "E-Test";
             //
             // lblEtStep
             //
@@ -1551,7 +1527,7 @@
             this.tabDie.Name = "tabDie";
             this.tabDie.Size = new System.Drawing.Size(901, 826);
             this.tabDie.TabIndex = 3;
-            this.tabDie.Text = "종합 (Die)";
+            this.tabDie.Text = "종합";
             this.tabDie.UseVisualStyleBackColor = true;
             // 
             // dgvDie
@@ -1956,10 +1932,8 @@
         private System.Windows.Forms.Label lblTolerance;
         private System.Windows.Forms.NumericUpDown numTolerance;
         private System.Windows.Forms.RadioButton rdoDefectSize;
-        private System.Windows.Forms.Label lblTolUnit;
         private System.Windows.Forms.RadioButton rdoSquare;
         private System.Windows.Forms.NumericUpDown numSquare;
-        private System.Windows.Forms.Label lblSquareUnit;
         private System.Windows.Forms.CheckBox chkLargeDefect;
         private System.Windows.Forms.Label lblOffset;
         private System.Windows.Forms.NumericUpDown numOffsetX;

@@ -1,0 +1,19 @@
+Control DLL: C:\Users\USER\AppData\Local\Temp\ChippacBuild\CLAUDE-159\bin\DACrux.SEMDMS.Control.dll
+PASS / C0 시험 DLL = TEMP 빌드 / C:\Users\USER\AppData\Local\Temp\ChippacBuild\CLAUDE-159\bin\DACrux.SEMDMS.Control.dll
+PASS / C1 이미지 15장 읽기 완료(대기열 1개) / L,L,L,L,L,L,L,L,L,L,L,L,L,L,L
+PASS / C2 글자 2줄 = DB 값(Defect / Die / Class / Bin / 크기) 15장 / 모두 같음
+PASS / C3 더블클릭 창 제목 줄(Defect 12) / Defect 12 / Die (6, 6) / Class 53 / Bin 53 / Size 3.23 x 3.23 μm / REL (5521.58, 1284.69) μm / Cluster 0
+PASS / C3b 카드 줄 (Defect 12) / Defect 12 | Die (6, 6) | Class 53 / Bin 53 | 3.23 μm
+PASS / C3c 크기 X / Y 다름(Defect 13) / 6.47 x 3.23 μm
+PASS / C4 카드 = 컨트롤 1개(자식 없음) / 자식 수 0
+PASS / C5 높이 = 폭 x 이미지 비율 + 글자 2줄 (폭 390) / 높이 382 / 기대 382
+PASS / C6 폭 바꾸면 높이 다시 맞춤 / 높이만 바꾸면 되돌림 / 폭 300 -> 304, 높이 50 지정 -> 304
+PASS / C7 클릭 = 그 카드만 선택 / 선택 수 1
+PASS / C8 더블클릭 = 기존 ImagePopUp + 제목 줄 / Defect 12 / Die (6, 6) / Class 53 / Bin 53 / Size 3.23 x 3.23 μm / REL (5521.58, 1284.69) μm / Cluster 0
+PASS / C8b 닫은 뒤 다시 열기 / 열림
+PASS / C9 못 읽으면 실패 상태 + 글자 줄 유지 + 큰 창 안 열림 / Failed / Defect 1 / 창 0
+PASS / C10 Defect ID 만(상세보기 창): 폭 220 / 2줄째 비움 / 제목 = Defect 12 / 220 / Loaded / ''
+PASS / C12 측정(카드 30장, 실제 카드) / USER +34 / GDI +6 / Private +24 MB / 다시 그리기 5회 182 ms
+PASS / C11 읽는 중 카드 해제(목록 지우기) 오류 없음 / 창 핸들 반환 / 해제 후 USER 증가 4
+
+IMAGE_CARD_CHECK=PASS (16/16)

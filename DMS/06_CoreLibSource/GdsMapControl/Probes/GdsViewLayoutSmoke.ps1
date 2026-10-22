@@ -12,14 +12,14 @@
 #      11) [Map 복사] 버튼: 호스트 모드에서 보이고 Map 선택 전 비활성, [Map ▾] 바로 왼쪽 (2026-10-15)
 #      12) Label 검색 줄(구분선 / Label / 입력 / 검색 / 전체 보기 / 결과 콤보) 숨김, 도면 후에도 숨김 (2026-10-15)
 #       화면은 화면 밖에 띄우고 DB / Service 를 쓰지 않는다(빈 도면 ShowPlacedElements). 배치 그림을 PNG 로 남긴다(OpenGL 도면 영역은 검게 나온다).
-# 실행: powershell -NoProfile -STA -ExecutionPolicy Bypass -File GdsViewLayoutSmoke.ps1 [-GdsExe <빌드한 NexplantQMS.GdsMap.exe>] [-OutDir <PNG 폴더>]
+# 실행: powershell -NoProfile -STA -ExecutionPolicy Bypass -File GdsViewLayoutSmoke.ps1 [-GdsExe <빌드한 NexplantQMS.GdsMap.dll>] [-OutDir <PNG 폴더>]
 param(
     [string]$GdsExe = '',
     [string]$OutDir = ''
 )
 $ErrorActionPreference = 'Stop'
 $dms = (Resolve-Path (Join-Path $PSScriptRoot '..\..\..')).Path
-if ($GdsExe -eq '') { $GdsExe = Join-Path $env:TEMP 'chippac\gdsmap\NexplantQMS.GdsMap.exe' }
+if ($GdsExe -eq '') { $GdsExe = Join-Path $env:TEMP 'chippac\gdsmap\NexplantQMS.GdsMap.dll' }
 if ($OutDir -eq '') { $OutDir = Split-Path $GdsExe }
 # PNG 폴더가 없으면 Bitmap.Save 가 GDI+ 오류를 내므로 먼저 만든다 (2026-10-15)
 New-Item -ItemType Directory -Force $OutDir | Out-Null

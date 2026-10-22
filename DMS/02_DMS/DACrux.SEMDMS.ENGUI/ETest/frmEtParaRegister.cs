@@ -22,6 +22,8 @@ namespace DACrux.SEMDMS.ENGUI
     ///     상태: 신규 / 등록됨 / 이름 충돌 / 단위 다름 / 오류 / 중복. 등록된 헤더는 GDS Chain / Spec 을 참고로 보인다.
     ///  2) 필요 없는 헤더 행은 드래그로 골라 우클릭 / Del 로 목록에서 뺀다(화면에서만, 같은 파일을 다시 열 때까지 유지).
     ///  3) 신규 헤더를 체크하고 [등록] -> 다시 읽어 상태를 바꾼다.
+    ///  4) [Device 삭제](2026-10-22): 등록 Device 콤보에서 고른 Device 의 업로드 파일(측정값 / Die / YMS 반영 포함)과 모든 공정의 등록 Parameter / Spec 을 지운다.
+    ///     확인 창에 공정별 Parameter / Spec / 업로드 파일 수를 보여 주고 [예]일 때만 지운다. GDS Map / Chain, KLARF 데이터는 지우지 않는다.
     /// 진행 표시: 서버 호출과 파일 읽기는 화면 아래 busyBar(ProgressStatusBar)가 별도 스레드에서 돌리고 작업 이름과 모래시계 커서를 보여 준다.
     /// </summary>
     public partial class frmEtParaRegister : DACrux.Framework.Base.DACruxUXBasic01
@@ -50,6 +52,8 @@ namespace DACrux.SEMDMS.ENGUI
             colHCheck.HeaderCell.Style.Font = new Font(dgvHeader.Font, FontStyle.Bold);
             // 행 머리글 = 결과 파일의 측정 열 순서. 오른쪽 / 가운데 정렬은 자릿수에 따라 위치가 달라져서 기본 왼쪽 정렬을 쓴다.
             dgvHeader.TopLeftHeaderCell.Value = "열";
+            // 파일 이름 아래 규칙 = 파일을 열 때 나누는 규칙(EtResultFileParser.FileNameRule)과 같은 글자 (2026-10-21)
+            lblFileRule.Text = EtResultFileParser.FileNameRule;
         }
 
         /// <summary>E-Test 서비스. 화면 Smoke 검사는 이 필드에 BSL 을 붙인 RO 를 넣는다.</summary>
@@ -64,6 +68,7 @@ namespace DACrux.SEMDMS.ENGUI
             base.OnLoad(e);
             if (txtFactory.Text.Trim().Length == 0)
                 txtFactory.Text = DACrux.Base.GlobalVariable.Factory ?? string.Empty;
+            LoadDeviceList();
         }
 
         #region [파일 열기 / 상태]
@@ -114,15 +119,19 @@ namespace DACrux.SEMDMS.ENGUI
                 BuildHeaderRows();
             else
                 dgvHeader.Rows.Clear();
+            LoadDeviceList(device);
         }
 
-        /// <summary>Factory 를 바꾸면 열린 파일의 등록 상태를 다시 계산한다.</summary>
+        /// <summary>Factory 를 바꾸면 열린 파일의 등록 상태와 등록 Device 목록을 다시 읽는다.</summary>
         private void txtFactory_Leave(object sender, EventArgs e)
         {
-            if (currentFile == null || string.Equals(txtFactory.Text.Trim(), loadedFactory, StringComparison.Ordinal)) return;
+            if (string.Equals(txtFactory.Text.Trim(), loadedFactory, StringComparison.Ordinal)) return;
             using (busyBar.Begin("등록 상태 다시 계산"))
-                if (LoadRegistered())
+            {
+                if (currentFile != null && LoadRegistered())
                     BuildHeaderRows();
+                LoadDeviceList();
+            }
         }
 
         /// <summary>지금 Factory + 파일 Device + 공정의 등록 Parameter 를 읽어 상태 계산용 사전을 만든다. 실패하면 안내하고 false.</summary>
@@ -448,8 +457,162 @@ namespace DACrux.SEMDMS.ENGUI
                 }
                 if (LoadRegistered())
                     BuildHeaderRows();
+                LoadDeviceList(device);
                 SetStatus(done);
             }
+        }
+
+        #endregion
+
+        #region [Device 삭제]
+
+        /// <summary>
+        /// 등록 Device 콤보를 채운다: Factory 의 등록 Parameter 가 있는 Device 이름만(2026-10-22 공정 / Parameter 수 표시 뺌).
+        /// select 가 있으면 그 Device 를, 없으면 지금 고른 Device 를 다시 고른다(목록에 없으면 고르지 않음).
+        /// </summary>
+        private void LoadDeviceList(string select = null)
+        {
+            string factory = txtFactory.Text.Trim();
+            string wanted = select ?? SelectedDevice();
+            List<string> devices = new List<string>();
+            if (factory.Length > 0)
+            {
+                try
+                {
+                    DataTable dt = busyBar.RunHere("등록 Device 목록", () => Service.GetEtParaProgramList(factory));
+                    devices = dt.Rows.Cast<DataRow>().Select(r => r["DEVICE_ID"].ToString()).Distinct(StringComparer.Ordinal)
+                        .OrderBy(d => d, StringComparer.Ordinal).ToList();
+                }
+                catch (Exception ex)
+                {
+                    SetStatus("등록 Device 목록 조회 실패: " + Cause(ex).Message);
+                }
+            }
+            cboRegDevice.BeginUpdate();
+            cboRegDevice.Items.Clear();
+            cboRegDevice.Items.AddRange(devices.Cast<object>().ToArray());
+            cboRegDevice.EndUpdate();
+            cboRegDevice.SelectedItem = devices.FirstOrDefault(d => string.Equals(d, wanted, StringComparison.OrdinalIgnoreCase));
+            btnDeleteDevice.Enabled = devices.Count > 0;
+        }
+
+        /// <summary>콤보를 펼칠 때 목록을 다시 읽는다(다른 화면에서 등록 / 삭제한 것 반영).</summary>
+        private void cboRegDevice_DropDown(object sender, EventArgs e)
+        {
+            LoadDeviceList();
+        }
+
+        private string SelectedDevice()
+        {
+            return cboRegDevice.SelectedItem as string ?? string.Empty;
+        }
+
+        /// <summary>
+        /// [Device 삭제]: 고른 Device 의 업로드 파일(측정값 / Die / YMS 반영 포함)과 모든 공정의 등록 Parameter / Spec 을 지운다.
+        /// 처리 흐름: 지울 내용 조회(공정별 Parameter / Spec 수, 업로드 파일) -> 확인(예 / 아니요) -> 업로드 파일마다 DeleteEtFile -> 공정마다 DeleteEtParameters.
+        /// 서버가 측정값이 있는 Parameter 는 지우지 않으므로 파일을 먼저 지운다. 중간에 실패하면 거기서 멈추고 그때까지 지운 수를 알린다(다시 누르면 남은 것부터).
+        /// GDS Map / Chain, KLARF 데이터는 지우지 않는다. 열어 둔 파일이 이 Device 면 등록 상태를 다시 계산한다(등록됨 -> 신규).
+        /// </summary>
+        private void btnDeleteDevice_Click(object sender, EventArgs e)
+        {
+            string factory = txtFactory.Text.Trim();
+            string device = SelectedDevice();
+            if (factory.Length == 0 || device.Length == 0)
+            {
+                Notify("지울 등록 Device 를 고르세요.", MessageBoxIcon.Warning);
+                return;
+            }
+
+            DataTable files;
+            List<string> programs;
+            Dictionary<string, string[]> names = new Dictionary<string, string[]>(StringComparer.Ordinal);
+            Dictionary<string, int> specs = new Dictionary<string, int>(StringComparer.Ordinal);
+            try
+            {
+                files = busyBar.RunHere("업로드 파일 확인", () => Service.GetEtFileList(factory, device));
+                programs = busyBar.RunHere("등록 공정 확인", () => Service.GetEtParaProgramList(factory)).Rows.Cast<DataRow>()
+                    .Where(r => string.Equals(r["DEVICE_ID"].ToString(), device, StringComparison.Ordinal))
+                    .Select(r => r["TEST_PROGRAM"].ToString()).ToList();
+                foreach (string program in programs)
+                {
+                    DataTable dt = busyBar.RunHere(program + " Parameter 확인", () => Service.GetEtParameterList(factory, device, program));
+                    names[program] = dt.Rows.Cast<DataRow>().Select(r => r["ITEM_NAME"].ToString()).ToArray();
+                    specs[program] = dt.Rows.Cast<DataRow>().Count(r => r["HAS_SPEC"].ToString() == "Y");
+                }
+            }
+            catch (Exception ex)
+            {
+                Notify("지울 내용을 조회하지 못했습니다: " + Cause(ex).Message, MessageBoxIcon.Error);
+                return;
+            }
+            if (programs.Count == 0 && files.Rows.Count == 0)
+            {
+                Notify("Device " + device + " 에 등록 Parameter / 업로드 파일이 없습니다.", MessageBoxIcon.Information);
+                LoadDeviceList();
+                return;
+            }
+
+            Dictionary<string, int> fileCount = files.Rows.Cast<DataRow>().GroupBy(r => r["TEST_PROGRAM"].ToString(), StringComparer.Ordinal)
+                .ToDictionary(g => g.Key, g => g.Count(), StringComparer.Ordinal);
+            List<string> lines = programs.Union(fileCount.Keys, StringComparer.Ordinal).OrderBy(p => p, StringComparer.Ordinal).Select(p =>
+            {
+                string[] list;
+                int spec, count;
+                names.TryGetValue(p, out list);
+                specs.TryGetValue(p, out spec);
+                fileCount.TryGetValue(p, out count);
+                return "  " + p + ": Parameter " + (list == null ? 0 : list.Length) + " / Spec " + spec + " / 업로드 파일 " + count;
+            }).ToList();
+            if (Ask("Factory " + factory + " 의 Device " + device + " 를 삭제합니다.\r\n\r\n" + string.Join("\r\n", lines.ToArray())
+                + "\r\n\r\n업로드 파일 " + files.Rows.Count + "개는 측정값 / Die / YMS 반영까지 같이 지웁니다. GDS Map / Chain, KLARF 데이터는 지우지 않습니다."
+                + "\r\n되돌릴 수 없습니다. 계속할까요?", MessageBoxButtons.YesNo) != DialogResult.Yes)
+                return;
+
+            string user = User();
+            int fileDone = 0, paraDone = 0;
+            using (busyBar.Begin("Device 삭제 (" + device + ")"))
+            {
+                try
+                {
+                    int step = 0, steps = files.Rows.Count + programs.Count;
+                    foreach (DataRow f in files.Rows)
+                    {
+                        busyBar.Step(step++, steps);
+                        string seq = f["SRC_FILE_SEQ"].ToString();
+                        busyBar.Run("업로드 파일 삭제 (" + f["LOT_ID"] + " / Slot " + f["SLOT_NO"] + ")", () => Service.DeleteEtFile(seq, user));
+                        fileDone++;
+                    }
+                    foreach (string program in programs)
+                    {
+                        busyBar.Step(step++, steps);
+                        string[] list = names[program];
+                        if (list.Length == 0) continue;
+                        string[] key = { factory, device, program };
+                        paraDone += busyBar.Run(program + " Parameter 삭제", () => Service.DeleteEtParameters(key, list, user));
+                    }
+                    busyBar.Step(steps, steps);
+                }
+                catch (Exception ex)
+                {
+                    string done = "업로드 파일 " + fileDone + " / Parameter " + paraDone;
+                    SetStatus("Device " + device + " 삭제 중 멈춤 / 지운 것: " + done);
+                    Notify("Device 삭제가 중간에 멈췄습니다. 지운 것: " + done + "\r\n다시 누르면 남은 것부터 지웁니다.\r\n\r\n" + Cause(ex).Message, MessageBoxIcon.Error);
+                    LoadDeviceList();
+                    RefreshOpenFile(device);
+                    return;
+                }
+                LoadDeviceList();
+                RefreshOpenFile(device);
+                SetStatus("Device " + device + " 삭제 / 업로드 파일 " + fileDone + " / Parameter " + paraDone + " (공정 " + programs.Count + ")");
+            }
+        }
+
+        /// <summary>열어 둔 파일이 지운 Device 면 등록 상태를 다시 계산한다(등록됨 -> 신규).</summary>
+        private void RefreshOpenFile(string device)
+        {
+            if (currentFile == null || !string.Equals(txtDevice.Text, device, StringComparison.OrdinalIgnoreCase)) return;
+            if (LoadRegistered())
+                BuildHeaderRows();
         }
 
         #endregion

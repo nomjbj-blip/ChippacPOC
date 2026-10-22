@@ -120,7 +120,15 @@ YMS Function List 11개 화면(Bin Map View·Gallery / Wafer Cumulative / Bin St
   - 삭제: `DeleteEtFile` 은 YMS 도 지운다.
   - Map 없음: WAIT. Map 을 만든 뒤 [Map 좌표 다시 계산] 을 하면 반영된다.
   - 메뉴: YMS 분석 메뉴를 열었다(VISIBLE / RESV_03 / `SELECT_TESTAREA`). 화면 수정은 없다.
-  - YMS 컬럼 이름은 Parameter 저장 이름 그대로다(`YMS_PARAM_NAME` 컬럼 안 만듦).
+  - YMS 컬럼 이름은 Parameter 저장 이름 그대로다(`YMS_PARAM_NAME` 컬럼 안 만듦). -> 2026-10-21 CLAUDE-171 로 바뀜(아래).
+    - 2026-10-21 설계(CLAUDE-170): 고객 DB 가 Oracle 11.2.0.4 라 이름 30자 제한. 등록 Parameter 194행(109종)이 모두 31 ~ 50자라 고객 DB 에서 TD 컬럼을 만들 수 없었다. [설계](../../../문서/설계/04_ETest/2026-10-21_ETest_YMS_컬럼이름_30자_설계.md)
+    - 현재 동작(2026-10-21 CLAUDE-171 구현, 권장안 Y1 ~ Y9): YMS 컬럼 이름 = `TQP_GDS_ET_ITEM.YMS_PARAM_NAME`(30자 이하, NOT NULL / CK / 같은 Device + 공정 안 UNIQUE). ITEM_NAME(50자)은 그대로.
+      - 등록 때 한 번 정해 저장하고 자동으로 바꾸지 않는다: 30자 이하 ITEM_NAME 은 그대로, 넘으면 측정 약어 + 조건 + Chain 1 + Chain 2 끝으로 조립, 그래도 넘으면 21자 + `_` + 해시 8자리(`EtYmsRule.ToYmsName`). 이미 등록된 것이나 같은 요청 안의 다른 Parameter 와 같으면 등록 오류.
+      - E-Test Para 설정 [등록 Parameter] 에 "YMS 이름" 열(저장 이름 오른쪽). 더블클릭 / F2 / Ctrl+V 로 고친다(대문자, 형식 / 표 안 겹침은 붉은 칸). 서버는 `SaveEtParameterSetup` 8번째 열로 받아 바뀐 행만 고친다(형식 / YMS 반영된 이름 수정 거부 / YMS 에 이미 있는 컬럼 이름 거부 / Device + 공정 전체 겹침 거부). Interface / RO 함수는 그대로.
+      - YMS 반영 여부(`YMS_PUBLISHED`) = 그 이름이 YMS Program(Device_공정)의 `TQP_PARASPEC` 에 있음. 반영된 Parameter 는 회색 글자 + 편집 안 됨. 바꾸려면 그 Program 의 파일 YMS 반영을 모두 지우고(`Probes/EtYmsRepublish.ps1`) 이름을 고친 뒤 다시 반영한다.
+      - Program(Device_공정)은 26자 이하(`TD_<Program>` 30자). 업로드 화면 분석 단계에서 넘으면 "이름 오류"로 저장하지 않는다. 업로드 화면에는 YMS 탭이 없다.
+      - 로컬 DB: 기존 194행은 규칙 값으로 채웠고(해시 2), SCK OMM / OMMTCB 파일 3개의 YMS 반영을 지우고 다시 반영해 `TD_OMM_TSVET` / `TD_OMMTCB_TSVET` 컬럼과 Parameter 정의가 모두 30자 이하가 됐다.
+      - 고객 DB(TRAINING): `06_CoreLibSource/GdsMapControl/Persistence/2026-10-21_tqp_gds_et_item_yms_name.sql` 실행 필요(미실행).
   - 검증: `ET_YMS_SERVICE_PROBE=PASS 9/9`.
   - 운영 반영: 14:33 사용자 VS 빌드로 운영 폴더에 들어갔다. DMS 화면 확인 대기.
 - TEST Analysis 메뉴 정리 (CLAUDE-097, 같은 날, 설계 16.6): CP 하위 메뉴를 없애고 Map / Bin·수율 / Parameter 3묶음(구분선)으로 나열, 9개 메뉴 아이콘 새로 그림(`99_Resource/ByModule/POC/make_test_menu_icons.ps1`). Yield Report 를 사용 가능(ENABLE True)으로 바꾸고 캡션 오타(Yeild) 수정. DACrux 다시 시작 후 화면 확인 대기.
@@ -152,6 +160,10 @@ E-Test 쪽 "ET Chain 매핑 기준"을 회의록 근거로 정했다 (설계 v2�
 - E-Test 측정값 단위는 파일 Unit 행(V / Ohm / uA)을 `TQP_GDS_ET_ITEM.UNIT` 에 그대로 두고 값은 환산하지 않는다.
 - 2026-10-16 수정: 업로드 계획 `EtUploadPlan.Build`(`ENGUI/ETest/EtJudgeRule.cs`)가 파일 Unit 과 등록 단위를 비교한다(둘 다 있을 때, 대소문자 구분 = Para 등록과 같은 규칙). 다르면 그 Parameter 는 저장 / 판정하지 않고 상태 경고 "단위 다름 n 건너뜀 (예: 저장 이름: 파일 nA / 등록 uA)"(`frmEtResultUpload`). 누락으로는 세지 않는다. 서버 변경 없음.
 - 검증: `Verify-EtResultUpload.ps1` -> `ET_UPLOAD_FORM_SMOKE=PASS`(새 검사: 첫 Parameter 단위를 nOhm 으로 바꾸면 저장 36 / 누락 0 / 경고) + `DIE_COORD_PROBE=PASS (11/11)`, TEMP 빌드 오류 0, PROBE 시험 데이터 정리됨.
+- 화면 정리 (2026-10-22, CLAUDE-194):
+  - E-Test Para 설정(`frmEtParaSetup`): 표의 YMS 이름 / 조건 / Spec 원문 / 출처 열 숨김(`Visible = false`, 값은 채움). Chain 1 / Chain 2 열은 한 번 숨겼다가 같은 날 다시 보이게 함. 필터 줄의 조건 콤보도 숨기고 Chain 1 / GDS Chain / 사용 / Enable / [필터 해제] 를 왼쪽으로 당겼다(숨긴 콤보는 (전체)로 남아 거르지 않음, 필터 처리 목록에는 그대로). 여러 칸 붙여넣기는 보이는 열에만 붙으므로 YMS 이름은 화면에서 고칠 수 없다.
+  - E-Test 결과 업로드(`frmEtResultUpload`): 위 둘째 줄 상태 / 메시지(`lblState` / `lblMessage`) 숨김, 위 막대 Designer 100 -> 60(실행 40). 상태는 결과 Control 제목, 메시지(오류 이유 / 경고)는 분석 뒤 아래 상태 표시줄 뒤에 붙인다(`AutoEllipsis`).
+  - 확인: TEMP 빌드 오류 0 + 화면 밖 띄워 보기(`POC_BUTTON_LAYOUT=PASS`, 4화면) / Smoke 미실행 / 배포는 사용자 VS 빌드.
 
 ## 2026-10-16 Scribe 위치 / GDS Chip 크기 / Pitch 비교 (CLAUDE-128, 결정 대기)
 
@@ -207,3 +219,58 @@ E-Test 쪽 "ET Chain 매핑 기준"을 회의록 근거로 정했다 (설계 v2�
 - 2026-10-20 CLAUDE-154 (결정 B28): KLARF 검사 면 = FS 고정, 화면에 보이지 않음(KLARF 탭 검사 면 콤보 삭제). 고르는 것은 GDS Chain 면만(기본 BS). 반전 규칙(Chain 면 ≠ 검사 면)은 그대로라 기본 조건 Chain BS · 검사 FS = 반전, STEP 528 Chain In 1 / 15(Chain FS 로 바꾸면 8 / 15). KLARF / E-Test Die 는 그대로: 서버가 검사 면 FS 일 때 KLARF Die 번호를 좌우로 바꾸던 것을 없앴다(ToSystem / FromSystem = Index 그대로). 서버 Ready VIEW_SIDE = FRONT, 요청 검사 면이 비면 FRONT. BSL + ENGUI, TEMP 빌드 + Smoke 70/70 + EtProbe 17/17 + AnalyzeProbe 14/14, 배포 안 함 / DMS 화면 확인 대기. 설계: 통합 분석 B28 / 6.4 / 18절, 화면 A 레이아웃 13절.
 - 2026-10-20 CLAUDE-157: 화면 A 상태줄과 상세보기 "분석 기준" GDS 칸 · GDS / KLARF 기준 줄에서도 검사 면을 뺐다(KLARF 검사 면 FS 고정, B28). 상태줄 "BACK 보기 (Chain BS -> 반전)", 상세보기 "GDS · Chain BS -> 반전". ENGUI + GdsMap EXE, TEMP 빌드 + Smoke 71/71, 배포 안 함 / DMS 화면 확인 대기.
 - 2026-10-20 CLAUDE-160 (E-Test 목록 조건, 결정 B29 = 권장안 3개): 화면 A [E-Test] 탭 목록은 Wafer Key 같음 + E-Test Device = 분석 GDS Device 인 파일만(서버 Ready), 표 위 Step 콤보(E-Test Step = 파일 Step ID = 공정)로 고른 Step 파일만 보이고 1개 선택. Device 가 다른 같은 Wafer 파일은 상태줄 "E-Test n개는 Device 가 GDS Device X 와 달라 목록에서 뺌(…)", [직접 찾기]로는 더할 수 있다(찾기 Device 기본 = GDS Device). 실제 데이터: STEP 601(OMMTCB) -> 331 / 603(OMM_TCB)·528(OMM_Hybrid) -> 0개. BSL + ENGUI, Probe 18/18 + Smoke 75/75, 배포 안 함 / DMS 화면 확인 대기. [설계](../../../문서/설계/05_연관분석/2026-10-20_ETest_목록_조건_설계.md)
+- 2026-10-20 CLAUDE-167: 화면 A 배치 검사 실패 2건 수정(Designer 위치만). KLARF 탭 Pitch 출처 글자가 패널 아래로 넘침 -> 단계 정보 높이 48 -> 46 / Pitch 출처 Y 62 -> 56, E-Test 탭 Spec Out 과 Fail Die(결과 파일) 체크 겹침 -> Fail Die X 300 -> 316. `Verify-PocButtonLayout` PASS. 배포 대기.
+
+## U8 처럼 Chain 이 많은 Device 대응 (2026-10-21, CLAUDE-179 / 180)
+
+- 확인(CLAUDE-179): U8(Chain 27,342개)은 판정 계산은 그대로지만 상세보기 열기(Chain 마다 Member 조회), 상세보기 표 전체 Chain 표시, 서버 모양 Cache 한도 초과, 화면 A Chain 이름 찾기에서 느려졌다. [영향 확인](../../../문서/설계/05_연관분석/2026-10-21_U8_연관분석_영향_확인.md)
+- 현재 동작(CLAUDE-180, 결정 = 권장안):
+  - 상세보기는 Chain Member 를 Chain 번호 5,000개 범위로 묶어 읽는다(`GetChainMembersRange`). 서버에 범위 조회가 없으면 Chain 마다 읽는다.
+  - 서버 모양 Cache 는 Device 1개 점 2,000만 개까지 둔다(U8 1,613만 점, 상주 약 370 MB, 최근 3 Device).
+  - 화면 A 는 결과가 바뀔 때 Chain 찾기 사전을 1번 만든다.
+  - Chain 이 1,000개를 넘는 Device 의 상세보기 [GDS / KLARF] 표와 [종합] 4분류 수는 그 Die 의 DIE_CHAIN Chain(탐색 거리 안 / 걸림 / E-Test 연결) + 역추적 Chain 만 쓴다. 머리 줄 "Chain n(이 Die 주변)". 1,000개 이하(U9 등)는 예전처럼 모든 Chain.
+- 효과(로컬 측정): 상세보기 67.7 ~ 75.9초 -> 20.0초, [분석] 두 번째부터 7.5초 -> 0.6초, 화면 A Defect 탭 2.3초 -> 8ms, [걸린 / Fail Chain 만] 끄기 11.6초 / 27,352행 -> 0.16초 / 93행.
+- 상태: 완료(코드) / TEMP 빌드 + Smoke 76/76 / 운영 폴더는 13:20 VS 빌드로 이미 반영됨(Service / DACrux 다시 시작 필요) / DMS 화면 확인 대기. U8 KLARF / E-Test 업로드 뒤 재측정은 남음.
+
+## GDS-KLARF 연관 분석 Simple 화면 설계 (2026-10-22, CLAUDE-192)
+
+- 요청: 화면 A 보다 단순한 새 화면. Wafer 1개를 받으면 기본 설정으로 1차 분석(KLARF Defect 가 GDS Chain 위에 올라갔는지, Defect 크기 그대로), Die 마다 Chain 위 Defect 수, E-Test 없음(삼각형 없음), 색 구간 그대로, 오른쪽 탭 2개(설정 + 간단한 정보 / Die 종합), 좌표 보정 제외, Die 더블클릭 상세는 2단계.
+- 설계: 새 화면 `frmGdsKlarfSimple`(ENGUI, 화면 A 보존), 같은 서버 `Analyze` 를 `SIZE_TOL` + 허용오차 0 + 보정 0 + `EtSrcFileSeq` 0 으로 부른다. **서버 / Interface / DB 변경 없음**. `GetWaferReady` 는 부르지 않는다.
+- 판정 뜻(소스 확인): Defect 좌표 중심 XSIZE × YSIZE 사각형과 Chain Member 실제 모양의 Gap ≤ 허용오차(0 = 겹치거나 닿음). 크기 0 은 점. DSIZE / DEFECTAREA 는 쓰지 않음.
+- 오른쪽 탭: [설정 / 정보] = 분석 정보 / Defect 영역 설정(+ Chain 면, [분석]) / 선택 Die 의 Chain 위 Defect 이미지 카드(`DPUCDefectImageCard`) / Chain 목록, [종합 (Die)] = 화면 A Die 표에서 E-Test 열 뺀 것.
+- 결정(같은 날): "권장안 S1 ~ S10 으로 1단계 구현 진행".
+- 구현(1단계, 설계 12절): POC > **GDS-KLARF 연관 분석 (Simple)** (`ENGUI/DefectMapAnalysis/frmGdsKlarfSimple`, 메뉴 `MNU_GDS_KLARF_SIMPLE` / F03129 / RESV_04 = DM, 소스 MenuFile 에만) + 색 구간 팝업 `GdsKlarfBandPopup`(화면 A 와 같은 동작, 새 화면 전용) + `GdsKlarfAnalysisMap.ShowDetailMenu`(기본 true, Simple 은 false). Wafer 받으면 자동 분석, 설정 바꾸면 "설정 바뀜" -> [분석], Die 클릭 = 그 Die 의 Chain 위 Defect 이미지 카드 / Chain 목록, Die 더블클릭 = Die 선택만(2단계 자리).
+- 검증: TEMP 빌드(새 경고 없음) + `Verify-GdsKlarfSimple.ps1` -> `GDS_KLARF_SIMPLE_FORM_SMOKE=PASS (17/17)` STEP 528(Defect 15, 허용오차 0 / 5 = Chain 위 1 / 1) · STEP 603(1,122, 437 / 472). Smoke 는 DB 연결 이름을 DMSMGR(로컬)로 바꿔 쓴다(서버 config 는 지금 실제 앱 DB CPKMESDV). 버튼 배치 Simple 화면 FAIL 0. 이미지 카드 실제 FTP 읽기는 Smoke 안에서 실패(원인 추정: 원격 설정 없음) -> DMS 화면 확인.
+- POC 문구 규칙 적용(같은 날 요청 "Simple 화면에도 CLAUDE-193 과 같은 문구 규칙 적용", 설계 13절): 탭 "종합", 라디오 "Defect 크기 + 허용오차", 입력란 옆 `µm` Label 삭제, 분석 정보 / 상태줄 기준 "Defect 크기 그대로 / 크기 + 허용오차 n" (단위 없음), 이름 글자 설명 괄호 삭제. 값 괄호(개수 / 좌표 / 비율 / 시간, 상태줄)와 창 제목 / 메뉴 "(Simple)" 은 그대로. Smoke 18/18(문구 규칙 검사 추가) · 528 / 603.
+- 레이아웃 정리(같은 날 요청 4건, 설계 14절): Map 위 "색 = Chain 위 Defect 수" 삭제 / 아래 상태줄 삭제(알림은 분석 정보 "알림" 줄, 진행 표시는 위 막대 오른쪽에 작업 중에만) / 버튼 "다시 분석" / 이미지 = 고른 Die 의 모든 Defect(Chain 위 · 밖 묶음과 체크 삭제, 분석 결과와 무관, 결정 S5 바뀜). "분석 버튼 아래 살짝 보이는 것" = [Chain 밖 Defect 도 보기] 체크였고 함께 없앰. Smoke 17/17 · 528 / 603, 버튼 배치 Simple FAIL 0.
+- 2단계 Die 상세보기(같은 날 요청, 설계 15절): Map Die 더블클릭 / 우클릭 [Detail Analysis] / [종합] 행 더블클릭 -> 화면 A 상세보기(`frmGdsDieAnalysis` + `GdsDieAnalysisForm`)를 마지막 분석 요청 그대로 연다. Simple 결과(`DETAIL_VIEW = SIMPLE`)일 때만: 위쪽 분석 기준 칸 · [GDS / KLARF] 체크 줄 숨김, 모든 Chain + Chain 밖 묶음, 처음 탭 GDS / KLARF, 도면 Defect = Chain 안 빨강 / 밖 노랑 채움(흰 점선 · #번호 없음, `GdsMapControl.DefectStyle = Filled`), 크기 = 분석 설정, E-Test 를 분석하지 않아 비는 분류 / ET / Fail Para 열과 [E-Test] / [종합] 탭 숨김(사용자 결정, 설계 15.7절). 화면 A 상세보기는 그대로. Smoke 27/27 · 528 / 603. 표 머리글 목록은 설계 15.5절.
+- 기능별 구분선(CLAUDE-198, 설계 16절): [설정 / 정보] 탭 기능 사이 전체 폭 선 3개. 별도 TEMP 빌드 + 배치 검사 PASS, Smoke 미실행(동작 변경 없음).
+- KLARF 위치 조정(CLAUDE-198, 구현 완료(코드, K1 ~ K8 권장안) / Smoke 33/33 · 528 / 603 / 배포 안 함 / DMS 화면 확인 대기): Defect 영역 설정 아래 X / Y + [◀][▲][▼][▶] 1 씩 + [초기화] + [다시 분석]. 화살표는 값만 바꾸고 [다시 분석] 때 반영, Wafer 를 바꿔도 값 유지, 0 이 아니면 분석 정보 기준 줄에 표시(2026-10-22 CLAUDE-209 에서 분석 정보 5줄을 빼 지금은 숫자칸에서만 보임). 서버 보정값이 반전 전 KLARF 좌표계에서 더해지므로(= REL 조정) 서버 변경 없음. 화면 A 보정값은 그대로. [설계](../../../문서/설계/05_연관분석/2026-10-22_KLARF_위치조정_설계.md)
+- Die 상세 화면 DLL 로딩 + 왼쪽 Die 목록(CLAUDE-200, 구현 완료(코드) / Smoke 화면 A 81/81 · Simple 35/35 · 528 / 603 / 배포 안 함 / DMS 화면 확인 대기):
+  - GdsMap 을 EXE 에서 DLL(`NexplantQMS.GdsMap.dll`, 같은 GdsMap 폴더)로 바꿨다. GDS 호스트 4개는 `GdsMapAssembly` 로 그 DLL 을 한 번만 읽는다.
+  - 상세보기 창은 전체에서 하나다. 열려 있으면 다른 Die 를 더블클릭해도 그 창 목록에서 고른다.
+  - 왼쪽 목록 열: No / X / Y / Defect / Chain 위 / E-Test Fail. 고르면 0.3초 뒤 호스트가 `AnalyzeDie` 로 계산하고, Die 별 결과 / 보기 상태를 기억한다.
+  - 분석 화면이 결과를 반영할 때마다 상세보기도 같은 Die 를 새 요청으로 다시 계산한다(`SourceAnalyzed`). 보기 상태는 이어 간다.
+  - 공유 도면 / 미리 읽기는 그대로다. [설계](../../../문서/설계/05_연관분석/2026-10-22_Die상세_DLL로딩_Die목록_설계.md)
+- 상태: **구현 완료(코드) / TEMP 빌드 + Smoke 확인 / 배포 안 함 / DMS 화면 확인 대기**. 배포 = ENGUI DLL + `NexplantQMS.GdsMap.exe`(100_ClientBin/GdsMap) + `MenuFile.mnu`(소스 -> 100_ClientBin) + DACrux 재시작(서버 변경 없음). [설계](../../../문서/설계/05_연관분석/2026-10-22_GDS_KLARF_연관분석_Simple_화면_설계.md)
+
+## 상세보기 오른쪽 한 패널 설계 (2026-10-22, CLAUDE-197)
+
+- 요청: 오른쪽 탭 3개([GDS / KLARF] [E-Test] [종합])를 한 패널로. GDS / KLARF 표가 주, 고른 행 Chain 의 이 Die E-Test Parameter 를 아래 표로([E-Test 값] 체크로 보이기 / 숨기기), 종합 정보는 위 표에 엮기, "가까운 Chain" 정보 삭제.
+- 설계: 종합은 4분류 수 칸 + 분류 글자색만 위 표로(나머지는 위쪽 Die 줄 / 위 표 / 아래 표와 겹침), 가까운 Chain 열 삭제(Chain 밖 Gap 은 남김). 공유 화면이라 화면 A · Simple 상세보기가 함께 바뀜. 서버 변경 없음, 배포는 GdsMap EXE.
+- 구현(결정 P1 ~ P9 권장안): `GdsDieAnalysisForm` 오른쪽 = 기준 묶음(+ E-Test 줄) / 4분류 수 칸 / 머리 줄([걸린 / Fail Chain 만] [Chain 밖 Defect] [E-Test 값]) / 가로 나누기 위 GDS / KLARF 표 + 아래 E-Test 값 표(아래 35%). 아래 표 = 고른 행 Chain(없음 = Die 전체, Chain 밖 = 빈 표). E-Test 없는 결과 · Simple 은 체크 · 아래 표 · 4분류 칸 숨김. `Verify-GdsKlarfAnalysis.ps1` 에 `-ConnectId`(기본 DMSMGR) / `-SkipBuild` / `-Capture`.
+- 검증: 화면 A Smoke 528 82/82 · 603 81/82(무관 1건: 화면 A [KLARF] 탭 Pitch 출처 기대값), E-Test 연결(같은 Wafer 파일 361 / 331)로 아래 표 범위 · 접기 · 분류 색 확인, Simple 27/27, 버튼 배치 상세 FAIL 0.
+- 상태: **구현 완료(코드) / TEMP 빌드 + Smoke 확인 / 배포 안 함(`NexplantQMS.GdsMap.exe`) / DMS 화면 확인 대기**. [설계](../../../문서/설계/05_연관분석/2026-10-22_상세보기_오른쪽_한패널_설계.md)
+- 두 화면 같은 모양 + Simple E-Test 자동 연결(같은 날 CLAUDE-199, 설계 12절): 요청 "두 화면에서 동일하게 / 컨셉대로 전부", 결정 "완전히 같게(두 요청 합침)" + "Simple E-Test = 같은 Wafer 최신 파일 자동". Simple 보기 표시(DETAIL_VIEW) 삭제 -> 두 화면 공통 = 분석 기준 칸 · 표 위 요약 숨김, [걸린 / Fail Chain 만] 기본 끔, Defect 빨강 / 노랑 채움(점선 · 번호 없음), 한 패널(E-Test 있으면 체크 · 아래 표 · 4분류 칸 · E-Test 열). Simple 은 GetWaferReady 로 같은 Wafer + 같은 Device 최신 READY E-Test 자동 연결 + 분석 정보 E-Test 줄. Simple Smoke 33/33, 화면 A 82/82(528). 배포 = GdsMap EXE + ENGUI DLL.
+- 상세보기 [다시 분석] + 정리(같은 날 CLAUDE-205, 설계 13절): 위쪽 오른쪽 [다시 분석] = 연 분석 화면의 [다시 분석] / [분석](지금 설정) -> SourceAnalyzed 로 상세보기 새 결과. [Chain 밖 Defect] 체크 삭제(늘 보임), 4분류 상태 칸 5개 삭제, 기준의 최종 저장 / 분석 시각 삭제. [걸린 / Fail Chain 만] 은 유지(기본 끔). 화면 A 80/80(528), Simple 36/36. 배포 = GdsMap DLL + ENGUI DLL.
+- 도면 머리 줄 좁은 폭(같은 날 CLAUDE-206, 설계 14절): Die 목록 옆에서 도면 칸이 좁으면(약 190px) 보기 / [배경 도면] / [원점 표시] / [전체 보기] 가 겹치던 것을 FlowLayoutPanel 로 바꿔 다음 줄로 넘김(넓으면 한 줄 32, 190px = 4줄). [전체 보기] 는 [원점 표시] 뒤. 화면 A 81/81(528), Simple 36/36(603). 배포 = GdsMap DLL.
+
+## E-Test Bin 설정 화면 설계 (2026-10-22, CLAUDE-201)
+
+- 요청: 기존 `TEST.ENGUI/Admin/frmSetupBin`(TestArea -> Program -> Bin 0 ~ 150 고정 표)을 POC 성격에 맞게 하나 더. 기준은 바꿔도 됨.
+- 설계: 신규 `SEMDMS.ENGUI/ETest/frmEtBinSetup`. 고르는 기준 = E-Test Device / 공정(YMS Program = `EtYmsRule.ToProgramName`, 읽기 전용). 행 = Bin 정의 + 파일 Die 의 Hardware Bin. 고치는 값 = 이름 / 양품 / 색 / 설명, 참고 열 = Software Bin / Die / Pass / Fail / 파일 / 상태. 저장 뒤 양품이 바뀌면 기존 `RejudgeEtFiles` 로 YMS 수율 다시 계산 질문. 서버 = `GdsEtResult` 메서드 4개 + `TQP_GDS_ET_YMS.xml` 쿼리 2개, Bin 정의는 기존 TEST DSL `TQP_BINDESC` 함수(DDL 없음). 기존 frmSetupBin 은 그대로.
+- 로컬 DB(읽기): OMM_TSVET 파일 Bin 1 / 5, 정의 1 / 2 / 4 / 5(2 / 4 는 파일에 없음), 수율 83.33. OMMTCB_TSVET 정의 2 / 4, 양품 없음.
+- 구현(같은 날, "진행" = B1 ~ B9 권장안): 화면 `frmEtBinSetup` + 메뉴 `MNU_DMS_ET_BIN`(POC, E-Test Para Setup 바로 뒤) + 서버 `GdsEtResult_Bin` + `TQP_GDS_ET_YMS.xml` 쿼리 5개. 기존 `MERGE_BIN` 이 설명을 40자에서 잘라(실측) Bin 정의 읽기 / 쓰기 / 삭제는 전용 쿼리로 바꿈(4열만 UPDATE, 숨긴 열 유지).
+- 검증: `ET_BIN_SETUP_PROBE=PASS (15/15)` / `ET_BIN_SETUP_FORM_SMOKE=PASS` (17) / 버튼 배치 새 화면 OK. 양품 변경 -> 수율 다시 계산 83.33 -> 100 -> 83.33 확인.
+- 상태: **구현 완료(코드) / TEMP 빌드 + Probe + 화면 밖 Smoke 확인 / 배포 안 함 / DMS 화면 확인 대기**. [설계](../../../문서/설계/04_ETest/2026-10-22_ETest_Bin_Setup_화면_설계.md) 13절
+- 후속(CLAUDE-207): 기존 `TQP_BINDESC.xml` `MERGE_BIN` / `SELECT_BIN_EDITABLE` 바인딩 size 40 / 25 -> 0. 기존 frmSetupBin / frmSetupProgram 도 긴 설명 / 26자 Program 이 잘리지 않음(Probe 확인, TEST Service 경유 화면은 미확인).

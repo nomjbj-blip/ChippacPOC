@@ -1,0 +1,29 @@
+﻿{
+    "id":  "08d",
+    "name":  "RG_Analysis",
+    "scenarios":  [
+                      "RG"
+                  ],
+    "status":  "FAIL",
+    "exitCode":  1,
+    "timedOut":  false,
+    "durationMs":  2800,
+    "started":  "2026-10-19 11:08:35",
+    "command":  "python -I -X utf8 \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\probes\\f07data_analysis_check.py\" C:\\Users\\USER\\AppData\\Local\\Temp\\claude\\D--1---------18-------POC\\957adbdd-9676-41cc-8e41-8662274edcca\\scratchpad\\verify\\db_mut",
+    "workingDir":  "D:\\1_프로젝트 문서\\18.스테츠칩팩_POC",
+    "keys":  {
+                 "ANALYSIS_CHECK_PROBE":  "FAIL (5/9)"
+             },
+    "passLines":  5,
+    "failLines":  [
+                      "FAIL / A1 Defect 1122개: Chip 좌표(gx, gy) / Die 번호 / 걸림(Gap \u003c= 5) / 걸린 Chain / 걸린 Member 수 / 최소 Gap(50 안) / 가장 가까운 Chain / 큰 Defect / 다른 값 {\u0027GDS_X/Y\u0027: 1, \u0027CHAIN_CODES\u0027: 1, \u0027HIT_MEMBER_COUNT\u0027: 1} 예 {\u0027GDS_X/Y\u0027: (1, \u0027960.13\u0027, 961.13, \u002710126.68\u0027, 10126.68), \u0027CHAIN_CODES\u0027: (263, \u0027AB\u0027, [\u0027H\u0027, \u0027AB\u0027]), \u0027HIT_MEMBER_COUNT\u0027: (263, \u00273\u0027, 4)} / 다시 계산 걸림 472 (분석 472) / Gap 이 5 µm ± 0.01 인 경계 Defect 0",
+                      "FAIL / A2 Defect x Chain 걸림 479 쌍 = 분석 DEFECT_CHAIN 478 행 (쌍 / Gap / 가장 가까운 Member) / 다른 값 {\u0027한쪽에만 있음\u0027: 1} 예 {\u0027한쪽에만 있음\u0027: ((263, \u0027298\u0027), None, (0.0, \u0027R0/E15884\u0027))} / Member ID 까지 같은 쌍 248",
+                      "FAIL / A5 (Die, Chain) 표: 걸린 Defect 가 있거나 E-Test F / N 인 칸 298 = 분석 DIE_CHAIN 298 (E-Test 상태 / 4분류 / Defect 수 · ID / 최소 Gap / Parameter · Fail 수 / 첫 Fail 항목) / 다른 값 {\u0027CLASS4\u0027: 1, \u0027DEFECT_COUNT/IDS\u0027: 1} 예 {\u0027CLASS4\u0027: (((4, 6), \u0027320\u0027), \u0027FAIL\u0027, \u0027BOTH\u0027), \u0027DEFECT_COUNT/IDS\u0027: (((7, 7), \u0027298\u0027), \u00271\u0027, 2)} / 4분류 {\u0027FAIL\u0027: 123, \u0027DEFECT\u0027: 106, \u0027BOTH\u0027: 26, \u0027NA\u0027: 43} / 상태 {\u0027F\u0027: 149, \u0027P\u0027: 106, \u0027-\u0027: 43}",
+                      "FAIL / A7 Chain 표 19: 걸린 Die / 걸린 Defect / E-Test 연결 · Parameter 수 / 대상 Die / Defect Die / Fail Die / 일치 Die / Fail률 2개 (7.2) / 다른 값 {\u0027값\u0027: 1} 예 {\u0027값\u0027: (\u0027H\u0027, (14, 63, \u0027LINKED\u0027, 4, 73, 11, 14, 4, 0.3636, 0.1613), (14, 64, \u0027LINKED\u0027, 4, 73, 11, 14, 4, 0.3636, 0.1613))}"
+                  ],
+    "skipLines":  [
+
+                  ],
+    "stdout":  "08d_RG_Analysis.stdout.txt",
+    "stderr":  "08d_RG_Analysis.stderr.txt"
+}

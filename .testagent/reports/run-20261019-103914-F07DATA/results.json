@@ -1,0 +1,297 @@
+﻿[
+    {
+        "id":  "02",
+        "name":  "KlarfCheck",
+        "scenarios":  [
+                          "SCN-K"
+                      ],
+        "status":  "FAIL",
+        "exitCode":  1,
+        "timedOut":  false,
+        "durationMs":  645,
+        "started":  "2026-10-19 10:45:03",
+        "command":  "python -I -X utf8 \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\probes\\f07data_klarf_check.py\" \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\SampleFile\\26_10_14 Sample File\\TEST.SINF\" \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\reports\\run-20261019-103914-F07DATA\\evidence\\db\"",
+        "workingDir":  "D:\\1_프로젝트 문서\\18.스테츠칩팩_POC",
+        "keys":  {
+                     "KLARF_CHECK_PROBE":  "FAIL (10/12)"
+                 },
+        "passLines":  10,
+        "failLines":  [
+                          "FAIL / K5b 원본 파일 Summary NDEFECT 와 DefectList 줄 수(파일 자체 일관성) / Summary {3: 1098, 80: 0} / DefectList TEST 분포 {\u00273\u0027: 1122}",
+                          "FAIL / K11 TQD_INSP_INFO Test 80 행: DEFECTS / INSPECTED_DIE / DEFECTIVE_DIE 가 원본 Test 80 과 같음 / DB DEFECTS 0 / INSPECTED_DIE 761 / DEFECTIVE_DIE 51(6.70%) vs 원본 Summary NDEFECT 0 / NDIE 1 / NDEFDIE 1, SampleTestPlan 761"
+                      ],
+        "skipLines":  [
+
+                      ],
+        "stdout":  "02_KlarfCheck.stdout.txt",
+        "stderr":  "02_KlarfCheck.stderr.txt"
+    },
+    {
+        "id":  "03",
+        "name":  "EtestCheck",
+        "scenarios":  [
+                          "SCN-E"
+                      ],
+        "status":  "FAIL",
+        "exitCode":  1,
+        "timedOut":  false,
+        "durationMs":  1746,
+        "started":  "2026-10-19 10:48:05",
+        "command":  "python -X utf8 \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\probes\\f07data_etest_check.py\" \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\SampleFile\\26_10_14 Sample File\\CAI_OMMTCB_ATV_A0_TSVET_20261002161846_SCKLOTIDA_SCKLOTIDA-01$Silterra$.xlsx\" \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\reports\\run-20261019-103914-F07DATA\\evidence\\db\" \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\SampleFile\\U9_Die좌표_대응표_20261012.tsv\" 7 5",
+        "workingDir":  "D:\\1_프로젝트 문서\\18.스테츠칩팩_POC",
+        "keys":  {
+                     "ETEST_CHECK_PROBE":  "FAIL (8/9)"
+                 },
+        "passLines":  8,
+        "failLines":  [
+                          "FAIL / E2 Wafer: DB WAFER_ID(파일 이름 Lot-Wafer No) = 내용의 Wafer ID 열 / DB SCKLOTIDA-01(LOT SCKLOTIDA, SLOT 1) / 내용 {\u0027U9-HS2635-01\u0027: 73} -\u003e 이 파일은 내용상 다른 Wafer 의 E-Test"
+                      ],
+        "skipLines":  [
+
+                      ],
+        "stdout":  "03_EtestCheck.stdout.txt",
+        "stderr":  "03_EtestCheck.stderr.txt"
+    },
+    {
+        "id":  "04",
+        "name":  "GdsCheck",
+        "scenarios":  [
+                          "1-G"
+                      ],
+        "status":  "PASS",
+        "exitCode":  0,
+        "timedOut":  false,
+        "durationMs":  7009,
+        "started":  "2026-10-19 10:54:36",
+        "command":  "python -I -X utf8 \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\probes\\f07data_gds_check.py\" \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\SampleFile\\OMM all layer2.gds\\OMM all layer2.gds\" \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\reports\\run-20261019-103914-F07DATA\\evidence\\db\"",
+        "workingDir":  "D:\\1_프로젝트 문서\\18.스테츠칩팩_POC",
+        "keys":  {
+                     "GDS_CHECK_PROBE":  "PASS (5/5)"
+                 },
+        "passLines":  5,
+        "failLines":  [
+
+                      ],
+        "skipLines":  [
+
+                      ],
+        "stdout":  "04_GdsCheck.stdout.txt",
+        "stderr":  "04_GdsCheck.stderr.txt"
+    },
+    {
+        "id":  "05",
+        "name":  "AnalysisCheck",
+        "scenarios":  [
+                          "3"
+                      ],
+        "status":  "PASS",
+        "exitCode":  0,
+        "timedOut":  false,
+        "durationMs":  2860,
+        "started":  "2026-10-19 11:01:52",
+        "command":  "python -I -X utf8 \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\probes\\f07data_analysis_check.py\" \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\reports\\run-20261019-103914-F07DATA\\evidence\\db\"",
+        "workingDir":  "D:\\1_프로젝트 문서\\18.스테츠칩팩_POC",
+        "keys":  {
+                     "ANALYSIS_CHECK_PROBE":  "PASS (9/9)"
+                 },
+        "passLines":  9,
+        "failLines":  [
+
+                      ],
+        "skipLines":  [
+
+                      ],
+        "stdout":  "05_AnalysisCheck.stdout.txt",
+        "stderr":  "05_AnalysisCheck.stderr.txt"
+    },
+    {
+        "id":  "06",
+        "name":  "DisplayDump",
+        "scenarios":  [
+                          "2"
+                      ],
+        "status":  "PASS",
+        "exitCode":  0,
+        "timedOut":  false,
+        "durationMs":  22171,
+        "started":  "2026-10-19 11:05:17",
+        "command":  "C:\\Users\\USER\\AppData\\Local\\Temp\\ChippacGdsKlarfAnalysisVerification\\bin\\F07DisplayDump.exe \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\reports\\run-20261019-103914-F07DATA\\evidence\\ui\" 582 SCK OMM_TCB SCKLOTIDA-01 SCKLOTIDA OMM_TCB",
+        "workingDir":  "C:\\Users\\USER\\AppData\\Local\\Temp\\ChippacGdsKlarfAnalysisVerification\\bin",
+        "keys":  {
+                     "DISPLAY_DUMP":  "PASS"
+                 },
+        "passLines":  0,
+        "failLines":  [
+
+                      ],
+        "skipLines":  [
+
+                      ],
+        "stdout":  "06_DisplayDump.stdout.txt",
+        "stderr":  "06_DisplayDump.stderr.txt"
+    },
+    {
+        "id":  "07",
+        "name":  "DisplayCheck",
+        "scenarios":  [
+                          "2"
+                      ],
+        "status":  "PASS",
+        "exitCode":  0,
+        "timedOut":  false,
+        "durationMs":  586,
+        "started":  "2026-10-19 11:07:30",
+        "command":  "python -I -X utf8 \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\probes\\f07data_display_check.py\" \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\reports\\run-20261019-103914-F07DATA\\evidence\\db\" \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\reports\\run-20261019-103914-F07DATA\\evidence\\ui\"",
+        "workingDir":  "D:\\1_프로젝트 문서\\18.스테츠칩팩_POC",
+        "keys":  {
+                     "DISPLAY_CHECK_PROBE":  "PASS (12/12)"
+                 },
+        "passLines":  12,
+        "failLines":  [
+
+                      ],
+        "skipLines":  [
+
+                      ],
+        "stdout":  "07_DisplayCheck.stdout.txt",
+        "stderr":  "07_DisplayCheck.stderr.txt"
+    },
+    {
+        "id":  "08a",
+        "name":  "RG_Klarf",
+        "scenarios":  [
+                          "RG"
+                      ],
+        "status":  "FAIL",
+        "exitCode":  1,
+        "timedOut":  false,
+        "durationMs":  637,
+        "started":  "2026-10-19 11:08:25",
+        "command":  "python -I -X utf8 \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\probes\\f07data_klarf_check.py\" \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\SampleFile\\26_10_14 Sample File\\TEST.SINF\" C:\\Users\\USER\\AppData\\Local\\Temp\\claude\\D--1---------18-------POC\\957adbdd-9676-41cc-8e41-8662274edcca\\scratchpad\\verify\\db_mut",
+        "workingDir":  "D:\\1_프로젝트 문서\\18.스테츠칩팩_POC",
+        "keys":  {
+                     "KLARF_CHECK_PROBE":  "FAIL (9/12)"
+                 },
+        "passLines":  9,
+        "failLines":  [
+                          "FAIL / K5b 원본 파일 Summary NDEFECT 와 DefectList 줄 수(파일 자체 일관성) / Summary {3: 1098, 80: 0} / DefectList TEST 분포 {\u00273\u0027: 1122}",
+                          "FAIL / K6 Defect 값 11개 열(XREL / YREL / XSIZE / YSIZE / DEFECTAREA / DSIZE / CLASS / TEST / CLUSTER / ROUGHBIN / FINEBIN) 1122건 1:1 (소수 2자리) / 다른 값 {\u0027XREL\u0027: 1} 예 {\u0027XREL\u0027: (\u00271\u0027, \u002712876.130\u0027, \u002712877.13\u0027)}",
+                          "FAIL / K11 TQD_INSP_INFO Test 80 행: DEFECTS / INSPECTED_DIE / DEFECTIVE_DIE 가 원본 Test 80 과 같음 / DB DEFECTS 0 / INSPECTED_DIE 761 / DEFECTIVE_DIE 51(6.70%) vs 원본 Summary NDEFECT 0 / NDIE 1 / NDEFDIE 1, SampleTestPlan 761"
+                      ],
+        "skipLines":  [
+
+                      ],
+        "stdout":  "08a_RG_Klarf.stdout.txt",
+        "stderr":  "08a_RG_Klarf.stderr.txt"
+    },
+    {
+        "id":  "08b",
+        "name":  "RG_Etest",
+        "scenarios":  [
+                          "RG"
+                      ],
+        "status":  "FAIL",
+        "exitCode":  1,
+        "timedOut":  false,
+        "durationMs":  1737,
+        "started":  "2026-10-19 11:08:26",
+        "command":  "python -X utf8 \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\probes\\f07data_etest_check.py\" \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\SampleFile\\26_10_14 Sample File\\CAI_OMMTCB_ATV_A0_TSVET_20261002161846_SCKLOTIDA_SCKLOTIDA-01$Silterra$.xlsx\" C:\\Users\\USER\\AppData\\Local\\Temp\\claude\\D--1---------18-------POC\\957adbdd-9676-41cc-8e41-8662274edcca\\scratchpad\\verify\\db_mut \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\SampleFile\\U9_Die좌표_대응표_20261012.tsv\" 7 5",
+        "workingDir":  "D:\\1_프로젝트 문서\\18.스테츠칩팩_POC",
+        "keys":  {
+                     "ETEST_CHECK_PROBE":  "FAIL (7/9)"
+                 },
+        "passLines":  7,
+        "failLines":  [
+                          "FAIL / E2 Wafer: DB WAFER_ID(파일 이름 Lot-Wafer No) = 내용의 Wafer ID 열 / DB SCKLOTIDA-01(LOT SCKLOTIDA, SLOT 1) / 내용 {\u0027U9-HS2635-01\u0027: 73} -\u003e 이 파일은 내용상 다른 Wafer 의 E-Test",
+                          "FAIL / E5 측정 값: 저장 항목 85 x DUT 73 = 6205 값이 원본 칸과 같음(HEADER_TEXT 로 열 찾기) / 열 못 찾음 [] / 다른 값 1 예 [(1, \u0027Connectivity_iforce=8.0mA@TSVDC_TR_FH\u0027, 5.75, \u00276.75\u0027, \u0027V\u0027)] / DB 값 6205 / VALUE_COUNT 6205"
+                      ],
+        "skipLines":  [
+
+                      ],
+        "stdout":  "08b_RG_Etest.stdout.txt",
+        "stderr":  "08b_RG_Etest.stderr.txt"
+    },
+    {
+        "id":  "08c",
+        "name":  "RG_Gds",
+        "scenarios":  [
+                          "RG"
+                      ],
+        "status":  "FAIL",
+        "exitCode":  1,
+        "timedOut":  false,
+        "durationMs":  7529,
+        "started":  "2026-10-19 11:08:27",
+        "command":  "python -I -X utf8 \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\probes\\f07data_gds_check.py\" \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\SampleFile\\OMM all layer2.gds\\OMM all layer2.gds\" C:\\Users\\USER\\AppData\\Local\\Temp\\claude\\D--1---------18-------POC\\957adbdd-9676-41cc-8e41-8662274edcca\\scratchpad\\verify\\db_mut",
+        "workingDir":  "D:\\1_프로젝트 문서\\18.스테츠칩팩_POC",
+        "keys":  {
+                     "GDS_CHECK_PROBE":  "FAIL (4/5)"
+                 },
+        "passLines":  4,
+        "failLines":  [
+                          "FAIL / G3 Chain Member 도형 62609개 = 원본 요소(같은 Layer / 종류 / nm 좌표 전체 / DataType / PATH 폭 · 타입, BOUNDARY Bounds) / 다른 값 {\u0027nm 정수 아님\u0027: 1, \u0027원본에 없음\u0027: 1} 예 {\u0027nm 정수 아님\u0027: (\u0027TOP/E15884\u0027, -2.08203125, -13639.994), \u0027원본에 없음\u0027: (\u0027TOP/E15884\u0027, \u00273\u0027, \u0027BOUNDARY\u0027, [(-2.08203125, -13639.994), (-11604.657, -13639.765)])} / 종류 {\u0027BOUNDARY\u0027: 34728, \u0027PATH\u0027: 27881} / 같은 모양 원본이 2개 이상인 Member 431"
+                      ],
+        "skipLines":  [
+
+                      ],
+        "stdout":  "08c_RG_Gds.stdout.txt",
+        "stderr":  "08c_RG_Gds.stderr.txt"
+    },
+    {
+        "id":  "08d",
+        "name":  "RG_Analysis",
+        "scenarios":  [
+                          "RG"
+                      ],
+        "status":  "FAIL",
+        "exitCode":  1,
+        "timedOut":  false,
+        "durationMs":  2800,
+        "started":  "2026-10-19 11:08:35",
+        "command":  "python -I -X utf8 \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\probes\\f07data_analysis_check.py\" C:\\Users\\USER\\AppData\\Local\\Temp\\claude\\D--1---------18-------POC\\957adbdd-9676-41cc-8e41-8662274edcca\\scratchpad\\verify\\db_mut",
+        "workingDir":  "D:\\1_프로젝트 문서\\18.스테츠칩팩_POC",
+        "keys":  {
+                     "ANALYSIS_CHECK_PROBE":  "FAIL (5/9)"
+                 },
+        "passLines":  5,
+        "failLines":  [
+                          "FAIL / A1 Defect 1122개: Chip 좌표(gx, gy) / Die 번호 / 걸림(Gap \u003c= 5) / 걸린 Chain / 걸린 Member 수 / 최소 Gap(50 안) / 가장 가까운 Chain / 큰 Defect / 다른 값 {\u0027GDS_X/Y\u0027: 1, \u0027CHAIN_CODES\u0027: 1, \u0027HIT_MEMBER_COUNT\u0027: 1} 예 {\u0027GDS_X/Y\u0027: (1, \u0027960.13\u0027, 961.13, \u002710126.68\u0027, 10126.68), \u0027CHAIN_CODES\u0027: (263, \u0027AB\u0027, [\u0027H\u0027, \u0027AB\u0027]), \u0027HIT_MEMBER_COUNT\u0027: (263, \u00273\u0027, 4)} / 다시 계산 걸림 472 (분석 472) / Gap 이 5 µm ± 0.01 인 경계 Defect 0",
+                          "FAIL / A2 Defect x Chain 걸림 479 쌍 = 분석 DEFECT_CHAIN 478 행 (쌍 / Gap / 가장 가까운 Member) / 다른 값 {\u0027한쪽에만 있음\u0027: 1} 예 {\u0027한쪽에만 있음\u0027: ((263, \u0027298\u0027), None, (0.0, \u0027R0/E15884\u0027))} / Member ID 까지 같은 쌍 248",
+                          "FAIL / A5 (Die, Chain) 표: 걸린 Defect 가 있거나 E-Test F / N 인 칸 298 = 분석 DIE_CHAIN 298 (E-Test 상태 / 4분류 / Defect 수 · ID / 최소 Gap / Parameter · Fail 수 / 첫 Fail 항목) / 다른 값 {\u0027CLASS4\u0027: 1, \u0027DEFECT_COUNT/IDS\u0027: 1} 예 {\u0027CLASS4\u0027: (((4, 6), \u0027320\u0027), \u0027FAIL\u0027, \u0027BOTH\u0027), \u0027DEFECT_COUNT/IDS\u0027: (((7, 7), \u0027298\u0027), \u00271\u0027, 2)} / 4분류 {\u0027FAIL\u0027: 123, \u0027DEFECT\u0027: 106, \u0027BOTH\u0027: 26, \u0027NA\u0027: 43} / 상태 {\u0027F\u0027: 149, \u0027P\u0027: 106, \u0027-\u0027: 43}",
+                          "FAIL / A7 Chain 표 19: 걸린 Die / 걸린 Defect / E-Test 연결 · Parameter 수 / 대상 Die / Defect Die / Fail Die / 일치 Die / Fail률 2개 (7.2) / 다른 값 {\u0027값\u0027: 1} 예 {\u0027값\u0027: (\u0027H\u0027, (14, 63, \u0027LINKED\u0027, 4, 73, 11, 14, 4, 0.3636, 0.1613), (14, 64, \u0027LINKED\u0027, 4, 73, 11, 14, 4, 0.3636, 0.1613))}"
+                      ],
+        "skipLines":  [
+
+                      ],
+        "stdout":  "08d_RG_Analysis.stdout.txt",
+        "stderr":  "08d_RG_Analysis.stderr.txt"
+    },
+    {
+        "id":  "08e",
+        "name":  "RG_Display",
+        "scenarios":  [
+                          "RG"
+                      ],
+        "status":  "FAIL",
+        "exitCode":  1,
+        "timedOut":  false,
+        "durationMs":  597,
+        "started":  "2026-10-19 11:08:38",
+        "command":  "python -I -X utf8 \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\probes\\f07data_display_check.py\" C:\\Users\\USER\\AppData\\Local\\Temp\\claude\\D--1---------18-------POC\\957adbdd-9676-41cc-8e41-8662274edcca\\scratchpad\\verify\\db_mut C:\\Users\\USER\\AppData\\Local\\Temp\\claude\\D--1---------18-------POC\\957adbdd-9676-41cc-8e41-8662274edcca\\scratchpad\\verify\\ui_mut",
+        "workingDir":  "D:\\1_프로젝트 문서\\18.스테츠칩팩_POC",
+        "keys":  {
+                     "DISPLAY_CHECK_PROBE":  "FAIL (9/12)"
+                 },
+        "passLines":  9,
+        "failLines":  [
+                          "FAIL / D3 Map Die 76: 채움색(Defect 없음 흰색 / Chain 밖만 연회색 / 구간 색) · 숫자 = Chain In 수(Defect Die 만) · 빨간 삼각형 = Spec Out / 다른 Die 1 [((6, 1), {\u0027X\u0027: \u00276\u0027, \u0027Y\u0027: \u00271\u0027, \u0027FILL\u0027: \u0027#DAF7A6\u0027, \u0027LABEL\u0027: \u00278\u0027, \u0027FAIL_MARK\u0027: \u0027\u0027}, \u0027#DAF7A6\u0027, 7, \u0027P\u0027)] / 화면 Die 76 / 삼각형 25",
+                          "FAIL / D9 Die 선택 시 GDS \u003e Chain 탭 = 그 Die 의 (Die, Chain) 298 행 (Chain 이름 / Defect 수 / 분류 / ET / 가까운 거리 / Fail Para / Defect ID / Member) / 다른 Die [(4, 6)] / 분류 {\u0027비교 불가\u0027: 43, \u0027Defect만\u0027: 106, \u0027일치\u0027: 26, \u0027Fail만\u0027: 123}",
+                          "FAIL / D11 E-Test Fail 탭 149 행 = E-Test F 인 (Die, Chain) 149 (Die / Chain / 분류 / 가까운 Defect / 걸린 Defect / Fail Para / 첫 Fail 항목 / Step, 정렬 일치 -\u003e 거리) / 다른 행 [\u0027(4, 6) TSVDC_BR_FH\u0027] / 분류 {\u0027일치\u0027: 26, \u0027Fail만\u0027: 123}"
+                      ],
+        "skipLines":  [
+
+                      ],
+        "stdout":  "08e_RG_Display.stdout.txt",
+        "stderr":  "08e_RG_Display.stderr.txt"
+    }
+]

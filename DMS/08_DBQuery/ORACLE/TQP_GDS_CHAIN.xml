@@ -129,4 +129,28 @@ SELECT FACTORY, :target_device_id, :new_chain_seq, CHAIN_CODE, CHAIN_STATUS, :cr
             <param direction="Input" dbtype="Number" size="0">:source_chain_seq</param>
         </parameters>
     </query>
+    <!-- Chain 일괄 저장 / 목록 (GdsChain.CreateChainBulk / GetChainCodeList, 2026-10-20 GDS Map View U8) -->
+    <query statement="Select" queryid="SELECT_NEXT_CHAIN_SEQ_MULTI" commandtype="Text" description="Chain 번호 여러 개 한 번에 채번 (시퀀스 CHAIN_SEQ, 행마다 새 번호)" commandtimeout="60">
+        <commandtext><![CDATA[SELECT CHAIN_SEQ.NEXTVAL AS CHAIN_SEQ
+  FROM DUAL
+CONNECT BY LEVEL <= :seq_count]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="Number" size="0">:seq_count</param>
+        </parameters>
+    </query>
+    <query statement="Select" queryid="SELECT_CHAIN_CODE_LIST" commandtype="Text" description="Device 의 Chain 번호 / Code / 이름 / 색 / 저장 상태 (포함 도형 수 계산 없음 - Chain 이 많을 때 목록용)" commandtimeout="120">
+        <commandtext><![CDATA[SELECT C.CHAIN_SEQ, C.CHAIN_CODE, V.CHAIN_NAME, V.COLOR_ARGB,
+       NVL(V.VERSION_STATUS, 'DRAFT') AS VERSION_STATUS,
+       TO_CHAR(NVL(C.UPDATE_TIME, C.CREATE_TIME), 'YYYY-MM-DD HH24:MI:SS') AS UPDATE_TIME
+  FROM TQP_GDS_CHAIN C
+  LEFT JOIN TQP_GDS_CHAIN_VER V
+    ON V.FACTORY = C.FACTORY AND V.DEVICE_ID = C.DEVICE_ID AND V.CHAIN_SEQ = C.CHAIN_SEQ AND V.VERSION_NO = 1
+ WHERE C.FACTORY = :factory
+   AND C.DEVICE_ID = :device_id
+ ORDER BY C.CHAIN_CODE]]></commandtext>
+        <parameters>
+            <param direction="Input" dbtype="VarChar" size="30">:factory</param>
+            <param direction="Input" dbtype="VarChar" size="50">:device_id</param>
+        </parameters>
+    </query>
 </queryxml>

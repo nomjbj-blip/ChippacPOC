@@ -1,7 +1,7 @@
 # 기본 경로의 직접 겹침, 한 단계 밖의 미포함, 분기 후보와 Layer 필터를 검사한다.
 $ErrorActionPreference = 'Stop'
 $exePath = if ($env:CHAIN_PROBE_EXE) { $env:CHAIN_PROBE_EXE }
-    else { Join-Path $PSScriptRoot '..\bin\Debug\NexplantQMS.GdsMap.exe' }
+    else { Join-Path $PSScriptRoot '..\bin\Debug\NexplantQMS.GdsMap.dll' }
 [void][System.Reflection.Assembly]::LoadFrom((Resolve-Path $exePath).Path)
 
 function New-Element([string]$key, [int]$layer, [double]$left, [double]$bottom,

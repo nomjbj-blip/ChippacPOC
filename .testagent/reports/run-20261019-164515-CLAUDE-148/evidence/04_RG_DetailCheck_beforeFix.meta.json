@@ -1,0 +1,26 @@
+﻿{
+    "id":  "04",
+    "name":  "RG_DetailCheck_beforeFix",
+    "scenarios":  [
+                      "RG"
+                  ],
+    "status":  "FAIL",
+    "exitCode":  1,
+    "timedOut":  false,
+    "durationMs":  709,
+    "started":  "2026-10-19 16:51:43",
+    "command":  "python -I -X utf8 \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\probes\\f07data_detail_check.py\" \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\reports\\run-20261019-164515-CLAUDE-148\\evidence\\ui_red_before_fix\" \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\reports\\run-20261019-103914-F07DATA\\evidence\\db\" 4 6",
+    "workingDir":  "D:\\1_프로젝트 문서\\18.스테츠칩팩_POC",
+    "keys":  {
+                 "DETAIL_CHECK_PROBE":  "FAIL (8/9)"
+             },
+    "passLines":  8,
+    "failLines":  [
+                      "FAIL / B7 탭 전환(종합 -\u003e GDS -\u003e KLARF -\u003e E-Test): Defect / E-Test 값 / 종합 표가 첫 행을 저절로 고르지 않음, 상태줄 그대로 / [(\u0027tabDie\u0027, \u0027선택 0\u0027, \u0027도면 조회 완료: OMM_TCB / 도형 173,906\u0027), (\u0027tabGds\u0027, \u0027선택 1\u0027, \u0027도면 조회 완료: OMM_TCB / 도형 173,906\u0027), (\u0027tabKlarf\u0027, \u0027선택 1\u0027, \u0027Defect #442 / GDS (-9287.76, 3789.06) µm / 걸린 Member 0\u0027), (\u0027tabEt\u0027, \u0027선택 1\u0027, \u0027RESISTANCE_IFORCE_8P0MA_TSVDC_BOT1_N_FH / TSVDC_BOT1_N_FH / 값 719 (F)\u0027)]"
+                  ],
+    "skipLines":  [
+
+                  ],
+    "stdout":  "04_RG_DetailCheck_beforeFix.stdout.txt",
+    "stderr":  "04_RG_DetailCheck_beforeFix.stderr.txt"
+}

@@ -58,7 +58,7 @@ internal static class KlarfViewerFormSmoke
             {
                 string analysisMenu = ShownMenu(analysisMap);
                 Console.WriteLine("Context menu (GDS-KLARF Analysis): " + analysisMenu);
-                if (analysisMenu != "Free Zoom / Fit Size / Defect Select / Die Select / - / Center Cross / - / Detail Analysis")
+                if (analysisMenu != "Free Zoom / Fit Size / - / Center Cross / - / Detail Analysis")
                     throw new Exception("Analysis context menu changed: " + analysisMenu);
                 // [Center Cross] (2026-10-13): 연관 분석 Map 은 기본 끔, 누르면 켬
                 var cross = FindMenu(analysisMap, "Center Cross");
@@ -80,7 +80,7 @@ internal static class KlarfViewerFormSmoke
             if (!mouse.Text.Contains("[검사 Die]") || !mouse.Text.Contains("가까운 Defect: ID "))
                 throw new Exception("Mouse info did not reach label");
             int expectX = first.XINDEX - ((Point)map.GetType().GetProperty("IndexOffset").GetValue(map, null)).X;
-            if (!mouse.Text.Contains("Die (KLARF Index): (" + expectX + ","))
+            if (!mouse.Text.Contains("Die: (" + expectX + ","))
                 throw new Exception("Die index under mouse is not the defect die (" + expectX + ")");
 
             // 목록 선택 강조와 Fill 그리기가 예외 없이 동작해야 한다.

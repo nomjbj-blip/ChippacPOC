@@ -1,0 +1,37 @@
+﻿TAB	tabList	tabGds	GDS
+TAB	tabList	tabKlarf	KLARF
+TAB	tabList	tabEt	E-Test
+TAB	tabList	tabDie	종합 (Die)
+TAB	tabGdsResult	tabChain	Chain
+TAB	tabKlarfResult	tabDefect	Defect (472)
+TAB	tabKlarfResult	tabTolerance	허용오차
+TAB	tabKlarfResult	tabImage	Image
+TAB	tabEtResult	tabEtFail	E-Test Fail (149)
+TAB	tabEtResult	tabEtLink	E-Test 연결
+SELECTED_TAB	종합 (Die)
+LEGEND	1 ~ 7   19
+LEGEND	8 ~ 14   12
+LEGEND	15 ~ 21   7
+LEGEND	22 ~ 28   3
+LEGEND	29 이상   2
+LEGEND	기준 미만   8
+LEGEND	Defect 없음   25
+LEGEND	Spec Out Die   25
+LABEL	lblSumGds	GDS · Chain FS · 검사 BS -> 반전
+LABEL	lblSumKlarf	KLARF · Step 1개 · 크기 + 허용오차 5 µm · 보정 (0, 0)
+LABEL	lblSumEt	E-Test · TSVET · 빨간 삼각형 = Spec Out
+LABEL	lblMapBasis	색 = Chain Defect 수
+LABEL	lblStatus	Wafer Key SCKLOTIDA-01 (Step 1개) / GDS OMM_TCB / BACK 보기 (Chain FS · 검사 BS -> 반전) / 크기 + 허용오차 5 µm / Chain 19 / Defect 1122 중 Chain In 472 / E-Test SCKLOTIDA-01 TSVET | 
+LABEL	lblWaferInfo	SCKLOTIDA-01  /  OMM_C4Bump_TCB_FullSilterra  (Product OMM_TCB)
+LABEL	lblDeviceValue	OMM_TCB
+CHECK	rdoFailSpec	Spec Out	True
+CHECK	rdoFailFile	Fail Die	False
+CHECK	chkChainAll	Wafer 전체	False
+CHECK	chkDefectAll	Wafer 전체	False
+COMBO	cboDefectScope	Chain In
+SELECTED_DIE	
+BAND	1	7	#DAF7A6
+BAND	8	14	#FFC300
+BAND	15	21	#FF5733
+BAND	22	28	#C70039
+BAND	29	999	#900C3F

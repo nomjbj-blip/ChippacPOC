@@ -149,5 +149,109 @@ namespace DACrux.SEMDMS.RO
         }
 
         #endregion
+
+        #region [Chain 상세 범위 조회 (2026-10-21)]
+
+        public DataTable GetChainLayersRange(string strFactory, string strDeviceID, string strFromSeq, string strToSeq)
+        {
+            try
+            {
+                return m_OBJ.GetChainLayersRange(strFactory, strDeviceID, strFromSeq, strToSeq);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public DataTable GetChainRulesRange(string strFactory, string strDeviceID, string strFromSeq, string strToSeq)
+        {
+            try
+            {
+                return m_OBJ.GetChainRulesRange(strFactory, strDeviceID, strFromSeq, strToSeq);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public DataTable GetChainMembersRange(string strFactory, string strDeviceID, string strFromSeq, string strToSeq)
+        {
+            try
+            {
+                return m_OBJ.GetChainMembersRange(strFactory, strDeviceID, strFromSeq, strToSeq);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public DataTable GetChainEditsRange(string strFactory, string strDeviceID, string strFromSeq, string strToSeq)
+        {
+            try
+            {
+                return m_OBJ.GetChainEditsRange(strFactory, strDeviceID, strFromSeq, strToSeq);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        #endregion
+
+        #region [Chain 일괄 저장]
+
+        public DataTable CreateChainBulk(string[] aKey, string[,] aChains, string[,] aLayers, string[,] aMembers, string strUpdateUser)
+        {
+            try
+            {
+                return m_OBJ.CreateChainBulk(aKey, aChains, aLayers, aMembers, strUpdateUser);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public DataTable GetChainCodeList(string strFactory, string strDeviceID)
+        {
+            try
+            {
+                return m_OBJ.GetChainCodeList(strFactory, strDeviceID);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public int DeleteChainBulk(string strFactory, string strDeviceID, string[] aChainSeqs, string strUpdateUser)
+        {
+            try
+            {
+                return m_OBJ.DeleteChainBulk(strFactory, strDeviceID, aChainSeqs, strUpdateUser);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public int UpdateChainColorBulk(string strFactory, string strDeviceID, string[] aChainSeqs, string strColorArgb, string strUpdateUser)
+        {
+            try
+            {
+                return m_OBJ.UpdateChainColorBulk(strFactory, strDeviceID, aChainSeqs, strColorArgb, strUpdateUser);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        #endregion
     }
 }

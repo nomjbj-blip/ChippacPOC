@@ -1,6 +1,6 @@
 # Service 연결 전에 도형/바이트 제한과 좌표 복사를 확인하는 독립 실행 검사다.
 $ErrorActionPreference = 'Stop'
-$assemblyPath = Join-Path $PSScriptRoot '..\bin\Debug\NexplantQMS.GdsMap.exe'
+$assemblyPath = Join-Path $PSScriptRoot '..\bin\Debug\NexplantQMS.GdsMap.dll'
 [void][System.Reflection.Assembly]::LoadFrom((Resolve-Path $assemblyPath).Path)
 
 function New-Element([string]$id) {

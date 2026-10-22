@@ -123,7 +123,7 @@ S1 / S2 때문에 "DataService 폴더에 파일을 복사해 자동 적재" 방�
 1. 화면: KLARF 의 `TiffFileName`(1.8 은 `Images` 블록) 이름을 모은다. 찾는 순서 = KLARF 폴더 -> `Defect Images` 하위 폴더 -> 사용자가 지정한 폴더. 찾은 수 / 없는 파일 목록을 미리보기에 표시한다.
 2. 전송: 이미지 파일마다 `AddImage` 1회 (파일 1개 = 호출 1회. 큰 다중 TIFF 도 1개씩 보내 Remoting 메시지 크기를 제한한다).
 3. 서버: 작업 폴더(`KLARF_UPLOAD_WORK_PATH\<UPLOAD_KEY>\`)에 KLARF 와 이미지를 **한 폴더**로 둔다 -> 기존 `ImageMapper` 가 그대로 이미지를 Defect 에 연결한다 (S4 해결, Parser 수정 없음).
-4. 서버: 이미지 저장소 `KLARF_IMAGE_ROOT\yyyy\MM\dd\{LotID}\` (DataService 백업 규칙과 같은 하위 구조, 날짜 = ResultTimestamp) 에 원본 복사 + `ImageManager.SaveThumbnailImage`(썸네일 `thumb_` 접두) / 다중 TIFF 는 `SaveFrameImageAndThumbnail` (HandlerInsp.Backup 187~219행과 같은 함수).
+4. 서버: 이미지 저장소 (**구현: 2026-10-07 `yyyyMMdd(저장일)\{LotID}` -> 2026-10-21 `yyyyMMdd\{Device}\{LotID}`, 썸네일은 업로드 서버가 JPEG 로 직접 생성 - F08 CLAUDE-185**) `KLARF_IMAGE_ROOT\yyyy\MM\dd\{LotID}\` (DataService 백업 규칙과 같은 하위 구조, 날짜 = ResultTimestamp) 에 원본 복사 + `ImageManager.SaveThumbnailImage`(썸네일 `thumb_` 접두) / 다중 TIFF 는 `SaveFrameImageAndThumbnail` (HandlerInsp.Backup 187~219행과 같은 함수).
 5. KLARF 원본도 같은 폴더에 복사한다 (`INSP_FILEPATH` 가 가리키는 위치).
 6. 이미지 파일이 없는 Defect 는 `TQD_IMAGES` 행을 만들지 않는다 (DataService 는 파일이 없어도 행을 만든다. 업로드는 화면에서 빠진 파일을 먼저 보여 주므로 빈 행을 만들 이유가 없다).
 
@@ -236,7 +236,7 @@ S1 / S2 때문에 "DataService 폴더에 파일을 복사해 자동 적재" 방�
 | --- | --- | --- |
 | D1 | 삭제 후 재등록 | 6.4 절대로. 미리보기에서 "등록됨" Wafer 는 저장 전 확인창 -> 기존 STEP 행 삭제 후 저장 |
 | D2 | `TQD_SETUP.SETUP_ID` 를 VARCHAR2(128) 로 확대 | 구현 1단계 전에 DDL 1건 작성 -> 로컬 DB 적용(승인 후). 고객 DB 에도 같은 DDL 필요 (배포 목록에 기록) |
-| D3 | RoughBin 을 Class 로 | 화면 "분류 기준" 기본 RoughBin (CLASSNUMBER = ROUGHBINNUMBER, ROUGHBIN 원값 유지). 선택지 Class(파일 그대로) / FineBin. Class 이름은 자동 등록 안 함 |
+| D3 | ~~RoughBin 을 Class 로~~ **2026-10-15 폐기 -> KLARF 표준** | **2026-10-15 사용자 지시 "표준대로 작업": ClassLookup = CLASSNUMBER 이름표. CLASSNUMBER / ROUGHBIN / FINEBIN 을 파일 값 그대로 저장, 화면 "분류 기준" 삭제 (CLAUDE-112).** 예전 내용: 화면 "분류 기준" 기본 RoughBin (CLASSNUMBER = ROUGHBINNUMBER, ROUGHBIN 원값 유지). 선택지 Class(파일 그대로) / FineBin. Class 이름은 자동 등록 안 함 |
 | D4 | **FTP 상대 경로** (권장안과 다름) | 6.3 절 아래 "D4 반영" 참고 |
 | D5 | (미질의) | 권장안 (1) 신규 화면으로 진행. 다르게 원하면 구현 3단계 전에 변경 |
 

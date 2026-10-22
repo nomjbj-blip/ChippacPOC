@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
 
@@ -31,14 +30,9 @@ namespace DACrux.SEMDMS.ENGUI
 
             try
             {
-                using (DACrux.SEMDMS.Control.BusyCursor.Show(this)) // GDS EXE 읽기 + 화면 만들기 동안 모래시계 커서 (2026-10-15)
+                using (DACrux.SEMDMS.Control.BusyCursor.Show(this)) // GDS DLL 읽기 + 화면 만들기 동안 모래시계 커서 (2026-10-15)
                 {
-                    string assemblyPath = Path.Combine(Application.StartupPath,
-                        "GdsMap", "NexplantQMS.GdsMap.exe");
-                    if (!File.Exists(assemblyPath))
-                        throw new FileNotFoundException("GDS Map 실행 파일을 찾을 수 없습니다.", assemblyPath);
-
-                    Assembly assembly = Assembly.LoadFrom(assemblyPath);
+                    Assembly assembly = GdsMapAssembly.Load();
                     Type formType = assembly.GetType("NexplantQMS.GdsMap.GdsMapViewForm", true);
                     gdsForm = Activator.CreateInstance(formType, new object[] { true }) as Form;
                     if (gdsForm == null)

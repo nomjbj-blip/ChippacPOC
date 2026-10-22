@@ -1,0 +1,7 @@
+﻿PASS / M1 [E-Test] 기준 = "Map E-Test 표식" + 체크 2개 Spec Out / Fail Die (결과 파일), 기본 둘 다 켬 / {'lblFailMark': 'Map E-Test 표식'} / {'chkMarkSpec': ('Spec Out', 'True'), 'chkMarkFile': ('Fail Die (결과 파일)', 'True')}
+PASS / M2 둘 다 켬: Spec Out 표식 Die = DIE.ET_STATE F 25 / Fail Die 표식 Die = DIE.ET_FILE_FLAG F 73 (리터럴 25 / 73) / 화면 25 / 73
+PASS / M3 색 구간 팝업 표 끝 2행 = Spec Out Die n / Fail Die (결과 파일) n / [('Spec Out Die', '25'), ('Fail Die (결과 파일)', '73')]
+PASS / M4 체크 끄고 켜기: Fail Die 끔 -> Spec Out 만 / 둘 다 끔 -> 표식 · 행 없음 / Fail Die 만 / 다시 둘 다 (표식 Die 와 표 행이 같이 바뀜) / 다른 단계 []
+FAIL / M5 상태줄(Die 위 마우스): E-Test Spec Out / Spec 통과 (Fail Chain, 일치) · 결과 파일 Fail Die / Pass, E-Test 없는 Die 는 E-Test 문구 없음 (3 종류) / 다른 Die [('12', '5', '', '', 'ect 1122 중 Chain In 374 / E-Test SCKLOTIDA-01 TSVET | Die (12, 5) Defect 전체 48 / Chain In 21 / Chain Out 27 / 걸린 Chain 8')] / 예 [' In 23 / Chain Out 23 / 걸린 Chain 8 / E-Test Spec Out (Fail Chain 4, 일치 3) · 결과 파일 Fail Die', 'n In 22 / Chain Out 23 / 걸린 Chain 4 / E-Test Spec 통과 (Fail Chain 0, 일치 0) · 결과 파일 Fail Die']
+
+MARK_CHECK_PROBE=FAIL (4/5)

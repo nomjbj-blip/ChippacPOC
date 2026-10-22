@@ -81,6 +81,8 @@ DMS 호스트 모드에서 상단에 Factory / Device / Revision 입력과 `DB �
 
 **2026-10-20 U8 Label 표시 크기 설계(CLAUDE-162, 설계만):** U8 은 Bump 한 자리에 Label 4 ~ 6개(핀 번호 TEXTTYPE 3 + Net 이름 4, 2벌)가 겹쳐 같은 좌표 3개 이상이면 간격 0 -> 화면 크기 기준 -> 64px(69,084개)이 된다. 같은 좌표 건너뛰기(D1) / 사본 1개(D2) / 같은 자리 줄 나눔(D3) / 대표 간격 상한(D4) / 이름 길이 차이 2배 이내(D5) 설계, OMM 은 시뮬레이션 픽셀 차이 0. D3 / D5 사용자 결정 대기, 구현은 CLAUDE-163 뒤. [U8 Label 표시 크기 설계](../../../문서/설계/02_GDS/2026-10-20_U8_Label_표시크기_설계.md).
 
+**2026-10-20 Label 글자 크기 = 배율마다 화면 전체 하나(CLAUDE-162 구현):** Label 마다 이웃 거리로 크기를 정하던 규칙을 바꿨다. 켜진 Label 키(Layer + TEXTTYPE)마다 대표 칸(간격 중앙값) 40% 에 보통 이름이 들어가는 크기를 구해 그중 최소를 모든 Label 에 쓴다(최대 64px, 6px 미만이면 안 보임). 같은 좌표 건너뛰기 / 같은 내용 사본 제외 / 같은 자리 여러 글자는 줄 나눔(이름 위 / 번호형 아래). 계산은 `LayoutTextLabels`(Probe `GdsLabelLayoutProbe.ps1` PASS 16). OMM 은 같은 Label 이 보이고 크기만 1종으로 맞춰진다. U8 Layer 18 은 TEXTTYPE 3 = C4 자리 핀 번호 + Net, 4 = TSV 자리 Net 이라 핀 번호만 따로 끌 수 없다. 배포 / 화면 확인 대기.
+
 ## GDS Map 조회 화면 레이아웃 (2026-10-12 CLAUDE-056)
 
 - 위 도구 막대 한 줄 / Chain 작업 줄(도면 조회 뒤) / 오른쪽 탭 [Chain] [Layer] / 도면 우클릭 메뉴. Map 정보 Label 제거(Device 콤보 툴팁).
@@ -130,3 +132,4 @@ DMS 호스트 모드에서 상단에 Factory / Device / Revision 입력과 `DB �
 **2026-10-20 U8 대응 구현(CLAUDE-158):** 파일을 열면 펼친 도형이 가장 많은 최상위 Cell 을 그린다(`GdsLibrary.GetTopStructures`), Setup 화면 [Cell] 목록으로 다른 최상위 Cell(예 U8 `TOP`)을 골라 펼치고 그 Cell 로 DB 저장. 그리기 버퍼는 Layer 별 VAO / VBO / EBO + 12바이트 정점 + 인덱스 채우기 + Layer 일괄 그리기(`LayerGpuBuffer`). 평행 이동은 GDI+ 와 비트 단위로 같은 직접 계산, 펼친 뒤 한 번 정렬 -> 펼친 결과(배치 ID / 좌표) 해시가 이전과 같다(`Probes/GdsPlacedHashProbe.ps1`). U8 제품 Cell 18초 / 다시 그리기 0.5~1초(남은 과제).
 
 **2026-10-20 Layer = 번호 + DataType(CLAUDE-163):** KLayout 처럼 Layer 를 (번호, DataType)으로 나눈다. TEXT 는 TEXTTYPE 을 DataType 자리에 쓴다(U8 Layer 18 = `18/0` 도형 / `18/3` 핀 번호 Label / `18/4` Net 이름 Label). 키 `Gds/GdsLayerKey.cs`(번호 x 65536 + DataType, 정수 순서 = 번호 -> DataType 순서), 화면 표시 `Layer 18/3`. Layer 목록 / 색 / 표시 / 도형 수 / GPU Layer 버퍼 / Label 표시 / 저장 필터가 키를 쓰고, `GlSceneItem.LayerID` / `MapPlacedElementData.LayerId` 는 GDS 번호 그대로. 기본 색은 번호 색에서 DataType 만큼 이동. U8 제품 Cell Layer 17개가 KLayout 목록과 같다(합계 1,817,538 그대로). Probe 해시 기준값은 방문 순서 / TEXT DataType 만 바뀌어 새 값으로 바꿈. 설계 `문서/설계/02_GDS/2026-10-20_U8_GDS_로딩_원인분석_설계.md` 9절. 배포(GdsMap EXE, 서버 / DDL 과 함께) / DMS 화면 확인 대기.
+- 2026-10-20 CLAUDE-164: GDS Setup / View 화면 Layer 목록 체크는 **왼쪽 체크 박스를 눌렀을 때만** 바뀐다(공용 `LayerColorCheckedListBox.CheckOnCheckBoxOnly`). 행 글자 클릭 / 더블클릭 / Space 는 행 선택만. Chain / 유사 묶음 목록은 더블클릭 방식 그대로. 배포(GdsMap EXE) / DMS 화면 확인 대기.

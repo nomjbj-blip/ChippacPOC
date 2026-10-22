@@ -60,15 +60,13 @@ namespace NexplantQMS.GdsMap
             UpdateChainSelectionButtons();
         }
 
-        /// <summary>단자 보호 묶음의 체크를 막고 나머지 체크 변경은 확정 버튼에 반영한다. 체크는 더블클릭으로만 바뀐다(2026-10-13).</summary>
+        /// <summary>
+        /// 단자 보호 묶음의 체크를 막고 나머지 체크 변경은 확정 버튼에 반영한다.
+        /// 체크는 행 왼쪽 체크 박스를 눌렀을 때만 바뀐다(2026-10-21, 목록 CheckOnCheckBoxOnly). 행 클릭은 위치 이동만 한다.
+        /// </summary>
         private void ChainSimilarList_ItemCheck(object sender, ItemCheckEventArgs e)
         {
             if (_updatingChainSimilarList || e.Index < 0) return;
-            if (!_chainCheckByDoubleClick)
-            {
-                e.NewValue = e.CurrentValue;
-                return;
-            }
             var item = (ChainSimilarListItem)_chainSimilarList.Items[e.Index];
             if (item.Group.IsProtected && e.NewValue == CheckState.Checked)
             {
@@ -77,12 +75,6 @@ namespace NexplantQMS.GdsMap
             }
             if (IsHandleCreated)
                 BeginInvoke(new Action(UpdateChainSelectionButtons));
-        }
-
-        /// <summary>유사 묶음 행을 더블클릭하면 제외 체크를 바꾼다. 한 번 클릭은 위치 이동만 한다(2026-10-13).</summary>
-        private void ChainSimilarList_MouseDoubleClick(object sender, MouseEventArgs e)
-        {
-            ToggleCheckByDoubleClick(_chainSimilarList, e);
         }
 
         /// <summary>결과 행을 고르면 해당 묶음을 강조하고 화면 중심으로 이동한다.</summary>

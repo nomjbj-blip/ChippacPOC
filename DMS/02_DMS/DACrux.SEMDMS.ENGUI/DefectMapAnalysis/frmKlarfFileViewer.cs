@@ -410,7 +410,7 @@ namespace DACrux.SEMDMS.ENGUI
 
             // 핵심 항목만 2줄(2026-10-15): Wafer 좌표 / Die Index / 검사 여부 / Die Defect 수, 가까운 Defect
             lblMouse.Text = string.Format(CultureInfo.InvariantCulture,
-                "Wafer X={0:#,0.0}, Y={1:#,0.0} um{2}   |   Die (KLARF Index): ({3}, {4})  {5}   |   Die Defect {6}개\r\n가까운 Defect: {7}",
+                "Wafer X={0:#,0.0}, Y={1:#,0.0}{2}   |   Die: ({3}, {4})  {5}   |   Die Defect {6}개\r\n가까운 Defect: {7}",
                 e.X, e.Y, onWafer ? "" : " (Wafer 밖)",
                 dieX, dieY, sampleDies.Contains(new Point(mapX, mapY)) ? "[검사 Die]" : "[미검사]",
                 dieDefects, DescribeNearDefect(e.Screen));

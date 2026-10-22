@@ -8,8 +8,10 @@
 #  3) 샘플: SampleFile\26_10_06 Sample File\CAI_OMM_ATV_A0_TSVET_20260609161940_RH-HS2615_RH-HS2615-02.xlsx / 고객 Spec 표 Verification\EtSpecTable_U9_20261012.txt
 #  4) 시험 데이터: FACTORY=PROBE / E-Test Device OMM(파일명) / 업로드 Slot 4 / GDS Device = 시험 Map LAYER_FILTER_PROBE 를 E-Test Device 이름(OMM)으로 복사한 Map (시험 Chain ZZETU*, 2026-10-15). 끝나면 지운다.
 #  5) 결과 화면 이미지: %TEMP%\ChippacEtParaSetupVerification\para.png (설정 화면) / para_register.png (등록 화면)
-# 실행: powershell -NoProfile -ExecutionPolicy Bypass -File Verify-EtParaSetup.ps1 [-Keep]
-param([switch]$Keep)
+#  6) DB 연결 이름(2026-10-21): 서버 config 의 DMS / TEST / QMS_CONNECT_ID 가 고객 DB(예: CPKMESDV)로 바뀌어 있어도 Smoke 설정에는 -ConnectId(기본 DMSMGR = 로컬)를 넣는다.
+#     Smoke 는 시험 데이터를 만들고 지우므로 고객 DB 에서 돌면 안 된다.
+# 실행: powershell -NoProfile -ExecutionPolicy Bypass -File Verify-EtParaSetup.ps1 [-Keep] [-ConnectId DMSMGR]
+param([switch]$Keep, [string]$ConnectId = 'DMSMGR')
 $ErrorActionPreference = 'Stop'
 $projectDir = Split-Path $PSScriptRoot -Parent
 $dmsDir = Split-Path (Split-Path $projectDir -Parent) -Parent
@@ -68,6 +70,12 @@ if ($LASTEXITCODE -ne 0) { throw 'Smoke 빌드 실패' }
 [xml]$x = Get-Content (Join-Path $serverBin 'DACrux.SEMDMS.Service.exe.config') -Encoding UTF8
 $remoting = $x.configuration.'system.runtime.remoting'
 if ($remoting) { [void]$x.configuration.RemoveChild($remoting) }
+$connectKeys = @($x.configuration.appSettings.add | Where-Object { $_.key -in 'DMS_CONNECT_ID', 'TEST_CONNECT_ID', 'QMS_CONNECT_ID' })
+if ($connectKeys.Count -eq 0) { throw 'Service config 에 DMS_CONNECT_ID 가 없습니다.' }
+foreach ($k in $connectKeys) {
+    if ($k.value -ne $ConnectId) { Write-Output "DB 연결 이름: $($k.key) $($k.value) -> $ConnectId (Smoke 설정만, 서버 config 는 그대로)" }
+    $k.value = $ConnectId
+}
 $x.Save("$out\EtParaSetupSmoke.exe.config")
 
 $sample = Join-Path $rootDir 'SampleFile\26_10_06 Sample File\CAI_OMM_ATV_A0_TSVET_20260609161940_RH-HS2615_RH-HS2615-02.xlsx'

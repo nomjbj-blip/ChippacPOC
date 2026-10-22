@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+  DACrux SCK POC 클라이언트 Setup 만들기 프로젝트 (2026-10-21).
+  VS 에서 이 프로젝트를 빌드(또는 다시 빌드)하면 같은 폴더의 Make-ClientSetup.ps1 을 실행한다.
+    1) DMS 를 %TEMP%\chippac\setup_build\<버전> 에 복사해 솔루션을 다시 빌드 (운영 100_ClientBin / 101_ServerBin / 71_CoreLib 은 바뀌지 않음)
+    2) stage 검사 -> Inno Setup 으로 Setup 생성 -> DMS\104_ClientSetup\<버전>\
+    3) 자동 검사 (SetupSettings.props 의 SetupVerify)
+  설정(서버 주소 기본값 / 버전 / .NET 포함 등)은 SetupSettings.props 에서 바꾼다.
+  솔루션 빌드 구성은 VS 도구 막대에서 고른 Debug / Release 를 따른다(SetupSettings.props 의 SetupConfiguration 으로 고정 가능, 2026-10-21).
+  메인 솔루션을 빌드할 때마다 Setup 이 만들어지지 않도록 별도 솔루션(DACrux_SCK_Setup.sln)에만 넣는다.
+  C# 코드는 없고 Build 대상만 Setup 만들기로 바꾼다. 중간 파일은 %TEMP%\chippac\setup_project 로 보낸다.
+-->
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <BaseIntermediateOutputPath>$(TEMP)\chippac\setup_project\obj\</BaseIntermediateOutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <OutputPath>SetupFile\</OutputPath>
+  </PropertyGroup>
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{CF1B14D7-5837-44D2-AADF-E72B254D76AD}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>DACrux.SCK.Setup</RootNamespace>
+    <AssemblyName>DACrux.SCK.Setup</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <OutputPath>$(TEMP)\chippac\setup_project\bin\</OutputPath>
+    <!-- 소스 파일이 없어 VS 가 "최신 상태" 로 보고 건너뛰지 않도록 빌드할 때마다 실행한다 -->
+    <DisableFastUpToDateCheck>true</DisableFastUpToDateCheck>
+  </PropertyGroup>
+  <Import Project="SetupSettings.props" />
+  <ItemGroup>
+    <None Include="SetupSettings.props" />
+    <None Include="Make-ClientSetup.ps1" />
+    <None Include="Build-ClientSetup.ps1" />
+    <None Include="Inspect-ClientStage.ps1" />
+    <None Include="Verify-ClientSetup.ps1" />
+    <None Include="DACrux_SCK_POC_Client.iss" />
+    <None Include="ClientSetup.exclude.txt" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- 빌드 = Setup 만들기 (C# 컴파일 없음) -->
+  <Target Name="Build">
+    <PropertyGroup>
+      <!-- 설정에 구성이 없으면 VS 에서 고른 구성(Debug / Release)을 쓴다 -->
+      <_SetupConfig>$(SetupConfiguration)</_SetupConfig>
+      <_SetupConfig Condition="'$(_SetupConfig)' == ''">$(Configuration)</_SetupConfig>
+      <_SetupArgs>-ServerIP "$(SetupServerIP)" -Configuration $(_SetupConfig)</_SetupArgs>
+      <_SetupArgs Condition="'$(SetupVersion)' != ''">$(_SetupArgs) -Version "$(SetupVersion)"</_SetupArgs>
+      <_SetupArgs Condition="'$(SetupVerify)' != 'true'">$(_SetupArgs) -NoVerify</_SetupArgs>
+      <_SetupArgs Condition="'$(SetupNoDotNet)' == 'true'">$(_SetupArgs) -NoDotNet</_SetupArgs>
+      <_SetupArgs Condition="'$(SetupNoPdb)' == 'true'">$(_SetupArgs) -NoPdb</_SetupArgs>
+      <_SetupArgs Condition="'$(SetupNoServerBundle)' == 'true'">$(_SetupArgs) -NoServerBundle</_SetupArgs>
+      <_SetupArgs Condition="'$(SetupOpenFolder)' == 'true'">$(_SetupArgs) -OpenFolder</_SetupArgs>
+      <_SetupArgs Condition="'$(SetupShowWarnings)' == 'true'">$(_SetupArgs) -ShowWarnings</_SetupArgs>
+      <_SetupArgs Condition="'$(SetupExtraArgs)' != ''">$(_SetupArgs) $(SetupExtraArgs)</_SetupArgs>
+    </PropertyGroup>
+    <Error Condition="'$(_SetupConfig)' != 'Debug' and '$(_SetupConfig)' != 'Release'" Text="SetupConfiguration 은 Debug 또는 Release 입니다: $(_SetupConfig)" />
+    <Message Importance="high" Text="Setup 만들기 시작 (복사본 빌드 + 자동 검사로 몇 분 걸림): 빌드 구성 $(_SetupConfig) / 서버 주소 기본값 $(SetupServerIP)" />
+    <Exec Command="powershell.exe -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)\Make-ClientSetup.ps1&quot; $(_SetupArgs)" WorkingDirectory="$(MSBuildProjectDirectory)" EchoOff="true" StandardOutputImportance="high" StandardErrorImportance="high" StdOutEncoding="utf-8" StdErrEncoding="utf-8" IgnoreStandardErrorWarningFormat="true" CustomErrorRegularExpression="^CLIENT_SETUP=FAIL" />
+  </Target>
+  <Target Name="Rebuild" DependsOnTargets="Build" />
+  <!-- 정리(Clean)는 만든 Setup 을 지우지 않는다 -->
+  <Target Name="Clean" />
+</Project>

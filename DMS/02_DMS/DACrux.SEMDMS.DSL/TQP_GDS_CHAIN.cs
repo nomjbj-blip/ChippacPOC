@@ -81,6 +81,19 @@ namespace DACrux.SEMDMS.DSL
                 throw ex;
             }
         }
+
+        /// <summary>여러 Chain 을 한 번에 지운다(ExecuteMultiple 1회, 2026-10-20 일괄 저장 실패 정리 / 일괄 삭제).</summary>
+        public void DeleteExecuteMultiple(string sqlName, string[,] paras)
+        {
+            try
+            {
+                this.ExecuteMultiple(sqlName, null, paras);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
         #endregion
 
         #region [Common Update]

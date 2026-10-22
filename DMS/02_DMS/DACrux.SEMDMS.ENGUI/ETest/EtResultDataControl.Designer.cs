@@ -214,7 +214,7 @@
             // 
             // colDMap
             // 
-            this.colDMap.HeaderText = "Map (X,Y)";
+            this.colDMap.HeaderText = "Map";
             this.colDMap.MinimumWidth = 8;
             this.colDMap.Name = "colDMap";
             this.colDMap.ReadOnly = true;
@@ -246,7 +246,7 @@
             // 
             // colDFlag
             // 
-            this.colDFlag.HeaderText = "DUT Flag(참고)";
+            this.colDFlag.HeaderText = "DUT Flag";
             this.colDFlag.MinimumWidth = 8;
             this.colDFlag.Name = "colDFlag";
             this.colDFlag.ReadOnly = true;
@@ -308,7 +308,7 @@
             // colVXY
             // 
             this.colVXY.DataPropertyName = "XY";
-            this.colVXY.HeaderText = "(X,Y)";
+            this.colVXY.HeaderText = "X,Y";
             this.colVXY.MinimumWidth = 8;
             this.colVXY.Name = "colVXY";
             this.colVXY.ReadOnly = true;

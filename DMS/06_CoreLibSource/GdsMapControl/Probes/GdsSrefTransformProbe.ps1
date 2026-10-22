@@ -8,7 +8,7 @@
 #      (도형 수 / 읽기 중복 수 / 배치 ID + 좌표 + 폭 + Bounds + 문자열 SHA-256)
 # 기대 좌표는 같은 합성 GDS 를 KLayout 0.30.12 로 펼친 값이다. 합성 GDS 는 이 스크립트가 만든다.
 # 화면은 띄우지 않고 DB / Service 를 쓰지 않는다.
-# 실행: powershell -NoProfile -STA -ExecutionPolicy Bypass -File GdsSrefTransformProbe.ps1 -GdsExe <빌드한 NexplantQMS.GdsMap.exe> [-SampleGds <경로>]
+# 실행: powershell -NoProfile -STA -ExecutionPolicy Bypass -File GdsSrefTransformProbe.ps1 -GdsExe <빌드한 NexplantQMS.GdsMap.dll> [-SampleGds <경로>]
 param(
     [Parameter(Mandatory = $true)][string]$GdsExe,
     [string]$SampleGds = ''

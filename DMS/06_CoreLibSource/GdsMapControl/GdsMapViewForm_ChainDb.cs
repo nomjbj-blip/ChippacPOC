@@ -74,7 +74,7 @@ namespace NexplantQMS.GdsMap
             int unsaved = CountUnsavedChains();
             if (unsaved == 0) return true;
             return MessageBox.Show(this, "저장하지 않은 Chain 변경이 " + unsaved + "건 있습니다(새 Chain / 수정 / 삭제 대기).\r\n\r\n"
-                    + action + "하면 변경 내용이 사라집니다. 계속하시겠습니까?\r\n(저장하려면 [아니오] 후 [Chain 저장(DB)])",
+                    + action + "하면 변경 내용이 사라집니다. 계속하시겠습니까?\r\n(저장하려면 [아니오] 후 [Chain 저장])",
                 "저장하지 않은 Chain", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.Yes;
         }
 

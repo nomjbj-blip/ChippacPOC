@@ -1,0 +1,27 @@
+﻿{
+    "id":  "08b",
+    "name":  "RG_Etest",
+    "scenarios":  [
+                      "RG"
+                  ],
+    "status":  "FAIL",
+    "exitCode":  1,
+    "timedOut":  false,
+    "durationMs":  1737,
+    "started":  "2026-10-19 11:08:26",
+    "command":  "python -X utf8 \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\probes\\f07data_etest_check.py\" \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\SampleFile\\26_10_14 Sample File\\CAI_OMMTCB_ATV_A0_TSVET_20261002161846_SCKLOTIDA_SCKLOTIDA-01$Silterra$.xlsx\" C:\\Users\\USER\\AppData\\Local\\Temp\\claude\\D--1---------18-------POC\\957adbdd-9676-41cc-8e41-8662274edcca\\scratchpad\\verify\\db_mut \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\SampleFile\\U9_Die좌표_대응표_20261012.tsv\" 7 5",
+    "workingDir":  "D:\\1_프로젝트 문서\\18.스테츠칩팩_POC",
+    "keys":  {
+                 "ETEST_CHECK_PROBE":  "FAIL (7/9)"
+             },
+    "passLines":  7,
+    "failLines":  [
+                      "FAIL / E2 Wafer: DB WAFER_ID(파일 이름 Lot-Wafer No) = 내용의 Wafer ID 열 / DB SCKLOTIDA-01(LOT SCKLOTIDA, SLOT 1) / 내용 {\u0027U9-HS2635-01\u0027: 73} -\u003e 이 파일은 내용상 다른 Wafer 의 E-Test",
+                      "FAIL / E5 측정 값: 저장 항목 85 x DUT 73 = 6205 값이 원본 칸과 같음(HEADER_TEXT 로 열 찾기) / 열 못 찾음 [] / 다른 값 1 예 [(1, \u0027Connectivity_iforce=8.0mA@TSVDC_TR_FH\u0027, 5.75, \u00276.75\u0027, \u0027V\u0027)] / DB 값 6205 / VALUE_COUNT 6205"
+                  ],
+    "skipLines":  [
+
+                  ],
+    "stdout":  "08b_RG_Etest.stdout.txt",
+    "stderr":  "08b_RG_Etest.stderr.txt"
+}

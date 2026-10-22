@@ -144,7 +144,7 @@ namespace DACrux.TEST.DSL
 
             foreach (string tableName in tableNames)
             {
-                string query = String.Format("SELECT * FROM DMSMGR.{0} WHERE 1=2", tableName);
+                string query = String.Format("SELECT * FROM {0} WHERE 1=2", tableName);
 
                 DataTable dt = GetDataTable("EXECUTE", new string[] { query }, null);
                 dt.TableName = tableName;
@@ -167,7 +167,7 @@ namespace DACrux.TEST.DSL
 
             foreach (string tableName in tableNames)
             {
-                string query = String.Format("SELECT * FROM DMSMGR.{0} WHERE WAFER_SEQ = '{1}'", tableName, waferseq);
+                string query = String.Format("SELECT * FROM {0} WHERE WAFER_SEQ = '{1}'", tableName, waferseq);
 
                 dt = GetDataTable("EXECUTE", new string[] { query }, null);
                 dt.TableName = tableName;
@@ -199,7 +199,7 @@ namespace DACrux.TEST.DSL
             StringBuilder sb = new StringBuilder();
             sb.AppendFormat(
 @"
-CREATE TABLE DMSMGR.{0}
+CREATE TABLE {0}
 (
 WAFER_SEQ     NUMBER,
 DIE_NUM       NUMBER,
@@ -213,16 +213,17 @@ DIEPROBE_CNT  NUMBER,
 
             // 쉼표 제거
             sb.Remove(sb.Length - 1, 1);
-            sb.AppendLine(") TABLESPACE " + TABLESPACE_DATA);
+            sb.Append(")");
 
-            ExecuteNonQuery("EXECUTE", new string[] { sb.ToString() }, null);
+            // 테이블스페이스가 없는 DB(ORA-00959)면 그 절 없이 사용자 기본 테이블스페이스에 만든다 (2026-10-22)
+            ExecuteWithTablespace(sb.ToString() + " TABLESPACE " + TABLESPACE_DATA, sb.ToString());
         }
 
         private void AppendColumnAtTDTable(string tableName, List<string> columnList)
         {
             StringBuilder sb = new StringBuilder();
 
-            sb.AppendFormat(@"ALTER TABLE DMSMGR.{0} ADD (", tableName);
+            sb.AppendFormat(@"ALTER TABLE {0} ADD (", tableName);
 
             foreach (string column in columnList)
             {
@@ -238,18 +239,54 @@ DIEPROBE_CNT  NUMBER,
 
         private void CreateTDPrimaryKey(string tableName)
         {
-            StringBuilder sb = new StringBuilder();
-
-            sb.Append(String.Format(
+            string withTablespace = String.Format(
 @"
-ALTER TABLE DMSMGR.{0} ADD (
+ALTER TABLE {0} ADD (
 PRIMARY KEY
 (WAFER_SEQ, DIE_NUM)
 USING INDEX
 TABLESPACE {1})
-", tableName, TABLESPACE_INDEX));
+", tableName, TABLESPACE_INDEX);
+            string withoutTablespace = String.Format(
+@"
+ALTER TABLE {0} ADD (
+PRIMARY KEY
+(WAFER_SEQ, DIE_NUM))
+", tableName);
 
-            ExecuteNonQuery("EXECUTE", new string[] { sb.ToString() }, null);
+            // 인덱스 테이블스페이스가 없는 DB(ORA-00959)면 PK 인덱스를 사용자 기본 테이블스페이스에 만든다 (2026-10-22)
+            ExecuteWithTablespace(withTablespace, withoutTablespace);
+        }
+
+        /// <summary>
+        /// 테이블스페이스를 지정한 DDL 을 실행하고, 그 테이블스페이스가 없는 DB(ORA-00959)면 테이블스페이스 없이 다시 실행한다(사용자 기본 테이블스페이스).
+        /// 2026-10-22: 고객 DB TRAINING 에 TS_TEST_TBL / TS_TEST_IDX 가 아직 없어 E-Test 업로드 YMS 반영의 TD_* 생성이 실패하던 문제.
+        /// 테이블스페이스가 있는 DB 는 지금과 같다. 나중에 테이블스페이스를 만들면 DB 스크립트(tablespace_apply)가 TD_* 를 그 테이블스페이스로 옮긴다.
+        /// 다른 오류는 그대로 던진다.
+        /// </summary>
+        private void ExecuteWithTablespace(string sqlWithTablespace, string sqlWithoutTablespace)
+        {
+            try
+            {
+                ExecuteNonQuery("EXECUTE", new string[] { sqlWithTablespace }, null);
+            }
+            catch (Exception ex)
+            {
+                if (!IsMissingTablespace(ex))
+                    throw;
+                ExecuteNonQuery("EXECUTE", new string[] { sqlWithoutTablespace }, null);
+            }
+        }
+
+        /// <summary>ORA-00959(테이블스페이스 없음)인지. 미들웨어가 감싼 예외도 안쪽까지 본다.</summary>
+        private static bool IsMissingTablespace(Exception ex)
+        {
+            for (Exception e = ex; e != null; e = e.InnerException)
+            {
+                if (e.Message.IndexOf("ORA-00959", StringComparison.Ordinal) >= 0)
+                    return true;
+            }
+            return false;
         }
 
 //            // 쉼표 제거

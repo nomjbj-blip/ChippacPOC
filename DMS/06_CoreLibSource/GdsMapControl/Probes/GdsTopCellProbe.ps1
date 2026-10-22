@@ -1,14 +1,14 @@
 ﻿# 최상위 Cell 선택 검증 (2026-10-20). 설계: 문서/설계/02_GDS/2026-10-20_U8_GDS_로딩_원인분석_설계.md D1
 # 확인: GdsLibrary.GetTopStructures / GetDefaultTopStructureName 이 첫 Structure 가 하위 Cell 인 U8 파일에서 제품 Cell 을 고르고,
 #       최상위 Cell 이 하나인 기존 파일은 지금과 같은 Cell 을 고르는지. 펼친 도형 수가 원본 레코드 분석 값(완전 중복 제외)과 같은지.
-# 실행: powershell -NoProfile -ExecutionPolicy Bypass -File GdsTopCellProbe.ps1 [-BinDir <NexplantQMS.GdsMap.exe 폴더>]
+# 실행: powershell -NoProfile -ExecutionPolicy Bypass -File GdsTopCellProbe.ps1 [-BinDir <NexplantQMS.GdsMap.dll 폴더>]
 param([string]$BinDir = '')
 if ($BinDir -eq '') { $BinDir = Join-Path (Resolve-Path (Join-Path $PSScriptRoot '..\..\..')).Path '100_ClientBin\GdsMap' }
 $ErrorActionPreference = 'Stop'
 $root = (Resolve-Path (Join-Path $PSScriptRoot '..\..\..\..\SampleFile')).Path
 $work = Join-Path $env:TEMP 'chippac\topcellprobe'
 New-Item -ItemType Directory -Force $work | Out-Null
-Copy-Item (Join-Path $BinDir 'NexplantQMS.GdsMap.exe') (Join-Path $work 'NexplantQMS.GdsMap.dll') -Force
+Copy-Item (Join-Path $BinDir 'NexplantQMS.GdsMap.dll') (Join-Path $work 'NexplantQMS.GdsMap.dll') -Force
 foreach ($d in 'OpenTK.dll', 'OpenTK.GLControl.dll') { Copy-Item (Join-Path $BinDir $d) $work -Force }
 foreach ($d in 'OpenTK.dll', 'OpenTK.GLControl.dll', 'NexplantQMS.GdsMap.dll') { [void][Reflection.Assembly]::LoadFrom((Join-Path $work $d)) }
 $results = New-Object Collections.Generic.List[string]

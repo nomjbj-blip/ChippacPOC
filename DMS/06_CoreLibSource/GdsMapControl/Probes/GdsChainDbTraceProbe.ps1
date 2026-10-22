@@ -4,7 +4,7 @@
 #       같은 Input / Layer / 격자로 TraceChainCandidate를 실행해 방문 / 후보 도형 ID 집합을 비교한다.
 #       또한 두 화면을 생성해 Designer 구성이 실행 시 오류 없이 만들어지는지(Setup에 Chain 컨트롤 없음 / View에 있음) 확인한다.
 # 전제: FACTORY=PROBE / DEVICE_ID=LAYER_FILTER_PROBE READY Map(Layer 1, 2, 6)이 있어야 한다(GdsImportLayerFilterProbe.ps1 -Keep).
-# 실행: powershell -NoProfile -ExecutionPolicy Bypass -File GdsChainDbTraceProbe.ps1 -GdsExe <빌드한 NexplantQMS.GdsMap.exe> [-GdsPath 경로]
+# 실행: powershell -NoProfile -ExecutionPolicy Bypass -File GdsChainDbTraceProbe.ps1 -GdsExe <빌드한 NexplantQMS.GdsMap.dll> [-GdsPath 경로]
 param(
     [Parameter(Mandatory = $true)][string]$GdsExe,
     [string]$GdsPath = '',

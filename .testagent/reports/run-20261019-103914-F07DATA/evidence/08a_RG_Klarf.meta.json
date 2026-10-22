@@ -1,0 +1,28 @@
+﻿{
+    "id":  "08a",
+    "name":  "RG_Klarf",
+    "scenarios":  [
+                      "RG"
+                  ],
+    "status":  "FAIL",
+    "exitCode":  1,
+    "timedOut":  false,
+    "durationMs":  637,
+    "started":  "2026-10-19 11:08:25",
+    "command":  "python -I -X utf8 \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\probes\\f07data_klarf_check.py\" \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\SampleFile\\26_10_14 Sample File\\TEST.SINF\" C:\\Users\\USER\\AppData\\Local\\Temp\\claude\\D--1---------18-------POC\\957adbdd-9676-41cc-8e41-8662274edcca\\scratchpad\\verify\\db_mut",
+    "workingDir":  "D:\\1_프로젝트 문서\\18.스테츠칩팩_POC",
+    "keys":  {
+                 "KLARF_CHECK_PROBE":  "FAIL (9/12)"
+             },
+    "passLines":  9,
+    "failLines":  [
+                      "FAIL / K5b 원본 파일 Summary NDEFECT 와 DefectList 줄 수(파일 자체 일관성) / Summary {3: 1098, 80: 0} / DefectList TEST 분포 {\u00273\u0027: 1122}",
+                      "FAIL / K6 Defect 값 11개 열(XREL / YREL / XSIZE / YSIZE / DEFECTAREA / DSIZE / CLASS / TEST / CLUSTER / ROUGHBIN / FINEBIN) 1122건 1:1 (소수 2자리) / 다른 값 {\u0027XREL\u0027: 1} 예 {\u0027XREL\u0027: (\u00271\u0027, \u002712876.130\u0027, \u002712877.13\u0027)}",
+                      "FAIL / K11 TQD_INSP_INFO Test 80 행: DEFECTS / INSPECTED_DIE / DEFECTIVE_DIE 가 원본 Test 80 과 같음 / DB DEFECTS 0 / INSPECTED_DIE 761 / DEFECTIVE_DIE 51(6.70%) vs 원본 Summary NDEFECT 0 / NDIE 1 / NDEFDIE 1, SampleTestPlan 761"
+                  ],
+    "skipLines":  [
+
+                  ],
+    "stdout":  "08a_RG_Klarf.stdout.txt",
+    "stderr":  "08a_RG_Klarf.stderr.txt"
+}

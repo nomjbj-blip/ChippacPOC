@@ -335,6 +335,7 @@
             // 
             // chkLayerItems
             // 
+            this.chkLayerItems.CheckOnCheckBoxOnly = true;
             this.chkLayerItems.Dock = System.Windows.Forms.DockStyle.Fill;
             this.chkLayerItems.FormattingEnabled = true;
             this.chkLayerItems.Location = new System.Drawing.Point(0, 146);
@@ -343,7 +344,6 @@
             this.chkLayerItems.TabIndex = 4;
             this.chkLayerItems.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.ChkLayerItems_ItemCheck);
             this.chkLayerItems.Format += new System.Windows.Forms.ListControlConvertEventHandler(this.ChkLayerItems_Format);
-            this.chkLayerItems.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.ChkLayerItems_MouseDoubleClick);
             // 
             // lblLayerSummary
             // 
@@ -353,7 +353,7 @@
             this.lblLayerSummary.Padding = new System.Windows.Forms.Padding(4, 0, 0, 0);
             this.lblLayerSummary.Size = new System.Drawing.Size(399, 36);
             this.lblLayerSummary.TabIndex = 9;
-            this.lblLayerSummary.Text = "Layer (도형 수)";
+            this.lblLayerSummary.Text = "Layer";
             this.lblLayerSummary.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // panel2

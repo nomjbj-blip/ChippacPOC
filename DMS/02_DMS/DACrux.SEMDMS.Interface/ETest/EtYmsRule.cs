@@ -30,6 +30,16 @@ namespace DACrux.SEMDMS.Interface
     //       Leakage_Serial@TSVDC_ASIC_HBM_N_FH:TSVDC_ASIC_HBM_P_FL (54자) -> LKG_SERIAL_TSVDC_ASIC_HBM_N_FH_TSVDC_ASIC_HBM_P_FL (50자)
     //   같은 Program 안의 서로 다른 Parameter 가 같은 이름이 되면 FindNameProblems 가 알려 준다 (적재 전에 막는다).
     //
+    //  YMS 컬럼 이름 (ToYmsName, 2026-10-21)
+    //   고객 DB(Oracle 11.2.0.4)는 테이블 / 컬럼 이름이 30바이트까지라 TD 컬럼에는 ToParamName 결과(최대 50자)를 그대로 쓸 수 없다.
+    //   Parameter 이름(ITEM_NAME)이 30자 이하면 그대로 쓰고, 넘으면 등록 때 분해한 정보로 짧게 조립한다.
+    //     측정 약어(RES / CONN / LKG / CONT) + 조건(8P0MA / PAR / SER) + Chain 1 + Chain 2 에서 Chain 1 과 앞이 같은 단어를 뺀 나머지
+    //   그래도 30자를 넘으면 앞 21자 + '_' + 해시 8자. 등록 때 한 번 만들어 TQP_GDS_ET_ITEM.YMS_PARAM_NAME 에 저장하고 다시 계산하지 않는다.
+    //   예) RESISTANCE_IFORCE_8P0MA_TSVDC_ASIC_HBM_N_FH -> RES_8P0MA_TSVDC_ASIC_HBM_N_FH
+    //       LEAKAGE_SERIAL_TSVDC_ASIC1_N_FH_TSVDC_ASIC1_P_FL -> LKG_SER_TSVDC_ASIC1_N_FH_P_FL
+    //   TD 테이블 이름("TD_" + Program + 분할 접미어)도 30자라 Program 은 26자 이하다.
+    //   설계: 문서/설계/04_ETest/2026-10-21_ETest_YMS_컬럼이름_30자_설계.md 5절
+    //
     //  BIN (ToBin, 2026-10-14 변경)
     //   YMS BIN = 결과 파일의 Hardware Bin. E-Test Spec 판정(POC Para / Limit)과는 따로 본다.
     //   Software Bin(예: 2001)은 BIN 으로 쓸 수 없다: YMS 요약(TD_TABLE.xml GET_RAW_DATA)이 BIN < 100 인 Die 만 세고
@@ -42,10 +52,12 @@ namespace DACrux.SEMDMS.Interface
     // =====================================================================================================
     public static class EtYmsRule
     {
-        /// <summary>Parameter 컬럼 이름 최대 길이 (TQP_PARASPEC.PARAM_NAME VARCHAR2(50), 컬럼 이름과 같은 값이어야 함)</summary>
+        /// <summary>Parameter 이름(ITEM_NAME) 최대 길이 (TQP_GDS_ET_ITEM CHECK / TQP_PARASPEC.PARAM_NAME VARCHAR2(50))</summary>
         public const int MaxParamNameLength = 50;
-        /// <summary>Program 최대 길이 (TQP_PARASPEC.TABLE_NAME 50 = "TD_" + Program + 분할 접미어 1자)</summary>
-        public const int MaxProgramLength = 45;
+        /// <summary>YMS TD 컬럼 이름 최대 길이 (Oracle 11g 식별자 30바이트, 2026-10-21)</summary>
+        public const int MaxYmsNameLength = 30;
+        /// <summary>Program 최대 길이 (TD 테이블 이름 30 = "TD_" + Program + 분할 접미어 1자, 2026-10-21 45 -> 26)</summary>
+        public const int MaxProgramLength = 26;
         /// <summary>TQP_LOT.LOT_ID 길이</summary>
         public const int MaxLotIdLength = 20;
         /// <summary>TQP_WAFER.WAFER_ID 길이</summary>
@@ -94,6 +106,7 @@ namespace DACrux.SEMDMS.Interface
         private static readonly Regex InvalidCharRegex = new Regex(@"[^A-Z0-9_]");
         private static readonly Regex UnderscoreRegex = new Regex(@"_+");
         private static readonly Regex ParamNameRegex = new Regex(@"^[A-Z][A-Z0-9_]*$");
+        private static readonly Regex ProgramRegex = new Regex(@"^[A-Z0-9_]+$");
 
         // 50자를 넘을 때만 쓰는 약어. 앞 단계부터 적용하고, 줄어들면 멈춘다.
         // 1단계는 측정 종류 (고객 Naming Rule 의 RES / LKG 표기), 2단계는 조건 이름.
@@ -127,6 +140,12 @@ namespace DACrux.SEMDMS.Interface
         /// </summary>
         public static string ToParamName(string parameterName)
         {
+            return ToParamName(parameterName, MaxParamNameLength);
+        }
+
+        /// <summary>ToParamName 과 같은 규칙을 주어진 길이 한도로 적용한다 (50 = ITEM_NAME, 30 = 분해 정보가 없는 Parameter 의 YMS 이름).</summary>
+        private static string ToParamName(string parameterName, int maxLength)
+        {
             string normalized = NormalizeParameterName(parameterName);
             string name = ToIdentifier(normalized.Replace('.', 'P'));
             if (name.Length == 0)
@@ -135,17 +154,118 @@ namespace DACrux.SEMDMS.Interface
             if (char.IsDigit(name[0]) || IsReserved(name))
                 name = "P_" + name;
 
-            if (name.Length > MaxParamNameLength)
-                name = ShortenWords(name, ShortWordsStep1);
-            if (name.Length > MaxParamNameLength)
-                name = ShortenWords(name, ShortWordsStep2);
-            if (name.Length > MaxParamNameLength)
-            {
-                // 약어로도 줄지 않으면 앞부분 + 원래 이름의 해시로 자른다. 해시는 실행 환경과 무관하게 같은 값이 나오도록 직접 계산한다.
-                string head = name.Substring(0, MaxParamNameLength - HashLength - 1).TrimEnd('_');
-                name = head + "_" + StableHash(normalized);
-            }
+            if (name.Length > maxLength)
+                name = ShortenWords(name, ShortWordsStep1, maxLength);
+            if (name.Length > maxLength)
+                name = ShortenWords(name, ShortWordsStep2, maxLength);
+            if (name.Length > maxLength)
+                name = CutWithHash(name, normalized, maxLength);
             return name;
+        }
+
+        /// <summary>
+        /// YMS TD 컬럼 이름 (머리 주석 'YMS 컬럼 이름'). 등록 때 분해한 Parameter 정보로 만든다.
+        /// itemName(ITEM_NAME) 이 30자 이하면 그대로 돌려준다. Chain 이름이 없으면(헤더 형식이 아님) ToParamName 규칙을 30자로 적용한다.
+        /// 같은 입력이면 항상 같은 결과를 낸다. 이름을 만들 수 없으면 빈 문자열.
+        /// </summary>
+        /// <param name="itemName">Parameter 이름 (ITEM_NAME)</param>
+        /// <param name="measType">측정 종류 (MEAS_TYPE, 예: RESISTANCE)</param>
+        /// <param name="paraName">'=' / '@' 앞 이름 (PARA_NAME, 예: LEAKAGE_SERIAL)</param>
+        /// <param name="condValue">조건 값 (COND_VALUE, 예: 8.0MA). 없으면 빈 값</param>
+        /// <param name="chainName">Chain 1 (CHAIN_NAME)</param>
+        /// <param name="chainName2">Chain 2 (CHAIN_NAME2, Leakage_Serial 만). 없으면 빈 값</param>
+        public static string ToYmsName(string itemName, string measType, string paraName, string condValue, string chainName, string chainName2)
+        {
+            string item = NormalizeParameterName(itemName);
+            if (item.Length > 0 && item.Length <= MaxYmsNameLength && ParamNameRegex.IsMatch(item) && !IsReserved(item))
+                return item;
+
+            string chain1 = ToIdentifier(NormalizeParameterName(chainName).Replace('.', 'P'));
+            if (chain1.Length == 0)
+                return ToParamName(item, MaxYmsNameLength);
+
+            string para = ToIdentifier(NormalizeParameterName(paraName).Replace('.', 'P'));
+            string meas = ToIdentifier(NormalizeParameterName(measType));
+            if (meas.Length == 0)
+            {
+                int first = para.IndexOf('_');
+                meas = first > 0 ? para.Substring(0, first) : para;
+            }
+
+            List<string> parts = new List<string>();
+            parts.Add(ShortWord(meas, ShortWordsStep1));
+            parts.Add(ConditionCode(meas, para, condValue));
+            parts.Add(chain1);
+            parts.Add(Chain2Tail(chain1, ToIdentifier(NormalizeParameterName(chainName2).Replace('.', 'P'))));
+
+            string name = UnderscoreRegex.Replace(string.Join("_", parts.FindAll(p => p.Length > 0).ToArray()), "_").Trim('_');
+            if (name.Length == 0)
+                return string.Empty;
+            if (char.IsDigit(name[0]) || IsReserved(name))
+                name = "P_" + name;
+            if (name.Length > MaxYmsNameLength)
+                name = CutWithHash(name, item, MaxYmsNameLength);
+            return name;
+        }
+
+        /// <summary>등록 때 분해한 결과로 YMS 컬럼 이름을 만든다 (ToYmsName 과 같은 규칙).</summary>
+        public static string ToYmsName(EtParameterParts parts)
+        {
+            if (parts == null)
+                return string.Empty;
+            return ToYmsName(parts.ParameterName, parts.MeasType, parts.ParaName, parts.CondValue, parts.Chain1, parts.Chain2);
+        }
+
+        /// <summary>YMS TD 컬럼 이름으로 쓸 수 있는지 (영문 대문자로 시작 / 대문자·숫자·'_' / 30자 이하 / 예약 이름 아님)</summary>
+        public static bool IsValidYmsName(string name)
+        {
+            return !string.IsNullOrEmpty(name)
+                && name.Length <= MaxYmsNameLength
+                && ParamNameRegex.IsMatch(name)
+                && !IsReserved(name);
+        }
+
+        /// <summary>YMS Program 이름으로 쓸 수 있는지 (대문자·숫자·'_' / 26자 이하). TD 테이블 이름은 "TD_" 로 시작하므로 숫자로 시작해도 된다.</summary>
+        public static bool IsValidProgramName(string program)
+        {
+            return !string.IsNullOrEmpty(program)
+                && program.Length <= MaxProgramLength
+                && ProgramRegex.IsMatch(program);
+        }
+
+        /// <summary>
+        /// 같은 Device + 공정에 들어갈 {Parameter 이름, YMS 이름} 목록을 검사한다.
+        /// YMS 이름으로 쓸 수 없는 것 / 서로 다른 Parameter 가 같은 YMS 이름인 것을 문장 목록으로 돌려준다. 비어 있으면 통과.
+        /// 같은 Parameter 가 두 번 있는 것은 문제로 보지 않는다.
+        /// </summary>
+        public static string[] FindYmsNameProblems(IList<string> itemNames, IList<string> ymsNames)
+        {
+            List<string> problems = new List<string>();
+            if (itemNames == null || ymsNames == null)
+                return problems.ToArray();
+            if (itemNames.Count != ymsNames.Count)
+                throw new ArgumentException("Parameter 이름과 YMS 이름 개수가 다릅니다.");
+
+            Dictionary<string, string> owners = new Dictionary<string, string>(StringComparer.Ordinal);
+            for (int i = 0; i < itemNames.Count; i++)
+            {
+                string item = itemNames[i] ?? string.Empty;
+                string yms = ymsNames[i] ?? string.Empty;
+                if (!IsValidYmsName(yms))
+                {
+                    problems.Add("YMS 이름으로 쓸 수 없음(영문 대문자로 시작, 대문자·숫자·'_', " + MaxYmsNameLength + "자 이하): " + yms + " [" + item + "]");
+                    continue;
+                }
+                string owner;
+                if (owners.TryGetValue(yms, out owner))
+                {
+                    if (!string.Equals(owner, item, StringComparison.Ordinal))
+                        problems.Add("같은 YMS 이름 " + yms + ": " + owner + " / " + item);
+                    continue;
+                }
+                owners.Add(yms, item);
+            }
+            return problems.ToArray();
         }
 
         /// <summary>YMS Parameter 컬럼 이름으로 쓸 수 있는지 (영문 대문자로 시작 / 대문자·숫자·'_' / 50자 이하 / 예약 이름 아님)</summary>
@@ -314,7 +434,7 @@ namespace DACrux.SEMDMS.Interface
             return name.Trim('_');
         }
 
-        private static string ShortenWords(string name, string[][] words)
+        private static string ShortenWords(string name, string[][] words, int maxLength)
         {
             string[] tokens = name.Split('_');
             foreach (string[] pair in words)
@@ -325,10 +445,68 @@ namespace DACrux.SEMDMS.Interface
                         tokens[i] = pair[1];
                 }
                 string shortened = string.Join("_", tokens);
-                if (shortened.Length <= MaxParamNameLength)
+                if (shortened.Length <= maxLength)
                     return shortened;
             }
             return string.Join("_", tokens);
+        }
+
+        /// <summary>앞부분 + '_' + 원래 이름의 해시 8자로 자른다. 해시는 실행 환경과 무관하게 같은 값이 나오도록 직접 계산한다.</summary>
+        private static string CutWithHash(string name, string hashSource, int maxLength)
+        {
+            string head = name.Substring(0, maxLength - HashLength - 1).TrimEnd('_');
+            return head + "_" + StableHash(hashSource);
+        }
+
+        /// <summary>단어 하나를 약어 목록으로 바꾼다 (목록에 없으면 그대로).</summary>
+        private static string ShortWord(string word, string[][] words)
+        {
+            foreach (string[] pair in words)
+            {
+                if (word == pair[0])
+                    return pair[1];
+            }
+            return word;
+        }
+
+        /// <summary>
+        /// YMS 이름의 조건 부분. 조건 값이 있으면 그 값('.' -> 'P', 예: 8.0MA -> 8P0MA)만 쓴다(IFORCE 같은 조건 이름은 넣지 않음).
+        /// 없으면 PARA_NAME 에서 측정 종류 뒤 단어를 약어로(PARALLEL -> PAR / SERIAL -> SER / IFORCE -> IF).
+        /// </summary>
+        private static string ConditionCode(string meas, string para, string condValue)
+        {
+            string cond = ToIdentifier(NormalizeParameterName(condValue).Replace('.', 'P'));
+            if (cond.Length > 0)
+                return cond;
+
+            string rest = para;
+            if (meas.Length > 0 && rest.StartsWith(meas + "_", StringComparison.Ordinal))
+                rest = rest.Substring(meas.Length + 1);
+            else if (rest == meas)
+                rest = string.Empty;
+            if (rest.Length == 0)
+                return string.Empty;
+
+            string[] tokens = rest.Split('_');
+            for (int i = 0; i < tokens.Length; i++)
+                tokens[i] = ShortWord(tokens[i], ShortWordsStep2);
+            return string.Join("_", tokens);
+        }
+
+        /// <summary>
+        /// Chain 2 에서 Chain 1 과 앞에서부터 같은 단어를 뺀 나머지. 마지막 단어는 항상 남긴다. Chain 2 가 없으면 빈 문자열.
+        /// 예: TSVDC_ASIC1_N_FH / TSVDC_ASIC1_P_FL -> P_FL
+        /// </summary>
+        private static string Chain2Tail(string chain1, string chain2)
+        {
+            if (string.IsNullOrEmpty(chain2))
+                return string.Empty;
+            string[] a = chain1.Split('_');
+            string[] b = chain2.Split('_');
+            int i = 0;
+            while (i < a.Length && i < b.Length - 1 && a[i] == b[i])
+                i++;
+            return string.Join("_", b, i, b.Length - i);
         }
 
         /// <summary>FNV-1a 32bit 해시 8자리 (string.GetHashCode 는 32 / 64bit 에서 값이 달라 쓰지 않는다)</summary>

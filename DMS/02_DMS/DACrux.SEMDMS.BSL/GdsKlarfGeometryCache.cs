@@ -136,7 +136,13 @@ namespace DACrux.SEMDMS.BSL
     public static class GdsKlarfGeometryCache
     {
         public const int MaxDevices = 3;
-        public const long MaxPoints = 4000000;
+        /// <summary>
+        /// Cache 에 둘 수 있는 Device 1개의 점 수 한도. 4,000,000 -> 20,000,000 (2026-10-21).
+        /// U8(Chain 27,342 / 점 16,131,780)이 한도를 넘어 [분석] / Die 상세마다 DB 에서 다시 읽어 7.5초씩 걸렸다.
+        /// U8 색인이 상주하는 메모리는 약 360 MB(측정), 서비스는 64비트로 실행된다.
+        /// 근거: 문서/설계/05_연관분석/2026-10-21_U8_연관분석_영향_확인.md A2
+        /// </summary>
+        public const long MaxPoints = 20000000;
         public const double DefaultCellSize = 200;
 
         private sealed class Entry

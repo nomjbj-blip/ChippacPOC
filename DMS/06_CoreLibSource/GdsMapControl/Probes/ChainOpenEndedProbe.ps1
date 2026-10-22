@@ -1,7 +1,7 @@
 # Output 없이 Input에서 연결된 도형을 끝까지 찾고, 기존 Output 탐색은 유지하는지 검사한다.
 $ErrorActionPreference = 'Stop'
 $exePath = if ($env:CHAIN_PROBE_EXE) { $env:CHAIN_PROBE_EXE }
-    else { Join-Path $PSScriptRoot '..\bin\Debug\NexplantQMS.GdsMap.exe' }
+    else { Join-Path $PSScriptRoot '..\bin\Debug\NexplantQMS.GdsMap.dll' }
 [void][System.Reflection.Assembly]::LoadFrom((Resolve-Path $exePath).Path)
 
 function New-Rectangle([string]$key, [int]$layer, [double]$left, [double]$right) {

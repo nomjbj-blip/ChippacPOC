@@ -17,12 +17,15 @@ namespace DACrux.SEMDMS.ENGUI
     /// 처리 흐름:
     ///  1) [파일 열기]: 파일 하나를 분석한다(진행 표시줄 작업 스레드).
     ///     분석 = 파일명 8칸(Device / 공정 / Lot / Lot-Wafer No -> Slot) -> 시트 -> 등록 Parameter 대조(EtUploadPlan) -> 미리보기 판정(EtJudgeRule)
+    ///     -> YMS Program(Device_공정) 26자 검사(2026-10-21, 넘으면 이름 오류로 저장 안 함)
     ///            -> Map 확인(Map ID = Device 필수, 없으면 오류 / 사용 Die 밖 Die 수) -> DB 의 같은 Wafer + 공정 파일 확인.
     ///     상태: 준비 / 경고(누락 · 이름 충돌 · Map 밖 · 빈 칸 · 파일 경고) / 오류(읽기 실패 · 등록 Parameter 없음 · Map 없음 · Slot) / 중복(DB) / 저장됨 / 실패.
     ///     [다시 읽기]: 같은 파일을 다시 분석한다(등록 Parameter / Spec / Map 을 바꾼 뒤).
     ///  2) 결과는 아래 공통 결과 Control(EtResultDataControl, 조회 화면과 같은 모양)에 정보 / 1단계 Die / 2단계 정의 Para 값으로 보인다.
     ///     정보 표의 Device / 공정 / Lot / Lot-Wafer No 는 더블클릭해 고친다(파일명이 틀렸을 때, 고치면 다시 분석). Slot = Lot-Wafer No 끝 '-숫자'.
     ///     위 Slot 칸(txtSlot)은 2026-10-15 화면에서 숨겼다(Visible = false). 코드는 남아 있어 보이게 하면 Enter / 칸 이동 때 WAFER_ID / DB 중복을 다시 본다.
+    ///     위 상태 / 메시지 줄(lblState / lblMessage)도 2026-10-22 화면에서 숨겼다. 값은 그대로 채운다.
+    ///     상태는 결과 Control 제목에, 메시지(오류 이유 / 경고)는 분석 뒤 아래 상태 표시줄에 같이 보인다.
     ///  3) [저장]: 저장 전에 한 번 묻는다 — 저장 Parameter x Die = 값 수(등록 Parameter 사용 Y 만 저장). 중복이면 예 = 덮어쓰기 / 아니요 = 저장 안 함.
     ///     BeginEtFile(21항목) -> Die -> 값(등록 Parameter 만, 10,000행씩) -> CompleteEtFile(판정 + Map 좌표 + READY). 실패하면 만든 파일을 지운다.
     ///     나중에 등록한 Parameter 는 이 파일을 다시 업로드해야 보인다.
@@ -111,7 +114,7 @@ namespace DACrux.SEMDMS.ENGUI
             current = item;
             ComputeStatus(item);
             ShowItem(item);
-            SetStatus("분석 완료 / " + Path.GetFileName(path) + " / " + item.Status);
+            SetStatus("분석 완료 / " + Path.GetFileName(path) + " / " + item.Status + " / " + item.Message);
         }
 
         /// <summary>
@@ -158,6 +161,13 @@ namespace DACrux.SEMDMS.ENGUI
                 if (item.Plan.Matched.Count == 0)
                 {
                     item.Error = "파일에 등록 Parameter 가 하나도 없음 (등록 " + item.Plan.RegisteredCount + " / 파일 헤더 " + f.ItemCount + ")";
+                    return;
+                }
+                // YMS Program(Device_공정)은 26자 이하 (YMS TD 테이블 이름 TD_<Program> 이 30자를 넘지 않게, 2026-10-21)
+                string ymsProgram = EtYmsRule.ToProgramName(f.FileDevice, item.Program);
+                if (!EtYmsRule.IsValidProgramName(ymsProgram))
+                {
+                    item.Error = "이름 오류: YMS Program " + ymsProgram + " (" + ymsProgram.Length + "자) 이 " + EtYmsRule.MaxProgramLength + "자를 넘거나 쓸 수 없는 이름입니다 (Device + '_' + 공정)";
                     return;
                 }
                 // Map 은 필수 (2026-10-15): 없으면 저장하지 않는다(좌표 없는 파일은 Map / YMS 에 그릴 수 없음)
@@ -337,7 +347,7 @@ namespace DACrux.SEMDMS.ENGUI
             }
             ComputeStatus(item);
             ShowItem(item);
-            SetStatus(e.Name + " = " + e.Value + " 로 다시 분석 / " + item.Status);
+            SetStatus(e.Name + " = " + e.Value + " 로 다시 분석 / " + item.Status + " / " + item.Message);
         }
 
         private void txtSlot_Leave(object sender, EventArgs e)
@@ -427,16 +437,12 @@ namespace DACrux.SEMDMS.ENGUI
         }
 
         /// <summary>
-        /// 저장 확인 문구 (2026-10-15): 파일 / WAFER_ID / 공정 / 저장 Parameter x Die = 값 수, 등록되지 않은 헤더는 저장하지 않는다는 안내, 경고.
-        /// 숫자는 분석 결과(EtUploadPlan.Matched x Die)이고 서버 저장 건수와 다르면 저장이 MISMATCH 로 실패한다.
+        /// 저장 확인 문구 (2026-10-15): 등록되지 않은 헤더는 저장하지 않는다는 안내, 경고.
+        /// 2026-10-22 파일 / WAFER_ID · 공정 / 저장 Parameter x Die = 값 수 줄은 뺐다(정보 표에 같은 내용이 있음).
         /// </summary>
         private static string SaveConfirmText(UploadItem item)
         {
             return "E-Test 결과 파일을 저장합니다. 등록 Parameter(사용 Y)만 저장합니다.\r\n\r\n"
-                + "  파일: " + Path.GetFileName(item.Path) + "\r\n"
-                + "  WAFER_ID " + item.WaferId + " / 공정 " + item.Program + "\r\n"
-                + "  저장: Parameter " + item.Plan.Matched.Count + " x Die " + item.File.DieCount + " = 값 "
-                + item.Plan.ValueCount(item.File).ToString("N0", CultureInfo.InvariantCulture) + "\r\n\r\n"
                 + "등록되지 않은 헤더는 저장하지 않습니다 (" + (item.Plan.Skipped + item.Plan.Unused).ToString("N0", CultureInfo.InvariantCulture) + "개). "
                 + "나중에 등록한 Parameter 는 이 파일을 다시 업로드해야 보입니다."
                 + (item.Status == StWarning ? "\r\n\r\n경고: " + item.Message : string.Empty);
@@ -472,11 +478,8 @@ namespace DACrux.SEMDMS.ENGUI
                 item.ExistingSeq = null;
                 item.ExistingText = null;
                 item.Status = StSaved;
-                string mapId = done["MAP_ID"].ToString();
-                item.Message = "저장 완료 / 파일 번호 " + seq + " / WAFER_ID " + head.Rows[0]["WAFER_ID"] + " / Spec Fail Die " + done["SPEC_FAIL_DIE"] + " / 값 "
-                    + Convert.ToInt64(done["DB_VALUE"], CultureInfo.InvariantCulture).ToString("N0", CultureInfo.InvariantCulture)
-                    + (mapId.Length == 0 ? " / Map 없음" : " / Map " + mapId + " 좌표 Die " + done["MAP_DIE"]
-                        + (Convert.ToInt64(done["OUT_OF_MAP"], CultureInfo.InvariantCulture) > 0 ? " (밖 " + done["OUT_OF_MAP"] + ")" : string.Empty));
+                // 2026-10-22 Spec Fail Die / 값 수 / Map 좌표 Die 표시는 뺐다(결과는 E-Test 결과 조회 화면에서 본다)
+                item.Message = "저장 완료 / 파일 번호 " + seq + " / WAFER_ID " + head.Rows[0]["WAFER_ID"];
                 return true;
             }
             catch (Exception ex)

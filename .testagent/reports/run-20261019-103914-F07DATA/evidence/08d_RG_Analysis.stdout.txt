@@ -1,0 +1,11 @@
+﻿PASS / A0 반전 규칙: Chain 면 FRONT / 검사 면 BACK / Map 저장 FRONT -> 반전 True = 분석 MIRROR / CHAIN_SIDE / STEP_SIDES / MIRROR Y / TOL 5 / HIT_GAP 5 / SEARCH 50 / SIZE_TOL
+FAIL / A1 Defect 1122개: Chip 좌표(gx, gy) / Die 번호 / 걸림(Gap <= 5) / 걸린 Chain / 걸린 Member 수 / 최소 Gap(50 안) / 가장 가까운 Chain / 큰 Defect / 다른 값 {'GDS_X/Y': 1, 'CHAIN_CODES': 1, 'HIT_MEMBER_COUNT': 1} 예 {'GDS_X/Y': (1, '960.13', 961.13, '10126.68', 10126.68), 'CHAIN_CODES': (263, 'AB', ['H', 'AB']), 'HIT_MEMBER_COUNT': (263, '3', 4)} / 다시 계산 걸림 472 (분석 472) / Gap 이 5 µm ± 0.01 인 경계 Defect 0
+FAIL / A2 Defect x Chain 걸림 479 쌍 = 분석 DEFECT_CHAIN 478 행 (쌍 / Gap / 가장 가까운 Member) / 다른 값 {'한쪽에만 있음': 1} 예 {'한쪽에만 있음': ((263, '298'), None, (0.0, 'R0/E15884'))} / Member ID 까지 같은 쌍 248
+PASS / A3 허용오차 표 0 / 2 / 5 / 10 / 20 / 50 µm: Chain 영역 Defect 수 / 걸린 Die 수 (5.5) / 다시 계산 [(0, 437, 43), (2, 450, 43), (5, 472, 43), (10, 511, 43), (20, 574, 43), (50, 637, 44)] / 분석 [('0', '437', '43'), ('2', '450', '43'), ('5', '472', '43'), ('10', '511', '43'), ('20', '574', '43'), ('50', '637', '44')]
+PASS / A4 E-Test Chain 이름 연결: 등록 Parameter(사용 N 제외, GDS Chain 이름 있음) 85개 -> 이름 17개 = 분석 ET_LINK 17 행 (상태 / Chain / Parameter 수 / 2 Chain 항목 수) / 다른 값 {} 예 {} / 상태 {'LINKED': 17} / 이름 없는 Parameter 0 / 사용 N 0
+FAIL / A5 (Die, Chain) 표: 걸린 Defect 가 있거나 E-Test F / N 인 칸 298 = 분석 DIE_CHAIN 298 (E-Test 상태 / 4분류 / Defect 수 · ID / 최소 Gap / Parameter · Fail 수 / 첫 Fail 항목) / 다른 값 {'CLASS4': 1, 'DEFECT_COUNT/IDS': 1} 예 {'CLASS4': (((4, 6), '320'), 'FAIL', 'BOTH'), 'DEFECT_COUNT/IDS': (((7, 7), '298'), '1', 2)} / 4분류 {'FAIL': 123, 'DEFECT': 106, 'BOTH': 26, 'NA': 43} / 상태 {'F': 149, 'P': 106, '-': 43}
+PASS / A6 Die 표 76 = KLARF 검사 Die 76 ∪ E-Test Die 73 (Defect / Chain 영역 / 밖 / 걸린 Chain 수 / 상위 Chain 3 / 검사 계획 / E-Test 판정 · 파일 Flag / Fail Chain 수 / 일치 Chain 수) / 다른 값 {} 예 {}
+FAIL / A7 Chain 표 19: 걸린 Die / 걸린 Defect / E-Test 연결 · Parameter 수 / 대상 Die / Defect Die / Fail Die / 일치 Die / Fail률 2개 (7.2) / 다른 값 {'값': 1} 예 {'값': ('H', (14, 63, 'LINKED', 4, 73, 11, 14, 4, 0.3636, 0.1613), (14, 64, 'LINKED', 4, 73, 11, 14, 4, 0.3636, 0.1613))}
+PASS / A8 분석 요약(ANL_INFO) 수: IN_CHAIN_DEFECT_COUNT 472, DEFECT_COUNT 1122, DEFECT_TOTAL 1122, PLAN_DIE_COUNT 76, DEFECT_DIE_COUNT 51, LARGE_DEFECT_COUNT 1, CHAIN_COUNT 19, MEMBER_COUNT 62609, ET_DIE_COUNT 73, ET_OUT_OF_MAP_COUNT 0 / 다른 값 {}
+
+ANALYSIS_CHECK_PROBE=FAIL (5/9)

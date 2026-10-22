@@ -52,12 +52,12 @@ D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\06_CoreLibSource\
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\06_CoreLibSource\GdsMapControl\obj\Debug\NexplantQMS.GdsMap.Properties.Resources.resources
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\06_CoreLibSource\GdsMapControl\obj\Debug\NexplantQMS.GdsMap.csproj.GenerateResource.cache
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\06_CoreLibSource\GdsMapControl\obj\Debug\NexplantQMS.GdsMap.csproj.CoreCompileInputs.cache
-D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\100_ClientBin\GdsMap\NexplantQMS.GdsMap.exe.config
-D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\100_ClientBin\GdsMap\NexplantQMS.GdsMap.exe
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\100_ClientBin\GdsMap\NexplantQMS.GdsMap.pdb
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\06_CoreLibSource\GdsMapControl\obj\Debug\Nexplant.673C19C3.Up2Date
-D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\06_CoreLibSource\GdsMapControl\obj\Debug\NexplantQMS.GdsMap.exe
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\06_CoreLibSource\GdsMapControl\obj\Debug\NexplantQMS.GdsMap.pdb
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\06_CoreLibSource\GdsMapControl\obj\Debug\NexplantQMS.GdsMap.GdsDieAnalysisForm.resources
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\06_CoreLibSource\GdsMapControl\obj\Debug\NexplantQMS.GdsMap.MapCopyForm.resources
-D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\06_CoreLibSource\GdsMapControl\obj\Debug\NexplantQMS.GdsMap.exe.config
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\06_CoreLibSource\GdsMapControl\obj\Debug\NexplantQMS.GdsMap.GdsMapViewU8Form.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\100_ClientBin\GdsMap\NexplantQMS.GdsMap.dll.config
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\100_ClientBin\GdsMap\NexplantQMS.GdsMap.dll
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\06_CoreLibSource\GdsMapControl\obj\Debug\NexplantQMS.GdsMap.dll

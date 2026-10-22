@@ -13,12 +13,14 @@ using System.Windows.Forms;
 /// GDS x KLARF 연관 분석 화면(화면 A, frmGdsKlarfAnalysis)과 Die 상세 화면(화면 B, NexplantQMS.GdsMap.GdsDieAnalysisForm)을
 /// 화면 밖에서 실제로 띄워 Wafer 그리기 -> [분석] -> 구간 색 / 목록 -> Die 선택 -> 상세(도면 + Chain + Defect) 흐름을 검사한다.
 /// Service(Remoting) 대신 RO 의 원격 연결 필드(m_OBJ)를 같은 프로세스 BSL 로 바꿔 화면 -> RO -> BSL -> DSL -> 로컬 DB 를 실제로 거친다. DB 는 조회만 한다.
-/// 인자: [0] 화면 A 이미지(png), [1] STEP_SEQ, [2] Factory, [3] GDS Device
+/// 인자: [0] 화면 A 이미지(png), [1] STEP_SEQ, [2] Factory, [3] GDS Device, [4] capture 면 화면 B 아래 E-Test 값 표 그림(2026-10-22, [0] 폴더 images_STEP)
 /// </summary>
 internal static class GdsKlarfAnalysisFormSmoke
 {
     private static int failures;
     private static int checks;
+    /// <summary>화면 B 그림 폴더(capture 인자일 때만, 아니면 null).</summary>
+    private static string captureDir;
 
     [STAThread]
     private static int Main(string[] args)
@@ -33,6 +35,11 @@ internal static class GdsKlarfAnalysisFormSmoke
         long stepSeq = long.Parse(args[1]);
         string factory = args[2];
         string device = args[3];
+        if (args.Length > 4 && args[4] == "capture")
+        {
+            captureDir = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(png), "images_" + stepSeq);
+            System.IO.Directory.CreateDirectory(captureDir);
+        }
         DACrux.Base.GlobalVariable.Factory = factory;
         DACrux.Base.GlobalVariable.UserID = "SMOKE";
 
@@ -69,6 +76,7 @@ internal static class GdsKlarfAnalysisFormSmoke
             form.Size = new Size(1400, 900);
             form.ShowInTaskbar = false;
             form.ShowErrorDialogs = false;
+            DACrux.SEMDMS.ENGUI.frmGdsDieAnalysis.ShowErrorDialogs = false;
             form.Show();
             Application.DoEvents();
 
@@ -184,7 +192,7 @@ internal static class GdsKlarfAnalysisFormSmoke
                 Console.WriteLine("[E-Test] 표 파일 " + etRows + "개 - 이 Smoke 는 E-Test 선택을 끄고 분석");
             }
             // KLARF 탭 (2026-10-20 Wafer 1개만 분석): Step 표 / KLARF [직접 찾기] 없음, 고른 Step 정보 + Pitch 출처,
-            // 검사 면 콤보 없음(KLARF 검사 면 FS 고정, Ready VIEW_SIDE = FRONT), GDS / KLARF / E-Test 탭 위쪽 제목 = "Wafer 1개만 분석"
+            // 검사 면 콤보 없음(KLARF 검사 면 FS 고정, Ready VIEW_SIDE = FRONT), GDS / KLARF / E-Test 탭 위쪽 제목에 괄호 설명 없음 (2026-10-22)
             {
                 BindingFlags f = BindingFlags.NonPublic | BindingFlags.Instance;
                 var stepInfo = (Label)Get(typeA, form, "lblStepInfo");
@@ -193,10 +201,10 @@ internal static class GdsKlarfAnalysisFormSmoke
                 string[] heads = { ((Label)Get(typeA, form, "lblReadyGds")).Text, ((Label)Get(typeA, form, "lblReadyStep")).Text, ((Label)Get(typeA, form, "lblReadyEt")).Text };
                 bool gone = typeA.GetField("dgvReadyStep", f) == null && typeA.GetField("btnFindStep", f) == null && typeA.GetMethod("btnFindStep_Click", f) == null
                     && typeA.GetField("cboStepSide", f) == null && typeA.GetField("lblStepSide", f) == null;
-                Check("KLARF 탭: Step 표 · [직접 찾기] · 검사 면 콤보 없음 / 고른 Step 정보 / Ready 검사 면 FRONT / Pitch 출처 / 탭 제목 3개 = Wafer 1개만 분석",
+                Check("KLARF 탭: Step 표 · [직접 찾기] · 검사 면 콤보 없음 / 고른 Step 정보 / Ready 검사 면 FRONT / Pitch 출처 / 탭 제목 3개 괄호 설명 없음",
                     gone && stepInfo.Text.StartsWith("Step " + pickedStep["STEP_ID"] + "  /  Lot " + pickedStep["LOT_ID"]) && stepInfo.Text.Contains("Defect " + pickedStep["DEFECTS"])
                     && !stepInfo.Text.Contains("검사 면") && pickedStep["VIEW_SIDE"].ToString() == "FRONT" && pitch.Text == "Pitch 출처: Map Setup"
-                    && heads.All(h => h.Contains("Wafer 1개만 분석")) && !heads.Any(h => h.Contains("같은 Wafer")),
+                    && heads.All(h => !h.Contains("(")) && !heads.Any(h => h.Contains("같은 Wafer")),
                     stepInfo.Text.Replace(Environment.NewLine, " | ") + " / Ready 검사 면 " + pickedStep["VIEW_SIDE"] + " / " + pitch.Text + " / " + String.Join(" | ", heads));
             }
             // 화면 배치 (2026-10-19 안 1): 기능 탭 GDS / KLARF / E-Test / 종합(Die) + 결과 하위 탭, [준비] 탭 · 점검 표 없음(기준은 기능 탭 위쪽),
@@ -209,8 +217,8 @@ internal static class GdsKlarfAnalysisFormSmoke
             BindingFlags hiddenField = BindingFlags.NonPublic | BindingFlags.Instance;
             bool summaryGone = new[] { "lblSumTitle", "lblSumGds", "lblSumKlarf", "lblSumEt", "flowLegend" }.All(n => typeA.GetField(n, hiddenField) == null)
                 && typeA.GetMethod("UpdateCriteriaSummary", hiddenField) == null && typeA.GetMethod("RefreshLegend", hiddenField) == null;
-            Check("화면 배치: 기능 탭 GDS / KLARF / E-Test / 종합 (Die) · 결과 하위 탭 / 준비 탭 · 점검 표 없음 / 색 구간 표 = 팝업 / 지금 기준 요약 · Map 범례 없음 / Chain 면 기본 BS / Wafer 받으면 KLARF 탭",
-                mainTabs.SequenceEqual(new[] { "GDS", "KLARF", "E-Test", "종합 (Die)" })
+            Check("화면 배치: 기능 탭 GDS / KLARF / E-Test / 종합 · 결과 하위 탭 / 준비 탭 · 점검 표 없음 / 색 구간 표 = 팝업 / 지금 기준 요약 · Map 범례 없음 / Chain 면 기본 BS / Wafer 받으면 KLARF 탭",
+                mainTabs.SequenceEqual(new[] { "GDS", "KLARF", "E-Test", "종합" })
                 && subTabs("tabGdsResult").SequenceEqual(new[] { "tabChain" }) && subTabs("tabKlarfResult").SequenceEqual(new[] { "tabDefect", "tabTolerance", "tabImage" })
                 && subTabs("tabEtResult").SequenceEqual(new[] { "tabEtFail", "tabEtLink" })
                 && typeA.GetField("tabReady", hiddenField) == null && typeA.GetField("dgvReadyCheck", hiddenField) == null && typeA.GetField("lblReadyCheck", hiddenField) == null
@@ -270,10 +278,10 @@ internal static class GdsKlarfAnalysisFormSmoke
             foreach (DataGridViewRow r in dgvBand.Rows) if (!"FAIL_MARK".Equals(r.Tag)) bandDies += Convert.ToInt32(r.Cells[3].Value);
             Check("구간 표 = 구간 + 고정 2행 / Die 수 합 = 결과 Die 수", dgvBand.Rows.Count == bands.Count + 2 && bandDies == result.Tables["DIE"].Rows.Count,
                 "rows " + dgvBand.Rows.Count + " / dies " + bandDies);
-            // [분석] 뒤 (2026-10-19 결정 L4) 처음 결과면 [종합 (Die)] 탭. Map 범례는 없고(2026-10-20) 색 구간 / Die 수는 [색 구간 설정] 팝업 표에서만 본다
+            // [분석] 뒤 (2026-10-19 결정 L4) 처음 결과면 [종합] 탭. Map 범례는 없고(2026-10-20) 색 구간 / Die 수는 [색 구간 설정] 팝업 표에서만 본다
             var mapHost = splitMainPanel(form, typeA);
             bool noLegend = mapHost.Controls.OfType<FlowLayoutPanel>().All(p => !p.Visible);
-            Check("[분석] 뒤 종합 (Die) 탭 / Map 범례 없음(색 구간은 팝업 표)", tabMain.SelectedTab.Text == "종합 (Die)" && noLegend && dgvBand.Rows.Count > 0,
+            Check("[분석] 뒤 종합 탭 / Map 범례 없음(색 구간은 팝업 표)", tabMain.SelectedTab.Text == "종합" && noLegend && dgvBand.Rows.Count > 0,
                 tabMain.SelectedTab.Text + " / Map 위 범례 패널 " + mapHost.Controls.OfType<FlowLayoutPanel>().Count(p => p.Visible) + " / 팝업 표 " + dgvBand.Rows.Count + "행");
             // 기준 접기 / 펴기, 결과 탭 열기(기능 탭 + 하위 탭)
             {
@@ -300,7 +308,7 @@ internal static class GdsKlarfAnalysisFormSmoke
             {
                 var chkSpec = (CheckBox)Get(typeA, form, "chkMarkSpec");
                 var chkFile = (CheckBox)Get(typeA, form, "chkMarkFile");
-                bool checkOk = ((Label)Get(typeA, form, "lblFailMark")).Text == "Map E-Test 표식" && chkSpec.Text == "Spec Out" && chkFile.Text == "Fail Die (결과 파일)"
+                bool checkOk = ((Label)Get(typeA, form, "lblFailMark")).Text == "Map E-Test 표식" && chkSpec.Text == "Spec Out" && chkFile.Text == "Fail Die"
                     && chkSpec.Checked && chkFile.Checked && chkSpec.Image != null && chkFile.Image != null;
                 bool noMarkRow = dgvBand.Rows.Cast<DataGridViewRow>().All(r => !"FAIL_MARK".Equals(r.Tag));
                 bool serverFileFlag = result.Tables["DIE"].Columns.Contains("ET_FILE_FLAG");
@@ -319,7 +327,7 @@ internal static class GdsKlarfAnalysisFormSmoke
                     .Select(r => Convert.ToString(r.Cells[0].Value) + " " + Convert.ToString(r.Cells[3].Value)).ToArray());
                 var specSet = (HashSet<Point>)Get(typeof(DACrux.SEMDMS.ENGUI.GdsKlarfAnalysisMap), map, "_specDies");
                 var fileSet = (HashSet<Point>)Get(typeof(DACrux.SEMDMS.ENGUI.GdsKlarfAnalysisMap), map, "_fileDies");
-                string bothRows = "Spec Out Die " + specDies.Count + " | Fail Die (결과 파일) " + fileDies.Count;
+                string bothRows = "Spec Out Die " + specDies.Count + " | Fail Die " + fileDies.Count;
                 form.ShowAnalysisResult(etCopy);
                 string both = markRows();
                 bool bothOk = both == bothRows && specSet.SetEquals(specDies) && fileSet.SetEquals(fileDies);
@@ -332,7 +340,7 @@ internal static class GdsKlarfAnalysisFormSmoke
                 chkSpec.Checked = false;
                 Application.DoEvents();
                 string fileOnly = markRows();
-                bool fileOnlyOk = fileOnly == "Fail Die (결과 파일) " + fileDies.Count && specSet.Count == 0 && fileSet.SetEquals(fileDies);
+                bool fileOnlyOk = fileOnly == "Fail Die " + fileDies.Count && specSet.Count == 0 && fileSet.SetEquals(fileDies);
                 chkSpec.Checked = true;
                 Application.DoEvents();
                 string bandPng = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(png), "band_fail_mark.png");
@@ -368,8 +376,9 @@ internal static class GdsKlarfAnalysisFormSmoke
                 && status.Text.Contains("(Chain BS -> 반전)") && !status.Text.Contains("검사 FS") && !status.Text.Contains("검사 BS")
                 && !status.Text.Contains("Map Step 만") && !status.Text.Contains("연결 전"),
                 status.Text.Replace(Environment.NewLine, " | "));
-            // 상세 화면에 넘길 결과 = 같은 조건 AnalyzeDie (Die 1개, Member 단위 DEFECT_HIT / E-Test 값 표)
-            DataSet detailData = form.DetailData(topX, topY, null);
+            // 상세 화면이 계산하는 결과 = 화면 마지막 요청으로 AnalyzeDie (Die 1개, Member 단위 DEFECT_HIT / E-Test 값 표). 2026-10-22: 상세보기 창이 직접 부른다
+            var lastRequest = (DACrux.SEMDMS.Interface.GdsKlarfAnalysisRequest)Get(typeA, form, "_lastRequest");
+            DataSet detailData = form.AnalysisService.AnalyzeDie(lastRequest, topX, topY, null);
             Check("상세 데이터 = AnalyzeDie(Die 1행 / Defect = 그 Die 전체 / DEFECT_HIT / ET_VALUE)", detailData.Tables["DIE"].Rows.Count == 1
                 && detailData.Tables.Contains("DEFECT_HIT") && detailData.Tables.Contains("ET_VALUE")
                 && detailData.Tables["DEFECT"].Rows.Count == Convert.ToInt32(topDie["DEFECT_COUNT"]),
@@ -430,9 +439,10 @@ internal static class GdsKlarfAnalysisFormSmoke
                 Application.DoEvents();
             }
 
-            // ---- 3-4) 상세보기 창은 Die 마다 하나(2026-10-16 요청: 1,1 다음 1,2 를 열면 하나 더) / 같은 Die 는 그 창 / 탭 제목 = 상세보기 (X, Y) ----
-            // (2026-10-12 의 "두 개가 뜨던 버그" = ShowForm 이 다른 어셈블리 사본을 만들던 것. 같은 Die 를 다시 열어도 창이 늘지 않아야 한다)
-            // MDI 부모 + 같은 화면 A 를 하나 더 만들어 OpenDetail 을 세 번 부른다. 상세 화면의 Shown(GDS EXE 로드)은 메시지를 돌리기 전에 닫아 실행하지 않는다.
+            // ---- 3-4) 상세보기 창은 하나(2026-10-22 요청 "상세 화면이 열려 있는 상태에서 다른 die 를 더블클릭하면 열려 있는 화면 그대로 조회") /
+            //      탭 제목 = 상세보기 (X, Y) = 지금 Die / 왼쪽 목록 = Defect Die, 지금 Die 선택 ----
+            // (2026-10-12 의 "두 개가 뜨던 버그" = ShowForm 이 다른 어셈블리 사본을 만들던 것. Die 를 바꿔 열어도 창이 늘지 않아야 한다)
+            // MDI 부모 + 같은 화면 A 를 하나 더 만들어 OpenDetail 을 세 번 부른다(요청 없음 = Wafer 결과 그대로). 상세 화면의 Shown(GDS DLL 로드)은 메시지를 돌리기 전에 닫아 실행하지 않는다.
             using (var mdi = new Form())
             {
                 mdi.IsMdiContainer = true;
@@ -449,15 +459,18 @@ internal static class GdsKlarfAnalysisFormSmoke
                 Point second = rightDie != null ? DiePoint(rightDie) : new Point(topX, topY);
                 Invoke(typeA, a2, "OpenDetail", second.X, second.Y);
                 Form[] details2 = mdi.MdiChildren.Where(f => f is DACrux.SEMDMS.ENGUI.frmGdsDieAnalysis).ToArray();
-                Form secondWindow = details2.FirstOrDefault(f => f != details1.FirstOrDefault());
-                string title2 = secondWindow != null ? secondWindow.Text : "";
+                string title2 = details2.Length > 0 ? details2[0].Text : "";
                 Invoke(typeA, a2, "OpenDetail", topX, topY);
                 Form[] details3 = mdi.MdiChildren.Where(f => f is DACrux.SEMDMS.ENGUI.frmGdsDieAnalysis).ToArray();
-                Check("상세보기 Die 마다 창(첫 창 그대로 + 하나 더) / 같은 Die 다시 = 창 늘지 않음 / 탭 제목 상세보기(좌표)",
-                    details1.Length == 1 && details2.Length == 2 && details3.Length == 2 && details2.Contains(details1[0]) && details3.SequenceEqual(details2)
-                    && title1 == "상세보기 (" + topX + ", " + topY + ")" && title2 == "상세보기 (" + second.X + ", " + second.Y + ")"
-                    && DACrux.SEMDMS.ENGUI.frmGdsDieAnalysis.FindWindow(a2, topX, topY) == details1[0],
-                    details1.Length + " -> " + details2.Length + " -> " + details3.Length + " / " + title1 + " , " + title2);
+                var dw = DACrux.SEMDMS.ENGUI.frmGdsDieAnalysis.Current;
+                int defectDies = result.Tables["DIE"].Rows.Cast<DataRow>().Count(r => Convert.ToInt32(r["DEFECT_COUNT"]) > 0
+                    || (!r.IsNull("ET_FAIL_CHAIN_COUNT") && Convert.ToInt32(r["ET_FAIL_CHAIN_COUNT"]) > 0));
+                Check("상세보기 창 하나(다른 Die · 같은 Die 다시 열어도 창 늘지 않음) / 탭 제목 = 상세보기(지금 Die 좌표) / 목록 = Defect · E-Test Fail Die",
+                    details1.Length == 1 && details2.Length == 1 && details3.Length == 1 && details2[0] == details1[0] && details3[0] == details1[0] && dw == details1[0]
+                    && title1 == "상세보기 (" + topX + ", " + topY + ")" && title2 == "상세보기 (" + second.X + ", " + second.Y + ")" && dw.Text == title1
+                    && dw.DieX == topX && dw.DieY == topY && dw.ListedDies.Count == defectDies && dw.AnalyzeCount == 0,
+                    details1.Length + " -> " + details2.Length + " -> " + details3.Length + " / " + title1 + " , " + title2 + " , " + (dw == null ? "-" : dw.Text)
+                    + " / 목록 " + (dw == null ? -1 : dw.ListedDies.Count) + " (" + defectDies + ")");
                 foreach (Form f in details3) f.Dispose();
                 a2.Dispose();
             }
@@ -532,7 +545,7 @@ internal static class GdsKlarfAnalysisFormSmoke
             bool sqInputs = numSquare.Enabled && !numTol.Enabled;
             rdoDefectSize.Checked = true;
             Check("Defect 중심 사각형 한 변 10 -> 크기 끔 + 허용오차 5 / 입력칸 전환 / 상태줄 문구", sq["USE_DEFECT_SIZE"].ToString() == "N" && Convert.ToDouble(sq["TOLERANCE_UM"]) == 5
-                && sqInputs && numTol.Enabled && sqStatus.Contains("중심 사각형 한 변 10 µm"), sq["USE_DEFECT_SIZE"] + " / " + sq["TOLERANCE_UM"] + " / " + sqStatus.Split('\n')[0]);
+                && sqInputs && numTol.Enabled && sqStatus.Contains("중심 사각형 한 변 10") && !sqStatus.Contains("µm"), sq["USE_DEFECT_SIZE"] + " / " + sq["TOLERANCE_UM"] + " / " + sqStatus.Split('\n')[0]);
             // ---- 6-1) Chain 면 (2026-10-16): Chain 면 ≠ 검사 면이면 반전. 고르는 것은 GDS Chain 면만, KLARF 검사 면은 FS 고정 (2026-10-20) ----
             var cboChainSide = (ComboBox)Get(typeA, form, "cboChainSide");
             cboChainSide.SelectedIndex = 0;   // Chain 면 FS = 검사 면 FS
@@ -586,7 +599,9 @@ internal static class GdsKlarfAnalysisFormSmoke
                 && detail.LoadedMapKey == NexplantQMS.GdsMap.GdsDieAnalysisForm.MapKeyOf(dieData), detail.LoadedMapKey);
             int dieDefects = dieData.Tables["DEFECT"].Rows.Cast<DataRow>().Count(r => Convert.ToInt32(r["XINDEX"]) == topX && Convert.ToInt32(r["YINDEX"]) == topY);
             Check("화면 B Defect 표시 = 선택 Die Defect", detail.DefectMarkerCount == dieDefects, detail.DefectMarkerCount + " / " + dieDefects);
-            Check("화면 B Chain 표시(걸린 Chain)", detail.VisibleChainCount == Math.Max(1, dieChains) || (dieChains == 0 && detail.VisibleChainCount > 0), detail.VisibleChainCount + " / " + dieChains);
+            // 2026-10-22 두 화면 같은 모양: [걸린 / Fail Chain 만] 기본 끔 -> 처음 열면 모든 Chain 을 그린다(Simple 요청 "기본으로 전부")
+            int allChains = dieData.Tables["CHAIN"].Rows.Count;
+            Check("화면 B Chain 표시 = 모든 Chain([걸린 / Fail Chain 만] 기본 끔)", detail.VisibleChainCount == allChains, detail.VisibleChainCount + " / " + allChains + " (걸린 " + dieChains + ")");
 
             // 반전 일치: 걸린 Member 도형(지도에 그린 보기 기준 좌표)이 Defect 사각형 ± 허용오차와 겹쳐야 한다
             Type typeB2 = typeof(NexplantQMS.GdsMap.GdsDieAnalysisForm);
@@ -637,37 +652,106 @@ internal static class GdsKlarfAnalysisFormSmoke
             dbl.Invoke(detail, new object[] { dgvChainsB, new DataGridViewCellEventArgs(dgvChainsB.Columns["colCode"].Index, pickHead.Index) });
             Application.DoEvents();
             bool focusKeep = groupOrder().SequenceEqual(orderBefore) && onPickHead() && detail.VisibleChainCount <= 1;
+            // [역추적 해제](2026-10-22): 표 위 체크 줄 아래, 실행 크기 높이 28 이상 · 머리 칸 안(잘리지 않음), 해제하면 숨김
+            var btnClearB = (Button)Get(typeB2, detail, "btnClearFocus");
+            Control chainHeadB = (Control)Get(typeB2, detail, "pnlChainHead");
+            string clearSize = btnClearB.Width + "x" + btnClearB.Height + " @" + btnClearB.Left + "," + btnClearB.Top + " / 머리 칸 높이 " + chainHeadB.ClientSize.Height;
+            bool clearShown = btnClearB.Visible && btnClearB.Parent == chainHeadB && btnClearB.Height >= 28 && btnClearB.Width >= 100
+                && btnClearB.Bottom <= chainHeadB.ClientSize.Height && btnClearB.Top >= ((Control)Get(typeB2, detail, "chkHitOnly")).Bottom;
             typeB2.GetMethod("btnClearFocus_Click", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(detail, new object[] { null, EventArgs.Empty });
             Application.DoEvents();
-            bool clearKeep = groupOrder().SequenceEqual(orderBefore) && onPickHead();
-            Check("화면 B 도면 Chain 색 = 저장 색 / Chain 칸 더블클릭(역추적) · 해제 뒤 묶음 순서와 고른 Chain 묶음 그대로",
-                detail.VisibleChainColors.Count > 0 && colorBad.Count == 0 && focusKeep && clearKeep,
+            bool clearKeep = groupOrder().SequenceEqual(orderBefore) && onPickHead() && !btnClearB.Visible;
+            Check("화면 B 도면 Chain 색 = 저장 색 / Chain 칸 더블클릭(역추적) · 해제 뒤 묶음 순서와 고른 Chain 묶음 그대로 / [역추적 해제] 체크 줄 아래 · 높이 28 이상 · 잘림 없음",
+                detail.VisibleChainColors.Count > 0 && colorBad.Count == 0 && focusKeep && clearKeep && clearShown,
                 "그린 Chain " + detail.VisibleChainColors.Count + " / 색 다름 " + colorBad.Count + " / 더블클릭 " + pickName + " -> "
-                + (dgvChainsB.CurrentRow == null ? "-" : Convert.ToString(dgvChainsB.CurrentRow.Cells["colCode"].Value)) + " / 역추적 " + focusKeep + " / 해제 " + clearKeep);
+                + (dgvChainsB.CurrentRow == null ? "-" : Convert.ToString(dgvChainsB.CurrentRow.Cells["colCode"].Value)) + " / 역추적 " + focusKeep + " / 해제 " + clearKeep
+                + " / [역추적 해제] " + clearShown + " " + clearSize);
 
-            // 화면 B 배치 (2026-10-19, 설계 2026-10-19_화면A_레이아웃_후보.md 10절): 화면 A 와 같은 기능 탭 + 기준 제목 + 분석 기준 요약 3칸 + 용어
+            // 화면 B 배치 (2026-10-22, 설계 2026-10-22_상세보기_오른쪽_한패널_설계.md): 오른쪽 탭 없이 한 패널
+            // = 기준 묶음(GDS / KLARF 2줄 + E-Test 줄) / 머리 줄(체크 2개) / 가로 나누기 위 GDS · KLARF 표 + 아래 E-Test 값 표.
+            // 2026-10-22 후속: 위쪽 오른쪽 [다시 분석], [Chain 밖 Defect] 체크 · 4분류 상태 칸 5개 삭제, 기준의 최종 저장 / 분석 시각 삭제
+            // 2026-10-22 후속 2: 기준 E-Test 줄 늘 숨김, 도면 [전체 보기] 삭제 · [배경 도면] -> [전체 도면], 역추적 Chain 글자(lblFocus) 삭제
             {
                 Func<string, Control> b = n => (Control)Get(typeB2, detail, n);
-                var tabB = (TabControl)b("tabMain");
-                string[] tabsB = tabB.TabPages.Cast<TabPage>().Select(p => p.Text).ToArray();
-                bool parents = b("dgvChainDefects").Parent == b("tabChainDefect") && b("dgvEtValues").Parent == b("tabEt")
-                    && b("dgvSummary").Parent == b("tabDie") && b("map").Parent == ((SplitContainer)b("splitMain")).Panel1;
-                bool titles = b("lblGdsCriteria").Text == "GDS / KLARF 기준" && b("lblGdsText").Text.Contains(Environment.NewLine + "Step ") && b("lblEtCriteria").Text == "E-Test 기준"
-                    && b("lblSumTitle").Text == "분석 기준" && b("lblSumGds").Text == "GDS · Chain BS -> 반전" && b("lblGdsText").Text.Contains(" · Chain 면 BS · Chain ") && !b("lblGdsText").Text.Contains("검사 면") && b("lblSumKlarf").Text.StartsWith("KLARF · Step 1개 · 크기 + 허용오차 5 µm · 보정 (0, 0)")
+                var splitRightB = (SplitContainer)b("splitRight");
+                var rightPanel = ((SplitContainer)b("splitMain")).Panel2;
+                var btnReanalyze = (Button)b("btnReanalyze");
+                bool parents = b("dgvChainDefects").Parent == splitRightB.Panel1 && b("dgvEtValues").Parent == splitRightB.Panel2
+                    && splitRightB.Parent == rightPanel && b("pnlChainHead").Parent == rightPanel && b("pnlGdsCriteria").Parent == rightPanel
+                    && b("chkEtValues").Parent == b("pnlChainHead") && b("lblEtText").Parent == b("pnlGdsCriteria")
+                    && splitRightB.Orientation == Orientation.Horizontal && b("map").Parent == ((SplitContainer)b("splitMain")).Panel1
+                    && btnReanalyze.Parent == b("pnlTop") && btnReanalyze.Visible && btnReanalyze.Text == "다시 분석" && btnReanalyze.Image != null
+                    && (btnReanalyze.Anchor & AnchorStyles.Right) != 0 && btnReanalyze.Right > b("pnlTop").Width - 40;
+                // 호스트 없이 연 상세 화면(이 Smoke)의 [다시 분석] = 상태줄 안내만, 호스트가 채우는 요청 속성 = System.Action
+                Invoke(typeB2, detail, "btnReanalyze_Click", btnReanalyze, EventArgs.Empty);
+                bool reanalyzeAlone = detail.StatusText.StartsWith("다시 분석은 DMS 분석 화면에서 연 상세보기에서만")
+                    && typeB2.GetProperty("ReanalyzeRequested") != null && typeB2.GetProperty("ReanalyzeRequested").PropertyType == typeof(Action);
+                bool noTimes = !b("lblGdsText").Text.Contains("최종 저장") && !b("lblGdsText").Text.Contains(" · 분석 ");
+                bool titles = b("lblGdsCriteria").Text == "GDS / KLARF 기준" && b("lblGdsText").Text.Contains(Environment.NewLine + "Step ") && noTimes && reanalyzeAlone
+                    && b("lblSumTitle").Text == "분석 기준" && b("lblSumGds").Text == "GDS · Chain BS -> 반전" && b("lblGdsText").Text.Contains(" · Chain 면 BS · Chain ") && !b("lblGdsText").Text.Contains("검사 면") && b("lblSumKlarf").Text.StartsWith("KLARF · Step 1개 · 크기 + 허용오차 5 · 보정 (0, 0)")
                     && b("lblSumEt").Text.StartsWith("E-Test · ") && b("lblMapSide").Text == "보기 = " + NexplantQMS.GdsMap.Persistence.GdsSideTransform.Text(dieData.Tables["ANL_INFO"].Rows[0]["VIEW_SIDE"].ToString());
-                bool oldGone = new[] { "lblCriteria", "tabRight", "tabGds", "tabKlarf", "dgvChains", "dgvDefects", "cboScope", "lblKlarfCriteria" }
-                    .All(n => typeB2.GetField(n, BindingFlags.NonPublic | BindingFlags.Instance) == null);
-                Check("화면 B 배치: 기능 탭 GDS / KLARF(합침) / E-Test / 종합 (Die) · 표 위치 · 기준 제목(GDS / KLARF 2줄) · 분석 기준 3칸(화면 A 문구) · 도면 머리 보기 면",
-                    tabsB.SequenceEqual(new[] { "GDS / KLARF", "E-Test", "종합 (Die)" }) && parents && titles && oldGone,
-                    String.Join(",", tabsB) + " / 표 위치 " + parents + " / 옛 컨트롤 없음 " + oldGone + " / " + b("lblSumGds").Text + " | " + b("lblSumKlarf").Text + " | " + b("lblSumEt").Text + " | " + b("lblMapSide").Text);
+                bool oldGone = new[] { "lblCriteria", "tabRight", "tabGds", "tabKlarf", "dgvChains", "dgvDefects", "cboScope", "lblKlarfCriteria",
+                    "tabMain", "tabChainDefect", "tabEt", "tabDie", "dgvSummary", "lblDieText", "lblDieCriteria", "pnlEtCriteria", "lblEtCriteria", "colNear",
+                    "chkOutside", "flowClass", "lblClassBoth", "lblClassFail", "lblClassDefect", "lblClassOk", "lblClassNa", "btnFit", "lblFocus" }
+                    .All(n => typeB2.GetField(n, BindingFlags.NonPublic | BindingFlags.Instance) == null)
+                    && typeB2.GetMethod("btnFit_Click", BindingFlags.NonPublic | BindingFlags.Instance) == null && b("chkBackground").Text == "전체 도면";
+                // 이 Smoke 기본 결과는 E-Test 를 연결하지 않는다 -> [E-Test 값] 체크 / 아래 표(접힘) 숨김. 기준 E-Test 줄은 늘 숨김
+                bool noEtHidden = !b("chkEtValues").Visible && splitRightB.Panel2Collapsed && !b("lblEtText").Visible && b("pnlChainHead").Visible
+                    && b("pnlGdsCriteria").Height == b("lblGdsText").Bottom + 4;
+                // 두 화면 같은 모양(2026-10-22): 위쪽 분석 기준 칸 · 표 위 요약 글자 숨김, [걸린 / Fail Chain 만] 끔, Defect 채움
+                bool sameLook = new[] { "lblSumTitle", "lblSumGds", "lblSumKlarf", "lblSumEt", "lblChainTitle" }.All(n => !b(n).Visible)
+                    && !((CheckBox)b("chkHitOnly")).Checked && gmap.DefectStyle == NexplantQMS.GdsMap.DefectOverlayStyle.Filled;
+                Check("화면 B 배치: 오른쪽 탭 없음 · 한 패널(기준 묶음 / 머리 줄 / 위 GDS · KLARF 표 + 아래 E-Test 값 표) · 위쪽 오른쪽 [다시 분석](호스트 없으면 안내) · Chain 밖 체크 · 4분류 칸 · [전체 보기] 없음 · [전체 도면] · 기준에 최종 저장 / 분석 시각 · E-Test 줄 없음 / E-Test 없는 결과 = 체크 · 아래 표 숨김 / 두 화면 같은 모양",
+                    parents && titles && oldGone && noEtHidden && sameLook,
+                    "표 위치 · 버튼 " + parents + " / 기준 · 다시 분석 안내 " + titles + " / 옛 컨트롤 없음 " + oldGone + " / E-Test 없음 숨김 " + noEtHidden + " / 같은 모양 " + sameLook
+                    + " / " + b("lblGdsText").Text.Replace(Environment.NewLine, " | ") + " / " + detail.StatusText);
 
-                // 용어: Chain 칸(표시 · 색 · Chain · Defect 수 · 분류 · ET · Fail Para · Member) + Defect 칸(Defect ID · Gap · RoughBin · Class ...), 4분류 '-' 없음
+                // 도면 머리 줄(2026-10-22): 도면 칸이 좁아도(Die 목록 옆 약 190px) 보기 / 전체 도면 / 원점 표시가 겹치지 않고 다음 줄로 넘어간다.
+                // 한 줄 = 모든 항목의 줄 위치(Top - Margin.Top)가 같음([전체 보기] 삭제로 줄 높이가 버튼 기준 32 보다 낮아짐)
+                {
+                    var splitMainB = (SplitContainer)b("splitMain");
+                    Control head = b("pnlMapHead");
+                    int keepDistance = splitMainB.SplitterDistance;
+                    Func<string> overlap = () =>
+                    {
+                        List<Control> items = head.Controls.Cast<Control>().Where(c => c.Visible).ToList();
+                        var bad = new List<string>();
+                        for (int i = 0; i < items.Count; i++)
+                        {
+                            if (items[i].Left < 0 || items[i].Right > head.ClientSize.Width) bad.Add(items[i].Name + " 밖");
+                            for (int j = i + 1; j < items.Count; j++)
+                                if (items[i].Bounds.IntersectsWith(items[j].Bounds)) bad.Add(items[i].Name + " x " + items[j].Name);
+                        }
+                        return String.Join(",", bad);
+                    };
+                    Func<int> headRows = () => head.Controls.Cast<Control>().Where(c => c.Visible).Select(c => c.Top - c.Margin.Top).Distinct().Count();
+                    string wideBad = overlap();
+                    int wideHeight = head.Height, wideRows = headRows();
+                    bool wideOk = wideBad.Length == 0 && wideRows == 1 && b("map").Top == head.Bottom;
+                    splitMainB.SplitterDistance = 190;
+                    Pump(300);
+                    string narrowBad = overlap();
+                    int narrowHeight = head.Height, narrowRows = headRows();
+                    bool narrowOk = narrowBad.Length == 0 && narrowRows > 1 && narrowHeight > wideHeight && b("map").Top == head.Bottom;
+                    CaptureDetail(detail, "B0_상세_도면칸좁음.png");
+                    splitMainB.SplitterDistance = keepDistance;
+                    Pump(300);
+                    bool restored = head.Height == wideHeight && headRows() == 1 && overlap().Length == 0;
+                    Check("화면 B 도면 머리 줄: 넓으면 한 줄, 도면 칸 190px 이면 다음 줄로 넘어가 겹침 · 잘림 없음, 도면은 머리 줄 바로 아래, 넓히면 다시 한 줄",
+                        wideOk && narrowOk && restored,
+                        "넓음 " + head.Parent.Width + "px " + wideRows + "줄 높이 " + wideHeight + (wideBad.Length == 0 ? "" : " 겹침 " + wideBad)
+                        + " / 좁음 190px " + narrowRows + "줄 높이 " + narrowHeight + (narrowBad.Length == 0 ? "" : " 겹침 " + narrowBad) + " / 되돌림 " + restored);
+                }
+
+                // 용어: Chain 칸(표시 · 색 · Chain · Defect 수) + Defect 칸(Defect ID · RoughBin · Class · 크기 · XREL · YREL), 4분류 '-' 없음.
+                // E-Test 없는 결과는 비어 있는 분류 / ET / Fail Para 열을 숨긴다(2026-10-22, E-Test 연결 결과는 EtPanelChecks 에서 열 보임 확인).
+                // Member / Gap / GDS X / GDS Y 열은 숨김(2026-10-22 요청, 값은 채워 둠)
                 string[] gridHeads = dgvChainsB.Columns.Cast<DataGridViewColumn>().Where(c => c.Visible).Select(c => c.HeaderText).ToArray();
                 List<DataGridViewRow> chainRows = dgvChainsB.Rows.Cast<DataGridViewRow>().Where(r => Convert.ToString(r.Cells["colCode"].Value) != "Chain 밖 Defect").ToList();
                 string[] classes = chainRows.Select(r => Convert.ToString(r.Cells["colClass"].Value)).Distinct().ToArray();
-                Check("화면 B 용어 = 화면 A: Chain 칸 8열 + Defect 칸 10열(Defect ID / Gap / 가까운 Chain(Gap 바로 뒤, 2026-10-20) / RoughBin / Class / 크기 / GDS X / Y / XREL / YREL), 분류 '-' 없음, 정렬 안 됨",
-                    gridHeads.SequenceEqual(new[] { "표시", "색", "Chain", "Defect 수", "분류", "ET", "Fail Para", "Member",
-                        "Defect ID", "Gap(µm)", "가까운 Chain", "RoughBin", "Class", "크기(µm)", "GDS X", "GDS Y", "XREL", "YREL" })
+                Check("화면 B 용어 = 화면 A: Chain 칸 4열 + Defect 칸 6열(가까운 Chain · Member · Gap · GDS X / Y 열 없음), E-Test 없는 결과는 분류 / ET / Fail Para 열 숨김, 분류 값 '-' 없음, 정렬 안 됨",
+                    gridHeads.SequenceEqual(new[] { "표시", "색", "Chain", "Defect 수",
+                        "Defect ID", "RoughBin", "Class", "크기", "XREL", "YREL" })
                     && classes.All(k => new[] { "일치", "Fail만", "Defect만", "정상", "비교 불가" }.Contains(k))
                     && chainRows.All(r => Convert.ToString(r.Cells["colMember"].Value).Length > 0)
                     && dgvChainsB.Columns.Cast<DataGridViewColumn>().All(c => c.SortMode == DataGridViewColumnSortMode.NotSortable),
@@ -675,7 +759,7 @@ internal static class GdsKlarfAnalysisFormSmoke
 
                 // 합친 표 묶음 규칙 (2026-10-20, 설계 2026-10-20_상세보기_GDS_KLARF_합친탭_설계.md 2.1절):
                 // Chain 묶음 행 = 그 Chain 에 걸린 Defect(CHAIN_CODES) 수(없으면 1행), 맨 아래 Chain 밖 묶음 = IN_CHAIN N Defect(가까운 거리 순, 거리 없음 뒤),
-                // 머리 줄 = Chain n / Defect 전체 / Chain In / Chain Out, [Chain 밖 Defect] 끄면 그 묶음 없음
+                // 머리 줄 = Chain n / Defect 전체 / Chain In / Chain Out(글자는 숨김). Chain 밖 묶음은 늘 있다(2026-10-22 체크 삭제)
                 {
                     List<DataRow> dieDefectRows = dieData.Tables["DEFECT"].Rows.Cast<DataRow>().Where(r => Convert.ToInt32(r["XINDEX"]) == topX && Convert.ToInt32(r["YINDEX"]) == topY).ToList();
                     Dictionary<string, string> nameToCode = dieData.Tables["CHAIN"].Rows.Cast<DataRow>().ToDictionary(r => r["CHAIN_NAME"].ToString(), r => r["CHAIN_CODE"].ToString());
@@ -697,19 +781,13 @@ internal static class GdsKlarfAnalysisFormSmoke
                     string title = ((Label)b("lblChainTitle")).Text;
                     int chainGroups = groups.Count(g => g != "Chain 밖 Defect");
                     bool titleOk = title == String.Format("Chain {0} / Defect 전체 {1} / Chain In {2} / Chain Out {3}", chainGroups, dieDefectRows.Count, dieDefectRows.Count - outCount, outCount);
-                    var chkOutsideB = (CheckBox)b("chkOutside");
-                    chkOutsideB.Checked = false;
-                    Application.DoEvents();
-                    bool hidden = dgvChainsB.Rows.Cast<DataGridViewRow>().All(r => Convert.ToString(r.Cells["colCode"].Value) != "Chain 밖 Defect");
-                    chkOutsideB.Checked = true;
-                    Application.DoEvents();
-                    bool shownAgain = outCount == 0 || dgvChainsB.Rows.Cast<DataGridViewRow>().Count(r => Convert.ToString(r.Cells["colCode"].Value) == "Chain 밖 Defect") == outCount;
-                    Check("화면 B [GDS / KLARF] 묶음: Chain 묶음 Defect = 그 Chain 에 걸린 Defect / 맨 아래 Chain 밖 = Chain Out(가까운 거리 순) / 머리 줄 수 / [Chain 밖 Defect] 끄기 · 켜기",
-                        groupErrors.Count == 0 && outLastSorted && titleOk && hidden && shownAgain,
-                        "묶음 " + String.Join(",", groups) + " / 어긋남 " + String.Join(",", groupErrors) + " / 순서 " + outLastSorted + " / \"" + title + "\" / 끄기 " + hidden + " 켜기 " + shownAgain);
+                    bool outShown = outCount == 0 || dgvChainsB.Rows.Cast<DataGridViewRow>().Count(r => Convert.ToString(r.Cells["colCode"].Value) == "Chain 밖 Defect") == outCount;
+                    Check("화면 B [GDS / KLARF] 묶음: Chain 묶음 Defect = 그 Chain 에 걸린 Defect / 맨 아래 Chain 밖 = Chain Out(가까운 거리 순, 늘 보임) / 머리 줄 수",
+                        groupErrors.Count == 0 && outLastSorted && titleOk && outShown,
+                        "묶음 " + String.Join(",", groups) + " / 어긋남 " + String.Join(",", groupErrors) + " / 순서 " + outLastSorted + " / \"" + title + "\" / Chain 밖 " + outShown);
                 }
 
-                // 두 Chain 에 걸린 Defect (2026-10-20): 두 묶음 모두 + Defect ID 굵게 + 바로 옆 "가까운 Chain" = "함께 걸림: 다른 Chain", 다른 Defect 는 굵지 않음.
+                // 두 Chain 에 걸린 Defect (2026-10-20): 두 묶음 모두 + Defect ID 굵게, 다른 Defect 는 굵지 않음("가까운 Chain" 열은 2026-10-22 삭제).
                 // 이 Smoke 데이터에는 두 Chain Defect 가 없어, 걸린 Defect 하나에 Chain 코드를 하나 더 넣은 복사본으로 확인하고 원래 결과로 되돌린다.
                 {
                     DataSet twoCopy = dieData.Copy();
@@ -744,41 +822,110 @@ internal static class GdsKlarfAnalysisFormSmoke
                         Func<DataGridViewRow, bool> bold = r => r.Cells["colDefectId"].Style.Font != null && r.Cells["colDefectId"].Style.Font.Bold;
                         bool othersPlain = dgvChainsB.Rows.Cast<DataGridViewRow>().Where(r => Convert.ToString(r.Cells["colDefectId"].Value).Length > 0 && Convert.ToString(r.Cells["colDefectId"].Value) != id).All(r => !bold(r));
                         twoOk = twoRows.Count == 2 && twoRows.All(bold) && othersPlain
-                            && twoRows.Any(r => Convert.ToString(r.Cells["colCode"].Value) == twoFirstName && Convert.ToString(r.Cells["colNear"].Value) == "함께 걸림: " + twoOtherName)
-                            && twoRows.Any(r => Convert.ToString(r.Cells["colCode"].Value) == twoOtherName && Convert.ToString(r.Cells["colNear"].Value) == "함께 걸림: " + twoFirstName)
-                            && dgvChainsB.Columns["colNear"].Index == dgvChainsB.Columns["colGap"].Index + 1;
+                            && twoRows.Any(r => Convert.ToString(r.Cells["colCode"].Value) == twoFirstName)
+                            && twoRows.Any(r => Convert.ToString(r.Cells["colCode"].Value) == twoOtherName)
+                            && !dgvChainsB.Columns.Contains("colNear");
                         twoText = "Defect " + id + " / " + twoFirstName + " + " + twoOtherName + " / 행 " + twoRows.Count + " / 굵게 " + twoRows.Count(bold) + " / 다른 Defect 굵지 않음 " + othersPlain
-                            + " / " + String.Join(" | ", twoRows.Select(r => r.Cells["colCode"].Value + ": " + r.Cells["colNear"].Value).ToArray());
+                            + " / " + String.Join(" | ", twoRows.Select(r => Convert.ToString(r.Cells["colCode"].Value)).ToArray());
                         Wait(detail.ShowDieAsync(dieData, topX, topY), 60);
                         Application.DoEvents();
                     }
-                    Check("화면 B 두 Chain 에 걸린 Defect: 두 묶음 모두 / Defect ID 굵게 / Gap 바로 뒤 가까운 Chain = 함께 걸림 + 다른 Chain (복사본 결과, 되돌림)", twoOk, twoText);
+                    Check("화면 B 두 Chain 에 걸린 Defect: 두 묶음 모두 / Defect ID 굵게 / 가까운 Chain 열 없음 (복사본 결과, 되돌림)", twoOk, twoText);
                 }
 
-                // [종합 (Die)]: 4분류 수 합 = Chain 수, 표 = 그 Die 의 일치 · Fail만 · Defect만 (Die, Chain), Die 요약 = Die 줄과 같은 수
-                int chainCount = dieData.Tables["CHAIN"].Rows.Count;
-                int chipSum = new[] { "lblClassBoth", "lblClassFail", "lblClassDefect", "lblClassOk", "lblClassNa" }
-                    .Sum(n => int.Parse(b(n).Text.Split(' ').Last()));
-                int wantRows = dieData.Tables["DIE_CHAIN"].Rows.Cast<DataRow>().Count(r => Convert.ToInt32(r["XINDEX"]) == topX && Convert.ToInt32(r["YINDEX"]) == topY
-                    && new[] { "BOTH", "FAIL", "DEFECT" }.Contains(Convert.ToString(r["CLASS4"])));
-                var dgvSum = (DataGridView)b("dgvSummary");
-                Check("화면 B [종합 (Die)]: 4분류 수 합 = Chain 수 / 표 행 = 일치 · Fail만 · Defect만 (Die, Chain) / Die 요약 Defect 전체 · Chain In",
-                    chipSum == chainCount && dgvSum.Rows.Count == wantRows && b("lblDieText").Text.StartsWith("Defect 전체 " + dieDefects + " / Chain In ")
-                    && b("lblDieCriteria").Text == "Die (" + topX + ", " + topY + ") 요약",
-                    "4분류 합 " + chipSum + " / Chain " + chainCount + " / 표 " + dgvSum.Rows.Count + " / 기대 " + wantRows + " / " + b("lblDieText").Text);
+                // Chain 이 많은 Device (2026-10-21): Chain 1,000개 초과면 [걸린 / Fail Chain 만]을 꺼도 [GDS / KLARF] 표는
+                // 그 Die 의 DIE_CHAIN Chain 만(4분류 상태 칸은 2026-10-22 삭제). 가짜 Chain 1,000개를 더한 복사본으로 확인하고 원래 결과로 되돌린다(가짜 Chain 은 Member 없음).
+                {
+                    DataSet bigCopy = dieData.Copy();
+                    DataTable chainT = bigCopy.Tables["CHAIN"];
+                    DataRow sample = chainT.Rows[0];
+                    for (int i = 0; i < 1000; i++)
+                    {
+                        DataRow fake = chainT.NewRow();
+                        fake.ItemArray = sample.ItemArray;
+                        fake["CHAIN_SEQ"] = 900000000L + i;
+                        fake["CHAIN_CODE"] = "ZZ" + i;
+                        fake["CHAIN_NAME"] = "SMOKE_FAKE_" + i;
+                        fake["MEMBER_COUNT"] = 0;
+                        chainT.Rows.Add(fake);
+                    }
+                    var hitOnlyB = (CheckBox)b("chkHitOnly");
+                    bool hitOnlyBefore = hitOnlyB.Checked;
+                    // 도면 키(Chain 목록)가 바뀌어 도면을 다시 읽는다. Application.Run 없이 DoEvents 만 돌리면 동기화 문맥이 풀려
+                    // 읽기 뒤 그리기가 다른 스레드에서 실행되므로(OpenGL 오류 170) 부르기 전에 다시 설정한다.
+                    System.Threading.SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext());
+                    Wait(detail.ShowDieAsync(bigCopy, topX, topY), 300);
+                    Application.DoEvents();
+                    hitOnlyB.Checked = false;
+                    Application.DoEvents();
+                    var dieChainNames = new HashSet<string>(bigCopy.Tables["DIE_CHAIN"].Rows.Cast<DataRow>()
+                        .Where(r => Convert.ToInt32(r["XINDEX"]) == topX && Convert.ToInt32(r["YINDEX"]) == topY)
+                        .Select(r => r["CHAIN_SEQ"].ToString()).Distinct()
+                        .Select(s => chainT.Rows.Cast<DataRow>().First(c => c["CHAIN_SEQ"].ToString() == s)["CHAIN_NAME"].ToString()));
+                    var shownNames = new HashSet<string>(dgvChainsB.Rows.Cast<DataGridViewRow>().Select(r => Convert.ToString(r.Cells["colCode"].Value))
+                        .Where(n => n != "Chain 밖 Defect"));
+                    string bigTitle = b("lblChainTitle").Text;
+                    string bigStatus = detail.StatusText;
+                    bool bigOk = shownNames.SetEquals(dieChainNames) && bigTitle.Contains("(이 Die 주변)")
+                        && dgvChainsB.Rows.Count < 1000 && bigStatus.StartsWith("도면 조회 완료");
+                    string bigText = "Chain " + chainT.Rows.Count + " / 표 Chain " + shownNames.Count + " / DIE_CHAIN Chain " + dieChainNames.Count
+                        + " / 행 " + dgvChainsB.Rows.Count + " / \"" + bigTitle + "\" / " + bigStatus;
+                    hitOnlyB.Checked = hitOnlyBefore;
+                    System.Threading.SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext());
+                    Wait(detail.ShowDieAsync(dieData, topX, topY), 300);
+                    Application.DoEvents();
+                    Check("화면 B Chain 1,000개 초과 Device: [걸린 / Fail Chain 만] 꺼도 표 = 그 Die 의 DIE_CHAIN Chain 만 / 머리 줄 (이 Die 주변) (복사본 결과, 되돌림)", bigOk, bigText);
+                }
 
-                // 처음 열기 = [종합 (Die)], 역추적으로 열기 = [GDS / KLARF] + 탭 제목 "(역추적)", 해제하면 원래 제목
+                // 열기 (2026-10-22 탭 없음): 역추적 = 그 Chain 묶음 첫 행을 고르고 아래 E-Test 값 범위 = 그 Chain, Die 전체 = 고른 행 없음 + 아래 = Die 전체
+                var lblEtCountB = (Label)b("lblEtCount");
                 string firstName = Convert.ToString(dgvChainsB.Rows[0].Cells["colCode"].Value);
                 string focusSeq = dieData.Tables["CHAIN"].Rows.Cast<DataRow>().First(r => r["CHAIN_NAME"].ToString() == firstName)["CHAIN_SEQ"].ToString();
                 Wait(detail.ShowDieAsync(dieData, topX, topY, focusSeq), 60);
                 Application.DoEvents();
-                bool focusTab = tabB.SelectedTab == b("tabChainDefect") && b("tabChainDefect").Text == "GDS / KLARF (역추적)" && b("tabEt").Text == "E-Test (역추적)"
-                    && dgvChainsB.CurrentRow != null && Convert.ToString(dgvChainsB.CurrentRow.Cells["colCode"].Value) == firstName;
+                bool focusOpen = dgvChainsB.SelectedRows.Count == 1 && Convert.ToString(dgvChainsB.SelectedRows[0].Cells["colCode"].Value) == firstName
+                    && lblEtCountB.Text.StartsWith("E-Test 값 · Chain " + firstName + " (");
+                string focusText = lblEtCountB.Text;
                 Wait(detail.ShowDieAsync(dieData, topX, topY, null), 60);
                 Application.DoEvents();
-                bool plainTab = tabB.SelectedTab == b("tabDie") && b("tabChainDefect").Text == "GDS / KLARF" && b("tabEt").Text == "E-Test";
-                Check("화면 B 첫 탭: Die 전체 = [종합 (Die)] / 역추적 = [GDS / KLARF](그 Chain 묶음) + 탭 제목 (역추적)", focusTab && plainTab,
-                    "역추적 " + focusTab + " / 전체 " + plainTab + " / 지금 " + tabB.SelectedTab.Text);
+                bool plainOpen = dgvChainsB.SelectedRows.Count == 0 && lblEtCountB.Text.StartsWith("E-Test 값 · Die 전체 (");
+                Check("화면 B 열기: 역추적 = 그 Chain 묶음 첫 행 + 아래 E-Test 값 범위 그 Chain / Die 전체 = 고른 행 없음 + 아래 Die 전체", focusOpen && plainOpen,
+                    focusText + " / " + lblEtCountB.Text);
+
+                // 아래 E-Test 값 표 (2026-10-22, 설계 3절): 이 Wafer 의 READY E-Test 파일을 연결한 결과로 확인하고 원래 결과로 되돌린다. 파일이 없으면 참고만 남긴다.
+                {
+                    DataSet ready = null;
+                    try { ready = analysisBsl.GetWaferReady(factory, stepSeq, device); }
+                    catch (Exception ex) { Console.WriteLine("참고 / E-Test 준비 목록 조회 실패: " + ex.Message); }
+                    DataRow etFile = ready == null ? null : ready.Tables["READY_ET"].Rows.Cast<DataRow>()
+                        .Where(r => { long v; return long.TryParse(r["SRC_FILE_SEQ"].ToString(), out v) && v > 0; })
+                        .OrderBy(r => r["SELECTED"].ToString() == "Y" ? 0 : 1).FirstOrDefault();
+                    // 준비 목록은 GDS Device 와 같은 Device 파일만 둔다. 같은 Wafer 파일이 다른 Device 이름이면(ET_OTHER_DEVICE) 파일 목록에서 같은 Wafer 파일을 쓴다
+                    // (서버 판정은 Parameter -> GDS Chain 이름 연결이라 화면 검사에는 쓸 수 있다)
+                    DataRow otherDevice = ready == null ? null : ready.Tables["READY_CHECK"].Rows.Cast<DataRow>().FirstOrDefault(r => r["CODE"].ToString() == "ET_OTHER_DEVICE");
+                    if (etFile == null && otherDevice != null && ready.Tables["WAFER_KEY"].Rows.Count > 0)
+                    {
+                        // 점검 문구 "... 목록에서 뺌(OMMTCB TSVET, ...)" 의 괄호 안 = "Device 공정" 목록 -> 첫 단어가 Device
+                        string message = otherDevice["MESSAGE"].ToString();
+                        string waferKey = ready.Tables["WAFER_KEY"].Rows[0]["WAFER_KEY"].ToString();
+                        var etBsl = new DACrux.SEMDMS.BSL.GdsEtResult();
+                        foreach (string etDevice in message.Substring(message.LastIndexOf('(') + 1).TrimEnd(')').Split(',')
+                            .Select(s => s.Trim().Split(' ')[0]).Where(s => s.Length > 0).Distinct())
+                        {
+                            try
+                            {
+                                etFile = etBsl.GetEtFileBrowseList(factory, etDevice, "", "").Rows.Cast<DataRow>()
+                                    .FirstOrDefault(r => String.Equals(r["WAFER_ID"].ToString(), waferKey, StringComparison.OrdinalIgnoreCase));
+                            }
+                            catch (Exception ex) { Console.WriteLine("참고 / E-Test 파일 목록 조회 실패(" + etDevice + "): " + ex.Message); }
+                            if (etFile == null) continue;
+                            Console.WriteLine("참고 / 같은 Wafer E-Test 파일이 다른 Device(" + etDevice + ")라 파일 목록에서 찾아 씀");
+                            break;
+                        }
+                    }
+                    if (etFile == null) Console.WriteLine("참고 / 이 Wafer 에 READY E-Test 파일이 없어 아래 E-Test 값 표 검사는 건너뜀 (Step " + stepSeq + ")");
+                    else EtPanelChecks(detail, typeB2, analysisBsl, baseRequest, ready, etFile);
+                }
             }
 
             DataRow other = result.Tables["DIE"].Rows.Cast<DataRow>().FirstOrDefault(r => Convert.ToInt32(r["DEFECT_COUNT"]) > 0 && DiePoint(r) != new Point(topX, topY));
@@ -801,8 +948,9 @@ internal static class GdsKlarfAnalysisFormSmoke
             }
         }
 
-        // ---- 10) 상세보기 여러 창 + GDS 상세 화면(도면) 하나 같이 쓰기 + [분석] 때 미리 읽기 (2026-10-16, 설계 Die상세_여러화면_GDS재사용) ----
-        // MDI 부모에 화면 A(띄우지 않음: Load 의 원격 조회를 피함)를 붙이고 실제 경로(OpenDetail -> AnalyzeDie -> 호스트 창 Shown / Activated)를 탄다.
+        // ---- 10) 상세보기 창 하나 + 왼쪽 Die 목록 + GDS 상세 화면(도면) 하나 + [분석] 때 미리 읽기 + 분석 화면과 동기화
+        //      (2026-10-16 설계 Die상세_여러화면_GDS재사용, 2026-10-22 설계 Die상세_DLL로딩_Die목록) ----
+        // MDI 부모에 화면 A(띄우지 않음: Load 의 원격 조회를 피함)를 붙이고 실제 경로(OpenDetail -> 상세보기 창 Open -> AnalyzeDie -> 창 Shown / Activated)를 탄다.
         // 호스트가 만드는 공유 화면은 기본 서비스(DefaultMapService / DefaultChainService)를 같은 프로세스 BSL 로 바꿔 쓴다.
         {
             NexplantQMS.GdsMap.GdsDieAnalysisForm.DefaultMapService = Ro<DACrux.SEMDMS.RO.GdsMapView>(viewBsl);
@@ -810,6 +958,7 @@ internal static class GdsKlarfAnalysisFormSmoke
             NexplantQMS.GdsMap.GdsDieMapCache.Clear();
             DataRow secondDie = result.Tables["DIE"].Rows.Cast<DataRow>().FirstOrDefault(r => Convert.ToInt32(r["DEFECT_COUNT"]) > 0 && DiePoint(r) != new Point(topX, topY));
             Point p2 = secondDie != null ? DiePoint(secondDie) : new Point(topX, topY);
+            Func<int> windows = () => DACrux.SEMDMS.ENGUI.frmGdsDieAnalysis.OpenWindows.Count;
             using (var mdi = new Form())
             {
                 mdi.IsMdiContainer = true;
@@ -840,7 +989,7 @@ internal static class GdsKlarfAnalysisFormSmoke
                 // 첫 상세보기: Shown 에서 공유 화면을 만들고 미리 읽은 데이터로 도면만 만든다
                 watch.Restart();
                 Invoke(typeA, a3, "OpenDetail", topX, topY);
-                var w1 = DACrux.SEMDMS.ENGUI.frmGdsDieAnalysis.FindWindow(a3, topX, topY);
+                var w1 = DACrux.SEMDMS.ENGUI.frmGdsDieAnalysis.Current;
                 bool shown1 = WaitFor(() => ShowsDie(topX, topY), 180);
                 double firstSeconds = watch.Elapsed.TotalSeconds;
                 var shared = (NexplantQMS.GdsMap.GdsDieAnalysisForm)DACrux.SEMDMS.ENGUI.frmGdsDieAnalysis.SharedDetailForm;
@@ -848,86 +997,95 @@ internal static class GdsKlarfAnalysisFormSmoke
                     && NexplantQMS.GdsMap.GdsDieMapCache.LoadCount == loads0 + 1 && shared.LoadedMapKey == keyWafer,
                     firstSeconds.ToString("0.0") + "초 / " + (shared == null ? "공유 화면 없음" : shared.StatusText));
                 if (!shown1 || shared == null) throw new InvalidOperationException("첫 상세보기가 표시되지 않아 이후 검사를 멈춤");
-                // 2026-10-20: Defect 범위 콤보 대신 [Chain 밖 Defect] 체크(창마다 보기 상태)
-                var chkOutsideB = (CheckBox)Get(typeB, shared, "chkOutside");
+                var dgvDiesW = (DataGridView)Get(typeof(DACrux.SEMDMS.ENGUI.frmGdsDieAnalysis), w1, "dgvDies");
+                Func<Point, DataGridViewRow> listRow = p => dgvDiesW.Rows.Cast<DataGridViewRow>().FirstOrDefault(r => (Point)r.Tag == p);
+                Func<Point?> listPick = () => dgvDiesW.SelectedRows.Count == 1 ? (Point?)(Point)dgvDiesW.SelectedRows[0].Tag : null;
+                // Die 마다 보기 상태: [걸린 / Fail Chain 만] 체크(2026-10-22 [Chain 밖 Defect] 체크가 없어져 이 체크로 본다)
+                var chkHitOnlyB = (CheckBox)Get(typeB, shared, "chkHitOnly");
                 var gmapB = (NexplantQMS.GdsMap.GdsMapControl)Get(typeB, shared, "map");
                 IntPtr mapHandle = gmapB.Handle;
-                // 창 1 보기 바꾸기: Chain 밖 Defect 끔, 확대 위치 이동
-                chkOutsideB.Checked = false;
+                // Die 1 보기 바꾸기: 걸린 / Fail Chain 만 켬, 확대 위치 이동
+                chkHitOnlyB.Checked = true;
                 double cx, cy, scale, label;
                 gmapB.GetView(out cx, out cy, out scale, out label);
                 double view1X = cx + 37, view1Y = cy - 21, view1Scale = scale * 1.7;
                 gmapB.SetView(view1X, view1Y, view1Scale, label);
 
-                // 두 번째 Die: 창 하나 더, 공유 화면을 옮겨 쓰고 도면은 다시 읽거나 만들지 않는다
+                // 열린 채로 두 번째 Die 더블클릭: 같은 창(새 창 없음) / 공유 화면 · 도면 핸들 그대로 / 도면 다시 읽지 않음 / 탭 제목 · 목록 선택 = 그 Die
                 watch.Restart();
                 Invoke(typeA, a3, "OpenDetail", p2.X, p2.Y);
-                var w2 = DACrux.SEMDMS.ENGUI.frmGdsDieAnalysis.FindWindow(a3, p2.X, p2.Y);
                 bool shown2 = WaitFor(() => ShowsDie(p2.X, p2.Y), 60);
                 double secondSeconds = watch.Elapsed.TotalSeconds;
-                Check("두 번째 Die = 새 창(첫 창 그대로) / 공유 화면 옮김(같은 화면 · 같은 도면 핸들) / 첫 창 안내 문구 / 도면 다시 읽지 않음",
-                    shown2 && w2 != null && w2 != w1 && !w1.IsDisposed && DACrux.SEMDMS.ENGUI.frmGdsDieAnalysis.OpenWindows.Count == 2
-                    && w2.HasSharedDetail && !w1.HasSharedDetail && w1.ShowsPlaceholder && !w2.ShowsPlaceholder
-                    && DACrux.SEMDMS.ENGUI.frmGdsDieAnalysis.SharedDetailForm == shared && gmapB.Handle == mapHandle
+                Check("열린 채로 두 번째 Die 더블클릭 = 같은 창(창 1개, 새 창 없음) / 공유 화면 · 도면 핸들 그대로 / 도면 다시 읽지 않음 / 탭 제목 · 목록 선택 = 그 Die",
+                    shown2 && DACrux.SEMDMS.ENGUI.frmGdsDieAnalysis.Current == w1 && windows() == 1
+                    && w1.HasSharedDetail && DACrux.SEMDMS.ENGUI.frmGdsDieAnalysis.SharedDetailForm == shared && gmapB.Handle == mapHandle
                     && NexplantQMS.GdsMap.GdsDieMapCache.LoadCount == loads0 + 1 && shared.LoadedMapKey == keyWafer && secondSeconds < 5
-                    && w1.Text == "상세보기 (" + topX + ", " + topY + ")" && w2.Text == "상세보기 (" + p2.X + ", " + p2.Y + ")",
-                    secondSeconds.ToString("0.00") + "초 / 창 " + DACrux.SEMDMS.ENGUI.frmGdsDieAnalysis.OpenWindows.Count + " / " + w1.Text + " , " + (w2 == null ? "-" : w2.Text));
-                chkOutsideB.Checked = true;   // 창 2 = Chain 밖 Defect 켬
+                    && w1.Text == "상세보기 (" + p2.X + ", " + p2.Y + ")" && listPick() == p2 && w1.AnalyzeCount == 2,
+                    secondSeconds.ToString("0.00") + "초 / 창 " + windows() + " / " + w1.Text + " / 목록 선택 " + listPick() + " / 계산 " + w1.AnalyzeCount);
+                chkHitOnlyB.Checked = false;   // Die 2 = 걸린 / Fail Chain 만 끔
                 gmapB.GetView(out cx, out cy, out scale, out label);
                 double view2X = cx, view2Y = cy, view2Scale = scale;
 
-                // 같은 Die 다시: 창은 늘지 않고 그 창으로 가며, 그 창에서 보던 Defect 범위 / 확대 위치로 되돌린다
-                Invoke(typeA, a3, "OpenDetail", topX, topY);
-                bool back1 = WaitFor(() => ShowsDie(topX, topY) && w1.HasSharedDetail, 30);
+                // 목록에서 Die 오가기(선택 0.3초 뒤 반영): 서버 다시 안 부름 / Die 마다 보던 걸린 / Fail Chain 만 · 확대 위치로 되돌림
+                int a0 = w1.AnalyzeCount;
+                dgvDiesW.CurrentCell = listRow(new Point(topX, topY)).Cells["colNo"];
+                bool back1 = WaitFor(() => ShowsDie(topX, topY), 30);
                 gmapB.GetView(out cx, out cy, out scale, out label);
                 bool view1Ok = Math.Abs(cx - view1X) < 0.01 && Math.Abs(cy - view1Y) < 0.01 && Math.Abs(scale / view1Scale - 1) < 1e-6;
-                bool out1 = chkOutsideB.Checked;
-                w2.Activate();
-                bool back2 = WaitFor(() => ShowsDie(p2.X, p2.Y) && w2.HasSharedDetail, 30);
+                bool hit1 = chkHitOnlyB.Checked;
+                dgvDiesW.CurrentCell = listRow(p2).Cells["colNo"];
+                bool back2 = WaitFor(() => ShowsDie(p2.X, p2.Y), 30);
                 gmapB.GetView(out cx, out cy, out scale, out label);
                 bool view2Ok = Math.Abs(cx - view2X) < 0.01 && Math.Abs(cy - view2Y) < 0.01 && Math.Abs(scale / view2Scale - 1) < 1e-6;
-                bool out2 = chkOutsideB.Checked;
-                Check("같은 Die 다시 = 그 창으로(창 2개 그대로) / 창마다 Chain 밖 Defect · 확대 위치 되돌림 / 도면 다시 읽지 않음",
-                    back1 && back2 && DACrux.SEMDMS.ENGUI.frmGdsDieAnalysis.OpenWindows.Count == 2 && view1Ok && view2Ok && !out1 && out2
+                bool hit2 = chkHitOnlyB.Checked;
+                Check("목록에서 Die 오가기 = 서버 다시 안 부름 / Die 마다 걸린 / Fail Chain 만 · 확대 위치 되돌림 / 도면 다시 읽지 않음 / 창 1개",
+                    back1 && back2 && w1.AnalyzeCount == a0 && view1Ok && view2Ok && hit1 && !hit2 && windows() == 1
                     && NexplantQMS.GdsMap.GdsDieMapCache.LoadCount == loads0 + 1 && gmapB.Handle == mapHandle,
-                    "창1 Chain 밖 " + out1 + " 위치 " + view1Ok + " / 창2 Chain 밖 " + out2 + " 위치 " + view2Ok);
+                    "Die1 걸린 Chain 만 " + hit1 + " 위치 " + view1Ok + " / Die2 걸린 Chain 만 " + hit2 + " 위치 " + view2Ok + " / 다시 계산 " + (w1.AnalyzeCount - a0));
 
-                // E-Test Fail 역추적으로 같은 Die 를 열면 창은 그대로, 그 창 역추적 Chain 만 바뀐다
+                // E-Test Fail 역추적으로 Die 를 열면 같은 창에서 다시 계산해 역추적 Chain 을 보인다
                 DataRow focusChain = result.Tables["CHAIN"].Rows[0];
                 Invoke(typeA, a3, "OpenDetail", topX, topY, focusChain["CHAIN_SEQ"].ToString());
-                var lblFocusB = (Label)Get(typeB, shared, "lblFocus");
-                bool focused = WaitFor(() => ShowsDie(topX, topY) && w1.HasSharedDetail && lblFocusB.Visible, 30);
-                Check("역추적으로 같은 Die 열기 = 그 창(창 2개 그대로) / 역추적 Chain 표시", focused && DACrux.SEMDMS.ENGUI.frmGdsDieAnalysis.OpenWindows.Count == 2
-                    && lblFocusB.Text.Contains(focusChain["CHAIN_NAME"].ToString()), lblFocusB.Text);
+                // 역추적 표시 = [역추적 해제] 보임 + 역추적 Chain 번호(2026-10-22 Chain 이름 글자 lblFocus 삭제)
+                var btnClearShared = (Control)Get(typeB, shared, "btnClearFocus");
+                Func<string> sharedFocusSeq = () => Convert.ToString(typeB.GetField("_focusChainSeq", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(shared));
+                bool focused = WaitFor(() => ShowsDie(topX, topY) && w1.HasSharedDetail && btnClearShared.Visible, 30);
+                Check("역추적으로 Die 열기 = 같은 창(창 1개) / 다시 계산 / 역추적 Chain 표시", focused && windows() == 1 && w1.AnalyzeCount == a0 + 1
+                    && sharedFocusSeq() == focusChain["CHAIN_SEQ"].ToString(), "역추적 Chain " + sharedFocusSeq() + " / [역추적 해제] " + btnClearShared.Visible);
 
-                // 공유 화면을 가진 창을 닫으면 남은 창이 가져간다(공유 화면 / 도면 핸들 그대로, 해제 안 됨)
-                w2.Activate();
-                WaitFor(() => w2.HasSharedDetail, 10);
-                w2.Dispose();
-                bool auto = WaitFor(() => w1.HasSharedDetail, 3);
-                if (!auto) w1.Activate();
-                bool kept1 = WaitFor(() => ShowsDie(topX, topY) && w1.HasSharedDetail, 30);
-                Check("공유 화면을 가진 창 닫기 -> 남은 창이 가져감(공유 화면 · 도면 핸들 그대로)", kept1 && w2.IsDisposed && DACrux.SEMDMS.ENGUI.frmGdsDieAnalysis.OpenWindows.Count == 1
-                    && DACrux.SEMDMS.ENGUI.frmGdsDieAnalysis.SharedDetailForm == shared && !shared.IsDisposed && gmapB.Handle == mapHandle,
-                    "MDI 자동 활성 " + auto);
+                // 분석 화면이 다른 조건(허용오차 + 3)으로 다시 분석 -> 열린 상세보기도 같이 새 결과(2026-10-22 동기화): 같은 창 · 같은 Die · 분석 순번 같음 · 새 허용오차
+                var request2 = (DACrux.SEMDMS.Interface.GdsKlarfAnalysisRequest)typeof(object).GetMethod("MemberwiseClone", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(baseRequest, null);
+                request2.ToleranceUm = baseRequest.ToleranceUm + 3;
+                DataSet result2 = analysisBsl.Analyze(request2);
+                int a1 = w1.AnalyzeCount;
+                typeA.GetField("_lastRequest", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(a3, request2);
+                a3.ShowAnalysisResult(result2);
+                int version3 = (int)typeA.GetField("_analysisVersion", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(a3);
+                bool synced = WaitFor(() => ShowsDie(topX, topY), 60);
+                double tol2 = Convert.ToDouble(w1.Analysis.Tables["ANL_INFO"].Rows[0]["TOLERANCE_UM"]);
+                Check("분석 화면이 다시 분석하면 열린 상세보기도 같이 새로 계산(더블클릭 없이) / 같은 창 · 같은 Die / 분석 순번 같음 / 새 허용오차 / 목록 = 새 결과",
+                    synced && DACrux.SEMDMS.ENGUI.frmGdsDieAnalysis.Current == w1 && windows() == 1 && w1.AnalysisVersion == version3 && w1.AnalyzeCount == a1 + 1
+                    && Math.Abs(tol2 - Convert.ToDouble(request2.ToleranceUm)) < 1e-9 && w1.Text == "상세보기 (" + topX + ", " + topY + ")"
+                    && listPick() == new Point(topX, topY) && w1.ListedDies.Count == ListedDieCount(result2),
+                    "허용오차 " + tol2 + " (" + request2.ToleranceUm + ") / 순번 " + w1.AnalysisVersion + " (" + version3 + ") / 다시 계산 " + (w1.AnalyzeCount - a1)
+                    + " / 목록 " + w1.ListedDies.Count + " (" + ListedDieCount(result2) + ")");
 
-                // 창을 모두 닫아도 화면 A 가 열려 있으면 공유 화면 / 미리 읽기 유지(D4) -> 화면 A 를 닫으면 해제(메모리 반환)
+                // 상세보기 창을 닫아도 화면 A 가 열려 있으면 공유 화면 / 미리 읽기 유지(D4) -> 화면 A 를 닫으면 해제(메모리 반환)
                 w1.Dispose();
                 Application.DoEvents();
                 bool keptAll = DACrux.SEMDMS.ENGUI.frmGdsDieAnalysis.SharedDetailForm == shared && !shared.IsDisposed && NexplantQMS.GdsMap.GdsDieMapCache.Key == keyWafer;
                 typeA.GetMethod("OnFormClosed", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(a3, new object[] { new FormClosedEventArgs(CloseReason.UserClosing) });
                 bool released = DACrux.SEMDMS.ENGUI.frmGdsDieAnalysis.SharedDetailForm == null && shared.IsDisposed && NexplantQMS.GdsMap.GdsDieMapCache.Key == null;
-                Check("상세보기 창을 다 닫아도 화면 A 가 있으면 공유 화면 유지 / 화면 A 닫으면 공유 화면 · 미리 읽기 해제", keptAll && released,
+                Check("상세보기 창을 닫아도 화면 A 가 있으면 공유 화면 유지 / 화면 A 닫으면 공유 화면 · 미리 읽기 해제", keptAll && released,
                     "유지 " + keptAll + " / 해제 " + released);
                 a3.Dispose();
             }
             NexplantQMS.GdsMap.GdsDieAnalysisForm.DefaultMapService = null;
             NexplantQMS.GdsMap.GdsDieAnalysisForm.DefaultChainService = null;
         }
-
-        // ---- 11) 메시지 루프 안 검사 (2026-10-16): DACrux 처럼 Application.Run 안에서 상세보기 창끼리 간섭을 본다 ----
-        // 콘솔에서 DoEvents 로만 돌리면 도면 키가 다른 창으로 바꿀 때 화면 스레드 문맥이 풀려 OpenGL MakeCurrent 가 실패한다(Error 170, 시험 환경 문제).
-        // 기본 결과(Chain BS · 검사 FS = 반전, BACK 보기)와 Chain FS 재분석(반전 없음, FRONT 보기)으로 도면 키가 다른 창을 비교한다 (2026-10-20 KLARF 검사 면 FS 고정)
+        // ---- 11) 메시지 루프 안 검사 (2026-10-16, 2026-10-22 창 하나 기준): DACrux 처럼 Application.Run 안에서 상세보기 Die / 결과 바꾸기 간섭을 본다 ----
+        // 콘솔에서 DoEvents 로만 돌리면 도면 키가 다른 결과로 바꿀 때 화면 스레드 문맥이 풀려 OpenGL MakeCurrent 가 실패한다(Error 170, 시험 환경 문제).
+        // 기본 결과(Chain BS · 검사 FS = 반전, BACK 보기)와 Chain FS 재분석(반전 없음, FRONT 보기)으로 도면 키가 다른 결과를 오간다 (2026-10-20 KLARF 검사 면 FS 고정)
         DataSet backResult = analysisBsl.Analyze(baseRequest);
         RunInMessageLoop(() => MessageLoopChecks(stepSeq, backResult, baseRequest, analysisBsl, viewBsl, chainBsl));
 
@@ -952,8 +1110,8 @@ internal static class GdsKlarfAnalysisFormSmoke
     }
 
     /// <summary>
-    /// 11절: 상세보기 창끼리 간섭 (2026-10-16 점검 결과 1 ~ 4 수정 확인).
-    /// BACK 보기 결과(Chain BS / 검사 FS)와 FRONT 보기 재분석 결과(Chain FS / 검사 FS)로 도면 키가 다른 창을 만든다 (2026-10-20 KLARF 검사 면 FS 고정).
+    /// 11절: 상세보기 간섭 (2026-10-16 점검 결과 1 ~ 4 수정 확인, 2026-10-22 창 하나 + 목록 + 분석 화면 동기화 기준으로 바꿈).
+    /// BACK 보기 결과(Chain BS / 검사 FS)와 FRONT 보기 재분석 결과(Chain FS / 검사 FS)를 화면 A 에 번갈아 넣어 도면 키가 다른 결과를 오간다 (2026-10-20 KLARF 검사 면 FS 고정).
     /// </summary>
     /// <summary>화면 A 의 Map 쪽 패널(splitMain.Panel1).</summary>
     private static System.Windows.Forms.Control splitMainPanel(Form form, Type typeA)
@@ -972,15 +1130,16 @@ internal static class GdsKlarfAnalysisFormSmoke
             DisplayStepSeq = reqBack.DisplayStepSeq, AreaMode = reqBack.AreaMode, ToleranceUm = reqBack.ToleranceUm, ClassBasis = reqBack.ClassBasis
         };
         DataSet resFront = analysisBsl.Analyze(reqFront);
-        List<Point> dies = resBack.Tables["DIE"].Rows.Cast<DataRow>().Where(r => Convert.ToInt32(r["DEFECT_COUNT"]) > 0).Select(DiePoint).Distinct().Take(3).ToList();
-        if (dies.Count < 3)
+        List<Point> dies = resBack.Tables["DIE"].Rows.Cast<DataRow>().Where(r => Convert.ToInt32(r["DEFECT_COUNT"]) > 0).Select(DiePoint).Distinct().Take(2).ToList();
+        if (dies.Count < 2)
         {
-            Check("메시지 루프 안 검사: Defect Die 3개", false, dies.Count.ToString());
+            Check("메시지 루프 안 검사: Defect Die 2개", false, dies.Count.ToString());
             return;
         }
-        Point d1 = dies[0], d2 = dies[1], d3 = dies[2];
+        Point d1 = dies[0], d2 = dies[1];
         string keyBack = NexplantQMS.GdsMap.GdsDieAnalysisForm.MapKeyOf(resBack);
         string keyFront = NexplantQMS.GdsMap.GdsDieAnalysisForm.MapKeyOf(resFront);
+        FieldInfo lastRequest = typeA.GetField("_lastRequest", BindingFlags.NonPublic | BindingFlags.Instance);
         NexplantQMS.GdsMap.GdsDieAnalysisForm.DefaultMapService = Ro<DACrux.SEMDMS.RO.GdsMapView>(viewBsl);
         NexplantQMS.GdsMap.GdsDieAnalysisForm.DefaultChainService = Ro<DACrux.SEMDMS.RO.GdsChain>(chainBsl);
         NexplantQMS.GdsMap.GdsDieMapCache.Clear();
@@ -998,17 +1157,19 @@ internal static class GdsKlarfAnalysisFormSmoke
                 a.MdiParent = mdi;
                 a.AnalysisService = new DACrux.SEMDMS.RO.GdsKlarfAnalysis(analysisBsl);
                 a.ShowErrorDialogs = false;
-                a.ShowAnalysisResult(resBack);   // 분석 순번 1
-                typeA.GetField("_lastRequest", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(a, reqBack);
+                lastRequest.SetValue(a, reqBack);
+                a.ShowAnalysisResult(resBack);   // 분석 순번 1 (열린 상세보기 없음)
                 DACrux.SEMDMS.ENGUI.frmGdsDieAnalysis.Preload(a, resBack);
                 Wait(NexplantQMS.GdsMap.GdsDieMapCache.Pending, 300);
                 int loads0 = NexplantQMS.GdsMap.GdsDieMapCache.LoadCount;
 
-                // ---- 11-1) 새 창은 앞 창의 상태줄 / Chain 고른 행 / 스크롤을 이어받지 않는다. 돌아가면 그 창 값 ----
+                // ---- 11-1) 목록에서 다른 Die 로 가면 앞 Die 의 상태줄 / Chain 고른 행 / 스크롤을 이어받지 않는다. 돌아가면 그 Die 값 ----
                 Invoke(typeA, a, "OpenDetail", d1.X, d1.Y);
                 WaitFor(() => ShowsDie(d1.X, d1.Y), 180);
-                var w1 = DACrux.SEMDMS.ENGUI.frmGdsDieAnalysis.FindWindow(a, d1.X, d1.Y);
+                var w = DACrux.SEMDMS.ENGUI.frmGdsDieAnalysis.Current;
                 var b = (NexplantQMS.GdsMap.GdsDieAnalysisForm)DACrux.SEMDMS.ENGUI.frmGdsDieAnalysis.SharedDetailForm;
+                var dgvDiesW = (DataGridView)Get(typeof(DACrux.SEMDMS.ENGUI.frmGdsDieAnalysis), w, "dgvDies");
+                Func<Point, DataGridViewRow> listRow = p => dgvDiesW.Rows.Cast<DataGridViewRow>().FirstOrDefault(r => (Point)r.Tag == p);
                 // 2026-10-20: Chain 표 + Defect 표 = [GDS / KLARF] 표 하나. 고른 행 = 마지막 Defect 행(Chain 칸 + Defect ID 로 비교)
                 var dgvChains = (DataGridView)Get(typeB, b, "dgvChainDefects");
                 Func<DataGridViewRow, string> rowText = r => r == null ? "-" : Convert.ToString(r.Cells["colCode"].Value) + "|" + Convert.ToString(r.Cells["colDefectId"].Value);
@@ -1020,76 +1181,59 @@ internal static class GdsKlarfAnalysisFormSmoke
                 string tag1 = rowText(lastChain);
                 Application.DoEvents();
                 string status1 = b.StatusText;
-                Invoke(typeA, a, "OpenDetail", d2.X, d2.Y);
+                dgvDiesW.CurrentCell = listRow(d2).Cells["colNo"];
                 WaitFor(() => ShowsDie(d2.X, d2.Y), 60);
-                var w2 = DACrux.SEMDMS.ENGUI.frmGdsDieAnalysis.FindWindow(a, d2.X, d2.Y);
                 string status2 = b.StatusText;
-                // 2026-10-19: Chain 표는 [GDS / KLARF] 기능 탭에 있어 새 창(처음 탭 = 종합 (Die))에서는 숨어 있다. 숨은 표의 첫 표시 행은 -1 = 스크롤 없음
                 int chainSelected = dgvChains.SelectedRows.Count, chainFirst = dgvChains.Rows.Count == 0 ? 0 : dgvChains.FirstDisplayedScrollingRowIndex;
                 bool freshList = chainSelected == 0 && chainFirst <= 0;
-                w1.Activate();
-                bool back1 = WaitFor(() => ShowsDie(d1.X, d1.Y) && w1.HasSharedDetail, 30);
-                Check("새 창은 앞 창 상태줄 / Chain 고른 행 · 스크롤 이어받지 않음 / 돌아가면 그 창 상태줄 · Chain 행",
+                dgvDiesW.CurrentCell = listRow(d1).Cells["colNo"];
+                bool back1 = WaitFor(() => ShowsDie(d1.X, d1.Y), 30);
+                Check("목록에서 다른 Die = 앞 Die 상태줄 / Chain 고른 행 · 스크롤 이어받지 않음 / 돌아가면 그 Die 상태줄 · Chain 행",
                     status1.StartsWith("Defect #") && status2 != status1 && status2.StartsWith("Die (" + d2.X + ", " + d2.Y + ")") && freshList
                     && back1 && b.StatusText == status1 && dgvChains.CurrentRow != null && rowText(dgvChains.CurrentRow) == tag1,
-                    "w1 \"" + status1 + "\" / w2 \"" + status2 + "\" / w2 Chain 새 목록 " + freshList + " (선택 " + chainSelected + " / 첫 행 " + chainFirst + ") / w1 되돌림 \"" + b.StatusText + "\""
-                    + " / w1 행 " + rowText(dgvChains.CurrentRow) + " (기대 " + tag1 + ")");
+                    "d1 \"" + status1 + "\" / d2 \"" + status2 + "\" / d2 Chain 새 목록 " + freshList + " (선택 " + chainSelected + " / 첫 행 " + chainFirst + ") / d1 되돌림 \"" + b.StatusText + "\""
+                    + " / d1 행 " + rowText(dgvChains.CurrentRow) + " (기대 " + tag1 + ")");
 
-                // ---- 11-2) 재분석(FRONT 보기) -> 이전 결과 창 탭 제목 "(이전 분석)" / 미리 읽기 캐시 2칸 ----
-                a.ShowAnalysisResult(resFront);  // 분석 순번 2
-                typeA.GetField("_lastRequest", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(a, reqFront);
-                DACrux.SEMDMS.ENGUI.frmGdsDieAnalysis.Preload(a, resFront);
-                Wait(NexplantQMS.GdsMap.GdsDieMapCache.Pending, 300);
+                // ---- 11-2) 분석 화면이 FRONT 보기로 다시 분석 -> 열린 상세보기도 FRONT 결과 · 도면(동기화) / 미리 읽기 캐시 2칸 / DB 읽기 1번 ----
+                lastRequest.SetValue(a, reqFront);
+                DACrux.SEMDMS.ENGUI.frmGdsDieAnalysis.Preload(a, resFront);   // 화면 A FinishAnalysis 처럼 반영 전에 미리 읽기 시작
+                a.ShowAnalysisResult(resFront);  // 분석 순번 2 -> 상세보기 동기화
+                bool toFront = WaitFor(() => ShowsDie(d1.X, d1.Y) && b.LoadedMapKey == keyFront, 120);
                 string[] keys = NexplantQMS.GdsMap.GdsDieMapCache.Keys;
-                Check("재분석 -> 이전 결과 창 탭 제목 (이전 분석) / 미리 읽기 캐시 2칸(FRONT · BACK)",
-                    w1.Text == "상세보기 (" + d1.X + ", " + d1.Y + ") (이전 분석)" && w2.Text == "상세보기 (" + d2.X + ", " + d2.Y + ") (이전 분석)"
+                Check("FRONT 보기로 다시 분석 -> 열린 상세보기도 FRONT 결과 · 도면(같은 창 · 같은 Die) / 미리 읽기 캐시 2칸 / DB 읽기 1번(미리 읽기를 같이 씀)",
+                    toFront && DACrux.SEMDMS.ENGUI.frmGdsDieAnalysis.Current == w && DACrux.SEMDMS.ENGUI.frmGdsDieAnalysis.OpenWindows.Count == 1
+                    && w.Analysis.Tables["ANL_INFO"].Rows[0]["VIEW_SIDE"].ToString() == "FRONT" && w.Text == "상세보기 (" + d1.X + ", " + d1.Y + ")"
                     && keyBack != keyFront && keys.Length == 2 && keys[0] == keyFront && keys[1] == keyBack && NexplantQMS.GdsMap.GdsDieMapCache.LoadCount == loads0 + 1,
-                    w1.Text + " , " + w2.Text + " / 캐시 " + keys.Length);
+                    w.Text + " " + w.Analysis.Tables["ANL_INFO"].Rows[0]["VIEW_SIDE"] + " / 캐시 " + keys.Length + " / DB 읽기 " + (NexplantQMS.GdsMap.GdsDieMapCache.LoadCount - loads0));
 
-                // ---- 11-3) 도면 키가 다른 창끼리 오가기: DB 다시 읽지 않음(도면만 다시 만듦) ----
+                // ---- 11-3) 다시 BACK 보기로 분석 -> BACK 도면, DB 다시 읽지 않음(캐시 2칸) ----
                 var watch = Stopwatch.StartNew();
-                Invoke(typeA, a, "OpenDetail", d3.X, d3.Y);
-                bool shown3 = WaitFor(() => ShowsDie(d3.X, d3.Y), 120);
-                var w3 = DACrux.SEMDMS.ENGUI.frmGdsDieAnalysis.FindWindow(a, d3.X, d3.Y);
-                double open3 = watch.Elapsed.TotalSeconds;
-                watch.Restart();
-                w1.Activate();
+                lastRequest.SetValue(a, reqBack);
+                a.ShowAnalysisResult(resBack);   // 분석 순번 3
                 bool toBack = WaitFor(() => ShowsDie(d1.X, d1.Y) && b.LoadedMapKey == keyBack, 120);
-                double backSeconds = watch.Elapsed.TotalSeconds;
-                watch.Restart();
-                w3.Activate();
-                bool toFront = WaitFor(() => ShowsDie(d3.X, d3.Y) && b.LoadedMapKey == keyFront, 120);
-                double frontSeconds = watch.Elapsed.TotalSeconds;
-                Check("도면 키 다른 창끼리 오가기 = DB 다시 읽지 않음(캐시 2칸) / 각 창 자기 도면", shown3 && toBack && toFront && w3.Text == "상세보기 (" + d3.X + ", " + d3.Y + ")"
-                    && NexplantQMS.GdsMap.GdsDieMapCache.LoadCount == loads0 + 1,
-                    String.Format("새 창 {0:0.0}초 / BACK 창으로 {1:0.0}초 / FRONT 창으로 {2:0.0}초 / DB 읽기 {3}", open3, backSeconds, frontSeconds, NexplantQMS.GdsMap.GdsDieMapCache.LoadCount - loads0));
+                Check("BACK 보기로 다시 분석 -> 열린 상세보기 BACK 도면 / DB 다시 읽지 않음(캐시 2칸)", toBack && NexplantQMS.GdsMap.GdsDieMapCache.LoadCount == loads0 + 1
+                    && w.Analysis.Tables["ANL_INFO"].Rows[0]["VIEW_SIDE"].ToString() == resBack.Tables["ANL_INFO"].Rows[0]["VIEW_SIDE"].ToString(),
+                    String.Format("{0:0.0}초 / DB 읽기 {1}", watch.Elapsed.TotalSeconds, NexplantQMS.GdsMap.GdsDieMapCache.LoadCount - loads0));
 
-                // ---- 11-4) 다른 키 도면을 읽는 중에 지금 도면과 같은 키 창으로 바로 넘어가기: 늦게 끝난 읽기가 덮지 않는다 ----
-                w1.Activate();
-                WaitFor(() => ShowsDie(d1.X, d1.Y) && b.LoadedMapKey == keyBack, 120);
+                // ---- 11-4) 다른 키 도면을 읽는 중에 지금 도면과 같은 키 결과로 다시 분석: 늦게 끝난 읽기가 덮지 않는다 ----
                 NexplantQMS.GdsMap.GdsDieMapCache.Clear();   // FRONT 를 DB 에서 읽게 한다
-                w3.Activate();
+                lastRequest.SetValue(a, reqFront);
+                a.ShowAnalysisResult(resFront);
                 bool started = WaitFor(() => b.IsBusy, 10);
-                w2.Activate();
+                lastRequest.SetValue(a, reqBack);
+                a.ShowAnalysisResult(resBack);
                 WaitFor(() => NexplantQMS.GdsMap.GdsDieMapCache.Pending != null && NexplantQMS.GdsMap.GdsDieMapCache.Pending.IsCompleted, 120);
                 Pump(1500);
-                int w2Defects = w2.Analysis.Tables["DEFECT"].Rows.Cast<DataRow>().Count(r => DiePoint(r) == d2);
-                Check("다른 키 도면 읽는 중 같은 키 창으로 전환 -> 늦게 끝난 읽기가 그 창 도면을 덮지 않음",
-                    started && w2.HasSharedDetail && ShowsDie(d2.X, d2.Y) && b.LoadedMapKey == keyBack && b.DefectMarkerCount == w2Defects && !b.IsBusy,
+                int d1Defects = w.Analysis.Tables["DEFECT"].Rows.Cast<DataRow>().Count(r => DiePoint(r) == d1);
+                Check("다른 키 도면 읽는 중 같은 키 결과로 다시 분석 -> 늦게 끝난 읽기가 지금 도면을 덮지 않음",
+                    started && ShowsDie(d1.X, d1.Y) && b.LoadedMapKey == keyBack && b.DefectMarkerCount == d1Defects && !b.IsBusy,
                     "읽기 시작 " + started + " / 도면 키 " + (b.LoadedMapKey == keyBack ? "BACK" : b.LoadedMapKey == keyFront ? "FRONT" : "-")
-                    + " / Defect 표시 " + b.DefectMarkerCount + " (w2 " + w2Defects + ")");
+                    + " / Defect 표시 " + b.DefectMarkerCount + " (" + d1Defects + ")");
                 int loadsRace = NexplantQMS.GdsMap.GdsDieMapCache.LoadCount;
-                w3.Activate();
-                bool after = WaitFor(() => ShowsDie(d3.X, d3.Y) && b.LoadedMapKey == keyFront, 120);
-                Check("버린 읽기 데이터는 캐시에 남음(그 창으로 가면 DB 다시 읽지 않음)", after && NexplantQMS.GdsMap.GdsDieMapCache.LoadCount == loadsRace, "");
-
-                // ---- 11-5) 재분석 뒤 같은 Die 다시 열기 = 그 창에 새 결과 + 제목 되돌림, 다른 창은 (이전 분석) 그대로 ----
-                Invoke(typeA, a, "OpenDetail", d1.X, d1.Y);
-                bool reopened = WaitFor(() => ShowsDie(d1.X, d1.Y) && w1.HasSharedDetail && b.LoadedMapKey == keyFront, 120);
-                Check("재분석 뒤 같은 Die 다시 = 그 창 새 결과(FRONT) / 제목 되돌림 / 다른 창 (이전 분석) 그대로",
-                    reopened && DACrux.SEMDMS.ENGUI.frmGdsDieAnalysis.OpenWindows.Count == 3 && w1.Text == "상세보기 (" + d1.X + ", " + d1.Y + ")"
-                    && w1.Analysis.Tables["ANL_INFO"].Rows[0]["VIEW_SIDE"].ToString() == "FRONT" && w2.Text.EndsWith("(이전 분석)"),
-                    w1.Text + " " + w1.Analysis.Tables["ANL_INFO"].Rows[0]["VIEW_SIDE"] + " / " + w2.Text);
+                lastRequest.SetValue(a, reqFront);
+                a.ShowAnalysisResult(resFront);
+                bool after = WaitFor(() => ShowsDie(d1.X, d1.Y) && b.LoadedMapKey == keyFront, 120);
+                Check("버린 읽기 데이터는 캐시에 남음(다시 그 결과로 가면 DB 다시 읽지 않음)", after && NexplantQMS.GdsMap.GdsDieMapCache.LoadCount == loadsRace, "");
 
                 foreach (Form f in DACrux.SEMDMS.ENGUI.frmGdsDieAnalysis.OpenWindows.ToArray()) f.Dispose();
                 typeA.GetMethod("OnFormClosed", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(a, new object[] { new FormClosedEventArgs(CloseReason.UserClosing) });
@@ -1105,6 +1249,12 @@ internal static class GdsKlarfAnalysisFormSmoke
         }
     }
 
+    /// <summary>상세보기 왼쪽 목록에 들어갈 Die 수: Defect 1개 이상 또는 E-Test Fail Chain 1개 이상.</summary>
+    private static int ListedDieCount(DataSet ds)
+    {
+        return ds.Tables["DIE"].Rows.Cast<DataRow>().Count(r => Convert.ToInt32(r["DEFECT_COUNT"]) > 0
+            || (r.Table.Columns.Contains("ET_FAIL_CHAIN_COUNT") && !r.IsNull("ET_FAIL_CHAIN_COUNT") && Convert.ToInt32(r["ET_FAIL_CHAIN_COUNT"]) > 0));
+    }
     /// <summary>RO 생성자(원격 URL 읽기)를 거치지 않고 원격 연결 필드만 BSL 로 채운다.</summary>
     private static T Ro<T>(object bsl) where T : class
     {
@@ -1117,6 +1267,142 @@ internal static class GdsKlarfAnalysisFormSmoke
     {
         return new Point(Convert.ToInt32(r["XINDEX"]), Convert.ToInt32(r["YINDEX"]));
     }
+
+    /// <summary>
+    /// 화면 B 아래 E-Test 값 표 (2026-10-22, 설계 2026-10-22_상세보기_오른쪽_한패널_설계.md 3절): 이 Wafer 의 READY E-Test 파일을 연결한 결과(BSL 직접)로
+    /// [E-Test 값] 체크 · 아래 표 범위(Die 전체 / 고른 행 Chain / Chain 밖) · 아래 행 고르기 · 접기 · 4분류 칸 · 분류 글자색 · 기준 E-Test 줄을 본다.
+    /// 다음 검사가 E-Test 없는 결과로 다시 연다.
+    /// </summary>
+    private static void EtPanelChecks(NexplantQMS.GdsMap.GdsDieAnalysisForm detail, Type typeB, DACrux.SEMDMS.BSL.GdsKlarfAnalysis analysisBsl,
+        DACrux.SEMDMS.Interface.GdsKlarfAnalysisRequest baseRequest, DataSet ready, DataRow etFile)
+    {
+        Func<string, Control> b = n => (Control)Get(typeB, detail, n);
+        var request = new DACrux.SEMDMS.Interface.GdsKlarfAnalysisRequest
+        {
+            Factory = baseRequest.Factory, DeviceId = baseRequest.DeviceId, StepSeqs = baseRequest.StepSeqs, ViewSides = baseRequest.ViewSides,
+            ChainSide = baseRequest.ChainSide, DisplayStepSeq = baseRequest.DisplayStepSeq, AreaMode = baseRequest.AreaMode, ToleranceUm = baseRequest.ToleranceUm,
+            ClassBasis = baseRequest.ClassBasis, EtSrcFileSeq = long.Parse(etFile["SRC_FILE_SEQ"].ToString()),
+            WaferKey = ready.Tables["WAFER_KEY"].Rows.Count > 0 ? ready.Tables["WAFER_KEY"].Rows[0]["WAFER_KEY"].ToString() : null
+        };
+        DataSet wafer = analysisBsl.Analyze(request);
+        // E-Test 값이 있는 Die: 일치 Chain 이 있는 Die -> Fail Chain 이 있는 Die -> E-Test 판정이 있는 Die
+        DataRow pickDc = wafer.Tables["DIE_CHAIN"].Rows.Cast<DataRow>()
+            .OrderBy(r => r["CLASS4"].ToString() == "BOTH" ? 0 : r["ET_STATUS"].ToString() == "F" ? 1 : r["ET_STATUS"].ToString().Length > 0 ? 2 : 3).FirstOrDefault();
+        if (pickDc == null || pickDc["ET_STATUS"].ToString().Length == 0)
+        {
+            Console.WriteLine("참고 / E-Test 판정이 있는 Die 가 없어 아래 E-Test 값 표 검사는 건너뜀 (SRC_FILE_SEQ " + request.EtSrcFileSeq + ")");
+            return;
+        }
+        int x = Convert.ToInt32(pickDc["XINDEX"]), y = Convert.ToInt32(pickDc["YINDEX"]);
+        DataSet die = analysisBsl.AnalyzeDie(request, x, y, null);
+        List<DataRow> etRows = die.Tables["ET_VALUE"].Rows.Cast<DataRow>().Where(r => Convert.ToInt32(r["XINDEX"]) == x && Convert.ToInt32(r["YINDEX"]) == y).ToList();
+        Console.WriteLine("E-Test 연결: SRC_FILE_SEQ " + request.EtSrcFileSeq + " / " + etFile["TEST_PROGRAM"] + " / Die (" + x + ", " + y + ") / E-Test 값 " + etRows.Count);
+        System.Threading.SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext());
+        Wait(detail.ShowDieAsync(die, x, y, null), 300);
+        Application.DoEvents();
+        var split = (SplitContainer)b("splitRight");
+        var chk = (CheckBox)b("chkEtValues");
+        var grid = (DataGridView)b("dgvChainDefects");
+        var et = (DataGridView)b("dgvEtValues");
+        var head = (Label)b("lblEtCount");
+        Func<DataGridViewRow, object> seqOf = r => r.Tag == null ? null : r.Tag.GetType().GetField("ChainSeq").GetValue(r.Tag);
+
+        // 1) 보이기 + 고른 행 없음 = Die 전체
+        // 기준 E-Test 줄은 2026-10-22 부터 E-Test 가 있어도 숨김(글자는 채움). 아래 표 높이 = 오른쪽의 35%(1/4 이상이면 통과)
+        bool shown = chk.Visible && chk.Checked && !split.Panel2Collapsed && !b("lblEtText").Visible && b("lblEtText").Text.StartsWith("E-Test 공정 ")
+            && new[] { "colClass", "colEt", "colFailPara" }.All(n => grid.Columns[n].Visible) && split.Panel2.Height * 4 >= split.Height;
+        bool dieAll = grid.SelectedRows.Count == 0 && et.Rows.Count == etRows.Count && head.Text.StartsWith("E-Test 값 · Die 전체 (" + etRows.Count + ")");
+        Check("화면 B E-Test 연결 결과: [E-Test 값] 켬 · 아래 표 펼침 · 분류 / ET / Fail Para 열 보임 · 기준 E-Test 줄 숨김 / 고른 행 없음 = 아래 표 Die 전체 Parameter", shown && dieAll,
+            "보임 " + shown + " / 아래 표 높이 " + split.Panel2.Height + " / " + split.Height + " / " + head.Text + " / 표 " + et.Rows.Count + " (" + etRows.Count + ") / " + b("lblEtText").Text);
+
+        // 2) 위 표 Chain 행 고르기 = 그 Chain 의 이 Die Parameter 만(Fail 먼저)
+        DataGridViewRow chainRow = grid.Rows.Cast<DataGridViewRow>().FirstOrDefault(r => seqOf(r) != null && etRows.Any(e => e["CHAIN_SEQ"].ToString() == seqOf(r).ToString()));
+        if (chainRow != null)
+        {
+            string seq = seqOf(chainRow).ToString();
+            string name = Convert.ToString(chainRow.Cells["colCode"].Value);
+            int want = etRows.Count(e => e["CHAIN_SEQ"].ToString() == seq);
+            grid.ClearSelection();
+            chainRow.Selected = true;
+            Application.DoEvents();
+            List<string> flags = et.Rows.Cast<DataGridViewRow>().Select(r => Convert.ToString(r.Cells["판정"].Value)).ToList();
+            bool scoped = et.Rows.Count == want && et.Rows.Cast<DataGridViewRow>().All(r => Convert.ToString(r.Cells["SEQ"].Value) == seq)
+                && head.Text.StartsWith("E-Test 값 · Chain " + name + " (" + want + ")") && flags.SkipWhile(f => f == "F").All(f => f != "F");
+            Check("화면 B 위 표 Chain 행 고르기 = 아래 표 = 그 Chain 의 이 Die Parameter(Fail 먼저) / 머리 글자", scoped, head.Text + " / 표 " + et.Rows.Count + " (" + want + ")");
+            CaptureDetail(detail, "B1_상세_Chain고름_아래ETest값.png");
+
+            // 3) 아래 행 고르기 = 상태줄 Parameter / GDS Chain / 값 / 판정 (그 Parameter 의 GDS Chain 도형 칠하기)
+            if (et.Rows.Count > 0)
+            {
+                et.ClearSelection();
+                et.Rows[0].Selected = true;
+                Application.DoEvents();
+                Check("화면 B 아래 E-Test 값 행 고르기 = 상태줄 Parameter / GDS Chain / 값 / 판정", detail.StatusText.StartsWith(Convert.ToString(et.Rows[0].Cells["Parameter"].Value) + " / "),
+                    detail.StatusText);
+            }
+        }
+        else Console.WriteLine("참고 / 이 Die 위 표에 E-Test 값이 있는 Chain 행이 없음");
+
+        // 4) Chain 밖 Defect 행 = 빈 표
+        DataGridViewRow outRow = grid.Rows.Cast<DataGridViewRow>().FirstOrDefault(r => r.Tag != null && seqOf(r) == null);
+        if (outRow != null)
+        {
+            grid.ClearSelection();
+            outRow.Selected = true;
+            Application.DoEvents();
+            Check("화면 B Chain 밖 Defect 행 고르기 = 아래 표 빈 표 + 머리 \"E-Test 값 · Chain 밖 Defect\"", et.Rows.Count == 0 && head.Text == "E-Test 값 · Chain 밖 Defect",
+                head.Text + " / 표 " + et.Rows.Count);
+            CaptureDetail(detail, "B2_상세_Chain밖고름.png");
+        }
+
+        // 5) [E-Test 값] 끄기 = 아래 접힘(위 표가 패널 끝까지), 켜기 = 펼침
+        int topHeight = grid.Height;
+        chk.Checked = false;
+        Application.DoEvents();
+        bool folded = split.Panel2Collapsed && grid.Height > topHeight;
+        int foldedHeight = grid.Height;
+        CaptureDetail(detail, "B3_상세_ETest값끔.png");
+        chk.Checked = true;
+        Application.DoEvents();
+        Check("화면 B [E-Test 값] 끄기 = 아래 접힘 · 위 표 늘어남 / 켜기 = 펼침", folded && !split.Panel2Collapsed && grid.Height == topHeight,
+            "위 표 높이 " + topHeight + " -> " + foldedHeight + " -> " + grid.Height);
+
+        // 6) 분류 칸 글자색 = 예전 [종합] 표 색 (4분류 상태 칸 5개는 2026-10-22 삭제)
+        var colors = new Dictionary<string, Color> { { "일치", Color.Firebrick }, { "Fail만", Color.DarkOrange }, { "Defect만", Color.FromArgb(150, 110, 0) } };
+        List<DataGridViewRow> classRows = grid.Rows.Cast<DataGridViewRow>().Where(r => colors.ContainsKey(Convert.ToString(r.Cells["colClass"].Value))).ToList();
+        bool colorOk = classRows.All(r => r.Cells["colClass"].Style.ForeColor.ToArgb() == colors[Convert.ToString(r.Cells["colClass"].Value)].ToArgb());
+        Check("화면 B 분류 칸 글자색(일치 빨강 / Fail만 주황 / Defect만 진노랑)", colorOk,
+            "색 행 " + classRows.Count + " (" + String.Join(",", classRows.Select(r => Convert.ToString(r.Cells["colClass"].Value)).Distinct().ToArray()) + ")");
+    }
+
+    /// <summary>
+    /// capture 인자일 때 화면 B 를 그림으로 남긴다(2026-10-22). OpenGL 도면은 DrawToBitmap 으로 그려지지 않아 PrintWindow(PW_RENDERFULLCONTENT)로 찍고,
+    /// 화면 밖(-32000)에서는 내용이 그려지지 않아 찍는 동안만 화면 왼쪽 위로 옮긴다(Simple Smoke 와 같은 방식).
+    /// </summary>
+    private static void CaptureDetail(Form detail, string name)
+    {
+        if (captureDir == null) return;
+        Point keep = detail.Location;
+        detail.Location = new Point(0, 0);
+        Pump(1500);
+        string file = System.IO.Path.Combine(captureDir, name);
+        using (var bmp = new Bitmap(detail.Width, detail.Height))
+        {
+            using (Graphics g = Graphics.FromImage(bmp))
+            {
+                IntPtr hdc = g.GetHdc();
+                try { PrintWindow(detail.Handle, hdc, 2); }
+                finally { g.ReleaseHdc(hdc); }
+            }
+            bmp.Save(file, System.Drawing.Imaging.ImageFormat.Png);
+        }
+        detail.Location = keep;
+        Application.DoEvents();
+        Console.WriteLine("그림: " + file);
+    }
+
+    [System.Runtime.InteropServices.DllImport("user32.dll")]
+    private static extern bool PrintWindow(IntPtr hwnd, IntPtr hdc, uint flags);
 
     private static void Pump(int milliseconds)
     {

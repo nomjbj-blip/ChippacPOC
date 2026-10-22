@@ -163,3 +163,6 @@ D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\02_DMS\DACrux.SEM
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmEtResultView.resources
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmKlarfFileViewer.resources
 D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmGdsKlarfSourceFind.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmGdsKlarfSimple.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmEtBinSetup.resources
+D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\02_DMS\DACrux.SEMDMS.ENGUI\obj\Debug\DACrux.SEMDMS.ENGUI.frmGdsDieAnalysis.resources

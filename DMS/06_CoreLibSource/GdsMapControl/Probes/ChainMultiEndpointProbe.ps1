@@ -1,7 +1,7 @@
 ﻿# 여러 Input/Output 중 실제 연결된 단자 쌍을 찾고 단일 지정 호출도 유지하는지 검사한다.
 $ErrorActionPreference = 'Stop'
 $exePath = if ($env:CHAIN_PROBE_EXE) { $env:CHAIN_PROBE_EXE }
-    else { Join-Path $PSScriptRoot '..\bin\Debug\NexplantQMS.GdsMap.exe' }
+    else { Join-Path $PSScriptRoot '..\bin\Debug\NexplantQMS.GdsMap.dll' }
 [void][System.Reflection.Assembly]::LoadFrom((Resolve-Path $exePath).Path)
 
 function New-Element([string]$key, [int]$layer, [double]$left, [double]$right) {

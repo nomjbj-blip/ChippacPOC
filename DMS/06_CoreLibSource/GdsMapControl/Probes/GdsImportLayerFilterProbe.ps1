@@ -21,7 +21,7 @@ $ErrorActionPreference = 'Stop'
 $dms = (Resolve-Path (Join-Path $PSScriptRoot '..\..\..')).Path
 $serverBin = Join-Path $dms '101_ServerBin'
 if ($BinDir -eq '') { $BinDir = $serverBin }
-$gdsExe = if ($GdsExe -ne '') { $GdsExe } else { Join-Path $dms '06_CoreLibSource\GdsMapControl\bin\Debug\NexplantQMS.GdsMap.exe' }
+$gdsExe = if ($GdsExe -ne '') { $GdsExe } else { Join-Path $dms '06_CoreLibSource\GdsMapControl\bin\Debug\NexplantQMS.GdsMap.dll' }
 if ($GdsPath -eq '') { $GdsPath = Join-Path (Split-Path $dms -Parent) 'SampleFile\OMM all layer2.gds\OMM all layer2.gds' }
 $factory = 'PROBE'; $device = 'LAYER_FILTER_PROBE'
 

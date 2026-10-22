@@ -12,7 +12,7 @@
             base.Dispose(disposing);
         }
 
-        /// <summary>위쪽 조회 줄 / 왼쪽 Map 목록 / 가운데 Map / 오른쪽 탭(Map 정보)을 WinForms 디자이너 구성으로 만든다.</summary>
+        /// <summary>위쪽 조회 줄 / 왼쪽 Map 목록 / 가운데 Map / 오른쪽 탭(Map 정보, 숨김)을 WinForms 디자이너 구성으로 만든다.</summary>
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmStandardMapView));
@@ -133,7 +133,7 @@
             //
             this.colMapId.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
             this.colMapId.DataPropertyName = "MAPID";
-            this.colMapId.HeaderText = "Device (Map ID)";
+            this.colMapId.HeaderText = "Device";
             this.colMapId.MinimumWidth = 120;
             this.colMapId.Name = "colMapId";
             this.colMapId.ReadOnly = true;
@@ -142,7 +142,7 @@
             //
             this.colWafer.DataPropertyName = "WAFER_MM";
             this.colWafer.DefaultCellStyle = numberStyle;
-            this.colWafer.HeaderText = "Wafer (mm)";
+            this.colWafer.HeaderText = "Wafer";
             this.colWafer.Name = "colWafer";
             this.colWafer.ReadOnly = true;
             this.colWafer.Width = 70;
@@ -173,6 +173,7 @@
             this.tabRight.SelectedIndex = 0;
             this.tabRight.Size = new System.Drawing.Size(480, 848);
             this.tabRight.TabIndex = 4;
+            this.tabRight.Visible = false;
             //
             // tabInfo
             //

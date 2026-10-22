@@ -1,7 +1,7 @@
 # 수동 제외로 중간 연결이 끊기거나 떨어진 객체가 추가될 때 연결 검증 결과를 검사한다.
 $ErrorActionPreference = 'Stop'
 $exePath = if ($env:CHAIN_PROBE_EXE) { $env:CHAIN_PROBE_EXE }
-    else { Join-Path $PSScriptRoot '..\bin\EndpointQA\NexplantQMS.GdsMap.exe' }
+    else { Join-Path $PSScriptRoot '..\bin\EndpointQA\NexplantQMS.GdsMap.dll' }
 [void][System.Reflection.Assembly]::LoadFrom((Resolve-Path $exePath).Path)
 
 function New-Element([string]$key, [double]$left, [double]$bottom,
