@@ -22,6 +22,7 @@ namespace DACrux.SEMDMS.ENGUI
     /// 창 / Die 목록 (2026-10-22)
     ///  1) 상세보기 창은 하나다. 열려 있으면 분석 화면에서 다른 Die 를 더블클릭해도 새 창을 만들지 않고 이 창 목록에서 그 Die 를 고른다.
     ///  2) 목록 = 연 화면 Wafer 결과의 Die 중 Defect 가 있거나 E-Test Fail Chain 이 있는 Die(연 Die 는 항상 넣음). 순서는 서버 DIE 표 그대로(Chain 위 많은 순).
+    ///     열 = No / Index(고객 통합 Die#, GdsDieIndex, 2026-10-22) / X / Y / Defect / Chain 위 / E-Test Fail.
     ///  3) 목록에서 고르면(선택이 0.3초 멈추면) 창이 가진 요청 사본으로 그 Die 만 다시 계산(AnalyzeDie)해 오른쪽에 보인다.
     ///     본 Die 의 결과 / 보기 상태는 기억해 다시 고르면 서버를 부르지 않는다.
     ///  4) 연 화면이 다시 분석하면(설정을 바꾼 분석 / Wafer 바꿈) 목록을 새 결과로 바꾸고 보던 Die 를 새 요청으로 다시 계산한다(SourceAnalyzed).
@@ -52,6 +53,8 @@ namespace DACrux.SEMDMS.ENGUI
         private readonly Dictionary<Point, DieView> views = new Dictionary<Point, DieView>();
         private Point? current;
         private bool listing;
+        // 목록 Index 열(고객 통합 Die#) 계산 Map: 목록 원본 ANL_INFO 의 FACTORY / PRODUCT (GdsDieIndex, 2026-10-22). 없으면 Index 칸을 비운다
+        private DieCoordinateMapper dieIndex;
         private static bool showErrorDialogs = true;
 
         public frmGdsDieAnalysis()
@@ -209,6 +212,7 @@ namespace DACrux.SEMDMS.ENGUI
             request = newRequest;
             service = newService;
             views.Clear();
+            dieIndex = IndexMapOf(newWafer);
             FillList();
         }
 
@@ -324,6 +328,7 @@ namespace DACrux.SEMDMS.ENGUI
         {
             if (FindListRow(p) != null) return;
             DataRow row = FindDieRow(wafer, p) ?? FindDieRow(dieData, p);
+            if (dieIndex == null && wafer == null) dieIndex = IndexMapOf(dieData);
             listing = true;
             try { AddRow(p, row); }
             finally { listing = false; }
@@ -333,7 +338,8 @@ namespace DACrux.SEMDMS.ENGUI
 
         private void AddRow(Point p, DataRow row)
         {
-            int index = dgvDies.Rows.Add(dgvDies.Rows.Count + 1, p.X, p.Y,
+            int number = GdsDieIndex.Of(dieIndex, p.X, p.Y);
+            int index = dgvDies.Rows.Add(dgvDies.Rows.Count + 1, number > 0 ? (object)number : "", p.X, p.Y,
                 row == null ? (object)"" : Int(row, "DEFECT_COUNT"),
                 row == null ? (object)"" : Int(row, "IN_CHAIN_COUNT"),
                 row == null || !row.Table.Columns.Contains("ET_FAIL_CHAIN_COUNT") || row.IsNull("ET_FAIL_CHAIN_COUNT") ? (object)"" : Int(row, "ET_FAIL_CHAIN_COUNT"));
@@ -369,6 +375,15 @@ namespace DACrux.SEMDMS.ENGUI
         private static Point PointOf(DataRow row)
         {
             return new Point(Int(row, "XINDEX"), Int(row, "YINDEX"));
+        }
+
+        /// <summary>결과 ANL_INFO 의 FACTORY / PRODUCT 로 Die Index Map 을 받는다(분석 화면이 Wafer 를 받을 때 읽어 둔 Map 을 그대로 씀). 없으면 null.</summary>
+        private static DieCoordinateMapper IndexMapOf(DataSet source)
+        {
+            if (source == null || !source.Tables.Contains("ANL_INFO") || source.Tables["ANL_INFO"].Rows.Count == 0) return null;
+            DataRow info = source.Tables["ANL_INFO"].Rows[0];
+            Func<string, string> text = c => info.Table.Columns.Contains(c) ? info[c].ToString() : string.Empty;
+            return GdsDieIndex.Cached(text("FACTORY"), text("PRODUCT"));
         }
 
         private static int Int(DataRow row, string column)
@@ -643,9 +658,15 @@ namespace DACrux.SEMDMS.ENGUI
             void AnalyzeAgain();
         }
 
+        /// <summary>이미지 창 카드의 축소본 최대 폭(검사 장비 원본 1808 폭보다 작게, 창을 크게 늘려도 흐리지 않을 만큼).</summary>
+        private const int ImageWindowThumbWidth = 1600;
+        /// <summary>이미지 창 카드의 최소 폭(창을 아주 작게 줄여도 이 폭 아래로는 줄이지 않는다).</summary>
+        private const int ImageWindowMinCardWidth = 160;
+
         /// <summary>
         /// GDS 상세 화면의 이미지 보기 요청. Defect Map Viewer 와 같은 경로(TQD_IMAGES -> 이미지 카드 DPUCDefectImageCard / FTP 다운로드)를 쓴다.
         /// 카드를 더블클릭하면 기존 ImagePopUp 이 열린다. 여기서는 Defect ID 만 알므로 카드 2줄째(Die / Class / 크기)는 비운다. (2026-10-20 카드 교체)
+        /// 2026-10-22: 카드를 창 크기에 맞춰 키운다(창을 열 때 / 창 크기를 바꿀 때 / 이미지를 읽어 비율이 정해질 때, FitImageCards).
         /// </summary>
         private void ShowDefectImages(long stepSeq, long defectId)
         {
@@ -656,7 +677,7 @@ namespace DACrux.SEMDMS.ENGUI
             {
                 Text = "Defect #" + defectId + " 이미지",
                 StartPosition = FormStartPosition.CenterParent,
-                Size = new Size(720, 460),
+                Size = new Size(760, 720),
                 ShowInTaskbar = false
             };
             var flow = new FlowLayoutPanel { Dock = DockStyle.Fill, AutoScroll = true, BackColor = Color.White };
@@ -665,7 +686,7 @@ namespace DACrux.SEMDMS.ENGUI
             {
                 if (Convert.ToInt64(row["DEFECTID"]) != defectId) continue;
                 string path = String.Format("{0}/{1}", row["IMAGE_PATH"].ToString().Trim(), row["IMAGE_FILENAME"].ToString().Trim());
-                flow.Controls.Add(new DACrux.SEMDMS.Control.DPUCDefectImageCard(defectId, path));
+                flow.Controls.Add(new DACrux.SEMDMS.Control.DPUCDefectImageCard(defectId, path, ImageWindowThumbWidth));
             }
             if (flow.Controls.Count == 0)
             {
@@ -673,7 +694,43 @@ namespace DACrux.SEMDMS.ENGUI
                 MessageBox.Show(this, "Defect #" + defectId + " 이미지가 없습니다(TQD_IMAGES).", "Defect 이미지", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
+            // 카드 폭을 바꾸면 카드 크기가 다시 바뀌므로 맞추는 동안 들어오는 요청은 건너뛴다
+            bool fitting = false;
+            Action fit = () =>
+            {
+                if (fitting) return;
+                fitting = true;
+                try { FitImageCards(flow); }
+                finally { fitting = false; }
+            };
+            flow.Resize += (s, e) => fit();
+            foreach (System.Windows.Forms.Control card in flow.Controls) card.SizeChanged += (s, e) => fit();
+            popup.Shown += (s, e) => fit();
             popup.Show(this);
+        }
+
+        /// <summary>
+        /// 이미지 창 카드를 창에 맞춘다: 카드를 가로로 나란히 두고 창 폭을 나눠 쓰며, 높이가 창을 넘으면 높이에 맞춰 줄인다.
+        /// 카드 높이는 카드가 폭과 이미지 비율로 정한다(이미지를 읽기 전에는 기본 비율).
+        /// </summary>
+        private static void FitImageCards(FlowLayoutPanel flow)
+        {
+            List<DACrux.SEMDMS.Control.DPUCDefectImageCard> cards = flow.Controls.OfType<DACrux.SEMDMS.Control.DPUCDefectImageCard>().ToList();
+            if (cards.Count == 0) return;
+            Size room = flow.ClientSize;
+            int width = Math.Max(ImageWindowMinCardWidth, (room.Width - cards[0].Margin.Horizontal * cards.Count) / cards.Count);
+            int height = room.Height - cards[0].Margin.Vertical;
+            foreach (DACrux.SEMDMS.Control.DPUCDefectImageCard card in cards)
+            {
+                card.Width = width;
+                if (height <= 0 || card.Height <= height) continue;
+                // 카드 높이 = 기울기(이미지 비율) x 폭 + 글자 칸(폭과 무관). 두 폭에서 높이를 재어 창 높이에 맞는 폭을 구한다
+                int w1 = card.Width, h1 = card.Height;
+                card.Width = Math.Max(ImageWindowMinCardWidth, w1 / 2);
+                int w2 = card.Width, h2 = card.Height;
+                double slope = w1 == w2 ? 0 : (double)(h1 - h2) / (w1 - w2);
+                card.Width = slope <= 0 ? w2 : Math.Max(ImageWindowMinCardWidth, (int)Math.Floor((height - (h2 - slope * w2)) / slope) - 1);
+            }
         }
 
         /// <summary>오류 알림: Trace 에 남기고, 오류 창을 켜 두었으면 메시지 창도 띄운다.</summary>

@@ -89,5 +89,22 @@ namespace DACrux.SEMDMS.RO
         }
 
         #endregion
+
+        #region [작업 기간]
+
+        /// <summary>데이터 생성 / 수정 작업 가능 기간 안내 한 행. 열 설명은 iGdsMapView.GetWorkState. (2026-10-23)</summary>
+        public DataTable GetWorkState()
+        {
+            try
+            {
+                return m_OBJ.GetWorkState();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        #endregion
     }
 }

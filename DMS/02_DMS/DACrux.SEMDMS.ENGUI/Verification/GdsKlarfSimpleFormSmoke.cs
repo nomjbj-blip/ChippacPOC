@@ -17,7 +17,7 @@ using DACrux.SEMDMS.Interface;
 /// <summary>
 /// GDS-KLARF 연관 분석 Simple 화면(frmGdsKlarfSimple) Smoke 검사.
 /// 설계: 문서/설계/05_연관분석/2026-10-22_GDS_KLARF_연관분석_Simple_화면_설계.md 8절
-/// 화면을 화면 밖에 실제로 띄워 Wafer 받기 -> 자동 1차 분석 -> Map 색 / 숫자 -> 종합 (Die) / Chain 목록 -> 색 구간 팝업 -> 설정 바꾸고 [분석]
+/// 화면을 화면 밖에 실제로 띄워 Wafer 받기 -> 자동 1차 분석 -> Map 색 / 숫자 -> 종합 (Die) -> 색 구간 팝업 -> 설정 바꾸고 [분석]
 /// -> Die 선택 -> 이미지 카드 흐름을 검사한다. Service(Remoting) 대신 RO 의 원격 연결 필드(m_OBJ)를 같은 프로세스 BSL 로 바꿔
 /// 화면 -> RO -> BSL -> DSL -> 로컬 DB 를 실제로 거친다. DB 는 조회만 한다.
 /// 2026-10-22 2단계: Die 더블클릭 상세보기(설계 15절)를 메시지 루프 안에서 실제 경로(MDI 부모 + 상세보기 창 + 공유 GDS 상세 화면)로 검사한다(DetailChecks).
@@ -27,6 +27,8 @@ internal static class GdsKlarfSimpleFormSmoke
 {
     private static int failures;
     private static int checks;
+    /// <summary>기대 Die Index(고객 통합 Die#) Map: BSL 로 직접 읽은 Factory + Product 의 TQP_USEMAP 사용 Die. 없으면 null (2026-10-22).</summary>
+    private static DieCoordinateMapper indexMap;
 
     [STAThread]
     private static int Main(string[] args)
@@ -71,8 +73,15 @@ internal static class GdsKlarfSimpleFormSmoke
         int in0 = Convert.ToInt32(info0["IN_CHAIN_DEFECT_COUNT"]);
         int in5 = Convert.ToInt32(expected5.Tables["ANL_INFO"].Rows[0]["IN_CHAIN_DEFECT_COUNT"]);
         DataTable imagePaths = defectBsl.GetDefectImagePath01(new[] { stepSeq });
+        // Die Index: 화면은 GdsDieIndex.Service(같은 프로세스 BSL)로 읽고, 기대값은 BSL 조회 결과로 직접 만든다
+        var etBsl = new DACrux.SEMDMS.BSL.GdsEtResult();
+        GdsDieIndex.Service = new DACrux.SEMDMS.RO.GdsEtResult(etBsl);
+        DataTable mapDies = etBsl.GetEtMapDieList(factory, info0["PRODUCT"].ToString());
+        indexMap = mapDies.Rows.Cast<DataRow>().Any(x => x["USECODE"] != DBNull.Value && Convert.ToInt32(x["USECODE"]) == DieCoordinateMapper.UsedDieCode)
+            ? DieCoordinateMapper.FromDieTable(mapDies, new DACrux.SEMDMS.Interface.DiePoint(0, 0)) : null;
         Console.WriteLine("BSL 기준: Defect " + info0["DEFECT_COUNT"] + " / Chain 위 (허용오차 0) " + in0 + " / (허용오차 5) " + in5
-            + " / Chain " + info0["CHAIN_COUNT"] + " / 이미지 경로 " + imagePaths.Rows.Count);
+            + " / Chain " + info0["CHAIN_COUNT"] + " / 이미지 경로 " + imagePaths.Rows.Count
+            + " / Index Map " + factory + " / " + info0["PRODUCT"] + " 사용 Die " + (indexMap == null ? 0 : indexMap.DieCount));
 
         Type t = typeof(frmGdsKlarfSimple);
         BindingFlags f = BindingFlags.NonPublic | BindingFlags.Instance;
@@ -89,7 +98,6 @@ internal static class GdsKlarfSimpleFormSmoke
             form.Show();
             Application.DoEvents();
 
-            var tabList = (TabControl)Get(t, form, "tabList");
             var map = (GdsKlarfAnalysisMap)Get(t, form, "map");
             var busyBar = (DACrux.SEMDMS.Control.ProgressStatusBar)Get(t, form, "busyBar");
             var lblInfo = (Label)Get(t, form, "lblInfo");
@@ -100,19 +108,19 @@ internal static class GdsKlarfSimpleFormSmoke
             var cboSide = (ComboBox)Get(t, form, "cboChainSide");
             var btnAnalyze = (Button)Get(t, form, "btnAnalyze");
             var dgvDie = (DataGridView)Get(t, form, "dgvDie");
-            var dgvChain = (DataGridView)Get(t, form, "dgvChain");
-            var chkChainAll = (CheckBox)Get(t, form, "chkChainAll");
-            var chkChainHit = (CheckBox)Get(t, form, "chkChainHit");
-            var lblChainCount = (Label)Get(t, form, "lblChainCount");
             var flowImage = (FlowLayoutPanel)Get(t, form, "flowImage");
+            var splitSetting = (SplitContainer)Get(t, form, "splitSetting");
             var lblImageInfo = (Label)Get(t, form, "lblImageInfo");
             var lblDeviceValue = (Label)Get(t, form, "lblDeviceValue");
 
             // ---- 1) 배치 / 기본값 ----
-            string[] tabs = tabList.TabPages.Cast<TabPage>().Select(p => p.Text).ToArray();
+            // 2026-10-22: 오른쪽 탭 없음(한 페이지) / Chain 목록 · [Wafer 전체] · [Defect 있는 Chain 만] 없음 / 종합 표 = 위, Defect 이미지 = 맨 아래
             string[] gone = { "numOffsetX", "numOffsetY", "dgvReadyEt", "cboEtStep", "chkMarkSpec", "chkMarkFile", "btnFindEt", "dgvReadyGds",
                 "lblWaferKey", "btnReadyRefresh", "dgvTolerance", "dgvDefect", "cboColorBasis", "btnClass", "btnChain", "lblTolUnit", "lblSquareUnit",
-                "lblMapBasis", "pnlStatus", "lblStatus", "chkImageOut" };
+                "lblMapBasis", "pnlStatus", "lblStatus", "chkImageOut", "tabList", "tabSetting", "tabDie", "dgvChain", "chkChainAll", "chkChainHit",
+                "lblChainCount", "pnlChainHead" };
+            bool onePage = dgvDie.Parent == splitSetting.Panel1 && flowImage.Parent == splitSetting.Panel2 && splitSetting.Orientation == Orientation.Horizontal
+                && splitSetting.Parent != null && splitSetting.Parent.Name == "pnlSetting";
             string[] present = gone.Where(n => t.GetField(n, f) != null).ToArray();
             MethodInfo popupFilter = typeof(GdsKlarfAnalysisMap).GetMethod("ctxmWaferMap_PopupFilter", f);
             popupFilter.Invoke(map, new object[] { null, EventArgs.Empty });
@@ -123,12 +131,12 @@ internal static class GdsKlarfSimpleFormSmoke
                 popupFilter.Invoke(mapA, new object[] { null, EventArgs.Empty });
                 analysisMenu = mapA.VisibleMenuItems();
             }
-            Check("배치: 탭 [설정 / 정보] [종합] / E-Test · 좌표 보정 · 준비 표 · 허용오차 탭 · Defect 표 · 단위 Label · Map 위 색 기준 글자 · 아래 상태줄 · Chain 밖 체크 없음"
+            Check("배치: 오른쪽 탭 없이 한 페이지(종합 표 위 / Defect 이미지 맨 아래) / Chain 목록 · 체크 2개 · E-Test · 좌표 보정 · 준비 표 · 허용오차 탭 · Defect 표 · 단위 Label · Map 위 색 기준 글자 · 아래 상태줄 · Chain 밖 체크 없음"
                 + " / [다시 분석] / 진행 표시 = 위 막대(쉬는 동안 숨김) / 우클릭 [Detail Analysis] 보임(2026-10-22 2단계 상세보기 연결, 화면 A Map 과 같음)",
-                tabs.SequenceEqual(new[] { "설정 / 정보", "종합" }) && present.Length == 0 && map.ShowDetailMenu
+                onePage && present.Length == 0 && map.ShowDetailMenu
                 && btnAnalyze.Text == "다시 분석" && busyBar.Parent != null && busyBar.Parent.Name == "pnlTop" && !busyBar.Visible
                 && simpleMenu.Contains("Detail Analysis") && simpleMenu.Contains("Free Zoom") && simpleMenu.Contains("Center Cross") && analysisMenu.Contains("Detail Analysis"),
-                String.Join(", ", tabs) + " / 남은 컨트롤 " + (present.Length == 0 ? "없음" : String.Join(",", present)) + " / Simple 메뉴 " + String.Join("|", simpleMenu.ToArray())
+                "한 페이지 " + onePage + " / 남은 컨트롤 " + (present.Length == 0 ? "없음" : String.Join(",", present)) + " / Simple 메뉴 " + String.Join("|", simpleMenu.ToArray())
                 + " / 화면 A 메뉴 " + String.Join("|", analysisMenu.ToArray()));
             Check("설정 기본값: Defect 크기 + 허용오차 0 µm / 정사각형 10 µm(꺼짐) / Chain 면 BS",
                 rdoSize.Checked && numTol.Value == 0 && numTol.Enabled && numSquare.Value == 10 && !numSquare.Enabled && cboSide.Text == "BS",
@@ -175,9 +183,9 @@ internal static class GdsKlarfSimpleFormSmoke
             // 2026-10-22: 분석 정보는 제목 줄(설정 바뀜 / 알림)만 남기고 Step / GDS / E-Test / 결과 / 기준 5줄은 뺐다
             var pnlInfo = (Panel)Get(t, form, "pnlInfo");
             var lblInfoTitle = (Label)Get(t, form, "lblInfoTitle");
-            Check("분석 정보 = 제목 줄만(Step / GDS / E-Test / 결과 / 기준 5줄 없음) / 설정 바뀜 · 알림 없음 / [설정 / 정보] 탭 / GDS Device / [다시 분석] 사용 가능",
+            Check("분석 정보 = 제목 줄만(Step / GDS / E-Test / 결과 / 기준 5줄 없음) / 설정 바뀜 · 알림 없음 / GDS Device / [다시 분석] 사용 가능",
                 !lblInfo.Visible && lblInfo.Text.Length == 0 && pnlInfo.Height <= lblInfoTitle.Bottom + lblInfoTitle.Top && !lblChanged.Visible
-                && tabList.SelectedTab.Name == "tabSetting" && lblDeviceValue.Text == device && btnAnalyze.Enabled,
+                && lblDeviceValue.Text == device && btnAnalyze.Enabled,
                 "분석 정보 높이 " + pnlInfo.Height + " (제목 아래 " + lblInfoTitle.Bottom + ") / 알림 \"" + lblInfo.Text + "\"");
             Check("아래 상태줄 없음: 진행 표시는 작업(Wafer 조회 + 분석) 뒤 숨김 / 오류 없으면 분석 정보 알림 없음",
                 !busyBar.Visible && busyBar.LastResult.StartsWith("Wafer 조회 + 분석") && !lblInfo.Visible,
@@ -186,38 +194,78 @@ internal static class GdsKlarfSimpleFormSmoke
             // 종합 (Die)
             {
                 List<DataRow> defectDies = result.Tables["DIE"].Rows.Cast<DataRow>().Where(d => Convert.ToInt32(d["DEFECT_COUNT"]) > 0).ToList();
-                string[] cols = dgvDie.Columns.Cast<DataGridViewColumn>().Select(c => c.HeaderText).ToArray();
+                // 2026-10-22: 검사 열은 값을 채우고 숨긴다
+                string[] cols = dgvDie.Columns.Cast<DataGridViewColumn>().Where(c => c.Visible).Select(c => c.HeaderText).ToArray();
                 bool order = dgvDie.Rows.Count == 0 || (Convert.ToInt32(dgvDie.Rows[0].Cells["X"].Value) == Convert.ToInt32(defectDies[0]["XINDEX"])
                     && Convert.ToInt32(dgvDie.Rows[0].Cells["Y"].Value) == Convert.ToInt32(defectDies[0]["YINDEX"]));
-                Check("종합 (Die): 열 = X / Y / Defect 전체 / Chain 위 / Chain 밖 / Chain 수 / 검사, 행 = Defect 있는 Die(서버 순서)",
-                    cols.SequenceEqual(new[] { "X", "Y", "Defect 전체", "Chain 위", "Chain 밖", "Chain 수", "검사" }) && dgvDie.Rows.Count == defectDies.Count && order,
-                    String.Join(",", cols) + " / 행 " + dgvDie.Rows.Count + " (Defect Die " + defectDies.Count + ")");
+                var lblDieCount = (Label)Get(t, form, "lblDieCount");
+                int hitDies = defectDies.Count(d => Convert.ToInt32(d["IN_CHAIN_COUNT"]) > 0);
+                Check("종합 (Die, 한 페이지 위쪽 표): 보이는 열 = Index / X / Y / Defect 전체 / Chain 위 / Chain 밖 / Chain 수 (검사 열 숨김), 행 = Defect 있는 Die(서버 순서) / 머리 = Die 수 · Chain 위 Die 수 / 화면에 보임",
+                    cols.SequenceEqual(new[] { "Index", "X", "Y", "Defect 전체", "Chain 위", "Chain 밖", "Chain 수" }) && dgvDie.Columns.Contains("검사") && !dgvDie.Columns["검사"].Visible
+                    && dgvDie.Rows.Count == defectDies.Count && order && lblDieCount.Text == "Die " + defectDies.Count + " / Chain 위 Defect 있는 Die " + hitDies
+                    && dgvDie.Visible && dgvDie.Height > 0,
+                    String.Join(",", cols) + " / 행 " + dgvDie.Rows.Count + " (Defect Die " + defectDies.Count + ") / " + lblDieCount.Text + " / 표 높이 " + dgvDie.Height);
+                // 2026-10-22: 맨 왼쪽 Index = 고객 통합 Die#(Map 사용 Die 를 위 행부터 · 같은 행 왼쪽부터). 사용 Die 가 아니면 빈 칸
+                int numbered = 0;
+                bool indexOk = indexMap != null && dgvDie.Rows.Cast<DataGridViewRow>().All(row =>
+                {
+                    int n = ExpectedIndex(Convert.ToInt32(row.Cells["X"].Value), Convert.ToInt32(row.Cells["Y"].Value));
+                    object v = row.Cells["Index"].Value;
+                    if (n > 0) numbered++;
+                    return n > 0 ? v != null && v != DBNull.Value && Convert.ToInt32(v) == n : v == null || v == DBNull.Value;
+                });
+                Check("종합 맨 왼쪽 Index = 고객 통합 Die#(BSL Map 사용 Die 로 직접 계산한 값과 같음, 사용 Die 아니면 빈 칸)",
+                    indexOk && numbered > 0 && dgvDie.Columns["Index"].DisplayIndex == 0,
+                    "Map 사용 Die " + (indexMap == null ? "없음" : indexMap.DieCount.ToString()) + " / 번호 있는 행 " + numbered + " / " + dgvDie.Rows.Count
+                    + (dgvDie.Rows.Count == 0 ? "" : " / 첫 행 Index " + dgvDie.Rows[0].Cells["Index"].Value + " (" + dgvDie.Rows[0].Cells["X"].Value + ", " + dgvDie.Rows[0].Cells["Y"].Value + ")"));
             }
-            // Chain 목록 (Wafer 전체)
+            // Wafer Map 머리: 마우스가 Die 위를 지나면 X / Y / Index, Map 밖으로 나가면 지움 (2026-10-22)
             {
-                List<DataRow> chains = result.Tables["CHAIN"].Rows.Cast<DataRow>().ToList();
-                int hitChains = chains.Count(c => Convert.ToInt32(c["HIT_DEFECT_COUNT"]) > 0);
-                int hitRows = dgvChain.Rows.Count;
-                string hitCount = lblChainCount.Text;
-                var sw = Stopwatch.StartNew();
-                chkChainHit.Checked = false;
+                var lblMapDie = (Label)Get(t, form, "lblMapDie");
+                var lblMapTitle = (Label)Get(t, form, "lblMapTitle");
+                var btnBand = (Button)Get(t, form, "btnBand");
+                DataRow top = result.Tables["DIE"].Rows.Cast<DataRow>().First(d => Convert.ToInt32(d["DEFECT_COUNT"]) > 0);
+                Point p = DiePoint(top);
+                DACrux.Base.Die hoverDie = null;
+                foreach (DACrux.Base.Die d in map.Dies) { if (d.IndexX == p.X && d.IndexY == p.Y) { hoverDie = d; break; } }
+                // Designer 연결까지 보려고 Map 의 OnChangeCurrentDie 이벤트 목록으로 부른다(필드를 못 찾으면 처리 함수를 직접 부름)
+                FieldInfo evField = null;
+                for (Type bt = map.GetType(); bt != null && evField == null; bt = bt.BaseType)
+                    evField = bt.GetField("OnChangeCurrentDie", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+                Delegate ev = evField == null ? null : evField.GetValue(map) as Delegate;
+                bool wired = ev != null && ev.GetInvocationList().Any(x => x.Target == form && x.Method.Name == "map_OnChangeCurrentDie");
+                string hoverError = "";
+                try
+                {
+                    if (wired) ev.DynamicInvoke(map, hoverDie);
+                    else Invoke(t, form, "map_OnChangeCurrentDie", map, hoverDie);
+                }
+                catch (TargetInvocationException ex) { hoverError = ex.InnerException.GetType().Name + ": " + ex.InnerException.Message; }
                 Application.DoEvents();
-                double allSeconds = sw.Elapsed.TotalSeconds;
-                int allRows = dgvChain.Rows.Count;
-                chkChainHit.Checked = true;
-                Application.DoEvents();
-                string[] cols = dgvChain.Columns.Cast<DataGridViewColumn>().Select(c => c.HeaderText).ToArray();
-                Check("Chain 목록(Wafer 전체): Defect 있는 Chain 만(기본) = 걸린 Chain / 끄면 전체 Chain / 열 Chain · Defect 수 · Die 수 · Member",
-                    chkChainAll.Checked && hitRows == hitChains && hitCount == hitChains + " / " + chains.Count && allRows == chains.Count
-                    && cols.SequenceEqual(new[] { "Chain", "Defect 수", "Die 수", "Member" }),
-                    "걸린 " + hitRows + " (" + hitCount + ") / 전체 " + allRows + String.Format(" ({0:0.00}초)", allSeconds) + " / " + String.Join(",", cols));
+                int n = ExpectedIndex(p.X, p.Y);
+                string expectText = "X " + p.X + "  /  Y " + p.Y + "  /  Index " + (n > 0 ? n.ToString() : "-");
+                string hoverText = lblMapDie.Text;
+                bool placed = lblMapDie.Visible && lblMapDie.Parent == lblMapTitle.Parent && lblMapDie.Left > lblMapTitle.Right && lblMapDie.Right < btnBand.Left
+                    && lblMapDie.Width > 0;
+                string position = lblMapDie.Left + "~" + lblMapDie.Right;
+                typeof(Control).GetMethod("OnMouseLeave", f).Invoke(map, new object[] { EventArgs.Empty });
+                string leaveText = lblMapDie.Text;
+                Invoke(t, form, "map_OnChangeCurrentDie", map, hoverDie);
+                Invoke(t, form, "map_OnChangeCurrentDie", map, null);
+                string nullText = lblMapDie.Text;
+                // S1 그림에 머리 표시가 보이게 다시 그 Die 위에 둔다
+                Invoke(t, form, "map_OnChangeCurrentDie", map, hoverDie);
+                Check("Wafer Map 머리: 마우스 Die = \"X / Y / Index\"(제목과 [색 구간 설정] 사이) / Map 밖 = 지움 / Die 없음(null) = 지움, 예외 없음",
+                    !ReferenceEquals(hoverDie, null) && wired && hoverError == "" && hoverText == expectText && n > 0 && placed && leaveText == "" && nullText == "",
+                    "\"" + hoverText + "\" (기대 \"" + expectText + "\") / 이벤트 연결 " + wired + (hoverError == "" ? "" : " / " + hoverError)
+                    + " / 위치 " + position + " (제목 끝 " + lblMapTitle.Right + ", 버튼 " + btnBand.Left + ") / 나감 \"" + leaveText + "\" / null \"" + nullText + "\"");
             }
             // POC 화면 문구 규칙(2026-10-22 공통 개발 지침): 이름(라벨 제목 / 체크 / 라디오 / 버튼 / 탭 / 표 머리글)에 설명 괄호 없음, 화면 어디에도 단위 없음.
             // 값을 보이는 괄호(개수 / 좌표 / 비율 / 시간, 예: "Die (6, 6)", "(6.7%)")는 쓸 수 있어 정보 칸은 단위만 본다
             {
                 var names = new List<string>();
                 var all = new List<string>();
-                var valueLabels = new HashSet<string> { "lblWaferInfo", "lblDeviceValue", "lblInfo", "lblImageInfo", "lblChainCount", "lblDieCount" };
+                var valueLabels = new HashSet<string> { "lblWaferInfo", "lblDeviceValue", "lblInfo", "lblImageInfo", "lblDieCount" };
                 Action<Control> walk = null;
                 walk = c =>
                 {
@@ -291,23 +339,17 @@ internal static class GdsKlarfSimpleFormSmoke
                 result = r5;
             }
 
-            // ---- 5) Die 선택 -> Chain 목록 / 이미지 카드 ----
+            // ---- 5) Die 선택 -> 종합 행 / 이미지 카드 ----
             {
                 Invoke(t, form, "dgvDie_CellClick", dgvDie, new DataGridViewCellEventArgs(0, 0));
                 Application.DoEvents();
                 Point die = form.SelectedDie ?? new Point(int.MinValue, int.MinValue);
                 Point first = dgvDie.Rows.Count == 0 ? die : new Point(Convert.ToInt32(dgvDie.Rows[0].Cells["X"].Value), Convert.ToInt32(dgvDie.Rows[0].Cells["Y"].Value));
-                List<DataRow> dieChains = result.Tables["DIE_CHAIN"].Rows.Cast<DataRow>().Where(d => DiePoint(d) == die && Convert.ToInt32(d["DEFECT_COUNT"]) > 0).ToList();
-                bool waferChains = dgvChain.Columns.Contains("Die 수");
-                chkChainAll.Checked = false;
-                Application.DoEvents();
-                string[] cols = dgvChain.Columns.Cast<DataGridViewColumn>().Select(c => c.HeaderText).ToArray();
-                Check("종합 첫 행 클릭 = Die 선택(Map / 이미지 머리) / Wafer 전체 끄면 Chain 목록 = 그 Die 의 Chain(Defect 수 · Defect ID)",
-                    form.SelectedDie.HasValue && die == first && waferChains && dgvChain.Rows.Count == dieChains.Count
-                    && cols.SequenceEqual(new[] { "Chain", "Defect 수", "Defect ID", "Member" }) && lblImageInfo.Text.StartsWith("Die (" + die.X + ", " + die.Y + ")  Defect "),
-                    "Die (" + die.X + ", " + die.Y + ") / Chain " + dgvChain.Rows.Count + " (" + dieChains.Count + ") / " + String.Join(",", cols));
-                chkChainAll.Checked = true;
-                Application.DoEvents();
+                bool rowPicked = dgvDie.SelectedRows.Count == 1 && dgvDie.SelectedRows[0].Index == 0;
+                Check("종합 첫 행 클릭 = Die 선택(Map 빨간 테두리 / 종합 행 / 이미지 머리)",
+                    form.SelectedDie.HasValue && die == first && rowPicked && map.SelectedDies.Count == 1 && map.SelectedDies[0] == die
+                    && lblImageInfo.Text.StartsWith("Die (" + die.X + ", " + die.Y + ")  Defect "),
+                    "Die (" + die.X + ", " + die.Y + ") / 종합 행 선택 " + rowPicked + " / " + lblImageInfo.Text);
 
                 bool loaded = WaitFor(() => Get(t, form, "_imagePaths") != null || ((string)Get(t, form, "_imagePathNote")).Length > 0, 60);
                 Invoke(t, form, "RefreshImages");
@@ -344,7 +386,7 @@ internal static class GdsKlarfSimpleFormSmoke
                 Check("KLARF 위치 조정 배치: X / Y 기본 0 / [◀][▲][▼][▶] 아이콘만 / [초기화] / [다시 분석] = 위치 조정 묶음 / 구분선 4개",
                     numShiftX.Value == 0 && numShiftY.Value == 0 && arrows.All(b => b.Text.Length == 0 && b.Image != null)
                     && btnReset.Text == "초기화" && btnReset.Image != null && btnAnalyze.Parent != null && btnAnalyze.Parent.Name == "pnlShift"
-                    && new[] { "lineArea", "lineShift", "lineImage", "lineChain" }.All(n => t.GetField(n, f) != null),
+                    && new[] { "lineArea", "lineShift", "lineDie", "lineImage" }.All(n => t.GetField(n, f) != null),
                     "X " + numShiftX.Value + " / Y " + numShiftY.Value + " / [다시 분석] 묶음 " + (btnAnalyze.Parent == null ? "-" : btnAnalyze.Parent.Name));
 
                 DataSet noShift = form.AnalysisResult;   // 4) 의 허용오차 5 / 위치 0 결과
@@ -516,25 +558,29 @@ internal static class GdsKlarfSimpleFormSmoke
                 DataSet dieData = w.Analysis;
 
                 // ---- 7-1b) 왼쪽 Die 목록 (2026-10-22 설계 Die상세_DLL로딩_Die목록 5.2절): Defect Die + E-Test Fail Die, 서버 DIE 표 순서 /
-                //      열 No · X · Y · Defect · Chain 위(E-Test 결과가 있으면 E-Test Fail) / 연 Die 가 골라져 있음 ----
+                //      열 No · Index(고객 통합 Die#, 2026-10-22) · X · Y · Defect · Chain 위(E-Test 결과가 있으면 E-Test Fail) / 연 Die 가 골라져 있음 ----
                 Func<DataRow, int> etFail = r => r.Table.Columns.Contains("ET_FAIL_CHAIN_COUNT") && !r.IsNull("ET_FAIL_CHAIN_COUNT") ? Convert.ToInt32(r["ET_FAIL_CHAIN_COUNT"]) : 0;
                 List<DataRow> targetRows = result.Tables["DIE"].Rows.Cast<DataRow>().Where(r => Convert.ToInt32(r["DEFECT_COUNT"]) > 0 || etFail(r) > 0).ToList();
                 bool etLoaded = result.Tables["DIE"].Rows.Cast<DataRow>().Any(r => r.Table.Columns.Contains("ET_FAIL_CHAIN_COUNT") && !r.IsNull("ET_FAIL_CHAIN_COUNT"));
                 var dgvDies = (DataGridView)Get(typeof(frmGdsDieAnalysis), w, "dgvDies");
                 string[] heads = dgvDies.Columns.Cast<DataGridViewColumn>().Where(c => c.Visible).Select(c => c.HeaderText).ToArray();
-                string[] expectHeads = etLoaded ?new[] { "No", "X", "Y", "Defect", "Chain 위", "E-Test Fail" } : new[] { "No", "X", "Y", "Defect", "Chain 위" };
+                string[] expectHeads = etLoaded ? new[] { "No", "Index", "X", "Y", "Defect", "Chain 위", "E-Test Fail" } : new[] { "No", "Index", "X", "Y", "Defect", "Chain 위" };
                 bool valuesOk = dgvDies.Rows.Count == targetRows.Count && dgvDies.Rows.Cast<DataGridViewRow>().All(row =>
                 {
                     DataRow r = targetRows[row.Index];
-                    return Convert.ToInt32(row.Cells["colNo"].Value) == row.Index + 1 && Convert.ToInt32(row.Cells["colX"].Value) == DiePoint(r).X
+                    int n = ExpectedIndex(DiePoint(r).X, DiePoint(r).Y);
+                    string indexText = Convert.ToString(row.Cells["colIndex"].Value);
+                    return Convert.ToInt32(row.Cells["colNo"].Value) == row.Index + 1 && indexText == (n > 0 ? n.ToString() : "")
+                        && Convert.ToInt32(row.Cells["colX"].Value) == DiePoint(r).X
                         && Convert.ToInt32(row.Cells["colY"].Value) == DiePoint(r).Y && Convert.ToInt32(row.Cells["colDefect"].Value) == Convert.ToInt32(r["DEFECT_COUNT"])
                         && Convert.ToInt32(row.Cells["colInChain"].Value) == Convert.ToInt32(r["IN_CHAIN_COUNT"]);
                 });
-                Check("상세보기 왼쪽 Die 목록 = Defect / E-Test Fail Die(서버 순서) / 열 No · X · Y · Defect · Chain 위 (+ E-Test Fail) / 값 = DIE 표 / 연 Die 선택 / 건수",
+                Check("상세보기 왼쪽 Die 목록 = Defect / E-Test Fail Die(서버 순서) / 열 No · Index · X · Y · Defect · Chain 위 (+ E-Test Fail) / 값 = DIE 표 · Index = 고객 통합 Die# / 연 Die 선택 / 건수",
                     valuesOk && w.ListedDies.SequenceEqual(targetRows.Select(DiePoint)) && heads.SequenceEqual(expectHeads)
                     && dgvDies.SelectedRows.Count == 1 && (Point)dgvDies.SelectedRows[0].Tag == d
                     && ((Label)Get(typeof(frmGdsDieAnalysis), w, "lblListCount")).Text == targetRows.Count.ToString(),
                     "목록 " + dgvDies.Rows.Count + " (DIE " + targetRows.Count + ") / 열 " + String.Join(",", heads)
+                    + (dgvDies.Rows.Count == 0 ? "" : " / 첫 행 Index " + dgvDies.Rows[0].Cells["colIndex"].Value)
                     + " / 선택 " + (dgvDies.SelectedRows.Count == 0 ? "-" : dgvDies.SelectedRows[0].Tag.ToString()));
                 List<DataRow> dieDefects = dieData.Tables["DEFECT"].Rows.Cast<DataRow>().Where(r => DiePoint(r) == d).ToList();
 
@@ -558,9 +604,11 @@ internal static class GdsKlarfSimpleFormSmoke
                 string[] etColumns = { "colClass", "colEt", "colFailPara" };
                 Func<string> shownColumns = () => String.Join(",", grid.Columns.Cast<DataGridViewColumn>().Where(c => c.Visible).Select(c => c.HeaderText).ToArray());
                 Func<bool> etPanelHidden = () => splitRight.Panel2Collapsed && !((Control)Get(tb, b, "lblEtText")).Visible
-                    && !((Control)Get(tb, b, "chkEtValues")).Visible && etColumns.All(n => !grid.Columns[n].Visible);
-                Check("E-Test 없는 결과: [분류 / ET / Fail Para] 열 · [E-Test 값] 체크 · 아래 표 · E-Test 줄 숨김 / 가까운 Chain 열 · 오른쪽 탭 없음",
-                    etPanelHidden() && !grid.Columns.Contains("colNear") && tb.GetField("tabMain", BindingFlags.NonPublic | BindingFlags.Instance) == null,
+                    && etColumns.All(n => !grid.Columns[n].Visible);
+                // [E-Test 값] 체크는 2026-10-23 삭제(E-Test 가 있으면 아래 표 늘 보임)
+                Check("E-Test 없는 결과: [분류 / ET / Fail Para] 열 · 아래 표 · E-Test 줄 숨김 / [E-Test 값] 체크 · 가까운 Chain 열 · 오른쪽 탭 없음",
+                    etPanelHidden() && !grid.Columns.Contains("colNear") && tb.GetField("tabMain", BindingFlags.NonPublic | BindingFlags.Instance) == null
+                    && tb.GetField("chkEtValues", BindingFlags.NonPublic | BindingFlags.Instance) == null,
                     "보이는 열 " + shownColumns() + " / 아래 표 접힘 " + splitRight.Panel2Collapsed);
 
                 // ---- 7-3) 기본으로 전부: 모든 Chain 묶음 + Chain 밖 Defect 묶음 ----
@@ -705,7 +753,7 @@ internal static class GdsKlarfSimpleFormSmoke
                         .OrderBy(r => r["CLASS4"].ToString() == "BOTH" ? 0 : r["ET_STATUS"].ToString() == "F" ? 1 : r["ET_STATUS"].ToString().Length > 0 ? 2 : 3).FirstOrDefault();
                     Point e = etDc == null ? d : DiePoint(etDc);
                     Invoke(t, s, "OpenDetail", e.X, e.Y);
-                    bool etShown = WaitFor(() => ShowsDie(e.X, e.Y) && ((Control)Get(tb, b, "chkEtValues")).Visible, 120);
+                    bool etShown = WaitFor(() => ShowsDie(e.X, e.Y) && !splitRight.Panel2Collapsed, 120);
                     var ew = frmGdsDieAnalysis.Current;
                     int etValues = ew == null ? -1 : ew.Analysis.Tables["ET_VALUE"].Rows.Cast<DataRow>().Count(r => DiePoint(r) == e);
                     var etGrid = (DataGridView)Get(tb, b, "dgvEtValues");
@@ -714,7 +762,7 @@ internal static class GdsKlarfSimpleFormSmoke
                     bool same = etShown && !splitRight.Panel2Collapsed && !((Control)Get(tb, b, "lblEtText")).Visible
                         && etColumns.All(n => grid.Columns[n].Visible) && sumHidden() && pnlChainHead.Visible && gmap.DefectStyle == NexplantQMS.GdsMap.DefectOverlayStyle.Filled
                         && etGrid.Rows.Count == etValues && etHead.Text.StartsWith("E-Test 값 · Die 전체 (" + etValues + ")");
-                    Check("Simple E-Test 연결 결과 상세보기 = 화면 A 와 같은 모양: [E-Test 값] · 아래 E-Test 값 표(Die 전체) · 분류 / ET / Fail Para 열 보임 + 분석 기준 칸 · 기준 E-Test 줄 숨김 · Defect 채움",
+                    Check("Simple E-Test 연결 결과 상세보기 = 화면 A 와 같은 모양: 아래 E-Test 값 표 늘 보임(Die 전체) · 분류 / ET / Fail Para 열 보임 + 분석 기준 칸 · 기준 E-Test 줄 숨김 · Defect 채움",
                         same, "Die (" + e.X + ", " + e.Y + ") / " + etHead.Text + " / 표 " + etGrid.Rows.Count + " (" + etValues + ") / 보이는 열 " + shownColumns());
                     if (capture) CaptureScreen(mdi, w, Path.Combine(outDir, "D3_상세보기_Simple_ETest연결.png"));
                 }
@@ -904,6 +952,12 @@ internal static class GdsKlarfSimpleFormSmoke
     private static Point DiePoint(DataRow r)
     {
         return new Point(Convert.ToInt32(r["XINDEX"]), Convert.ToInt32(r["YINDEX"]));
+    }
+
+    /// <summary>기대 Die Index (Map 이 없거나 사용 Die 가 아니면 0).</summary>
+    private static int ExpectedIndex(int x, int y)
+    {
+        return indexMap == null ? 0 : indexMap.DieNumberOf(new DACrux.SEMDMS.Interface.DiePoint(x, y));
     }
 
     private static void Pump(int milliseconds)

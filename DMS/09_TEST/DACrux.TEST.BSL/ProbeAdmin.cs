@@ -230,6 +230,8 @@ namespace DACrux.TEST.BSL
             , int XY_DIRECTION
             , int REFERENCEDIE_SETTING)
         {
+            // 작업 기간 확인: 기간이 지나면 여기서 멈추고 저장하지 않는다 (2026-10-23)
+            new DACrux.SEMDMS.DSL.WorkRule().Confirm(DACrux.SEMDMS.DSL.WorkModule.WaferMap, DACrux.SEMDMS.DSL.WorkKind.Setup);
             TQP_MAPDEF oMapDef = new TQP_MAPDEF();
             oMapDef.SetMapDef(MAPID
                                 , WAFER_SIZE
@@ -262,12 +264,16 @@ namespace DACrux.TEST.BSL
         }
         public void CreateUseMap(string MapID, DataTable dtDies)
         {
+            // 작업 기간 확인: 기간이 지나면 여기서 멈추고 저장하지 않는다 (2026-10-23)
+            new DACrux.SEMDMS.DSL.WorkRule().Confirm(DACrux.SEMDMS.DSL.WorkModule.WaferMap, DACrux.SEMDMS.DSL.WorkKind.Setup);
             TQP_USEMAP oMapDef = new TQP_USEMAP();
             oMapDef.CreateUseMap(MapID, dtDies);
         }
 
         public void CreateUseMap(string strFactory, string MapID, DataTable dtDies)
         {
+            // 작업 기간 확인: 기간이 지나면 여기서 멈추고 저장하지 않는다 (2026-10-23)
+            new DACrux.SEMDMS.DSL.WorkRule().Confirm(DACrux.SEMDMS.DSL.WorkModule.WaferMap, DACrux.SEMDMS.DSL.WorkKind.Setup);
             TQP_USEMAP oMapDef = new TQP_USEMAP();
             oMapDef.CreateUseMap(strFactory, MapID, dtDies);
         }
@@ -301,6 +307,8 @@ namespace DACrux.TEST.BSL
             int DIE_INDEX_MAX_Y,
             int XY_DIRECTION)
         {
+            // 작업 기간 확인: 기간이 지나면 여기서 멈추고 저장하지 않는다 (2026-10-23)
+            new DACrux.SEMDMS.DSL.WorkRule().Confirm(DACrux.SEMDMS.DSL.WorkModule.WaferMap, DACrux.SEMDMS.DSL.WorkKind.Setup);
             TQP_MAPDEF oMapDef = new TQP_MAPDEF();
             oMapDef.UpdateMapDef(MAPID,
                                 WAFER_SIZE,

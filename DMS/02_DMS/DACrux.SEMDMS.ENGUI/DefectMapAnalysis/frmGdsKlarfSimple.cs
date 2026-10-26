@@ -23,10 +23,10 @@ namespace DACrux.SEMDMS.ENGUI
     ///  - KLARF 위치 조정(2026-10-22): GDS 는 맞다고 보고 KLARF Defect 의 XREL / YREL 에 X / Y 를 더한다(화살표 1 씩, 서버 보정값 그대로).
     ///  - 서버는 화면 A 와 같은 RO.GdsKlarfAnalysis.Analyze 다(서버 / Interface 변경 없음). E-Test 파일 / Wafer Key 는 화면 A 와 같은 GetWaferReady 로 찾는다(FindEtFile).
     ///  - Map: Die 색 = 색 구간, 가운데 숫자 = Chain 위 Defect 수(DIE.IN_CHAIN_COUNT). E-Test 삼각형은 그리지 않는다.
-    ///  - 오른쪽 탭 [설정 / 정보] = 분석 정보 / Defect 영역 설정 + Chain 면 / KLARF 위치 조정 + [다시 분석] / 선택 Die 의 Defect 이미지 / Chain 목록,
-    ///    [종합] = Defect 가 있는 Die 표(화면 A Die 표에서 E-Test 열을 뺀 것).
+    ///  - 오른쪽은 탭 없이 한 페이지(2026-10-22) = 분석 정보 / Defect 영역 설정 + Chain 면 / KLARF 위치 조정 + [다시 분석] /
+    ///    종합 = Defect 가 있는 Die 표(화면 A Die 표에서 E-Test 열을 뺀 것) / 선택 Die 의 Defect 이미지(맨 아래). Chain 목록은 뺐다.
     ///  - 용어는 Chain 위 / Chain 밖(= 화면 A 의 Chain In / Chain Out, 결정 S7).
-    ///  - Die 더블클릭 / [종합] 행 더블클릭 / Map 우클릭 [Detail Analysis] = Die 상세보기(2026-10-22 2단계, 화면 A 상세보기를 그대로 씀, OpenDetail).
+    ///  - Die 더블클릭 / 종합 행 더블클릭 / Map 우클릭 [Detail Analysis] = Die 상세보기(2026-10-22 2단계, 화면 A 상세보기를 그대로 씀, OpenDetail).
     ///    두 화면 상세보기는 같은 모양이다(2026-10-22 요청 "두 화면에서 동일하게").
     ///  - 아래 상태줄은 두지 않는다(2026-10-22 레이아웃 정리). 알림은 분석 정보 제목 줄에, 진행 표시는 위 막대 오른쪽에 작업 중에만 보인다.
     ///    분석 정보 5줄(Step / GDS / E-Test / 결과 / 기준)은 2026-10-22 에 뺐다. 설정 바뀜 / 알림만 남는다.
@@ -35,7 +35,7 @@ namespace DACrux.SEMDMS.ENGUI
     ///  1) DrawWafer(1장, 여러 장이면 오류) -> LoadSelectedWafer: Wafer 조회(작업 스레드) -> ShowWafer(Map / GDS Device = Product 이름)
     ///     -> GDS Device 가 있으면 AnalyzeCore(작업 스레드에서 Analyze) -> ApplyResult. 이미지 경로는 따로 백그라운드로 읽는다.
     ///  2) 설정을 바꾸면 "설정 바뀜" 만 표시하고, [다시 분석] 을 눌러야 다시 계산한다(숫자를 바꿀 때마다 서버를 부르지 않는다).
-    ///  3) Die 클릭(Map / 종합 표) = Die 선택 -> 그 Die 의 Defect 이미지 카드(분석 결과와 상관없이 그 Die 의 모든 Defect) / (Wafer 전체를 끄면) 그 Die 의 Chain 목록.
+    ///  3) Die 클릭(Map / 종합 표) = Die 선택 -> 종합 행 선택 + 그 Die 의 Defect 이미지 카드(분석 결과와 상관없이 그 Die 의 모든 Defect).
     /// 서비스는 속성으로 바꿀 수 있다(기본 원격 호출, Smoke 검사는 같은 프로세스 BSL).
     /// </summary>
     public partial class frmGdsKlarfSimple : DACruxUXBasic01, iSEMControl, frmGdsDieAnalysis.IDetailSource
@@ -66,6 +66,8 @@ namespace DACrux.SEMDMS.ENGUI
         /// <summary>E-Test 파일 조회 실패 문구(분석 정보 알림에 보인다). Wafer 를 받을 때 지운다.</summary>
         private string _etNote = string.Empty;
         private Point? _selectedDie;
+        /// <summary>Die Index(고객 통합 Die#) 계산 Map. Wafer 를 받을 때 정한다. 없으면 Index 를 비운다 (2026-10-22).</summary>
+        private DieCoordinateMapper _dieIndex;
         private bool _dirty;
         private bool _loading;
         /// <summary>Wafer 조회 / 분석 중. 작업 스레드를 기다리는 동안 DMSearch 에서 Wafer 가 또 들어오면 받지 않는다.</summary>
@@ -110,12 +112,10 @@ namespace DACrux.SEMDMS.ENGUI
             cboChainSide.SelectedIndex = 1;     // GDS Chain 면 기본 BS (결정 S4, 화면 A 와 같음)
             _loading = false;
             DefectArea_CheckedChanged(this, EventArgs.Empty);
-            foreach (DataGridView grid in new[] { dgvDie, dgvChain })
-                ConfigureGrid(grid);
+            ConfigureGrid(dgvDie);
             _bandPopup.BandsChanged += (s, e) => ColorMap();
             ShowInfo();
             BindDieGrid();
-            BindChainGrid();
             RefreshImages();
         }
 
@@ -134,8 +134,8 @@ namespace DACrux.SEMDMS.ENGUI
         }
 
         /// <summary>
-        /// 처음 보일 때 [설정 / 정보] 탭의 이미지 / Chain 목록을 반씩 나눈다.
-        /// 안쪽 SplitContainer 의 나누기 위치(SplitterDistance)는 화면 배율에 맞춰 줄지 않아 설계 값 그대로면 Chain 목록이 너무 낮다(2026-10-22 Smoke 그림 확인).
+        /// 처음 보일 때 오른쪽 아래의 종합 표 / Defect 이미지를 반씩 나눈다.
+        /// 안쪽 SplitContainer 의 나누기 위치(SplitterDistance)는 화면 배율에 맞춰 줄지 않아 설계 값 그대로면 아래 칸이 너무 낮다(2026-10-22 Smoke 그림 확인).
         /// 그 뒤 크기가 바뀌면 SplitContainer 가 비율을 유지하고, 사용자가 끌어 바꿀 수 있다.
         /// </summary>
         protected override void OnShown(EventArgs e)
@@ -213,6 +213,9 @@ namespace DACrux.SEMDMS.ENGUI
                             throw new InvalidOperationException("Wafer 기준 정보(TQD_INSP_INFO)가 없습니다.");
                         DataRow stepRow = stepInfo.Tables["STEP_INFO"].Rows[0];
                         DataTable dies = svc.GetDefectMapViewer_Map(steps, new[] { stepRow["SETUP_SEQ"].ToString() }, new[] { stepRow["TEST"].ToString() });
+                        // Die Index Map 도 여기서 새로 읽어 둔다(ShowWafer 가 GdsDieIndex.Cached 로 받는다). Factory 는 CurrentFactory 와 같은 규칙
+                        string login = (GlobalVariable.Factory ?? string.Empty).Trim();
+                        GdsDieIndex.Load(login.Length > 0 ? login : ColText(stepRow, "FACTORY"), ColText(stepRow, "PRODUCT"));
                         return new object[] { found, stepInfo, dies };
                     });
                     ShowWafer(step, (DefectList)data[0], (DataSet)data[1], (DataTable)data[2]);
@@ -286,10 +289,11 @@ namespace DACrux.SEMDMS.ENGUI
             map.DieSelectMode();   // 기본 Die 선택 (화면 A 와 같음)
 
             SelectDeviceForProduct();   // GDS Map 이 없으면 분석 정보 알림에 보인다
+            _dieIndex = GdsDieIndex.Cached(CurrentFactory, _product);
+            lblMapDie.Text = string.Empty;
             _selectedDie = null;
             _failure = string.Empty;
             ClearResult();
-            tabList.SelectedTab = tabSetting;
         }
 
         /// <summary>Defect 이미지 경로(TQD_IMAGES)를 백그라운드로 읽는다. 실패하면 이미지 머리에 "이미지 경로 조회 실패" 만 보인다.</summary>
@@ -557,7 +561,7 @@ namespace DACrux.SEMDMS.ENGUI
         }
 
         /// <summary>
-        /// 분석 결과를 화면에 반영한다: 색 구간(자동이면 다시 만듦) -> Map 색 / 숫자 -> 종합 -> Chain 목록 -> 이미지 -> 분석 정보.
+        /// 분석 결과를 화면에 반영한다: 색 구간(자동이면 다시 만듦) -> Map 색 / 숫자 -> 종합 -> 이미지 -> 분석 정보.
         /// 마지막에 이 화면에서 연 상세보기 창도 새 결과로 바꾼다(2026-10-22 동기화, 화면 A 와 같음).
         /// </summary>
         private void ApplyResult(DataSet ds)
@@ -573,7 +577,6 @@ namespace DACrux.SEMDMS.ENGUI
             _bandPopup.SetDieValues(Rows(_result, "DIE").Select(r => new[] { ColInt(r, "DEFECT_COUNT"), ColInt(r, "IN_CHAIN_COUNT") }).ToList());
             ColorMap();
             BindDieGrid();
-            BindChainGrid();
             RefreshImages();
             ShowInfo();
             frmGdsDieAnalysis.SourceAnalyzed(this, _analysisVersion, _result, _lastRequest, AnalysisService);
@@ -588,7 +591,6 @@ namespace DACrux.SEMDMS.ENGUI
             _bandPopup.SetDieValues(null);
             map.ClearDieDisplay();
             BindDieGrid();
-            BindChainGrid();
             RefreshImages();
             ShowInfo();
         }
@@ -643,21 +645,34 @@ namespace DACrux.SEMDMS.ENGUI
 
         #endregion
 
-        #region [종합 / Chain 목록 / 이미지]
+        #region [종합 / 이미지]
 
+        /// <summary>표에 값은 채우되 보이지 않는 열(2026-10-22): 종합 표 검사(Map Step 검사 Die 여부).</summary>
+        private static readonly string[] HiddenColumns = { "검사" };
+
+        /// <summary>열 너비는 보이는 값에 맞추고, 묶을 때마다 숨김 열을 다시 숨긴다(DataSource 를 바꾸면 열을 새로 만든다).</summary>
         private static void ConfigureGrid(DataGridView grid)
         {
             grid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.DisplayedCells;
             grid.AutoGenerateColumns = true;
+            grid.DataBindingComplete += (s, e) => HideColumns((DataGridView)s);
+        }
+
+        private static void HideColumns(DataGridView grid)
+        {
+            foreach (string name in HiddenColumns)
+                if (grid.Columns.Contains(name)) grid.Columns[name].Visible = false;
         }
 
         /// <summary>
-        /// [종합] 탭: Defect 가 있는 Die 만, 서버 정렬(Chain 위 많은 순 -> Defect 전체 -> Y -> X) 그대로.
-        /// 화면 A Die 표에서 E-Test 열(ET 판정 / Fail Chain / 일치 Chain)을 뺐다. Defect 전체 = Chain 위 + Chain 밖.
+        /// 종합 표(2026-10-22 탭을 없애고 Chain 목록 자리로 옮김): Defect 가 있는 Die 만, 서버 정렬(Chain 위 많은 순 -> Defect 전체 -> Y -> X) 그대로.
+        /// 화면 A Die 표에서 E-Test 열(ET 판정 / Fail Chain / 일치 Chain)을 뺐다. Defect 전체 = Chain 위 + Chain 밖. 검사 열은 숨긴다(HiddenColumns).
+        /// 맨 왼쪽 Index = 고객 통합 Die#(GdsDieIndex). Map 사용 Die 가 아니거나 Map 이 없으면 빈 칸 (2026-10-22).
         /// </summary>
         private void BindDieGrid()
         {
             var table = new DataTable();
+            table.Columns.Add("Index", typeof(int));
             table.Columns.Add("X", typeof(int));
             table.Columns.Add("Y", typeof(int));
             table.Columns.Add("Defect 전체", typeof(int));
@@ -669,71 +684,14 @@ namespace DACrux.SEMDMS.ENGUI
             foreach (DataRow r in Rows(_result, "DIE"))
             {
                 if (ColInt(r, "DEFECT_COUNT") <= 0) continue;
-                table.Rows.Add(ColInt(r, "XINDEX"), ColInt(r, "YINDEX"), ColInt(r, "DEFECT_COUNT"), ColInt(r, "IN_CHAIN_COUNT"), ColInt(r, "OUT_CHAIN_COUNT"),
+                int x = ColInt(r, "XINDEX"), y = ColInt(r, "YINDEX"), index = GdsDieIndex.Of(_dieIndex, x, y);
+                table.Rows.Add(index > 0 ? (object)index : DBNull.Value, x, y, ColInt(r, "DEFECT_COUNT"), ColInt(r, "IN_CHAIN_COUNT"), ColInt(r, "OUT_CHAIN_COUNT"),
                     ColInt(r, "HIT_CHAIN_COUNT"), ColText(r, "IN_PLAN"));
                 if (ColInt(r, "IN_CHAIN_COUNT") > 0) hitDies++;
             }
             dgvDie.DataSource = table;
             lblDieCount.Text = _result == null ? "Die 0" : String.Format("Die {0} / Chain 위 Defect 있는 Die {1}", table.Rows.Count, hitDies);
             SyncDieGridSelection();
-        }
-
-        /// <summary>
-        /// Chain 목록(결정 S6): [Wafer 전체] 또는 선택 Die 가 없으면 Chain 별 합계(CHAIN: Chain 위 Defect 수 / Die 수 / Member),
-        /// 아니면 선택 Die 의 Chain(DIE_CHAIN: Defect 수 / Defect ID / Member). [Defect 있는 Chain 만] 을 켜면 Defect 0 인 Chain 은 뺀다(기본 켬,
-        /// U8 처럼 Chain 이 2만 개 넘는 Device 에서 표를 가볍게 둔다). Chain 은 이름으로만 보인다(화면 A 와 같음).
-        /// </summary>
-        private void BindChainGrid()
-        {
-            var table = new DataTable();
-            bool waferMode = chkChainAll.Checked || !_selectedDie.HasValue;
-            bool hitOnly = chkChainHit.Checked;
-            table.Columns.Add("Chain", typeof(string));
-            table.Columns.Add("Defect 수", typeof(int));
-            if (waferMode) table.Columns.Add("Die 수", typeof(int));
-            else table.Columns.Add("Defect ID", typeof(string));
-            table.Columns.Add("Member", typeof(int));
-            int total = 0;
-            if (_result != null)
-            {
-                List<DataRow> chains = Rows(_result, "CHAIN").ToList();
-                total = chains.Count;
-                if (waferMode)
-                {
-                    foreach (DataRow c in chains.Where(c => !hitOnly || ColInt(c, "HIT_DEFECT_COUNT") > 0)
-                        .OrderByDescending(c => ColInt(c, "HIT_DEFECT_COUNT")).ThenByDescending(c => ColInt(c, "HIT_DIE_COUNT")).ThenBy(c => ColText(c, "CHAIN_NAME")))
-                        table.Rows.Add(ChainName(c), ColInt(c, "HIT_DEFECT_COUNT"), ColInt(c, "HIT_DIE_COUNT"), ColInt(c, "MEMBER_COUNT"));
-                }
-                else
-                {
-                    var bySeq = new Dictionary<string, DataRow>(StringComparer.Ordinal);
-                    foreach (DataRow c in chains)
-                        if (!bySeq.ContainsKey(ColText(c, "CHAIN_SEQ"))) bySeq.Add(ColText(c, "CHAIN_SEQ"), c);
-                    Point die = _selectedDie.Value;
-                    foreach (DataRow dc in Rows(_result, "DIE_CHAIN").Where(r => DiePointOf(r) == die && (!hitOnly || ColInt(r, "DEFECT_COUNT") > 0))
-                        .OrderByDescending(r => ColInt(r, "DEFECT_COUNT")))
-                    {
-                        DataRow c;
-                        bySeq.TryGetValue(ColText(dc, "CHAIN_SEQ"), out c);
-                        table.Rows.Add(c == null ? ColText(dc, "CHAIN_CODE") : ChainName(c), ColInt(dc, "DEFECT_COUNT"), ColText(dc, "DEFECT_IDS"),
-                            c == null ? 0 : ColInt(c, "MEMBER_COUNT"));
-                    }
-                }
-            }
-            dgvChain.DataSource = table;
-            lblChainCount.Text = _result == null ? string.Empty : String.Format("{0} / {1}", table.Rows.Count, total);
-        }
-
-        private static string ChainName(DataRow chain)
-        {
-            string name = ColText(chain, "CHAIN_NAME");
-            return name.Length > 0 ? name : ColText(chain, "CHAIN_CODE");
-        }
-
-        private void ChainFilter_Changed(object sender, EventArgs e)
-        {
-            if (_loading) return;
-            BindChainGrid();
         }
 
         /// <summary>
@@ -797,7 +755,7 @@ namespace DACrux.SEMDMS.ENGUI
 
         #region [Die 선택]
 
-        /// <summary>Die 를 고른다: Map 빨간 테두리 / 종합 행 / Chain 목록 / 이미지. 탭은 바꾸지 않는다.</summary>
+        /// <summary>Die 를 고른다: Map 빨간 테두리 / 종합 행 / 이미지.</summary>
         public void SelectDie(int x, int y)
         {
             using (DACrux.SEMDMS.Control.BusyCursor.Show(this))
@@ -806,7 +764,6 @@ namespace DACrux.SEMDMS.ENGUI
                 map.SetSelectedDie(x, y);
                 map.Redraw();
                 SyncDieGridSelection();
-                BindChainGrid();
                 RefreshImages();
             }
         }
@@ -836,6 +793,28 @@ namespace DACrux.SEMDMS.ENGUI
             OpenDetail(e.XIndex, e.YIndex);
         }
 
+        /// <summary>
+        /// 마우스가 다른 Die 로 가면 Wafer Map 머리에 그 Die 의 X / Y / Index 를 보인다 (2026-10-22). 분석 전에도 보인다.
+        /// DACrux.Base.Die 의 == 는 null 을 처리하지 않아 ReferenceEquals 로 확인한다(화면 A 와 같음).
+        /// </summary>
+        private void map_OnChangeCurrentDie(object sender, Die die)
+        {
+            lblMapDie.Text = ReferenceEquals(die, null) ? string.Empty : MapDieText(die.IndexX, die.IndexY);
+        }
+
+        /// <summary>마우스가 Map 밖으로 나가면 머리의 Die 표시를 지운다.</summary>
+        private void map_MousePositionCleared(object sender, EventArgs e)
+        {
+            lblMapDie.Text = string.Empty;
+        }
+
+        /// <summary>"X 3  /  Y 5  /  Index 39". Map 사용 Die 가 아니거나 Map 이 없으면 Index 는 "-".</summary>
+        private string MapDieText(int x, int y)
+        {
+            int index = GdsDieIndex.Of(_dieIndex, x, y);
+            return String.Format("X {0}  /  Y {1}  /  Index {2}", x, y, index > 0 ? index.ToString(CultureInfo.InvariantCulture) : "-");
+        }
+
         /// <summary>우클릭 [Detail Analysis] = 그 Die 상세보기(화면 A 와 같은 메뉴, 1단계에서는 숨겼음).</summary>
         private void map_DetailAnalysisRequested(object sender, GdsKlarfDieEventArgs e)
         {
@@ -850,7 +829,7 @@ namespace DACrux.SEMDMS.ENGUI
             SelectDie(System.Convert.ToInt32(row.Cells["X"].Value), System.Convert.ToInt32(row.Cells["Y"].Value));
         }
 
-        /// <summary>[종합] 행 더블클릭 = 그 Die 상세보기.</summary>
+        /// <summary>종합 행 더블클릭 = 그 Die 상세보기.</summary>
         private void dgvDie_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex < 0) return;
@@ -947,7 +926,7 @@ namespace DACrux.SEMDMS.ENGUI
         }
 
         /// <summary>
-        /// [설정 / 정보] 탭 분석 정보 제목 줄: 설정을 바꾸고 아직 [다시 분석] 하지 않았으면 "설정 바뀜", 그 뒤에 알림을 잇는다.
+        /// 분석 정보 제목 줄: 설정을 바꾸고 아직 [다시 분석] 하지 않았으면 "설정 바뀜", 그 뒤에 알림을 잇는다.
         /// 알림 = GDS Map 없음 / 분석 실패 / E-Test 파일 조회 실패 / 오류 · 받지 않은 Wafer 등(아래 상태줄 대신, 2026-10-22). 없으면 숨긴다.
         /// 2026-10-22: 제목 아래 5줄(Step / GDS / E-Test / 결과 / 기준)은 화면에서 뺐다.
         /// </summary>

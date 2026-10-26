@@ -10,6 +10,7 @@
         private System.Windows.Forms.Label lblListCount;
         private System.Windows.Forms.DataGridView dgvDies;
         private System.Windows.Forms.DataGridViewTextBoxColumn colNo;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colIndex;
         private System.Windows.Forms.DataGridViewTextBoxColumn colX;
         private System.Windows.Forms.DataGridViewTextBoxColumn colY;
         private System.Windows.Forms.DataGridViewTextBoxColumn colDefect;
@@ -38,6 +39,7 @@
             this.splitMain = new System.Windows.Forms.SplitContainer();
             this.dgvDies = new System.Windows.Forms.DataGridView();
             this.colNo = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colIndex = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colX = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colY = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colDefect = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -76,7 +78,7 @@
             // 
             this.splitMain.Panel2.Controls.Add(this.pnlGdsMap);
             this.splitMain.Size = new System.Drawing.Size(1714, 1200);
-            this.splitMain.SplitterDistance = 300;
+            this.splitMain.SplitterDistance = 350;
             this.splitMain.SplitterWidth = 7;
             this.splitMain.TabIndex = 0;
             // 
@@ -90,6 +92,7 @@
             this.dgvDies.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvDies.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.colNo,
+            this.colIndex,
             this.colX,
             this.colY,
             this.colDefect,
@@ -104,7 +107,7 @@
             this.dgvDies.RowHeadersVisible = false;
             this.dgvDies.RowHeadersWidth = 62;
             this.dgvDies.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvDies.Size = new System.Drawing.Size(300, 1155);
+            this.dgvDies.Size = new System.Drawing.Size(350, 1155);
             this.dgvDies.TabIndex = 1;
             this.dgvDies.SelectionChanged += new System.EventHandler(this.dgvDies_SelectionChanged);
             // 
@@ -118,7 +121,17 @@
             this.colNo.Name = "colNo";
             this.colNo.ReadOnly = true;
             this.colNo.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
+            //
+            // colIndex
+            //
+            this.colIndex.DefaultCellStyle = dataGridViewCellStyle1;
+            this.colIndex.FillWeight = 50F;
+            this.colIndex.HeaderText = "Index";
+            this.colIndex.MinimumWidth = 8;
+            this.colIndex.Name = "colIndex";
+            this.colIndex.ReadOnly = true;
+            this.colIndex.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            //
             // colX
             // 
             this.colX.DefaultCellStyle = dataGridViewCellStyle1;
@@ -179,7 +192,7 @@
             this.pnlListHead.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.pnlListHead.Name = "pnlListHead";
             this.pnlListHead.Padding = new System.Windows.Forms.Padding(9, 0, 9, 0);
-            this.pnlListHead.Size = new System.Drawing.Size(300, 45);
+            this.pnlListHead.Size = new System.Drawing.Size(350, 45);
             this.pnlListHead.TabIndex = 0;
             // 
             // lblListCount
@@ -190,7 +203,7 @@
             this.lblListCount.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblListCount.Name = "lblListCount";
             this.lblListCount.Padding = new System.Windows.Forms.Padding(9, 0, 0, 0);
-            this.lblListCount.Size = new System.Drawing.Size(200, 45);
+            this.lblListCount.Size = new System.Drawing.Size(250, 45);
             this.lblListCount.TabIndex = 1;
             this.lblListCount.Text = "0";
             this.lblListCount.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -215,7 +228,7 @@
             this.pnlGdsMap.Location = new System.Drawing.Point(0, 0);
             this.pnlGdsMap.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.pnlGdsMap.Name = "pnlGdsMap";
-            this.pnlGdsMap.Size = new System.Drawing.Size(1407, 1200);
+            this.pnlGdsMap.Size = new System.Drawing.Size(1357, 1200);
             this.pnlGdsMap.TabIndex = 0;
             // 
             // lblShared
@@ -225,7 +238,7 @@
             this.lblShared.Location = new System.Drawing.Point(0, 0);
             this.lblShared.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblShared.Name = "lblShared";
-            this.lblShared.Size = new System.Drawing.Size(1407, 1200);
+            this.lblShared.Size = new System.Drawing.Size(1357, 1200);
             this.lblShared.TabIndex = 0;
             this.lblShared.Text = "다른 상세보기 창에 도면을 표시하고 있습니다.\r\n이 창을 누르면 여기에 표시합니다.";
             this.lblShared.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;

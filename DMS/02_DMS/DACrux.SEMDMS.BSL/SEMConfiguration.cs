@@ -178,6 +178,8 @@ namespace DACrux.SEMDMS.BSL
             string classnumber
             )
         {
+            // 작업 기간 확인: 기간이 지나면 여기서 멈추고 저장하지 않는다 (2026-10-23)
+            new WorkRule().Confirm(WorkModule.Dms, WorkKind.Setup);
             TQD_DEFECT_TYPE oDefectType = new TQD_DEFECT_TYPE();
             int result = oDefectType.DeleteDefectType(classnumber);
             return result > 0;
@@ -189,6 +191,8 @@ namespace DACrux.SEMDMS.BSL
             string uid
             )
         {
+            // 작업 기간 확인: 기간이 지나면 여기서 멈추고 저장하지 않는다 (2026-10-23)
+            new WorkRule().Confirm(WorkModule.Dms, WorkKind.Setup);
             TQD_DEFECT_TYPE oDefectType = new TQD_DEFECT_TYPE();
             // Killer Defect or Non Killer Defect에  대한 Grouping 
             string groupId = dicValues["GROUP_ID"].Substring(
@@ -212,6 +216,8 @@ namespace DACrux.SEMDMS.BSL
             string uid
             )
         {
+            // 작업 기간 확인: 기간이 지나면 여기서 멈추고 저장하지 않는다 (2026-10-23)
+            new WorkRule().Confirm(WorkModule.Dms, WorkKind.Setup);
             TQD_DEFECT_TYPE oDefectType = new TQD_DEFECT_TYPE();
             // Killer Defect or Non Killer Defect에  대한 Grouping 
             string groupId = dicValues["GROUP_ID"].Substring(

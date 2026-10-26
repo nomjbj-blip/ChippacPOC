@@ -27,7 +27,7 @@ namespace DACrux.SEMDMS.Control
         private const int Pad = 4;
         private const int LineHeight = 19;
         private const int TextHeight = LineHeight * 2 + 4;
-        /// <summary>축소본 최대 폭. Defect Map Viewer 이미지 목록 폭(약 390)보다 조금 크게 잡는다.</summary>
+        /// <summary>기본 축소본 최대 폭. Defect Map Viewer 이미지 목록 폭(약 390)보다 조금 크게 잡는다.</summary>
         private const int ThumbMaxWidth = 400;
         /// <summary>이미지를 읽기 전 높이 계산에 쓰는 비율(검사 장비 이미지 1808 x 1572).</summary>
         private const double DefaultRatio = 1572.0 / 1808.0;
@@ -41,6 +41,8 @@ namespace DACrux.SEMDMS.Control
         private static readonly Color EmptyImageColor = Color.FromArgb(240, 240, 240);
 
         private readonly string m_ImagePath;
+        /// <summary>이 카드의 축소본 최대 폭. 카드를 크게 쓰는 화면(상세보기 이미지 창)은 더 크게 받는다.</summary>
+        private readonly int m_ThumbMaxWidth;
         private Bitmap m_Thumb;
         private byte[] m_ImageBytes;
         private double m_Ratio = DefaultRatio;
@@ -72,6 +74,15 @@ namespace DACrux.SEMDMS.Control
 
         /// <summary>Defect ID 만 아는 경우(상세보기 이미지 창). 2줄째와 Die 는 비워 둔다.</summary>
         public DPUCDefectImageCard(long defectId, string imagePath)
+            : this(defectId, imagePath, ThumbMaxWidth)
+        {
+        }
+
+        /// <summary>
+        /// 축소본 최대 폭을 정해 만든다(2026-10-22). 카드를 창 크기만큼 크게 그리는 화면은 기본 400 보다 크게 받아야 흐리지 않다.
+        /// 읽기는 만들자마자 대기열에 넣으므로 폭은 생성자에서만 정한다.
+        /// </summary>
+        public DPUCDefectImageCard(long defectId, string imagePath, int thumbMaxWidth)
         {
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.UserPaint | ControlStyles.ResizeRedraw, true);
             Name = "DPUCDefectImageCard";
@@ -86,6 +97,7 @@ namespace DACrux.SEMDMS.Control
             SizeText = string.Empty;
             PopupTitle = "Defect " + defectId;
             m_ImagePath = imagePath ?? string.Empty;
+            m_ThumbMaxWidth = Math.Max(1, thumbMaxWidth);
 
             Size = new Size(220, HeightFor(220));
             ImageLoader.Enqueue(this);
@@ -269,7 +281,7 @@ namespace DACrux.SEMDMS.Control
                     using (Image full = Image.FromStream(ms))
                     {
                         ratio = (double)full.Height / full.Width;
-                        int width = Math.Min(ThumbMaxWidth, full.Width);
+                        int width = Math.Min(m_ThumbMaxWidth, full.Width);
                         int height = Math.Max(1, (int)Math.Round(width * ratio));
                         thumb = new Bitmap(width, height);
                         using (Graphics g = Graphics.FromImage(thumb))

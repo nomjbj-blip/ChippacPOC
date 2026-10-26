@@ -77,6 +77,8 @@ internal static class GdsKlarfAnalysisFormSmoke
             form.ShowInTaskbar = false;
             form.ShowErrorDialogs = false;
             DACrux.SEMDMS.ENGUI.frmGdsDieAnalysis.ShowErrorDialogs = false;
+            // 상세보기 Die 목록 Index 열(2026-10-22)이 원격 호출 대신 같은 프로세스 BSL 로 Map 사용 Die 를 읽게 한다
+            DACrux.SEMDMS.ENGUI.GdsDieIndex.Service = new DACrux.SEMDMS.RO.GdsEtResult(new DACrux.SEMDMS.BSL.GdsEtResult());
             form.Show();
             Application.DoEvents();
 
@@ -602,6 +604,35 @@ internal static class GdsKlarfAnalysisFormSmoke
             // 2026-10-22 두 화면 같은 모양: [걸린 / Fail Chain 만] 기본 끔 -> 처음 열면 모든 Chain 을 그린다(Simple 요청 "기본으로 전부")
             int allChains = dieData.Tables["CHAIN"].Rows.Count;
             Check("화면 B Chain 표시 = 모든 Chain([걸린 / Fail Chain 만] 기본 끔)", detail.VisibleChainCount == allChains, detail.VisibleChainCount + " / " + allChains + " (걸린 " + dieChains + ")");
+            // [전체 표시](2026-10-23): 처음 = 모든 Chain 표시라 켬 / 끄면 표시 체크 모두 끔 · 도면 0 / 켜면 다시 모두 / Chain 하나를 끄면 꺼지고 다시 켜면 켬
+            {
+                Type typeAll = typeof(NexplantQMS.GdsMap.GdsDieAnalysisForm);
+                var chkAllB = (CheckBox)Get(typeAll, detail, "chkShowAll");
+                var gridAllB = (DataGridView)Get(typeAll, detail, "dgvChainDefects");
+                Func<DataGridViewRow, bool> isHead = r => r.Tag != null && (bool)r.Tag.GetType().GetField("First").GetValue(r.Tag)
+                    && r.Tag.GetType().GetField("ChainSeq").GetValue(r.Tag) != null;
+                Func<int> shownHeads = () => gridAllB.Rows.Cast<DataGridViewRow>().Count(r => isHead(r) && r.Cells["colShow"].Value is bool && (bool)r.Cells["colShow"].Value);
+                int headCount = gridAllB.Rows.Cast<DataGridViewRow>().Count(isHead);
+                bool startOn = chkAllB.Visible && chkAllB.Checked && chkAllB.Text == "전체 표시" && headCount > 0 && shownHeads() == headCount;
+                chkAllB.Checked = false;
+                Application.DoEvents();
+                bool allOff = shownHeads() == 0 && detail.VisibleChainCount == 0;
+                chkAllB.Checked = true;
+                Application.DoEvents();
+                bool allOn = shownHeads() == headCount && detail.VisibleChainCount == allChains;
+                // Chain 하나 끄기 / 켜기 = 표시 칸 클릭과 같은 처리(값 바꾼 뒤 CellContentClick)
+                DataGridViewRow oneB = gridAllB.Rows.Cast<DataGridViewRow>().First(isHead);
+                int showCol = gridAllB.Columns["colShow"].Index;
+                oneB.Cells[showCol].Value = false;
+                Invoke(typeAll, detail, "dgvChainDefects_CellContentClick", gridAllB, new DataGridViewCellEventArgs(showCol, oneB.Index));
+                bool oneOff = !chkAllB.Checked && detail.VisibleChainCount == allChains - 1;
+                oneB.Cells[showCol].Value = true;
+                Invoke(typeAll, detail, "dgvChainDefects_CellContentClick", gridAllB, new DataGridViewCellEventArgs(showCol, oneB.Index));
+                bool oneBack = chkAllB.Checked && detail.VisibleChainCount == allChains;
+                Check("화면 B [전체 표시]: 처음 켬(모든 Chain 표시) / 끄면 표시 체크 모두 끔 · 도면 Chain 0 / 켜면 모두 · 도면 전부 / Chain 하나 끄면 꺼짐 · 다시 켜면 켬",
+                    startOn && allOff && allOn && oneOff && oneBack,
+                    "Chain " + headCount + " / 처음 " + startOn + " / 끔 " + allOff + " / 켬 " + allOn + " / 하나 끔 " + oneOff + " / 다시 " + oneBack + " / 도면 " + detail.VisibleChainCount);
+            }
 
             // 반전 일치: 걸린 Member 도형(지도에 그린 보기 기준 좌표)이 Defect 사각형 ± 허용오차와 겹쳐야 한다
             Type typeB2 = typeof(NexplantQMS.GdsMap.GdsDieAnalysisForm);
@@ -633,7 +664,7 @@ internal static class GdsKlarfAnalysisFormSmoke
                 && dgvChainsB.Rows.Cast<DataGridViewRow>().All(r => chainNamesB.Contains(Convert.ToString(r.Cells["colCode"].Value)) || Convert.ToString(r.Cells["colCode"].Value) == "Chain 밖 Defect")
                 && !dgvChainsB.Columns.Contains("colName"),
                 dgvChainsB.Rows.Count == 0 ? "-" : Convert.ToString(dgvChainsB.Rows[0].Cells["colCode"].Value));
-            // 화면 B 도면의 Chain 색 = 저장 색(E-Test Fail Chain 도 빨간색으로 덮지 않음), 더블클릭(역추적) / 해제해도 Chain 목록 순서 · 선택 행 그대로 (2026-10-16)
+            // 화면 B 도면의 Chain 색 = 저장 색(E-Test Fail Chain 도 빨간색으로 덮지 않음), 역추적(Chain 지정 열기) / 해제해도 Chain 목록 순서 · 선택 행 그대로 (2026-10-16)
             Dictionary<long, int> stored = result.Tables["CHAIN"].Rows.Cast<DataRow>().ToDictionary(r => Convert.ToInt64(r["CHAIN_SEQ"]), r =>
             {
                 int argb = Convert.ToInt32(r["COLOR_ARGB"]);
@@ -648,24 +679,81 @@ internal static class GdsKlarfAnalysisFormSmoke
             string pickName = Convert.ToString(pickHead.Cells["colCode"].Value);
             Func<bool> onPickHead = () => dgvChainsB.CurrentRow != null && Convert.ToString(dgvChainsB.CurrentRow.Cells["colCode"].Value) == pickName
                 && (dgvChainsB.CurrentRow.Index == 0 || Convert.ToString(dgvChainsB.Rows[dgvChainsB.CurrentRow.Index - 1].Cells["colCode"].Value) != pickName);
-            MethodInfo dbl = typeB2.GetMethod("dgvChainDefects_CellDoubleClick", BindingFlags.NonPublic | BindingFlags.Instance);
-            dbl.Invoke(detail, new object[] { dgvChainsB, new DataGridViewCellEventArgs(dgvChainsB.Columns["colCode"].Index, pickHead.Index) });
+            // 표 더블클릭은 아무 일도 하지 않는다(2026-10-22 더블클릭 역추적 · 이미지 삭제) -> 역추적은 분석 화면에서 Chain 을 지정해 열 때만
+            bool noDoubleClick = typeB2.GetMethod("dgvChainDefects_CellDoubleClick", BindingFlags.NonPublic | BindingFlags.Instance) == null;
+            string pickSeq = dieData.Tables["CHAIN"].Rows.Cast<DataRow>().First(r => r["CHAIN_NAME"].ToString() == pickName)["CHAIN_SEQ"].ToString();
+            Wait(detail.ShowDieAsync(dieData, topX, topY, pickSeq), 60);
             Application.DoEvents();
-            bool focusKeep = groupOrder().SequenceEqual(orderBefore) && onPickHead() && detail.VisibleChainCount <= 1;
-            // [역추적 해제](2026-10-22): 표 위 체크 줄 아래, 실행 크기 높이 28 이상 · 머리 칸 안(잘리지 않음), 해제하면 숨김
+            bool focusKeep = groupOrder().SequenceEqual(orderBefore) && onPickHead() && detail.VisibleChainCount <= 1 && noDoubleClick;
+            // [역추적 해제](2026-10-22 위쪽 칸 pnlTop 의 [다시 분석] 아래로 옮김): 실행 크기 높이 28 이상 · 위쪽 칸 안(잘리지 않음) · [다시 분석] 아래 오른쪽 끝 맞춤
+            // · 위쪽 칸 다른 컨트롤과 겹치지 않음, 해제하면 숨김
             var btnClearB = (Button)Get(typeB2, detail, "btnClearFocus");
-            Control chainHeadB = (Control)Get(typeB2, detail, "pnlChainHead");
-            string clearSize = btnClearB.Width + "x" + btnClearB.Height + " @" + btnClearB.Left + "," + btnClearB.Top + " / 머리 칸 높이 " + chainHeadB.ClientSize.Height;
-            bool clearShown = btnClearB.Visible && btnClearB.Parent == chainHeadB && btnClearB.Height >= 28 && btnClearB.Width >= 100
-                && btnClearB.Bottom <= chainHeadB.ClientSize.Height && btnClearB.Top >= ((Control)Get(typeB2, detail, "chkHitOnly")).Bottom;
+            var btnReanalyzeB = (Button)Get(typeB2, detail, "btnReanalyze");
+            Control topB = (Control)Get(typeB2, detail, "pnlTop");
+            Func<string> clearPlace = () => btnClearB.Width + "x" + btnClearB.Height + " @" + btnClearB.Left + "," + btnClearB.Top
+                + " / 위쪽 칸 " + topB.ClientSize.Width + "x" + topB.ClientSize.Height + " / [다시 분석] 오른쪽 끝 " + btnReanalyzeB.Right + " 아래 끝 " + btnReanalyzeB.Bottom;
+            Func<bool> clearPlaced = () => btnClearB.Visible && btnClearB.Parent == topB && btnClearB.Height >= 28 && btnClearB.Width >= 100
+                && btnClearB.Left >= 0 && btnClearB.Right <= topB.ClientSize.Width && btnClearB.Bottom <= topB.ClientSize.Height
+                && btnClearB.Top >= btnReanalyzeB.Bottom && Math.Abs(btnClearB.Right - btnReanalyzeB.Right) <= 12
+                && topB.Controls.Cast<Control>().All(sib => sib == btnClearB || !sib.Visible || !sib.Bounds.IntersectsWith(btnClearB.Bounds));
+            string clearSize = clearPlace();
+            bool clearShown = clearPlaced();
+            // 상세보기 호스트 패널 폭은 창 크기마다 다르다: 화면 폭을 줄이거나 늘려도 [다시 분석] 아래 그대로 · 잘림 없음
+            Size clearSizeKeep = detail.Size;
+            var clearWidths = new List<string>();
+            bool clearResize = true;
+            foreach (int clearW in new[] { 1100, 1700 })
+            {
+                detail.Width = clearW;
+                Application.DoEvents();
+                bool clearOk = clearPlaced();
+                clearResize &= clearOk;
+                clearWidths.Add(clearW + "px " + (clearOk ? "OK" : "어긋남 " + clearPlace()));
+            }
+            detail.Size = clearSizeKeep;
+            Application.DoEvents();
             typeB2.GetMethod("btnClearFocus_Click", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(detail, new object[] { null, EventArgs.Empty });
             Application.DoEvents();
             bool clearKeep = groupOrder().SequenceEqual(orderBefore) && onPickHead() && !btnClearB.Visible;
-            Check("화면 B 도면 Chain 색 = 저장 색 / Chain 칸 더블클릭(역추적) · 해제 뒤 묶음 순서와 고른 Chain 묶음 그대로 / [역추적 해제] 체크 줄 아래 · 높이 28 이상 · 잘림 없음",
+            Check("화면 B 도면 Chain 색 = 저장 색 / 표 더블클릭 처리 없음 / Chain 지정 열기(역추적) · 해제 뒤 묶음 순서와 고른 Chain 묶음 그대로 / [역추적 해제] 위쪽 칸 [다시 분석] 아래 · 높이 28 이상 · 잘림 · 겹침 없음",
                 detail.VisibleChainColors.Count > 0 && colorBad.Count == 0 && focusKeep && clearKeep && clearShown,
-                "그린 Chain " + detail.VisibleChainColors.Count + " / 색 다름 " + colorBad.Count + " / 더블클릭 " + pickName + " -> "
+                "그린 Chain " + detail.VisibleChainColors.Count + " / 색 다름 " + colorBad.Count + " / 더블클릭 처리 없음 " + noDoubleClick + " / 역추적 " + pickName + " -> "
                 + (dgvChainsB.CurrentRow == null ? "-" : Convert.ToString(dgvChainsB.CurrentRow.Cells["colCode"].Value)) + " / 역추적 " + focusKeep + " / 해제 " + clearKeep
                 + " / [역추적 해제] " + clearShown + " " + clearSize);
+            Check("화면 B [역추적 해제] 화면 폭을 바꿔도(1100 / 1700) [다시 분석] 아래 오른쪽 끝 맞춤 · 잘림 없음", clearResize, String.Join(" / ", clearWidths.ToArray()));
+
+            // Defect 이미지 보기 = Defect 행 오른쪽 클릭 메뉴(2026-10-22, 예전 Defect 칸 더블클릭 대신): 그 행을 고르고 메뉴 [Defect 이미지 보기],
+            // 메뉴를 누르면 호스트에 그 Defect 이미지 요청(호스트 없으면 상태줄 안내). Defect 없는 Chain 행은 메뉴 없음
+            {
+                var mnuDefectB = (ContextMenuStrip)Get(typeB2, detail, "mnuDefect");
+                DataGridViewRow defectRowB = dgvChainsB.Rows.Cast<DataGridViewRow>().Last(r => Convert.ToString(r.Cells["colDefectId"].Value).Length > 0);
+                DataGridViewRow plainRowB = dgvChainsB.Rows.Cast<DataGridViewRow>().FirstOrDefault(r => Convert.ToString(r.Cells["colDefectId"].Value).Length == 0);
+                int idCol = dgvChainsB.Columns["colDefectId"].Index;
+                Func<DataGridViewRow, bool> rightClick = row =>
+                {
+                    Invoke(typeB2, detail, "dgvChainDefects_CellMouseClick", dgvChainsB,
+                        new DataGridViewCellMouseEventArgs(idCol, row.Index, 5, 5, new MouseEventArgs(MouseButtons.Right, 1, 0, 0, 0)));
+                    Application.DoEvents();
+                    bool menuOpen = mnuDefectB.Visible;
+                    mnuDefectB.Close();
+                    Application.DoEvents();
+                    return menuOpen;
+                };
+                bool plainNoMenu = plainRowB == null || !rightClick(plainRowB);
+                dgvChainsB.ClearSelection();
+                bool menuShown = rightClick(defectRowB);
+                bool rowPicked = defectRowB.Selected && dgvChainsB.SelectedRows.Count == 1;
+                string wantId = Convert.ToString(defectRowB.Cells["colDefectId"].Value);
+                long gotId = -1;
+                detail.DefectImageRequested = (imageStep, imageId) => gotId = imageId;
+                Invoke(typeB2, detail, "mnuDefectImage_Click", mnuDefectB.Items[0], EventArgs.Empty);
+                detail.DefectImageRequested = null;
+                Invoke(typeB2, detail, "mnuDefectImage_Click", mnuDefectB.Items[0], EventArgs.Empty);
+                bool noHostNote = detail.StatusText.StartsWith("이미지는 DMS 안에서 열었을 때만");
+                Check("화면 B Defect 행 오른쪽 클릭 = 그 행 고름 + [Defect 이미지 보기] 메뉴 -> 호스트에 그 Defect 이미지 요청(호스트 없으면 안내) / Defect 없는 행은 메뉴 없음",
+                    menuShown && rowPicked && mnuDefectB.Items.Count == 1 && mnuDefectB.Items[0].Text == "Defect 이미지 보기" && gotId.ToString() == wantId && noHostNote && plainNoMenu,
+                    "메뉴 " + menuShown + " / 행 고름 " + rowPicked + " / 요청 Defect " + gotId + " (행 " + wantId + ") / 호스트 없음 안내 " + noHostNote + " / 빈 행 메뉴 없음 " + plainNoMenu);
+            }
 
             // 화면 B 배치 (2026-10-22, 설계 2026-10-22_상세보기_오른쪽_한패널_설계.md): 오른쪽 탭 없이 한 패널
             // = 기준 묶음(GDS / KLARF 2줄 + E-Test 줄) / 머리 줄(체크 2개) / 가로 나누기 위 GDS · KLARF 표 + 아래 E-Test 값 표.
@@ -678,7 +766,7 @@ internal static class GdsKlarfAnalysisFormSmoke
                 var btnReanalyze = (Button)b("btnReanalyze");
                 bool parents = b("dgvChainDefects").Parent == splitRightB.Panel1 && b("dgvEtValues").Parent == splitRightB.Panel2
                     && splitRightB.Parent == rightPanel && b("pnlChainHead").Parent == rightPanel && b("pnlGdsCriteria").Parent == rightPanel
-                    && b("chkEtValues").Parent == b("pnlChainHead") && b("lblEtText").Parent == b("pnlGdsCriteria")
+                    && b("chkShowAll").Parent == b("pnlChainHead") && b("lblEtText").Parent == b("pnlGdsCriteria")
                     && splitRightB.Orientation == Orientation.Horizontal && b("map").Parent == ((SplitContainer)b("splitMain")).Panel1
                     && btnReanalyze.Parent == b("pnlTop") && btnReanalyze.Visible && btnReanalyze.Text == "다시 분석" && btnReanalyze.Image != null
                     && (btnReanalyze.Anchor & AnchorStyles.Right) != 0 && btnReanalyze.Right > b("pnlTop").Width - 40;
@@ -692,16 +780,16 @@ internal static class GdsKlarfAnalysisFormSmoke
                     && b("lblSumEt").Text.StartsWith("E-Test · ") && b("lblMapSide").Text == "보기 = " + NexplantQMS.GdsMap.Persistence.GdsSideTransform.Text(dieData.Tables["ANL_INFO"].Rows[0]["VIEW_SIDE"].ToString());
                 bool oldGone = new[] { "lblCriteria", "tabRight", "tabGds", "tabKlarf", "dgvChains", "dgvDefects", "cboScope", "lblKlarfCriteria",
                     "tabMain", "tabChainDefect", "tabEt", "tabDie", "dgvSummary", "lblDieText", "lblDieCriteria", "pnlEtCriteria", "lblEtCriteria", "colNear",
-                    "chkOutside", "flowClass", "lblClassBoth", "lblClassFail", "lblClassDefect", "lblClassOk", "lblClassNa", "btnFit", "lblFocus" }
+                    "chkOutside", "flowClass", "lblClassBoth", "lblClassFail", "lblClassDefect", "lblClassOk", "lblClassNa", "btnFit", "lblFocus", "chkEtValues" }
                     .All(n => typeB2.GetField(n, BindingFlags.NonPublic | BindingFlags.Instance) == null)
                     && typeB2.GetMethod("btnFit_Click", BindingFlags.NonPublic | BindingFlags.Instance) == null && b("chkBackground").Text == "전체 도면";
-                // 이 Smoke 기본 결과는 E-Test 를 연결하지 않는다 -> [E-Test 값] 체크 / 아래 표(접힘) 숨김. 기준 E-Test 줄은 늘 숨김
-                bool noEtHidden = !b("chkEtValues").Visible && splitRightB.Panel2Collapsed && !b("lblEtText").Visible && b("pnlChainHead").Visible
+                // 이 Smoke 기본 결과는 E-Test 를 연결하지 않는다 -> 아래 표(접힘) 숨김. 기준 E-Test 줄은 늘 숨김([E-Test 값] 체크는 2026-10-23 삭제)
+                bool noEtHidden = splitRightB.Panel2Collapsed && !b("lblEtText").Visible && b("pnlChainHead").Visible
                     && b("pnlGdsCriteria").Height == b("lblGdsText").Bottom + 4;
                 // 두 화면 같은 모양(2026-10-22): 위쪽 분석 기준 칸 · 표 위 요약 글자 숨김, [걸린 / Fail Chain 만] 끔, Defect 채움
                 bool sameLook = new[] { "lblSumTitle", "lblSumGds", "lblSumKlarf", "lblSumEt", "lblChainTitle" }.All(n => !b(n).Visible)
                     && !((CheckBox)b("chkHitOnly")).Checked && gmap.DefectStyle == NexplantQMS.GdsMap.DefectOverlayStyle.Filled;
-                Check("화면 B 배치: 오른쪽 탭 없음 · 한 패널(기준 묶음 / 머리 줄 / 위 GDS · KLARF 표 + 아래 E-Test 값 표) · 위쪽 오른쪽 [다시 분석](호스트 없으면 안내) · Chain 밖 체크 · 4분류 칸 · [전체 보기] 없음 · [전체 도면] · 기준에 최종 저장 / 분석 시각 · E-Test 줄 없음 / E-Test 없는 결과 = 체크 · 아래 표 숨김 / 두 화면 같은 모양",
+                Check("화면 B 배치: 오른쪽 탭 없음 · 한 패널(기준 묶음 / 머리 줄 / 위 GDS · KLARF 표 + 아래 E-Test 값 표) · 위쪽 오른쪽 [다시 분석](호스트 없으면 안내) · Chain 밖 체크 · 4분류 칸 · [전체 보기] 없음 · [전체 도면] · 기준에 최종 저장 / 분석 시각 · E-Test 줄 · [E-Test 값] 체크 없음 · 머리 줄에 [전체 표시] / E-Test 없는 결과 = 아래 표 숨김 / 두 화면 같은 모양",
                     parents && titles && oldGone && noEtHidden && sameLook,
                     "표 위치 · 버튼 " + parents + " / 기준 · 다시 분석 안내 " + titles + " / 옛 컨트롤 없음 " + oldGone + " / E-Test 없음 숨김 " + noEtHidden + " / 같은 모양 " + sameLook
                     + " / " + b("lblGdsText").Text.Replace(Environment.NewLine, " | ") + " / " + detail.StatusText);
@@ -1301,7 +1389,6 @@ internal static class GdsKlarfAnalysisFormSmoke
         Wait(detail.ShowDieAsync(die, x, y, null), 300);
         Application.DoEvents();
         var split = (SplitContainer)b("splitRight");
-        var chk = (CheckBox)b("chkEtValues");
         var grid = (DataGridView)b("dgvChainDefects");
         var et = (DataGridView)b("dgvEtValues");
         var head = (Label)b("lblEtCount");
@@ -1309,10 +1396,10 @@ internal static class GdsKlarfAnalysisFormSmoke
 
         // 1) 보이기 + 고른 행 없음 = Die 전체
         // 기준 E-Test 줄은 2026-10-22 부터 E-Test 가 있어도 숨김(글자는 채움). 아래 표 높이 = 오른쪽의 35%(1/4 이상이면 통과)
-        bool shown = chk.Visible && chk.Checked && !split.Panel2Collapsed && !b("lblEtText").Visible && b("lblEtText").Text.StartsWith("E-Test 공정 ")
+        bool shown = !split.Panel2Collapsed && !b("lblEtText").Visible && b("lblEtText").Text.StartsWith("E-Test 공정 ")
             && new[] { "colClass", "colEt", "colFailPara" }.All(n => grid.Columns[n].Visible) && split.Panel2.Height * 4 >= split.Height;
         bool dieAll = grid.SelectedRows.Count == 0 && et.Rows.Count == etRows.Count && head.Text.StartsWith("E-Test 값 · Die 전체 (" + etRows.Count + ")");
-        Check("화면 B E-Test 연결 결과: [E-Test 값] 켬 · 아래 표 펼침 · 분류 / ET / Fail Para 열 보임 · 기준 E-Test 줄 숨김 / 고른 행 없음 = 아래 표 Die 전체 Parameter", shown && dieAll,
+        Check("화면 B E-Test 연결 결과: 아래 표 펼침 · 분류 / ET / Fail Para 열 보임 · 기준 E-Test 줄 숨김 / 고른 행 없음 = 아래 표 Die 전체 Parameter", shown && dieAll,
             "보임 " + shown + " / 아래 표 높이 " + split.Panel2.Height + " / " + split.Height + " / " + head.Text + " / 표 " + et.Rows.Count + " (" + etRows.Count + ") / " + b("lblEtText").Text);
 
         // 2) 위 표 Chain 행 고르기 = 그 Chain 의 이 Die Parameter 만(Fail 먼저)
@@ -1331,14 +1418,17 @@ internal static class GdsKlarfAnalysisFormSmoke
             Check("화면 B 위 표 Chain 행 고르기 = 아래 표 = 그 Chain 의 이 Die Parameter(Fail 먼저) / 머리 글자", scoped, head.Text + " / 표 " + et.Rows.Count + " (" + want + ")");
             CaptureDetail(detail, "B1_상세_Chain고름_아래ETest값.png");
 
-            // 3) 아래 행 고르기 = 상태줄 Parameter / GDS Chain / 값 / 판정 (그 Parameter 의 GDS Chain 도형 칠하기)
+            // 3) 아래 행 고르기 = 상태줄 Parameter / GDS Chain / 값 / 판정. 그 GDS Chain 도형을 노랗게 칠하지 않는다(2026-10-22 요청, 도면 선택 도형 0)
             if (et.Rows.Count > 0)
             {
                 et.ClearSelection();
                 et.Rows[0].Selected = true;
                 Application.DoEvents();
-                Check("화면 B 아래 E-Test 값 행 고르기 = 상태줄 Parameter / GDS Chain / 값 / 판정", detail.StatusText.StartsWith(Convert.ToString(et.Rows[0].Cells["Parameter"].Value) + " / "),
-                    detail.StatusText);
+                var picked = (System.Collections.ICollection)typeof(NexplantQMS.GdsMap.GdsMapControl)
+                    .GetField("_selectedItems", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(b("map"));
+                Check("화면 B 아래 E-Test 값 행 고르기 = 상태줄 Parameter / GDS Chain / 값 / 판정 / 도면 Chain 노랗게 칠하지 않음",
+                    detail.StatusText.StartsWith(Convert.ToString(et.Rows[0].Cells["Parameter"].Value) + " / ") && picked.Count == 0,
+                    detail.StatusText + " / 칠한 도형 " + picked.Count);
             }
         }
         else Console.WriteLine("참고 / 이 Die 위 표에 E-Test 값이 있는 Chain 행이 없음");
@@ -1355,17 +1445,14 @@ internal static class GdsKlarfAnalysisFormSmoke
             CaptureDetail(detail, "B2_상세_Chain밖고름.png");
         }
 
-        // 5) [E-Test 값] 끄기 = 아래 접힘(위 표가 패널 끝까지), 켜기 = 펼침
-        int topHeight = grid.Height;
-        chk.Checked = false;
+        // 5) [E-Test 값] 체크 없음(2026-10-23): 같은 결과를 다시 보여도 아래 E-Test 값 표는 늘 펼침
+        Type etFormType = detail.GetType();
+        Wait(detail.ShowDieAsync(die, x, y, null), 300);
         Application.DoEvents();
-        bool folded = split.Panel2Collapsed && grid.Height > topHeight;
-        int foldedHeight = grid.Height;
-        CaptureDetail(detail, "B3_상세_ETest값끔.png");
-        chk.Checked = true;
-        Application.DoEvents();
-        Check("화면 B [E-Test 값] 끄기 = 아래 접힘 · 위 표 늘어남 / 켜기 = 펼침", folded && !split.Panel2Collapsed && grid.Height == topHeight,
-            "위 표 높이 " + topHeight + " -> " + foldedHeight + " -> " + grid.Height);
+        bool noEtCheck = etFormType.GetField("chkEtValues", BindingFlags.NonPublic | BindingFlags.Instance) == null
+            && etFormType.GetMethod("chkEtValues_CheckedChanged", BindingFlags.NonPublic | BindingFlags.Instance) == null;
+        Check("화면 B [E-Test 값] 체크 없음 / E-Test 연결 결과는 다시 보여도 아래 표 늘 펼침", noEtCheck && !split.Panel2Collapsed && split.Panel2.Height * 4 >= split.Height,
+            "체크 없음 " + noEtCheck + " / 아래 표 높이 " + split.Panel2.Height + " / " + split.Height);
 
         // 6) 분류 칸 글자색 = 예전 [종합] 표 색 (4분류 상태 칸 5개는 2026-10-22 삭제)
         var colors = new Dictionary<string, Color> { { "일치", Color.Firebrick }, { "Fail만", Color.DarkOrange }, { "Defect만", Color.FromArgb(150, 110, 0) } };

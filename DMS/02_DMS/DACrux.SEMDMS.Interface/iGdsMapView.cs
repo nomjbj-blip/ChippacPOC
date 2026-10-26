@@ -53,5 +53,16 @@ namespace DACrux.SEMDMS.Interface
         DataTable GetMapTextIndex(string strFactory, string strDeviceID);
 
         #endregion
+
+        #region [작업 기간]
+
+        /// <summary>
+        /// 데이터 생성 / 수정 작업 가능 기간 안내 한 행 (2026-10-23). 클라이언트가 시작할 때 메뉴를 막을지 정하는 데만 쓴다.
+        /// 실제 차단은 각 저장 함수의 첫 단계(DSL WorkRule.Confirm)가 한다.
+        /// 열: DB_TIME(yyyy-MM-dd HH:mm:ss, 한국 시간) / LAST_DAY(yyyy-MM-dd) / WORK_OPEN(Y / N) / DAYS_LEFT(마지막 날까지 남은 일수, 오늘 포함)
+        /// </summary>
+        DataTable GetWorkState();
+
+        #endregion
     }
 }

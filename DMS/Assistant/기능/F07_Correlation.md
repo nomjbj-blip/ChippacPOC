@@ -238,6 +238,8 @@ E-Test 쪽 "ET Chain 매핑 기준"을 회의록 근거로 정했다 (설계 v2�
 - 설계: 새 화면 `frmGdsKlarfSimple`(ENGUI, 화면 A 보존), 같은 서버 `Analyze` 를 `SIZE_TOL` + 허용오차 0 + 보정 0 + `EtSrcFileSeq` 0 으로 부른다. **서버 / Interface / DB 변경 없음**. `GetWaferReady` 는 부르지 않는다.
 - 판정 뜻(소스 확인): Defect 좌표 중심 XSIZE × YSIZE 사각형과 Chain Member 실제 모양의 Gap ≤ 허용오차(0 = 겹치거나 닿음). 크기 0 은 점. DSIZE / DEFECTAREA 는 쓰지 않음.
 - 오른쪽 탭: [설정 / 정보] = 분석 정보 / Defect 영역 설정(+ Chain 면, [분석]) / 선택 Die 의 Chain 위 Defect 이미지 카드(`DPUCDefectImageCard`) / Chain 목록, [종합 (Die)] = 화면 A Die 표에서 E-Test 열 뺀 것.
+  - 2026-10-22 CLAUDE-217: 탭을 없애고 한 페이지로 바꿨다. 위에서부터 분석 정보 / Defect 영역 설정 / KLARF 위치 조정 + [다시 분석] / 종합(Die 표) / Defect 이미지(맨 아래). Chain 목록과 체크 2개는 뺐다.
+  - 2026-10-22 CLAUDE-219: Die Index(= 고객 통합 Die#, Factory + Product 의 TQP_USEMAP 사용 Die 를 위 행부터 · 같은 행 왼쪽부터 번호, `ENGUI/DefectMapAnalysis/GdsDieIndex`) 표시. Wafer Map 머리 = 마우스 Die "X / Y / Index", 종합 표 맨 왼쪽 Index 열, 상세보기 Die 목록 No 다음 Index 열. 서버 변경 없음(기존 `GetEtMapDieList`). Simple 설계 23절.
 - 결정(같은 날): "권장안 S1 ~ S10 으로 1단계 구현 진행".
 - 구현(1단계, 설계 12절): POC > **GDS-KLARF 연관 분석 (Simple)** (`ENGUI/DefectMapAnalysis/frmGdsKlarfSimple`, 메뉴 `MNU_GDS_KLARF_SIMPLE` / F03129 / RESV_04 = DM, 소스 MenuFile 에만) + 색 구간 팝업 `GdsKlarfBandPopup`(화면 A 와 같은 동작, 새 화면 전용) + `GdsKlarfAnalysisMap.ShowDetailMenu`(기본 true, Simple 은 false). Wafer 받으면 자동 분석, 설정 바꾸면 "설정 바뀜" -> [분석], Die 클릭 = 그 Die 의 Chain 위 Defect 이미지 카드 / Chain 목록, Die 더블클릭 = Die 선택만(2단계 자리).
 - 검증: TEMP 빌드(새 경고 없음) + `Verify-GdsKlarfSimple.ps1` -> `GDS_KLARF_SIMPLE_FORM_SMOKE=PASS (17/17)` STEP 528(Defect 15, 허용오차 0 / 5 = Chain 위 1 / 1) · STEP 603(1,122, 437 / 472). Smoke 는 DB 연결 이름을 DMSMGR(로컬)로 바꿔 쓴다(서버 config 는 지금 실제 앱 DB CPKMESDV). 버튼 배치 Simple 화면 FAIL 0. 이미지 카드 실제 FTP 읽기는 Smoke 안에서 실패(원인 추정: 원격 설정 없음) -> DMS 화면 확인.
@@ -264,6 +266,9 @@ E-Test 쪽 "ET Chain 매핑 기준"을 회의록 근거로 정했다 (설계 v2�
 - 두 화면 같은 모양 + Simple E-Test 자동 연결(같은 날 CLAUDE-199, 설계 12절): 요청 "두 화면에서 동일하게 / 컨셉대로 전부", 결정 "완전히 같게(두 요청 합침)" + "Simple E-Test = 같은 Wafer 최신 파일 자동". Simple 보기 표시(DETAIL_VIEW) 삭제 -> 두 화면 공통 = 분석 기준 칸 · 표 위 요약 숨김, [걸린 / Fail Chain 만] 기본 끔, Defect 빨강 / 노랑 채움(점선 · 번호 없음), 한 패널(E-Test 있으면 체크 · 아래 표 · 4분류 칸 · E-Test 열). Simple 은 GetWaferReady 로 같은 Wafer + 같은 Device 최신 READY E-Test 자동 연결 + 분석 정보 E-Test 줄. Simple Smoke 33/33, 화면 A 82/82(528). 배포 = GdsMap EXE + ENGUI DLL.
 - 상세보기 [다시 분석] + 정리(같은 날 CLAUDE-205, 설계 13절): 위쪽 오른쪽 [다시 분석] = 연 분석 화면의 [다시 분석] / [분석](지금 설정) -> SourceAnalyzed 로 상세보기 새 결과. [Chain 밖 Defect] 체크 삭제(늘 보임), 4분류 상태 칸 5개 삭제, 기준의 최종 저장 / 분석 시각 삭제. [걸린 / Fail Chain 만] 은 유지(기본 끔). 화면 A 80/80(528), Simple 36/36. 배포 = GdsMap DLL + ENGUI DLL.
 - 도면 머리 줄 좁은 폭(같은 날 CLAUDE-206, 설계 14절): Die 목록 옆에서 도면 칸이 좁으면(약 190px) 보기 / [배경 도면] / [원점 표시] / [전체 보기] 가 겹치던 것을 FlowLayoutPanel 로 바꿔 다음 줄로 넘김(넓으면 한 줄 32, 190px = 4줄). [전체 보기] 는 [원점 표시] 뒤. 화면 A 81/81(528), Simple 36/36(603). 배포 = GdsMap DLL.
+- 버튼 · 열 · 문구 정리(같은 날 CLAUDE-208, 설계 15절): [역추적 해제](체크 줄 아래) 실행 112 x 28, Member / Gap / GDS X / GDS Y 열 숨김, [전체 보기] 삭제, [배경 도면] -> [전체 도면], 기준 묶음 E-Test 줄 늘 숨김. 사용자 VS 150% 저장으로 눌린 아래 E-Test 값 표를 35% 로 맞춤. 화면 A 81/81(528), Simple 36/36(603). 배포 = GdsMap DLL.
+- 아래 E-Test 값 행 선택 칠하기 삭제(같은 날 CLAUDE-211, 설계 16절): 행을 골라도 도면 Chain 을 노랗게 칠하지 않고 상태줄만(위 표는 2026-10-20 에 이미 뺌). 화면 A 81/81(528), Simple 36/36(603). 배포 = GdsMap DLL.
+- 표 더블클릭 삭제 / 이미지 = 오른쪽 클릭(같은 날 CLAUDE-216, 설계 17절): 더블클릭 역추적에서 회색 행이 빠지고 자동 스크롤돼 줄이 사라져 보이던 것(원인 분석) 뒤 요청으로 더블클릭 = 아무 일 없음. 클릭 = Defect 따라감, 표시 체크 그대로, Defect 행 오른쪽 클릭 = [Defect 이미지 보기]. 역추적은 분석 화면 Chain 지정 열기만. 화면 A 82/82(528), Simple 36/36(603). 배포 = GdsMap DLL.
 
 ## E-Test Bin 설정 화면 설계 (2026-10-22, CLAUDE-201)
 
@@ -273,4 +278,5 @@ E-Test 쪽 "ET Chain 매핑 기준"을 회의록 근거로 정했다 (설계 v2�
 - 구현(같은 날, "진행" = B1 ~ B9 권장안): 화면 `frmEtBinSetup` + 메뉴 `MNU_DMS_ET_BIN`(POC, E-Test Para Setup 바로 뒤) + 서버 `GdsEtResult_Bin` + `TQP_GDS_ET_YMS.xml` 쿼리 5개. 기존 `MERGE_BIN` 이 설명을 40자에서 잘라(실측) Bin 정의 읽기 / 쓰기 / 삭제는 전용 쿼리로 바꿈(4열만 UPDATE, 숨긴 열 유지).
 - 검증: `ET_BIN_SETUP_PROBE=PASS (15/15)` / `ET_BIN_SETUP_FORM_SMOKE=PASS` (17) / 버튼 배치 새 화면 OK. 양품 변경 -> 수율 다시 계산 83.33 -> 100 -> 83.33 확인.
 - 상태: **구현 완료(코드) / TEMP 빌드 + Probe + 화면 밖 Smoke 확인 / 배포 안 함 / DMS 화면 확인 대기**. [설계](../../../문서/설계/04_ETest/2026-10-22_ETest_Bin_Setup_화면_설계.md) 13절
+- 후속(CLAUDE-215): 화면 확인 뒤 요청으로 Die / Pass / Fail / 파일 / 상태 열 숨김(값은 채움). 보이는 열 = Bin / 이름 / 양품 / 색 / 설명 / Software Bin. Smoke PASS, ENGUI DLL 만 바뀜.
 - 후속(CLAUDE-207): 기존 `TQP_BINDESC.xml` `MERGE_BIN` / `SELECT_BIN_EDITABLE` 바인딩 size 40 / 25 -> 0. 기존 frmSetupBin / frmSetupProgram 도 긴 설명 / 26자 Program 이 잘리지 않음(Probe 확인, TEST Service 경유 화면은 미확인).

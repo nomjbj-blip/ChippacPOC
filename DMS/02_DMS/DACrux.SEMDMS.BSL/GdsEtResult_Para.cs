@@ -69,6 +69,8 @@ namespace DACrux.SEMDMS.BSL
         /// </summary>
         public DataTable RegisterEtParameters(string[] aKey, string[,] aRows, string strUpdateUser)
         {
+            // 작업 기간 확인: 기간이 지나면 여기서 멈추고 저장하지 않는다 (2026-10-23)
+            new WorkRule().Confirm(WorkModule.ETest, WorkKind.Setup);
             if (aKey == null || aKey.Length != 5)
                 throw new ArgumentException("Parameter 등록 키는 5개 항목(Factory / Device / 공정 / 출처 / 파일 이름)이어야 합니다.", "aKey");
             string f = Required(aKey[0], "Factory", 30);
@@ -189,6 +191,8 @@ namespace DACrux.SEMDMS.BSL
         /// </summary>
         public DataTable SaveEtParameterSetup(string[] aKey, string[,] aRows, string strUpdateUser)
         {
+            // 작업 기간 확인: 기간이 지나면 여기서 멈추고 저장하지 않는다 (2026-10-23)
+            new WorkRule().Confirm(WorkModule.ETest, WorkKind.Setup);
             if (aKey == null || aKey.Length != 3)
                 throw new ArgumentException("Parameter 키는 3개 항목(Factory / Device / 공정)이어야 합니다.", "aKey");
             string f = Required(aKey[0], "Factory", 30);
@@ -365,6 +369,8 @@ namespace DACrux.SEMDMS.BSL
         /// </summary>
         public int DeleteEtParameters(string[] aKey, string[] aParameters, string strUpdateUser)
         {
+            // 작업 기간 확인: 기간이 지나면 여기서 멈추고 저장하지 않는다 (2026-10-23)
+            new WorkRule().Confirm(WorkModule.ETest, WorkKind.Setup);
             if (aKey == null || aKey.Length != 3)
                 throw new ArgumentException("Parameter 키는 3개 항목(Factory / Device / 공정)이어야 합니다.", "aKey");
             string f = Required(aKey[0], "Factory", 30);

@@ -17,7 +17,9 @@ namespace DACrux.SEMDMS.ENGUI
     /// 기준:
     ///  - TestArea / Program 대신 E-Test Device / 공정으로 고른다. YMS Program = Device_공정(업로드와 같은 규칙, 읽기 전용 칸).
     ///  - 행 = 그 YMS Program 의 Bin 정의(TQP_BINDESC) + 업로드 파일 Die 에 나온 Hardware Bin. 0 ~ 150 고정 행은 없다.
-    ///  - 고치는 값은 이름 / 양품 / 색 / 설명뿐이다. Software Bin / Die / Pass / Fail / 파일 / 상태는 양품을 정하는 근거로 보이기만 한다.
+    ///  - 고치는 값은 이름 / 양품 / 색 / 설명뿐이다. Software Bin 은 참고로 보인다.
+    ///    Die / Pass / Fail / 파일 / 상태 열은 화면에서 숨긴다(Visible = false, 2026-10-22). 값은 그대로 채우고 상태도 계산한다.
+    ///    입력 오류는 붉은 칸 / 행 머리글 툴팁 / 저장 때 안내창으로 알린다.
     ///    자동으로 바꾸는 값은 없다. Map 기호 / 표시 / Limit 수는 서버가 그대로 둔다.
     /// 처리 흐름:
     ///  1) Device / 공정 콤보를 고르면 바로 조회한다(저장 안 한 수정이 있으면 먼저 묻고, 아니요면 콤보를 원래 값으로 되돌림).

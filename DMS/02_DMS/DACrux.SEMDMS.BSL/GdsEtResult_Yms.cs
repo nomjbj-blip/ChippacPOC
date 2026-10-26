@@ -33,6 +33,8 @@ namespace DACrux.SEMDMS.BSL
         /// </summary>
         public DataTable PublishEtFileToYms(string strSrcFileSeq, string strUpdateUser)
         {
+            // 작업 기간 확인: 기간이 지나면 여기서 멈추고 저장하지 않는다 (2026-10-23)
+            new DACrux.SEMDMS.DSL.WorkRule().Confirm(DACrux.SEMDMS.DSL.WorkModule.ETest, DACrux.SEMDMS.DSL.WorkKind.Upload);
             string strSeq = RequiredSeq(strSrcFileSeq, "파일 번호");
             string strUser = Required(strUpdateUser, "Update User", 30);
             DataTable dt = PublishToYms(strSeq, strUser).ToDataTable();

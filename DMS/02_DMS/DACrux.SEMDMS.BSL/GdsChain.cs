@@ -37,6 +37,8 @@ namespace DACrux.SEMDMS.BSL
         /// <summary>Chain 1개를 실제로 삭제한다. 하위 VER / MEMBER / LAYER / RULE / EDIT는 FK CASCADE로 함께 지워진다.</summary>
         public int DeleteChain(string strFactory, string strDeviceID, string strChainSeq, string strUpdateUser)
         {
+            // 작업 기간 확인: 기간이 지나면 여기서 멈추고 저장하지 않는다 (2026-10-23)
+            new WorkRule().Confirm(WorkModule.Gds, WorkKind.Setup);
             Required(strUpdateUser, "Update User", 30);
             DACrux.SEMDMS.DSL.TQP_GDS_CHAIN oTQP_GDS_CHAIN = new DACrux.SEMDMS.DSL.TQP_GDS_CHAIN();
             return oTQP_GDS_CHAIN.DeleteDataNonQuery("DELETE_CHAIN_ONE", null, ChainKey(strFactory, strDeviceID, strChainSeq));
@@ -57,6 +59,8 @@ namespace DACrux.SEMDMS.BSL
         /// </summary>
         public DataTable BeginChainSave(string[] ChainInfo, string[,] aLayers, string[,] aRules)
         {
+            // 작업 기간 확인: 기간이 지나면 여기서 멈추고 저장하지 않는다 (2026-10-23)
+            new WorkRule().Confirm(WorkModule.Gds, WorkKind.Setup);
             if (ChainInfo == null || ChainInfo.Length != 9)
                 throw new ArgumentException("Chain 저장 정보는 9개 항목이어야 합니다.", "ChainInfo");
             string strFactory = Required(ChainInfo[0], "Factory", 30);
@@ -183,6 +187,8 @@ namespace DACrux.SEMDMS.BSL
         /// </summary>
         public DataTable CompleteChainSave(string[] aKey, string strUpdateUser)
         {
+            // 작업 기간 확인: 기간이 지나면 여기서 멈추고 저장하지 않는다 (2026-10-23)
+            new WorkRule().Confirm(WorkModule.Gds, WorkKind.Setup);
             if (aKey == null || aKey.Length != 5)
                 throw new ArgumentException("확정 키는 Factory / Device / Chain 번호 / 예상 Member 수 / 예상 편집 수 5개여야 합니다.", "aKey");
             string[] aChainKey = ChainKey(aKey[0], aKey[1], aKey[2]);
@@ -429,6 +435,8 @@ namespace DACrux.SEMDMS.BSL
         /// </summary>
         public DataTable CreateChainBulk(string[] aKey, string[,] aChains, string[,] aLayers, string[,] aMembers, string strUpdateUser)
         {
+            // 작업 기간 확인: 기간이 지나면 여기서 멈추고 저장하지 않는다 (2026-10-23)
+            new WorkRule().Confirm(WorkModule.Gds, WorkKind.Setup);
             if (aKey == null || aKey.Length != 4)
                 throw new ArgumentException("일괄 저장 키는 Factory / Device / Layer 규칙 적용 / 격자 크기 4개여야 합니다.", "aKey");
             string strFactory = Required(aKey[0], "Factory", 30);
@@ -604,6 +612,8 @@ namespace DACrux.SEMDMS.BSL
         /// <summary>Chain 여러 개를 한 번에 실제로 삭제한다(DeleteExecuteMultiple 1회, 하위 테이블 FK CASCADE). 반환: 요청한 Chain 수.</summary>
         public int DeleteChainBulk(string strFactory, string strDeviceID, string[] aChainSeqs, string strUpdateUser)
         {
+            // 작업 기간 확인: 기간이 지나면 여기서 멈추고 저장하지 않는다 (2026-10-23)
+            new WorkRule().Confirm(WorkModule.Gds, WorkKind.Setup);
             string strFactoryKey = Required(strFactory, "Factory", 30);
             string strDevice = Required(strDeviceID, "Device ID", 50);
             Required(strUpdateUser, "Update User", 30);
@@ -628,6 +638,8 @@ namespace DACrux.SEMDMS.BSL
         /// </summary>
         public int UpdateChainColorBulk(string strFactory, string strDeviceID, string[] aChainSeqs, string strColorArgb, string strUpdateUser)
         {
+            // 작업 기간 확인: 기간이 지나면 여기서 멈추고 저장하지 않는다 (2026-10-23)
+            new WorkRule().Confirm(WorkModule.Gds, WorkKind.Setup);
             string strFactoryKey = Required(strFactory, "Factory", 30);
             string strDevice = Required(strDeviceID, "Device ID", 50);
             string strUser = Required(strUpdateUser, "Update User", 30);

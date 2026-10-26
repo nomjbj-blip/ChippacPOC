@@ -272,6 +272,7 @@ B8 권장 이유: E-Test 화면이 모두 `RO.GdsEtResult` 하나만 부른다. 
 | 색 고르기 키 | 더블클릭 / Enter | 더블클릭 / F2 | 표가 Enter 를 다음 행 이동으로 먼저 처리해 KeyDown 까지 오지 않는다 |
 | 상태 글자 | 정의 없음 / 파일에 없음 / 파일 결과와 다름 / YMS 에 못 넣음 | + `새 Bin`(추가한 행), 입력 오류가 있으면 오류 문장(붉은 글자) | 새 행과 오류 이유를 같은 칸에서 보이게 |
 | 표 열 폭 | 설명 320 | 설명 = 남는 폭 채우기(최소 200), 상태 140 | 1100 폭에서 가로 스크롤 / '파일' 머리글 접힘을 없앰 |
+| 참고 열 (B4) | Software Bin / Die / Pass / Fail / 파일 / 상태를 표 열로 | **Die / Pass / Fail / 파일 / 상태 열은 숨김**(Visible = false, 값은 채우고 상태도 계산). 보이는 열 = Bin / 이름 / 양품 / 색 / 설명 / Software Bin | 화면 확인 뒤 요청 "지워..", "상태도 지워.." (CLAUDE-215). 입력 오류는 붉은 칸 / 행 머리글 툴팁 / 저장 안내창 |
 | 진행 표시 | busyBar | 목록 / Bin 조회는 `RunHere`(콤보 변경에서도 부름), 저장 / 삭제 / 수율 다시 계산은 `Run` | 빌드 가이드 기준(콤보 변경 이벤트 안에서는 RunHere) |
 
 같은 날 후속(CLAUDE-207): 기존 `TQP_BINDESC.xml` `MERGE_BIN` / `SELECT_BIN_EDITABLE` 바인딩도 size 0 으로 고쳤다(frmSetupBin / frmSetupProgram 도 긴 설명 / 26자 Program 이 잘리지 않음, 컬럼보다 긴 값은 저장 오류). 이 화면은 4열만 바꾸는 `MERGE_ET_BIN` 을 그대로 쓴다.

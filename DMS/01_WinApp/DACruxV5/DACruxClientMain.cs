@@ -136,6 +136,7 @@ namespace DACruxV5
             DACrux.Base.GlobalVariable.Password = "1111";
             DACrux.Framework.DACruxMain mMain = new DACrux.Framework.DACruxMain(MainTitle, oIcon);
             ApplyMenuSize(mMain);
+            MenuWorkRule.Attach(mMain);
             mMain.Load += new EventHandler(mMain_Load);
             Application.Run(mMain);
 #else
@@ -151,6 +152,7 @@ namespace DACruxV5
                         oIcon
                         );
                     ApplyMenuSize(mMain);
+                    MenuWorkRule.Attach(mMain);
 
                     Application.Run(mMain);
                     switch (DACrux.Base.GlobalVariable.ExitMode)

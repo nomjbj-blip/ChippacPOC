@@ -66,11 +66,12 @@ internal static class EtBinSetupFormSmoke
             txtFactory.Text = Factory;
 
             // 1) 구성
-            string headers = string.Join(",", grid.Columns.Cast<DataGridViewColumn>().OrderBy(c => c.DisplayIndex).Select(c => c.HeaderText).ToArray());
-            Check("구성: Factory / YMS Program 읽기 전용, 콤보 목록만, 편집은 코드로, [저장] 굵게, Copy 없음, 열 머리글",
+            string headers = string.Join(",", grid.Columns.Cast<DataGridViewColumn>().Where(c => c.Visible).OrderBy(c => c.DisplayIndex).Select(c => c.HeaderText).ToArray());
+            bool hidden = new[] { "colDie", "colPass", "colFail", "colFiles", "colState" }.All(n => !grid.Columns[n].Visible);
+            Check("구성: Factory / YMS Program 읽기 전용, 콤보 목록만, 편집은 코드로, [저장] 굵게, Copy 없음, 보이는 열 머리글 / Die · Pass · Fail · 파일 · 상태 숨김(2026-10-22)",
                 txtFactory.ReadOnly && txtYms.ReadOnly && cboDevice.DropDownStyle == ComboBoxStyle.DropDownList && cboProgram.DropDownStyle == ComboBoxStyle.DropDownList
                 && grid.EditMode == DataGridViewEditMode.EditProgrammatically && btnSave.Font.Bold && !HasField(type, "btnCopy")
-                && headers == "Bin,이름,양품,색,설명,Software Bin,Die,Pass,Fail,파일,상태" && form.Text == "E-Test Bin 설정", headers);
+                && headers == "Bin,이름,양품,색,설명,Software Bin" && hidden && form.Text == "E-Test Bin 설정", headers);
             Invoke(type, form, "btnSearch_Click");
             Check("Device 없이 조회 -> 고르라는 안내", form.LastNotice.Contains("Factory / Device / 공정을 고르세요"), form.LastNotice);
 

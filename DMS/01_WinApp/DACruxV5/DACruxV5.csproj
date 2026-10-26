@@ -195,6 +195,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DACruxClientMain.cs" />
+    <Compile Include="MenuWorkRule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -832,6 +833,14 @@
     <ProjectReference Include="..\..\02_DMS\DACrux.SEMDMS.ENGUI\DACrux.SEMDMS.ENGUI.csproj">
       <Project>{EE34AC74-5A6C-4E9F-B0D3-F8F0613DD073}</Project>
       <Name>DACrux.SEMDMS.ENGUI</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\02_DMS\DACrux.SEMDMS.Interface\DACrux.SEMDMS.Interface.csproj">
+      <Project>{21875FB0-5B25-45E6-834D-72B4949B49F6}</Project>
+      <Name>DACrux.SEMDMS.Interface</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\02_DMS\DACrux.SEMDMS.RO\DACrux.SEMDMS.RO.csproj">
+      <Project>{B3DE56DD-3EC4-4359-BDA2-2F3289699C8B}</Project>
+      <Name>DACrux.SEMDMS.RO</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\06_CoreLibSource\DACrux.Common.Setup\DACrux.Common.Setup.csproj">
       <Project>{D70179B9-FC65-4CE9-A31A-FA5822DA9DFF}</Project>

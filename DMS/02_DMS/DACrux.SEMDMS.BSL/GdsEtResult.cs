@@ -107,6 +107,8 @@ namespace DACrux.SEMDMS.BSL
         /// </summary>
         public DataTable BeginEtFile(string[] FileInfo)
         {
+            // 작업 기간 확인: 기간이 지나면 여기서 멈추고 저장하지 않는다 (2026-10-23)
+            new WorkRule().Confirm(WorkModule.ETest, WorkKind.Upload);
             if (FileInfo == null || FileInfo.Length != 21)
                 throw new ArgumentException("저장 시작 정보는 21개 항목이어야 합니다(2026-10-14 등록 Parameter 저장 방식). 업로드 화면을 새 버전으로 바꾸세요.", "FileInfo");
             string strFactory = Required(FileInfo[0], "Factory", 30);
@@ -180,6 +182,8 @@ namespace DACrux.SEMDMS.BSL
         /// </summary>
         public DataTable CompleteEtFile(string strSrcFileSeq, string strUpdateUser)
         {
+            // 작업 기간 확인: 기간이 지나면 여기서 멈추고 저장하지 않는다 (2026-10-23)
+            new WorkRule().Confirm(WorkModule.ETest, WorkKind.Upload);
             string strSeq = RequiredSeq(strSrcFileSeq, "파일 번호");
             string strUser = Required(strUpdateUser, "Update User", 30);
             DataRow drFile;
@@ -221,6 +225,8 @@ namespace DACrux.SEMDMS.BSL
         /// </summary>
         public int RejudgeEtFiles(string[] aKey, string strUpdateUser)
         {
+            // 작업 기간 확인: 기간이 지나면 여기서 멈추고 저장하지 않는다 (2026-10-23)
+            new WorkRule().Confirm(WorkModule.ETest, WorkKind.Setup);
             if (aKey == null || aKey.Length != 3)
                 throw new ArgumentException("다시 판정 키는 3개 항목(Factory / Device / 공정)이어야 합니다.", "aKey");
             string f = Required(aKey[0], "Factory", 30);
@@ -585,6 +591,8 @@ namespace DACrux.SEMDMS.BSL
         /// </summary>
         public int SaveEtLimit(string[] aKey, string[,] aRows, string strUpdateUser)
         {
+            // 작업 기간 확인: 기간이 지나면 여기서 멈추고 저장하지 않는다 (2026-10-23)
+            new WorkRule().Confirm(WorkModule.ETest, WorkKind.Setup);
             if (aKey == null || aKey.Length != 3)
                 throw new ArgumentException("Spec 키는 3개 항목(Factory / Device / 공정)이어야 합니다.", "aKey");
             string strFactory = Required(aKey[0], "Factory", 30);
@@ -656,6 +664,8 @@ namespace DACrux.SEMDMS.BSL
         /// <summary>Spec 1행을 삭제한다. aKey: 0 Factory / 1 Device / 2 공정 / 3 Parameter(저장 이름 또는 헤더 원문, 저장 때와 같은 규칙으로 찾는다).</summary>
         public int DeleteEtLimit(string[] aKey, string strUpdateUser)
         {
+            // 작업 기간 확인: 기간이 지나면 여기서 멈추고 저장하지 않는다 (2026-10-23)
+            new WorkRule().Confirm(WorkModule.ETest, WorkKind.Setup);
             if (aKey == null || aKey.Length != 4)
                 throw new ArgumentException("Spec 삭제 키는 4개 항목(Factory / Device / 공정 / Parameter)이어야 합니다.", "aKey");
             Required(strUpdateUser, "Update User", 30);

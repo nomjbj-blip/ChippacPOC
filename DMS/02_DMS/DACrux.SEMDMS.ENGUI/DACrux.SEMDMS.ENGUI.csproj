@@ -184,6 +184,7 @@
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="DefectMapAnalysis\GdsKlarfColorBands.cs" />
+    <Compile Include="DefectMapAnalysis\GdsDieIndex.cs" />
     <Compile Include="DefectMapAnalysis\frmGdsKlarfAnalysis.cs">
       <SubType>Form</SubType>
     </Compile>

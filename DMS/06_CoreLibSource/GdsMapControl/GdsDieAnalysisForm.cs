@@ -39,15 +39,16 @@ namespace NexplantQMS.GdsMap
     ///     어느 Chain 에도 안 걸린 Defect 는 맨 아래 "Chain 밖 Defect" 묶음(가까운 거리 순). 서버 결과(AnalyzeDie)는 그대로 쓴다.
     ///  7) 화면 A · Simple 같은 모양 (2026-10-22 요청 "두 화면에서 동일하게", 설계 문서/설계/05_연관분석/2026-10-22_상세보기_오른쪽_한패널_설계.md 12절):
     ///     어느 화면이 열어도 같은 모양이다(예전 Simple 보기 표시 DETAIL_VIEW 는 없앰). Simple 상세 요청과 한 패널 요청을 합친다.
-    ///     위쪽 "분석 기준" 칸과 표 위 요약 글자는 숨기고, 표 위 체크는 [걸린 / Fail Chain 만](기본 끔 = 모든 Chain) / [E-Test 값].
+    ///     위쪽 "분석 기준" 칸과 표 위 요약 글자는 숨기고, 표 위 체크는 [걸린 / Fail Chain 만](기본 끔 = 모든 Chain) / [전체 표시].
+    ///     [전체 표시](2026-10-23)는 모든 Chain 의 표시 체크를 한 번에 켜거나 끄고, Chain 하나를 바꾸면 표시 체크를 따라간다(모두 켜짐 = 켬).
     ///     Chain 밖 Defect 묶음은 늘 보인다(체크 없음, 2026-10-22).
     ///     도면 Defect 는 Chain 영역 빨강 / 밖 노랑으로 채우고 흰 점선 · 흰 테두리 · 번호는 그리지 않으며(DefectOverlayStyle.Filled),
     ///     크기는 분석 Defect 영역 그대로(크기 + 허용오차 양쪽 / 중심 정사각형)다.
     ///  8) 오른쪽 한 패널 (2026-10-22, 설계 문서/설계/05_연관분석/2026-10-22_상세보기_오른쪽_한패널_설계.md):
     ///     탭 [GDS / KLARF] [E-Test] [종합] 을 없애고 위 = GDS / KLARF 표, 아래 = 위 표에서 고른 행 Chain 의 이 Die E-Test 값 표
-    ///     (고른 행 없음 = Die 전체, Chain 밖 행 = 빈 표). [E-Test 값] 체크로 아래를 접는다(화면 하나 설정).
+    ///     (고른 행 없음 = Die 전체, Chain 밖 행 = 빈 표). E-Test 가 있는 결과는 아래 표를 늘 보인다(2026-10-23 [E-Test 값] 체크 삭제).
     ///     분류 글자색은 표 분류 칸에, E-Test 기준은 기준 묶음 3째 줄에 둔다. "가까운 Chain" 열 / 4분류 상태 칸 5개는 뺐다.
-    ///     E-Test 를 연결하지 않은 결과는 [E-Test 값] 체크 / 아래 표 / E-Test 줄 / [분류 · ET · Fail Para] 열을 숨긴다(비어 있는 칸).
+    ///     E-Test 를 연결하지 않은 결과는 아래 표 / E-Test 줄 / [분류 · ET · Fail Para] 열을 숨긴다(비어 있는 칸).
     ///  9) [다시 분석] (2026-10-22, 설계 13절): 위쪽 오른쪽 버튼. ReanalyzeRequested 로 호스트에 알리고 호스트는 이 화면을 연 분석 화면의
     ///     [다시 분석] / [분석] 을 부른다(그 화면의 지금 설정으로 Wafer 다시 분석 -> 동기화로 이 화면도 새 결과). 기준의 최종 저장 / 분석 시각은 보이지 않는다.
     /// </summary>
@@ -76,7 +77,7 @@ namespace NexplantQMS.GdsMap
         private readonly Dictionary<long, IList<ChainTraceElement>> _chainElements = new Dictionary<long, IList<ChainTraceElement>>();
         /// <summary>기준 E-Test 줄 중 분석 결과(파일) 부분. 빈 값 = E-Test 를 연결하지 않은 분석. Die 판정은 ShowEtCriteria 가 뒤에 붙인다.</summary>
         private string _etCriteria = string.Empty;
-        /// <summary>이 결과에 E-Test 가 있는지(ANL_INFO.ET_TEST_PROGRAM 있음). 없으면 [E-Test 값] / 아래 표 / E-Test 줄 / E-Test 열을 숨긴다.</summary>
+        /// <summary>이 결과에 E-Test 가 있는지(ANL_INFO.ET_TEST_PROGRAM 있음). 있으면 아래 E-Test 값 표를 늘 보이고, 없으면 아래 표 / E-Test 줄 / E-Test 열을 숨긴다.</summary>
         private bool _etAvailable;
         /// <summary>아래 E-Test 값 표가 지금 보이는 범위: null = Die 전체, OutsideEtKey = Chain 밖 Defect, 그 밖 = CHAIN_SEQ.</summary>
         private string _etKey;
@@ -134,6 +135,7 @@ namespace NexplantQMS.GdsMap
             // 기준 묶음 E-Test 줄(E-Test 공정 / Wafer / 판정 / 이 Die 판정)은 보이지 않는다(2026-10-22 요청). Die 판정은 위쪽 Die 줄에 있다
             lblEtText.Visible = false;
             map.DefectStyle = DefectOverlayStyle.Filled;
+            SetEtSplit();
             // Chain 칸은 묶음의 첫 행(가려지면 화면 첫 행)에만 글자를 그린다. 스크롤하면 새 첫 행을 다시 그리도록 전체를 다시 그린다 (2026-10-20)
             dgvChainDefects.Scroll += (s, e) => dgvChainDefects.Invalidate();
         }
@@ -270,7 +272,7 @@ namespace NexplantQMS.GdsMap
         }
 
         /// <summary>
-        /// 결과마다 보기를 맞춘다(8번): E-Test 를 연결하지 않은 결과는 [E-Test 값] 체크 / 아래 표 /
+        /// 결과마다 보기를 맞춘다(8번): E-Test 를 연결하지 않은 결과는 아래 표 /
         /// [분류 · ET · Fail Para] 열(비어 있음)을 숨긴다(기준 E-Test 줄은 2026-10-22 부터 늘 숨김). 어느 화면이 연 결과든 같은 규칙이다(2026-10-22 두 화면 같은 모양).
         /// 화면 하나를 두 화면의 상세보기 창이 같이 쓰기 때문에 ShowDie 마다 부른다.
         /// </summary>
@@ -280,18 +282,17 @@ namespace NexplantQMS.GdsMap
             colClass.Visible = _etAvailable;
             colEt.Visible = _etAvailable;
             colFailPara.Visible = _etAvailable;
-            chkEtValues.Visible = _etAvailable;
             pnlGdsCriteria.Height = lblGdsText.Bottom + 4;
             ApplyEtPanel();
         }
 
         /// <summary>
-        /// 아래 E-Test 값 표를 펴거나 접는다(E-Test 있는 결과 + [E-Test 값] 켬일 때만 편다).
+        /// 아래 E-Test 값 표를 펴거나 접는다(E-Test 있는 결과면 늘 편다, 2026-10-23 [E-Test 값] 체크 삭제).
         /// 표가 다시 보일 때 첫 행을 저절로 고르는 것은 행 선택 처리(Chain 도형 칠하기 / 상태줄)를 돌리지 않고 지운다.
         /// </summary>
         private void ApplyEtPanel()
         {
-            bool show = _etAvailable && chkEtValues.Checked;
+            bool show = _etAvailable;
             if (splitRight.Panel2Collapsed == show)
             {
                 _updating = true;
@@ -299,13 +300,19 @@ namespace NexplantQMS.GdsMap
                 dgvEtValues.ClearSelection();
                 _updating = false;
             }
-            // 아래 표를 처음 펼 때 한 번 오른쪽 높이의 35% 로 맞춘다(2026-10-22). 디자이너를 다른 화면 배율로 저장하면
-            // 나누기 위치는 배율대로 줄지 않아 아래 표가 최소 높이로 눌리기 때문이다. 그 뒤 사용자가 옮긴 위치는 그대로 둔다
-            if (show && !_etSplitSized && splitRight.Height > splitRight.Panel1MinSize + splitRight.Panel2MinSize + splitRight.SplitterWidth)
-            {
-                splitRight.SplitterDistance = Math.Max(splitRight.Panel1MinSize, splitRight.Height * 65 / 100);
-                _etSplitSized = true;
-            }
+            // 아래 표를 처음 펼 때(창 크기가 정해진 뒤) 한 번 더 35% 로 맞춘다. 그 뒤 사용자가 옮긴 위치는 그대로 둔다
+            if (show && !_etSplitSized) _etSplitSized = SetEtSplit();
+        }
+
+        /// <summary>
+        /// 아래 E-Test 값 표 = 오른쪽 높이의 35%(2026-10-22). 디자이너를 다른 화면 배율로 저장하면 나누기 위치는 배율대로 줄지 않아
+        /// 아래 표가 최소 높이로 눌리거나 칸 밖으로 나가므로 비율로 다시 맞춘다. 높이가 모자라면 그대로 두고 false.
+        /// </summary>
+        private bool SetEtSplit()
+        {
+            if (splitRight.Height <= splitRight.Panel1MinSize + splitRight.Panel2MinSize + splitRight.SplitterWidth) return false;
+            splitRight.SplitterDistance = Math.Max(splitRight.Panel1MinSize, splitRight.Height * 65 / 100);
+            return true;
         }
 
         /// <summary>[걸린 / Fail Chain 만]. 기본 끔 = 모든 Chain (2026-10-22 두 화면 같은 모양, Simple 요청 "기본으로 전부").</summary>
@@ -610,7 +617,7 @@ namespace NexplantQMS.GdsMap
         {
             Point die = _currentDie.Value;
             return _analysis.Tables["DEFECT"].Rows.Cast<DataRow>()
-                .Where(r => Convert.ToInt32(r["XINDEX"], CultureInfo.InvariantCulture) == die.X && Convert.ToInt32(r["YINDEX"], CultureInfo.InvariantCulture) == die.Y);
+                .Where(r => Convert.ToInt32(r["XINDEX"], CultureInfo.InvariantCulture) == die.X && Convert.ToInt32(r["YINDEX"], CultureInfo.InvariantCulture) == die.Y);    
         }
 
         /// <summary>맨 아래 묶음의 Chain 칸 문구.</summary>
@@ -644,10 +651,10 @@ namespace NexplantQMS.GdsMap
         /// <summary>
         /// [GDS / KLARF] 표를 채운다 (2026-10-20, 예전 Chain 표 + Defect 표).
         /// Chain 순서 = 일치 -> Fail만 -> Defect만 -> 정상 -> 비교 불가, 같은 분류는 Defect 수 많은 순(예전 Chain 표와 같음).
-        /// 역추적 Chain 을 맨 위로 올리지 않는다(2026-10-16 변경: 더블클릭한 행이 그 자리에 있어야 함).
+        /// 역추적 Chain 을 표 순서 맨 위로 옮기지 않는다(2026-10-16, 순서는 분류 순 그대로이고 그 묶음 첫 행으로 스크롤만 한다).
         /// [걸린 / Fail Chain 만] 이면 걸렸거나 E-Test Fail 인 Chain 만 행으로 둔다(둘 다 없는 Die 는 전부, 역추적 Chain 은 늘 둔다). 끄면 모든 Chain.
         /// Chain 이 LargeChainCount 보다 많은 Device 는 "모든 Chain" 대신 그 Die 의 DIE_CHAIN Chain 만(ScopeChains, 2026-10-21).
-        /// 표시 체크: 역추적이면 그 Chain 만, 아니면 행이 있는 Chain 전부.
+        /// 표시 체크: 역추적이면 그 Chain 만, 아니면 행이 있는 Chain 전부. [전체 표시] 는 채운 뒤 표시 체크에 맞춘다(SyncShowAll).
         /// Chain 마다 걸린 Defect 를 Gap 순(같으면 Defect ID)으로 붙이고, 없으면 빈 1행.
         /// 두 Chain 에 걸린 Defect 는 두 묶음에 모두 넣는다(Defect ID 굵은 글자. "가까운 Chain" 열은 2026-10-22 뺐다).
         /// 역추적 Chain 묶음은 예전 [KLARF] 역추적처럼 탐색 거리 안 Defect 를 거리 순으로 모두 보인다(허용오차 밖은 회색).
@@ -741,6 +748,7 @@ namespace NexplantQMS.GdsMap
                 else if (firstRow >= 0 && firstRow < grid.Rows.Count) grid.FirstDisplayedScrollingRowIndex = firstRow;
             }
             _updating = false;
+            SyncShowAll();
             grid.Invalidate();
         }
 
@@ -1157,30 +1165,64 @@ namespace NexplantQMS.GdsMap
             }
             _updating = false;
             ApplyChainOverlays();
+            SyncShowAll();
         }
 
         /// <summary>
-        /// 더블클릭 (2026-10-20): Chain 칸 = 그 Chain 으로 역추적(그 Chain 만 표시 + 전체 범위로 이동 + Defect 거리 순, 2026-10-16),
-        /// Defect 칸 = DMS 호스트에 그 Defect 이미지 보기 요청. Chain 밖 묶음의 Chain 칸은 아무 일도 하지 않는다.
+        /// [전체 표시] (2026-10-23 요청 "전체 체크 / 미체크 기능"): 모든 Chain 의 표시 체크(묶음 전체 행)를 한 번에 켜거나 끄고 바로 도면에 반영한다.
+        /// 역추적 중이어도 그대로 따른다. Chain 밖 Defect 묶음은 표시 체크가 없어 건드리지 않는다.
         /// </summary>
-        private void dgvChainDefects_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        private void chkShowAll_CheckedChanged(object sender, EventArgs e)
         {
-            GridRowTag tag = TagAt(e.RowIndex);
-            if (tag == null || _analysis == null || e.ColumnIndex < 0) return;
-            if (e.ColumnIndex <= colMember.Index)
+            if (_updating || _analysis == null || _loadedKey == null) return;
+            dgvChainDefects.EndEdit();
+            bool on = chkShowAll.Checked;
+            _updating = true;
+            foreach (DataGridViewRow row in dgvChainDefects.Rows)
             {
-                if (!tag.ChainSeq.HasValue) return;
-                _focusChainSeq = tag.ChainSeq.Value.ToString(CultureInfo.InvariantCulture);
-                ShowCurrent();
-                return;
+                var t = row.Tag as GridRowTag;
+                if (t != null && t.ChainSeq.HasValue) row.Cells[colShow.Index].Value = on;
             }
-            if (tag.Defect != null) RequestDefectImage(DefectIdOf(tag.Defect));
+            _updating = false;
+            ApplyChainOverlays();
         }
 
-        /// <summary>[E-Test 값]: 아래 E-Test 값 표를 펴거나 접는다(2026-10-22). 화면 하나 설정이라 다른 창으로 바꿔도 그대로다.</summary>
-        private void chkEtValues_CheckedChanged(object sender, EventArgs e)
+        /// <summary>[전체 표시] 를 지금 표시 체크에 맞춘다(Chain 이 있고 모두 켜져 있으면 켬). 이벤트는 돌리지 않는다.</summary>
+        private void SyncShowAll()
         {
-            ApplyEtPanel();
+            List<DataGridViewRow> heads = ChainHeadRows().ToList();
+            bool was = _updating;
+            _updating = true;
+            chkShowAll.Checked = heads.Count > 0 && heads.All(r => r.Cells[colShow.Index].Value is bool && (bool)r.Cells[colShow.Index].Value);
+            _updating = was;
+        }
+
+        /// <summary>
+        /// 오른쪽 클릭 (2026-10-22): Defect 가 있는 행이면 그 행을 고르고(도면이 그 Defect 를 따라감) [Defect 이미지 보기] 메뉴를 연다.
+        /// 표 더블클릭은 아무 일도 하지 않는다(Chain 칸 더블클릭 역추적 / Defect 칸 더블클릭 이미지 보기를 뺐다).
+        /// 역추적은 분석 화면에서 Chain 을 지정해 열 때만 하고 [역추적 해제] 로 푼다.
+        /// </summary>
+        private void dgvChainDefects_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            if (e.Button != MouseButtons.Right || e.RowIndex < 0 || e.ColumnIndex < 0) return;
+            GridRowTag tag = TagAt(e.RowIndex);
+            if (tag == null || tag.Defect == null) return;
+            DataGridViewRow row = dgvChainDefects.Rows[e.RowIndex];
+            if (!row.Selected)
+            {
+                dgvChainDefects.ClearSelection();
+                dgvChainDefects.CurrentCell = row.Cells[colCode.Index];
+                row.Selected = true;
+            }
+            Rectangle cell = dgvChainDefects.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, false);
+            mnuDefect.Show(dgvChainDefects, cell.Left + e.X, cell.Top + e.Y);
+        }
+
+        /// <summary>[Defect 이미지 보기]: 고른 행의 Defect 이미지를 DMS 호스트에 요청한다.</summary>
+        private void mnuDefectImage_Click(object sender, EventArgs e)
+        {
+            GridRowTag tag = dgvChainDefects.SelectedRows.Count == 0 ? null : dgvChainDefects.SelectedRows[0].Tag as GridRowTag;
+            if (tag != null && tag.Defect != null) RequestDefectImage(DefectIdOf(tag.Defect));
         }
 
         /// <summary>[역추적 해제]: Die 전체 보기로 돌아간다.</summary>
@@ -1190,14 +1232,13 @@ namespace NexplantQMS.GdsMap
             ShowCurrent();
         }
 
-        /// <summary>E-Test 값 행 선택: 그 Parameter 의 GDS Chain 도형을 선택 색으로 칠한다.</summary>
+        /// <summary>
+        /// E-Test 값 행 선택: 상태줄에 Parameter / GDS Chain / 값 / 판정을 보인다.
+        /// 그 GDS Chain 도형을 선택 색(노랑)으로 칠하던 것은 뺐다(2026-10-22 요청, 위 표 행 선택과 같이 Chain 색 그대로).
+        /// </summary>
         private void dgvEtValues_SelectionChanged(object sender, EventArgs e)
         {
             if (_updating || dgvEtValues.SelectedRows.Count == 0 || !dgvEtValues.Columns.Contains("SEQ")) return;
-            long seq;
-            if (!long.TryParse(Convert.ToString(dgvEtValues.SelectedRows[0].Cells["SEQ"].Value), NumberStyles.Integer, CultureInfo.InvariantCulture, out seq)) return;
-            IList<string> members;
-            map.HighlightChainElements(_chainMembers.TryGetValue(seq, out members) ? members.ToList() : null);
             SetStatus(String.Format("{0} / {1} / 값 {2} ({3})", dgvEtValues.SelectedRows[0].Cells["Parameter"].Value,
                 dgvEtValues.SelectedRows[0].Cells["GDS Chain"].Value, dgvEtValues.SelectedRows[0].Cells["값"].Value, dgvEtValues.SelectedRows[0].Cells["판정"].Value));
         }
@@ -1357,6 +1398,7 @@ namespace NexplantQMS.GdsMap
             }
             _updating = false;
             ApplyChainOverlays();
+            SyncShowAll();
 
             DataGridViewRow pick = s.RowKey == null ? null : dgvChainDefects.Rows.Cast<DataGridViewRow>().FirstOrDefault(r => RowKey(r.Tag as GridRowTag) == s.RowKey);
             if (pick != null && s.RowSelected)

@@ -41,6 +41,8 @@ namespace DACrux.SEMDMS.BSL
         /// </summary>
         public int DeleteMap(string strFactory, string strDeviceID, string strUpdateUser)
         {
+            // 작업 기간 확인: 기간이 지나면 여기서 멈추고 저장하지 않는다 (2026-10-23)
+            new WorkRule().Confirm(WorkModule.Gds, WorkKind.Setup);
             string strCleanFactory = Required(strFactory, "Factory", 30);
             string strCleanDevice = Required(strDeviceID, "Device ID", 50);
             Required(strUpdateUser, "Update User", 30);
@@ -61,6 +63,8 @@ namespace DACrux.SEMDMS.BSL
         /// </summary>
         public DataTable CopyMap(string strFactory, string strSourceDeviceID, string strTargetDeviceID, string strUser)
         {
+            // 작업 기간 확인: 기간이 지나면 여기서 멈추고 저장하지 않는다 (2026-10-23)
+            new WorkRule().Confirm(WorkModule.Gds, WorkKind.Setup);
             string strFac = Required(strFactory, "Factory", 30);
             string strSource = Required(strSourceDeviceID, "원본 Device ID", 50);
             string strTarget = Required(strTargetDeviceID, "새 Device ID", 50);
@@ -172,6 +176,8 @@ namespace DACrux.SEMDMS.BSL
         /// </summary>
         public DataTable BeginMapImport(string[] ImportInfo)
         {
+            // 작업 기간 확인: 기간이 지나면 여기서 멈추고 저장하지 않는다 (2026-10-23)
+            new WorkRule().Confirm(WorkModule.Gds, WorkKind.Setup);
             if (ImportInfo == null || (ImportInfo.Length != 11 && ImportInfo.Length != 12))
                 throw new ArgumentException("저장 시작 정보는 11개 또는 12개(저장 기준 포함) 항목이어야 합니다.", "ImportInfo");
             string strFactory = Required(ImportInfo[0], "Factory", 30);
@@ -244,6 +250,8 @@ namespace DACrux.SEMDMS.BSL
         /// </summary>
         public DataTable CompleteMapImport(string strImportJobSeq, string strUpdateUser)
         {
+            // 작업 기간 확인: 기간이 지나면 여기서 멈추고 저장하지 않는다 (2026-10-23)
+            new WorkRule().Confirm(WorkModule.Gds, WorkKind.Setup);
             string strUser = Required(strUpdateUser, "Update User", 30);
             DataTable dtJob = null;
             try

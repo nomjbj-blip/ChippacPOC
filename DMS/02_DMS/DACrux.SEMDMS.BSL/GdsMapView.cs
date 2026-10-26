@@ -120,6 +120,19 @@ namespace DACrux.SEMDMS.BSL
 
         #endregion
 
+        #region [작업 기간]
+
+        /// <summary>
+        /// 데이터 생성 / 수정 작업 가능 기간 안내 한 행 (2026-10-23). 클라이언트 메뉴 안내용이며 DB 를 바꾸지 않는다.
+        /// 실제 차단은 각 저장 함수의 첫 단계(WorkRule.Confirm)가 한다.
+        /// </summary>
+        public DataTable GetWorkState()
+        {
+            return new WorkRule().GetState();
+        }
+
+        #endregion
+
         #region [공통 검증]
 
         /// <summary>Factory / Device 형식을 확인하고 READY Map이 아니면 오류를 낸다. 정리한 [Factory, Device]를 반환한다.</summary>

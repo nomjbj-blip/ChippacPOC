@@ -140,13 +140,14 @@ namespace DACrux.SEMDMS.Control
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DPUCStepSelect));
             Infragistics.Win.ValueListItem valueListItem1 = new Infragistics.Win.ValueListItem();
             Infragistics.Win.ValueListItem valueListItem2 = new Infragistics.Win.ValueListItem();
             Infragistics.Win.UltraWinTree.Override _override1 = new Infragistics.Win.UltraWinTree.Override();
             this.splitter1 = new System.Windows.Forms.Splitter();
             this.fpSelectOption_Sheet1 = new FarPoint.Win.Spread.SheetView();
-            this.imageList1 = new System.Windows.Forms.ImageList();
+            this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.pnlRunLoad = new System.Windows.Forms.Panel();
             this.fpSpread1 = new FarPoint.Win.Spread.FpSpread();
             this.fpSpread1_Sheet1 = new FarPoint.Win.Spread.SheetView();
@@ -537,6 +538,7 @@ namespace DACrux.SEMDMS.Control
             this.chkWaferID.TabIndex = 5;
             this.chkWaferID.Text = "Wafer ID";
             this.chkWaferID.UseVisualStyleBackColor = true;
+            this.chkWaferID.Visible = false;
             // 
             // chkOrdered
             // 
@@ -550,6 +552,7 @@ namespace DACrux.SEMDMS.Control
             this.chkOrdered.TabIndex = 5;
             this.chkOrdered.Text = "ASCENDING";
             this.chkOrdered.UseVisualStyleBackColor = true;
+            this.chkOrdered.Visible = false;
             this.chkOrdered.CheckedChanged += new System.EventHandler(this.chkOrdered_CheckedChanged);
             // 
             // butRun

@@ -1,0 +1,133 @@
+﻿NAME	TYPE	TEXT	X	Y	W	H	PARENT
+	MdiTabGroupControl		9	53	1918	22	DACruxMain
+	MdiClient		9	53	1920	1085	DACruxMain
+frmGdsDieAnalysis	frmGdsDieAnalysis	상세보기 (7, 5)	9	75	1918	1061	
+splitMain	SplitContainer		9	75	1918	1061	frmGdsDieAnalysis
+	SplitterPanel		9	75	350	1061	splitMain
+dgvDies	DataGridView		9	105	350	1031	
+dgvDies:colNo	Column	No	11	105	49	20	dgvDies
+dgvDies:colIndex	Column	Index	60	105	61	20	dgvDies
+dgvDies:colX	Column	X	121	105	48	20	dgvDies
+dgvDies:colY	Column	Y	169	105	49	20	dgvDies
+dgvDies:colDefect	Column	Defect	218	105	67	20	dgvDies
+dgvDies:colInChain	Column	Chain 위	285	105	73	20	dgvDies
+pnlListHead	Panel		9	75	350	30	
+lblListCount	Label	26	69	75	284	30	pnlListHead
+lblListTitle	Label	Die 목록	15	75	54	15	pnlListHead
+	SplitterPanel		364	75	1563	1061	splitMain
+pnlGdsMap	Panel		364	75	1563	1061	
+GdsDieAnalysisForm	GdsDieAnalysisForm	Die 상세 분석	364	75	1563	1061	pnlGdsMap
+splitMain	SplitContainer		364	145	1563	967	GdsDieAnalysisForm
+	SplitterPanel		364	145	853	967	splitMain
+map	GdsMapControl		364	169	853	943	
+pnlMapHead	FlowLayoutPanel		364	145	853	24	
+lblMapTitle	Label	GDS 도면	370	153	60	15	pnlMapHead
+lblMapSide	Label	보기 = Back side(좌우 반전)	436	155	161	12	pnlMapHead
+chkBackground	CheckBox	전체 도면	612	153	76	16	pnlMapHead
+chkOriginCross	CheckBox	원점 표시	694	153	76	16	pnlMapHead
+	SplitterPanel		1221	145	706	967	splitMain
+splitRight	SplitContainer		1221	243	706	869	
+	SplitterPanel		1221	243	706	869	splitRight
+dgvChainDefects	DataGridView		1221	243	706	869	
+dgvChainDefects:colShow	Column	표시	1223	243	40	20	dgvChainDefects
+dgvChainDefects:colColor	Column	색	1263	243	30	20	dgvChainDefects
+dgvChainDefects:colCode	Column	Chain	1293	243	140	20	dgvChainDefects
+dgvChainDefects:colCount	Column	Defect 수	1433	243	68	20	dgvChainDefects
+dgvChainDefects:colDefectId	Column	Defect ID	1501	243	64	20	dgvChainDefects
+dgvChainDefects:colRoughBin	Column	RoughBin	1565	243	64	20	dgvChainDefects
+dgvChainDefects:colClassNo	Column	Class	1629	243	44	20	dgvChainDefects
+dgvChainDefects:colSize	Column	크기	1673	243	92	20	dgvChainDefects
+dgvChainDefects:colXRel	Column	XREL	1765	243	72	20	dgvChainDefects
+dgvChainDefects:colYRel	Column	YREL	1837	243	72	20	dgvChainDefects
+	VScrollBar		1909	244	17	867	dgvChainDefects
+pnlChainHead	Panel		1221	213	706	30	
+chkHitOnly	CheckBox	걸린 / Fail Chain 만	1227	219	135	16	pnlChainHead
+chkShowAll	CheckBox	전체 표시	1371	219	76	16	pnlChainHead
+pnlGdsCriteria	Panel		1221	145	706	68	
+lblGdsCriteria	Label	GDS / KLARF 기준	1227	149	109	15	pnlGdsCriteria
+lblGdsText	Label	보기 Back side(좌우 반전) · Chain 면 BS · Chain 27341  Step OMM_U8_	1229	169	694	40	pnlGdsCriteria
+pnlTop	Panel		364	75	1563	70	GdsDieAnalysisForm
+flowCriteria	FlowLayoutPanel		368	77	1421	32	pnlTop
+lblWaferInfo	Label	PFIC_U8-NPI_RDL-01 / OMM_U8_RDL_Silterra  (GDS U8)	372	85	364	17	flowCriteria
+lblDieInfo	Label	Die (7, 5)  Defect 전체 82 / Chain In 29 / Chain Out 53 / 걸린 C	374	116	514	20	pnlTop
+btnReanalyze	Button	다시 분석	1797	79	120	30	pnlTop
+statusStrip	StatusStrip		364	1112	1563	24	GdsDieAnalysisForm
+statusStrip:lblStatus	ToolItem	도면 조회 완료: U8 / 도형 301,694	365	1115	1486	19	statusStrip
+statusStrip:lblCoordinate	ToolItem	X: - / Y: -	1851	1115	62	19	statusStrip
+frmGdsKlarfSimple	frmGdsKlarfSimple	GDS-KLARF-ET Correlation	9	75	1918	1061	
+splitMain	SplitContainer		9	115	1918	1021	frmGdsKlarfSimple
+	SplitterPanel		9	115	1040	1021	splitMain
+map	GdsKlarfAnalysisMap		10	152	1040	985	
+pnlMapHead	Panel		9	115	1040	36	
+lblMapTitle	Label	Wafer Map	15	125	73	15	pnlMapHead
+lblMapDie	Label		114	125	0	12	pnlMapHead
+btnBand	Button	색 구간 설정	916	119	126	28	pnlMapHead
+	SplitterPanel		1053	115	874	1021	splitMain
+pnlSetting	Panel		1053	115	874	1021	
+splitSetting	SplitContainer		1053	329	874	807	pnlSetting
+	SplitterPanel		1053	329	874	402	splitSetting
+dgvDie	DataGridView		1053	358	874	373	
+dgvDie:Index	Column	Index	1055	358	61	20	dgvDie
+dgvDie:X	Column	X	1116	358	38	20	dgvDie
+dgvDie:Y	Column	Y	1154	358	38	20	dgvDie
+dgvDie:Defect 전체	Column	Defect 전체	1192	358	93	20	dgvDie
+dgvDie:Chain 위	Column	Chain 위	1285	358	79	20	dgvDie
+dgvDie:Chain 밖	Column	Chain 밖	1364	358	79	20	dgvDie
+dgvDie:Chain 수	Column	Chain 수	1443	358	79	20	dgvDie
+	VScrollBar		1909	359	17	371	dgvDie
+pnlDieHead	Panel		1053	330	874	28	
+lblDieCount	Label	Die 26 / Chain 위 Defect 있는 Die 24	1090	330	829	28	pnlDieHead
+lblDieTitle	Label	종합	1059	330	31	15	pnlDieHead
+lineDie	Panel		1053	329	874	1	
+	SplitterPanel		1053	734	874	402	splitSetting
+flowImage	FlowLayoutPanel		1053	763	874	373	
+pnlImageHead	Panel		1053	735	874	28	
+lblImageInfo	Label	선택 Die 없음	1144	735	775	28	pnlImageHead
+lblImageTitle	Label	Defect 이미지	1059	735	85	15	pnlImageHead
+lineImage	Panel		1053	734	874	1	
+pnlShift	Panel		1053	262	874	67	pnlSetting
+lblShiftTitle	Label	KLARF 위치 조정	1059	268	99	15	pnlShift
+lblShiftX	Label	X	1066	298	13	12	pnlShift
+numShiftX	NumericUpDown	0.0	1084	294	77	21	pnlShift
+	UpDownButtons		1144	295	16	19	numShiftX
+	UpDownEdit	0.0	1086	296	57	17	numShiftX
+lblShiftY	Label	Y	1176	298	13	12	pnlShift
+numShiftY	NumericUpDown	0.0	1194	294	77	21	pnlShift
+	UpDownButtons		1254	295	16	19	numShiftY
+	UpDownEdit	0.0	1196	296	57	17	numShiftY
+btnShiftLeft	Button		1291	293	29	28	pnlShift
+btnShiftUp	Button		1323	293	29	28	pnlShift
+btnShiftDown	Button		1355	293	29	28	pnlShift
+btnShiftRight	Button		1388	293	29	28	pnlShift
+btnShiftReset	Button	초기화	1431	293	84	28	pnlShift
+btnAnalyze	Button	다시 분석	1812	293	105	28	pnlShift
+lineShift	Panel		1053	261	874	1	pnlSetting
+pnlArea	Panel		1053	144	874	117	pnlSetting
+lblAreaTitle	Label	Defect 영역 설정	1059	150	101	15	pnlArea
+rdoDefectSize	RadioButton	Defect 크기 + 허용오차	1066	176	148	16	pnlArea
+numTolerance	NumericUpDown	0.0	1235	174	70	21	pnlArea
+	UpDownButtons		1288	175	16	19	numTolerance
+	UpDownEdit	0.0	1237	176	50	17	numTolerance
+rdoSquare	RadioButton	Defect 중심 정사각형	1066	204	138	16	pnlArea
+numSquare	NumericUpDown	10.0	1235	202	70	21	pnlArea
+	UpDownButtons		1288	203	16	19	numSquare
+	UpDownEdit	10.0	1237	204	50	17	numSquare
+lblChainSide	Label	GDS Chain 면	1066	237	83	12	pnlArea
+cboChainSide	ComboBox	BS	1158	234	64	20	pnlArea
+lineArea	Panel		1053	143	874	1	pnlSetting
+pnlInfo	Panel		1053	115	874	28	pnlSetting
+lblInfoTitle	Label	분석 정보	1059	121	59	15	pnlInfo
+pnlTop	Panel		9	75	1918	40	frmGdsKlarfSimple
+lblWafer	Label	분석 Wafer	19	89	64	12	pnlTop
+lblWaferInfo	Label	PFIC_U8-NPI_RDL-01  /  OMM_U8_RDL_Silterra  (Product U8)	85	86	396	17	pnlTop
+lblDevice	Label	GDS Device	511	89	72	12	pnlTop
+lblDeviceValue	Label	U8	589	86	26	17	pnlTop
+_DACruxMainUnpinnedTabAreaTop	UnpinnedTabArea		8	52	1920	0	DACruxMain
+_DACruxMainUnpinnedTabAreaBottom	UnpinnedTabArea		8	1137	1920	0	DACruxMain
+_DACruxMainUnpinnedTabAreaRight	UnpinnedTabArea		1928	52	0	1085	DACruxMain
+_DACruxMainUnpinnedTabAreaLeft	UnpinnedTabArea		8	52	0	1085	DACruxMain
+_frmDCMain_Toolbars_Dock_Area_Left	UltraToolbarsDockArea		8	52	0	1085	DACruxMain
+_frmDCMain_Toolbars_Dock_Area_Right	UltraToolbarsDockArea		1928	52	0	1085	DACruxMain
+_frmDCMain_Toolbars_Dock_Area_Bottom	UltraToolbarsDockArea		8	1137	1920	0	DACruxMain
+utsMain	UltraStatusBar	ultraStatusBar1	8	1137	1920	23	DACruxMain
+_frmDCMain_Toolbars_Dock_Area_Top	UltraToolbarsDockArea		8	31	1920	21	DACruxMain

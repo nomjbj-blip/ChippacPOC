@@ -94,6 +94,8 @@ namespace DACrux.SEMDMS.BSL
         /// </summary>
         public DataTable BeginUpload(string[] UploadInfo, byte[] KlarfFile)
         {
+            // 작업 기간 확인: 기간이 지나면 여기서 멈추고 저장하지 않는다 (2026-10-23)
+            new WorkRule().Confirm(WorkModule.Klarf, WorkKind.Upload);
             UploadSetting setting = UploadSetting.FromArray(UploadInfo);
             if (KlarfFile == null || KlarfFile.Length == 0)
                 throw new Exception("KLARF 파일 내용이 없습니다.");
@@ -152,6 +154,8 @@ namespace DACrux.SEMDMS.BSL
         /// </summary>
         public DataTable CommitUpload(string strUploadKey, string[] Options)
         {
+            // 작업 기간 확인: 기간이 지나면 여기서 멈추고 저장하지 않는다 (2026-10-23)
+            new WorkRule().Confirm(WorkModule.Klarf, WorkKind.Upload);
             string dir = GetExistingWorkFolder(strUploadKey);
             ParserKlarf parser = null;
             try
@@ -198,6 +202,8 @@ namespace DACrux.SEMDMS.BSL
         /// </summary>
         public int DeleteUploadedStep(string strStepSeq, string strWaferSeq, string strUser)
         {
+            // 작업 기간 확인: 기간이 지나면 여기서 멈추고 저장하지 않는다 (2026-10-23)
+            new WorkRule().Confirm(WorkModule.Klarf, WorkKind.Upload);
             long stepSeq = RequiredNumber(strStepSeq, "STEP_SEQ");
             long waferSeq = RequiredNumber(strWaferSeq, "WAFER_SEQ");
             Required(strUser, "User", 30);

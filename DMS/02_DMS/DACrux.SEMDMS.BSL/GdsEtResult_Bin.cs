@@ -102,6 +102,8 @@ namespace DACrux.SEMDMS.BSL
         /// </summary>
         public DataTable SaveEtBins(string[] aKey, string[,] aRows, string strUpdateUser)
         {
+            // 작업 기간 확인: 기간이 지나면 여기서 멈추고 저장하지 않는다 (2026-10-23)
+            new WorkRule().Confirm(WorkModule.ETest, WorkKind.Setup);
             string f, d, t, program;
             BinKey(aKey, out f, out d, out t, out program);
             Required(strUpdateUser, "Update User", 30);
@@ -176,6 +178,8 @@ namespace DACrux.SEMDMS.BSL
         /// </summary>
         public int DeleteEtBins(string[] aKey, string[] aBins, string strUpdateUser)
         {
+            // 작업 기간 확인: 기간이 지나면 여기서 멈추고 저장하지 않는다 (2026-10-23)
+            new WorkRule().Confirm(WorkModule.ETest, WorkKind.Setup);
             string f, d, t, program;
             BinKey(aKey, out f, out d, out t, out program);
             Required(strUpdateUser, "Update User", 30);

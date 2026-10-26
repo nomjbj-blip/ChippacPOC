@@ -34,14 +34,14 @@ namespace NexplantQMS.GdsMap
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(GdsDieAnalysisForm));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle11 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle12 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle13 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle14 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle15 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle16 = new System.Windows.Forms.DataGridViewCellStyle();
             this.pnlTop = new System.Windows.Forms.Panel();
             this.flowCriteria = new System.Windows.Forms.FlowLayoutPanel();
             this.lblWaferInfo = new System.Windows.Forms.Label();
@@ -50,8 +50,8 @@ namespace NexplantQMS.GdsMap
             this.lblSumKlarf = new System.Windows.Forms.Label();
             this.lblSumEt = new System.Windows.Forms.Label();
             this.lblDieInfo = new System.Windows.Forms.Label();
-            this.btnClearFocus = new System.Windows.Forms.Button();
             this.btnReanalyze = new System.Windows.Forms.Button();
+            this.btnClearFocus = new System.Windows.Forms.Button();
             this.splitMain = new System.Windows.Forms.SplitContainer();
             this.map = new NexplantQMS.GdsMap.GdsMapControl();
             this.pnlMapHead = new System.Windows.Forms.FlowLayoutPanel();
@@ -83,7 +83,7 @@ namespace NexplantQMS.GdsMap
             this.lblEtCount = new System.Windows.Forms.Label();
             this.pnlChainHead = new System.Windows.Forms.Panel();
             this.chkHitOnly = new System.Windows.Forms.CheckBox();
-            this.chkEtValues = new System.Windows.Forms.CheckBox();
+            this.chkShowAll = new System.Windows.Forms.CheckBox();
             this.lblChainTitle = new System.Windows.Forms.Label();
             this.pnlGdsCriteria = new System.Windows.Forms.Panel();
             this.lblGdsCriteria = new System.Windows.Forms.Label();
@@ -95,6 +95,8 @@ namespace NexplantQMS.GdsMap
             this.lblStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.lblCoordinate = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
+            this.mnuDefect = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.mnuDefectImage = new System.Windows.Forms.ToolStripMenuItem();
             this.pnlTop.SuspendLayout();
             this.flowCriteria.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitMain)).BeginInit();
@@ -112,6 +114,7 @@ namespace NexplantQMS.GdsMap
             this.pnlChainHead.SuspendLayout();
             this.pnlGdsCriteria.SuspendLayout();
             this.statusStrip.SuspendLayout();
+            this.mnuDefect.SuspendLayout();
             this.SuspendLayout();
             // 
             // pnlTop
@@ -120,9 +123,10 @@ namespace NexplantQMS.GdsMap
             this.pnlTop.Controls.Add(this.flowCriteria);
             this.pnlTop.Controls.Add(this.lblDieInfo);
             this.pnlTop.Controls.Add(this.btnReanalyze);
+            this.pnlTop.Controls.Add(this.btnClearFocus);
             this.pnlTop.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlTop.Location = new System.Drawing.Point(0, 0);
-            this.pnlTop.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.pnlTop.Margin = new System.Windows.Forms.Padding(4);
             this.pnlTop.Name = "pnlTop";
             this.pnlTop.Size = new System.Drawing.Size(2000, 105);
             this.pnlTop.TabIndex = 0;
@@ -218,26 +222,12 @@ namespace NexplantQMS.GdsMap
             this.lblDieInfo.TabIndex = 1;
             this.lblDieInfo.Text = "Die (-, -)";
             // 
-            // btnClearFocus
-            // 
-            this.btnClearFocus.Image = ((System.Drawing.Image)(resources.GetObject("btnClearFocus.Image")));
-            this.btnClearFocus.Location = new System.Drawing.Point(9, 42);
-            this.btnClearFocus.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.btnClearFocus.Name = "btnClearFocus";
-            this.btnClearFocus.Size = new System.Drawing.Size(160, 42);
-            this.btnClearFocus.TabIndex = 3;
-            this.btnClearFocus.Text = "역추적 해제";
-            this.btnClearFocus.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.btnClearFocus.UseVisualStyleBackColor = true;
-            this.btnClearFocus.Visible = false;
-            this.btnClearFocus.Click += new System.EventHandler(this.btnClearFocus_Click);
-            // 
             // btnReanalyze
             // 
             this.btnReanalyze.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnReanalyze.Image = ((System.Drawing.Image)(resources.GetObject("btnReanalyze.Image")));
             this.btnReanalyze.Location = new System.Drawing.Point(1814, 6);
-            this.btnReanalyze.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnReanalyze.Margin = new System.Windows.Forms.Padding(4);
             this.btnReanalyze.Name = "btnReanalyze";
             this.btnReanalyze.Size = new System.Drawing.Size(171, 45);
             this.btnReanalyze.TabIndex = 4;
@@ -247,12 +237,26 @@ namespace NexplantQMS.GdsMap
             this.btnReanalyze.UseVisualStyleBackColor = true;
             this.btnReanalyze.Click += new System.EventHandler(this.btnReanalyze_Click);
             // 
+            // btnClearFocus
+            // 
+            this.btnClearFocus.Image = ((System.Drawing.Image)(resources.GetObject("btnClearFocus.Image")));
+            this.btnClearFocus.Location = new System.Drawing.Point(1825, 55);
+            this.btnClearFocus.Margin = new System.Windows.Forms.Padding(4);
+            this.btnClearFocus.Name = "btnClearFocus";
+            this.btnClearFocus.Size = new System.Drawing.Size(160, 42);
+            this.btnClearFocus.TabIndex = 3;
+            this.btnClearFocus.Text = "역추적 해제";
+            this.btnClearFocus.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.btnClearFocus.UseVisualStyleBackColor = true;
+            this.btnClearFocus.Visible = false;
+            this.btnClearFocus.Click += new System.EventHandler(this.btnClearFocus_Click);
+            // 
             // splitMain
             // 
             this.splitMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.splitMain.FixedPanel = System.Windows.Forms.FixedPanel.Panel2;
             this.splitMain.Location = new System.Drawing.Point(0, 105);
-            this.splitMain.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.splitMain.Margin = new System.Windows.Forms.Padding(4);
             this.splitMain.Name = "splitMain";
             // 
             // splitMain.Panel1
@@ -266,7 +270,7 @@ namespace NexplantQMS.GdsMap
             this.splitMain.Panel2.Controls.Add(this.pnlChainHead);
             this.splitMain.Panel2.Controls.Add(this.pnlGdsCriteria);
             this.splitMain.Size = new System.Drawing.Size(2000, 1209);
-            this.splitMain.SplitterDistance = 1294;
+            this.splitMain.SplitterDistance = 1290;
             this.splitMain.SplitterWidth = 6;
             this.splitMain.TabIndex = 1;
             // 
@@ -277,11 +281,11 @@ namespace NexplantQMS.GdsMap
             this.map.Cursor = System.Windows.Forms.Cursors.SizeAll;
             this.map.DefectStyle = NexplantQMS.GdsMap.DefectOverlayStyle.Standard;
             this.map.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.map.Location = new System.Drawing.Point(0, 48);
+            this.map.Location = new System.Drawing.Point(0, 37);
             this.map.Margin = new System.Windows.Forms.Padding(7, 6, 7, 6);
             this.map.Mode = NexplantQMS.GdsMap.GdsMapControl.ViewMode.View;
             this.map.Name = "map";
-            this.map.Size = new System.Drawing.Size(1294, 1161);
+            this.map.Size = new System.Drawing.Size(1290, 1172);
             this.map.TabIndex = 1;
             this.map.VSync = false;
             this.map.MouseWorldPositionChanged += new System.EventHandler<System.Drawing.PointF>(this.map_MouseWorldPositionChanged);
@@ -298,10 +302,10 @@ namespace NexplantQMS.GdsMap
             this.pnlMapHead.Controls.Add(this.chkOriginCross);
             this.pnlMapHead.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlMapHead.Location = new System.Drawing.Point(0, 0);
-            this.pnlMapHead.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.pnlMapHead.Margin = new System.Windows.Forms.Padding(4);
             this.pnlMapHead.Name = "pnlMapHead";
             this.pnlMapHead.Padding = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.pnlMapHead.Size = new System.Drawing.Size(1294, 48);
+            this.pnlMapHead.Size = new System.Drawing.Size(1290, 37);
             this.pnlMapHead.TabIndex = 0;
             // 
             // lblMapTitle
@@ -355,8 +359,8 @@ namespace NexplantQMS.GdsMap
             // splitRight
             // 
             this.splitRight.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitRight.Location = new System.Drawing.Point(0, 222);
-            this.splitRight.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.splitRight.Location = new System.Drawing.Point(0, 177);
+            this.splitRight.Margin = new System.Windows.Forms.Padding(4);
             this.splitRight.Name = "splitRight";
             this.splitRight.Orientation = System.Windows.Forms.Orientation.Horizontal;
             // 
@@ -370,8 +374,8 @@ namespace NexplantQMS.GdsMap
             this.splitRight.Panel2.Controls.Add(this.dgvEtValues);
             this.splitRight.Panel2.Controls.Add(this.pnlEtHead);
             this.splitRight.Panel2MinSize = 80;
-            this.splitRight.Size = new System.Drawing.Size(700, 987);
-            this.splitRight.SplitterDistance = 648;
+            this.splitRight.Size = new System.Drawing.Size(704, 1032);
+            this.splitRight.SplitterDistance = 677;
             this.splitRight.SplitterWidth = 6;
             this.splitRight.TabIndex = 3;
             // 
@@ -402,17 +406,17 @@ namespace NexplantQMS.GdsMap
             this.colYRel});
             this.dgvChainDefects.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dgvChainDefects.Location = new System.Drawing.Point(0, 0);
-            this.dgvChainDefects.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.dgvChainDefects.Margin = new System.Windows.Forms.Padding(4);
             this.dgvChainDefects.MultiSelect = false;
             this.dgvChainDefects.Name = "dgvChainDefects";
             this.dgvChainDefects.RowHeadersVisible = false;
             this.dgvChainDefects.RowHeadersWidth = 62;
             this.dgvChainDefects.RowTemplate.Height = 23;
             this.dgvChainDefects.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvChainDefects.Size = new System.Drawing.Size(700, 648);
+            this.dgvChainDefects.Size = new System.Drawing.Size(704, 677);
             this.dgvChainDefects.TabIndex = 2;
             this.dgvChainDefects.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvChainDefects_CellContentClick);
-            this.dgvChainDefects.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvChainDefects_CellDoubleClick);
+            this.dgvChainDefects.CellMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dgvChainDefects_CellMouseClick);
             this.dgvChainDefects.CellPainting += new System.Windows.Forms.DataGridViewCellPaintingEventHandler(this.dgvChainDefects_CellPainting);
             this.dgvChainDefects.SelectionChanged += new System.EventHandler(this.dgvChainDefects_SelectionChanged);
             // 
@@ -489,8 +493,8 @@ namespace NexplantQMS.GdsMap
             // 
             // colDefectId
             // 
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.colDefectId.DefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.colDefectId.DefaultCellStyle = dataGridViewCellStyle9;
             this.colDefectId.HeaderText = "Defect ID";
             this.colDefectId.MinimumWidth = 8;
             this.colDefectId.Name = "colDefectId";
@@ -500,8 +504,8 @@ namespace NexplantQMS.GdsMap
             // 
             // colGap
             // 
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.colGap.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle10.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.colGap.DefaultCellStyle = dataGridViewCellStyle10;
             this.colGap.HeaderText = "Gap";
             this.colGap.MinimumWidth = 8;
             this.colGap.Name = "colGap";
@@ -512,8 +516,8 @@ namespace NexplantQMS.GdsMap
             // 
             // colRoughBin
             // 
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.colRoughBin.DefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle11.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.colRoughBin.DefaultCellStyle = dataGridViewCellStyle11;
             this.colRoughBin.HeaderText = "RoughBin";
             this.colRoughBin.MinimumWidth = 8;
             this.colRoughBin.Name = "colRoughBin";
@@ -523,8 +527,8 @@ namespace NexplantQMS.GdsMap
             // 
             // colClassNo
             // 
-            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.colClassNo.DefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle12.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.colClassNo.DefaultCellStyle = dataGridViewCellStyle12;
             this.colClassNo.HeaderText = "Class";
             this.colClassNo.MinimumWidth = 8;
             this.colClassNo.Name = "colClassNo";
@@ -543,8 +547,8 @@ namespace NexplantQMS.GdsMap
             // 
             // colGdsX
             // 
-            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.colGdsX.DefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle13.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.colGdsX.DefaultCellStyle = dataGridViewCellStyle13;
             this.colGdsX.HeaderText = "GDS X";
             this.colGdsX.MinimumWidth = 8;
             this.colGdsX.Name = "colGdsX";
@@ -555,8 +559,8 @@ namespace NexplantQMS.GdsMap
             // 
             // colGdsY
             // 
-            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.colGdsY.DefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewCellStyle14.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.colGdsY.DefaultCellStyle = dataGridViewCellStyle14;
             this.colGdsY.HeaderText = "GDS Y";
             this.colGdsY.MinimumWidth = 8;
             this.colGdsY.Name = "colGdsY";
@@ -567,8 +571,8 @@ namespace NexplantQMS.GdsMap
             // 
             // colXRel
             // 
-            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.colXRel.DefaultCellStyle = dataGridViewCellStyle7;
+            dataGridViewCellStyle15.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.colXRel.DefaultCellStyle = dataGridViewCellStyle15;
             this.colXRel.HeaderText = "XREL";
             this.colXRel.MinimumWidth = 8;
             this.colXRel.Name = "colXRel";
@@ -578,8 +582,8 @@ namespace NexplantQMS.GdsMap
             // 
             // colYRel
             // 
-            dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.colYRel.DefaultCellStyle = dataGridViewCellStyle8;
+            dataGridViewCellStyle16.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.colYRel.DefaultCellStyle = dataGridViewCellStyle16;
             this.colYRel.HeaderText = "YREL";
             this.colYRel.MinimumWidth = 8;
             this.colYRel.Name = "colYRel";
@@ -597,7 +601,7 @@ namespace NexplantQMS.GdsMap
             this.dgvEtValues.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvEtValues.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dgvEtValues.Location = new System.Drawing.Point(0, 42);
-            this.dgvEtValues.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.dgvEtValues.Margin = new System.Windows.Forms.Padding(4);
             this.dgvEtValues.MultiSelect = false;
             this.dgvEtValues.Name = "dgvEtValues";
             this.dgvEtValues.ReadOnly = true;
@@ -605,7 +609,7 @@ namespace NexplantQMS.GdsMap
             this.dgvEtValues.RowHeadersWidth = 62;
             this.dgvEtValues.RowTemplate.Height = 23;
             this.dgvEtValues.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvEtValues.Size = new System.Drawing.Size(700, 300);
+            this.dgvEtValues.Size = new System.Drawing.Size(704, 307);
             this.dgvEtValues.TabIndex = 2;
             this.dgvEtValues.SelectionChanged += new System.EventHandler(this.dgvEtValues_SelectionChanged);
             // 
@@ -615,9 +619,9 @@ namespace NexplantQMS.GdsMap
             this.pnlEtHead.Controls.Add(this.lblEtCount);
             this.pnlEtHead.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlEtHead.Location = new System.Drawing.Point(0, 0);
-            this.pnlEtHead.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.pnlEtHead.Margin = new System.Windows.Forms.Padding(4);
             this.pnlEtHead.Name = "pnlEtHead";
-            this.pnlEtHead.Size = new System.Drawing.Size(700, 42);
+            this.pnlEtHead.Size = new System.Drawing.Size(704, 42);
             this.pnlEtHead.TabIndex = 1;
             // 
             // lblEtCount
@@ -634,21 +638,20 @@ namespace NexplantQMS.GdsMap
             // pnlChainHead
             // 
             this.pnlChainHead.Controls.Add(this.chkHitOnly);
-            this.pnlChainHead.Controls.Add(this.chkEtValues);
+            this.pnlChainHead.Controls.Add(this.chkShowAll);
             this.pnlChainHead.Controls.Add(this.lblChainTitle);
-            this.pnlChainHead.Controls.Add(this.btnClearFocus);
             this.pnlChainHead.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlChainHead.Location = new System.Drawing.Point(0, 132);
-            this.pnlChainHead.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.pnlChainHead.Margin = new System.Windows.Forms.Padding(4);
             this.pnlChainHead.Name = "pnlChainHead";
-            this.pnlChainHead.Size = new System.Drawing.Size(700, 90);
+            this.pnlChainHead.Size = new System.Drawing.Size(704, 45);
             this.pnlChainHead.TabIndex = 2;
             // 
             // chkHitOnly
             // 
             this.chkHitOnly.AutoSize = true;
             this.chkHitOnly.Location = new System.Drawing.Point(9, 9);
-            this.chkHitOnly.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.chkHitOnly.Margin = new System.Windows.Forms.Padding(4);
             this.chkHitOnly.Name = "chkHitOnly";
             this.chkHitOnly.Size = new System.Drawing.Size(190, 22);
             this.chkHitOnly.TabIndex = 0;
@@ -657,20 +660,20 @@ namespace NexplantQMS.GdsMap
             this.chkHitOnly.UseVisualStyleBackColor = true;
             this.chkHitOnly.CheckedChanged += new System.EventHandler(this.chkHitOnly_CheckedChanged);
             // 
-            // chkEtValues
+            // chkShowAll
             // 
-            this.chkEtValues.AutoSize = true;
-            this.chkEtValues.Checked = true;
-            this.chkEtValues.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkEtValues.Location = new System.Drawing.Point(214, 9);
-            this.chkEtValues.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.chkEtValues.Name = "chkEtValues";
-            this.chkEtValues.Size = new System.Drawing.Size(113, 22);
-            this.chkEtValues.TabIndex = 2;
-            this.chkEtValues.Text = "E-Test 값";
-            this.toolTip.SetToolTip(this.chkEtValues, "고른 행 Chain 의 이 Die E-Test Parameter 값을 아래 표에 표시");
-            this.chkEtValues.UseVisualStyleBackColor = true;
-            this.chkEtValues.CheckedChanged += new System.EventHandler(this.chkEtValues_CheckedChanged);
+            this.chkShowAll.AutoSize = true;
+            this.chkShowAll.Checked = true;
+            this.chkShowAll.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkShowAll.Location = new System.Drawing.Point(214, 9);
+            this.chkShowAll.Margin = new System.Windows.Forms.Padding(4);
+            this.chkShowAll.Name = "chkShowAll";
+            this.chkShowAll.Size = new System.Drawing.Size(107, 22);
+            this.chkShowAll.TabIndex = 2;
+            this.chkShowAll.Text = "전체 표시";
+            this.toolTip.SetToolTip(this.chkShowAll, "모든 Chain 의 표시 체크를 한 번에 켜거나 끔");
+            this.chkShowAll.UseVisualStyleBackColor = true;
+            this.chkShowAll.CheckedChanged += new System.EventHandler(this.chkShowAll_CheckedChanged);
             // 
             // lblChainTitle
             // 
@@ -682,6 +685,7 @@ namespace NexplantQMS.GdsMap
             this.lblChainTitle.Size = new System.Drawing.Size(60, 25);
             this.lblChainTitle.TabIndex = 2;
             this.lblChainTitle.Text = "Chain";
+            this.lblChainTitle.Visible = false;
             // 
             // pnlGdsCriteria
             // 
@@ -691,9 +695,9 @@ namespace NexplantQMS.GdsMap
             this.pnlGdsCriteria.Controls.Add(this.lblEtText);
             this.pnlGdsCriteria.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlGdsCriteria.Location = new System.Drawing.Point(0, 0);
-            this.pnlGdsCriteria.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.pnlGdsCriteria.Margin = new System.Windows.Forms.Padding(4);
             this.pnlGdsCriteria.Name = "pnlGdsCriteria";
-            this.pnlGdsCriteria.Size = new System.Drawing.Size(700, 132);
+            this.pnlGdsCriteria.Size = new System.Drawing.Size(704, 132);
             this.pnlGdsCriteria.TabIndex = 0;
             // 
             // lblGdsCriteria
@@ -715,7 +719,7 @@ namespace NexplantQMS.GdsMap
             this.lblGdsText.Location = new System.Drawing.Point(11, 36);
             this.lblGdsText.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblGdsText.Name = "lblGdsText";
-            this.lblGdsText.Size = new System.Drawing.Size(683, 60);
+            this.lblGdsText.Size = new System.Drawing.Size(687, 60);
             this.lblGdsText.TabIndex = 1;
             this.lblGdsText.Text = "-";
             // 
@@ -728,7 +732,7 @@ namespace NexplantQMS.GdsMap
             this.lblEtText.Location = new System.Drawing.Point(11, 99);
             this.lblEtText.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblEtText.Name = "lblEtText";
-            this.lblEtText.Size = new System.Drawing.Size(683, 27);
+            this.lblEtText.Size = new System.Drawing.Size(687, 27);
             this.lblEtText.TabIndex = 2;
             this.lblEtText.Text = "-";
             // 
@@ -776,6 +780,21 @@ namespace NexplantQMS.GdsMap
             this.lblCoordinate.Size = new System.Drawing.Size(90, 29);
             this.lblCoordinate.Text = "X: - / Y: -";
             // 
+            // mnuDefect
+            // 
+            this.mnuDefect.ImageScalingSize = new System.Drawing.Size(24, 24);
+            this.mnuDefect.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.mnuDefectImage});
+            this.mnuDefect.Name = "mnuDefect";
+            this.mnuDefect.Size = new System.Drawing.Size(241, 36);
+            // 
+            // mnuDefectImage
+            // 
+            this.mnuDefectImage.Name = "mnuDefectImage";
+            this.mnuDefectImage.Size = new System.Drawing.Size(240, 32);
+            this.mnuDefectImage.Text = "Defect 이미지 보기";
+            this.mnuDefectImage.Click += new System.EventHandler(this.mnuDefectImage_Click);
+            // 
             // GdsDieAnalysisForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
@@ -784,7 +803,7 @@ namespace NexplantQMS.GdsMap
             this.Controls.Add(this.splitMain);
             this.Controls.Add(this.pnlTop);
             this.Controls.Add(this.statusStrip);
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "GdsDieAnalysisForm";
             this.Text = "Die 상세 분석";
             this.pnlTop.ResumeLayout(false);
@@ -812,6 +831,7 @@ namespace NexplantQMS.GdsMap
             this.pnlGdsCriteria.PerformLayout();
             this.statusStrip.ResumeLayout(false);
             this.statusStrip.PerformLayout();
+            this.mnuDefect.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -858,7 +878,7 @@ namespace NexplantQMS.GdsMap
         private System.Windows.Forms.Panel pnlChainHead;
         private System.Windows.Forms.Label lblChainTitle;
         private System.Windows.Forms.CheckBox chkHitOnly;
-        private System.Windows.Forms.CheckBox chkEtValues;
+        private System.Windows.Forms.CheckBox chkShowAll;
         private System.Windows.Forms.Panel pnlGdsCriteria;
         private System.Windows.Forms.Label lblGdsCriteria;
         private System.Windows.Forms.Label lblGdsText;
@@ -872,5 +892,7 @@ namespace NexplantQMS.GdsMap
         private System.Windows.Forms.ToolStripStatusLabel lblStatus;
         private System.Windows.Forms.ToolStripStatusLabel lblCoordinate;
         private System.Windows.Forms.ToolTip toolTip;
+        private System.Windows.Forms.ContextMenuStrip mnuDefect;
+        private System.Windows.Forms.ToolStripMenuItem mnuDefectImage;
     }
 }

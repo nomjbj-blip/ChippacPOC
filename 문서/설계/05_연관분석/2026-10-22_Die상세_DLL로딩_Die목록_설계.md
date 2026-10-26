@@ -309,3 +309,23 @@
 - `100_ClientBin`: `DACrux.SEMDMS.ENGUI.dll`.
 - 그 뒤 DACrux 를 다시 시작한다(이미 읽은 GDS 어셈블리는 같은 프로세스에서 바뀌지 않음).
 - 서버 DLL / `MenuFile.mnu` 변경 없음.
+
+### 11.6 Defect 이미지 창 크기 맞춤 (2026-10-22, CLAUDE-212)
+
+- 상세보기 [GDS / KLARF] 표에서 여는 "Defect #n 이미지" 창은 처음 760 x 720 이다. 카드는 창 크기에 맞춰 커진다.
+  - 맞추는 때: 창을 열 때 / 창 크기를 바꿀 때 / 이미지를 읽을 때.
+  - 여러 장이면 가로로 나란히, 높이가 넘치면 높이에 맞춘다.
+- 이 창 카드만 축소본을 1600 폭으로 받는다(`DPUCDefectImageCard` 새 생성자). 다른 화면 카드는 400 그대로다.
+- 검증: `IMAGE_WINDOW_FIT=PASS`(실제 이미지 1장 / 2장, 창 760x720 · 1100x520).
+
+![Defect 이미지 창 760x720](2026-10-22_Die상세_목록_구현/L3_이미지창_창크기맞춤_760x720.png)
+
+### 11.7 Die 목록 Index 열 (2026-10-22, CLAUDE-219)
+
+- 요청: "상세보기 화면에서도 좌측 Die 목록에 Index 정보가 보이도록".
+- 열 = No / **Index** / X / Y / Defect / Chain 위 (/ E-Test Fail). Index = 고객 통합 Die#(Simple 설계 23절, `GdsDieIndex`). 사용 Die 가 아니거나 Map 이 없으면 빈 칸.
+- Map 은 목록 원본(연 화면 Wafer 결과) ANL_INFO 의 FACTORY / PRODUCT 로 받는다. 원본 없이 Die 결과로 연 경우는 그 결과의 ANL_INFO.
+- 목록 폭 300 -> 350(열 하나 늘어 다른 열 폭 유지).
+- 검증: Simple Smoke 7-1b 목록 머리 · Index 값 PASS(528 / 603). 화면 A Smoke 는 목록 머리를 보지 않고, 상세 창이 같은 프로세스 BSL 로 Map 을 읽게 서비스만 붙였다.
+
+![Die 목록 Index 열](2026-10-22_Die상세_목록_구현/L5_STEP528_Die목록_Index열.png)

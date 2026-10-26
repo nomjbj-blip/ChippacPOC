@@ -601,3 +601,55 @@ Simple 은 E-Test 를 분석하지 않으므로(요청 `EtSrcFileSeq = 0`) E-Tes
   - 결과 합계는 Map 숫자 / [종합] 표 / Chain 목록에서, KLARF 위치 조정 값은 숫자칸에서 본다(17절의 "기준 줄 표시" 는 없어짐).
 - 배치: `pnlInfo` 높이 180 -> 42(제목 줄만), `lblInfo` = 제목 줄 알림 1줄(주황, 말줄임).
 - 검증: Smoke `PASS (36/36)` STEP 528 / 603. 분석 정보 = 제목 줄만 / 알림 없음 / 여러 Wafer 알림 / E-Test 연결은 요청 · 결과 파일 번호로 검사. 그림 `2026-10-22_Simple화면_구현/S6_STEP528_분석정보_제목줄만.png`. 배포 안 함 / DMS 화면 확인 대기.
+
+## 21. Chain 목록 Member 열 / [종합] 검사 열 숨김 (2026-10-22, CLAUDE-210)
+
+- 요청: Chain 목록 캡처 "member 숨겨줘", [종합] 탭 캡처 "검사 숨겨줘".
+- 값은 그대로 채우고 열만 숨긴다(`HiddenColumns` = 검사 / Member, 표를 묶을 때마다 `DataBindingComplete` 에서 숨김).
+- 보이는 열:
+  - Chain 목록 Wafer 전체 = Chain / Defect 수 / Die 수
+  - Chain 목록 고른 Die = Chain / Defect 수 / Defect ID
+  - [종합] = X / Y / Defect 전체 / Chain 위 / Chain 밖 / Chain 수
+- 검증: Smoke `PASS (36/36)` STEP 528 / 603(보이는 열 + 숨긴 열이 있고 안 보이는지). 배포 안 함 / DMS 화면 확인 대기.
+
+## 22. 오른쪽 한 페이지: Chain 목록 삭제 + 종합 표 위 / Defect 이미지 아래 (2026-10-22, CLAUDE-217)
+
+- 요청(캡처): Chain 목록과 [Wafer 전체] / [Defect 있는 Chain 만] 체크를 지우고 그 자리에 [종합] 탭 표를 넣는다. 탭 없이 한 페이지에서 다 본다. Defect 이미지와 위치를 바꿔 이미지는 아래로.
+- 오른쪽(위에서부터):
+  1. 분석 정보(제목 줄)
+  2. Defect 영역 설정
+  3. KLARF 위치 조정 + [다시 분석]
+  4. 종합: 머리 "종합  Die n / Chain 위 Defect 있는 Die m" + Die 표
+  5. Defect 이미지(맨 아래)
+  - 4와 5는 위아래 나누기(처음 반씩), 기능 사이 구분선은 그대로.
+- 바뀐 것:
+  - 탭(TabControl)이 없다. [설정 / 정보] / [종합] 탭 이름도 없다.
+  - Chain 목록(Wafer 전체 합계 / 고른 Die 의 Chain)과 체크 2개가 없다(결정 S6 의 Chain 목록은 없어짐).
+  - 종합 표 동작은 그대로다(행 클릭 = Die 선택 -> Map 빨간 테두리 · 이미지, 행 더블클릭 = 상세보기, 검사 열 숨김).
+- 검증: Smoke `PASS (35/35)` STEP 528 / 603(한 페이지 배치 / 지운 컨트롤 없음 / 종합 표 보임 · 머리 글자 / 종합 첫 행 클릭 = Die 선택), Simple 버튼 배치 PASS. 그림 `2026-10-22_Simple화면_구현/S7_STEP528_한페이지_종합위_이미지아래.png`. 배포 안 함 / DMS 화면 확인 대기.
+
+![STEP 528 Simple 한 페이지](2026-10-22_Simple화면_구현/S7_STEP528_한페이지_종합위_이미지아래.png)
+
+## 23. Die Index 표시: Wafer Map 머리 마우스 위치 + 종합 표 맨 왼쪽 Index (2026-10-22, CLAUDE-219)
+
+- 요청: "Wafer Map 상단에 마우스 올리면 x,y,index 정보가 보이도록 / 우측 grid 상에는 x,y 좌표가 있는데 가장 좌측에 Index 정보 보이게 / 상세보기 화면에서도 좌측 Die 목록에 Index 정보가 보이도록".
+- Index 뜻 = 고객 통합 Die# (`DieCoordinateMapper.DieNumberOf`, 좌표 변환 설계의 DieNumber).
+  - Map = 분석이 E-Test 비교에 쓰는 것과 같은 Factory + Product 의 File Map Setup(TQP_USEMAP 사용 Die, 가장 큰 PROGRAM_REV).
+  - 번호: 사용 Die 를 위 행부터(Y 큰 것부터), 같은 행은 왼쪽부터(X 작은 것부터) 1, 2, 3 ...
+  - 분석 결과 DIE 의 XINDEX / YINDEX 가 이 Map 의 시스템 좌표라 그대로 찾는다. 사용 Die 가 아니면 빈 칸(Map 머리는 "-").
+  - Map 이 없거나 조회에 실패하면 Index 만 비우고 나머지 화면은 그대로 둔다.
+- 화면:
+  - Wafer Map 머리: "Wafer Map" 제목 오른쪽에 `lblMapDie` "X 6  /  Y 6  /  Index 27". 마우스가 다른 Die 로 가면 바뀌고(`OnChangeCurrentDie`), Map 밖으로 나가면 지운다(`MousePositionCleared`). 분석 전에도 보인다.
+  - 종합 표: 맨 왼쪽 `Index` 열 + X / Y / Defect 전체 / Chain 위 / Chain 밖 / Chain 수.
+  - 상세보기 Die 목록: No 다음에 `Index` 열(Die상세 설계 11.7절).
+- 구현:
+  - 새 `ENGUI/DefectMapAnalysis/GdsDieIndex.cs`: `Load(factory, product)`(새로 읽음, 작업 스레드 가능) / `Cached`(마지막에 읽은 같은 Factory + Product 면 그대로) / `Of(mapper, x, y)`. 조회는 기존 `RO.GdsEtResult.GetEtMapDieList`(서버 / Interface / DB 변경 없음).
+  - Simple: Wafer 조회 작업 스레드("서버 조회")에서 `Load` 로 미리 읽고, `ShowWafer` 가 `Cached` 로 받는다. Factory 는 `CurrentFactory` 와 같은 규칙(로그인 Factory, 없으면 Step FACTORY).
+  - 상세보기: 목록 원본 ANL_INFO 의 FACTORY / PRODUCT 로 `Cached`(Simple 이 읽어 둔 Map 을 그대로 씀). 화면 A 에서 열면 처음 한 번 읽는다.
+- 검증: Smoke `PASS (37/37)` STEP 528 / 603(`-Device OMM_TCB`).
+  - 종합 열 / Index 값: BSL 로 직접 읽은 Map 으로 계산한 값과 행마다 같음(528 = 4행 모두 번호, (6, 6) = 27 / 603 = 51행, (8, 7) = 19, Map 사용 Die 76).
+  - Map 머리: Map 의 이벤트 목록으로 불러 Designer 연결까지 확인, Map 밖 / Die 없음 = 지움.
+  - 상세보기 목록 머리 No · Index · X · Y · Defect · Chain 위, Index 값 같음.
+  - 그림 `2026-10-22_Simple화면_구현/S8_STEP528_Map머리_XY_Index_종합Index열.png`. 배포 안 함 / DMS 화면 확인 대기.
+
+![STEP 528 Map 머리 X / Y / Index + 종합 Index 열](2026-10-22_Simple화면_구현/S8_STEP528_Map머리_XY_Index_종합Index열.png)

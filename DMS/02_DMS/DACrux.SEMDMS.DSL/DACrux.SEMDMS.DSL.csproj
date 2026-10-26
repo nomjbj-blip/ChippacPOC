@@ -96,6 +96,7 @@
     <Compile Include="TQP_GDS_ET_VALUE.cs" />
     <Compile Include="TQP_GDS_ET_LIMIT.cs" />
     <Compile Include="TQP_GDS_ET_YMS.cs" />
+    <Compile Include="WorkRule.cs" />
     <Compile Include="TQP_GDS_CHAIN_LAYER.cs" />
     <Compile Include="TQP_GDS_CHAIN_RULE.cs" />
     <Compile Include="TQP_GDS_CHAIN_EDIT.cs" />

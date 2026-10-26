@@ -365,4 +365,102 @@ KlarfDoc $g
 Magnifier $g 62 62 42
 $g.Dispose(); Save $b 'KLARF_FILE_VIEW'
 
+# ---- POC 메뉴 그룹 아이콘 3개 (2026-10-22) ----
+# 공통: 노란 폴더(여러 화면을 묶은 그룹). 오른쪽 아래 표시는 그룹 안 화면 아이콘과 같은 뜻으로 맞춘다(톱니 = 설정, 녹색 화살표 = 업로드, 돋보기 = 조회).
+function Folder($g) {
+    $tab = RR 6 14 46 22 6
+    $g.FillPath((LinBrush 6 14 46 22 (C 255 250 205 95) (C 255 230 165 45)), $tab)
+    $g.DrawPath((New-Object Drawing.Pen((C 255 165 105 20), 4)), $tab)
+    $body = RR 6 26 100 76 8
+    $g.FillPath((LinBrush 6 26 100 76 (C 255 255 222 120) (C 255 238 170 40)), $body)
+    $g.DrawPath((New-Object Drawing.Pen((C 255 165 105 20), 4)), $body)
+    $g.DrawLine((New-Object Drawing.Pen((C 160 255 245 200), 4)), 14, 36, 98, 36)
+}
+
+# 16. POC Setup 그룹 : 폴더 + 톱니 (기준정보 설정 화면 묶음)
+$b = New-Object Drawing.Bitmap $S, $S; $g = NewG $b
+Folder $g
+Gear $g 94 94 30
+$g.Dispose(); Save $b 'POC_GROUP_SETUP'
+
+# 17. POC Data Upload 그룹 : 폴더 + 녹색 업로드 배지 (KLARF / E-Test 결과 업로드 묶음)
+$b = New-Object Drawing.Bitmap $S, $S; $g = NewG $b
+Folder $g
+UploadBadge $g
+$g.Dispose(); Save $b 'POC_GROUP_UPLOAD'
+
+# 18. POC View / Analysis 그룹 : 폴더 + 돋보기 (조회 / 연관 분석 화면 묶음)
+$b = New-Object Drawing.Bitmap $S, $S; $g = NewG $b
+Folder $g
+Magnifier $g 66 66 40
+$g.Dispose(); Save $b 'POC_GROUP_VIEW'
+
+# ---- 같은 아이콘을 쓰던 POC 화면 3개를 성격별로 나눈 아이콘 (2026-10-22) ----
+# GDS Map View(Chip + Layout + 돋보기) 와 E-Test Para Setup(Chart + 톱니) 은 그대로 두고 아래 3개를 다르게 그린다.
+
+# 19. Wafer Map View : 노치 있는 웨이퍼 + Pass(녹색) / Fail(빨강) Die 격자 + 돋보기 (Wafer Map Setup 과 같은 Die 색)
+$b = New-Object Drawing.Bitmap $S, $S; $g = NewG $b
+$disk = New-Object Drawing.Drawing2D.GraphicsPath
+$disk.AddEllipse(6, 6, 100, 100)
+$g.FillPath((LinBrush 6 6 100 100 (C 255 250 250 252) (C 255 200 206 216) 45), $disk)
+$old = $g.Clip; $g.SetClip($disk)
+$rand = New-Object Random 5
+for ($i = 0; $i -lt 8; $i++) { for ($j = 0; $j -lt 8; $j++) {
+    $x = 12 + $i * 11.5; $y = 12 + $j * 11.5
+    $dx = $x + 5 - 56; $dy = $y + 5 - 56
+    if ([Math]::Sqrt($dx * $dx + $dy * $dy) -gt 44) { continue }
+    $col = if ($rand.Next(6) -eq 0) { C 255 225 40 45 } else { C 255 60 185 80 }
+    $g.FillRectangle((New-Object Drawing.SolidBrush($col)), [float]$x, [float]$y, 9.5, 9.5)
+} }
+$g.Clip = $old
+$g.DrawEllipse((New-Object Drawing.Pen((C 255 70 80 100), 4)), 6, 6, 100, 100)
+$g.FillPie((New-Object Drawing.SolidBrush((C 255 255 255 255))), 48, 98, 16, 16, 180, 180)
+Magnifier $g 66 66 40
+$g.Dispose(); Save $b 'WAFER_MAP_VIEW'
+
+# 20. GDS Map View U8 : Chip + 흐린 Layout + 주황 Net 연결선(단자 점) + 돋보기 (Net / Chain 을 찾는 화면)
+$b = New-Object Drawing.Bitmap $S, $S; $g = NewG $b
+$chip = RR 6 6 100 100 10
+$g.FillPath((LinBrush 6 6 100 100 (C 255 60 72 95) (C 255 22 28 42)), $chip)
+$g.DrawPath((New-Object Drawing.Pen((C 255 15 18 28), 3)), $chip)
+Layout $g 16 16 80 80 110
+$net = [Drawing.PointF[]]@((New-Object Drawing.PointF(20, 24)), (New-Object Drawing.PointF(52, 24)), (New-Object Drawing.PointF(52, 50)),
+    (New-Object Drawing.PointF(86, 50)), (New-Object Drawing.PointF(86, 88)), (New-Object Drawing.PointF(30, 88)))
+$g.DrawLines((New-Object Drawing.Pen((C 255 120 50 0), 11)), $net)
+$g.DrawLines((New-Object Drawing.Pen((C 255 255 160 30), 7)), $net)
+foreach ($p in @($net[0], $net[5])) {
+    $g.FillEllipse((New-Object Drawing.SolidBrush((C 255 255 230 120))), ($p.X - 8), ($p.Y - 8), 16, 16)
+    $g.DrawEllipse((New-Object Drawing.Pen((C 255 120 50 0), 3)), ($p.X - 8), ($p.Y - 8), 16, 16)
+}
+Magnifier $g 66 66 40
+$g.Dispose(); Save $b 'GDS_MAP_VIEW_U8'
+
+# 21. E-Test Bin Setup : Bin 표(색 칸 + 이름 줄, Pass 초록 / Fail 빨강 / 주황) + 톱니 (E-Test Para Setup 의 Chart 와 구분)
+$b = New-Object Drawing.Bitmap $S, $S; $g = NewG $b
+$panel = RR 4 10 104 92 8
+$g.FillPath((LinBrush 4 10 104 92 (C 255 255 255 255) (C 255 222 230 242)), $panel)
+$g.DrawPath((New-Object Drawing.Pen((C 255 90 105 130), 3)), $panel)
+$bins = @((C 255 60 185 80), (C 255 60 185 80), (C 255 245 160 30), (C 255 225 40 45))
+for ($k = 0; $k -lt 4; $k++) {
+    $y = 20 + $k * 20
+    $g.FillRectangle((New-Object Drawing.SolidBrush($bins[$k])), 14, $y, 16, 14)
+    $g.DrawRectangle((New-Object Drawing.Pen((C 255 50 60 80), 2)), 14, $y, 16, 14)
+    $g.FillRectangle((New-Object Drawing.SolidBrush((C 255 120 130 150))), 38, ($y + 4), ($(if ($k -eq 3) { 34 } else { 54 })), 6)
+}
+Gear $g 96 96 28
+$g.Dispose(); Save $b 'ET_BIN_SETUP'
+
+# 22. E-Test Result View : 결과 표 문서(파란 머리 줄 + 측정값 줄마다 Pass 초록 / Fail 빨강 칸) + 돋보기 (KLARF File View 의 KLARF 문서와 구분)
+$b = New-Object Drawing.Bitmap $S, $S; $g = NewG $b
+Page $g 10 4 84 108
+$g.FillRectangle((New-Object Drawing.SolidBrush((C 255 40 110 200))), 18, 18, 64, 12)
+$judge = @((C 255 60 185 80), (C 255 60 185 80), (C 255 225 40 45), (C 255 60 185 80), (C 255 225 40 45))
+for ($k = 0; $k -lt 5; $k++) {
+    $y = 36 + $k * 14
+    $g.FillRectangle((New-Object Drawing.SolidBrush((C 255 140 150 170))), 18, ($y + 3), 38, 6)
+    $g.FillRectangle((New-Object Drawing.SolidBrush($judge[$k])), 62, $y, 16, 11)
+}
+Magnifier $g 66 66 40
+$g.Dispose(); Save $b 'ET_RESULT_VIEW'
+
 Get-ChildItem $OutDir -Filter *.png | Select-Object Name, Length

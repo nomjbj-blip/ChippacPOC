@@ -27,8 +27,8 @@
         /// <summary>
         /// 위: 분석 Wafer / GDS Device (읽기 전용, DMSearch 에서 Wafer 1장, Device 는 Wafer Product 를 따른다) + 오른쪽 진행 표시(작업 중에만)
         /// 왼쪽: Wafer Map (위 막대 [색 구간 설정] = 색 구간 팝업)
-        /// 오른쪽: 탭 [설정 / 정보] = 분석 정보 / Defect 영역 설정 + Chain 면 / KLARF 위치 조정 + [다시 분석] / Defect 이미지 · Chain 목록(위아래 나누기),
-        ///         기능 사이에는 구분선(lineArea / lineShift / lineImage / lineChain), [종합] = Die 표
+        /// 오른쪽: 탭 없이 한 페이지(pnlSetting) = 분석 정보 / Defect 영역 설정 + Chain 면 / KLARF 위치 조정 + [다시 분석] / 종합(Die 표) · Defect 이미지(위아래 나누기),
+        ///         기능 사이에는 구분선(lineArea / lineShift / lineDie / lineImage). Chain 목록은 2026-10-22 에 뺐다
         /// 아래 상태줄 / Map 위 색 기준 글자는 두지 않는다 (2026-10-22 레이아웃 정리). 분석 정보는 제목 줄(설정 바뀜 / 알림)만 남겼다(2026-10-22)
         /// </summary>
         private void InitializeComponent()
@@ -44,22 +44,16 @@
             this.map = new DACrux.SEMDMS.ENGUI.GdsKlarfAnalysisMap();
             this.pnlMapHead = new System.Windows.Forms.Panel();
             this.lblMapTitle = new System.Windows.Forms.Label();
+            this.lblMapDie = new System.Windows.Forms.Label();
             this.btnBand = new System.Windows.Forms.Button();
-            this.tabList = new System.Windows.Forms.TabControl();
-            this.tabSetting = new System.Windows.Forms.TabPage();
+            this.pnlSetting = new System.Windows.Forms.Panel();
             this.splitSetting = new System.Windows.Forms.SplitContainer();
             this.flowImage = new System.Windows.Forms.FlowLayoutPanel();
             this.pnlImageHead = new System.Windows.Forms.Panel();
             this.lblImageInfo = new System.Windows.Forms.Label();
             this.lblImageTitle = new System.Windows.Forms.Label();
             this.lineImage = new System.Windows.Forms.Panel();
-            this.dgvChain = new System.Windows.Forms.DataGridView();
-            this.pnlChainHead = new System.Windows.Forms.Panel();
-            this.lblChainTitle = new System.Windows.Forms.Label();
-            this.chkChainAll = new System.Windows.Forms.CheckBox();
-            this.chkChainHit = new System.Windows.Forms.CheckBox();
-            this.lblChainCount = new System.Windows.Forms.Label();
-            this.lineChain = new System.Windows.Forms.Panel();
+            this.lineDie = new System.Windows.Forms.Panel();
             this.pnlShift = new System.Windows.Forms.Panel();
             this.lblShiftTitle = new System.Windows.Forms.Label();
             this.lblShiftX = new System.Windows.Forms.Label();
@@ -86,25 +80,22 @@
             this.lblInfoTitle = new System.Windows.Forms.Label();
             this.lblChanged = new System.Windows.Forms.Label();
             this.lblInfo = new System.Windows.Forms.Label();
-            this.tabDie = new System.Windows.Forms.TabPage();
             this.dgvDie = new System.Windows.Forms.DataGridView();
             this.pnlDieHead = new System.Windows.Forms.Panel();
             this.lblDieCount = new System.Windows.Forms.Label();
+            this.lblDieTitle = new System.Windows.Forms.Label();
             this.pnlTop.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitMain)).BeginInit();
             this.splitMain.Panel1.SuspendLayout();
             this.splitMain.Panel2.SuspendLayout();
             this.splitMain.SuspendLayout();
             this.pnlMapHead.SuspendLayout();
-            this.tabList.SuspendLayout();
-            this.tabSetting.SuspendLayout();
+            this.pnlSetting.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitSetting)).BeginInit();
             this.splitSetting.Panel1.SuspendLayout();
             this.splitSetting.Panel2.SuspendLayout();
             this.splitSetting.SuspendLayout();
             this.pnlImageHead.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dgvChain)).BeginInit();
-            this.pnlChainHead.SuspendLayout();
             this.pnlShift.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numShiftX)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numShiftY)).BeginInit();
@@ -112,7 +103,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.numTolerance)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numSquare)).BeginInit();
             this.pnlInfo.SuspendLayout();
-            this.tabDie.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvDie)).BeginInit();
             this.pnlDieHead.SuspendLayout();
             this.SuspendLayout();
@@ -201,7 +191,7 @@
             // 
             // splitMain.Panel2
             // 
-            this.splitMain.Panel2.Controls.Add(this.tabList);
+            this.splitMain.Panel2.Controls.Add(this.pnlSetting);
             this.splitMain.Size = new System.Drawing.Size(2000, 1290);
             this.splitMain.SplitterDistance = 1085;
             this.splitMain.SplitterWidth = 6;
@@ -300,10 +290,13 @@
             this.map.DieClicked += new System.EventHandler<DACrux.SEMDMS.ENGUI.GdsKlarfDieEventArgs>(this.map_DieClicked);
             this.map.DieDoubleClicked += new System.EventHandler<DACrux.SEMDMS.ENGUI.GdsKlarfDieEventArgs>(this.map_DieDoubleClicked);
             this.map.DetailAnalysisRequested += new System.EventHandler<DACrux.SEMDMS.ENGUI.GdsKlarfDieEventArgs>(this.map_DetailAnalysisRequested);
-            // 
+            this.map.OnChangeCurrentDie += new DACrux.Map.ChangeCurrentDie(this.map_OnChangeCurrentDie);
+            this.map.MousePositionCleared += new System.EventHandler(this.map_MousePositionCleared);
+            //
             // pnlMapHead
-            // 
+            //
             this.pnlMapHead.Controls.Add(this.lblMapTitle);
+            this.pnlMapHead.Controls.Add(this.lblMapDie);
             this.pnlMapHead.Controls.Add(this.btnBand);
             this.pnlMapHead.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlMapHead.Location = new System.Drawing.Point(0, 0);
@@ -322,7 +315,17 @@
             this.lblMapTitle.Size = new System.Drawing.Size(108, 25);
             this.lblMapTitle.TabIndex = 0;
             this.lblMapTitle.Text = "Wafer Map";
-            // 
+            //
+            // lblMapDie
+            //
+            this.lblMapDie.AutoSize = true;
+            this.lblMapDie.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(20)))), ((int)(((byte)(60)))), ((int)(((byte)(130)))));
+            this.lblMapDie.Location = new System.Drawing.Point(150, 15);
+            this.lblMapDie.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblMapDie.Name = "lblMapDie";
+            this.lblMapDie.Size = new System.Drawing.Size(0, 18);
+            this.lblMapDie.TabIndex = 1;
+            //
             // btnBand
             // 
             this.btnBand.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -336,57 +339,43 @@
             this.btnBand.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.btnBand.UseVisualStyleBackColor = true;
             this.btnBand.Click += new System.EventHandler(this.btnBand_Click);
-            // 
-            // tabList
-            // 
-            this.tabList.Controls.Add(this.tabSetting);
-            this.tabList.Controls.Add(this.tabDie);
-            this.tabList.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tabList.ItemSize = new System.Drawing.Size(150, 34);
-            this.tabList.Location = new System.Drawing.Point(0, 0);
-            this.tabList.Margin = new System.Windows.Forms.Padding(4);
-            this.tabList.Name = "tabList";
-            this.tabList.SelectedIndex = 0;
-            this.tabList.Size = new System.Drawing.Size(909, 1290);
-            this.tabList.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
-            this.tabList.TabIndex = 0;
-            // 
-            // tabSetting
-            // 
-            this.tabSetting.Controls.Add(this.splitSetting);
-            this.tabSetting.Controls.Add(this.pnlShift);
-            this.tabSetting.Controls.Add(this.lineShift);
-            this.tabSetting.Controls.Add(this.pnlArea);
-            this.tabSetting.Controls.Add(this.lineArea);
-            this.tabSetting.Controls.Add(this.pnlInfo);
-            this.tabSetting.Location = new System.Drawing.Point(4, 38);
-            this.tabSetting.Margin = new System.Windows.Forms.Padding(4);
-            this.tabSetting.Name = "tabSetting";
-            this.tabSetting.Size = new System.Drawing.Size(901, 1248);
-            this.tabSetting.TabIndex = 0;
-            this.tabSetting.Text = "설정 / 정보";
-            this.tabSetting.UseVisualStyleBackColor = true;
-            // 
+            //
+            // pnlSetting
+            //
+            this.pnlSetting.BackColor = System.Drawing.Color.White;
+            this.pnlSetting.Controls.Add(this.splitSetting);
+            this.pnlSetting.Controls.Add(this.pnlShift);
+            this.pnlSetting.Controls.Add(this.lineShift);
+            this.pnlSetting.Controls.Add(this.pnlArea);
+            this.pnlSetting.Controls.Add(this.lineArea);
+            this.pnlSetting.Controls.Add(this.pnlInfo);
+            this.pnlSetting.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pnlSetting.Location = new System.Drawing.Point(0, 0);
+            this.pnlSetting.Margin = new System.Windows.Forms.Padding(4);
+            this.pnlSetting.Name = "pnlSetting";
+            this.pnlSetting.Size = new System.Drawing.Size(909, 1290);
+            this.pnlSetting.TabIndex = 0;
+            //
             // splitSetting
-            // 
+            //
             this.splitSetting.Dock = System.Windows.Forms.DockStyle.Fill;
             this.splitSetting.Location = new System.Drawing.Point(0, 460);
             this.splitSetting.Margin = new System.Windows.Forms.Padding(4);
             this.splitSetting.Name = "splitSetting";
             this.splitSetting.Orientation = System.Windows.Forms.Orientation.Horizontal;
-            // 
+            //
             // splitSetting.Panel1
-            // 
-            this.splitSetting.Panel1.Controls.Add(this.flowImage);
-            this.splitSetting.Panel1.Controls.Add(this.pnlImageHead);
-            this.splitSetting.Panel1.Controls.Add(this.lineImage);
-            // 
+            //
+            this.splitSetting.Panel1.Controls.Add(this.dgvDie);
+            this.splitSetting.Panel1.Controls.Add(this.pnlDieHead);
+            this.splitSetting.Panel1.Controls.Add(this.lineDie);
+            //
             // splitSetting.Panel2
-            // 
-            this.splitSetting.Panel2.Controls.Add(this.dgvChain);
-            this.splitSetting.Panel2.Controls.Add(this.pnlChainHead);
-            this.splitSetting.Panel2.Controls.Add(this.lineChain);
-            this.splitSetting.Size = new System.Drawing.Size(901, 788);
+            //
+            this.splitSetting.Panel2.Controls.Add(this.flowImage);
+            this.splitSetting.Panel2.Controls.Add(this.pnlImageHead);
+            this.splitSetting.Panel2.Controls.Add(this.lineImage);
+            this.splitSetting.Size = new System.Drawing.Size(909, 830);
             this.splitSetting.SplitterDistance = 471;
             this.splitSetting.SplitterWidth = 6;
             this.splitSetting.TabIndex = 2;
@@ -450,100 +439,16 @@
             this.lineImage.Name = "lineImage";
             this.lineImage.Size = new System.Drawing.Size(901, 2);
             this.lineImage.TabIndex = 2;
-            // 
-            // dgvChain
-            // 
-            this.dgvChain.AllowUserToAddRows = false;
-            this.dgvChain.AllowUserToDeleteRows = false;
-            this.dgvChain.AllowUserToResizeRows = false;
-            this.dgvChain.BackgroundColor = System.Drawing.Color.White;
-            this.dgvChain.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvChain.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dgvChain.Location = new System.Drawing.Point(0, 44);
-            this.dgvChain.Margin = new System.Windows.Forms.Padding(4);
-            this.dgvChain.MultiSelect = false;
-            this.dgvChain.Name = "dgvChain";
-            this.dgvChain.ReadOnly = true;
-            this.dgvChain.RowHeadersVisible = false;
-            this.dgvChain.RowHeadersWidth = 62;
-            this.dgvChain.RowTemplate.Height = 23;
-            this.dgvChain.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvChain.Size = new System.Drawing.Size(901, 267);
-            this.dgvChain.TabIndex = 1;
-            // 
-            // pnlChainHead
-            // 
-            this.pnlChainHead.Controls.Add(this.lblChainTitle);
-            this.pnlChainHead.Controls.Add(this.chkChainAll);
-            this.pnlChainHead.Controls.Add(this.chkChainHit);
-            this.pnlChainHead.Controls.Add(this.lblChainCount);
-            this.pnlChainHead.Dock = System.Windows.Forms.DockStyle.Top;
-            this.pnlChainHead.Location = new System.Drawing.Point(0, 2);
-            this.pnlChainHead.Margin = new System.Windows.Forms.Padding(4);
-            this.pnlChainHead.Name = "pnlChainHead";
-            this.pnlChainHead.Padding = new System.Windows.Forms.Padding(0, 0, 12, 0);
-            this.pnlChainHead.Size = new System.Drawing.Size(901, 42);
-            this.pnlChainHead.TabIndex = 0;
-            // 
-            // lblChainTitle
-            // 
-            this.lblChainTitle.AutoSize = true;
-            this.lblChainTitle.Font = new System.Drawing.Font("맑은 고딕", 9F, System.Drawing.FontStyle.Bold);
-            this.lblChainTitle.Location = new System.Drawing.Point(8, 9);
-            this.lblChainTitle.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.lblChainTitle.Name = "lblChainTitle";
-            this.lblChainTitle.Size = new System.Drawing.Size(102, 25);
-            this.lblChainTitle.TabIndex = 0;
-            this.lblChainTitle.Text = "Chain 목록";
-            // 
-            // chkChainAll
-            // 
-            this.chkChainAll.AutoSize = true;
-            this.chkChainAll.Checked = true;
-            this.chkChainAll.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkChainAll.Location = new System.Drawing.Point(150, 10);
-            this.chkChainAll.Margin = new System.Windows.Forms.Padding(4);
-            this.chkChainAll.Name = "chkChainAll";
-            this.chkChainAll.Size = new System.Drawing.Size(122, 22);
-            this.chkChainAll.TabIndex = 1;
-            this.chkChainAll.Text = "Wafer 전체";
-            this.chkChainAll.UseVisualStyleBackColor = true;
-            this.chkChainAll.CheckedChanged += new System.EventHandler(this.ChainFilter_Changed);
-            // 
-            // chkChainHit
-            // 
-            this.chkChainHit.AutoSize = true;
-            this.chkChainHit.Checked = true;
-            this.chkChainHit.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkChainHit.Location = new System.Drawing.Point(290, 10);
-            this.chkChainHit.Margin = new System.Windows.Forms.Padding(4);
-            this.chkChainHit.Name = "chkChainHit";
-            this.chkChainHit.Size = new System.Drawing.Size(202, 22);
-            this.chkChainHit.TabIndex = 2;
-            this.chkChainHit.Text = "Defect 있는 Chain 만";
-            this.chkChainHit.UseVisualStyleBackColor = true;
-            this.chkChainHit.CheckedChanged += new System.EventHandler(this.ChainFilter_Changed);
-            // 
-            // lblChainCount
-            // 
-            this.lblChainCount.Dock = System.Windows.Forms.DockStyle.Right;
-            this.lblChainCount.ForeColor = System.Drawing.Color.DimGray;
-            this.lblChainCount.Location = new System.Drawing.Point(689, 0);
-            this.lblChainCount.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.lblChainCount.Name = "lblChainCount";
-            this.lblChainCount.Size = new System.Drawing.Size(200, 42);
-            this.lblChainCount.TabIndex = 3;
-            this.lblChainCount.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            // 
-            // lineChain
-            // 
-            this.lineChain.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(190)))), ((int)(((byte)(200)))), ((int)(((byte)(214)))));
-            this.lineChain.Dock = System.Windows.Forms.DockStyle.Top;
-            this.lineChain.Location = new System.Drawing.Point(0, 0);
-            this.lineChain.Margin = new System.Windows.Forms.Padding(0);
-            this.lineChain.Name = "lineChain";
-            this.lineChain.Size = new System.Drawing.Size(901, 2);
-            this.lineChain.TabIndex = 2;
+            //
+            // lineDie
+            //
+            this.lineDie.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(190)))), ((int)(((byte)(200)))), ((int)(((byte)(214)))));
+            this.lineDie.Dock = System.Windows.Forms.DockStyle.Top;
+            this.lineDie.Location = new System.Drawing.Point(0, 0);
+            this.lineDie.Margin = new System.Windows.Forms.Padding(0);
+            this.lineDie.Name = "lineDie";
+            this.lineDie.Size = new System.Drawing.Size(909, 2);
+            this.lineDie.TabIndex = 2;
             // 
             // pnlShift
             // 
@@ -899,19 +804,7 @@
             this.lblInfo.Size = new System.Drawing.Size(737, 22);
             this.lblInfo.TabIndex = 2;
             this.lblInfo.Visible = false;
-            // 
-            // tabDie
-            // 
-            this.tabDie.Controls.Add(this.dgvDie);
-            this.tabDie.Controls.Add(this.pnlDieHead);
-            this.tabDie.Location = new System.Drawing.Point(4, 38);
-            this.tabDie.Margin = new System.Windows.Forms.Padding(4);
-            this.tabDie.Name = "tabDie";
-            this.tabDie.Size = new System.Drawing.Size(901, 1248);
-            this.tabDie.TabIndex = 1;
-            this.tabDie.Text = "종합";
-            this.tabDie.UseVisualStyleBackColor = true;
-            // 
+            //
             // dgvDie
             // 
             this.dgvDie.AllowUserToAddRows = false;
@@ -920,7 +813,7 @@
             this.dgvDie.BackgroundColor = System.Drawing.Color.White;
             this.dgvDie.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvDie.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dgvDie.Location = new System.Drawing.Point(0, 42);
+            this.dgvDie.Location = new System.Drawing.Point(0, 44);
             this.dgvDie.Margin = new System.Windows.Forms.Padding(4);
             this.dgvDie.MultiSelect = false;
             this.dgvDie.Name = "dgvDie";
@@ -929,7 +822,7 @@
             this.dgvDie.RowHeadersWidth = 62;
             this.dgvDie.RowTemplate.Height = 23;
             this.dgvDie.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvDie.Size = new System.Drawing.Size(901, 1206);
+            this.dgvDie.Size = new System.Drawing.Size(909, 427);
             this.dgvDie.TabIndex = 1;
             this.dgvDie.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvDie_CellClick);
             this.dgvDie.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvDie_CellDoubleClick);
@@ -937,22 +830,41 @@
             // pnlDieHead
             // 
             this.pnlDieHead.Controls.Add(this.lblDieCount);
+            this.pnlDieHead.Controls.Add(this.lblDieTitle);
             this.pnlDieHead.Dock = System.Windows.Forms.DockStyle.Top;
-            this.pnlDieHead.Location = new System.Drawing.Point(0, 0);
+            this.pnlDieHead.Location = new System.Drawing.Point(0, 2);
             this.pnlDieHead.Margin = new System.Windows.Forms.Padding(4);
             this.pnlDieHead.Name = "pnlDieHead";
-            this.pnlDieHead.Size = new System.Drawing.Size(901, 42);
+            this.pnlDieHead.Padding = new System.Windows.Forms.Padding(8, 0, 12, 0);
+            this.pnlDieHead.Size = new System.Drawing.Size(909, 42);
             this.pnlDieHead.TabIndex = 0;
-            // 
+            //
             // lblDieCount
-            // 
-            this.lblDieCount.AutoSize = true;
-            this.lblDieCount.Location = new System.Drawing.Point(8, 12);
+            //
+            this.lblDieCount.AutoEllipsis = true;
+            this.lblDieCount.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lblDieCount.ForeColor = System.Drawing.Color.DimGray;
+            this.lblDieCount.Location = new System.Drawing.Point(62, 0);
             this.lblDieCount.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblDieCount.Name = "lblDieCount";
-            this.lblDieCount.Size = new System.Drawing.Size(48, 18);
-            this.lblDieCount.TabIndex = 0;
+            this.lblDieCount.Padding = new System.Windows.Forms.Padding(12, 0, 0, 0);
+            this.lblDieCount.Size = new System.Drawing.Size(835, 42);
+            this.lblDieCount.TabIndex = 1;
             this.lblDieCount.Text = "Die 0";
+            this.lblDieCount.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            //
+            // lblDieTitle
+            //
+            this.lblDieTitle.AutoSize = true;
+            this.lblDieTitle.Dock = System.Windows.Forms.DockStyle.Left;
+            this.lblDieTitle.Font = new System.Drawing.Font("맑은 고딕", 9F, System.Drawing.FontStyle.Bold);
+            this.lblDieTitle.Location = new System.Drawing.Point(8, 0);
+            this.lblDieTitle.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblDieTitle.Name = "lblDieTitle";
+            this.lblDieTitle.Size = new System.Drawing.Size(54, 25);
+            this.lblDieTitle.TabIndex = 0;
+            this.lblDieTitle.Text = "종합";
+            this.lblDieTitle.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // frmGdsKlarfSimple
             // 
@@ -973,17 +885,13 @@
             this.splitMain.ResumeLayout(false);
             this.pnlMapHead.ResumeLayout(false);
             this.pnlMapHead.PerformLayout();
-            this.tabList.ResumeLayout(false);
-            this.tabSetting.ResumeLayout(false);
+            this.pnlSetting.ResumeLayout(false);
             this.splitSetting.Panel1.ResumeLayout(false);
             this.splitSetting.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitSetting)).EndInit();
             this.splitSetting.ResumeLayout(false);
             this.pnlImageHead.ResumeLayout(false);
             this.pnlImageHead.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dgvChain)).EndInit();
-            this.pnlChainHead.ResumeLayout(false);
-            this.pnlChainHead.PerformLayout();
             this.pnlShift.ResumeLayout(false);
             this.pnlShift.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numShiftX)).EndInit();
@@ -994,7 +902,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.numSquare)).EndInit();
             this.pnlInfo.ResumeLayout(false);
             this.pnlInfo.PerformLayout();
-            this.tabDie.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dgvDie)).EndInit();
             this.pnlDieHead.ResumeLayout(false);
             this.pnlDieHead.PerformLayout();
@@ -1013,23 +920,17 @@
         private GdsKlarfAnalysisMap map;
         private System.Windows.Forms.Panel pnlMapHead;
         private System.Windows.Forms.Label lblMapTitle;
+        private System.Windows.Forms.Label lblMapDie;
         private System.Windows.Forms.Button btnBand;
-        private System.Windows.Forms.TabControl tabList;
-        private System.Windows.Forms.TabPage tabSetting;
+        private System.Windows.Forms.Panel pnlSetting;
         private System.Windows.Forms.SplitContainer splitSetting;
         private System.Windows.Forms.FlowLayoutPanel flowImage;
         private System.Windows.Forms.Panel pnlImageHead;
         private System.Windows.Forms.Panel lineArea;
         private System.Windows.Forms.Panel lineImage;
-        private System.Windows.Forms.Panel lineChain;
+        private System.Windows.Forms.Panel lineDie;
         private System.Windows.Forms.Label lblImageTitle;
         private System.Windows.Forms.Label lblImageInfo;
-        private System.Windows.Forms.DataGridView dgvChain;
-        private System.Windows.Forms.Panel pnlChainHead;
-        private System.Windows.Forms.Label lblChainTitle;
-        private System.Windows.Forms.CheckBox chkChainAll;
-        private System.Windows.Forms.CheckBox chkChainHit;
-        private System.Windows.Forms.Label lblChainCount;
         private System.Windows.Forms.Panel pnlArea;
         private System.Windows.Forms.Label lblAreaTitle;
         private System.Windows.Forms.RadioButton rdoDefectSize;
@@ -1055,10 +956,10 @@
         private System.Windows.Forms.Label lblInfoTitle;
         private System.Windows.Forms.Label lblChanged;
         private System.Windows.Forms.Label lblInfo;
-        private System.Windows.Forms.TabPage tabDie;
         private System.Windows.Forms.DataGridView dgvDie;
         private System.Windows.Forms.Panel pnlDieHead;
         private System.Windows.Forms.Label lblDieCount;
+        private System.Windows.Forms.Label lblDieTitle;
         private DACrux.SEMDMS.Control.ProgressStatusBar busyBar;
     }
 }
