@@ -1,0 +1,26 @@
+﻿{
+    "id":  "04",
+    "name":  "WorkRule_DbFail",
+    "scenarios":  [
+                      "SCN-06"
+                  ],
+    "status":  "PASS",
+    "exitCode":  0,
+    "timedOut":  false,
+    "durationMs":  1160,
+    "started":  "2026-10-29 15:01:50",
+    "command":  "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\probes\\WorkRuleDbFailCheck.ps1\"",
+    "workingDir":  "D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\probes",
+    "keys":  {
+                 "WORK_RULE_DBFAIL_PROBE":  "PASS (1)"
+             },
+    "passLines":  0,
+    "failLines":  [
+
+                  ],
+    "skipLines":  [
+
+                  ],
+    "stdout":  "04_WorkRule_DbFail.stdout.txt",
+    "stderr":  "04_WorkRule_DbFail.stderr.txt"
+}

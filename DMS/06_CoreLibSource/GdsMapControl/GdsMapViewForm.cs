@@ -444,9 +444,7 @@ namespace NexplantQMS.GdsMap
                 int partialChains = _chains.Count(chain => chain.DbIncomplete != null);
                 _loadSummary = "조회 완료: " + target.DeviceId + " / 도형 " + items.Count.ToString("N0")
                     + " / Chain " + _chains.Count + "개"
-                    + (partialChains > 0 ? " (Layer 미조회 " + partialChains + "개)" : "")
-                    // Chain 이 많아 지도 표시를 끈 채로 불러왔으면 알려 준다(LoadChainsFromDb, 2026-10-21)
-                    + (!sameMap && dbChains != null && dbChains.Count > ChainLoadVisibleLimit ? " - Chain 이 많아 지도 표시는 꺼 둠(체크 박스로 표시)" : "");
+                    + (partialChains > 0 ? " (Layer 미조회 " + partialChains + "개)" : "");
                 SetStatus(_loadSummary);
             }
             catch (OperationCanceledException)

@@ -8,6 +8,7 @@
 #          도형 추가 / 도형 제외 버튼 이름 (2026-10-19)
 #       8) Chain Code(A, B, C) 화면 숨김: 목록 / 작업 줄 제목은 이름, 새 Chain 기본 이름 "새 Chain n" (2026-10-12)
 #       9) 상태 문구는 아래 상태 줄 한 곳: Chain 안내 줄 / Label 결과 글자 없음, Chain 안내는 한 문장, 목록 행은 색 견본(색 코드 없음) (2026-10-13)
+#          목록 행 = 이름 + 저장 상태, 도형 수 없음 (2026-10-27)
 #      10) 상태 줄 작업 중 표시: 조회 중 "작업 중..." + 모래시계, 끝나면 숨김 (처리 시간 표시 없음, 2026-10-15)
 #      11) [Map 복사] 버튼: 호스트 모드에서 보이고 Map 선택 전 비활성, [Map ▾] 바로 왼쪽 (2026-10-15)
 #      12) Label 검색 줄(구분선 / Label / 입력 / 검색 / 전체 보기 / 결과 콤보) 숨김, 도면 후에도 숨김 (2026-10-15)
@@ -211,7 +212,7 @@ Check 'Label 검색 줄 숨김(도면 후)' ($v['labelSearchHidden'] -eq 'True|'
 Check '작업 줄 한 줄(넓은 창)' ($v['barOneRow'].StartsWith('True')) $v['barOneRow']
 Check '작업 줄 제목: Chain 미선택' ($v['barTitleNoChain'] -eq 'Chain 선택 필요') $v['barTitleNoChain']
 Check '작업 줄 제목: 새 Chain 선택(Code 없이 이름)' ($v['barTitleChain'] -eq '새 Chain 1 편집') $v['barTitleChain']
-Check 'Chain 목록 행: 이름 + 수 + 저장 상태 (Code / 색 코드 없음)' ($v['chainListText'] -eq '새 Chain 1  0개  (저장 안 됨)') $v['chainListText']
+Check 'Chain 목록 행: 이름 + 저장 상태 (도형 수 / Code / 색 코드 없음, 도형 수는 2026-10-27 삭제)' ($v['chainListText'] -eq '새 Chain 1  (저장 안 됨)') $v['chainListText']
 Check 'Chain 목록 행 색 견본 / 우클릭은 선택을 바꾸지 않음' ($v['chainListSwatch'] -eq 'True') $v['chainListSwatch']
 Check '새 Chain 안내 한 문장(계산 값 / 구분자 없음)' ($v['statusNewChain'].StartsWith('새 Chain 1 을(를) 만들었습니다.') -and -not $v['statusNewChain'].Contains(' / ')) $v['statusNewChain']
 Check 'Input 지정 상태(사용법 안내 없음)' ($v['statusInputCapture'] -eq 'Input 지정 중') $v['statusInputCapture']

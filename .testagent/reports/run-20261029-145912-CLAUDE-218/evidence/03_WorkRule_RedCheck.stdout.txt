@@ -1,0 +1,34 @@
+﻿[PASS] 소스: 대상 함수 첫 줄 WorkRule().Confirm 있음 31 / 31
+[PASS] 소스: 파일 삭제(DeleteEtFile)는 확인하지 않음 string[] aKey = new string[] { RequiredSeq(strSrcFileSeq, "파일 번호") };             Required(strUpdateUser, "Update User", 30);
+[PASS] 소스: 조회 서비스(GdsMapView)에는 Confirm 없음 Confirm 0 곳
+BSL / DSL: D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\101_ServerBin
+[PASS] 판정: 기간 경계 2026-09-30 23:59:59=차단 / 2026-10-01 00:00:00=통과 / 2027-01-31 23:59:59=통과 / 2027-02-01 00:00:00=차단
+[PASS] 판정: 남은 일수 마지막 날 1 / 다음 날 0 / 13일 전 14
+[PASS] DB 일시: 한국 시간(PC 시각과 5분 이내) DB 2026-10-29 15:01:48 / PC 2026-10-29 15:01:48 / 차이 0.0분
+[FAIL] GetState: 기간 상태 WORK_OPEN=Y LAST_DAY=2027-01-31 DAYS_LEFT=95
+[FAIL] BSL GdsMapView.GetWorkState (클라이언트 메뉴용) WORK_OPEN=Y
+[FAIL] Confirm: 기간 문장으로 막음 
+[FAIL] 기간 후: 대상 함수 31개 첫 단계에서 멈춤 멈춤 0 / 31 / 안 멈춤: GdsMapImport.DeleteMap(3): Factory은(는) 1~30바이트로 입력하세요.
+Parameter name: Factory | GdsMapImport.CopyMap(4): Factory은(는) 1~30바이트로 입력하세요.
+Parameter name: Factory | GdsMapImport.BeginMapImport(1): 저장 시작 정보는 11개 또는 12개(저장 기준 포함) 항목이어야 합니다.
+Parameter name: ImportInfo | GdsMapImport.CompleteMapImport(2): Update User은(는) 1~30바이트로 입력하세요.
+Parameter name: Update User | GdsChain.DeleteChain(4): Update User은(는) 1~30바이트로 입력하세요.
+Parameter name: Update User | GdsChain.BeginChainSave(3): Chain 저장 정보는 9개 항목이어야 합니다.
+Parameter name: ChainInfo | GdsChain.CompleteChainSave(2): 확정 키는 Factory / Device / Chain 번호 / 예상 Member 수 / 예상 편집 수 5개여야 합니다.
+Parameter name: aKey | GdsChain.CreateChainBulk(5): 일괄 저장 키는 Factory / Device / Layer 규칙 적용 / 격자 크기 4개여야 합니다.
+Parameter name: aKey | GdsChain.DeleteChainBulk(4): Factory은(는) 1~30바이트로 입력하세요.
+Parameter name: Factory | GdsChain.UpdateChainColorBulk(5): Factory은(는) 1~30바이트로 입력하세요.
+Parameter name: Factory | GdsEtResult.BeginEtFile(1): 저장 시작 정보는 21개 항목이어야 합니다(2026-10-14 등록 Parameter 저장 방식). 업로드 화면을 새 버전으로 바꾸세요.
+Parameter name: FileInfo | GdsEtResult.CompleteEtFile(2): 파일 번호는 1 이상의 정수여야 합니다: 
+Parameter name: 파일 번호 | GdsEtResult.RejudgeEtFiles(2): 다시 판정 키는 3개 항목(Factory / Device / 공정)이어야 합니다.
+Parameter name: aKey | GdsEtResult.SaveEtLimit(3): Spec 키는 3개 항목(Factory / Device / 공정)이어야 합니다.
+Parameter name: aKey | GdsEtResult.DeleteEtLimit(2): Spec 삭제 키는 4개 항목(Factory / Device / 공정 / Parameter)이어야 합니다.
+Parameter name: aKey | GdsEtResult.PublishEtFileToYms(2): 파일 번호는 1 이상의 정수여야 합니다: 
+Parameter name: 파일 번호 | GdsEtResult.RegisterEtParameters(3): Parameter 등록 키는 5개 항목(Factory / Device / 공정 / 출처 / 파일 이름)이어야 합니다.
+Parameter name: aKey | GdsEtResult.SaveEtParameterSetup(3): Parameter 키는 3개 항목(Factory / Device / 공정)이어야 합니다.
+Parameter name: aKey | GdsEtResult.DeleteEtParameters(3): Parameter 키는 3개 항목(Factory / Device / 공정)이어야 합니다.
+Parameter name: aKey | GdsEtResult.SaveEtBins(3): Bin 설정 키는 3개 항목(Factory / Device / 공정)이어야 합니다.
+Parameter name: aKey | GdsEtResult.DeleteEtBins(3): Bin 설정 키는 3개 항목(Factory / Device / 공정)이어야 합니다.
+Parameter name: aKey | KlarfUpload.BeginUpload(2): UploadInfo 는 7개 항목이어야 합니다. (Factory / User / 파일명 / Product / Step ID / 설비 / 예약(빈 값)) | KlarfUpload.CommitUpload(2): 업로드 키 형식이 올바르지 않습니다. | KlarfUpload.DeleteUploadedStep(3): STEP_SEQ 값이 올바르지 않습니다:  | SEMConfiguration.InsertDefectType(3): Object reference not set to an instance of an object. | SEMConfiguration.UpdateDefectType(3): Object reference not set to an instance of an object. | SEMConfiguration.DeleteDefectType(1): 예외 없음 | ProbeAdmin.SetMapDef(28): Object reference not set to an instance of an object. | ProbeAdmin.UpdateMapDef(27): 예외 없음 | ProbeAdmin.CreateUseMap(2): Object reference not set to an instance of an object. | ProbeAdmin.CreateUseMap(3): Object reference not set to an instance of an object.
+[PASS] 기간 후: 조회(GetMapDeviceList)는 그대로 Device 10건
+WORK_RULE_PROBE=FAIL (4 / 11)

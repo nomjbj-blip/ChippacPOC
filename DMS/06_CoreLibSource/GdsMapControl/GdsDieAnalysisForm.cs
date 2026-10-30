@@ -39,7 +39,7 @@ namespace NexplantQMS.GdsMap
     ///     어느 Chain 에도 안 걸린 Defect 는 맨 아래 "Chain 밖 Defect" 묶음(가까운 거리 순). 서버 결과(AnalyzeDie)는 그대로 쓴다.
     ///  7) 화면 A · Simple 같은 모양 (2026-10-22 요청 "두 화면에서 동일하게", 설계 문서/설계/05_연관분석/2026-10-22_상세보기_오른쪽_한패널_설계.md 12절):
     ///     어느 화면이 열어도 같은 모양이다(예전 Simple 보기 표시 DETAIL_VIEW 는 없앰). Simple 상세 요청과 한 패널 요청을 합친다.
-    ///     위쪽 "분석 기준" 칸과 표 위 요약 글자는 숨기고, 표 위 체크는 [걸린 / Fail Chain 만](기본 끔 = 모든 Chain) / [전체 표시].
+    ///     위쪽 "분석 기준" 칸과 표 위 요약 글자는 숨기고, 표 위 체크는 [걸린 / Fail Chain 만](2026-10-28 기본 켬, 끄면 모든 Chain) / [전체 표시].
     ///     [전체 표시](2026-10-23)는 모든 Chain 의 표시 체크를 한 번에 켜거나 끄고, Chain 하나를 바꾸면 표시 체크를 따라간다(모두 켜짐 = 켬).
     ///     Chain 밖 Defect 묶음은 늘 보인다(체크 없음, 2026-10-22).
     ///     도면 Defect 는 Chain 영역 빨강 / 밖 노랑으로 채우고 흰 점선 · 흰 테두리 · 번호는 그리지 않으며(DefectOverlayStyle.Filled),
@@ -653,7 +653,7 @@ namespace NexplantQMS.GdsMap
         /// Chain 순서 = 일치 -> Fail만 -> Defect만 -> 정상 -> 비교 불가, 같은 분류는 Defect 수 많은 순(예전 Chain 표와 같음).
         /// 역추적 Chain 을 표 순서 맨 위로 옮기지 않는다(2026-10-16, 순서는 분류 순 그대로이고 그 묶음 첫 행으로 스크롤만 한다).
         /// [걸린 / Fail Chain 만] 이면 걸렸거나 E-Test Fail 인 Chain 만 행으로 둔다(둘 다 없는 Die 는 전부, 역추적 Chain 은 늘 둔다). 끄면 모든 Chain.
-        /// Chain 이 LargeChainCount 보다 많은 Device 는 "모든 Chain" 대신 그 Die 의 DIE_CHAIN Chain 만(ScopeChains, 2026-10-21).
+        /// Chain 이 많은 Device(U8 27,341개 등)도 모든 Chain 을 넣는다(2026-10-28 요청 "다 보여줘라". 10-21 의 그 Die DIE_CHAIN Chain 만 넣던 예외 삭제).
         /// 표시 체크: 역추적이면 그 Chain 만, 아니면 행이 있는 Chain 전부. [전체 표시] 는 채운 뒤 표시 체크에 맞춘다(SyncShowAll).
         /// Chain 마다 걸린 Defect 를 Gap 순(같으면 Defect ID)으로 붙이고, 없으면 빈 1행.
         /// 두 Chain 에 걸린 Defect 는 두 묶음에 모두 넣는다(Defect ID 굵은 글자. "가까운 Chain" 열은 2026-10-22 뺐다).
@@ -685,7 +685,7 @@ namespace NexplantQMS.GdsMap
             _updating = true;
             grid.Rows.Clear();
             int group = 0, chainGroups = 0;
-            foreach (DataRow c in ScopeChains(new HashSet<string>(dieChains.Keys.Select(k => k.ToString(CultureInfo.InvariantCulture))))
+            foreach (DataRow c in Rows("CHAIN")
                 .OrderBy(r => ClassOrder(ClassOf(r, DieChainOf(dieChains, r), die)))
                 .ThenByDescending(r => CountOf(counts, r)).ThenBy(r => r["CHAIN_CODE"].ToString().Length).ThenBy(r => r["CHAIN_CODE"].ToString(), StringComparer.Ordinal))
             {
@@ -721,8 +721,8 @@ namespace NexplantQMS.GdsMap
                 }).OrderBy(d => d.Gap.HasValue ? 0 : 1).ThenBy(d => d.Gap ?? 0).ThenBy(d => DefectIdOf(d.Row)).ToList();
                 AddGroup(group++, null, new object[] { false, "", OutsideGroupText, outside.Count, "", "", "", "" }, rows, OutsideColor, true, false, "");
             }
-            lblChainTitle.Text = String.Format("Chain {0}{1} / Defect 전체 {2} / Chain In {3} / Chain Out {4}",
-                chainGroups, IsLargeChainSet() ? "(이 Die 주변)" : "", defects.Count, defects.Count - outside.Count, outside.Count);
+            lblChainTitle.Text = String.Format("Chain {0} / Defect 전체 {1} / Chain In {2} / Chain Out {3}",
+                chainGroups, defects.Count, defects.Count - outside.Count, outside.Count);
 
             // 순서는 같으므로 스크롤 위치를 되돌리고, 역추적 Chain 묶음 첫 행(없으면 전에 고른 행)을 고른다(선택 처리는 돌리지 않음)
             if (firstRow >= 0 && firstRow < grid.Rows.Count) grid.FirstDisplayedScrollingRowIndex = firstRow;
@@ -1466,30 +1466,6 @@ namespace NexplantQMS.GdsMap
         private DataRow DieChainRow(string chainSeq)
         {
             return Rows("DIE_CHAIN").FirstOrDefault(r => r["CHAIN_SEQ"].ToString() == chainSeq && IsCurrentDie(r));
-        }
-
-        /// <summary>
-        /// Chain 이 이보다 많은 Device(U8 같은 형태 Chain 27,342개)는 [GDS / KLARF] 표와 [종합] 4분류 수를
-        /// 그 Die 의 DIE_CHAIN Chain(탐색 거리 안 / 걸림 / E-Test 연결) + 역추적 Chain 으로만 만든다 (2026-10-21).
-        /// 모든 Chain 을 넣으면 [걸린 / Fail Chain 만]을 끄거나 걸린 Chain 이 없는 Die 를 열 때 27,352행에 11.6초, 메모리가 약 2 GB 늘었다.
-        /// 이 수 이하(U9 19개 등)는 예전처럼 모든 Chain. 근거: 문서/설계/05_연관분석/2026-10-21_U8_연관분석_영향_확인.md A4 / A5
-        /// </summary>
-        private const int LargeChainCount = 1000;
-
-        private bool IsLargeChainSet()
-        {
-            return _analysis != null && _analysis.Tables.Contains("CHAIN") && _analysis.Tables["CHAIN"].Rows.Count > LargeChainCount;
-        }
-
-        /// <summary>표 / 4분류 수를 만들 Chain. dieChainSeqs = 그 Die 의 DIE_CHAIN Chain 번호. Chain 이 많지 않으면 모든 Chain.</summary>
-        private IEnumerable<DataRow> ScopeChains(ICollection<string> dieChainSeqs)
-        {
-            if (!IsLargeChainSet()) return Rows("CHAIN");
-            return Rows("CHAIN").Where(r =>
-            {
-                string seq = r["CHAIN_SEQ"].ToString();
-                return dieChainSeqs.Contains(seq) || seq == _focusChainSeq;
-            });
         }
 
         /// <summary>작업 중 표시 (2026-10-15): 도면 / Defect 읽기 중 상태 칸 "작업 중..." + 모래시계 커서(지도 위 포함). 처리 시간은 보이지 않는다.</summary>

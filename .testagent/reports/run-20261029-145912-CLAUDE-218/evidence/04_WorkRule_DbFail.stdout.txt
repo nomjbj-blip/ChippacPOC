@@ -1,0 +1,2 @@
+﻿[PASS] DB 일시 실패 -> 저장 막음 InvalidOperationException: 서버 일시를 확인할 수 없어 저장할 수 없습니다. (Object reference not set to an instance of an object.)
+WORK_RULE_DBFAIL_PROBE=PASS (1)

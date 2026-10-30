@@ -5,7 +5,7 @@
 ;   /DStageDir=<폴더>           설치할 파일 (빌드 결과 + 설치 점검 도구 + 버전정보.txt / 파일목록.txt)
 ;   /DAppExe=<파일 이름>        설치 폴더의 실행 파일 이름. 빌드 결과 DACruxV5.exe 를 stage 에서 이 이름으로 바꿔 둔다
 ;   /DOutputDir=<폴더>          Setup 파일을 만들 폴더
-;   /DDefaultServerIP=<주소>    서버 주소 입력 칸의 기본값
+;   /DDefaultServerIP=<주소>    서버 주소 (설치 화면에서 바꿀 수 없는 고정 값)
 ;   /DDotNetInstaller=<파일>    .NET Framework 4.8 오프라인 설치 파일 (넣을 때만)
 ;   /DIconFile=<파일>           Setup 아이콘 (선택)
 ;   /DTestMode                  자동 검사용. 다른 AppId / 폴더 / 이름으로 만들어 실제 설치와 섞이지 않게 한다
@@ -15,7 +15,7 @@
 ;   2. 화면: 시작 -> 서버 주소 -> 설치 폴더 -> 바로 가기 -> 준비 요약
 ;   3. PrepareToInstall: 실행 중 확인 -> .NET 4.8 설치(없을 때만, 관리자 확인) -> 기존 버전 무음 삭제 -> 지난 파일 남음 확인
 ;      .NET 설치를 기존 버전 삭제보다 먼저 해서 .NET 설치가 실패해도 쓰던 프로그램이 남게 한다.
-;   4. 파일 복사 -> DACruxConfig.ini 값 기록 -> 바로 가기 -> 설치 점검(SCK_EnvCheck.exe)
+;   4. 파일 복사 -> DACruxConfig.ini 값 기록 -> 바로 가기 (설치 점검 창은 띄우지 않음, 시작 메뉴에서 실행)
 ;
 ; 설치 위치는 사용자 폴더(%LOCALAPPDATA%\Programs)다. DACrux 는 로그인할 때마다 실행 폴더에 DACruxConfig.ini 를
 ; 다시 쓰므로 일반 사용자가 쓸 수 없는 Program Files 에는 설치하지 않는다.
@@ -30,7 +30,7 @@
   #define OutputDir "Output"
 #endif
 #ifndef DefaultServerIP
-  #define DefaultServerIP "LOCALHOST"
+  #define DefaultServerIP "10.86.253.162"
 #endif
 #ifndef AppExe
   #define AppExe "DACrux SCK POC.exe"
@@ -114,7 +114,8 @@ Name: "{autoprograms}\{#AppName}\{#AppName} 삭제"; Filename: "{uninstallexe}"
 Name: "{autodesktop}\{#AppName}"; Filename: "{app}\{#AppExe}"; WorkingDir: "{app}"; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\SCK_EnvCheck.exe"; Parameters: "/setup"; WorkingDir: "{app}"; StatusMsg: "설치 환경을 점검하고 있습니다..."; Flags: waituntilterminated; Check: not WizardSilent
+; 화면 설치에서는 설치 점검 창을 띄우지 않는다 (2026-10-28). 필요하면 시작 메뉴 "설치 점검"으로 실행한다.
+; 무음 설치는 화면 없이 결과 파일(설치점검_결과.txt)만 남긴다.
 Filename: "{app}\SCK_EnvCheck.exe"; Parameters: "/silent"; WorkingDir: "{app}"; StatusMsg: "설치 환경을 점검하고 있습니다..."; Flags: waituntilterminated runhidden; Check: WizardSilent
 Filename: "{app}\{#AppExe}"; WorkingDir: "{app}"; Description: "{#AppName} 실행"; Flags: postinstall nowait skipifsilent; Check: not DotNetRestartNeeded
 
@@ -276,11 +277,11 @@ begin
   Log(Format('기존 설치: 버전 %s / 폴더 %s / 서버 %s', [PrevVersion, PrevDir, PrevServerIP]));
 end;
 
-// 서버 주소 기본값: 명령줄 /SERVERIP= > 기존 설치 값 > 빌드 기본값
+// 서버 주소: 빌드 때 정한 값(/DDefaultServerIP)으로 고정한다 (2026-10-28). 기존 설치 값은 쓰지 않는다.
+// 명령줄 /SERVERIP= 는 자동 검사용으로만 남긴다.
 function DefaultServer: String;
 begin
   Result := Trim(ExpandConstant('{param:SERVERIP|}'));
-  if Result = '' then Result := PrevServerIP;
   if Result = '' then Result := '{#DefaultServerIP}';
 end;
 
@@ -403,13 +404,16 @@ begin
   if PrevInstalled then
     WizardForm.WelcomeLabel2.Caption := WizardForm.WelcomeLabel2.Caption + #13#10#13#10 +
       '이 PC 에 ' + PrevVersion + ' 버전이 설치되어 있습니다. 기존 버전을 삭제한 뒤 새 버전을 설치합니다. ' +
-      '서버 주소 / 사용자 ID / 언어 설정은 그대로 유지합니다.';
+      '사용자 ID / 언어 설정은 그대로 유지합니다.';
 
+  // 서버 주소는 고정 값으로 보여만 주고 바꿀 수 없게 한다 (2026-10-28)
   ServerPage := CreateInputQueryPage(wpWelcome, '서버 주소',
-    '{#AppName} 가 접속할 서버를 입력하세요.',
-    '고객 서버의 IP 주소 또는 컴퓨터 이름입니다. 설치한 뒤 바꾸려면 이 Setup 을 다시 실행하세요.');
+    '{#AppName} 가 접속할 서버입니다.',
+    '서버 주소는 고정되어 있어 바꿀 수 없습니다.');
   ServerPage.Add('서버 주소:', False);
   ServerPage.Values[0] := DefaultServer;
+  ServerPage.Edits[0].ReadOnly := True;
+  ServerPage.Edits[0].TabStop := False;
 end;
 
 function NextButtonClick(CurPageID: Integer): Boolean;

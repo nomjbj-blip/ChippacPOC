@@ -195,3 +195,10 @@ scratchpad `perf/` 폴더.
 
 - 배포는 사용자가 한다. 서버(Interface + BSL, XML 4개는 `08_DBQuery/ORACLE`)와 클라이언트(Interface + RO + GdsMap EXE)를 함께 반영하고 Service 를 다시 시작한다. TEMP 빌드는 지금 소스 전체(다른 작업의 미배포 변경 포함)로 만든 것이다.
 - 남은 선택: 목록 넣기 3 ~ 4초(CheckedListBox 자체 비용)는 가상 목록으로 바꿔야 줄어든다(S5 와 함께 판단). S4(기존 조회 함수 Binary)는 보류.
+
+## 11. 표시 예외 삭제 (2026-10-28, CLAUDE-225)
+
+- 요청 "다 보여줘라. u8에 대해 예외 처리 된 부분도 전부": 1,000개 초과면 지도 표시(체크)를 끈 채로 불러오던 `ChainLoadVisibleLimit`(10.2절 / S5 성격), [전체 체크] 확인 창, 상태줄 "Chain 이 많아 지도 표시는 꺼 둠" 을 삭제했다. 저장된 표시 상태 그대로 불러온다.
+- U8 화면: 목록에서 고른 Chain 을 지도에 앞 20개만 그리던 제한과 [전체 체크] 1,000개 확인 창 삭제. 20개 넘게 읽을 때 범위 조회 + 모래시계는 그대로(`SavedBatchReadMin`).
+- 영향: U8 27,342개를 모두 표시로 불러오면 외곽선 정점 약 3,200만 개(10.1절 측정 기준 불러오기 약 15초 + 메모리 1.6 GB 이상)가 그대로 든다. S1 ~ S3(범위 조회 / 목록 한 번에 넣기 / 외곽선 재사용)는 그대로.
+- Smoke `GdsViewLayoutSmoke.ps1` 29 / `GdsMapViewU8Smoke.ps1` 35 / `GdsChainListDoubleClickSmoke.ps1` 43 PASS. 배포 / 화면 확인 대기.

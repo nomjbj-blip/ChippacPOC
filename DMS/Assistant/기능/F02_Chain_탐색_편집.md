@@ -121,6 +121,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File '.\Probes\ChainOpenEndedProb
 
 **2026-10-21 Chain 목록 [전체 체크] / [전체 미체크](CLAUDE-181):** 기존 View Chain 탭에 [전체 체크] / [전체 미체크](모든 Chain 지도 표시 켜기 / 끄기, 선택 행 그대로, 1,000개 초과 [전체 체크]는 확인). U8 저장된 Chain 목록에 '표시' 체크 칸 + [전체 체크](찾기로 거른 목록의 행) / [전체 미체크](전체) 추가, 체크한 Chain 은 고르지 않아도 지도에 그림(목록 선택 표시는 그대로, 21개 이상은 CHAIN_SEQ 범위 조회). Smoke `GdsChainListDoubleClickSmoke.ps1` / `GdsMapViewU8Smoke.ps1`. 배포 / 화면 확인 대기.
 
+**2026-10-28 Chain 많은 Device 표시 예외 삭제(CLAUDE-225):** 기존 View 는 Chain 이 1,000개를 넘어도 저장된 표시 상태 그대로 불러오고(표시 끔 없음), [전체 체크] 확인 창도 없앴다. U8 화면은 목록에서 고른 Chain 을 모두 지도에 그리고(앞 20개 제한 삭제), [전체 체크] 1,000개 확인 창을 없앴다. 21개 이상을 읽을 때 범위 조회 + 모래시계는 그대로. Smoke `GdsViewLayoutSmoke.ps1` 29 / `GdsMapViewU8Smoke.ps1` 35 / `GdsChainListDoubleClickSmoke.ps1` 43 PASS. 배포 / 화면 확인 대기.
+
 **2026-10-21 Chain 목록 체크는 체크 박스로만(CLAUDE-184, CLAUDE-079 대체):** GDS Map View Chain 목록(표시) / 유사 묶음 목록(제외)은 행 왼쪽 체크 박스를 눌렀을 때만 체크가 바뀐다. 행 클릭 / 더블클릭 / Space 는 선택만. 공용 `LayerColorCheckedListBox.CheckOnCheckBoxOnly`. Smoke `GdsChainListDoubleClickSmoke.ps1`.
 
 **2026-10-20 U8 Net 목록 삭제 / 생성 버튼 이동(CLAUDE-168):** GDS Map View U8 의 [Net 목록] / 범위 콤보 / E-Test Net 거르기를 뺐다. [Chain 생성(DB)] 는 찾기 결과 탭에서 지금 목록(분류 / 찾기로 거르고 [목록에서 빼기]로 뺀 뒤) 중 일치 + DB 없음만 만든다. 이름 = Net Label + 번호, 없으면 TSV Code.
@@ -128,3 +130,5 @@ powershell -NoProfile -ExecutionPolicy Bypass -File '.\Probes\ChainOpenEndedProb
 **2026-10-21 U8 저장된 Chain 색 변경(CLAUDE-187):** 저장된 Chain 탭 [색 변경] - 고른 Chain(여러 개 가능)의 색을 색 선택 창으로 정해 DB 에 바로 저장(서버 `UpdateChainColorBulk`, COLOR_ARGB 만), 목록 "색" 칸. Smoke PASS 35. 배포 대기(서버 + 클라이언트).
 
 **2026-10-21 Chain 을 다른 DB 의 같은 GDS Map 으로 복사(CLAUDE-188):** `Assistant/DB/sql/make_u9_chain_copy.py` 로 로컬 Chain 묶음(예 OMM_TCB 19개)을 SQL 로 만들어 같은 GDS / 같은 Layer 로 저장된 Map(예 고객 TRAINING U9)에 넣는다. PLACED_ELEMENT_ID(R0/E<n>)는 같은 GDS 면 같다. 사전 검사(시작 도형 Layer · 위치 비교) / 같은 이름 건너뜀 / Code 겹침 시 빈 Code / 건수 확인 후 COMMIT.
+
+**2026-10-27 Chain 목록 도형 수 삭제(CLAUDE-223):** GDS Map View [Chain] 탭 목록 행 = 이름 + 저장 상태(`(저장 안 됨)` / `(Layer 미조회)` / `(저장 미완료)`, 저장된 Chain 은 이름만). 행 끝 "11개" 같은 도형 수는 보이지 않는다(요청 "개수는 보여주지 말자"). `GdsViewLayoutSmoke.ps1` PASS 29. 배포(GdsMap DLL) / 화면 확인 대기.

@@ -30,7 +30,7 @@
 # 결과 마지막 줄: CLIENT_SETUP_BUILD=PASS <Setup 경로> 또는 CLIENT_SETUP_BUILD=FAIL <이유>
 param(
     [string]$Version,
-    [string]$ServerIP = 'LOCALHOST',
+    [string]$ServerIP = '10.86.253.162',
     [ValidateSet('Debug', 'Release')][string]$Configuration = 'Debug',
     [switch]$NoPdb,
     [switch]$NoDotNet,

@@ -228,7 +228,7 @@ E-Test 쪽 "ET Chain 매핑 기준"을 회의록 근거로 정했다 (설계 v2�
   - 상세보기는 Chain Member 를 Chain 번호 5,000개 범위로 묶어 읽는다(`GetChainMembersRange`). 서버에 범위 조회가 없으면 Chain 마다 읽는다.
   - 서버 모양 Cache 는 Device 1개 점 2,000만 개까지 둔다(U8 1,613만 점, 상주 약 370 MB, 최근 3 Device).
   - 화면 A 는 결과가 바뀔 때 Chain 찾기 사전을 1번 만든다.
-  - Chain 이 1,000개를 넘는 Device 의 상세보기 [GDS / KLARF] 표와 [종합] 4분류 수는 그 Die 의 DIE_CHAIN Chain(탐색 거리 안 / 걸림 / E-Test 연결) + 역추적 Chain 만 쓴다. 머리 줄 "Chain n(이 Die 주변)". 1,000개 이하(U9 등)는 예전처럼 모든 Chain.
+  - (2026-10-28 CLAUDE-225 로 삭제) ~~Chain 이 1,000개를 넘는 Device 의 상세보기 표는 그 Die 의 DIE_CHAIN Chain 만~~ -> 지금은 Chain 수와 상관없이 모든 Chain. 대신 상세보기 [걸린 / Fail Chain 만]이 기본 켬이라 처음에는 걸린 / E-Test Fail Chain 만 보이고(없는 Die 는 모든 Chain), 끄면 U8 도 27,342개 전부(로컬 13.4초 / Private 3.8 GB).
 - 효과(로컬 측정): 상세보기 67.7 ~ 75.9초 -> 20.0초, [분석] 두 번째부터 7.5초 -> 0.6초, 화면 A Defect 탭 2.3초 -> 8ms, [걸린 / Fail Chain 만] 끄기 11.6초 / 27,352행 -> 0.16초 / 93행.
 - 상태: 완료(코드) / TEMP 빌드 + Smoke 76/76 / 운영 폴더는 13:20 VS 빌드로 이미 반영됨(Service / DACrux 다시 시작 필요) / DMS 화면 확인 대기. U8 KLARF / E-Test 업로드 뒤 재측정은 남음.
 

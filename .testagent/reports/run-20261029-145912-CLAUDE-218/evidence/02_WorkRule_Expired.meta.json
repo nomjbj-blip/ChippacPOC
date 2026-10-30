@@ -1,0 +1,26 @@
+﻿{
+    "id":  "02",
+    "name":  "WorkRule_Expired",
+    "scenarios":  [
+                      "SCN-05"
+                  ],
+    "status":  "PASS",
+    "exitCode":  0,
+    "timedOut":  false,
+    "durationMs":  2814,
+    "started":  "2026-10-29 15:01:19",
+    "command":  "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\DMS\\02_DMS\\DACrux.SEMDMS.BSL\\Probes\\WorkRuleProbe.ps1\" -BslDir C:\\Users\\USER\\AppData\\Local\\Temp\\ChippacBuild\\CLAUDE-218-verify1029\\expired -ExpectClosed",
+    "workingDir":  "D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\DMS\\02_DMS\\DACrux.SEMDMS.BSL\\Probes",
+    "keys":  {
+                 "WORK_RULE_PROBE":  "PASS (11)"
+             },
+    "passLines":  0,
+    "failLines":  [
+
+                  ],
+    "skipLines":  [
+
+                  ],
+    "stdout":  "02_WorkRule_Expired.stdout.txt",
+    "stderr":  "02_WorkRule_Expired.stderr.txt"
+}

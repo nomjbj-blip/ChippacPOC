@@ -58,17 +58,16 @@ namespace NexplantQMS.GdsMap
             public string DbIncomplete;
 
             /// <summary>
-            /// Chain 목록 문구: 이름 + 도형 수 + 필요할 때만 저장 상태. Code(A, B, C)는 DB 구분 키로만 쓰고 화면에는 보이지 않는다 (2026-10-12).
+            /// Chain 목록 문구: 이름 + 필요할 때만 저장 상태. Code(A, B, C)는 DB 구분 키로만 쓰고 화면에는 보이지 않는다 (2026-10-12).
             /// 색은 행 오른쪽 색 견본으로 보이고 색 코드(#RRGGBB)는 쓰지 않는다. 저장된 Chain 은 상태를 붙이지 않는다 (2026-10-13).
+            /// 도형 수("11개")는 보이지 않는다 (2026-10-27).
             /// </summary>
             public override string ToString()
             {
-                int count = LastResult == null ? Inputs.Count + Outputs.Count
-                    : LastResult.CandidateElements.Count + ManualAdded.Count - ManualExcluded.Count;
                 string state = ChainSeq == null ? "  (저장 안 됨)"
                     : DbIncomplete != null ? "  (Layer 미조회)"
                     : SavedFingerprint == null ? "  (저장 미완료)" : "";
-                return Name + "  " + Math.Max(0, count).ToString("N0") + "개" + state;
+                return Name + state;
             }
         }
 
@@ -125,15 +124,10 @@ namespace NexplantQMS.GdsMap
 
         /// <summary>
         /// [전체 체크]: 목록의 모든 Chain 을 지도에 표시한다(Layer 목록 [전체 체크]와 같은 방식) (2026-10-21).
-        /// Chain 이 많으면(ChainLoadVisibleLimit 초과) 외곽선이 수천만 점이 되어 오래 걸리고 메모리를 많이 쓰므로 먼저 묻는다.
+        /// Chain 이 많아도 묻지 않는다(2026-10-28 요청 "다 보여줘라". 1,000개 초과 확인 창 삭제).
         /// </summary>
         private void BtnChainCheckAll_Click(object sender, EventArgs e)
         {
-            if (_chains.Count > ChainLoadVisibleLimit
-                && MessageBox.Show(this, "Chain " + _chains.Count.ToString("N0") + "개를 모두 지도에 표시합니다.\r\n\r\n"
-                    + "외곽선이 많아 표시까지 오래 걸리고 메모리를 많이 쓸 수 있습니다. 계속하시겠습니까?",
-                    "전체 체크", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
-                return;
             SetAllChainsVisible(true);
         }
 

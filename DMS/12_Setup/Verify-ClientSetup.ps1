@@ -172,7 +172,7 @@ Check 'B 등록 버전' ((Get-ItemProperty $UninstallKey -ErrorAction SilentlyCo
 Check 'B 지난 버전 전용 파일 삭제' (-not (Test-Path (Join-Path $AppDir 'zz_verify_old.dll')))
 $cmp = Compare-FileList $AppDir
 Check 'B 파일목록 일치' ($cmp[0] -eq 0) "($($cmp[1])개 중 틀림 $($cmp[0]))"
-Check 'B ServerIP 유지' ((Get-LastOption $ini 'ServerIP') -eq $TestServer) "($(Get-LastOption $ini 'ServerIP'))"
+Check 'B ServerIP = 고정값 (기존 설치 값을 쓰지 않음)' ((Get-LastOption $ini 'ServerIP') -eq 'LOCALHOST') "($(Get-LastOption $ini 'ServerIP'))"
 Check 'B UserID 유지' ((Get-LastOption $ini 'UserID') -eq 'VERIFYUSER') "($(Get-LastOption $ini 'UserID'))"
 Check 'B 임시 파일 삭제 (excel_temp / temp_chart)' (-not (Test-Path (Join-Path $AppDir 'excel_temp123.xls')) -and -not (Test-Path (Join-Path $AppDir 'temp_chart1.bmp')))
 Check 'B DEFECT_IMAGE 비움' ((Test-Path (Join-Path $AppDir 'DEFECT_IMAGE')) -and -not (Test-Path (Join-Path $AppDir 'DEFECT_IMAGE\a.jpg')))
@@ -212,7 +212,7 @@ $alive = -not $proc.HasExited
 Check '실행 후 로그인 창 표시 (종료되지 않음)' ($alive -and ($titles -contains 'Login')) "(보이는 창: $($titles -join ', '))"
 $iniText = Get-Content $ini -Raw
 Check '프로그램이 설치 폴더 ini 를 다시 씀 (쓰기 권한)' (((Get-Item $ini).LastWriteTime -gt $iniBefore) -and ($iniText -match '# Create Time'))
-Check '프로그램이 쓴 ini 의 ServerIP' ((Get-LastOption $ini 'ServerIP') -eq $TestServer)
+Check '프로그램이 쓴 ini 의 ServerIP (고정값)' ((Get-LastOption $ini 'ServerIP') -eq 'LOCALHOST')
 $logDir = Join-Path $env:LOCALAPPDATA 'DACrux\Log'
 $newErr = @(Get-ChildItem $logDir -File -ErrorAction SilentlyContinue | Where-Object { $_.LastWriteTime -gt $iniBefore })
 Check '실행 중 오류 로그 없음' ($newErr.Count -eq 0) $(if ($newErr.Count) { '(' + ($newErr.Name -join ', ') + ')' } else { '' })

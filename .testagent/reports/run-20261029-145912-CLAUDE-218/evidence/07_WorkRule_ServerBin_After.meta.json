@@ -1,0 +1,28 @@
+﻿{
+    "id":  "07",
+    "name":  "WorkRule_ServerBin_After",
+    "scenarios":  [
+                      "SCN-01",
+                      "SCN-03",
+                      "SCN-04"
+                  ],
+    "status":  "PASS",
+    "exitCode":  0,
+    "timedOut":  false,
+    "durationMs":  1903,
+    "started":  "2026-10-29 15:04:07",
+    "command":  "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\DMS\\02_DMS\\DACrux.SEMDMS.BSL\\Probes\\WorkRuleProbe.ps1\" -BslDir \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\DMS\\101_ServerBin\"",
+    "workingDir":  "D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\DMS\\02_DMS\\DACrux.SEMDMS.BSL\\Probes",
+    "keys":  {
+                 "WORK_RULE_PROBE":  "PASS (10)"
+             },
+    "passLines":  0,
+    "failLines":  [
+
+                  ],
+    "skipLines":  [
+
+                  ],
+    "stdout":  "07_WorkRule_ServerBin_After.stdout.txt",
+    "stderr":  "07_WorkRule_ServerBin_After.stderr.txt"
+}

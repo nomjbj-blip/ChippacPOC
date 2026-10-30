@@ -601,10 +601,17 @@ internal static class GdsKlarfAnalysisFormSmoke
                 && detail.LoadedMapKey == NexplantQMS.GdsMap.GdsDieAnalysisForm.MapKeyOf(dieData), detail.LoadedMapKey);
             int dieDefects = dieData.Tables["DEFECT"].Rows.Cast<DataRow>().Count(r => Convert.ToInt32(r["XINDEX"]) == topX && Convert.ToInt32(r["YINDEX"]) == topY);
             Check("화면 B Defect 표시 = 선택 Die Defect", detail.DefectMarkerCount == dieDefects, detail.DefectMarkerCount + " / " + dieDefects);
-            // 2026-10-22 두 화면 같은 모양: [걸린 / Fail Chain 만] 기본 끔 -> 처음 열면 모든 Chain 을 그린다(Simple 요청 "기본으로 전부")
+            // 2026-10-28 [걸린 / Fail Chain 만] 기본 켬 -> 처음 열면 이 Die 에서 걸린 / E-Test Fail Chain 만 그린다(둘 다 없는 Die 는 모든 Chain)
             int allChains = dieData.Tables["CHAIN"].Rows.Count;
-            Check("화면 B Chain 표시 = 모든 Chain([걸린 / Fail Chain 만] 기본 끔)", detail.VisibleChainCount == allChains, detail.VisibleChainCount + " / " + allChains + " (걸린 " + dieChains + ")");
-            // [전체 표시](2026-10-23): 처음 = 모든 Chain 표시라 켬 / 끄면 표시 체크 모두 끔 · 도면 0 / 켜면 다시 모두 / Chain 하나를 끄면 꺼지고 다시 켜면 켬
+            int hitChains = dieData.Tables["DIE_CHAIN"].Rows.Cast<DataRow>()
+                .Where(r => Convert.ToInt32(r["XINDEX"]) == topX && Convert.ToInt32(r["YINDEX"]) == topY
+                    && (Convert.ToInt32(r["DEFECT_COUNT"]) > 0 || (r.Table.Columns.Contains("ET_STATUS") && r["ET_STATUS"].ToString() == "F")))
+                .Select(r => r["CHAIN_SEQ"].ToString()).Distinct().Count();
+            int startChains = hitChains > 0 ? hitChains : allChains;
+            Check("화면 B Chain 표시 = 걸린 / Fail Chain 만([걸린 / Fail Chain 만] 기본 켬, 둘 다 없으면 모든 Chain)", detail.VisibleChainCount == startChains,
+                detail.VisibleChainCount + " / 걸린 · Fail " + hitChains + " / 모든 Chain " + allChains + " (Die Chain " + dieChains + ")");
+            // [전체 표시](2026-10-23): 처음 = 표의 모든 Chain 표시라 켬 / 끄면 표시 체크 모두 끔 · 도면 0 / 켜면 다시 모두 / Chain 하나를 끄면 꺼지고 다시 켜면 켬
+            // (2026-10-28 [걸린 / Fail Chain 만] 기본 켬: "모두" = 표에 있는 Chain 묶음 수)
             {
                 Type typeAll = typeof(NexplantQMS.GdsMap.GdsDieAnalysisForm);
                 var chkAllB = (CheckBox)Get(typeAll, detail, "chkShowAll");
@@ -619,16 +626,16 @@ internal static class GdsKlarfAnalysisFormSmoke
                 bool allOff = shownHeads() == 0 && detail.VisibleChainCount == 0;
                 chkAllB.Checked = true;
                 Application.DoEvents();
-                bool allOn = shownHeads() == headCount && detail.VisibleChainCount == allChains;
+                bool allOn = shownHeads() == headCount && detail.VisibleChainCount == headCount;
                 // Chain 하나 끄기 / 켜기 = 표시 칸 클릭과 같은 처리(값 바꾼 뒤 CellContentClick)
                 DataGridViewRow oneB = gridAllB.Rows.Cast<DataGridViewRow>().First(isHead);
                 int showCol = gridAllB.Columns["colShow"].Index;
                 oneB.Cells[showCol].Value = false;
                 Invoke(typeAll, detail, "dgvChainDefects_CellContentClick", gridAllB, new DataGridViewCellEventArgs(showCol, oneB.Index));
-                bool oneOff = !chkAllB.Checked && detail.VisibleChainCount == allChains - 1;
+                bool oneOff = !chkAllB.Checked && detail.VisibleChainCount == headCount - 1;
                 oneB.Cells[showCol].Value = true;
                 Invoke(typeAll, detail, "dgvChainDefects_CellContentClick", gridAllB, new DataGridViewCellEventArgs(showCol, oneB.Index));
-                bool oneBack = chkAllB.Checked && detail.VisibleChainCount == allChains;
+                bool oneBack = chkAllB.Checked && detail.VisibleChainCount == headCount;
                 Check("화면 B [전체 표시]: 처음 켬(모든 Chain 표시) / 끄면 표시 체크 모두 끔 · 도면 Chain 0 / 켜면 모두 · 도면 전부 / Chain 하나 끄면 꺼짐 · 다시 켜면 켬",
                     startOn && allOff && allOn && oneOff && oneBack,
                     "Chain " + headCount + " / 처음 " + startOn + " / 끔 " + allOff + " / 켬 " + allOn + " / 하나 끔 " + oneOff + " / 다시 " + oneBack + " / 도면 " + detail.VisibleChainCount);
@@ -786,9 +793,9 @@ internal static class GdsKlarfAnalysisFormSmoke
                 // 이 Smoke 기본 결과는 E-Test 를 연결하지 않는다 -> 아래 표(접힘) 숨김. 기준 E-Test 줄은 늘 숨김([E-Test 값] 체크는 2026-10-23 삭제)
                 bool noEtHidden = splitRightB.Panel2Collapsed && !b("lblEtText").Visible && b("pnlChainHead").Visible
                     && b("pnlGdsCriteria").Height == b("lblGdsText").Bottom + 4;
-                // 두 화면 같은 모양(2026-10-22): 위쪽 분석 기준 칸 · 표 위 요약 글자 숨김, [걸린 / Fail Chain 만] 끔, Defect 채움
+                // 두 화면 같은 모양(2026-10-22): 위쪽 분석 기준 칸 · 표 위 요약 글자 숨김, [걸린 / Fail Chain 만] 켬(2026-10-28 기본 켬), Defect 채움
                 bool sameLook = new[] { "lblSumTitle", "lblSumGds", "lblSumKlarf", "lblSumEt", "lblChainTitle" }.All(n => !b(n).Visible)
-                    && !((CheckBox)b("chkHitOnly")).Checked && gmap.DefectStyle == NexplantQMS.GdsMap.DefectOverlayStyle.Filled;
+                    && ((CheckBox)b("chkHitOnly")).Checked && gmap.DefectStyle == NexplantQMS.GdsMap.DefectOverlayStyle.Filled;
                 Check("화면 B 배치: 오른쪽 탭 없음 · 한 패널(기준 묶음 / 머리 줄 / 위 GDS · KLARF 표 + 아래 E-Test 값 표) · 위쪽 오른쪽 [다시 분석](호스트 없으면 안내) · Chain 밖 체크 · 4분류 칸 · [전체 보기] 없음 · [전체 도면] · 기준에 최종 저장 / 분석 시각 · E-Test 줄 · [E-Test 값] 체크 없음 · 머리 줄에 [전체 표시] / E-Test 없는 결과 = 아래 표 숨김 / 두 화면 같은 모양",
                     parents && titles && oldGone && noEtHidden && sameLook,
                     "표 위치 · 버튼 " + parents + " / 기준 · 다시 분석 안내 " + titles + " / 옛 컨트롤 없음 " + oldGone + " / E-Test 없음 숨김 " + noEtHidden + " / 같은 모양 " + sameLook
@@ -921,8 +928,8 @@ internal static class GdsKlarfAnalysisFormSmoke
                     Check("화면 B 두 Chain 에 걸린 Defect: 두 묶음 모두 / Defect ID 굵게 / 가까운 Chain 열 없음 (복사본 결과, 되돌림)", twoOk, twoText);
                 }
 
-                // Chain 이 많은 Device (2026-10-21): Chain 1,000개 초과면 [걸린 / Fail Chain 만]을 꺼도 [GDS / KLARF] 표는
-                // 그 Die 의 DIE_CHAIN Chain 만(4분류 상태 칸은 2026-10-22 삭제). 가짜 Chain 1,000개를 더한 복사본으로 확인하고 원래 결과로 되돌린다(가짜 Chain 은 Member 없음).
+                // Chain 이 많은 Device (2026-10-28): Chain 1,000개 초과여도 [걸린 / Fail Chain 만]을 끄면 [GDS / KLARF] 표는 모든 Chain
+                // (10-21 의 그 Die DIE_CHAIN Chain 만 넣던 예외는 2026-10-28 요청 "다 보여줘라"로 삭제). 가짜 Chain 1,000개를 더한 복사본으로 확인하고 원래 결과로 되돌린다(가짜 Chain 은 Member 없음).
                 {
                     DataSet bigCopy = dieData.Copy();
                     DataTable chainT = bigCopy.Tables["CHAIN"];
@@ -946,23 +953,20 @@ internal static class GdsKlarfAnalysisFormSmoke
                     Application.DoEvents();
                     hitOnlyB.Checked = false;
                     Application.DoEvents();
-                    var dieChainNames = new HashSet<string>(bigCopy.Tables["DIE_CHAIN"].Rows.Cast<DataRow>()
-                        .Where(r => Convert.ToInt32(r["XINDEX"]) == topX && Convert.ToInt32(r["YINDEX"]) == topY)
-                        .Select(r => r["CHAIN_SEQ"].ToString()).Distinct()
-                        .Select(s => chainT.Rows.Cast<DataRow>().First(c => c["CHAIN_SEQ"].ToString() == s)["CHAIN_NAME"].ToString()));
+                    var allNames = new HashSet<string>(chainT.Rows.Cast<DataRow>().Select(r => r["CHAIN_NAME"].ToString()));
                     var shownNames = new HashSet<string>(dgvChainsB.Rows.Cast<DataGridViewRow>().Select(r => Convert.ToString(r.Cells["colCode"].Value))
                         .Where(n => n != "Chain 밖 Defect"));
                     string bigTitle = b("lblChainTitle").Text;
                     string bigStatus = detail.StatusText;
-                    bool bigOk = shownNames.SetEquals(dieChainNames) && bigTitle.Contains("(이 Die 주변)")
-                        && dgvChainsB.Rows.Count < 1000 && bigStatus.StartsWith("도면 조회 완료");
-                    string bigText = "Chain " + chainT.Rows.Count + " / 표 Chain " + shownNames.Count + " / DIE_CHAIN Chain " + dieChainNames.Count
+                    bool bigOk = shownNames.SetEquals(allNames) && bigTitle.StartsWith("Chain " + chainT.Rows.Count + " /") && !bigTitle.Contains("(이 Die 주변)")
+                        && dgvChainsB.Rows.Count >= chainT.Rows.Count && bigStatus.StartsWith("도면 조회 완료");
+                    string bigText = "Chain " + chainT.Rows.Count + " / 표 Chain " + shownNames.Count
                         + " / 행 " + dgvChainsB.Rows.Count + " / \"" + bigTitle + "\" / " + bigStatus;
                     hitOnlyB.Checked = hitOnlyBefore;
                     System.Threading.SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext());
                     Wait(detail.ShowDieAsync(dieData, topX, topY), 300);
                     Application.DoEvents();
-                    Check("화면 B Chain 1,000개 초과 Device: [걸린 / Fail Chain 만] 꺼도 표 = 그 Die 의 DIE_CHAIN Chain 만 / 머리 줄 (이 Die 주변) (복사본 결과, 되돌림)", bigOk, bigText);
+                    Check("화면 B Chain 1,000개 초과 Device: [걸린 / Fail Chain 만] 끄면 표 = 모든 Chain / 머리 줄 (이 Die 주변) 없음 (복사본 결과, 되돌림)", bigOk, bigText);
                 }
 
                 // 열기 (2026-10-22 탭 없음): 역추적 = 그 Chain 묶음 첫 행을 고르고 아래 E-Test 값 범위 = 그 Chain, Die 전체 = 고른 행 없음 + 아래 = Die 전체

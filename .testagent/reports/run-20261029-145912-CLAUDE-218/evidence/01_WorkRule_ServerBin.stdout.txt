@@ -1,0 +1,12 @@
+﻿[PASS] 소스: 대상 함수 첫 줄 WorkRule().Confirm 있음 31 / 31
+[PASS] 소스: 파일 삭제(DeleteEtFile)는 확인하지 않음 string[] aKey = new string[] { RequiredSeq(strSrcFileSeq, "파일 번호") };             Required(strUpdateUser, "Update User", 30);
+[PASS] 소스: 조회 서비스(GdsMapView)에는 Confirm 없음 Confirm 0 곳
+BSL / DSL: D:\1_프로젝트 문서\18.스테츠칩팩_POC\ChippacPOC\DMS\101_ServerBin
+[PASS] 상수: 마지막 날 2027-01-31 / 하한 2026-10-01 2027-01-31 / 2026-10-01
+[PASS] 판정: 기간 경계 2026-09-30 23:59:59=차단 / 2026-10-01 00:00:00=통과 / 2027-01-31 23:59:59=통과 / 2027-02-01 00:00:00=차단
+[PASS] 판정: 남은 일수 마지막 날 1 / 다음 날 0 / 13일 전 14
+[PASS] DB 일시: 한국 시간(PC 시각과 5분 이내) DB 2026-10-29 15:00:57 / PC 2026-10-29 15:00:57 / 차이 0.0분
+[PASS] GetState: 기간 상태 WORK_OPEN=Y LAST_DAY=2027-01-31 DAYS_LEFT=95
+[PASS] BSL GdsMapView.GetWorkState (클라이언트 메뉴용) WORK_OPEN=Y
+[PASS] Confirm: 통과 예외 없음
+WORK_RULE_PROBE=PASS (10)

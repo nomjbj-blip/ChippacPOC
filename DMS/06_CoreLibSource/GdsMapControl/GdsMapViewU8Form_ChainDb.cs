@@ -24,12 +24,13 @@ namespace NexplantQMS.GdsMap
         private const int BulkMemberRows = 10000;
         /// <summary>삭제 한 번에 보내는 Chain 수.</summary>
         private const int BulkDeleteChains = 1000;
-        /// <summary>목록에서 여러 Chain 을 고르면 지도에 함께 그리는 최대 수(Chain 마다 서버 호출 1번).</summary>
-        private const int SavedShowLimit = 20;
+        /// <summary>
+        /// 포함 도형을 읽을 Chain 이 이보다 많으면 CHAIN_SEQ 범위로 묶어 읽고 모래시계를 보인다(이하면 Chain 마다 서버 호출 1번).
+        /// 2026-10-28 요청 "다 보여줘라": 목록에서 고른 Chain 을 지도에 앞 20개만 그리던 제한과 [전체 체크] 1,000개 초과 확인 창은 삭제.
+        /// </summary>
+        private const int SavedBatchReadMin = 20;
         /// <summary>'표시' 체크한 Chain 포함 도형을 CHAIN_SEQ 범위로 묶어 읽을 때 한 번에 묶는 Chain 수(기존 GDS Map View 와 같다).</summary>
         private const int SavedMemberRangeSize = 5000;
-        /// <summary>[전체 체크]로 이보다 많이 지도에 그리면 먼저 묻는다(기존 GDS Map View Chain 목록과 같은 기준).</summary>
-        private const int SavedShowConfirm = 1000;
         /// <summary>저장 격자 크기(기존 GDS Map View 기본값과 같다). U8 덩어리 계산에는 쓰지 않는다.</summary>
         private const string SavedCellSize = "10";
         /// <summary>이보다 많이 만들면 확인 창에 기존 화면이 느려진다는 안내를 함께 보인다.</summary>
@@ -403,12 +404,6 @@ namespace NexplantQMS.GdsMap
         private void btnSavedCheckAll_Click(object sender, EventArgs e)
         {
             if (_savedView.Count == 0) return;
-            int after = _savedRows.Count(c => c.Show) + _savedView.Count(c => !c.Show);
-            if (after > SavedShowConfirm
-                && MessageBox.Show(this, "Chain " + after.ToString("N0") + "개를 지도에 표시합니다.\r\n\r\n"
-                    + "포함 도형을 읽고 외곽선을 그리는 데 시간이 걸리고 메모리를 많이 쓸 수 있습니다. 계속하시겠습니까?",
-                    "전체 체크", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
-                return;
             SetAllSavedShow(_savedView, true);
         }
 
@@ -441,14 +436,14 @@ namespace NexplantQMS.GdsMap
                 .Where(i => i >= 0 && i < _savedView.Count).OrderBy(i => i).Select(i => _savedView[i]).ToList();
         }
 
-        /// <summary>목록에서 고른 Chain(최대 SavedShowLimit 개)을 그리고 그 범위로 이동한다. '표시' 체크한 Chain 도 함께 그린다.</summary>
+        /// <summary>목록에서 고른 Chain(모두)을 그리고 그 범위로 이동한다. '표시' 체크한 Chain 도 함께 그린다.</summary>
         private void ShowSelectedSavedChains()
         {
             ShowSavedChainsOnMap(true);
         }
 
         /// <summary>
-        /// 저장된 Chain 을 Chain 색 외곽선으로 그린다: '표시' 체크한 Chain 전체 + 목록에서 고른 Chain(최대 SavedShowLimit 개) (2026-10-21).
+        /// 저장된 Chain 을 Chain 색 외곽선으로 그린다: '표시' 체크한 Chain 전체 + 목록에서 고른 Chain 전체 (2026-10-21, 2026-10-28 고른 Chain 앞 20개 제한 삭제).
         /// 처리 흐름: 포함 도형 ID 를 아직 읽지 않은 Chain 만 서버에서 읽음(ReadSavedMembers, 읽은 것은 _savedMemberKeys 에 보관)
         ///  -> 늦게 끝난 조회는 선택 / 체크가 바뀌었으면 버림 -> 체크한 Chain, 고른 Chain 순서로 외곽선(고른 Chain 이 위)
         ///  -> focusSelection 이면 고른 Chain 범위로 이동. 체크를 바꿀 때(focusSelection = false)는 화면 위치를 그대로 둔다.
@@ -458,7 +453,7 @@ namespace NexplantQMS.GdsMap
             int generation = ++_savedShowGeneration;
             if (map.Structure == null || !_chainDbEnabled || _shownMap == null) return;
             List<SavedChain> selected = SelectedSavedChains();
-            List<SavedChain> shown = selected.Take(SavedShowLimit).ToList();
+            List<SavedChain> shown = selected;
             List<SavedChain> checkedChains = _savedRows.Where(c => c.Show).ToList();
             if (shown.Count == 0 && checkedChains.Count == 0)
             {
@@ -474,7 +469,7 @@ namespace NexplantQMS.GdsMap
                 {
                     Dictionary<string, string[]> read;
                     // 많이 읽을 때만 모래시계(목록에서 몇 개 고를 때는 예전처럼 바로 그린다)
-                    using (unread.Count > SavedShowLimit ? ViewBusy.Busy() : null)
+                    using (unread.Count > SavedBatchReadMin ? ViewBusy.Busy() : null)
                         read = await Task.Run(() => ReadSavedMembers(factory, device, unread));
                     if (_shownMap == null || _shownMap.DeviceId != device) return;
                     foreach (KeyValuePair<string, string[]> pair in read) _savedMemberKeys[pair.Key] = pair.Value;
@@ -512,7 +507,7 @@ namespace NexplantQMS.GdsMap
                     if (!_savedMemberKeys.TryGetValue(shown[0].Seq, out firstKeys)) firstKeys = new string[0];
                     status = selected.Count == 1
                         ? shown[0].Name + (shown[0].Code != shown[0].Name ? " / Code " + shown[0].Code : "") + " / 도형 " + firstKeys.Length
-                        : "선택 Chain " + selected.Count.ToString("N0") + "개" + (selected.Count > SavedShowLimit ? "(지도에는 앞 " + SavedShowLimit + "개)" : "");
+                        : "선택 Chain " + selected.Count.ToString("N0") + "개";
                     if (checkedChains.Count > 0) status += " / 체크 표시 " + checkedChains.Count.ToString("N0") + "개";
                 }
                 else if (!focusSelection)
@@ -530,14 +525,14 @@ namespace NexplantQMS.GdsMap
 
         /// <summary>
         /// Chain 포함 도형 ID(PLACED_ELEMENT_ID)를 읽는다(작업 스레드). 반환: CHAIN_SEQ -> 도형 ID(없으면 빈 배열).
-        /// SavedShowLimit 개 이하면 Chain 마다 읽고(예전 방식), 많으면 CHAIN_SEQ 범위로 묶어 읽어 범위 안 다른 Chain 행은 버린다.
+        /// SavedBatchReadMin 개 이하면 Chain 마다 읽고(예전 방식), 많으면 CHAIN_SEQ 범위로 묶어 읽어 범위 안 다른 Chain 행은 버린다.
         /// 서버에 범위 조회가 없으면(이전 서버) Chain 마다 읽는 방식으로 돌아간다 (2026-10-21).
         /// </summary>
         private Dictionary<string, string[]> ReadSavedMembers(string factory, string device, List<SavedChain> chains)
         {
             var service = ChainRo();
             var result = new Dictionary<string, string[]>(StringComparer.Ordinal);
-            if (chains.Count > SavedShowLimit)
+            if (chains.Count > SavedBatchReadMin)
             {
                 var wanted = new Dictionary<long, string>();
                 foreach (SavedChain chain in chains)

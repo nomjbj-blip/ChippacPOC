@@ -417,7 +417,7 @@ public static class U8Smoke
         Add(r, "다시 읽기 뒤에도 체크 유지 / 포함 도형 다시 읽어 지도에 그림", !ReferenceEquals(again, row2162) && (bool)Member(again, "Show") && reread,
             "Show " + Member(again, "Show") + " / 읽은 Chain " + ((ICollection)Field(form, "_savedMemberKeys")).Count + " / 외곽선 " + overlayCount());
 
-        // 8-2) 많이 체크했을 때 읽는 방식(범위 조회): 진짜 Chain 1개 + 없는 CHAIN_SEQ 20개(SavedShowLimit 초과)
+        // 8-2) 많이 체크했을 때 읽는 방식(범위 조회): 진짜 Chain 1개 + 없는 CHAIN_SEQ 20개(SavedBatchReadMin 초과)
         //      -> 진짜 Chain 은 Chain 단위 조회와 같은 도형 / 순서, 없는 Chain 은 빈 목록
         Type showType = form.GetType().GetNestedType("SavedChain", BindingFlags.NonPublic);
         var many = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(showType));

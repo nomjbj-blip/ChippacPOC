@@ -39,6 +39,7 @@ SELECT FACTORY, DEVICE_ID, CHAIN_SEQ, VERSION_NO, PLACED_ELEMENT_ID, MARKER_X, M
   FROM TQP_GDS_CHAIN_MEMBER WHERE FACTORY = 'SCK' AND DEVICE_ID = 'U8';
 
 -- 3) 이동: POINTS_BIN v1 = 점마다 X, Y double little-endian(16 byte)
+--    2026-10-28 갱신에 PK 인덱스 힌트 추가: 통계가 없는 DB 에서 IX_GDS_PLACED_LAYER 를 앞 두 컬럼으로만 타서 도형마다 U8 전체를 훑는 계획이 나와 끝나지 않았다.
 DECLARE
     c_dx CONSTANT BINARY_DOUBLE := -11915d;
     c_dy CONSTANT BINARY_DOUBLE := -15026.5d;
@@ -74,7 +75,7 @@ BEGIN
             v_bins(i) := shifted(v_bins(i));
         END LOOP;
         FORALL i IN 1 .. v_ids.COUNT
-            UPDATE TQP_GDS_PLACED_EL
+            UPDATE /*+ INDEX(T PK_GDS_PLACED_EL) */ TQP_GDS_PLACED_EL T
                SET POINTS_BIN = v_bins(i),
                    MIN_X = MIN_X + c_dx, MAX_X = MAX_X + c_dx,
                    MIN_Y = MIN_Y + c_dy, MAX_Y = MAX_Y + c_dy
@@ -91,6 +92,7 @@ END;
 /
 
 -- 4) 검증: 백업과 차이가 정확히 이동 값 / 첫 점이 새 범위 안 / 점 수 그대로. 하나라도 틀리면 되돌리고 멈춘다
+--    2026-10-28 백업과의 조인에 U8 조건 + 해시 조인 힌트 추가: 없으면 IX_GDS_PLACED_LAYER 로 행마다 U8 전체를 훑는 Nested Loop 가 나온다.
 DECLARE
     v_bad_box  NUMBER;
     v_bad_pt   NUMBER;
@@ -98,14 +100,16 @@ DECLARE
     v_bad_mk   NUMBER;
     v_minx BINARY_DOUBLE; v_maxx BINARY_DOUBLE; v_miny BINARY_DOUBLE; v_maxy BINARY_DOUBLE;
 BEGIN
-    SELECT COUNT(*) INTO v_bad_box
+    SELECT /*+ USE_HASH(N B) */ COUNT(*) INTO v_bad_box
       FROM TQP_GDS_PLACED_EL N JOIN TQP_GDS_PLACED_EL_U8BAK B
         ON B.FACTORY = N.FACTORY AND B.DEVICE_ID = N.DEVICE_ID AND B.PLACED_ELEMENT_ID = N.PLACED_ELEMENT_ID
-     WHERE ABS((N.MIN_X - B.MIN_X) - (-11915d)) > 1e-6 OR ABS((N.MAX_Y - B.MAX_Y) - (-15026.5d)) > 1e-6;
-    SELECT COUNT(*) INTO v_bad_len
+     WHERE N.FACTORY = 'SCK' AND N.DEVICE_ID = 'U8'
+       AND (ABS((N.MIN_X - B.MIN_X) - (-11915d)) > 1e-6 OR ABS((N.MAX_Y - B.MAX_Y) - (-15026.5d)) > 1e-6);
+    SELECT /*+ USE_HASH(N B) */ COUNT(*) INTO v_bad_len
       FROM TQP_GDS_PLACED_EL N JOIN TQP_GDS_PLACED_EL_U8BAK B
         ON B.FACTORY = N.FACTORY AND B.DEVICE_ID = N.DEVICE_ID AND B.PLACED_ELEMENT_ID = N.PLACED_ELEMENT_ID
-     WHERE NVL(DBMS_LOB.GETLENGTH(N.POINTS_BIN), -1) <> NVL(DBMS_LOB.GETLENGTH(B.POINTS_BIN), -1);
+     WHERE N.FACTORY = 'SCK' AND N.DEVICE_ID = 'U8'
+       AND NVL(DBMS_LOB.GETLENGTH(N.POINTS_BIN), -1) <> NVL(DBMS_LOB.GETLENGTH(B.POINTS_BIN), -1);
     SELECT COUNT(*) INTO v_bad_pt
       FROM TQP_GDS_PLACED_EL
      WHERE FACTORY = 'SCK' AND DEVICE_ID = 'U8' AND POINTS_BIN IS NOT NULL

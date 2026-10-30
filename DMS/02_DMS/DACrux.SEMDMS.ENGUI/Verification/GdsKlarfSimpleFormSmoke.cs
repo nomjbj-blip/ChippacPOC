@@ -585,7 +585,7 @@ internal static class GdsKlarfSimpleFormSmoke
                 List<DataRow> dieDefects = dieData.Tables["DEFECT"].Rows.Cast<DataRow>().Where(r => DiePoint(r) == d).ToList();
 
                 // ---- 7-2) Simple 요청 1 / 2 + 한 패널 요청(두 화면 같은 모양): 위 분석 기준 칸 · 표 위 요약 글자 없음, 기준 묶음 그대로,
-                //      표 위 체크 = [걸린 / Fail Chain 만](기본 끔 = 전부) · [E-Test 값]. Chain 밖 체크 · 4분류 상태 칸 없음, 위쪽 오른쪽 [다시 분석] (2026-10-22) ----
+                //      표 위 체크 = [걸린 / Fail Chain 만](2026-10-28 기본 켬) · [E-Test 값]. Chain 밖 체크 · 4분류 상태 칸 없음, 위쪽 오른쪽 [다시 분석] (2026-10-22) ----
                 string[] sumNames = { "lblSumTitle", "lblSumGds", "lblSumKlarf", "lblSumEt", "lblChainTitle" };
                 Func<bool> sumHidden = () => sumNames.All(n => !((Control)Get(tb, b, n)).Visible);
                 var pnlChainHead = (Control)Get(tb, b, "pnlChainHead");
@@ -593,9 +593,9 @@ internal static class GdsKlarfSimpleFormSmoke
                 var chkHitOnly = (CheckBox)Get(tb, b, "chkHitOnly");
                 bool removed = new[] { "chkOutside", "flowClass", "lblClassBoth" }.All(n => tb.GetField(n, BindingFlags.NonPublic | BindingFlags.Instance) == null)
                     && ((Control)Get(tb, b, "btnReanalyze")).Visible;
-                Check("상세보기: 위쪽 분석 기준 칸 · 표 위 요약 글자 없음(Wafer · Die 줄 그대로) / GDS / KLARF 기준 그대로 / 표 위 체크 보임 · [걸린 / Fail Chain 만] 끔 / Chain 밖 체크 · 4분류 칸 없음 / [다시 분석] 보임",
+                Check("상세보기: 위쪽 분석 기준 칸 · 표 위 요약 글자 없음(Wafer · Die 줄 그대로) / GDS / KLARF 기준 그대로 / 표 위 체크 보임 · [걸린 / Fail Chain 만] 켬 / Chain 밖 체크 · 4분류 칸 없음 / [다시 분석] 보임",
                     sumHidden() && ((Control)Get(tb, b, "lblWaferInfo")).Visible && ((Control)Get(tb, b, "lblDieInfo")).Visible
-                    && pnlChainHead.Visible && pnlGdsCriteria.Visible && !chkHitOnly.Checked && removed,
+                    && pnlChainHead.Visible && pnlGdsCriteria.Visible && chkHitOnly.Checked && removed,
                     "분석 기준 칸 · 요약 글자 숨김 " + sumHidden() + " / 체크 줄 보임 " + pnlChainHead.Visible + " / 걸린 Chain 만 " + chkHitOnly.Checked + " / 지운 컨트롤 · 다시 분석 " + removed);
 
                 // ---- 7-2b) E-Test 없는 결과(이 Smoke 의 로컬 DB 는 같은 Device E-Test 파일 없음): 비어 있는 분류 / ET / Fail Para 열 · 아래 E-Test 값 표 · E-Test 줄 숨김 ----
@@ -611,15 +611,18 @@ internal static class GdsKlarfSimpleFormSmoke
                     && tb.GetField("chkEtValues", BindingFlags.NonPublic | BindingFlags.Instance) == null,
                     "보이는 열 " + shownColumns() + " / 아래 표 접힘 " + splitRight.Panel2Collapsed);
 
-                // ---- 7-3) 기본으로 전부: 모든 Chain 묶음 + Chain 밖 Defect 묶음 ----
+                // ---- 7-3) 기본(2026-10-28 [걸린 / Fail Chain 만] 켬): 걸린 / E-Test Fail Chain 묶음(둘 다 없는 Die 는 모든 Chain) + Chain 밖 Defect 묶음 ----
                 List<object> tags = grid.Rows.Cast<DataGridViewRow>().Select(r => r.Tag).Where(x => x != null).ToList();
                 int chainGroups = tags.Count(o => (bool)field(o, "First") && field(o, "ChainSeq") != null);
                 bool outsideGroup = tags.Any(o => field(o, "ChainSeq") == null);
                 int outside = dieDefects.Count(r => r["IN_CHAIN"].ToString() != "Y");
                 int chains = dieData.Tables["CHAIN"].Rows.Count;
-                Check("[GDS / KLARF] 표 = 모든 Chain 묶음(걸린 / Fail 거르기 없음) + Chain 밖 Defect 묶음(있으면)",
-                    (chains > 1000 || chainGroups == chains) && outsideGroup == (outside > 0),
-                    "Chain 묶음 " + chainGroups + " / Chain " + chains + " / Chain 밖 Defect " + outside + " / 밖 묶음 " + outsideGroup);
+                int hitChains = dieData.Tables["DIE_CHAIN"].Rows.Cast<DataRow>()
+                    .Where(r => DiePoint(r) == d && (Convert.ToInt32(r["DEFECT_COUNT"]) > 0 || (r.Table.Columns.Contains("ET_STATUS") && r["ET_STATUS"].ToString() == "F")))
+                    .Select(r => r["CHAIN_SEQ"].ToString()).Distinct().Count();
+                Check("[GDS / KLARF] 표 = 걸린 / Fail Chain 묶음(기본 [걸린 / Fail Chain 만] 켬, 둘 다 없으면 모든 Chain) + Chain 밖 Defect 묶음(있으면)",
+                    chainGroups == (hitChains > 0 ? hitChains : chains) && outsideGroup == (outside > 0),
+                    "Chain 묶음 " + chainGroups + " / 걸린 · Fail " + hitChains + " / Chain " + chains + " / Chain 밖 Defect " + outside + " / 밖 묶음 " + outsideGroup);
 
                 // ---- 7-4) 요청 3 / 4: Defect 채움(빨강 / 노랑), 흰 점선 없음, 크기 = 분석 Defect 영역(허용오차 0 = KLARF 크기) ----
                 var gmap = (NexplantQMS.GdsMap.GdsMapControl)Get(tb, b, "map");

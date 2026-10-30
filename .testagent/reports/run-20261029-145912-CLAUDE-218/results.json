@@ -1,0 +1,188 @@
+﻿[
+    {
+        "id":  "01",
+        "name":  "WorkRule_ServerBin",
+        "scenarios":  [
+                          "SCN-01",
+                          "SCN-03",
+                          "SCN-04"
+                      ],
+        "status":  "PASS",
+        "exitCode":  0,
+        "timedOut":  false,
+        "durationMs":  2171,
+        "started":  "2026-10-29 15:00:55",
+        "command":  "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\DMS\\02_DMS\\DACrux.SEMDMS.BSL\\Probes\\WorkRuleProbe.ps1\" -BslDir \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\DMS\\101_ServerBin\"",
+        "workingDir":  "D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\DMS\\02_DMS\\DACrux.SEMDMS.BSL\\Probes",
+        "keys":  {
+                     "WORK_RULE_PROBE":  "PASS (10)"
+                 },
+        "passLines":  0,
+        "failLines":  [
+
+                      ],
+        "skipLines":  [
+
+                      ],
+        "stdout":  "01_WorkRule_ServerBin.stdout.txt",
+        "stderr":  "01_WorkRule_ServerBin.stderr.txt"
+    },
+    {
+        "id":  "02",
+        "name":  "WorkRule_Expired",
+        "scenarios":  [
+                          "SCN-05"
+                      ],
+        "status":  "PASS",
+        "exitCode":  0,
+        "timedOut":  false,
+        "durationMs":  2814,
+        "started":  "2026-10-29 15:01:19",
+        "command":  "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\DMS\\02_DMS\\DACrux.SEMDMS.BSL\\Probes\\WorkRuleProbe.ps1\" -BslDir C:\\Users\\USER\\AppData\\Local\\Temp\\ChippacBuild\\CLAUDE-218-verify1029\\expired -ExpectClosed",
+        "workingDir":  "D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\DMS\\02_DMS\\DACrux.SEMDMS.BSL\\Probes",
+        "keys":  {
+                     "WORK_RULE_PROBE":  "PASS (11)"
+                 },
+        "passLines":  0,
+        "failLines":  [
+
+                      ],
+        "skipLines":  [
+
+                      ],
+        "stdout":  "02_WorkRule_Expired.stdout.txt",
+        "stderr":  "02_WorkRule_Expired.stderr.txt"
+    },
+    {
+        "id":  "03",
+        "name":  "WorkRule_RedCheck",
+        "scenarios":  [
+                          "SCN-05"
+                      ],
+        "status":  "FAIL",
+        "exitCode":  1,
+        "timedOut":  false,
+        "durationMs":  2346,
+        "started":  "2026-10-29 15:01:47",
+        "command":  "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\DMS\\02_DMS\\DACrux.SEMDMS.BSL\\Probes\\WorkRuleProbe.ps1\" -BslDir \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\DMS\\101_ServerBin\" -ExpectClosed",
+        "workingDir":  "D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\DMS\\02_DMS\\DACrux.SEMDMS.BSL\\Probes",
+        "keys":  {
+                     "WORK_RULE_PROBE":  "FAIL (4 / 11)"
+                 },
+        "passLines":  0,
+        "failLines":  [
+
+                      ],
+        "skipLines":  [
+
+                      ],
+        "stdout":  "03_WorkRule_RedCheck.stdout.txt",
+        "stderr":  "03_WorkRule_RedCheck.stderr.txt"
+    },
+    {
+        "id":  "04",
+        "name":  "WorkRule_DbFail",
+        "scenarios":  [
+                          "SCN-06"
+                      ],
+        "status":  "PASS",
+        "exitCode":  0,
+        "timedOut":  false,
+        "durationMs":  1160,
+        "started":  "2026-10-29 15:01:50",
+        "command":  "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\probes\\WorkRuleDbFailCheck.ps1\"",
+        "workingDir":  "D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\.testagent\\probes",
+        "keys":  {
+                     "WORK_RULE_DBFAIL_PROBE":  "PASS (1)"
+                 },
+        "passLines":  0,
+        "failLines":  [
+
+                      ],
+        "skipLines":  [
+
+                      ],
+        "stdout":  "04_WorkRule_DbFail.stdout.txt",
+        "stderr":  "04_WorkRule_DbFail.stderr.txt"
+    },
+    {
+        "id":  "05",
+        "name":  "WorkRule_RedCheck_Guarded",
+        "scenarios":  [
+                          "SCN-05"
+                      ],
+        "status":  "FAIL",
+        "exitCode":  1,
+        "timedOut":  false,
+        "durationMs":  2014,
+        "started":  "2026-10-29 15:04:03",
+        "command":  "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\DMS\\02_DMS\\DACrux.SEMDMS.BSL\\Probes\\WorkRuleProbe.ps1\" -BslDir \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\DMS\\101_ServerBin\" -ExpectClosed",
+        "workingDir":  "D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\DMS\\02_DMS\\DACrux.SEMDMS.BSL\\Probes",
+        "keys":  {
+                     "WORK_RULE_PROBE":  "FAIL (4 / 10)"
+                 },
+        "passLines":  0,
+        "failLines":  [
+
+                      ],
+        "skipLines":  [
+
+                      ],
+        "stdout":  "05_WorkRule_RedCheck_Guarded.stdout.txt",
+        "stderr":  "05_WorkRule_RedCheck_Guarded.stderr.txt"
+    },
+    {
+        "id":  "06",
+        "name":  "WorkRule_Expired_Guarded",
+        "scenarios":  [
+                          "SCN-05"
+                      ],
+        "status":  "PASS",
+        "exitCode":  0,
+        "timedOut":  false,
+        "durationMs":  1994,
+        "started":  "2026-10-29 15:04:05",
+        "command":  "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\DMS\\02_DMS\\DACrux.SEMDMS.BSL\\Probes\\WorkRuleProbe.ps1\" -BslDir C:\\Users\\USER\\AppData\\Local\\Temp\\ChippacBuild\\CLAUDE-218-verify1029\\expired -ExpectClosed",
+        "workingDir":  "D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\DMS\\02_DMS\\DACrux.SEMDMS.BSL\\Probes",
+        "keys":  {
+                     "WORK_RULE_PROBE":  "PASS (11)"
+                 },
+        "passLines":  0,
+        "failLines":  [
+
+                      ],
+        "skipLines":  [
+
+                      ],
+        "stdout":  "06_WorkRule_Expired_Guarded.stdout.txt",
+        "stderr":  "06_WorkRule_Expired_Guarded.stderr.txt"
+    },
+    {
+        "id":  "07",
+        "name":  "WorkRule_ServerBin_After",
+        "scenarios":  [
+                          "SCN-01",
+                          "SCN-03",
+                          "SCN-04"
+                      ],
+        "status":  "PASS",
+        "exitCode":  0,
+        "timedOut":  false,
+        "durationMs":  1903,
+        "started":  "2026-10-29 15:04:07",
+        "command":  "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\DMS\\02_DMS\\DACrux.SEMDMS.BSL\\Probes\\WorkRuleProbe.ps1\" -BslDir \"D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\DMS\\101_ServerBin\"",
+        "workingDir":  "D:\\1_프로젝트 문서\\18.스테츠칩팩_POC\\ChippacPOC\\DMS\\02_DMS\\DACrux.SEMDMS.BSL\\Probes",
+        "keys":  {
+                     "WORK_RULE_PROBE":  "PASS (10)"
+                 },
+        "passLines":  0,
+        "failLines":  [
+
+                      ],
+        "skipLines":  [
+
+                      ],
+        "stdout":  "07_WorkRule_ServerBin_After.stdout.txt",
+        "stderr":  "07_WorkRule_ServerBin_After.stderr.txt"
+    }
+]

@@ -54,13 +54,6 @@ namespace NexplantQMS.GdsMap
         private const int ChainDetailRangeSize = 5000;
 
         /// <summary>
-        /// 불러온 Chain 이 이보다 많으면 지도 표시(체크)를 끈 채로 불러온다. 목록에는 모두 넣고, 체크 박스로 체크한 Chain 만 외곽선을 그린다.
-        /// U8 같은 형태 Chain 27,342개를 모두 그리면 외곽선 정점이 약 3,200만 개(불러오기 약 15초 + 메모리 1.6GB 이상)였다 (2026-10-21 결정).
-        /// 표시 여부는 저장 지문에 들어가지 않아 꺼도 "변경 없음" 그대로다.
-        /// </summary>
-        private const int ChainLoadVisibleLimit = 1000;
-
-        /// <summary>
         /// DB Chain 목록과 Chain별 상세를 읽는다. 서비스 호출만 하므로 백그라운드 스레드에서 실행한다.
         /// progress: 화면 상태줄에 "n / 전체"를 보여 주기 위한 진행 보고(Chain이 많을 때 멈춘 것처럼 보이지 않게).
         /// 처리 흐름:
@@ -173,7 +166,7 @@ namespace NexplantQMS.GdsMap
         {
             map.RebuildChainTraceItems();
             int maxOrdinal = 0;
-            bool hideAll = data.Count > ChainLoadVisibleLimit;
+            // Chain 수와 상관없이 저장된 표시 상태로 불러온다(2026-10-28 요청 "다 보여줘라". 10-21 의 1,000개 초과면 지도 표시를 끄던 예외 삭제)
             _switchingChain = true;
             // Chain 이 수만 개면 하나씩 넣을 때마다 목록을 다시 계산해 수십 초가 걸렸다. 넣는 동안 목록 그리기를 멈춘다 (2026-10-21)
             _chainList.BeginUpdate();
@@ -182,7 +175,6 @@ namespace NexplantQMS.GdsMap
                 foreach (ChainDbData item in data)
                 {
                     ChainDefinition chain = CreateChainFromDb(item);
-                    if (hideAll) chain.Visible = false;
                     _chains.Add(chain);
                     _chainList.Items.Add(chain, chain.Visible);
                     maxOrdinal = Math.Max(maxOrdinal, ParseChainCode(chain.Code));

@@ -650,6 +650,8 @@ namespace NexplantQMS.GdsMap
             // chkHitOnly
             // 
             this.chkHitOnly.AutoSize = true;
+            this.chkHitOnly.Checked = true;
+            this.chkHitOnly.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkHitOnly.Location = new System.Drawing.Point(9, 9);
             this.chkHitOnly.Margin = new System.Windows.Forms.Padding(4);
             this.chkHitOnly.Name = "chkHitOnly";

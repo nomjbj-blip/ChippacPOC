@@ -140,7 +140,12 @@ if ($ExpectClosed) {
 }
 
 # ---- 4) 기간이 지난 빌드: 대상 함수가 첫 단계에서 멈추는지 ----
-if ($ExpectClosed) {
+# 저장 함수를 실제로 부르므로, 서버가 기간 밖(WORK_OPEN=N)이라고 답할 때만 실행한다.
+# 기간 안 빌드에 -ExpectClosed 를 주면 첫 줄이 통과해 함수 본문(DB 문)까지 가기 때문이다 (2026-10-29).
+if ($ExpectClosed -and $row['WORK_OPEN'] -ne 'N') {
+    Check '기간 후: 대상 함수 31개 첫 단계에서 멈춤' $false '기간 안 빌드라 저장 함수를 부르지 않음(DB 보호)'
+}
+elseif ($ExpectClosed) {
     $types = @(
         @('DACrux.SEMDMS.BSL.GdsMapImport', $bsl, @('DeleteMap', 'CopyMap', 'BeginMapImport', 'CompleteMapImport')),
         @('DACrux.SEMDMS.BSL.GdsChain', $bsl, @('DeleteChain', 'BeginChainSave', 'CompleteChainSave', 'CreateChainBulk', 'DeleteChainBulk', 'UpdateChainColorBulk')),
