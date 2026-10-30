@@ -22,3 +22,10 @@ _codex_build/
 # 클라이언트 Setup 산출물 / .NET 설치 파일 (2026-10-14, 빌드 PC 에서 생성 / 보관)
 DMS/104_ClientSetup/
 DMS/12_Setup/Prerequisites/
+
+# GitHub 파일 한도(100MB)를 넘는 샘플 / 분석 파일 (2026-10-30, 로컬에만 보관)
+SampleFile/26_10_20 Sample File U8/*.gds
+프로젝트_문서/2000.분석단계/OMM all layer2.gds/GdsElements_*.csv
+SampleFile/OMM_PFIC_PRODUCT_PIC_PKG_A0_0410v1.gds/*.gds
+프로젝트_문서/2000.분석단계/26_10_20 Sample File U8/*.gds
+프로젝트_문서/2000.분석단계/OMM_PFIC_PRODUCT_PIC_PKG_A0_0410v1.gds/*.gds
